@@ -1,0 +1,351 @@
+
+{% block content %}
+<div class="container-fluid mt--6">
+  <div class="row">
+    <div class="col">
+      <div class="card">
+        <div class="card-header border-0">
+          <div class="row align-items-center">
+            <div class="col">
+              <h3 class="mb-0">Diagnóstico de los trastornos del sueño</h3>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <form>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="form-control-label">Síntoma principal</label>
+                  <textarea class="form-control" rows="5" placeholder="Describe le sintoma principal"></textarea>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="form-control-label">Factores precipitantes</label>
+                  <div class="mt-3">
+                    <input type="text" id="additionalComments" class="form-control" placeholder="Factores precipitantes">
+                  </div>
+
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="divorce" id="divorce">
+                    <label class="form-check-label" for="divorce">Divorcio (Problema de pareja)</label>
+                  </div>
+                
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="death" id="death">
+                    <label class="form-check-label" for="death">Fallecimiento de una persona cercana</label>
+                  </div>
+                
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="unemployment" id="unemployment">
+                    <label class="form-check-label" for="unemployment">Desempleo (problemas económicos)</label>
+                  </div>
+                
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="family" id="family">
+                    <label class="form-check-label" for="family">Problemas familiares</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="form-control-label">Factores predisponentes</label>
+                  <div class="mb-3">
+                    <input type="text" id="predisposingComments" class="form-control" placeholder="Factores predisponentes">
+                  </div>
+                
+                  <!-- Opciones de checkbox -->
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="personality" id="personality">
+                    <label class="form-check-label" for="personality">Rasgos de personalidad</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="worry" id="worry">
+                    <label class="form-check-label" for="worry">Preocupación excesiva</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="hyperactive" id="hyperactive">
+                    <label class="form-check-label" for="hyperactive">Hiperactividad</label>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-2">
+                <div class="form-group">
+                  <label class="form-control-label">Duración</label>
+                  <input type="text" class="form-control" placeholder="Duración">
+                </div>
+              </div>
+              <div class="col-md-2">
+                <div class="form-group">
+                  <label class="form-control-label">Frecuencia</label>
+                  <input type="text" class="form-control" placeholder="Frecuencia">
+                </div>
+              </div>
+              <div class="col-md-2">
+                <div class="form-group">
+                  <label class="form-control-label">Severidad</label>
+                  <input type="text" class="form-control" placeholder="Severidad">
+                </div>
+              </div>
+            </div>
+
+            <hr class="my-4" />
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="form-control-label">Síntomas nocturnos asociados</label>
+                  
+                  <!-- Checkboxes con el mismo name -->
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="sintomas_nocturnos[]" value="leg_discomfort">
+                    <label class="form-check-label">Molestias en las piernas</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="sintomas_nocturnos[]" value="leg_movements">
+                    <label class="form-check-label">Necesidad de mover las piernas</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="sintomas_nocturnos[]" value="paralysis">
+                    <label class="form-check-label">Parálisis del sueño y alucinaciones</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="sintomas_nocturnos[]" value="sleep_disorder">
+                    <label class="form-check-label">Trastorno respiratorio del sueño</label>
+                  </div>
+                  
+                  <!-- Campo de texto adicional -->
+                  <input type="text" class="form-control mt-2" name="sintomas_nocturnos[]" placeholder="Otros síntomas nocturnos...">
+                </div>
+                 
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="form-control-label">Trastorno respiratorio del sueño</label>
+                  
+                  <!-- Checkboxes con el mismo name -->
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="trastorno_respiratorio[]" value="snoring">
+                    <label class="form-check-label">Ronquidos</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="trastorno_respiratorio[]" value="apnea">
+                    <label class="form-check-label">Apneas presenciadas</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="trastorno_respiratorio[]" value="stridor">
+                    <label class="form-check-label">Estridor y catatrenia</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="trastorno_respiratorio[]" value="morning_headache">
+                    <label class="form-check-label">Cefalea matutina</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="trastorno_respiratorio[]" value="mouth_breathing">
+                    <label class="form-check-label">Respiración oral</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="trastorno_respiratorio[]" value="nasal_congestion">
+                    <label class="form-check-label">Congestión nasal</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="trastorno_respiratorio[]" value="nocturia">
+                    <label class="form-check-label">Nicturia</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="trastorno_respiratorio[]" value="erectile_dysfunction">
+                    <label class="form-check-label">Disfunción eréctil</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="trastorno_respiratorio[]" value="nocturnal_dyspnea">
+                    <label class="form-check-label">Disnea nocturna</label>
+                  </div>
+                  <!-- Campo de texto adicional -->
+                  <input type="text" class="form-control mt-2" name="trastorno_respiratorio[]" placeholder="Otros síntomas respiratorios">
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="form-control-label">Comportamiento nocturno</label>
+                  
+                  <!-- Checkboxes con el mismo name -->
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="comportamiento_nocturno[]" value="sleepwalking">
+                    <label class="form-check-label">Sonambulismo</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="comportamiento_nocturno[]" value="sleep_talking">
+                    <label class="form-check-label">Somniloquios y gritos</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="comportamiento_nocturno[]" value="night_eating">
+                    <label class="form-check-label">Ingestión de comida</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="comportamiento_nocturno[]" value="leg_movements">
+                    <label class="form-check-label">Movimientos de las piernas</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="comportamiento_nocturno[]" value="vivid_dreams">
+                    <label class="form-check-label">Sueños vívidos o violencia</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="comportamiento_nocturno[]" value="bruxism">
+                    <label class="form-check-label">Bruxismo</label>
+                  </div>
+                  
+                  <!-- Campo de texto adicional para otros comportamientos nocturnos -->
+                  <input type="text" class="form-control mt-2" name="comportamiento_nocturno[]" placeholder="Otros comportamientos nocturnos...">
+                </div>
+                
+              </div>
+
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="form-control-label">Despertares nocturnos</label>
+                  <div class="row">
+                    <div class="col-md-4">
+                      <label class="form-control-label">Precipitantes</label>
+                      <input type="text" class="form-control" name="despertares_nocturnos[]" placeholder="Precipitantes">
+                    </div>
+                    <div class="col-md-4">
+                      <label class="form-control-label">Duración</label>
+                      <input type="text" class="form-control" name="despertares_nocturnos[]" placeholder="Duración">
+                    </div>
+                    <div class="col-md-4">
+                      <label class="form-control-label">Frecuencia</label>
+                      <input type="text" class="form-control" name="despertares_nocturnos[]" placeholder="Frecuencia">
+                    </div>
+                  </div>
+                
+                  <!-- Campo adicional para "Actividad nocturna" -->
+                  <div class="form-group">
+                    <label class="form-control-label">Actividad nocturna</label>
+                    <textarea class="form-control" rows="3" name="despertares_nocturnos[]" placeholder="Actividad nocturna"></textarea>
+                  </div>
+                  
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="form-control-label">Funcionamiento diurno</label>
+                  
+                  <!-- Checkboxes con el mismo name -->
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="funcionamiento_diurno[]" value="daytime_sleepiness">
+                    <label class="form-check-label">Somnolencia diurna</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="funcionamiento_diurno[]" value="mood_disturbance">
+                    <label class="form-check-label">Trastorno del humor</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="funcionamiento_diurno[]" value="decreased_productivity">
+                    <label class="form-check-label">Disminución de la productividad laboral</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="funcionamiento_diurno[]" value="relationship_issues">
+                    <label class="form-check-label">Alteración de las relaciones personales</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="funcionamiento_diurno[]" value="memory_concentration">
+                    <label class="form-check-label">Trastorno de la memoria o de la concentración</label>
+                  </div>
+                
+                  <!-- Campo de texto adicional -->
+                  <div class="form-group mt-2">
+                    <input type="text" name="funcionamiento_diurno[]" class="form-control" placeholder="Especificar otro síntoma">
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="form-control-label">Higiene del sueño</label>
+                  
+                  <!-- Hora de acostarse y levantarse -->
+                  <div class="form-group">
+                    <label class="form-control-label">Hora de acostarse</label>
+                    <input type="text" class="form-control" name="higiene_del_sueno[hora_acostarse]" placeholder="Hora de acostarse">
+                  </div>
+                
+                  <!-- Rutina antes de acostarse -->
+                  <div class="form-group">
+                    <label class="form-control-label">Rutina antes de acostarse</label>
+                    <input type="text" class="form-control" name="higiene_del_sueno[rutina_pre_acostarse]" placeholder="Rutina antes de acostarse">
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="form-control-label">Consumo de fármacos y sustancias</label>
+                  
+                  <!-- Medicaciones prescritas y complementos -->
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="medicamentos" value="medicamentos_prescritos" name="consumo_farmacos_sustancias[]">
+                    <label class="form-check-label" for="medicamentos">Medicaciones prescritas y complementos (incluyendo homeopatía y remedios)</label>
+                   
+                  </div>
+                  
+                  <!-- Cafeína y bebidas energéticas -->
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="cafeina" value="cafeina_bebidas_energeticas" name="consumo_farmacos_sustancias[]">
+                    <label class="form-check-label" for="cafeina">Cafeína y bebidas energéticas</label>
+                  
+                  </div>
+                
+                  <!-- Sustancias ilícitas y tóxicas -->
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="sustancias_ilicitas" value="sustancias_ilicitas" name="consumo_farmacos_sustancias[]">
+                    <label class="form-check-label" for="sustancias_ilicitas">Sustancias ilícitas y tóxicas</label>
+                    
+                  </div>
+                </div>
+                
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="form-control-label">Observaciones adicionales</label>
+                <textarea class="form-control" rows="5" name="observaciones_adicionales" placeholder="Additional Observations"></textarea>
+              </div>
+            </div>
+            </div>
+          
+            <div class="row">
+              <div class="col-12 text-right">
+                <button type="submit" class="btn btn-primary">Guardar Anamnesis</button>
+                <button type="button" class="btn btn-secondary" onclick="cerrarFormulario(this)">Cancelar</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+{% block javascripts %}
+<script>
+  // Form validation and submission logic would go here
+  document.querySelector('form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    // Add your form submission logic here
+  });
+
+  // Print functionality
+  document.getElementById('printForm').addEventListener('click', function() {
+    window.print();
+  });
+</script>
+{% endblock javascripts %}

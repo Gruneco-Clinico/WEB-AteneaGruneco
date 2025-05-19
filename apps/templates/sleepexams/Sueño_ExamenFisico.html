@@ -1,0 +1,443 @@
+{% extends 'layouts/base.html' %} {% block content %}
+<div class="header bg-primary pb-6">
+    <div class="container-fluid">
+        <div class="header-body">
+            <div class="row align-items-center py-4">
+                <div class="col-lg-6 col-5">
+                    <h6 class="h2 text-white d-inline-block mb-0">
+                        Información del Paciente
+                    </h6>
+                    <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
+                        <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
+                            <li class="breadcrumb-item">
+                                <a href="#"><i class="fas fa-home"></i></a>
+                            </li>
+                            <li class="breadcrumb-item">
+                                <a href="/pacientes/">Pacientes</a>
+                            </li>
+                            <li class="breadcrumb-item"><a href="/pacientes/">Volver</a></li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid mt--6">
+    <div class="row">
+        <div class="col">
+            <div class="card shadow">
+                <form method="post" action="{% url 'guardar_examen_sueno_fisico' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="visita_id" id="visita_id" value="{{ visita_examen }}" />
+                    <input type="hidden" name="paciente_id" id="paciente_id" value="{{ paciente_id }}" />
+                    <input type="hidden" name="examen_id" id="examen_id" value="{{ examen_id }}" />
+
+                    <!-- Card Header -->
+                    <div class="card-header border-0">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <h3 class="mb-0">Examen Físico de Sueño</h3>
+                            </div>
+                            <div class="col text-right">
+                                <span class="text-muted">Fecha: {% now "d/m/Y" %}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card Body -->
+                    <div class="card-body">
+                        <!-- Navegación por pestañas -->
+                        <ul class="nav nav-pills nav-fill mb-4" id="sleepExamTabs" role="tablist">
+                            <li class="nav-item">
+                                <a class="nav-link active" id="antropometricos-tab" data-toggle="tab"
+                                    href="#antropometricos" role="tab">Antropométricos</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="vias-aereas-tab" data-toggle="tab" href="#vias-aereas"
+                                    role="tab">Vías Aéreas</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="craneofacial-tab" data-toggle="tab" href="#craneofacial"
+                                    role="tab">Cráneo-Facial</a>
+                            </li>
+                        </ul>
+
+                        <div class="tab-content" id="sleepExamTabContent">
+                            <!-- Pestaña Antropométricos -->
+                            <div class="tab-pane fade show active" id="antropometricos" role="tabpanel">
+                                <div class="card bg-gradient-default shadow-sm mb-4">
+                                    <div class="card-header bg-transparent">
+                                        <h4 class="text-white mb-0">Medidas Antropométricas</h4>
+                                    </div>
+                                    <div class="card-body bg-white">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="peso">Peso (Kg):</label>
+                                                    <input type="number" class="form-control" id="peso" name="peso"
+                                                        step="0.1" required>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="talla">Talla (cm):</label>
+                                                    <input type="number" class="form-control" id="talla" name="talla"
+                                                        step="0.1" required>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="imc">Índice de Masa Corporal (IMC):</label>
+                                                    <input type="text" class="form-control" id="imc" name="imc"
+                                                        readonly>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="rango_imc">Rango IMC:</label>
+                                                    <input type="text" class="form-control" id="rango_imc"
+                                                        name="rango_imc" readonly>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="circunferencia_cuello">Circunferencia de cuello
+                                                        (cm):</label>
+                                                    <input type="number" class="form-control" id="circunferencia_cuello"
+                                                        name="circunferencia_cuello" step="0.1" required>
+                                                    <small class="form-text text-muted">Límite superior: Hombres: 42 cm
+                                                        | Mujeres: 38 cm</small>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="perimetro_abdominal">Perímetro abdominal (cm):</label>
+                                                    <input type="number" class="form-control" id="perimetro_abdominal"
+                                                        name="perimetro_abdominal" step="0.1" required>
+                                                    <small class="form-text text-muted">Límite superior: Hombres: 110 cm
+                                                        | Mujeres: 100 cm</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Pestaña Vías Aéreas -->
+                            <div class="tab-pane fade" id="vias-aereas" role="tabpanel">
+                                <div class="card bg-gradient-default shadow-sm mb-4">
+                                    <div class="card-header bg-transparent">
+                                        <h4 class="text-white mb-0">Evaluación de Vías Aéreas</h4>
+                                    </div>
+                                    <div class="card-body bg-white">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="simetria_narinas">Simetría de las narinas:</label>
+                                                    <select class="form-control" id="simetria_narinas"
+                                                        name="simetria_narinas">
+                                                        <option value="" selected disabled>Seleccione una opción
+                                                        </option>
+                                                        <option value="Si">Sí</option>
+                                                        <option value="No">No</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="tipo_narina">Tipo de narina:</label>
+                                                    <select class="form-control" id="tipo_narina" name="tipo_narina">
+                                                        <option value="" selected disabled>Seleccione un tipo</option>
+                                                        <option value="Tipo 1">Narinas anchas (Tipo 1)</option>
+                                                        <option value="Tipo 2">Narinas estrechas (Tipo 2)</option>
+                                                        <option value="Tipo 3">Columela corta y narinas estrechas (Tipo
+                                                            3)</option>
+                                                        <option value="Tipo 4">Columela corta pies crus alaris
+                                                            prominente (Tipo 4)</option>
+                                                    </select>
+                                                    <a href="#" data-toggle="modal" data-target="#narinaModal"
+                                                        class="small">Ver referencia</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="desviacion_septo">Presencia de desviación de
+                                                        septo:</label>
+                                                    <select class="form-control" id="desviacion_septo"
+                                                        name="desviacion_septo">
+                                                        <option value="" selected disabled>Seleccione una opción
+                                                        </option>
+                                                        <option value="Si">Sí</option>
+                                                        <option value="No">No</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="hipertrofia_cornetes">Hipertrofia de cornetes
+                                                        nasales:</label>
+                                                    <select class="form-control" id="hipertrofia_cornetes"
+                                                        name="hipertrofia_cornetes">
+                                                        <option value="" selected disabled>Seleccione una opción
+                                                        </option>
+                                                        <option value="Si">Sí</option>
+                                                        <option value="No">No</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="grado">Grado de obstrucción:</label>
+                                                    <select class="form-control" id="grado" name="grado">
+                                                        <option value="" selected disabled>Seleccione un grado</option>
+                                                        <option value="Normal">Normal</option>
+                                                        <option value="Moderado">Moderado</option>
+                                                        <option value="Severo">Severo</option>
+                                                        <option value="Obstruido">Obstruido</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="hipertrofia_uvula">Hipertrofia de úvula:</label>
+                                                    <select class="form-control" id="hipertrofia_uvula"
+                                                        name="hipertrofia_uvula">
+                                                        <option value="" selected disabled>Seleccione una opción
+                                                        </option>
+                                                        <option value="Si">Sí</option>
+                                                        <option value="No">No</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="mallampati">Clasificación de Mallampati:</label>
+                                                    <select class="form-control" id="mallampati" name="mallampati">
+                                                        <option value="Clase 1">Clase 1</option>
+                                                        <option value="Clase 2">Clase 2</option>
+                                                        <option value="Clase 3">Clase 3</option>
+                                                        <option value="Clase 4">Clase 4</option>
+                                                    </select>
+                                                    <a href="#" data-toggle="modal" data-target="#mallampatiModal"
+                                                        class="small">Ver referencia</a>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="amigdalas">Hipertrofía de amígdalas (Escala de
+                                                        Friedman):</label>
+                                                    <select class="form-control" id="amigdalas" name="amigdalas">
+                                                        <option value="Grado 0">Grado 0</option>
+                                                        <option value="Grado 1">Grado 1</option>
+                                                        <option value="Grado 2">Grado 2</option>
+                                                        <option value="Grado 3">Grado 3</option>
+                                                        <option value="Grado 4">Grado 4</option>
+                                                    </select>
+                                                    <a href="#" data-toggle="modal" data-target="#amigdalasModal"
+                                                        class="small">Ver referencia</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Pestaña Cráneo-Facial -->
+                            <div class="tab-pane fade" id="craneofacial" role="tabpanel">
+                                <div class="card bg-gradient-default shadow-sm mb-4">
+                                    <div class="card-header bg-transparent">
+                                        <h4 class="text-white mb-0">Evaluación Cráneo-Facial</h4>
+                                    </div>
+                                    <div class="card-body bg-white">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="biotipo">Biotipo:</label>
+                                                    <select class="form-control" id="biotipo" name="biotipo">
+                                                        <option value="" selected disabled>Seleccione un biotipo
+                                                        </option>
+                                                        <option value="Ectomorfo">Ectomorfo</option>
+                                                        <option value="Mesomorfo">Mesomorfo</option>
+                                                        <option value="Endomorfo">Endomorfo</option>
+                                                    </select>
+                                                    <a href="#" data-toggle="modal" data-target="#biotipoModal"
+                                                        class="small">Ver referencia</a>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="tipo_mordida">Tipo de mordida:</label>
+                                                    <select class="form-control" id="tipo_mordida" name="tipo_mordida">
+                                                        <option value="Clase 1">Clase 1</option>
+                                                        <option value="Clase 2">Clase 2</option>
+                                                        <option value="Clase 3">Clase 3</option>
+                                                        <option value="Abierta">Abierta</option>
+                                                        <option value="Asimetrica">Asimétrica</option>
+                                                    </select>
+                                                    <a href="#" data-toggle="modal" data-target="#mordidaModal"
+                                                        class="small">Ver referencia</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    <label for="alteracion_craneo">Alteración cráneo o cara:</label>
+                                                    <textarea class="form-control" id="alteracion_craneo"
+                                                        name="alteracion_craneo" rows="3"></textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Botones de acción -->
+                        <div class="row mt-4">
+                            <div class="col-12 text-right">
+                                <button type="submit" class="btn btn-primary">Guardar Examen</button>
+                                <a href="{% url 'detalle_paciente' paciente_id %}" class="btn btn-secondary">Ver
+                                    Paciente</a>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modales para las imágenes de referencia -->
+<div class="modal fade" id="narinaModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Tipos de Narina</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body text-center">
+                <img src="/static/assets/img/help_icons/tipodenarina.png" class="img-fluid" alt="Tipos de Narina">
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="mallampatiModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Clasificación de Mallampati</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body text-center">
+                <img src="/static/assets/img/help_icons/mallampati.png" class="img-fluid"
+                    alt="Clasificación de Mallampati">
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="amigdalasModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Escala de Friedman para Amígdalas</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body text-center">
+                <img src="/static/assets/img/help_icons/hipertrofiraamigdalas.jpg" class="img-fluid"
+                    alt="Escala de Friedman">
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="biotipoModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Tipos de Biotipo</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body text-center">
+                <img src="/static/assets/img/help_icons/biotipo.png" class="img-fluid" alt="Tipos de Biotipo">
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="mordidaModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Tipos de Mordida</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body text-center">
+                <img src="/static/assets/img/help_icons/modida.jpg" class="img-fluid" alt="Tipos de Mordida">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Script para agregar dinámicamente más diagnósticos -->
+{% block javascripts %}
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        function calcularIMC() {
+            let peso = parseFloat(document.getElementById("peso").value);
+            let talla = parseFloat(document.getElementById("talla").value) / 100; // Convertir cm a metros
+
+            if (!isNaN(peso) && !isNaN(talla) && talla > 0) {
+                let imc = peso / (talla * talla);
+                document.getElementById("imc").value = imc.toFixed(2);
+                determinarRangoIMC(imc);
+            } else {
+                document.getElementById("imc").value = "";
+                document.getElementById("rango_imc").value = "";
+            }
+        }
+
+        function determinarRangoIMC(imc) {
+            let rango = "";
+            if (imc < 18.5) {
+                rango = "Bajo peso";
+            } else if (imc < 24.9) {
+                rango = "Peso normal";
+            } else if (imc < 29.9) {
+                rango = "Sobrepeso";
+            } else {
+                rango = "Obesidad";
+            }
+            document.getElementById("rango_imc").value = rango;
+        }
+
+        document.getElementById("peso").addEventListener("input", calcularIMC);
+        document.getElementById("talla").addEventListener("input", calcularIMC);
+    });
+</script>
+{% endblock javascripts %}
+{% endblock content %}

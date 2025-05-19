@@ -1,0 +1,308 @@
+{% extends 'layouts/base_theme.html' %}
+
+{% block stylesheets %}
+<style>
+  .form-control-lg {
+    font-size: 0.1rem;
+  }
+
+  .input-group-text-lg {
+    font-size: 1.25rem;
+  }
+
+  .btn-lg {
+    font-size: 1.25rem;
+  }
+
+  .centered-image {
+    display: block;
+    margin: 0 auto;
+  }
+
+  .featurette-heading {
+    font-size: 2.5rem;
+    font-weight: 300;
+    line-height: 1.2;
+    letter-spacing: -0.05rem;
+  }
+
+  .lead {
+    font-size: 1.25rem;
+    font-weight: 300;
+  }
+
+  .rounded-circle {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .rounded-circle:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  }
+
+  .container {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    padding: 0.3rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  }
+
+  .mt--16 {
+    margin-top: -1rem;
+  }
+
+  .pt-7 {
+    padding-top: 5rem;
+  }
+
+  .pb-5 {
+    padding-bottom: 3rem;
+  }
+
+  .mt--15 {
+    margin-top: -1rem;
+  }
+
+  .pt-6 {
+    padding-top: 1rem;
+  }
+
+  .pb-4 {
+    padding-bottom: 1rem;
+  }
+
+  .text-center h2 {
+    margin-top: 1.1rem;
+    font-size: 1.5rem;
+    font-weight: 500;
+  }
+
+  .text-center p {
+    margin-top: 1.6rem;
+    font-size: 1.2rem;
+    color: #555;
+  }
+
+  .card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    background: white;
+    href="/static/assets/img/theme/Gruneco_Miembros.jpeg"
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+  }
+
+  .card-title {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #333;
+  }
+
+  .card-text {
+    href="/static/assets/img/theme/Gruneco_Miembros.jpeg"
+    font-size: 1.8rem;
+    color: #555;
+    line-height: 1.6;
+  }
+
+  .principles-list {
+    list-style-type: none;
+    padding-left: 0;
+  }
+
+  .principles-list li {
+    margin-top: 1.6rem;
+    font-size: 1.3rem;
+    color: #555;
+  }
+</style>
+
+{% endblock stylesheets %}
+
+{% block content %}
+<div class="header pt-6 pb-4 pt-lg-8"
+  style="min-height: 200px; background-image: url(/static/assets/img/theme/tem_university.jpg); background-size: cover; background-position: center top;">
+  <span class="mask bg-gradient-default opacity-8"></span>
+  <div class="header-body text-center mb-7">
+    <div class="row justify-content-center">
+      <div class="col-12">
+        <div id="carouselExampleDark" class="carousel slide" data-bs-ride="carousel">
+          <div class="carousel-indicators">
+            <button type="button" data-bs-target="#carouselExampleDark" data-bs-slide-to="0" class="active"
+              aria-current="true" aria-label="Slide 1"></button>
+            <button type="button" data-bs-target="#carouselExampleDark" data-bs-slide-to="1"
+              aria-label="Slide 2"></button>
+            <button type="button" data-bs-target="#carouselExampleDark" data-bs-slide-to="2"
+              aria-label="Slide 3"></button>
+            <button type="button" data-bs-target="#carouselExampleDark" data-bs-slide-to="3"
+              aria-label="Slide 4"></button>
+          </div>
+          <div class="carousel-inner">
+            <div class="carousel-item active" data-bs-interval="3000">
+              <a href="https://www.udea.edu.co/wps/portal/udea/web/inicio/investigacion/jovenes-investigadores-semilleros-investigacion/!ut/p/z1/jZDBDoIwEES_xS_otltQjrU0WG0oTahgL4YTIVH0YPx-CTEcjCJ72-TN7M6QQGoS-ubZtc2ju_XNZdhPIT7nLlKUSTCZNlsQBp23_IjWc1KNwCaRjAoOBg40AuFUkZdWFumekbBEDz9GwDL9DBDm7SsSRmRKYFM7JIhTtSspoqTsDUwnrEYFLsmjAjPN-Bo_Hb508O-L-9X7GjrditXqBf9s48I!/?1dmy&urile=wcm%3Apath%3A/PortalUdeA/asPortalUdeA/asHogmeUdeA/Investigaci!c3!b3n/semilleros+de+investigacion/Contenido/asContenidosMenu/ESI"
+                target="_blank">
+                <img src="/static/assets/img/brand/rotador-esi.png" class="d-block mx-auto" alt="banner esi+ji"
+                  style="max-height: 300px; background-color: white;">
+              </a>
+              <div class="carousel-caption d-none d-md-block">
+              </div>
+            </div>
+            <div class="carousel-item" data-bs-interval="3000">
+              <a href="https://udea.edu.co/wps/portal/udea/web/inicio/investigacion/grupos-investigacion/ciencias-medicas-salud/neuropsicologia-conducta"
+                target="_blank">
+                <img src="/static/assets/img/theme/GRUNECO_CPT_T.png" class="d-block mx-auto" alt="banner 1"
+                  style="max-height: 300px; background-color: white;">
+              </a>
+              <div class="carousel-caption d-none d-md-block">
+              </div>
+            </div>
+            <div class="carousel-item" data-bs-interval="3000">
+              <a href="https://enlace-generico.com/3" target="_blank">
+                <img src="/static/assets/img/brand/Publicidad_Hombre_Invisible.png" class="d-block mx-auto"
+                  alt="banner 2" style="max-height: 300px; background-color: white;">
+              </a>
+              <div class="carousel-caption d-none d-md-block">
+              </div>
+            </div>
+            <div class="carousel-item" data-bs-interval="3000">
+              <a href="https://enlace-generico.com/4" target="_blank">
+                <img src="/static/assets/img/brand/jovenes.JPG" class="d-block mx-auto" alt="banner 3"
+                  style="max-height: 300px; background-color: white;">
+              </a>
+              <div class="carousel-caption d-none d-md-block">
+              </div>
+            </div>
+          </div>
+          <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleDark"
+            data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Anterior</span>
+          </button>
+          <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleDark"
+            data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Siguiente</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container mt--16 pt-7 pb-5">
+  <div class="row justify-content-center">
+    <div class="row">
+      <div class="row justify-content-center">
+        <div class="row featurette">
+          <div class="col-md-7">
+            <h2 class="featurette-heading fw-normal lh-1">Grupo Neuropsicología y Conducta <span
+                class="text-body-secondary"></span></h2>
+            <p class="lead">Somos un grupo interdisciplinar de investigación, perteneciente a la Facultad de Medicina de
+              la Universidad de Antioquia, que a través de la estructuración y ejecución de proyectos de investigación
+              formamos talento humano en investigación en los niveles de pre y posgrado, al igual que contribuimos a la
+              generación de conocimiento enfocado en soluciones clínicas y tecnológicas en el área de las neurociencias
+              cognitivas.</p>
+          </div>
+          <div class="col-md-5">
+            <svg class="bd-placeholder-img bd-placeholder-img-lg featurette-image img-fluid mx-auto" width="500"
+              height="500" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: 500x500"
+              preserveAspectRatio="xMidYMid slice" focusable="false">
+              <image href="/static/assets/img/theme/Gruneco_Miembros.jpeg" width="100%" height="100%" />
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Tarjetas de Visión, Líneas de Investigación y Principios -->
+<div class="row pt-3">
+  <!-- Tarjeta de Visión -->
+  <div class="col-md-4 mb-4">
+    <div class="card h-100 text-center p-4 shadow-lg rounded">
+      <div class="card-body d-flex flex-column">
+        <div class="mb-3">
+          <i class="fas fa-eye fa-4x text-primary"></i>
+        </div>
+        <h3 class="card-title">Visión</h3>
+        <ul class="list-unstyled flex-grow-1 fs-5"> <!-- Texto más grande -->
+          En el 2030 GRUNECO será reconocido a nivel internacional por la calidad científica de las investigaciones
+          desarrolladas con una estructura administrativa sostenible que le permitirá brindar espacios continuos de
+          formación investigativa interdisciplinar de alto nivel en pregrado y posgrado.
+          </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tarjeta de Líneas de Investigación -->
+  <div class="col-md-4 mb-4">
+    <div class="card h-100 text-center p-4 shadow-lg rounded">
+      <div class="card-body d-flex flex-column">
+        <div class="mb-3">
+          <i class="fas fa-brain fa-4x text-primary"></i>
+        </div>
+        <h3 class="card-title">Líneas de Investigación</h3>
+        <ul class="list-unstyled flex-grow-1 fs-5"> <!-- Texto más grande -->
+          <li class="py-2"><i class="fas fa-check-circle text-primary"></i> Neurociencias Cognitivas</li>
+          <li class="py-2"><i class="fas fa-check-circle text-primary"></i> Neurociencias e Ingeniería</li>
+          <li class="py-2"><i class="fas fa-check-circle text-primary"></i> Neurociencias Clínica</li>
+          <li class="py-2"><i class="fas fa-check-circle text-primary"></i> Aprendizaje y Enseñanza de la Investigación
+          </li>
+          </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tarjeta de Principios -->
+  <div class="col-md-4 mb-4">
+    <div class="card h-100 text-center p-4 shadow-lg rounded">
+      <div class="card-body d-flex flex-column">
+        <div class="mb-3">
+          <i class="fas fa-handshake fa-4x text-primary"></i> <!-- Ícono más grande -->
+        </div>
+        <h3 class="card-title fs-3">Principios</h2> <!-- Título más grande -->
+          <ul class="list-unstyled flex-grow-1 fs-5"> <!-- Texto más grande -->
+            <li class="py-2"><i class="fas fa-check-circle text-primary"></i> Trabajo en equipo</li>
+            <li class="py-2"><i class="fas fa-check-circle text-primary"></i> Responsabilidad</li>
+            <li class="py-2"><i class="fas fa-check-circle text-primary"></i> Respeto</li>
+            <li class="py-2"><i class="fas fa-check-circle text-primary"></i> Disciplina</li>
+            <li class="py-2"><i class="fas fa-check-circle text-primary"></i> Pasión</li>
+          </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row pt-7">
+  <!-- Miembro 1 -->
+  <div class="col-lg-6 text-center">
+    <svg class="bd-placeholder-img rounded-circle centered-image" width="140" height="140" role="img"
+      aria-label="Placeholder" preserveAspectRatio="xMidYMid slice" focusable="false">
+      <title>Placeholder</title>
+      <rect width="100%" height="100%" fill="var(--bs-secondary-color)"></rect>
+      <image href="/static/assets/img/theme/Carlos_imagen.jpeg" width="100%" height="100%" />
+    </svg>
+    <h2 class="fw-normal mt-3">Carlos Andrés Tobón Quintero, MD, PhD</h2>
+    <p>Coordinador del Grupo</p>
+  </div>
+  <!-- Miembro 2 -->
+  <div class="col-lg-6 text-center">
+    <svg class="bd-placeholder-img rounded-circle centered-image" width="140" height="140" role="img"
+      aria-label="Placeholder" preserveAspectRatio="xMidYMid slice" focusable="false">
+      <title>Placeholder</title>
+      <rect width="100%" height="100%" fill="var(--bs-secondary-color)"></rect>
+      <image href="/static/assets/img/theme/Jonh_Imagen.png" width="100%" height="100%" />
+    </svg>
+    <h2 class="fw-normal mt-3">John Fredy Ochoa Ph.D.</h2>
+    <p>Coordinador académico del Grupo</p>
+  </div>
+</div>
+</div>
+</div>
+{% endblock content %}
+
+<!-- Agrega Font Awesome para los iconos -->
+<script src="https://kit.fontawesome.com/your-fontawesome-kit.js" crossorigin="anonymous"></script>

@@ -1,0 +1,616 @@
+{% extends 'layouts/base.html' %} {% block content %}
+<div class="header bg-primary pb-6">
+  <div class="container-fluid">
+    <div class="header-body">
+      <div class="row align-items-center py-4">
+        <div class="col-lg-6 col-5">
+          <h6 class="h2 text-white d-inline-block mb-0">
+            Información del Paciente
+          </h6>
+          <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
+            <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
+              <li class="breadcrumb-item">
+                <a href="#"><i class="fas fa-home"></i></a>
+              </li>
+              <li class="breadcrumb-item">
+                <a href="/pacientes/">Pacientes</a>
+              </li>
+              <li class="breadcrumb-item"><a href="/pacientes/">Volver</a></li>
+            </ol>
+          </nav>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Page content -->
+<div class="container-fluid mt--6">
+  <div class="row">
+    <div class="col">
+      <div class="card shadow">
+        <form method="post" action="{% url 'guardar_examen_neurologico' %}">
+          {% csrf_token %}
+          <input type="hidden" name="visita_examen" value="{{ visita_examen }}" />
+          <input type="hidden" name="paciente_id" value="{{ paciente_id }}" />
+          <input type="hidden" name="examen_id" id="examen_id" value="{{ examen_id }}" />
+
+          <!-- Card Header -->
+          <div class="card-header border-0">
+            <div class="row align-items-center">
+              <div class="col">
+                <h3 class="mb-0">Examen Neurológico</h3>
+              </div>
+              <div class="col text-right">
+                <span class="text-muted">Fecha: {% now "d/m/Y" %}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card Body -->
+          <div class="card-body">
+            <!-- Navigation Tabs -->
+            <ul class="nav nav-pills nav-fill mb-4" id="neuroTabs" role="tablist">
+              <li class="nav-item">
+                <a class="nav-link active" id="pares-tab" data-toggle="tab" href="#pares" role="tab">Pares Craneales</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" id="sensibilidad-tab" data-toggle="tab" href="#sensibilidad"
+                  role="tab">Sensibilidad</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" id="reflejos-tab" data-toggle="tab" href="#reflejos" role="tab">Reflejos</a>
+              </li>
+            </ul>
+
+            <div class="tab-content" id="neuroTabContent">
+              <!-- Pares Craneales -->
+              <div class="tab-pane fade show active" id="pares" role="tabpanel">
+                <!-- I Par (Olfatorio) -->
+                <div class="card bg-gradient-default shadow-sm mb-4">
+                  <div class="card-header bg-transparent">
+                    <h4 class="text-white mb-0">I Par (Olfatorio)</h4>
+                  </div>
+                  <div class="card-body bg-white">
+                    <div class="row">
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label class="form-control-label">Clavos</label>
+                          <div class="row">
+                            <div class="col-6">
+                              <div class="custom-control custom-switch">
+                                <input type="checkbox" class="custom-control-input" id="clavos_izquierdo"
+                                  name="clavos_izquierdo">
+                                <label class="custom-control-label" for="clavos_izquierdo">Izquierdo</label>
+                              </div>
+                            </div>
+                            <div class="col-6">
+                              <div class="custom-control custom-switch">
+                                <input type="checkbox" class="custom-control-input" id="clavos_derecho"
+                                  name="clavos_derecho">
+                                <label class="custom-control-label" for="clavos_derecho">Derecho</label>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label class="form-control-label">Pimienta</label>
+                          <div class="row">
+                            <div class="col-6">
+                              <div class="custom-control custom-switch">
+                                <input type="checkbox" class="custom-control-input" id="pimienta_izquierdo"
+                                  name="pimienta_izquierdo">
+                                <label class="custom-control-label" for="pimienta_izquierdo">Izquierdo</label>
+                              </div>
+                            </div>
+                            <div class="col-6">
+                              <div class="custom-control custom-switch">
+                                <input type="checkbox" class="custom-control-input" id="pimienta_derecho"
+                                  name="pimienta_derecho">
+                                <label class="custom-control-label" for="pimienta_derecho">Derecho</label>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label class="form-control-label">Café</label>
+                          <div class="row">
+                            <div class="col-6">
+                              <div class="custom-control custom-switch">
+                                <input type="checkbox" class="custom-control-input" id="cafe_izquierdo"
+                                  name="cafe_izquierdo">
+                                <label class="custom-control-label" for="cafe_izquierdo">Izquierdo</label>
+                              </div>
+                            </div>
+                            <div class="col-6">
+                              <div class="custom-control custom-switch">
+                                <input type="checkbox" class="custom-control-input" id="cafe_derecho"
+                                  name="cafe_derecho">
+                                <label class="custom-control-label" for="cafe_derecho">Derecho</label>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- II Par (Óptico) -->
+                <div class="card bg-gradient-default shadow-sm mb-4">
+                  <div class="card-header bg-transparent">
+                    <h4 class="text-white mb-0">II Par (Óptico)</h4>
+                  </div>
+                  <div class="card-body bg-white">
+                    <div class="row">
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label class="form-control-label">Agudeza Visual</label>
+                          <div class="custom-control custom-switch">
+                            <input type="checkbox" class="custom-control-input" id="agudeza_visual"
+                              name="agudeza_visual">
+                            <label class="custom-control-label" for="agudeza_visual">Alterada</label>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label class="form-control-label">Campimetría</label>
+                          <select class="form-control" name="campimetria">
+                            <option value="">Seleccione...</option>
+                            <option value="CV1">CV1</option>
+                            <option value="CV2">CV2</option>
+                            <option value="CV3">CV3</option>
+                            <option value="CV4">CV4</option>
+                            <option value="CV5">CV5</option>
+                            <option value="CV6">CV6</option>
+                            <option value="CV7">CV7</option>
+                            <option value="CV8">CV8</option>
+                            <option value="CV9">CV9</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label class="form-control-label">Fundoscopia</label>
+                          <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" id="fundoscopia_normal" name="fundoscopia" value="Normal"
+                              class="custom-control-input">
+                            <label class="custom-control-label" for="fundoscopia_normal">Normal</label>
+                          </div>
+                          <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" id="fundoscopia_anormal" name="fundoscopia" value="Anormal"
+                              class="custom-control-input">
+                            <label class="custom-control-label" for="fundoscopia_anormal">Anormal</label>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- III, IV y VI Par -->
+                <div class="card bg-gradient-default shadow-sm mb-4">
+                  <div class="card-header bg-transparent">
+                    <h4 class="text-white mb-0">III, IV y VI Par (Oculomotores)</h4>
+                  </div>
+                  <div class="card-body bg-white">
+                    <div class="row">
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label class="form-control-label">Diplopía</label>
+                          <div class="custom-control custom-switch">
+                            <input type="checkbox" class="custom-control-input" id="diplopia" name="diplopia">
+                            <label class="custom-control-label" for="diplopia">Presente</label>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label class="form-control-label">Ptosis palpebral</label>
+                          <div class="custom-control custom-switch">
+                            <input type="checkbox" class="custom-control-input" id="ptosis_palpebral"
+                              name="ptosis_palpebral">
+                            <label class="custom-control-label" for="ptosis_palpebral">Presente</label>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label class="form-control-label">Movimientos oculares</label>
+                          <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" id="mov_oculares_normal" name="mov_oculares" value="Normal"
+                              class="custom-control-input">
+                            <label class="custom-control-label" for="mov_oculares_normal">Normal</label>
+                          </div>
+                          <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" id="mov_oculares_anormal" name="mov_oculares" value="Anormal"
+                              class="custom-control-input">
+                            <label class="custom-control-label" for="mov_oculares_anormal">Anormal</label>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- V Par (Trigémino) -->
+                <div class="card bg-gradient-default shadow-sm mb-4">
+                  <div class="card-header bg-transparent">
+                    <h4 class="text-white mb-0">V Par (Trigémino)</h4>
+                  </div>
+                  <div class="card-body bg-white">
+                    <div class="row">
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label class="form-control-label">Tacto superficial</label>
+                          <div class="custom-control custom-switch">
+                            <input type="checkbox" class="custom-control-input" id="tacto_frente" name="tacto_frente">
+                            <label class="custom-control-label" for="tacto_frente">Frente/globo ocular</label>
+                          </div>
+                          <div class="custom-control custom-switch">
+                            <input type="checkbox" class="custom-control-input" id="tacto_parpado" name="tacto_parpado">
+                            <label class="custom-control-label" for="tacto_parpado">Párpado inferior/labio
+                              superior</label>
+                          </div>
+                          <div class="custom-control custom-switch">
+                            <input type="checkbox" class="custom-control-input" id="tacto_labio" name="tacto_labio">
+                            <label class="custom-control-label" for="tacto_labio">Labio inferior/mentón</label>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label class="form-control-label">Fuerza muscular</label>
+                          <div class="custom-control custom-switch">
+                            <input type="checkbox" class="custom-control-input" id="fuerza_maseteros"
+                              name="fuerza_maseteros">
+                            <label class="custom-control-label" for="fuerza_maseteros">Maseteros</label>
+                          </div>
+                          <div class="custom-control custom-switch">
+                            <input type="checkbox" class="custom-control-input" id="fuerza_temporales"
+                              name="fuerza_temporales">
+                            <label class="custom-control-label" for="fuerza_temporales">Temporales</label>
+                          </div>
+                          <div class="custom-control custom-switch">
+                            <input type="checkbox" class="custom-control-input" id="fuerza_pterigoideos"
+                              name="fuerza_pterigoideos">
+                            <label class="custom-control-label" for="fuerza_pterigoideos">Pterigoideos</label>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- VII Par (Facial) -->
+                <div class="card bg-gradient-default shadow-sm mb-4">
+                  <div class="card-header bg-transparent">
+                    <h4 class="text-white mb-0">VII Par (Facial)</h4>
+                  </div>
+                  <div class="card-body bg-white">
+                    <div class="row">
+                      <div class="col-md-6">
+                        <div class="form-group">
+                          <label class="form-control-label">Mímica facial</label>
+                          <div class="custom-control custom-switch">
+                            <input type="checkbox" class="custom-control-input" id="mimica_frente" name="mimica_frente">
+                            <label class="custom-control-label" for="mimica_frente">Frente</label>
+                          </div>
+                          <div class="custom-control custom-switch">
+                            <input type="checkbox" class="custom-control-input" id="mimica_parpados"
+                              name="mimica_parpados">
+                            <label class="custom-control-label" for="mimica_parpados">Párpados</label>
+                          </div>
+                          <div class="custom-control custom-switch">
+                            <input type="checkbox" class="custom-control-input" id="mimica_nasal" name="mimica_nasal">
+                            <label class="custom-control-label" for="mimica_nasal">Elevación nasal</label>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                        <div class="form-group">
+                          <label class="form-control-label">Gusto tercio anterior</label>
+                          <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" id="gusto_normal" name="gusto_tercio_anterior" value="Normal"
+                              class="custom-control-input">
+                            <label class="custom-control-label" for="gusto_normal">Normal</label>
+                          </div>
+                          <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" id="gusto_anormal" name="gusto_tercio_anterior" value="Anormal"
+                              class="custom-control-input">
+                            <label class="custom-control-label" for="gusto_anormal">Anormal</label>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- VIII Par (Auditivo) -->
+                <div class="card bg-gradient-default shadow-sm mb-4">
+                  <div class="card-header bg-transparent">
+                    <h4 class="text-white mb-0">VIII Par (Auditivo)</h4>
+                  </div>
+                  <div class="card-body bg-white">
+                    <div class="row">
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label class="form-control-label">Prueba de Weber</label>
+                          <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" id="weber_normal" name="weber" value="Normal"
+                              class="custom-control-input">
+                            <label class="custom-control-label" for="weber_normal">Normal</label>
+                          </div>
+                          <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" id="weber_anormal" name="weber" value="Anormal"
+                              class="custom-control-input">
+                            <label class="custom-control-label" for="weber_anormal">Anormal</label>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label class="form-control-label">Prueba de Rinne</label>
+                          <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" id="rinne_normal" name="rinne" value="Normal"
+                              class="custom-control-input">
+                            <label class="custom-control-label" for="rinne_normal">Normal</label>
+                          </div>
+                          <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" id="rinne_anormal" name="rinne" value="Anormal"
+                              class="custom-control-input">
+                            <label class="custom-control-label" for="rinne_anormal">Anormal</label>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label class="form-control-label">Nistagmus</label>
+                          <div class="custom-control custom-switch">
+                            <input type="checkbox" class="custom-control-input" id="nistagmus" name="nistagmus">
+                            <label class="custom-control-label" for="nistagmus">Presente</label>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- IX y X Par (Glosofaríngeo y Vago) -->
+                <div class="card bg-gradient-default shadow-sm mb-4">
+                  <div class="card-header bg-transparent">
+                    <h4 class="text-white mb-0">IX y X Par (Glosofaríngeo y Vago)</h4>
+                  </div>
+                  <div class="card-body bg-white">
+                    <div class="row">
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label class="form-control-label">Reflejo nauseoso</label>
+                          <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" id="nauseoso_normal" name="reflejo_nauseoso" value="Normal"
+                              class="custom-control-input">
+                            <label class="custom-control-label" for="nauseoso_normal">Normal</label>
+                          </div>
+                          <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" id="nauseoso_anormal" name="reflejo_nauseoso" value="Anormal"
+                              class="custom-control-input">
+                            <label class="custom-control-label" for="nauseoso_anormal">Anormal</label>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label class="form-control-label">Posición úvula</label>
+                          <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" id="uvula_normal" name="posicion_uvula" value="Normal"
+                              class="custom-control-input">
+                            <label class="custom-control-label" for="uvula_normal">Normal</label>
+                          </div>
+                          <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" id="uvula_anormal" name="posicion_uvula" value="Anormal"
+                              class="custom-control-input">
+                            <label class="custom-control-label" for="uvula_anormal">Anormal</label>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- XI Par (Espinal Accesorio) -->
+                <div class="card bg-gradient-default shadow-sm mb-4">
+                  <div class="card-header bg-transparent">
+                    <h4 class="text-white mb-0">XI Par (Espinal Accesorio)</h4>
+                  </div>
+                  <div class="card-body bg-white">
+                    <div class="row">
+                      <div class="col-md-6">
+                        <div class="form-group">
+                          <label class="form-control-label">Elevación hombros</label>
+                          <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" id="hombros_normal" name="elevacion_hombros" value="Normal"
+                              class="custom-control-input">
+                            <label class="custom-control-label" for="hombros_normal">Normal</label>
+                          </div>
+                          <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" id="hombros_anormal" name="elevacion_hombros" value="Anormal"
+                              class="custom-control-input">
+                            <label class="custom-control-label" for="hombros_anormal">Anormal</label>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- XII Par (Hipogloso) -->
+                <div class="card bg-gradient-default shadow-sm mb-4">
+                  <div class="card-header bg-transparent">
+                    <h4 class="text-white mb-0">XII Par (Hipogloso)</h4>
+                  </div>
+                  <div class="card-body bg-white">
+                    <div class="row">
+                      <div class="col-md-6">
+                        <div class="form-group">
+                          <label class="form-control-label">Movimientos lengua</label>
+                          <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" id="lengua_normal" name="movimientos_lengua" value="Normal"
+                              class="custom-control-input">
+                            <label class="custom-control-label" for="lengua_normal">Normal</label>
+                          </div>
+                          <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" id="lengua_anormal" name="movimientos_lengua" value="Anormal"
+                              class="custom-control-input">
+                            <label class="custom-control-label" for="lengua_anormal">Anormal</label>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Sensibilidad -->
+              <div class="tab-pane fade" id="sensibilidad" role="tabpanel">
+                <div class="card bg-gradient-default shadow-sm mb-4">
+                  <div class="card-header bg-transparent">
+                    <h4 class="text-white mb-0">Sensibilidad</h4>
+                  </div>
+                  <div class="card-body bg-white">
+                    <div class="row">
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label class="form-control-label">Dolor al pinchazo</label>
+                          <div class="custom-control custom-switch">
+                            <input type="checkbox" class="custom-control-input" id="dolor_cuello" name="dolor_cuello">
+                            <label class="custom-control-label" for="dolor_cuello">Cuello</label>
+                          </div>
+                          <div class="custom-control custom-switch">
+                            <input type="checkbox" class="custom-control-input" id="dolor_torax" name="dolor_torax">
+                            <label class="custom-control-label" for="dolor_torax">Tórax</label>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label class="form-control-label">Táctil superficial</label>
+                          <div class="custom-control custom-switch">
+                            <input type="checkbox" class="custom-control-input" id="tactil_cuello" name="tactil_cuello">
+                            <label class="custom-control-label" for="tactil_cuello">Cuello</label>
+                          </div>
+                          <div class="custom-control custom-switch">
+                            <input type="checkbox" class="custom-control-input" id="tactil_torax" name="tactil_torax">
+                            <label class="custom-control-label" for="tactil_torax">Tórax</label>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label class="form-control-label">Térmica</label>
+                          <div class="custom-control custom-switch">
+                            <input type="checkbox" class="custom-control-input" id="termica_cuello"
+                              name="termica_cuello">
+                            <label class="custom-control-label" for="termica_cuello">Cuello</label>
+                          </div>
+                          <div class="custom-control custom-switch">
+                            <input type="checkbox" class="custom-control-input" id="termica_torax" name="termica_torax">
+                            <label class="custom-control-label" for="termica_torax">Tórax</label>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Reflejos -->
+              <div class="tab-pane fade" id="reflejos" role="tabpanel">
+                <div class="card bg-gradient-default shadow-sm mb-4">
+                  <div class="card-header bg-transparent">
+                    <h4 class="text-white mb-0">Reflejos</h4>
+                  </div>
+                  <div class="card-body bg-white">
+                    <div class="row">
+                      <div class="col-md-6">
+                        <div class="form-group">
+                          <label class="form-control-label">Maseteriano</label>
+                          <div class="row">
+                            <div class="col-md-6">
+                              <label class="form-control-label">Izquierdo</label>
+                              <select class="form-control" name="maseteriano_izquierdo">
+                                <option value="0">0. Sin respuesta</option>
+                                <option value="1">1. Disminuido</option>
+                                <option value="2" selected>2. Normal</option>
+                                <option value="3">3. Aumentado</option>
+                                <option value="4">4. Clonus agotable</option>
+                                <option value="5">5. Clonus permanente</option>
+                              </select>
+                            </div>
+                            <div class="col-md-6">
+                              <label class="form-control-label">Derecho</label>
+                              <select class="form-control" name="maseteriano_derecho">
+                                <option value="0">0. Sin respuesta</option>
+                                <option value="1">1. Disminuido</option>
+                                <option value="2" selected>2. Normal</option>
+                                <option value="3">3. Aumentado</option>
+                                <option value="4">4. Clonus agotable</option>
+                                <option value="5">5. Clonus permanente</option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                        <div class="form-group">
+                          <label class="form-control-label">Tricipital</label>
+                          <div class="row">
+                            <div class="col-md-6">
+                              <label class="form-control-label">Izquierdo</label>
+                              <select class="form-control" name="tricipital_izquierdo">
+                                <option value="0">0. Sin respuesta</option>
+                                <option value="1">1. Disminuido</option>
+                                <option value="2" selected>2. Normal</option>
+                                <option value="3">3. Aumentado</option>
+                                <option value="4">4. Clonus agotable</option>
+                                <option value="5">5. Clonus permanente</option>
+                              </select>
+                            </div>
+                            <div class="col-md-6">
+                              <label class="form-control-label">Derecho</label>
+                              <select class="form-control" name="tricipital_derecho">
+                                <option value="0">0. Sin respuesta</option>
+                                <option value="1">1. Disminuido</option>
+                                <option value="2" selected>2. Normal</option>
+                                <option value="3">3. Aumentado</option>
+                                <option value="4">4. Clonus agotable</option>
+                                <option value="5">5. Clonus permanente</option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Botones de acción -->
+            <div class="row mt-4">
+              <div class="col-12 text-right">
+                <button type="submit" class="btn btn-primary">Guardar Examen</button>
+                <a href="{% url 'detalle_paciente' paciente_id %}" class="btn btn-secondary">Ver Paciente</a>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock content %}

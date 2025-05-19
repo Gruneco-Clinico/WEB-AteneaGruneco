@@ -1,0 +1,1645 @@
+{% extends 'layouts/base.html' %}
+
+{% block content %}
+
+<style>
+    .custom-control-label {
+        margin-left: 2rem;
+        /* Ajusta este valor según sea necesario */
+    }
+
+    .custom-control.custom-switch {
+        display: flex;
+        align-items: center;
+    }
+</style>
+
+<div class="header bg-primary pb-6">
+    <div class="container-fluid">
+        <div class="header-body">
+            <div class="row align-items-center py-4">
+                <div class="col-lg-6 col-5">
+                    <h6 class="h2 text-white d-inline-block mb-0">Información del Paciente</h6>
+                    <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
+                        <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
+                            <li class="breadcrumb-item"><a href="#"><i class="fas fa-home"></i></a></li>
+                            <li class="breadcrumb-item"><a href="/pacientes/">Pacientes</a></li>
+                            <li class="breadcrumb-item"><a href="/pacientes/">Volver</a></li>
+                        </ol>
+                    </nav>
+                </div>
+                <div class="col-lg-6 col-7 text-right">
+                    <span class="badge badge-info" id="id-paciente">Paciente ID: {{ paciente_id }}</span>
+                    <span class="badge badge-warning" id="id-visita">Visita ID: {{ visita_examen }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Page content -->
+<div class="container-fluid mt--6">
+    <div class="row">
+        <div class="col">
+            <div class="card shadow">
+                <form method="post" action="{% url 'guardar_examen_cognitivo_anamnesis' %}">
+
+                    <!-- Card header -->
+                    <div class="card-header border-0">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <h3 class="mb-0">Examen cognitivo anamnesis</h3>
+                            </div>
+                            <div class="col text-right">
+                                <span class="text-muted">Fecha: {% now "d/m/Y" %}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Card body -->
+                    <div class="card-body">
+
+                        {% csrf_token %}
+                        <input type="hidden" name="visita_id" id="visita_id" value="{{ visita_examen }}" />
+                        <input type="hidden" name="paciente_id" id="paciente_id" value="{{ paciente_id }}" />
+                        <input type="hidden" name="examen_id" id="examen_id" value="{{ examen_id }}" />
+
+                        <!-- Navegación de secciones -->
+                        <ul class="nav nav-pills nav-fill mb-4" id="examTabs" role="tablist">
+                            <li class="nav-item">
+                                <a class="nav-link active" id="anamnesis-tab" data-toggle="tab" href="#anamnesis"
+                                    role="tab">Anamnesis</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="evaluacion_cognitiva-tab" data-toggle="tab"
+                                    href="#evaluacion_cognitiva" role="tab">Apariencia/Actitud</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="alerta-tab" data-toggle="tab" href="#alerta"
+                                    role="tab">Alerta</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="memoria-tab" data-toggle="tab" href="#memoria"
+                                    role="tab">Memoria/Lenguaje</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="pensamiento-tab" data-toggle="tab" href="#pensamiento"
+                                    role="tab">Pensamiento</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="funcion_ejecutiva-tab" data-toggle="tab"
+                                    href="#funcion_ejecutiva" role="tab">Función ejecutiva</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="funcionalidad-tab" data-toggle="tab" href="#funcionalidad"
+                                    role="tab">Funcionalidad</a>
+                            </li>
+
+
+
+                        </ul>
+                        <div class="tab-content" id="examTabContent">
+                            <!-- Anamnesis -->
+                            <div class="tab-pane fade show active" id="anamnesis" role="tabpanel">
+                                <div class="card bg-gradient-default shadow-sm mb-4">
+                                    <div class="card-header bg-transparent">
+                                        <h4 class="text-white mb-0">Anamnesis</h4>
+                                    </div>
+                                    <div class="card-body bg-white">
+                                        <div class="row">
+                                            <!-- Campo para Motivo de Consulta -->
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label class="form-control-label">Motivo de Consulta <span
+                                                            class="text-danger">*</span></label>
+                                                    <textarea class="form-control" name="motivo_consulta"
+                                                        id="motivo_consulta" required></textarea>
+                                                    <small class="form-text text-muted">Describa el motivo principal de
+                                                        la
+                                                        consulta.</small>
+                                                </div>
+                                            </div>
+                                            <!-- Campo para Descripción General -->
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label class="form-control-label">Descripción General <span
+                                                            class="text-danger">*</span></label>
+                                                    <textarea class="form-control" name="descripcion_general"
+                                                        id="descripcion_general" required></textarea>
+                                                    <small class="form-text text-muted">Resumen general del estado del
+                                                        paciente.</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Evaluación Cognitiva -->
+                            <div class="tab-pane fade" id="evaluacion_cognitiva" role="tabpanel">
+                                <div class="card bg-gradient-default shadow-sm mb-4">
+                                    <div class="card-header bg-transparent">
+                                        <h4 class="text-white mb-0">Evaluación Cognitiva</h4>
+                                    </div>
+                                    <div class="card-body bg-white">
+                                        <div class="row">
+                                            <!-- Apariencia - Descripción -->
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label class="form-control-label">Descripción de la
+                                                        Apariencia</label>
+                                                    <textarea class="form-control" name="apariencia_descripcion"
+                                                        id="apariencia_descripcion"></textarea>
+                                                    <small class="form-text text-muted">Definición de la presentación
+                                                        personal.</small>
+                                                </div>
+                                            </div>
+                                            <!-- Apariencia - Selección -->
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label class="form-control-label">Estado de la Apariencia</label>
+                                                    <select class="form-control" name="apariencia_estado"
+                                                        id="apariencia_estado">
+                                                        <option value="Adecuada">Adecuada</option>
+                                                        <option value="Inadecuada">Inadecuada</option>
+                                                    </select>
+                                                    <small class="form-text text-muted">Seleccione el estado de la
+                                                        apariencia.</small>
+                                                </div>
+                                            </div>
+                                            <!-- Actitud - Descripción -->
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label class="form-control-label">Descripción de la Actitud</label>
+                                                    <textarea class="form-control" name="actitud_descripcion"
+                                                        id="actitud_descripcion"></textarea>
+                                                    <small class="form-text text-muted">Descripción general de la
+                                                        actitud.</small>
+                                                </div>
+                                            </div>
+                                            <!-- Actitud - Selección -->
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label class="form-control-label">Seleccione Actitudes
+                                                        Presentes</label>
+                                                    <div class="d-flex flex-wrap">
+                                                        <div class="form-check mr-3">
+                                                            <input class="form-check-input" type="checkbox"
+                                                                name="actitud_seleccion" value="Colaborador"
+                                                                id="colaborador">
+                                                            <label class="form-check-label"
+                                                                for="colaborador">Colaborador</label>
+                                                        </div>
+                                                        <div class="form-check mr-3">
+                                                            <input class="form-check-input" type="checkbox"
+                                                                name="actitud_seleccion" value="Desinteresado"
+                                                                id="desinteresado">
+                                                            <label class="form-check-label"
+                                                                for="desinteresado">Desinteresado</label>
+                                                        </div>
+                                                        <div class="form-check mr-3">
+                                                            <input class="form-check-input" type="checkbox"
+                                                                name="actitud_seleccion" value="Hostil" id="hostil">
+                                                            <label class="form-check-label" for="hostil">Hostil</label>
+                                                        </div>
+                                                        <div class="form-check mr-3">
+                                                            <input class="form-check-input" type="checkbox"
+                                                                name="actitud_seleccion" value="Intrusivo"
+                                                                id="intrusivo">
+                                                            <label class="form-check-label"
+                                                                for="intrusivo">Intrusivo</label>
+                                                        </div>
+                                                        <div class="form-check mr-3">
+                                                            <input class="form-check-input" type="checkbox"
+                                                                name="actitud_seleccion" value="Evasivo" id="evasivo">
+                                                            <label class="form-check-label"
+                                                                for="evasivo">Evasivo</label>
+                                                        </div>
+                                                        <div class="form-check mr-3">
+                                                            <input class="form-check-input" type="checkbox"
+                                                                name="actitud_seleccion" value="Seductor" id="seductor">
+                                                            <label class="form-check-label"
+                                                                for="seductor">Seductor</label>
+                                                        </div>
+                                                        <div class="form-check mr-3">
+                                                            <input class="form-check-input" type="checkbox"
+                                                                name="actitud_seleccion" value="Suspicaz" id="suspicaz">
+                                                            <label class="form-check-label" for="suspicaz">Suspicaz
+                                                                (cuestiona y sospecha de todo)</label>
+                                                        </div>
+                                                        <div class="form-check mr-3">
+                                                            <input class="form-check-input" type="checkbox"
+                                                                name="actitud_seleccion" value="Hiperfamiliar"
+                                                                id="hiperfamiliar">
+                                                            <label class="form-check-label"
+                                                                for="hiperfamiliar">Hiperfamiliar</label>
+                                                        </div>
+                                                        <div class="form-check mr-3">
+                                                            <input class="form-check-input" type="checkbox"
+                                                                name="actitud_seleccion" value="Complaciente"
+                                                                id="complaciente">
+                                                            <label class="form-check-label"
+                                                                for="complaciente">Complaciente</label>
+                                                        </div>
+                                                        <div class="form-check mr-3">
+                                                            <input class="form-check-input" type="checkbox"
+                                                                name="actitud_seleccion" value="Pueril" id="pueril">
+                                                            <label class="form-check-label" for="pueril">Pueril</label>
+                                                        </div>
+                                                        <div class="form-check mr-3">
+                                                            <input class="form-check-input" type="checkbox"
+                                                                name="actitud_seleccion" value="Amable" id="amable">
+                                                            <label class="form-check-label" for="amable">Amable</label>
+                                                        </div>
+                                                        <div class="form-check mr-3">
+                                                            <input class="form-check-input" type="checkbox"
+                                                                name="actitud_seleccion" value="Agresivo" id="agresivo">
+                                                            <label class="form-check-label"
+                                                                for="agresivo">Agresivo</label>
+                                                        </div>
+                                                        <div class="form-check mr-3">
+                                                            <input class="form-check-input" type="checkbox"
+                                                                name="actitud_seleccion" value="Negativista"
+                                                                id="negativista">
+                                                            <label class="form-check-label"
+                                                                for="negativista">Negativista</label>
+                                                        </div>
+                                                    </div>
+                                                    <small class="form-text text-muted">Seleccione si presenta alguna de
+                                                        las
+                                                        siguientes actitudes.</small>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- alerta -->
+                            <div class="tab-pane fade" id="alerta" role="tabpanel">
+                                <div class="card bg-gradient-default shadow-sm mb-4">
+                                    <div class="card-header bg-transparent">
+                                        <h4 class="text-white mb-0">Estado de alerta / orientacion</h4>
+                                    </div>
+                                    <div class="card-body bg-white">
+                                        <div class="row">
+                                            <!-- Estado de Alerta - Descripción -->
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label class="form-control-label">Descripción del Estado de
+                                                        Alerta</label>
+                                                    <textarea class="form-control" name="estado_alerta_descripcion"
+                                                        id="estado_alerta_descripcion"></textarea>
+                                                    <small class="form-text text-muted">Descripción del estado de alerta
+                                                        del paciente.</small>
+                                                </div>
+                                            </div>
+                                            <!-- Estado de Alerta - Selección -->
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label class="form-control-label">Seleccione si presenta alguna de
+                                                        las siguientes</label>
+                                                    <select class="form-control" name="estado_alerta_seleccion"
+                                                        id="estado_alerta_seleccion">
+                                                        <option value="">Seleccione...</option>
+                                                        <option value="Alerta">Alerta</option>
+                                                        <option value="Somnolencia">Somnolencia</option>
+                                                        <option value="Obnubilación">Obnubilación</option>
+                                                        <option value="Estupor">Estupor</option>
+                                                        <option value="Coma">Coma</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <!-- Orientación - Descripción -->
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label class="form-control-label">Descripción de la
+                                                        Orientación</label>
+                                                    <textarea class="form-control" name="orientacion_descripcion"
+                                                        id="orientacion_descripcion"></textarea>
+                                                    <small class="form-text text-muted">Descripción de la orientación
+                                                        del paciente.</small>
+                                                </div>
+                                            </div>
+                                            <!-- Orientación - Selección -->
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label class="form-control-label">Seleccione si presenta alguna de
+                                                        las siguientes</label>
+                                                    <select class="form-control" name="orientacion_seleccion"
+                                                        id="orientacion_seleccion">
+                                                        <option value="">Seleccione...</option>
+                                                        <option value="Desorientación temporal">Desorientación temporal
+                                                        </option>
+                                                        <option value="Desorientación espacial">Desorientación espacial
+                                                        </option>
+                                                        <option value="Desorientación en persona">Desorientación en
+                                                            persona</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card bg-gradient-default shadow-sm mb-4">
+                                    <div class="card-header bg-transparent">
+                                        <h4 class="text-white mb-0">Atención</h4>
+                                    </div>
+                                    <div class="card-body bg-white">
+                                        <div class="row">
+
+                                            <!-- Atención - Descripción -->
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label class="form-control-label">Descripción de la Atención</label>
+                                                    <textarea class="form-control" name="atencion_descripcion"
+                                                        id="atencion_descripcion"></textarea>
+                                                    <small class="form-text text-muted">Descripción de la atención del
+                                                        paciente.</small>
+                                                </div>
+                                            </div>
+                                            <!-- Atención - Selección (checkboxes con campos asociados) -->
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    <label class="form-control-label">Seleccione si presenta alguna de
+                                                        las siguientes</label>
+
+                                                    <!-- Opción 1: Quejas atencionales -->
+                                                    <div class="mb-3">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input atencion-checkbox"
+                                                                type="checkbox" name="atencion_seleccion[]"
+                                                                value="Quejas atencionales" id="atencion_quejas"
+                                                                data-target="quejas-campos">
+                                                            <label class="form-check-label" for="atencion_quejas">Quejas
+                                                                atencionales</label>
+                                                        </div>
+                                                        <div id="quejas-campos" class="row mt-2 ml-4 campos-adicionales"
+                                                            style="display: none;">
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label class="form-control-label">Edad de inicio
+                                                                        (Quejas atencionales)</label>
+                                                                    <input type="text" class="form-control"
+                                                                        name="quejas_edad_inicio">
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label class="form-control-label">Características
+                                                                        (Quejas atencionales)</label>
+                                                                    <textarea class="form-control"
+                                                                        name="quejas_caracteristicas"></textarea>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Opción 2: Alteración atención sostenida -->
+                                                    <div class="mb-3">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input atencion-checkbox"
+                                                                type="checkbox" name="atencion_seleccion[]"
+                                                                value="Alteración atención sostenida"
+                                                                id="atencion_sostenida" data-target="sostenida-campos">
+                                                            <label class="form-check-label"
+                                                                for="atencion_sostenida">Alteración atención
+                                                                sostenida</label>
+                                                        </div>
+                                                        <div id="sostenida-campos"
+                                                            class="row mt-2 ml-4 campos-adicionales"
+                                                            style="display: none;">
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label class="form-control-label">Edad de inicio
+                                                                        (Atención sostenida)</label>
+                                                                    <input type="text" class="form-control"
+                                                                        name="sostenida_edad_inicio">
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label class="form-control-label">Características
+                                                                        (Atención sostenida)</label>
+                                                                    <textarea class="form-control"
+                                                                        name="sostenida_caracteristicas"></textarea>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Opción 3: Alteración atención dividida -->
+                                                    <div class="mb-3">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input atencion-checkbox"
+                                                                type="checkbox" name="atencion_seleccion[]"
+                                                                value="Alteración atención dividida"
+                                                                id="atencion_dividida" data-target="dividida-campos">
+                                                            <label class="form-check-label"
+                                                                for="atencion_dividida">Alteración atención
+                                                                dividida</label>
+                                                        </div>
+                                                        <div id="dividida-campos"
+                                                            class="row mt-2 ml-4 campos-adicionales"
+                                                            style="display: none;">
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label class="form-control-label">Edad de inicio
+                                                                        (Atención dividida)</label>
+                                                                    <input type="text" class="form-control"
+                                                                        name="dividida_edad_inicio">
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label class="form-control-label">Características
+                                                                        (Atención dividida)</label>
+                                                                    <textarea class="form-control"
+                                                                        name="dividida_caracteristicas"></textarea>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Opción 4: Incapacidad para quedarse quieto -->
+                                                    <div class="mb-3">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input atencion-checkbox"
+                                                                type="checkbox" name="atencion_seleccion[]"
+                                                                value="Incapacidad para quedarse quieto"
+                                                                id="atencion_quieto" data-target="quieto-campos">
+                                                            <label class="form-check-label"
+                                                                for="atencion_quieto">Incapacidad para quedarse
+                                                                quieto</label>
+                                                        </div>
+                                                        <div id="quieto-campos" class="row mt-2 ml-4 campos-adicionales"
+                                                            style="display: none;">
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label class="form-control-label">Edad de inicio
+                                                                        (Incapacidad quieto)</label>
+                                                                    <input type="text" class="form-control"
+                                                                        name="quieto_edad_inicio">
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label class="form-control-label">Características
+                                                                        (Incapacidad quieto)</label>
+                                                                    <textarea class="form-control"
+                                                                        name="quieto_caracteristicas"></textarea>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Opción 5: Dificultad para finalizar una tarea -->
+                                                    <div class="mb-3">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input atencion-checkbox"
+                                                                type="checkbox" name="atencion_seleccion[]"
+                                                                value="Dificultad para finalizar una tarea"
+                                                                id="atencion_tarea" data-target="tarea-campos">
+                                                            <label class="form-check-label"
+                                                                for="atencion_tarea">Dificultad para finalizar una
+                                                                tarea</label>
+                                                        </div>
+                                                        <div id="tarea-campos" class="row mt-2 ml-4 campos-adicionales"
+                                                            style="display: none;">
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label class="form-control-label">Edad de inicio
+                                                                        (Dificultad tareas)</label>
+                                                                    <input type="text" class="form-control"
+                                                                        name="tarea_edad_inicio">
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label class="form-control-label">Características
+                                                                        (Dificultad tareas)</label>
+                                                                    <textarea class="form-control"
+                                                                        name="tarea_caracteristicas"></textarea>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Opción 6: Dificultad para seguir instrucciones -->
+                                                    <div class="mb-3">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input atencion-checkbox"
+                                                                type="checkbox" name="atencion_seleccion[]"
+                                                                value="Dificultad para seguir instrucciones"
+                                                                id="atencion_instrucciones"
+                                                                data-target="instrucciones-campos">
+                                                            <label class="form-check-label"
+                                                                for="atencion_instrucciones">Dificultad para seguir
+                                                                instrucciones</label>
+                                                        </div>
+                                                        <div id="instrucciones-campos"
+                                                            class="row mt-2 ml-4 campos-adicionales"
+                                                            style="display: none;">
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label class="form-control-label">Edad de inicio
+                                                                        (Dificultad instrucciones)</label>
+                                                                    <input type="text" class="form-control"
+                                                                        name="instrucciones_edad_inicio">
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label class="form-control-label">Características
+                                                                        (Dificultad instrucciones)</label>
+                                                                    <textarea class="form-control"
+                                                                        name="instrucciones_caracteristicas"></textarea>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Opción 7: Distracción con estímulos irrelevantes -->
+                                                    <div class="mb-3">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input atencion-checkbox"
+                                                                type="checkbox" name="atencion_seleccion[]"
+                                                                value="Distracción con estímulos irrelevantes"
+                                                                id="atencion_distraccion"
+                                                                data-target="distraccion-campos">
+                                                            <label class="form-check-label"
+                                                                for="atencion_distraccion">Distracción con estímulos
+                                                                irrelevantes</label>
+                                                        </div>
+                                                        <div id="distraccion-campos"
+                                                            class="row mt-2 ml-4 campos-adicionales"
+                                                            style="display: none;">
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label class="form-control-label">Edad de inicio
+                                                                        (Distracción)</label>
+                                                                    <input type="text" class="form-control"
+                                                                        name="distraccion_edad_inicio">
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label class="form-control-label">Características
+                                                                        (Distracción)</label>
+                                                                    <textarea class="form-control"
+                                                                        name="distraccion_caracteristicas"></textarea>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <!-- memoria -->
+                            <div class="tab-pane fade" id="memoria" role="tabpanel">
+
+                                <div class="card bg-gradient-default shadow-sm mb-4">
+                                    <div class="card-header bg-transparent">
+                                        <h4 class="text-white mb-0">Memoria</h4>
+                                    </div>
+                                    <div class="card-body bg-white">
+                                        <div class="row">
+                                            <!-- Memoria - Descripción -->
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label class="form-control-label">Descripción de la Memoria</label>
+                                                    <textarea class="form-control" name="memoria_descripcion"
+                                                        id="memoria_descripcion"></textarea>
+                                                    <small class="form-text text-muted">Descripción de la memoria del
+                                                        paciente.</small>
+                                                </div>
+                                            </div>
+                                            <!-- Memoria - Signo Dr Lopera (Memoria de toda la vida) -->
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label class="form-control-label">¿De 1 a 10 cuánto calificaría su
+                                                        memoria de toda la vida?</label>
+                                                    <input type="number" min="1" max="10" class="form-control"
+                                                        name="memoria_lopera_vida" id="memoria_lopera_vida">
+                                                </div>
+                                            </div>
+                                            <!-- Memoria - Signo Dr Lopera (Memoria actual) -->
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label class="form-control-label">¿De 1 a 10 cuánto calificaría su
+                                                        memoria actual?</label>
+                                                    <input type="number" min="1" max="10" class="form-control"
+                                                        name="memoria_lopera_actual" id="memoria_lopera_actual">
+                                                </div>
+                                            </div>
+                                            <!-- Memoria - Quejas de memoria -->
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    <label class="form-control-label">¿Presenta quejas de
+                                                        memoria?</label>
+                                                    <div class="form-check form-check-inline">
+                                                        <input class="form-check-input memoria-queja-radio" type="radio"
+                                                            name="memoria_quejas" id="memoria_quejas_si" value="Si">
+                                                        <label class="form-check-label"
+                                                            for="memoria_quejas_si">Sí</label>
+                                                    </div>
+                                                    <div class="form-check form-check-inline">
+                                                        <input class="form-check-input memoria-queja-radio" type="radio"
+                                                            name="memoria_quejas" id="memoria_quejas_no" value="No"
+                                                            checked>
+                                                        <label class="form-check-label"
+                                                            for="memoria_quejas_no">No</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Contenedor para campos condicionales (inicialmente oculto) -->
+                                            <div id="memoria-campos-adicionales" style="display: none;">
+                                                <div class="row">
+                                                    <!-- Memoria - Edad de inicio -->
+                                                    <div class="col-md-3">
+                                                        <div class="form-group">
+                                                            <label class="form-control-label">Edad de inicio de
+                                                                problemas de memoria</label>
+                                                            <input type="number" class="form-control"
+                                                                name="memoria_edad_inicio" id="memoria_edad_inicio">
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Memoria - Progresivas -->
+                                                    <div class="col-md-3">
+                                                        <div class="form-group">
+                                                            <label class="form-control-label">¿Son progresivas?</label>
+                                                            <div class="form-check">
+                                                                <input class="form-check-input" type="radio"
+                                                                    name="memoria_progresivas"
+                                                                    id="memoria_progresivas_si" value="Si">
+                                                                <label class="form-check-label"
+                                                                    for="memoria_progresivas_si">Sí</label>
+                                                            </div>
+                                                            <div class="form-check">
+                                                                <input class="form-check-input" type="radio"
+                                                                    name="memoria_progresivas"
+                                                                    id="memoria_progresivas_no" value="No">
+                                                                <label class="form-check-label"
+                                                                    for="memoria_progresivas_no">No</label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Memoria - Cambio con respecto al estado previo -->
+                                                    <div class="col-md-3">
+                                                        <div class="form-group">
+                                                            <label class="form-control-label">¿Representan un cambio con
+                                                                respecto al estado previo?</label>
+                                                            <div class="form-check">
+                                                                <input class="form-check-input" type="radio"
+                                                                    name="memoria_cambio_previo"
+                                                                    id="memoria_cambio_previo_si" value="Si">
+                                                                <label class="form-check-label"
+                                                                    for="memoria_cambio_previo_si">Sí</label>
+                                                            </div>
+                                                            <div class="form-check">
+                                                                <input class="form-check-input" type="radio"
+                                                                    name="memoria_cambio_previo"
+                                                                    id="memoria_cambio_previo_no" value="No">
+                                                                <label class="form-check-label"
+                                                                    for="memoria_cambio_previo_no">No</label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Memoria - Compromete actividades instrumentales básicas -->
+                                                    <div class="col-md-2">
+                                                        <div class="form-group">
+                                                            <label class="form-control-label">¿Compromete actividades
+                                                                instrumentales básicas?</label>
+                                                            <div class="form-check">
+                                                                <input class="form-check-input" type="radio"
+                                                                    name="memoria_compromete_basicas"
+                                                                    id="memoria_compromete_basicas_si" value="Si">
+                                                                <label class="form-check-label"
+                                                                    for="memoria_compromete_basicas_si">Sí</label>
+                                                            </div>
+                                                            <div class="form-check">
+                                                                <input class="form-check-input" type="radio"
+                                                                    name="memoria_compromete_basicas"
+                                                                    id="memoria_compromete_basicas_no" value="No">
+                                                                <label class="form-check-label"
+                                                                    for="memoria_compromete_basicas_no">No</label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Memoria - Compromete actividades instrumentales complejas -->
+                                                    <div class="col-md-2">
+                                                        <div class="form-group">
+                                                            <label class="form-control-label">¿Compromete actividades
+                                                                instrumentales complejas?</label>
+                                                            <div class="form-check">
+                                                                <input class="form-check-input" type="radio"
+                                                                    name="memoria_compromete_complejas"
+                                                                    id="memoria_compromete_complejas_si" value="Si">
+                                                                <label class="form-check-label"
+                                                                    for="memoria_compromete_complejas_si">Sí</label>
+                                                            </div>
+                                                            <div class="form-check">
+                                                                <input class="form-check-input" type="radio"
+                                                                    name="memoria_compromete_complejas"
+                                                                    id="memoria_compromete_complejas_no" value="No">
+                                                                <label class="form-check-label"
+                                                                    for="memoria_compromete_complejas_no">No</label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Memoria - Compromete actividades de la vida cotidiana -->
+                                                    <div class="col-md-2">
+                                                        <div class="form-group">
+                                                            <label class="form-control-label">¿Compromete actividades de
+                                                                la vida cotidiana?</label>
+                                                            <div class="form-check">
+                                                                <input class="form-check-input" type="radio"
+                                                                    name="memoria_compromete_cotidiana"
+                                                                    id="memoria_compromete_cotidiana_si" value="Si">
+                                                                <label class="form-check-label"
+                                                                    for="memoria_compromete_cotidiana_si">Sí</label>
+                                                            </div>
+                                                            <div class="form-check">
+                                                                <input class="form-check-input" type="radio"
+                                                                    name="memoria_compromete_cotidiana"
+                                                                    id="memoria_compromete_cotidiana_no" value="No">
+                                                                <label class="form-check-label"
+                                                                    for="memoria_compromete_cotidiana_no">No</label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card bg-gradient-default shadow-sm mb-4">
+                                    <div class="card-header bg-transparent">
+                                        <h4 class="text-white mb-0">Lenguaje</h4>
+                                    </div>
+                                    <div class="card-body bg-white">
+                                        <div class="row">
+                                            <!-- Lenguaje - Descripción -->
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label class="form-control-label">Descripción del Lenguaje</label>
+                                                    <textarea class="form-control" name="lenguaje_descripcion"
+                                                        id="lenguaje_descripcion"></textarea>
+                                                    <small class="form-text text-muted">Descripción del lenguaje del
+                                                        paciente.</small>
+                                                </div>
+                                            </div>
+                                            <!-- Lenguaje - Cantidad -->
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label class="form-control-label">Cantidad</label>
+                                                    <select class="form-control" name="lenguaje_cantidad"
+                                                        id="lenguaje_cantidad">
+                                                        <option value="">Seleccione...</option>
+                                                        <option value="Normal">Normal</option>
+                                                        <option value="Logorrea">Logorrea</option>
+                                                        <option value="Locuacidad">Locuacidad</option>
+                                                        <option value="Laconismo">Laconismo</option>
+                                                        <option value="Concretismo">Concretismo</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <!-- Lenguaje - Fluidez -->
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label class="form-control-label">¿El lenguaje es fluido?</label>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="radio"
+                                                            name="lenguaje_fluido" id="lenguaje_fluido_si" value="Si">
+                                                        <label class="form-check-label"
+                                                            for="lenguaje_fluido_si">Sí</label>
+                                                    </div>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="radio"
+                                                            name="lenguaje_fluido" id="lenguaje_fluido_no" value="No">
+                                                        <label class="form-check-label"
+                                                            for="lenguaje_fluido_no">No</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- Lenguaje - Tono -->
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label class="form-control-label">Tono</label>
+                                                    <select class="form-control" name="lenguaje_tono"
+                                                        id="lenguaje_tono">
+                                                        <option value="">Seleccione...</option>
+                                                        <option value="Normal">Normal</option>
+                                                        <option value="Altisonante">Altisonante</option>
+                                                        <option value="Musitación">Musitación</option>
+                                                        <option value="Aprosodia">Aprosodia</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <!-- Lenguaje - Articulación -->
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label class="form-control-label">Articulación</label>
+                                                    <select class="form-control" name="lenguaje_articulacion"
+                                                        id="lenguaje_articulacion">
+                                                        <option value="">Seleccione...</option>
+                                                        <option value="Normal">Normal</option>
+                                                        <option value="Anormal">Anormal</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <!-- Lenguaje - Comprensión -->
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label class="form-control-label">Comprensión</label>
+                                                    <select class="form-control" name="lenguaje_comprension"
+                                                        id="lenguaje_comprension">
+                                                        <option value="">Seleccione...</option>
+                                                        <option value="Normal">Normal</option>
+                                                        <option value="Anormal">Anormal</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <!-- Lenguaje - Escritura -->
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label class="form-control-label">Escritura</label>
+                                                    <select class="form-control" name="lenguaje_escritura"
+                                                        id="lenguaje_escritura">
+                                                        <option value="">Seleccione...</option>
+                                                        <option value="Normal">Normal</option>
+                                                        <option value="Anormal">Anormal</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <!-- Lenguaje - Lectura -->
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label class="form-control-label">Lectura</label>
+                                                    <select class="form-control" name="lenguaje_lectura"
+                                                        id="lenguaje_lectura">
+                                                        <option value="">Seleccione...</option>
+                                                        <option value="Normal">Normal</option>
+                                                        <option value="Anormal">Anormal</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <!-- Lenguaje - Repetición -->
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label class="form-control-label">Repetición</label>
+                                                    <select class="form-control" name="lenguaje_repeticion"
+                                                        id="lenguaje_repeticion">
+                                                        <option value="">Seleccione...</option>
+                                                        <option value="Normal">Normal</option>
+                                                        <option value="Anormal">Anormal</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <!-- Lenguaje - Selección de errores -->
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    <label class="form-control-label">Seleccione si presenta alguna de
+                                                        las siguientes</label>
+                                                    <div class="d-flex flex-wrap">
+                                                        <!-- Checkbox para Errores sintácticos -->
+                                                        <div class="form-check mr-3 mb-2">
+                                                            <input class="form-check-input" type="checkbox"
+                                                                name="lenguaje_errores[]" value="Errores sintácticos"
+                                                                id="lenguaje_errores_sintacticos">
+                                                            <label class="form-check-label"
+                                                                for="lenguaje_errores_sintacticos">Errores
+                                                                sintácticos</label>
+                                                        </div>
+
+                                                        <!-- Checkbox para Errores fonéticos -->
+                                                        <div class="form-check mr-3 mb-2">
+                                                            <input class="form-check-input" type="checkbox"
+                                                                name="lenguaje_errores[]" value="Errores fonéticos"
+                                                                id="lenguaje_errores_foneticos">
+                                                            <label class="form-check-label"
+                                                                for="lenguaje_errores_foneticos">Errores
+                                                                fonéticos</label>
+                                                        </div>
+
+                                                        <!-- Checkbox para Errores semánticos -->
+                                                        <div class="form-check mr-3 mb-2">
+                                                            <input class="form-check-input" type="checkbox"
+                                                                name="lenguaje_errores[]" value="Errores semánticos"
+                                                                id="lenguaje_errores_semanticos">
+                                                            <label class="form-check-label"
+                                                                for="lenguaje_errores_semanticos">Errores
+                                                                semánticos</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- pensamiento -->
+                            <div class="tab-pane fade" id="pensamiento" role="tabpanel">
+                                <div class="card bg-gradient-default shadow-sm mb-4">
+                                    <div class="card-header bg-transparent">
+                                        <h4 class="text-white mb-0">Pensamiento</h4>
+                                    </div>
+                                    <div class="card-body bg-white">
+                                        <div class="row">
+                                            <!-- Pensamiento - Descripción -->
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label class="form-control-label">Descripción del
+                                                        Pensamiento</label>
+                                                    <textarea class="form-control" name="pensamiento_descripcion"
+                                                        id="pensamiento_descripcion"></textarea>
+                                                    <small class="form-text text-muted">Descripción del pensamiento del
+                                                        paciente.</small>
+                                                </div>
+                                            </div>
+
+                                            <!-- Pensamiento - Alteraciones de forma -->
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label class="form-control-label">Alteraciones de la forma de
+                                                        pensamiento</label>
+                                                    <select class="form-control" name="pensamiento_forma"
+                                                        id="pensamiento_forma">
+                                                        <option value="">Seleccione...</option>
+                                                        <option value="Velocidad">Velocidad</option>
+                                                        <option value="Coherencia">Coherencia</option>
+                                                        <option value="Lógica">Lógica</option>
+                                                        <option value="Organización">Organización</option>
+                                                        <option value="Fuga de ideas">Fuga de ideas</option>
+                                                        <option value="Ensalada de palabras">Ensalada de palabras
+                                                        </option>
+                                                        <option value="Perseverancia">Perseverancia</option>
+                                                        <option value="Circunstancialidad">Circunstancialidad</option>
+                                                        <option value="Tangencialidad">Tangencialidad</option>
+                                                        <option value="Soliloquio">Soliloquio</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <!-- Pensamiento - Alteraciones de contenido -->
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label class="form-control-label">Alteraciones del contenido de
+                                                        pensamiento</label>
+                                                    <select class="form-control" name="pensamiento_contenido"
+                                                        id="pensamiento_contenido">
+                                                        <option value="">Seleccione...</option>
+                                                        <option value="Ideas delirantes">Ideas delirantes</option>
+                                                        <option value="Ideas sobrevaloradas">Ideas sobrevaloradas
+                                                        </option>
+                                                        <option value="Ideas obsesivas">Ideas obsesivas</option>
+                                                        <option value="Ideas fantasiosas">Ideas fantasiosas</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <!-- Pensamiento - Juicio y raciocinio -->
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label class="form-control-label">Juicio y raciocinio</label>
+                                                    <select class="form-control" name="pensamiento_juicio"
+                                                        id="pensamiento_juicio">
+                                                        <option value="">Seleccione...</option>
+                                                        <option value="En construcción">En construcción</option>
+                                                        <option value="Conservado">Conservado</option>
+                                                        <option value="Distorsionado">Distorsionado</option>
+                                                        <option value="Debilitado">Debilitado</option>
+                                                        <option value="Nulo">Nulo</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <!-- Pensamiento - Introspección -->
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label class="form-control-label">Introspección</label>
+                                                    <select class="form-control" name="pensamiento_introspeccion"
+                                                        id="pensamiento_introspeccion">
+                                                        <option value="">Seleccione...</option>
+                                                        <option value="Adecuada">Adecuada</option>
+                                                        <option value="Aceptable">Aceptable</option>
+                                                        <option value="Pobre">Pobre</option>
+                                                        <option value="Precaria">Precaria</option>
+                                                        <option value="Nula">Nula</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <!-- Pensamiento - Prospección -->
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label class="form-control-label">Prospección</label>
+                                                    <select class="form-control" name="pensamiento_prospeccion"
+                                                        id="pensamiento_prospeccion">
+                                                        <option value="">Seleccione...</option>
+                                                        <option value="Conservada">Conservada</option>
+                                                        <option value="Grandiosidad">Grandiosidad</option>
+                                                        <option value="Delirante">Delirante</option>
+                                                        <option value="Desesperanzadora">Desesperanzadora</option>
+                                                        <option value="Nula">Nula</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Sensopercepción -->
+                                <div class="card bg-gradient-default shadow-sm mb-4">
+                                    <div class="card-header bg-transparent">
+                                        <h4 class="text-white mb-0">Sensopercepción</h4>
+                                    </div>
+                                    <div class="card-body bg-white">
+                                        <div class="row">
+                                            <!-- Sensopercepción - Descripción -->
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label class="form-control-label">Descripción de
+                                                        Sensopercepción</label>
+                                                    <textarea class="form-control" name="sensopercepcion_descripcion"
+                                                        id="sensopercepcion_descripcion"></textarea>
+                                                    <small class="form-text text-muted">Descripción de la
+                                                        sensopercepción del paciente.</small>
+                                                </div>
+                                            </div>
+
+                                            <!-- Sensopercepción - Alteraciones -->
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label class="form-control-label">Alteraciones de
+                                                        Sensopercepción</label>
+                                                    <select class="form-control" name="sensopercepcion_alteraciones"
+                                                        id="sensopercepcion_alteraciones">
+                                                        <option value="">Seleccione...</option>
+                                                        <option value="Alucinaciones">Alucinaciones</option>
+                                                        <option value="Pseudoalucinaciones">Pseudoalucinaciones</option>
+                                                        <option value="Alucinosis">Alucinosis</option>
+                                                        <option value="Ilusiones">Ilusiones</option>
+                                                        <option value="Anomalías en integración">Anomalías en
+                                                            integración</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Función Ejecutiva / Comportamiento -->
+                            <div class="tab-pane fade" id="funcion_ejecutiva" role="tabpanel">
+                                <!-- Función Ejecutiva / Comportamiento -->
+                                <div class="card bg-gradient-default shadow-sm mb-4">
+                                    <div class="card-header bg-transparent">
+                                        <h4 class="text-white mb-0">Función Ejecutiva / Comportamiento</h4>
+                                    </div>
+                                    <div class="card-body bg-white">
+                                        <div class="row">
+                                            <!-- Descripción -->
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label class="form-control-label">Descripción</label>
+                                                    <textarea class="form-control" name="funcion_ejecutiva_descripcion"
+                                                        id="funcion_ejecutiva_descripcion"></textarea>
+                                                </div>
+                                            </div>
+
+                                            <!-- Comportamientos -->
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label class="form-control-label">Comportamientos presentes</label>
+                                                    <select class="form-control"
+                                                        name="funcion_ejecutiva_comportamientos"
+                                                        id="funcion_ejecutiva_comportamientos">
+                                                        <option value="">Seleccione...</option>
+                                                        <option value="Irritabilidad">Irritabilidad</option>
+                                                        <option value="Agresividad">Agresividad</option>
+                                                        <option value="Apatía">Apatía</option>
+                                                        <option value="Abulia">Abulia</option>
+                                                        <option value="Desinhibición">Desinhibición</option>
+                                                        <option value="Impulsividad">Impulsividad</option>
+                                                        <option value="Hipersexualidad">Hipersexualidad</option>
+                                                        <option value="Ludopatía">Ludopatía</option>
+                                                        <option value="Rigidez o inflexibilidad en las decisiones">
+                                                            Rigidez o inflexibilidad en las decisiones</option>
+                                                        <option value="Comportamientos ritualistas o compulsivos">
+                                                            Comportamientos ritualistas o compulsivos</option>
+                                                        <option value="Comportamientos perseverativos o estereotipados">
+                                                            Comportamientos perseverativos o estereotipados</option>
+                                                        <option value="Conductas de eco">Conductas de eco</option>
+                                                        <option value="Hiperoralidad">Hiperoralidad</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <!-- Campos condicionales para comportamientos -->
+                                            <div id="comportamiento-campos" class="col-md-12" style="display: none;">
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label class="form-control-label">Edad de inicio
+                                                                (Comportamiento)</label>
+                                                            <input type="text" class="form-control"
+                                                                name="comportamiento_edad_inicio">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label class="form-control-label">Características
+                                                                (Comportamiento)</label>
+                                                            <textarea class="form-control"
+                                                                name="comportamiento_caracteristicas"></textarea>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Síntomas ejecutivos -->
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label class="form-control-label">Síntomas ejecutivos</label>
+                                                    <select class="form-control" name="funcion_ejecutiva_sintomas"
+                                                        id="funcion_ejecutiva_sintomas">
+                                                        <option value="">Seleccione...</option>
+                                                        <option value="Dificultad para planificar u organizar">
+                                                            Dificultad para planificar u organizar</option>
+                                                        <option value="Dificultad para resolver problemas">Dificultad
+                                                            para resolver problemas</option>
+                                                        <option value="Alteraciones en memoria de trabajo">Alteraciones
+                                                            en memoria de trabajo</option>
+                                                        <option value="Alteraciones en empatía o simpatía">Alteraciones
+                                                            en empatía o simpatía</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <!-- Campos condicionales para síntomas ejecutivos -->
+                                            <div id="sintomas-campos" class="col-md-12" style="display: none;">
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label class="form-control-label">Edad de inicio
+                                                                (Síntomas)</label>
+                                                            <input type="text" class="form-control"
+                                                                name="sintomas_edad_inicio">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label class="form-control-label">Características
+                                                                (Síntomas)</label>
+                                                            <textarea class="form-control"
+                                                                name="sintomas_caracteristicas"></textarea>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Estado de Ánimo / Afecto -->
+                                <div class="card bg-gradient-default shadow-sm mb-4">
+                                    <div class="card-header bg-transparent">
+                                        <h4 class="text-white mb-0">Estado de Ánimo / Afecto</h4>
+                                    </div>
+                                    <div class="card-body bg-white">
+                                        <div class="row">
+                                            <!-- Descripción -->
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label class="form-control-label">Descripción</label>
+                                                    <textarea class="form-control" name="estado_animo_descripcion"
+                                                        id="estado_animo_descripcion"></textarea>
+                                                </div>
+                                            </div>
+
+                                            <!-- Cualidades afectivas -->
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label class="form-control-label">Cualidades afectivas</label>
+                                                    <select class="form-control" name="estado_animo_cualidades"
+                                                        id="estado_animo_cualidades">
+                                                        <option value="">Seleccione...</option>
+                                                        <option value="Sentimientos depresivos">Sentimientos depresivos
+                                                        </option>
+                                                        <option value="Ansiedad">Ansiedad</option>
+                                                        <option value="Panico">Pánico</option>
+                                                        <option value="Euforia">Euforia</option>
+                                                        <option value="Extasis">Éxtasis</option>
+                                                        <option value="Irritabilidad">Irritabilidad</option>
+                                                        <option value="Disforia">Disforia</option>
+                                                        <option value="Animo expansivo">Ánimo expansivo</option>
+                                                        <option value="Mania o hipomania">Manía o hipomanía</option>
+                                                        <option value="Hiperhedonia">Hiperhedonia</option>
+                                                        <option value="Anhedonia">Anhedonia</option>
+                                                        <option value="Resonancia afectiva">Resonancia afectiva</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <!-- Expresiones afectivas -->
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label class="form-control-label">Expresiones afectivas</label>
+                                                    <select class="form-control" name="estado_animo_expresiones"
+                                                        id="estado_animo_expresiones">
+                                                        <option value="">Seleccione...</option>
+                                                        <option value="Reactividad">Reactividad</option>
+                                                        <option value="Embotamiento">Embotamiento</option>
+                                                        <option value="Paratimia">Paratimia</option>
+                                                        <option value="Labilidad emocional">Labilidad emocional</option>
+                                                        <option value="Incontinencia afectiva">Incontinencia afectiva
+                                                        </option>
+                                                        <option value="Alexitimia">Alexitimia</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Apetito -->
+                                <div class="card bg-gradient-default shadow-sm mb-4">
+                                    <div class="card-header bg-transparent">
+                                        <h4 class="text-white mb-0">Apetito</h4>
+                                    </div>
+                                    <div class="card-body bg-white">
+                                        <div class="row">
+                                            <!-- Descripción -->
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label class="form-control-label">Descripción</label>
+                                                    <textarea class="form-control" name="apetito_descripcion"
+                                                        id="apetito_descripcion"></textarea>
+                                                </div>
+                                            </div>
+
+                                            <!-- Cambios en hábitos alimenticios -->
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label class="form-control-label">Cambios en hábitos
+                                                        alimenticios</label>
+                                                    <select class="form-control" name="apetito_cambios"
+                                                        id="apetito_cambios">
+                                                        <option value="">Seleccione...</option>
+                                                        <option value="Atracones">Atracones</option>
+                                                        <option value="Cambios de apetito">Cambios de apetito</option>
+                                                        <option value="Alteración de la deglución">Alteración de la
+                                                            deglución</option>
+                                                        <option value="Hiperfagia">Hiperfagia</option>
+                                                        <option value="Aumento de ingesta de dulces y carbohidratos">
+                                                            Aumento de ingesta de dulces y carbohidratos</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <!-- Campos condicionales para apetito -->
+                                            <div id="apetito-campos" class="col-md-12" style="display: none;">
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label class="form-control-label">Edad de inicio
+                                                                (Apetito)</label>
+                                                            <input type="text" class="form-control"
+                                                                name="apetito_edad_inicio">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label class="form-control-label">Características
+                                                                (Apetito)</label>
+                                                            <textarea class="form-control"
+                                                                name="apetito_caracteristicas"></textarea>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- funcioanlidad -->
+                            <div class="tab-pane fade" id="funcionalidad" role="tabpanel">
+                                <div class="card bg-gradient-default shadow-sm mb-4">
+                                    <div class="card-header bg-transparent">
+                                        <h4 class="text-white mb-0">Funcionalidad</h4>
+                                    </div>
+                                    <div class="card-body bg-white">
+                                        <div class="row">
+                                            <!-- Apariencia - Descripción -->
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label class="form-control-label">Descripción de la
+                                                        funcionalidad</label>
+                                                    <textarea class="form-control" name="funcionalidad_descripcion"
+                                                        id="funcionalidad_descripcion"></textarea>
+                                                    <small class="form-text text-muted">Descripción de la
+                                                        funcionalidad.</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <!-- Independencia en actividades de la vida diaria -->
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label class="form-control-label">Es independiente para todas las
+                                                        actividades de la vida diaria</label>
+                                                    <select class="form-control" id="independencia_vida_diaria"
+                                                        name="independencia_vida_diaria" onchange="toggleCombobox()">
+                                                        <option value="no" selected>No</option>
+                                                        <option value="si">Sí</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6" id="actividades_vida_diaria" style="display:none;">
+                                                <div class="form-group">
+                                                    <label class="form-control-label">Actividades para las que necesita
+                                                        ayuda</label>
+                                                    <div>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox"
+                                                                name="actividades_vida_diaria[]" value="comer">
+                                                            <label class="form-check-label">Comer</label>
+                                                        </div>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox"
+                                                                name="actividades_vida_diaria[]" value="asearse">
+                                                            <label class="form-check-label">Asearse</label>
+                                                        </div>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox"
+                                                                name="actividades_vida_diaria[]" value="vestirse">
+                                                            <label class="form-check-label">Vestirse</label>
+                                                        </div>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox"
+                                                                name="actividades_vida_diaria[]" value="desplazarse">
+                                                            <label class="form-check-label">Desplazarse</label>
+                                                        </div>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox"
+                                                                name="actividades_vida_diaria[]" value="comunicarse">
+                                                            <label class="form-check-label">Comunicarse</label>
+                                                        </div>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox"
+                                                                name="actividades_vida_diaria[]"
+                                                                value="control_esfinteres">
+                                                            <label class="form-check-label">Control de
+                                                                esfínteres</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+
+                                            <!-- Independencia en actividades instrumentales complejas -->
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label class="form-control-label">Es independiente para todas las
+                                                        actividades instrumentales complejas</label>
+                                                    <select class="form-control"
+                                                        id="independencia_actividades_complejas"
+                                                        name="independencia_actividades_complejas"
+                                                        onchange="toggleActividadesComplejas()">
+                                                        <option value="no" selected>No</option>
+                                                        <option value="si">Sí</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <!-- Checkboxes de actividades (solo aparecen si la respuesta es "No") -->
+                                            <div class="col-md-6" id="actividades_complejas" style="display:none;">
+                                                <div class="form-group">
+                                                    <label class="form-control-label">Actividades para las que necesita
+                                                        ayuda</label>
+                                                    <div>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox"
+                                                                name="actividades_complejas[]" value="telefono">
+                                                            <label class="form-check-label">Teléfono</label>
+                                                        </div>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox"
+                                                                name="actividades_complejas[]" value="compras">
+                                                            <label class="form-check-label">Compras</label>
+                                                        </div>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox"
+                                                                name="actividades_complejas[]" value="cocinar">
+                                                            <label class="form-check-label">Cocinar</label>
+                                                        </div>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox"
+                                                                name="actividades_complejas[]" value="cuidado_hogar">
+                                                            <label class="form-check-label">Cuidado del hogar</label>
+                                                        </div>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox"
+                                                                name="actividades_complejas[]" value="lavar_ropa">
+                                                            <label class="form-check-label">Lavar ropa</label>
+                                                        </div>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox"
+                                                                name="actividades_complejas[]" value="transporte">
+                                                            <label class="form-check-label">Transporte</label>
+                                                        </div>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox"
+                                                                name="actividades_complejas[]" value="medicacion">
+                                                            <label class="form-check-label">Manejo de medicación</label>
+                                                        </div>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox"
+                                                                name="actividades_complejas[]"
+                                                                value="asuntos_economicos">
+                                                            <label class="form-check-label">Asuntos económicos</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card bg-gradient-default shadow-sm mb-4">
+                                    <div class="card-header bg-transparent">
+                                        <h4 class="text-white mb-0">Conducta Motora - Trastornos Cuantitativos</h4>
+                                    </div>
+                                    <div class="card-body bg-white">
+                                        <div class="row">
+                                            <!-- Apariencia - Descripción -->
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label class="form-control-label">Conducta Motora</label>
+                                                    <textarea class="form-control" name="conducta_motora_descripcion"
+                                                        id="funcionalidad_descripcion"></textarea>
+                                                    <small class="form-text text-muted">Descripción de la
+                                                        Conducta Motora.</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    <label class="form-control-label">Seleccione si presenta alguna de
+                                                        las siguientes trastornos cuantitativos de la conducta
+                                                        motora</label>
+                                                    <select class="form-control" name="trastornos_cuantitativos">
+                                                        <option value="">Seleccione...</option>
+                                                        <option value="hiperactividad">Hiperactividad</option>
+                                                        <option value="inquietud">Inquietud</option>
+                                                        <option value="agitacion">Agitación</option>
+                                                        <option value="retardo_psicomotor">Retardo psicomotor</option>
+                                                        <option value="hipoactividad">Hipoactividad</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="card bg-gradient-default shadow-sm mb-4">
+                                    <div class="card-header bg-transparent">
+                                        <h4 class="text-white mb-0">Conducta Motora - Trastornos Cualitativos</h4>
+                                    </div>
+                                    <div class="card-body bg-white">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    <label class="form-control-label">Seleccione si presenta alguna de
+                                                        las siguientes trastornos cualitativos de la conducta
+                                                        motora</label>
+                                                    <select class="form-control" name="trastornos_cualitativos">
+                                                        <option value="">Seleccione...</option>
+                                                        <option value="catatonia">Catatonía</option>
+                                                        <option value="estereotipias">Estereotipias</option>
+                                                        <option value="manierismos">Manierismos</option>
+                                                        <option value="mimica_gestualidad">Alteraciones de la mímica y
+                                                            gestualidad</option>
+                                                        <option value="ambitendencia">Ambitendencia</option>
+                                                        <option value="perseveracion">Perseveración</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Botones de acción -->
+                                <div class="row mt-4">
+                                    <div class="col-12 text-right">
+                                        <button type="submit" class="btn btn-primary">Guardar Antecedentes</button>
+                                        <a href="{% url 'detalle_paciente'  paciente_id %}" class="btn btn-primary">
+                                            Ver Paciente
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    document.getElementById('independencia_vida_diaria').addEventListener('change', function () {
+        let actividades = document.getElementById('actividades_vida_diaria');
+        actividades.style.display = this.value === 'si' ? 'block' : 'none';
+    });
+
+    document.getElementById('independencia_actividades_complejas').addEventListener('change', function () {
+        let actividades = document.getElementById('actividades_complejas');
+        actividades.style.display = this.value === 'si' ? 'block' : 'none';
+    });
+    document.addEventListener('DOMContentLoaded', function () {
+        const checkboxes = document.querySelectorAll('.atencion-checkbox');
+
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function () {
+                const targetId = this.getAttribute('data-target');
+                const targetElement = document.getElementById(targetId);
+
+                if (this.checked) {
+                    targetElement.style.display = 'flex';
+                } else {
+                    targetElement.style.display = 'none';
+                    // Opcional: Limpiar campos cuando se deselecciona
+                    const inputs = targetElement.querySelectorAll('input, textarea');
+                    inputs.forEach(input => input.value = '');
+                }
+            });
+        });
+    });
+    document.addEventListener('DOMContentLoaded', function () {
+        const radioButtons = document.querySelectorAll('.memoria-queja-radio');
+        const camposAdicionales = document.getElementById('memoria-campos-adicionales');
+
+        radioButtons.forEach(radio => {
+            radio.addEventListener('change', function () {
+                if (document.getElementById('memoria_quejas_si').checked) {
+                    camposAdicionales.style.display = 'block';
+                } else {
+                    camposAdicionales.style.display = 'none';
+                    // Opcional: Resetear los valores cuando se ocultan
+                    const inputs = camposAdicionales.querySelectorAll('input[type="number"], textarea');
+                    inputs.forEach(input => input.value = '');
+
+                    const radios = camposAdicionales.querySelectorAll('input[type="radio"]');
+                    radios.forEach(radio => radio.checked = false);
+                }
+            });
+        });
+
+        // Verificar estado inicial al cargar la página
+        if (document.getElementById('memoria_quejas_si').checked) {
+            camposAdicionales.style.display = 'block';
+        }
+    });
+    document.addEventListener('DOMContentLoaded', function () {
+        // Comportamientos
+        const selectComportamiento = document.getElementById('funcion_ejecutiva_comportamientos');
+        const camposComportamiento = document.getElementById('comportamiento-campos');
+
+        // Síntomas ejecutivos
+        const selectSintomas = document.getElementById('funcion_ejecutiva_sintomas');
+        const camposSintomas = document.getElementById('sintomas-campos');
+
+        // Apetito
+        const selectApetito = document.getElementById('apetito_cambios');
+        const camposApetito = document.getElementById('apetito-campos');
+
+        // Función genérica para mostrar/ocultar campos
+        function toggleCampos(selectElement, camposElement) {
+            selectElement.addEventListener('change', function () {
+                if (this.value) {
+                    camposElement.style.display = 'block';
+                } else {
+                    camposElement.style.display = 'none';
+                    // Limpiar campos cuando se ocultan
+                    const inputs = camposElement.querySelectorAll('input, textarea');
+                    inputs.forEach(input => input.value = '');
+                }
+            });
+        }
+
+        // Aplicar a todos los selects
+        toggleCampos(selectComportamiento, camposComportamiento);
+        toggleCampos(selectSintomas, camposSintomas);
+        toggleCampos(selectApetito, camposApetito);
+    });
+</script>
+{% endblock content %}

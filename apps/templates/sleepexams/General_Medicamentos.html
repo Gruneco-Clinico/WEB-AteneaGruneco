@@ -1,0 +1,351 @@
+{% extends 'layouts/base.html' %}
+
+{% block content %}
+<!-- CSS personalizado para mejoras visuales -->
+<style>
+  .custom-card {
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s;
+    margin-bottom: 1.25rem;
+    border-left: 3px solid #5e72e4;
+    background-color: white;
+  }
+  
+  .custom-card:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+  }
+  
+  .custom-header {
+    padding: 0.75rem 1.25rem;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    background-color: #f8f9fe;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    display: flex;
+    align-items: center;
+  }
+  
+  .custom-header h3 {
+    margin-bottom: 0;
+    color: #32325d;
+    font-weight: 600;
+    flex: 1;
+  }
+  
+  .custom-body {
+    padding: 1.25rem;
+    background-color: white;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+  }
+  
+  .form-control:focus {
+    border-color: #5e72e4;
+    box-shadow: 0 0 0 0.1rem rgba(94, 114, 228, 0.15);
+  }
+  
+  .btn-primary {
+    background-color: #5e72e4;
+    border-color: #5e72e4;
+    box-shadow: 0 2px 3px rgba(50, 50, 93, 0.1);
+    transition: all 0.2s;
+  }
+  
+  .btn-primary:hover {
+    background-color: #4454c3;
+    border-color: #4454c3;
+  }
+  
+  .btn-danger {
+    background-color: #f5365c;
+    border-color: #f5365c;
+    box-shadow: 0 2px 3px rgba(50, 50, 93, 0.1);
+    transition: all 0.2s;
+  }
+  
+  .btn-danger:hover {
+    background-color: #ea0038;
+    border-color: #ea0038;
+  }
+  
+  .btn-view {
+    background-color: #2dce89;
+    border-color: #2dce89;
+    box-shadow: 0 2px 3px rgba(50, 50, 93, 0.1);
+    transition: all 0.2s;
+  }
+  
+  .btn-view:hover {
+    background-color: #26af73;
+    border-color: #26af73;
+  }
+  
+  .breadcrumb-custom {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 0.4rem 0.8rem;
+  }
+  
+  .breadcrumb-custom .breadcrumb-item a {
+    color: rgba(255, 255, 255, 0.8);
+    transition: color 0.3s;
+  }
+  
+  .breadcrumb-custom .breadcrumb-item a:hover {
+    color: white;
+    text-decoration: none;
+  }
+  
+  .page-header {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .page-header:after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, #5e72e4 25%, #11cdef 50%, #2dce89 75%, #fb6340 100%);
+  }
+  
+  .form-control-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #525f7f;
+  }
+  
+  .form-control {
+    border-radius: 6px;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+  }
+  
+  .medicamento {
+    transition: all 0.3s ease;
+  }
+  
+  .medicamento:hover {
+    transform: translateY(-2px);
+  }
+  
+  .medicamento .card {
+    border: none;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    border-radius: 8px;
+    overflow: hidden;
+    border-left: 3px solid #5e72e4;
+  }
+  
+  .action-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 2rem;
+  }
+  
+  .action-buttons button, .action-buttons a {
+    padding: 0.675rem 1.5rem;
+    font-weight: 600;
+    letter-spacing: 0.025em;
+    border-radius: 6px;
+  }
+</style>
+
+<div class="header bg-primary pb-6 page-header">
+  <div class="container-fluid">
+    <div class="header-body">
+      <div class="row align-items-center py-4">
+        <div class="col-lg-6 col-5">
+          <h6 class="h2 text-white d-inline-block mb-0">Información del Paciente</h6>
+          <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
+            <ol class="breadcrumb breadcrumb-custom breadcrumb-links breadcrumb-dark">
+              <li class="breadcrumb-item"><a href="#"><i class="fas fa-home"></i></a></li>
+              <li class="breadcrumb-item"><a href="/pacientes/">Pacientes</a></li>
+              <li class="breadcrumb-item"><a href="/pacientes/">Volver</a></li>
+            </ol>
+          </nav>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid mt--6">
+  <form method="post" action="{% url 'guardar_examen_medicamentos' %}">
+    {% csrf_token %}
+    <div class="row">
+      <div class="col">
+        <div class="custom-card">
+          <div class="custom-header">
+            <h3 class="mb-0"><i class="fas fa-pills mr-2 text-primary"></i>Medicamentos</h3>
+            <input type="hidden" name="visita_id" id="visita_id" value="{{ visita_examen }}" />
+            <input type="hidden" name="paciente_id" id="paciente_id" value="{{ paciente_id }}" />
+            <input type="hidden" name="examen_id" id="examen_id" value="{{ examen_id }}" />
+          </div>
+          <div class="custom-body">
+            <div id="medicamentos"></div>
+            <button type="button" id="agregar-medicamento" class="btn btn-primary mt-3">
+              <i class="fas fa-plus mr-2"></i>Agregar Medicamento
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row mt-4">
+      <div class="col-12 action-buttons">
+        <div>
+          <a href="{% url 'detalle_paciente' paciente_id %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left mr-2"></i>Cancelar
+          </a>
+        </div>
+        <div>
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save mr-2"></i>Guardar Examen
+          </button>
+          <a href="{% url 'detalle_paciente' paciente_id %}" class="btn btn-view ml-2">
+            <i class="fas fa-user mr-2"></i>Ver Paciente
+          </a>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    document.getElementById('agregar-medicamento').addEventListener('click', function () {
+      const div = document.createElement('div');
+      div.classList.add('medicamento', 'mb-3', 'animate__animated', 'animate__fadeIn');
+      div.innerHTML = `
+      <div class="card p-3">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group">
+              <label class="form-control-label"><i class="fas fa-tag text-primary mr-1"></i> Nombre Comercial</label>
+              <input type="text" class="form-control" name="nombre_comercial[]" placeholder="Ingrese el nombre comercial">
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label class="form-control-label"><i class="fas fa-prescription text-primary mr-1"></i> Nombre Genérico</label>
+              <input type="text" class="form-control" name="nombre_generico[]" placeholder="Ingrese el nombre genérico">
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group">
+              <label class="form-control-label"><i class="fas fa-tablets text-primary mr-1"></i> Presentación</label>
+              <select class="form-control" name="presentacion[]">
+                <option>Tableta</option>
+                <option>Cápsula</option>
+                <option>Solución</option>
+                <option>Ampolla</option>
+                <option>Spray</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label class="form-control-label"><i class="fas fa-flask text-primary mr-1"></i> Concentración</label>
+              <input type="text" class="form-control" name="concentracion[]" placeholder="Ingrese la concentración">
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group">
+              <label class="form-control-label"><i class="fas fa-weight text-primary mr-1"></i> Unidad</label>
+              <select class="form-control" name="unidad[]">
+                <option>Microgramos</option>
+                <option>Miligramos</option>
+                <option>Gramos</option>
+                <option>Mililitros</option>
+                <option>Porcentaje</option>
+                <option>Volumen</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label class="form-control-label"><i class="fas fa-route text-primary mr-1"></i> Vía de Administración</label>
+              <select class="form-control" name="via_administracion[]">
+                <option>Oral</option>
+                <option>Tópico</option>
+                <option>Intramuscular</option>
+                <option>Subcutáneo</option>
+                <option>Intravenoso</option>
+                <option>Intrarectal</option>
+                <option>Vaginal</option>
+                <option>Subdérmico</option>
+                <option>Ótico</option>
+                <option>Óptico</option>
+                <option>Intranasal</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group">
+              <label class="form-control-label"><i class="fas fa-tally text-primary mr-1"></i> Cantidad</label>
+              <input type="text" class="form-control" name="cantidad[]" placeholder="Ingrese la cantidad">
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label class="form-control-label"><i class="fas fa-clock text-primary mr-1"></i> Frecuencia</label>
+              <input type="text" class="form-control" name="frecuencia[]" placeholder="Ingrese la frecuencia">
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group">
+              <label class="form-control-label"><i class="fas fa-calendar-plus text-primary mr-1"></i> Fecha de Inicio</label>
+              <input type="date" class="form-control" name="fecha_inicio[]">
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label class="form-control-label"><i class="fas fa-calendar-check text-primary mr-1"></i> Fecha de Finalización</label>
+              <input type="date" class="form-control" name="fecha_finalizacion[]">
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12">
+            <div class="form-group">
+              <label class="form-control-label"><i class="fas fa-info-circle text-primary mr-1"></i> Indicación</label>
+              <textarea class="form-control" name="indicacion[]" rows="3" placeholder="Ingrese las indicaciones"></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="text-right">
+        <button type="button" class="btn btn-danger btn-sm eliminar-medicamento mt-2">
+          <i class="fas fa-trash mr-1"></i> Eliminar Medicamento
+        </button>
+      </div>
+      <hr>
+      `;
+      document.getElementById('medicamentos').appendChild(div);
+      div.querySelector('.eliminar-medicamento').addEventListener('click', function () {
+        div.classList.add('animate__animated', 'animate__fadeOut');
+        setTimeout(() => div.remove(), 300);
+      });
+    });
+    
+    // Agregar el primer medicamento automáticamente
+    document.getElementById('agregar-medicamento').click();
+  });
+</script>
+
+<!-- Incluir FontAwesome si no está ya en el layout base -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<!-- Añadir Animate.css para animaciones -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+{% endblock %}

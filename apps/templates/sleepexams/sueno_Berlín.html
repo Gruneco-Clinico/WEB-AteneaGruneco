@@ -1,0 +1,315 @@
+{% extends 'layouts/base.html' %}
+
+{% block content %}
+<div class="header bg-primary pb-6 page-header">
+    <div class="container-fluid">
+        <div class="header-body">
+            <div class="row align-items-center py-4">
+                <div class="col-lg-6 col-5">
+                    <h6 class="h2 text-white d-inline-block mb-0">Información del Paciente</h6>
+                    <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
+                        <ol class="breadcrumb breadcrumb-links breadcrumb-dark breadcrumb-custom">
+                            <li class="breadcrumb-item"><a href="#"><i class="fas fa-home"></i></a></li>
+                            <li class="breadcrumb-item"><a href="/pacientes/">Pacientes</a></li>
+                            <li class="breadcrumb-item"><a href="/pacientes/">Volver</a></li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid mt--6">
+    <form method="post" action="{% url 'guardar_examen_Berlin' %}">
+        {% csrf_token %}
+        <input type="hidden" name="visita_id" id="visita_id" value="{{ visita_examen }}" />
+        <input type="hidden" name="paciente_id" id="paciente_id" value="{{ paciente_id }}" />
+        <input type="hidden" name="examen_id" id="examen_id" value="{{ examen_id }}" />
+
+        <div class="sistema-card">
+            <div class="sistema-header">
+                <h4>Cuestionario de Berlín</h4>
+            </div>
+            <div class="sistema-body">
+                <!-- Cambio de peso -->
+                <div class="mb-3">
+                    <label class="form-control-label">¿Su peso ha cambiado en los últimos 5 años?</label>
+                    <select class="form-control" name="peso_cambio">
+                        <option value="Aumentado">Aumentado</option>
+                        <option value="Disminuido">Disminuido</option>
+                        <option value="No ha cambiado">No ha cambiado</option>
+                    </select>
+                </div>
+
+                <!-- ¿Usted ronca? -->
+                <div class="mb-3">
+                    <label class="form-control-label">¿Usted ronca?</label>
+                    <select class="form-control" name="ronca">
+                        <option value="Sí">Sí</option>
+                        <option value="No">No</option>
+                        <option value="No sabe">No sabe</option>
+                    </select>
+                </div>
+
+                <!-- Si usted ronca, ¿su ronquido es? -->
+                <div class="mb-3">
+                    <label class="form-control-label">Si usted ronca, ¿Su ronquido es?</label>
+                    <select class="form-control" name="tipo_ronquido">
+                        <option value="------">----------</option>
+                        <option value="Ligeramente más fuerte que respirar">Ligeramente más fuerte que respirar</option>
+                        <option value="Tan fuerte como hablar">Tan fuerte como hablar</option>
+                        <option value="Más fuerte que hablar">Más fuerte que hablar</option>
+                        <option value="Muy fuerte">Muy fuerte - se puede escuchar en habitaciones adyacentes</option>
+                    </select>
+                </div>
+
+                <!-- ¿Con qué frecuencia ronca? -->
+                <div class="mb-3">
+                    <label class="form-control-label">¿Con qué frecuencia ronca?</label>
+                    <select class="form-control" name="frecuencia_ronquidos">
+                        <option value="Todas las noches">Todas las noches</option>
+                        <option value="3-4 veces por semana">3-4 veces por semana</option>
+                        <option value="1-2 veces por semana">1-2 veces por semana</option>
+                        <option value="1-2 veces por mes">1-2 veces por mes</option>
+                        <option value="Nunca o casi nunca">Nunca o casi nunca</option>
+                    </select>
+                </div>
+
+                <!-- ¿Alguna vez su ronquido ha molestado a otras personas? -->
+                <div class="mb-3">
+                    <label class="form-control-label">¿Alguna vez su ronquido ha molestado a otras personas?</label>
+                    <select class="form-control" name="ronquido_molesto">
+                        <option value="Sí">Sí</option>
+                        <option value="No">No</option>
+                        <option value="No sabe">No sabe</option>
+                    </select>
+                </div>
+
+                <!-- ¿Ha notado alguien que usted deja de respirar cuando duerme? -->
+                <div class="mb-3">
+                    <label class="form-control-label">¿Ha notado alguien que usted deja de respirar cuando duerme?</label>
+                    <select class="form-control" name="apnea_observada">
+                        <option value="Casi todas las noches">Casi todas las noches</option>
+                        <option value="3-4 veces por semana">3-4 veces por semana</option>
+                        <option value="1-2 veces por semana">1-2 veces por semana</option>
+                        <option value="1-2 veces por mes">1-2 veces por mes</option>
+                        <option value="Nunca o casi nunca">Nunca o casi nunca</option>
+                    </select>
+                </div>
+
+                <!-- ¿Se siente cansado o fatigado al levantarse por la mañana? -->
+                <div class="mb-3">
+                    <label class="form-control-label">¿Se siente cansado o fatigado al levantarse por la mañana después de dormir?</label>
+                    <select class="form-control" name="fatiga_matutina">
+                        <option value="Casi todos los días">Casi todos los días</option>
+                        <option value="3-4 veces por semana">3-4 veces por semana</option>
+                        <option value="1-2 veces por semana">1-2 veces por semana</option>
+                        <option value="1-2 veces por mes">1-2 veces por mes</option>
+                        <option value="Nunca o casi nunca">Nunca o casi nunca</option>
+                    </select>
+                </div>
+
+                <!-- ¿Se siente cansado o fatigado durante el día? -->
+                <div class="mb-3">
+                    <label class="form-control-label">¿Se siente cansado o fatigado durante el día?</label>
+                    <select class="form-control" name="fatiga_dia">
+                        <option value="Casi todos los días">Casi todos los días</option>
+                        <option value="3-4 veces por semana">3-4 veces por semana</option>
+                        <option value="1-2 veces por semana">1-2 veces por semana</option>
+                        <option value="1-2 veces por mes">1-2 veces por mes</option>
+                        <option value="Nunca o casi nunca">Nunca o casi nunca</option>
+                    </select>
+                </div>
+
+                <!-- ¿Alguna vez se ha quedado dormido mientras maneja o va de pasajero? -->
+                <div class="mb-3">
+                    <label class="form-control-label">¿Alguna vez se ha quedado dormido mientras maneja o va de pasajero?</label>
+                    <div class="custom-control custom-radio mt-2">
+                        <input type="radio" id="somnolencia_si" name="somnolencia_conducir" value="Sí" class="custom-control-input">
+                        <label class="custom-control-label" for="somnolencia_si">Sí</label>
+                    </div>
+                    <div class="custom-control custom-radio">
+                        <input type="radio" id="somnolencia_no" name="somnolencia_conducir" value="No" class="custom-control-input">
+                        <label class="custom-control-label" for="somnolencia_no">No</label>
+                    </div>
+                </div>
+
+                <!-- ¿Usted tiene la presión alta? -->
+                <div class="mb-3">
+                    <label class="form-control-label">¿Usted tiene la presión alta?</label>
+                    <div class="custom-control custom-radio mt-2">
+                        <input type="radio" id="presion_si" name="presion_alta" value="Sí" class="custom-control-input">
+                        <label class="custom-control-label" for="presion_si">Sí</label>
+                    </div>
+                    <div class="custom-control custom-radio">
+                        <input type="radio" id="presion_no" name="presion_alta" value="No" class="custom-control-input">
+                        <label class="custom-control-label" for="presion_no">No</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-4 mb-5">
+            <div class="col-12 text-right">
+                <button type="submit" class="btn btn-save text-white">Guardar Examen</button>
+                <a href="{% url 'detalle_paciente' paciente_id %}" class="btn btn-view text-white ml-2">
+                    Ver Paciente
+                </a>
+            </div>
+        </div>
+    </form>
+</div>
+
+<style>
+    .sistema-card {
+       border-radius: 8px;
+       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+       transition: all 0.2s;
+       margin-bottom: 1.25rem;
+       border-left: 3px solid #5e72e4;
+       background-color: white;
+       position: relative; /* Añadido */
+       z-index: 1000; /* Ajustado */
+    }
+    .sistema-card:hover {
+       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+    }
+    .sistema-header {
+       padding: 0.75rem 1.25rem;
+       border-bottom: 1px solid rgba(0,0,0,0.05);
+       background-color: #f8f9fe;
+       border-top-left-radius: 8px;
+       border-top-right-radius: 8px;
+       display: flex;
+       align-items: center;
+    }
+    .sistema-header h4 {
+       margin-bottom: 0;
+       color: #32325d;
+       font-weight: 600;
+       flex: 1;
+       font-size: 1rem;
+    }
+    .sistema-body {
+       padding: 1.25rem;
+       background-color: white;
+       border-bottom-left-radius: 8px;
+       border-bottom-right-radius: 8px;
+    }
+    .form-control:focus {
+       border-color: #5e72e4;
+       box-shadow: 0 0 0 0.1rem rgba(94, 114, 228, 0.15);
+    }
+    .btn-save {
+       background-color: #5e72e4;
+       border-color: #5e72e4;
+       box-shadow: 0 2px 3px rgba(50, 50, 93, 0.1);
+       transition: all 0.2s;
+    }
+    .btn-save:hover {
+       background-color: #4454c3;
+       border-color: #4454c3;
+    }
+    .btn-view {
+       background-color: #2dce89;
+       border-color: #2dce89;
+       box-shadow: 0 2px 3px rgba(50, 50, 93, 0.1);
+       transition: all 0.2s;
+    }
+    .btn-view:hover {
+       background-color: #26af73;
+       border-color: #26af73;
+    }
+    .toggle-switch {
+       position: relative;
+       display: inline-block;
+       width: 48px;
+       height: 24px;
+    }
+    .toggle-switch input {
+       opacity: 0;
+       width: 0;
+       height: 0;
+    }
+    .toggle-slider {
+       position: absolute;
+       cursor: pointer;
+       top: 0;
+       left: 0;
+       right: 0;
+       bottom: 0;
+       background-color: #eee;
+       transition: .3s;
+       border-radius: 24px;
+    }
+    .toggle-slider:before {
+       position: absolute;
+       content: "";
+       height: 18px;
+       width: 18px;
+       left: 3px;
+       bottom: 3px;
+       background-color: white;
+       transition: .3s;
+       border-radius: 50%;
+    }
+    input:checked + .toggle-slider {
+       background-color: #5e72e4;
+    }
+    input:focus + .toggle-slider {
+       box-shadow: 0 0 1px #5e72e4;
+    }
+    input:checked + .toggle-slider:before {
+       transform: translateX(24px);
+    }
+    .form-control-label {
+       font-size: 0.875rem;
+       font-weight: 500;
+       color: #525f7f;
+    }
+    .form-control {
+       border-radius: 6px;
+       padding: 0.5rem 0.75rem;
+       font-size: 0.875rem;
+    }
+    .breadcrumb-custom {
+       background-color: rgba(255, 255, 255, 0.1);
+       border-radius: 20px;
+       padding: 0.4rem 0.8rem;
+    }
+    .breadcrumb-custom .breadcrumb-item a {
+       color: rgba(255, 255, 255, 0.8);
+       transition: color 0.3s;
+    }
+    .breadcrumb-custom .breadcrumb-item a:hover {
+       color: white;
+       text-decoration: none;
+    }
+    .page-header {
+       position: relative;
+       overflow: hidden;
+    }
+    .page-header:after {
+       content: '';
+       position: absolute;
+       bottom: -4px;
+       left: 0;
+       width: 100%;
+       height: 4px;
+       background: linear-gradient(90deg, #5e72e4 25%, #11cdef 50%, #2dce89 75%, #fb6340 100%);
+    }
+    .custom-control-input:checked ~ .custom-control-label::before {
+       border-color: #5e72e4;
+       background-color: #5e72e4;
+    }
+    .custom-control {
+       padding-left: 1.75rem;
+       margin-bottom: 0.25rem;
+    }
+    .custom-control-label {
+       color: #525f7f;
+       font-size: 0.875rem;
+    }
+   </style>
+{% endblock %}

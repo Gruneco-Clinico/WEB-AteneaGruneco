@@ -1,0 +1,294 @@
+{% extends 'layouts/base.html' %}
+
+{% block content %}
+<div class="header bg-primary pb-6">
+    <div class="container-fluid">
+        <div class="header-body">
+            <div class="row align-items-center py-4">
+                <div class="col-lg-6 col-5">
+                    <h6 class="h2 text-white d-inline-block mb-0">Información del Paciente</h6>
+                    <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
+                        <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
+                            <li class="breadcrumb-item"><a href="#"><i class="fas fa-home"></i></a></li>
+                            <li class="breadcrumb-item"><a href="/pacientes/">Pacientes</a></li>
+                            <li class="breadcrumb-item"><a href="/pacientes/">Volver</a></li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid mt--6">
+    <div class="row">
+        <div class="col">
+            <div class="card shadow">
+                <form method="post" action="{% url 'guardar_examen_Stop-Bang' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="visita_id" id="visita_id" value="{{ visita_examen }}" />
+                    <input type="hidden" name="paciente_id" id="paciente_id" value="{{ paciente_id }}" />
+                    <input type="hidden" name="examen_id" id="examen_id" value="{{ examen_id }}" />
+                    <input type="hidden" name="puntaje_total" id="puntaje_total" value="0" />
+                    <input type="hidden" name="riesgo_osa" id="riesgo_osa" value="Bajo" />
+
+                    <!-- Card Header -->
+                    <div class="card-header border-0">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <h3 class="mb-0">Cuestionario Stop-Bang</h3>
+                            </div>
+                            <div class="col text-right">
+                                <span class="text-muted">Fecha: {% now "d/m/Y" %}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card Body -->
+                    <div class="card-body">
+                        <div class="card bg-gradient-default shadow-sm mb-4">
+                            <div class="card-header bg-transparent">
+                                <h4 class="text-white mb-0">Evaluación de Riesgo de Apnea del Sueño</h4>
+                            </div>
+                            <div class="card-body bg-white">
+                                <div class="alert alert-info">
+                                    <strong>Instrucciones:</strong> Seleccione "Sí" para cada afirmación que aplique al
+                                    paciente.
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="form-control-label">
+                                                <strong>R</strong>onca - Ronca fuerte (lo suficientemente fuerte como
+                                                para ser escuchado a través de puertas cerradas)
+                                            </label>
+                                            <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                                                <label class="btn btn-outline-secondary active">
+                                                    <input type="radio" name="ronca_fuerte" value="0" autocomplete="off"
+                                                        checked> No
+                                                </label>
+                                                <label class="btn btn-outline-primary">
+                                                    <input type="radio" name="ronca_fuerte" value="1"
+                                                        autocomplete="off"> Sí
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="form-control-label">
+                                                <strong>C</strong>ansancio - Se siente cansado, fatigado o somnoliento
+                                                durante el día
+                                            </label>
+                                            <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                                                <label class="btn btn-outline-secondary active">
+                                                    <input type="radio" name="cansado_frecuencia" value="0"
+                                                        autocomplete="off" checked> No
+                                                </label>
+                                                <label class="btn btn-outline-primary">
+                                                    <input type="radio" name="cansado_frecuencia" value="1"
+                                                        autocomplete="off"> Sí
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="form-control-label">
+                                                <strong>O</strong>bservar - Lo han observado dejar de respirar o
+                                                ahogarse mientras dormía
+                                            </label>
+                                            <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                                                <label class="btn btn-outline-secondary active">
+                                                    <input type="radio" name="deja_respirar" value="0"
+                                                        autocomplete="off" checked> No
+                                                </label>
+                                                <label class="btn btn-outline-primary">
+                                                    <input type="radio" name="deja_respirar" value="1"
+                                                        autocomplete="off"> Sí
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="form-control-label">
+                                                <strong>P</strong>resión - Tiene o está recibiendo tratamiento para la
+                                                presión arterial alta
+                                            </label>
+                                            <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                                                <label class="btn btn-outline-secondary active">
+                                                    <input type="radio" name="presion_arterial" value="0"
+                                                        autocomplete="off" checked> No
+                                                </label>
+                                                <label class="btn btn-outline-primary">
+                                                    <input type="radio" name="presion_arterial" value="1"
+                                                        autocomplete="off"> Sí
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="form-control-label">
+                                                <strong>I</strong>MC - IMC > 35 kg/m²
+                                            </label>
+                                            <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                                                <label class="btn btn-outline-secondary active">
+                                                    <input type="radio" name="imc_alto" value="0" autocomplete="off"
+                                                        checked> No
+                                                </label>
+                                                <label class="btn btn-outline-primary">
+                                                    <input type="radio" name="imc_alto" value="1" autocomplete="off"> Sí
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="form-control-label">
+                                                <strong>E</strong>dad - Edad > 50 años
+                                            </label>
+                                            <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                                                <label class="btn btn-outline-secondary active">
+                                                    <input type="radio" name="mayor_50" value="0" autocomplete="off"
+                                                        checked> No
+                                                </label>
+                                                <label class="btn btn-outline-primary">
+                                                    <input type="radio" name="mayor_50" value="1" autocomplete="off"> Sí
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="form-control-label">
+                                                <strong>C</strong>uello - Circunferencia del cuello grande (Hombres > 40
+                                                cm, Mujeres > 35 cm)
+                                            </label>
+                                            <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                                                <label class="btn btn-outline-secondary active">
+                                                    <input type="radio" name="cuello_grande" value="0"
+                                                        autocomplete="off" checked> No
+                                                </label>
+                                                <label class="btn btn-outline-primary">
+                                                    <input type="radio" name="cuello_grande" value="1"
+                                                        autocomplete="off"> Sí
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="form-control-label">
+                                                <strong>G</strong>enero - Género masculino
+                                            </label>
+                                            <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                                                <label class="btn btn-outline-secondary active">
+                                                    <input type="radio" name="masculino" value="0" autocomplete="off"
+                                                        checked> No
+                                                </label>
+                                                <label class="btn btn-outline-primary">
+                                                    <input type="radio" name="masculino" value="1" autocomplete="off">
+                                                    Sí
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Resultado del cálculo -->
+                                <div class="alert alert-success mt-4" id="resultado-container" style="display: none;">
+                                    <h4 class="alert-heading">Resultado del STOP-BANG</h4>
+                                    <p><strong>Puntaje total:</strong> <span id="puntaje-display">0</span>/8</p>
+                                    <p><strong>Riesgo de OSA:</strong> <span id="riesgo-display">Bajo</span></p>
+                                    <div id="interpretacion-detallada"></div>
+                                </div>
+
+                                <div class="alert alert-warning mt-4">
+                                    <strong>Interpretación del puntaje:</strong><br>
+                                    - <strong>0-2 puntos:</strong> Bajo riesgo de apnea obstructiva del sueño (OSA)<br>
+                                    - <strong>3-4 puntos:</strong> Riesgo intermedio de OSA<br>
+                                    - <strong>5-8 puntos:</strong> Alto riesgo de OSA<br>
+                                    - <strong>≥2 de 4 STOP + (Hombre, IMC>35 o Cuello>40cm):</strong> Alto riesgo de OSA
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Botones de acción -->
+                        <div class="row mt-4">
+                            <div class="col-12 text-right">
+                                <button type="submit" class="btn btn-primary">Guardar Examen</button>
+                                <a href="{% url 'detalle_paciente' paciente_id %}" class="btn btn-secondary">Ver
+                                    Paciente</a>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Usar este event listener para los botones de Bootstrap
+        document.querySelectorAll('.btn-group-toggle label').forEach(label => {
+            label.addEventListener('click', function () {
+                setTimeout(calculateTotalScore, 50);
+            });
+        });
+
+        // También mantener los listeners originales por si acaso
+        const radioButtons = document.querySelectorAll('input[type="radio"]');
+        radioButtons.forEach(radio => {
+            radio.addEventListener('change', calculateTotalScore);
+        });
+
+        function calculateTotalScore() {
+            let total = 0;
+            document.querySelectorAll('input[type="radio"]:checked').forEach(radio => {
+                total += parseInt(radio.value);
+            });
+
+            // Calcular riesgo según criterios
+            let riesgo = "Bajo";
+            let interpretacion = "";
+
+            // Contar respuestas positivas en STOP
+            const stopQuestions = ['ronca_fuerte', 'cansado_frecuencia', 'deja_respirar', 'presion_arterial'];
+            let stopCount = stopQuestions.reduce((acc, name) => {
+                const selected = document.querySelector(`input[name="${name}"]:checked`);
+                return acc + (selected && selected.value === "1" ? 1 : 0);
+            }, 0);
+
+            // Contar respuestas positivas en BANG (excluyendo edad)
+            const bangCriteria = ['masculino', 'imc_alto', 'cuello_grande'];
+            let bangCount = bangCriteria.reduce((acc, name) => {
+                const selected = document.querySelector(`input[name="${name}"]:checked`);
+                return acc + (selected && selected.value === "1" ? 1 : 0);
+            }, 0);
+
+            // Determinar riesgo
+            if (total >= 5 || (stopCount >= 2 && bangCount >= 1)) {
+                riesgo = "Alto";
+                interpretacion = "Alto riesgo de apnea obstructiva del sueño...";
+            } else if (total >= 3) {
+                riesgo = "Intermedio";
+                interpretacion = "Riesgo intermedio de apnea obstructiva del sueño...";
+            } else {
+                riesgo = "Bajo";
+                interpretacion = "Bajo riesgo de apnea obstructiva del sueño...";
+            }
+
+            // Actualizar UI
+            document.getElementById('puntaje-display').textContent = total;
+            document.getElementById('riesgo-display').textContent = riesgo;
+            document.getElementById('interpretacion-detallada').innerHTML = `<strong>Interpretación:</strong> ${interpretacion}`;
+            document.getElementById('puntaje_total').value = total;
+            document.getElementById('riesgo_osa').value = riesgo;
+            document.getElementById('resultado-container').style.display = 'block';
+        }
+
+        // Calcular al cargar
+        calculateTotalScore();
+    });
+</script>
+
+{% endblock %}

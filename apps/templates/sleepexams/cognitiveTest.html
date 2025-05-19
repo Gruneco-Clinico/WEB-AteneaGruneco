@@ -1,0 +1,168 @@
+
+{% block content %}
+    <!-- Page content -->
+    <div class="container-fluid mt--6">
+      <div class="row">
+        <div class="col">
+          <div class="card">
+            <!-- Card header -->
+            <div class="card-header border-0">
+              <div class="row align-items-center">
+                <div class="col">
+                  <h3 class="mb-0">Amnanesis cognitivo</h3>
+                </div>
+              </div>
+            </div>
+            <!-- Card body -->
+            <div class="card-body">
+              <form>
+                <hr class="my-4">
+                <!-- Anamnesis form -->
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label class="form-control-label">Motivo de Consulta</label>
+                      <textarea class="form-control" rows="3" placeholder="Describa el motivo de consulta"></textarea>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label class="form-control-label">Descripción General</label>
+                      <textarea class="form-control" rows="3" placeholder="Descripción general del paciente"></textarea>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-md-4">
+                    <div class="form-group">
+                      <label class="form-control-label">Estado de Alerta</label>
+                      <div class="mt-3">
+                        <input type="text" id="alerta" class="form-control" placeholder="Estado de Alerta">
+                      </div>
+                      <select class="form-control">
+                        <option value="alerta">Alerta</option>
+                        <option value="somnoliento">Somnoliento</option>
+                        <option value="confuso">Confuso</option>
+                        <option value="otro">Otro</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-group">
+                      <label class="form-control-label">Orientación</label>
+                      <select class="form-control" multiple>
+                        <option value="tiempo">Tiempo</option>
+                        <option value="espacio">Espacio</option>
+                        <option value="persona">Persona</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-group">
+                      <label class="form-control-label">Atención</label>
+                      <select class="form-control">
+                        <option value="normal">Normal</option>
+                        <option value="disminuida">Disminuida</option>
+                        <option value="fluctuante">Fluctuante</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label class="form-control-label">Memoria</label>
+                      <textarea class="form-control" rows="2" placeholder="Estado de la memoria"></textarea>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label class="form-control-label">Lenguaje</label>
+                      <textarea class="form-control" rows="2" placeholder="Características del lenguaje"></textarea>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-md-4">
+                    <div class="form-group">
+                      <label class="form-control-label">Comportamiento</label>
+                      <textarea class="form-control" rows="2" placeholder="Descripción del comportamiento"></textarea>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-group">
+                      <label class="form-control-label">Estado de Ánimo</label>
+                      <div class="checkbox-group">
+                        <div class="form-check">
+                          <input class="form-check-input" type="checkbox" id="eutimico" name="estado_animo" value="eutimico">
+                          <label class="form-check-label" for="eutimico">Eutímico</label>
+                        </div>
+                        <div class="form-check">
+                          <input class="form-check-input" type="checkbox" id="deprimido" name="estado_animo" value="deprimido">
+                          <label class="form-check-label" for="deprimido">Deprimido</label>
+                        </div>
+                        <div class="form-check">
+                          <input class="form-check-input" type="checkbox" id="ansioso" name="estado_animo" value="ansioso">
+                          <label class="form-check-label" for="ansioso">Ansioso</label>
+                        </div>
+                        <div class="form-check">
+                          <input class="form-check-input" type="checkbox" id="irritable" name="estado_animo" value="irritable">
+                          <label class="form-check-label" for="irritable">Irritable</label>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-group">
+                      <label class="form-control-label">Apetito</label>
+                      <select class="form-control">
+                        <option value="normal">Normal</option>
+                        <option value="aumentado">Aumentado</option>
+                        <option value="disminuido">Disminuido</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-12">
+                    <div class="form-group">
+                      <label class="form-control-label">Observaciones</label>
+                      <textarea class="form-control" rows="4" placeholder="Observaciones adicionales"></textarea>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-12 text-right">
+                    <button type="submit" class="btn btn-primary">Guardar Anamnesis</button>
+                    <button type="button" class="btn btn-secondary" onclick="cerrarFormulario(this)">Cancelar</button>
+
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+{% endblock content %}
+
+{% block javascripts %}
+<script>
+  // Form validation and submission logic would go here
+  document.querySelector('form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    // Add your form submission logic here
+  });
+
+  // Print functionality
+  document.getElementById('printForm').addEventListener('click', function() {
+    window.print();
+  });
+</script>
+{% endblock javascripts %}

@@ -1,0 +1,442 @@
+{% extends 'layouts/base.html' %}
+
+{% block content %}
+
+<div class="header bg-primary pb-6">
+  <div class="container-fluid">
+    <div class="header-body">
+      <div class="row align-items-center py-4">
+        <div class="col-lg-6 col-5">
+          <h6 class="h2 text-white d-inline-block mb-0">Gestión de Proyectos</h6>
+          <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
+            <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
+              <li class="breadcrumb-item"><a href="/index/"><i class="fas fa-home"></i></a></li>
+              <li class="breadcrumb-item active" aria-current="page">Proyectos</li>
+            </ol>
+          </nav>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid mt--6">
+  {% if messages %}
+  <div class="alert alert-success">
+    {% for message in messages %}
+    {{ message }}
+    {% endfor %}
+  </div>
+  {% endif %}
+  <div class="row">
+    <div class="col-xl-6 order-xl-1">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="mb-0">Crear Nuevo Proyecto</h3>
+        </div>
+        <div class="card-body">
+          <form method="POST" action="{% url 'proyectos' %}">
+            {% csrf_token %}
+            <div class="form-group">
+              <label for="nombreProyecto">Nombre del Proyecto</label>
+              <input type="text" class="form-control" id="nombreProyecto" name="nombre"
+                placeholder="Nombre del Proyecto" required>
+            </div>
+            <div class="form-group">
+              <label for="descripcionProyecto">Descripción del Proyecto</label>
+              <textarea class="form-control" id="descripcionProyecto" name="descripcion"
+                placeholder="Descripción del Proyecto"></textarea>
+            </div>
+            <div class="form-group">
+              <label for="investigadorPrincipal">Investigador Principal</label>
+              <input type="text" class="form-control" id="investigadorPrincipal" name="investigador_principal"
+                placeholder="Investigador Principal">
+            </div>
+            <div class="form-group">
+              <label for="codigoProyecto">Código del Proyecto</label>
+              <input type="text" class="form-control" id="codigoProyecto" name="codigo_siu"
+                placeholder="Código del Proyecto">
+            </div>
+            <div class="form-group">
+              <label for="fechaInicio">Fecha de Inicio</label>
+              <input type="date" class="form-control" id="fechaInicio" name="fecha_inicio">
+            </div>
+            <div class="form-group">
+              <label for="fechaFinanciacion">Fecha de Financiación</label>
+              <input type="date" class="form-control" id="fechaFinanciacion" name="fecha_financiacion">
+            </div>
+            <button type="submit" class="btn btn-primary">Crear Proyecto</button>
+          </form>
+        </div>
+      </div>
+    </div>
+    <!-- Mostrar Proyectos Existentes -->
+    <div class="col-xl-6 order-xl-2">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="mb-0">Proyectos Existentes</h3>
+        </div>
+        <div class="card-body">
+          <ul class="list-group">
+            {% for proyecto in proyectos %}
+            <li class="list-group-item">
+              <!-- Encabezado del proyecto -->
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="card-title text-uppercase text-muted mb-0">{{ proyecto.nombre }}</h5>
+                <div>
+                  <!-- Botón para ver la descripción del proyecto -->
+                  <button class="btn btn-sm btn-info" data-toggle="modal" data-target="#modalDescripcionProyecto"
+                    data-id="{{ proyecto.id }}" data-nombre="{{ proyecto.nombre }}"
+                    data-fecha-inicio="{{ proyecto.fecha_inicio|date:'Y-m-d' }}"
+                    data-fecha-financiacion="{{ proyecto.fecha_financiacion|date:'Y-m-d' }}"
+                    data-investigador="{{ proyecto.investigador_principal }}"
+                    data-codigo-siu="{{ proyecto.codigo_siu }}" data-descripcion="{{ proyecto.descripcion }}"
+                    data-proyectoData="{{ proyecto_data }}" data-toggle="tooltip" data-placement="top"
+                    title="Ver Descripción">
+                    <i class="fas fa-info-circle"></i> <!-- Ícono de Font Awesome -->
+                  </button>
+
+                  <!-- Botón para agregar visita -->
+                  <button class="btn btn-sm btn-secondary" data-toggle="modal" data-target="#modalAgregarVisita"
+                    data-proyecto-id="{{ proyecto.id }}" data-nombre="{{ proyecto.nombre }}" data-toggle="tooltip"
+                    data-placement="top" title="Agregar Visita">
+                    <i class="fas fa-plus"></i> <!-- Ícono de Font Awesome -->
+                  </button>
+
+                  <!-- Formulario para eliminar proyecto -->
+                  <form method="POST" action="{% url 'eliminar_proyecto' id=proyecto.id %}" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm btn-danger" data-toggle="tooltip" data-placement="top"
+                      title="Eliminar Proyecto">
+                      <i class="fas fa-trash"></i> <!-- Ícono de Font Awesome -->
+                    </button>
+                  </form>
+                </div>
+              </div>
+
+              <!-- Lista de visitas del proyecto -->
+              <div class="mt-3">
+                {% for key, visitas in proyecto_data.items %}
+                {% if key == proyecto.id and visitas %}
+                <ul class="list-group">
+                  {% for visita in visitas %}
+                  <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <span class="font-weight-bold">Visita: {{ visita.nombre }}</span>
+
+                    <div class="d-flex gap-2"> <!-- Contenedor flex para alinear los botones -->
+                      <!-- Botón Eliminar Visita -->
+                      <form method="POST" action="{% url 'eliminar_visita' id=visita.id %}" class="m-0">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-danger" data-toggle="tooltip" data-placement="top"
+                          title="Eliminar Visita">
+                          <i class="fas fa-trash"></i>
+                        </button>
+                      </form>
+
+                      <!-- Botón Ver Exámenes -->
+                      <button class="btn btn-sm btn-info" data-toggle="collapse"
+                        data-target="#examenes-visita-{{ proyecto.id }}-{{ forloop.counter }}" data-toggle="tooltip"
+                        data-placement="top" title="Ver Exámenes">
+                        <i class="fas fa-list"></i>
+                      </button>
+
+                      <!-- Botón Editar Visita -->
+                      <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal"
+                        data-bs-target="#modalEditarVisita-{{ visita.id }}" data-visita-id="{{ visita.id }}"
+                        data-nombre="{{ visita.nombre }}" data-observaciones="{{ visita.observaciones }}"
+                        data-proyecto="{{ visita.proyecto }}" data-examenes="{{ visita.examenes }}">
+                        <i class="fas fa-edit"></i>
+                      </button>
+                    </div>
+
+                    <!-- Contenedor de exámenes (colapsable) -->
+                    <div id="examenes-visita-{{ proyecto.id }}-{{ forloop.counter }}" class="collapse mt-3">
+                      <ul class="list-group">
+                        <!-- Iterar sobre los exámenes de la visita -->
+                        {% for examen in visita.examenes %}
+                        <li class="list-group-item">
+                          <strong>Examen:</strong> {{ examen }}
+                        </li>
+                        {% endfor %}
+                      </ul>
+                    </div>
+                  </li>
+
+                  <div class="modal fade" id="modalEditarVisita-{{ visita.id }}" tabindex="-1"
+                    aria-labelledby="modalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title">Editar Visita</h5>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <form method="POST" action="{% url 'editar_visita' visita.id %}">
+                          {% csrf_token %}
+                          <div class="modal-body">
+                            <input type="hidden" name="proyecto_id" value="{{ proyecto.id  }}">
+                            <!-- Nombre -->
+                            <div class="mb-3">
+                              <label class="form-label">Nombre del Tipo de Visita</label>
+                              <input type="text" class="form-control" name="nombre_visita" value="{{ visita.nombre }}"
+                                required>
+                            </div>
+
+                            <!-- Observaciones -->
+                            <div class="mb-3">
+                              <label class="form-label">Observaciones</label>
+                              <textarea class="form-control" name="observaciones">{{ visita.observaciones }}</textarea>
+                            </div>
+
+                            <!-- Exámenes Asociados -->
+                            <div class="card">
+                              <div class="card-header">
+                                <h4>Gestión de Exámenes</h4>
+                              </div>
+                              <div class="card-body">
+                                <div class="row">
+                                  <div class="col-md-6">
+                                    <h5>Exámenes Asociados</h5>
+                                    {% for examen in visita.examenes.all %}
+                                    <div class="form-check">
+                                      <input class="form-check-input" type="checkbox" value="{{ examen }}"
+                                        id="examen_asociado_{{ examen.id }}" checked>
+                                      <label class="form-check-label" for="examen_asociado_{{ examen.id }}">
+                                        {{examen}}
+                                      </label>
+                                    </div>
+                                    {% empty %}
+                                    <p class="text-muted">No hay exámenes asociados</p>
+                                    {% endfor %}
+                                  </div>
+                                  <div class="col-md-6">
+                                    <h5>Exámenes Disponibles</h5>
+                                    {% for examen in examenes %}
+                                    {% if examen.nombre not in visita.examenes.all %}
+                                    <div class="form-check">
+                                      <input class="form-check-input" type="checkbox" name="examenes"
+                                        value="{{ examen.id }}" id="examen_disponible_{{ examen.id }}">
+                                      <label class="form-check-label" for="examen_disponible_{{ examen.id }}">
+                                        {{ examen.nombre }}
+                                      </label>
+                                    </div>
+                                    {% endif %}
+                                    {% empty %}
+                                    <p class="text-muted">No hay más exámenes disponibles</p>
+                                    {% endfor %}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                          </div>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                  {% endfor %}
+                </ul>
+                {% endif %}
+                {% endfor %}
+
+                <!-- Mensaje si no hay visitas -->
+                {% if proyecto.id not in proyecto_data %}
+                <p class="text-muted">No hay visitas registradas para este proyecto.</p>
+                {% endif %}
+              </div>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Modal para Ver Descripción del Proyecto -->
+<div class="modal fade" id="modalDescripcionProyecto" tabindex="-1" role="dialog"
+  aria-labelledby="modalDescripcionTitulo" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalDescripcionTitulo">Descripción del Proyecto</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col-md-6">
+              <p><strong>Nombre del Proyecto:</strong> <span id="proyectoNombre"></span></p>
+              <p><strong>Fecha de Inicio:</strong> <span id="proyectoFechaInicio"></span></p>
+              <p><strong>Fecha de Financiación:</strong> <span id="proyectoFechaFinanciacion"></span></p>
+            </div>
+            <div class="col-md-6">
+              <p><strong>Investigador Principal:</strong> <span id="proyectoInvestigador"></span></p>
+              <p><strong>Código SIU:</strong> <span id="proyectoCodigoSIU"></span></p>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12">
+              <p><strong>Descripción:</strong></p>
+              <p id="proyectoDescripcion"></p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para Agregar Visita -->
+<div class="modal fade" id="modalAgregarVisita" tabindex="-1" role="dialog" aria-labelledby="modalAgregarVisitas"
+  aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Agregar tipo de visita al Proyecto</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form method="POST" action="{% url 'agregar_visita' %}">
+        {% csrf_token %}
+        <div class="modal-body">
+          <input type="hidden" name="proyecto_id" id="proyecto_id">
+          <p><strong>Nombre del Proyecto:</strong> <span id="proyectoNombre"></span></p>
+
+          <div id="visitas-container">
+            <div class="visita">
+              <div class="form-group">
+                <label>Nombre del tipo de Visita</label>
+                <input type="text" class="form-control" name="nombre_visita[]" required>
+              </div>
+              <div class="form-group">
+                <label>Observaciones</label>
+                <textarea class="form-control" name="observaciones[]"></textarea>
+              </div>
+              <div class="form-group">
+                <div class="form-group">
+                  <label>Exámenes Asociados</label>
+                  <div class="examenes-container">
+                    {% for examen in examenes %}
+                    <div class="form-check">
+                      <input class="form-check-input examen-checkbox" type="checkbox" data-id="{{ examen.id }}"
+                        data-nombre="{{ examen.nombre }}">
+                      <label class="form-check-label">{{ examen.nombre }}</label>
+                    </div>
+                    {% endfor %}
+                    <input type="hidden" name="examenes_json" id="examenes-json" value="[]">
+                  </div>
+                </div>
+
+                <hr>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-primary">Guardar Visitas</button>
+          </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+
+    // Escuchar el evento de apertura del modal de descripción
+    $('#modalDescripcionProyecto').on('show.bs.modal', function (event) {
+
+
+      const button = $(event.relatedTarget);  // Botón que activó el modal
+      const modal = $(this); // Modal actual
+
+      // Obtener los datos del proyecto desde los atributos data-*
+      const proyectoId = button.data('id');
+      const nombre = button.data('nombre');
+      const fechaInicio = button.data('fecha-inicio');
+      const fechaFinanciacion = button.data('fecha-financiacion');
+      const investigador = button.data('investigador');
+      const codigoSIU = button.data('codigo-siu');
+      const descripcion = button.data('descripcion');
+      const proyectoData = {};
+
+      // Actualizar los elementos del modal con la información del proyecto
+      modal.find('#proyectoNombre').text(nombre);
+      modal.find('#proyectoFechaInicio').text(fechaInicio);
+      modal.find('#proyectoFechaFinanciacion').text(fechaFinanciacion);
+      modal.find('#proyectoInvestigador').text(investigador);
+      modal.find('#proyectoCodigoSIU').text(codigoSIU);
+      modal.find('#proyectoDescripcion').text(descripcion);
+
+      // Cargar las visitas en la lista
+      var visitasContainer = modal.find('#visitasContainer');
+      visitasContainer.empty();  // Limpiar contenido previo
+
+      // Obtener las visitas del proyecto desde el JSON
+      var visitas = proyectoData[proyectoId] || [];
+
+      if (visitas.length > 0) {
+        visitas.forEach(function (visita) {
+          visitasContainer.append(`
+                      <li class="list-group-item">
+                          <strong>Nombre:</strong> ${visita.nombre} <br>
+                          <strong>Observaciones:</strong> ${visita.observaciones} <br>
+                          <strong>Exámenes:</strong>
+                          <ul>${visita.examenes.map(ex => `<li>${ex}</li>`).join('')}</ul>
+                      </li>
+                  `);
+        });
+      } else {
+        visitasContainer.append("<li class='list-group-item text-muted'>No hay visitas registradas.</li>");
+      }
+    });
+
+    // Escuchar el evento de apertura del modal de agregar visita
+    $('#modalAgregarVisita').on('show.bs.modal', function (event) {
+      var button = $(event.relatedTarget); // Botón que activó el modal
+      var proyectoId = button.data('proyecto-id'); // Extraer el ID del proyecto
+      var nombre = button.data('nombre'); // Extraer el nombre
+
+      var modal = $(this);
+      modal.find('#proyecto_id').val(proyectoId); // Asignar el ID en el formulario
+      modal.find('#proyectoNombre').text(nombre); // Asignar el nombre del proyecto
+    });
+
+    let checkboxes = document.querySelectorAll(".examen-checkbox");
+    let hiddenInput = document.getElementById("examenes-json");
+
+    checkboxes.forEach(checkbox => {
+      checkbox.addEventListener("change", function () {
+        let examenesSeleccionados = JSON.parse(hiddenInput.value || "[]");
+
+        let examenId = this.dataset.id;
+        let examenNombre = this.dataset.nombre;
+
+        if (this.checked) {
+          // Agregar si no existe
+          if (!examenesSeleccionados.some(e => e.id === examenId)) {
+            examenesSeleccionados.push({ id: examenId, nombre: examenNombre });
+          }
+        } else {
+          // Eliminar si se desmarca
+          examenesSeleccionados = examenesSeleccionados.filter(e => e.id !== examenId);
+        }
+
+        hiddenInput.value = JSON.stringify(examenesSeleccionados);
+      });
+    });
+  });
+</script>
+
+{% endblock %}

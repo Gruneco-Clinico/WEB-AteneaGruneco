@@ -1,0 +1,855 @@
+{% extends 'layouts/base.html' %}
+
+{% block content %}
+<!-- CSS personalizado para mejoras visuales -->
+<style>
+  .sistema-card {
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s;
+    margin-bottom: 1.25rem;
+    border-left: 3px solid #5e72e4;
+    background-color: white;
+  }
+
+  .sistema-card:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+  }
+
+  .sistema-header {
+    padding: 0.75rem 1.25rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    background-color: #f8f9fe;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    display: flex;
+    align-items: center;
+  }
+
+  .sistema-header h4 {
+    margin-bottom: 0;
+    color: #32325d;
+    font-weight: 600;
+    flex: 1;
+    font-size: 1rem;
+  }
+
+  .sistema-body {
+    padding: 1.25rem;
+    background-color: white;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+  }
+
+  .form-control:focus {
+    border-color: #5e72e4;
+    box-shadow: 0 0 0 0.1rem rgba(94, 114, 228, 0.15);
+  }
+
+  .btn-save {
+    background-color: #5e72e4;
+    border-color: #5e72e4;
+    box-shadow: 0 2px 3px rgba(50, 50, 93, 0.1);
+    transition: all 0.2s;
+  }
+
+  .btn-save:hover {
+    background-color: #4454c3;
+    border-color: #4454c3;
+  }
+
+  .btn-view {
+    background-color: #2dce89;
+    border-color: #2dce89;
+    box-shadow: 0 2px 3px rgba(50, 50, 93, 0.1);
+    transition: all 0.2s;
+  }
+
+  .btn-view:hover {
+    background-color: #26af73;
+    border-color: #26af73;
+  }
+
+  .toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 48px;
+    height: 24px;
+  }
+
+  .toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #eee;
+    transition: .3s;
+    border-radius: 24px;
+  }
+
+  .toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .3s;
+    border-radius: 50%;
+  }
+
+  input:checked+.toggle-slider {
+    background-color: #5e72e4;
+  }
+
+  input:focus+.toggle-slider {
+    box-shadow: 0 0 1px #5e72e4;
+  }
+
+  input:checked+.toggle-slider:before {
+    transform: translateX(24px);
+  }
+
+  .hide-details {
+    display: none;
+  }
+
+  /* Animación para campos de detalle */
+  .sistema-detalle {
+    transition: all 0.3s ease-in-out;
+    overflow: hidden;
+    opacity: 0;
+    max-height: 0;
+  }
+
+  .sistema-detalle.show {
+    opacity: 1;
+    max-height: 500px;
+    margin-top: 10px;
+  }
+
+  .breadcrumb-custom {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 0.4rem 0.8rem;
+  }
+
+  .breadcrumb-custom .breadcrumb-item a {
+    color: rgba(255, 255, 255, 0.8);
+    transition: color 0.3s;
+  }
+
+  .breadcrumb-custom .breadcrumb-item a:hover {
+    color: white;
+    text-decoration: none;
+  }
+
+  .page-header {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .page-header:after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, #5e72e4 25%, #11cdef 50%, #2dce89 75%, #fb6340 100%);
+  }
+
+  .form-control-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #525f7f;
+  }
+
+  .form-control {
+    border-radius: 6px;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+  }
+</style>
+
+<div class="header bg-primary pb-6 page-header">
+  <div class="container-fluid">
+    <div class="header-body">
+      <div class="row align-items-center py-4">
+        <div class="col-lg-6 col-7">
+          <h6 class="h2 text-white d-inline-block mb-0">Información del paciente</h6>
+          <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
+            <ol class="breadcrumb breadcrumb-links breadcrumb-dark breadcrumb-custom">
+              <li class="breadcrumb-item"><a href="#"><i class="fas fa-home"></i></a></li>
+              <li class="breadcrumb-item"><a href="/pacientes/">Pacientes</a></li>
+              <li class="breadcrumb-item"><a href="/pacientes/">Volver</a></li>
+            </ol>
+          </nav>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Page content -->
+<div class="container-fluid mt--6">
+  <div class="row">
+    <div class="col">
+      <div class="card shadow">
+        <!-- Card header -->
+        <div class="card-header bg-transparent border-0">
+          <div class="row align-items-center">
+            <div class="col">
+              <h3 class="mb-0">Revisión por Sistemas</h3>
+              <p class="text-sm text-muted mb-0">Complete la información de los sistemas que presentan síntomas</p>
+            </div>
+          </div>
+        </div>
+        <!-- Card body -->
+        <div class="card-body">
+          <form method="post" action="{% url 'guardar_examen' %}">
+            {% csrf_token %}
+            <input type="hidden" name="visita_id" id="visita_id" value="{{ visita_examen }}" />
+            <input type="hidden" name="paciente_id" id="paciente_id" value="{{ paciente_id }}" />
+            <input type="hidden" name="examen_id" id="examen_id" value="{{ examen_id }}" />
+
+            <!-- General -->
+            <div class="sistema-card">
+              <div class="sistema-header">
+                <h4>General</h4>
+                <div class="ml-auto">
+                  <label class="toggle-switch">
+                    <input type="checkbox" class="sistema-toggle" data-sistema="general">
+                    <span class="toggle-slider"></span>
+                  </label>
+                  <input type="hidden" name="sintoma_general" value="no" id="sintoma_general_input">
+                </div>
+              </div>
+              <div class="sistema-body sistema-general-detalle hide-details">
+                <!-- Contenedor de síntomas -->
+                <div id="sintomas_general_container">
+                  <!-- Primer síntoma (siempre visible cuando el sistema está activado) -->
+                  <div class="sintoma-item mb-3 border-bottom pb-3">
+                    <div class="row">
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label class="form-control-label">Síntoma</label>
+                          <input type="text" class="form-control" placeholder="Describa el síntoma"
+                            name="general_sintoma[]">
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <label class="form-control-label">Hace cuánto</label>
+                          <input type="text" class="form-control" placeholder="Tiempo de evolución"
+                            name="general_tiempo[]">
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <label class="form-control-label">Características</label>
+                          <input type="text" class="form-control" placeholder="Detalles del síntoma"
+                            name="general_caracteristicas[]">
+                        </div>
+                      </div>
+                      <div class="col-md-2 d-flex align-items-end">
+                        <button type="button" class="btn btn-danger btn-sm btn-remove-sintoma" style="display: none;">
+                          <i class="fas fa-trash"></i>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Botón para agregar más síntomas -->
+                <div class="text-right mt-2">
+                  <button type="button" class="btn btn-sm btn-success btn-add-sintoma" data-sistema="general">
+                    <i class="fas fa-plus mr-1"></i> Agregar otro síntoma
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Cabeza y Cuello -->
+            <div class="sistema-card">
+              <div class="sistema-header">
+                <h4>Cabeza y Cuello</h4>
+                <div class="ml-auto">
+                  <label class="toggle-switch">
+                    <input type="checkbox" class="sistema-toggle" data-sistema="cabeza_cuello">
+                    <span class="toggle-slider"></span>
+                  </label>
+                  <input type="hidden" name="sintoma_cabeza_cuello" value="no" id="sintoma_cabeza_cuello_input">
+                </div>
+              </div>
+              <div class="sistema-body sistema-cabeza_cuello-detalle hide-details">
+                <!-- Contenedor de síntomas -->
+                <div id="sintomas_cabeza_cuello_container">
+                  <!-- Primer síntoma -->
+                  <div class="sintoma-item mb-3 border-bottom pb-3">
+                    <div class="row">
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label class="form-control-label">Síntoma</label>
+                          <input type="text" class="form-control" placeholder="Describa el síntoma"
+                            name="cabeza_cuello_sintoma[]">
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <label class="form-control-label">Hace cuánto</label>
+                          <input type="text" class="form-control" placeholder="Tiempo de evolución"
+                            name="cabeza_cuello_tiempo[]">
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <label class="form-control-label">Características</label>
+                          <input type="text" class="form-control" placeholder="Detalles del síntoma"
+                            name="cabeza_cuello_caracteristicas[]">
+                        </div>
+                      </div>
+                      <div class="col-md-2 d-flex align-items-end">
+                        <button type="button" class="btn btn-danger btn-sm btn-remove-sintoma" style="display: none;">
+                          <i class="fas fa-trash"></i>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Botón para agregar más síntomas -->
+                <div class="text-right mt-2">
+                  <button type="button" class="btn btn-sm btn-success btn-add-sintoma" data-sistema="cabeza_cuello">
+                    <i class="fas fa-plus mr-1"></i> Agregar otro síntoma
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Cardiopulmonar -->
+            <div class="sistema-card">
+              <div class="sistema-header">
+                <h4>Cardiopulmonar</h4>
+                <div class="ml-auto">
+                  <label class="toggle-switch">
+                    <input type="checkbox" class="sistema-toggle" data-sistema="cardiopulmonar">
+                    <span class="toggle-slider"></span>
+                  </label>
+                  <input type="hidden" name="sintoma_cardiopulmonar" value="no" id="sintoma_cardiopulmonar_input">
+                </div>
+              </div>
+              <div class="sistema-body sistema-cardiopulmonar-detalle hide-details">
+                <!-- Contenedor de síntomas -->
+                <div id="sintomas_cardiopulmonar_container">
+                  <!-- Primer síntoma -->
+                  <div class="sintoma-item mb-3 border-bottom pb-3">
+                    <div class="row">
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label class="form-control-label">Síntoma</label>
+                          <input type="text" class="form-control" placeholder="Describa el síntoma"
+                            name="cardiopulmonar_sintoma[]">
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <label class="form-control-label">Hace cuánto</label>
+                          <input type="text" class="form-control" placeholder="Tiempo de evolución"
+                            name="cardiopulmonar_tiempo[]">
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <label class="form-control-label">Características</label>
+                          <input type="text" class="form-control" placeholder="Detalles del síntoma"
+                            name="cardiopulmonar_caracteristicas[]">
+                        </div>
+                      </div>
+                      <div class="col-md-2 d-flex align-items-end">
+                        <button type="button" class="btn btn-danger btn-sm btn-remove-sintoma" style="display: none;">
+                          <i class="fas fa-trash"></i>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Botón para agregar más síntomas -->
+                <div class="text-right mt-2">
+                  <button type="button" class="btn btn-sm btn-success btn-add-sintoma" data-sistema="cardiopulmonar">
+                    <i class="fas fa-plus mr-1"></i> Agregar otro síntoma
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Gastrointestinal -->
+            <div class="sistema-card">
+              <div class="sistema-header">
+                <h4>Gastrointestinal</h4>
+                <div class="ml-auto">
+                  <label class="toggle-switch">
+                    <input type="checkbox" class="sistema-toggle" data-sistema="gastrointestinal">
+                    <span class="toggle-slider"></span>
+                  </label>
+                  <input type="hidden" name="sintoma_gastrointestinal" value="no" id="sintoma_gastrointestinal_input">
+                </div>
+              </div>
+              <div class="sistema-body sistema-gastrointestinal-detalle hide-details">
+                <!-- Contenedor de síntomas -->
+                <div id="sintomas_gastrointestinal_container">
+                  <!-- Primer síntoma -->
+                  <div class="sintoma-item mb-3 border-bottom pb-3">
+                    <div class="row">
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label class="form-control-label">Síntoma</label>
+                          <input type="text" class="form-control" placeholder="Describa el síntoma"
+                            name="gastrointestinal_sintoma[]">
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <label class="form-control-label">Hace cuánto</label>
+                          <input type="text" class="form-control" placeholder="Tiempo de evolución"
+                            name="gastrointestinal_tiempo[]">
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <label class="form-control-label">Características</label>
+                          <input type="text" class="form-control" placeholder="Detalles del síntoma"
+                            name="gastrointestinal_caracteristicas[]">
+                        </div>
+                      </div>
+                      <div class="col-md-2 d-flex align-items-end">
+                        <button type="button" class="btn btn-danger btn-sm btn-remove-sintoma" style="display: none;">
+                          <i class="fas fa-trash"></i>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Botón para agregar más síntomas -->
+                <div class="text-right mt-2">
+                  <button type="button" class="btn btn-sm btn-success btn-add-sintoma" data-sistema="gastrointestinal">
+                    <i class="fas fa-plus mr-1"></i> Agregar otro síntoma
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Genitourinario -->
+            <div class="sistema-card">
+              <div class="sistema-header">
+                <h4>Genitourinario</h4>
+                <div class="ml-auto">
+                  <label class="toggle-switch">
+                    <input type="checkbox" class="sistema-toggle" data-sistema="genitourinario">
+                    <span class="toggle-slider"></span>
+                  </label>
+                  <input type="hidden" name="sintoma_genitourinario" value="no" id="sintoma_genitourinario_input">
+                </div>
+              </div>
+              <div class="sistema-body sistema-genitourinario-detalle hide-details">
+                <!-- Contenedor de síntomas -->
+                <div id="sintomas_genitourinario_container">
+                  <!-- Primer síntoma -->
+                  <div class="sintoma-item mb-3 border-bottom pb-3">
+                    <div class="row">
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label class="form-control-label">Síntoma</label>
+                          <input type="text" class="form-control" placeholder="Describa el síntoma"
+                            name="genitourinario_sintoma[]">
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <label class="form-control-label">Hace cuánto</label>
+                          <input type="text" class="form-control" placeholder="Tiempo de evolución"
+                            name="genitourinario_tiempo[]">
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <label class="form-control-label">Características</label>
+                          <input type="text" class="form-control" placeholder="Detalles del síntoma"
+                            name="genitourinario_caracteristicas[]">
+                        </div>
+                      </div>
+                      <div class="col-md-2 d-flex align-items-end">
+                        <button type="button" class="btn btn-danger btn-sm btn-remove-sintoma" style="display: none;">
+                          <i class="fas fa-trash"></i>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Botón para agregar más síntomas -->
+                <div class="text-right mt-2">
+                  <button type="button" class="btn btn-sm btn-success btn-add-sintoma" data-sistema="genitourinario">
+                    <i class="fas fa-plus mr-1"></i> Agregar otro síntoma
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Vascular periférico -->
+            <div class="sistema-card">
+              <div class="sistema-header">
+                <h4>Vascular periférico</h4>
+                <div class="ml-auto">
+                  <label class="toggle-switch">
+                    <input type="checkbox" class="sistema-toggle" data-sistema="vascular_periferico">
+                    <span class="toggle-slider"></span>
+                  </label>
+                  <input type="hidden" name="sintoma_vascular_periferico" value="no"
+                    id="sintoma_vascular_periferico_input">
+                </div>
+              </div>
+              <div class="sistema-body sistema-vascular_periferico-detalle hide-details">
+                <!-- Contenedor de síntomas -->
+                <div id="sintomas_vascular_periferico_container">
+                  <!-- Primer síntoma -->
+                  <div class="sintoma-item mb-3 border-bottom pb-3">
+                    <div class="row">
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label class="form-control-label">Síntoma</label>
+                          <input type="text" class="form-control" placeholder="Describa el síntoma"
+                            name="vascular_periferico_sintoma[]">
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <label class="form-control-label">Hace cuánto</label>
+                          <input type="text" class="form-control" placeholder="Tiempo de evolución"
+                            name="vascular_periferico_tiempo[]">
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <label class="form-control-label">Características</label>
+                          <input type="text" class="form-control" placeholder="Detalles del síntoma"
+                            name="vascular_periferico_caracteristicas[]">
+                        </div>
+                      </div>
+                      <div class="col-md-2 d-flex align-items-end">
+                        <button type="button" class="btn btn-danger btn-sm btn-remove-sintoma" style="display: none;">
+                          <i class="fas fa-trash"></i>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Botón para agregar más síntomas -->
+                <div class="text-right mt-2">
+                  <button type="button" class="btn btn-sm btn-success btn-add-sintoma"
+                    data-sistema="vascular_periferico">
+                    <i class="fas fa-plus mr-1"></i> Agregar otro síntoma
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Osteomuscular -->
+            <div class="sistema-card">
+              <div class="sistema-header">
+                <h4>Osteomuscular</h4>
+                <div class="ml-auto">
+                  <label class="toggle-switch">
+                    <input type="checkbox" class="sistema-toggle" data-sistema="osteomuscular">
+                    <span class="toggle-slider"></span>
+                  </label>
+                  <input type="hidden" name="sintoma_osteomuscular" value="no" id="sintoma_osteomuscular_input">
+                </div>
+              </div>
+              <div class="sistema-body sistema-osteomuscular-detalle hide-details">
+                <!-- Contenedor de síntomas -->
+                <div id="sintomas_osteomuscular_container">
+                  <!-- Primer síntoma -->
+                  <div class="sintoma-item mb-3 border-bottom pb-3">
+                    <div class="row">
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label class="form-control-label">Síntoma</label>
+                          <input type="text" class="form-control" placeholder="Describa el síntoma"
+                            name="osteomuscular_sintoma[]">
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <label class="form-control-label">Hace cuánto</label>
+                          <input type="text" class="form-control" placeholder="Tiempo de evolución"
+                            name="osteomuscular_tiempo[]">
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <label class="form-control-label">Características</label>
+                          <input type="text" class="form-control" placeholder="Detalles del síntoma"
+                            name="osteomuscular_caracteristicas[]">
+                        </div>
+                      </div>
+                      <div class="col-md-2 d-flex align-items-end">
+                        <button type="button" class="btn btn-danger btn-sm btn-remove-sintoma" style="display: none;">
+                          <i class="fas fa-trash"></i>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Botón para agregar más síntomas -->
+                <div class="text-right mt-2">
+                  <button type="button" class="btn btn-sm btn-success btn-add-sintoma" data-sistema="osteomuscular">
+                    <i class="fas fa-plus mr-1"></i> Agregar otro síntoma
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Piel y Faneras -->
+            <div class="sistema-card">
+              <div class="sistema-header">
+                <h4>Piel y Faneras</h4>
+                <div class="ml-auto">
+                  <label class="toggle-switch">
+                    <input type="checkbox" class="sistema-toggle" data-sistema="piel_faneras">
+                    <span class="toggle-slider"></span>
+                  </label>
+                  <input type="hidden" name="sintoma_piel_faneras" value="no" id="sintoma_piel_faneras_input">
+                </div>
+              </div>
+              <div class="sistema-body sistema-piel_faneras-detalle hide-details">
+                <!-- Contenedor de síntomas -->
+                <div id="sintomas_piel_faneras_container">
+                  <!-- Primer síntoma -->
+                  <div class="sintoma-item mb-3 border-bottom pb-3">
+                    <div class="row">
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label class="form-control-label">Síntoma</label>
+                          <input type="text" class="form-control" placeholder="Describa el síntoma"
+                            name="piel_faneras_sintoma[]">
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <label class="form-control-label">Hace cuánto</label>
+                          <input type="text" class="form-control" placeholder="Tiempo de evolución"
+                            name="piel_faneras_tiempo[]">
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <label class="form-control-label">Características</label>
+                          <input type="text" class="form-control" placeholder="Detalles del síntoma"
+                            name="piel_faneras_caracteristicas[]">
+                        </div>
+                      </div>
+                      <div class="col-md-2 d-flex align-items-end">
+                        <button type="button" class="btn btn-danger btn-sm btn-remove-sintoma" style="display: none;">
+                          <i class="fas fa-trash"></i>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Botón para agregar más síntomas -->
+                <div class="text-right mt-2">
+                  <button type="button" class="btn btn-sm btn-success btn-add-sintoma" data-sistema="piel_faneras">
+                    <i class="fas fa-plus mr-1"></i> Agregar otro síntoma
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Otros -->
+            <div class="sistema-card">
+              <div class="sistema-header">
+                <h4>Otros</h4>
+                <div class="ml-auto">
+                  <label class="toggle-switch">
+                    <input type="checkbox" class="sistema-toggle" data-sistema="otros">
+                    <span class="toggle-slider"></span>
+                  </label>
+                  <input type="hidden" name="sintoma_otros" value="no" id="sintoma_otros_input">
+                </div>
+              </div>
+              <div class="sistema-body sistema-otros-detalle hide-details">
+                <!-- Contenedor de síntomas -->
+                <div id="sintomas_otros_container">
+                  <!-- Primer síntoma -->
+                  <div class="sintoma-item mb-3 border-bottom pb-3">
+                    <div class="row">
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label class="form-control-label">Síntoma</label>
+                          <input type="text" class="form-control" placeholder="Describa el síntoma"
+                            name="otros_sintoma[]">
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <label class="form-control-label">Hace cuánto</label>
+                          <input type="text" class="form-control" placeholder="Tiempo de evolución"
+                            name="otros_tiempo[]">
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <label class="form-control-label">Características</label>
+                          <input type="text" class="form-control" placeholder="Detalles del síntoma"
+                            name="otros_caracteristicas[]">
+                        </div>
+                      </div>
+                      <div class="col-md-2 d-flex align-items-end">
+                        <button type="button" class="btn btn-danger btn-sm btn-remove-sintoma" style="display: none;">
+                          <i class="fas fa-trash"></i>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Botón para agregar más síntomas -->
+                <div class="text-right mt-2">
+                  <button type="button" class="btn btn-sm btn-success btn-add-sintoma" data-sistema="otros">
+                    <i class="fas fa-plus mr-1"></i> Agregar otro síntoma
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Botones de acción -->
+            <div class="row mt-4">
+              <div class="col-12 text-right">
+                <button type="submit" class="btn btn-primary btn-save">
+                  <i class="fas fa-save mr-2"></i>Guardar
+                </button>
+                <a href="{% url 'detalle_paciente' paciente_id %}" class="btn btn-primary btn-view">
+                  <i class="fas fa-user mr-2"></i>Ver Paciente
+                </a>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Script para controlar la visibilidad de los campos -->
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    // Función para mostrar/ocultar campos de un sistema
+    function toggleCampos(toggle) {
+      const sistema = toggle.getAttribute('data-sistema');
+      const camposDetalle = document.querySelector(`.sistema-${sistema}-detalle`);
+      const hiddenInput = document.getElementById(`sintoma_${sistema}_input`);
+
+      if (toggle.checked) {
+        camposDetalle.classList.remove('hide-details');
+        camposDetalle.classList.add('show');
+        hiddenInput.value = 'si';
+        setTimeout(() => { camposDetalle.style.opacity = 1; }, 10);
+      } else {
+        camposDetalle.classList.remove('show');
+        camposDetalle.style.opacity = 0;
+        hiddenInput.value = 'no';
+        setTimeout(() => {
+          camposDetalle.classList.add('hide-details');
+          // Limpiar todos los síntomas excepto el primero
+          const container = document.getElementById(`sintomas_${sistema}_container`);
+          const sintomas = container.querySelectorAll('.sintoma-item');
+          sintomas.forEach((sintoma, index) => {
+            if (index > 0) {
+              sintoma.remove();
+            } else {
+              // Limpiar inputs del primer síntoma
+              sintoma.querySelectorAll('input').forEach(input => input.value = '');
+            }
+          });
+        }, 300);
+      }
+    }
+
+    // Configurar toggles de sistemas
+    document.querySelectorAll('.sistema-toggle').forEach(toggle => {
+      toggleCampos(toggle);
+      toggle.addEventListener('change', function () { toggleCampos(this); });
+    });
+
+    // Función para agregar nuevo síntoma
+    function agregarSintoma(sistema) {
+      const container = document.getElementById(`sintomas_${sistema}_container`);
+      const nuevoSintoma = document.createElement('div');
+      nuevoSintoma.className = 'sintoma-item mb-3 border-bottom pb-3';
+      nuevoSintoma.innerHTML = `
+        <div class="row">
+          <div class="col-md-4">
+            <div class="form-group">
+              <input type="text" class="form-control" placeholder="Describa el síntoma"
+                name="${sistema}_sintoma[]">
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="form-group">
+              <input type="text" class="form-control" placeholder="Tiempo de evolución" 
+                name="${sistema}_tiempo[]">
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="form-group">
+              <input type="text" class="form-control" placeholder="Detalles del síntoma"
+                name="${sistema}_caracteristicas[]">
+            </div>
+          </div>
+          <div class="col-md-2 d-flex align-items-end">
+            <button type="button" class="btn btn-danger btn-sm btn-remove-sintoma">
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
+        </div>
+      `;
+      container.appendChild(nuevoSintoma);
+
+      // Agregar evento al botón de eliminar
+      nuevoSintoma.querySelector('.btn-remove-sintoma').addEventListener('click', function () {
+        nuevoSintoma.remove();
+      });
+    }
+
+    // Configurar botones para agregar síntomas
+    document.querySelectorAll('.btn-add-sintoma').forEach(btn => {
+      btn.addEventListener('click', function () {
+        const sistema = this.getAttribute('data-sistema');
+        agregarSintoma(sistema);
+      });
+    });
+
+    // Mostrar botón de eliminar en el primer síntoma si hay más de uno
+    document.querySelectorAll('.sintoma-item').forEach(item => {
+      const container = item.closest('[id^="sintomas_"]');
+      if (container.querySelectorAll('.sintoma-item').length > 1) {
+        item.querySelector('.btn-remove-sintoma').style.display = 'block';
+      }
+    });
+  });
+</script>
+{% endblock content %}

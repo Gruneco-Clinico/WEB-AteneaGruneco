@@ -1,0 +1,253 @@
+{% extends 'layouts/base.html' %}
+
+{% block content %}
+<div class="header bg-primary pb-6">
+    <div class="container-fluid">
+        <div class="header-body">
+            <div class="row align-items-center py-4">
+                <div class="col-lg-6 col-5">
+                    <h6 class="h2 text-white d-inline-block mb-0">Información del Paciente</h6>
+                    <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
+                        <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
+                            <li class="breadcrumb-item"><a href="#"><i class="fas fa-home"></i></a></li>
+                            <li class="breadcrumb-item"><a href="/pacientes/">Pacientes</a></li>
+                            <li class="breadcrumb-item"><a href="/pacientes/">Volver</a></li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid mt--6">
+    <div class="row">
+        <div class="col">
+            <div class="card shadow">
+                <form method="post" action="{% url 'guardar_examen_ISI' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="visita_id" id="visita_id" value="{{ visita_examen }}" />
+                    <input type="hidden" name="paciente_id" id="paciente_id" value="{{ paciente_id }}" />
+                    <input type="hidden" name="examen_id" id="examen_id" value="{{ examen_id }}" />
+
+                    <!-- Card Header -->
+                    <div class="card-header border-0">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <h3 class="mb-0">Índice de Severidad del Insomnio (ISI)</h3>
+                            </div>
+                            <div class="col text-right">
+                                <span class="text-muted">Fecha: {% now "d/m/Y" %}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card Body -->
+                    <div class="card-body">
+                        <div class="card bg-gradient-default shadow-sm mb-4">
+                            <div class="card-header bg-transparent">
+                                <h4 class="text-white mb-0">Evaluación de Insomnio</h4>
+                            </div>
+                            <div class="card-body bg-white">
+                                <div class="alert alert-info">
+                                    <strong>Instrucciones:</strong> Evalúe cada aspecto de su insomnio durante las
+                                    últimas 2 semanas, seleccionando la opción que mejor describa su experiencia.
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <!-- Pregunta 1 -->
+                                        <div class="form-group">
+                                            <label>1. Dificultad para conciliar el sueño</label>
+                                            <select class="form-control" name="dificultad_dormir" required>
+                                                <option value="" selected disabled>Seleccione una opción</option>
+                                                <option value="Ninguno">Ninguna dificultad (0 puntos)</option>
+                                                <option value="Poco">Poca dificultad (1 punto)</option>
+                                                <option value="Moderado">Dificultad moderada (2 puntos)</option>
+                                                <option value="Severo">Dificultad severa (3 puntos)</option>
+                                                <option value="Muy severo">Dificultad muy severa (4 puntos)</option>
+                                            </select>
+                                        </div>
+
+                                        <!-- Pregunta 2 -->
+                                        <div class="form-group">
+                                            <label>2. Dificultad para mantener el sueño</label>
+                                            <select class="form-control" name="dificultad_mantener_sueno" required>
+                                                <option value="" selected disabled>Seleccione una opción</option>
+                                                <option value="Ninguno">Ninguna dificultad (0 puntos)</option>
+                                                <option value="Poco">Poca dificultad (1 punto)</option>
+                                                <option value="Moderado">Dificultad moderada (2 puntos)</option>
+                                                <option value="Severo">Dificultad severa (3 puntos)</option>
+                                                <option value="Muy severo">Dificultad muy severa (4 puntos)</option>
+                                            </select>
+                                        </div>
+
+                                        <!-- Pregunta 3 -->
+                                        <div class="form-group">
+                                            <label>3. Despertar demasiado temprano</label>
+                                            <select class="form-control" name="despertar_temprano" required>
+                                                <option value="" selected disabled>Seleccione una opción</option>
+                                                <option value="Ninguno">Nunca (0 puntos)</option>
+                                                <option value="Poco">Pocas veces (1 punto)</option>
+                                                <option value="Moderado">Algunas veces (2 puntos)</option>
+                                                <option value="Severo">Frecuentemente (3 puntos)</option>
+                                                <option value="Muy severo">Muy frecuentemente (4 puntos)</option>
+                                            </select>
+                                        </div>
+
+                                        <!-- Pregunta 4 -->
+                                        <div class="form-group">
+                                            <label>4. Satisfacción con el patrón de sueño actual</label>
+                                            <select class="form-control" name="satisfaccion_sueno" required>
+                                                <option value="" selected disabled>Seleccione una opción</option>
+                                                <option value="Muy satisfecho">Muy satisfecho (0 puntos)</option>
+                                                <option value="Satisfecho">Satisfecho (1 punto)</option>
+                                                <option value="Moderadamente satisfecho">Moderadamente satisfecho (2
+                                                    puntos)</option>
+                                                <option value="Insatisfecho">Insatisfecho (3 puntos)</option>
+                                                <option value="Muy insatisfecho">Muy insatisfecho (4 puntos)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <!-- Pregunta 5 -->
+                                        <div class="form-group">
+                                            <label>5. Notabilidad del problema de sueño</label>
+                                            <select class="form-control" name="notabilidad_problema" required>
+                                                <option value="" selected disabled>Seleccione una opción</option>
+                                                <option value="No es notable">No es notable (0 puntos)</option>
+                                                <option value="Un poco notable">Un poco notable (1 punto)</option>
+                                                <option value="Moderadamente notable">Moderadamente notable (2 puntos)
+                                                </option>
+                                                <option value="Muy notable">Muy notable (3 puntos)</option>
+                                                <option value="Demasiado notable">Demasiado notable (4 puntos)</option>
+                                            </select>
+                                        </div>
+
+                                        <!-- Pregunta 6 -->
+                                        <div class="form-group">
+                                            <label>6. Preocupación por el problema de sueño</label>
+                                            <select class="form-control" name="preocupacion_sueno" required>
+                                                <option value="" selected disabled>Seleccione una opción</option>
+                                                <option value="Para nada preocupado">Nada preocupado (0 puntos)</option>
+                                                <option value="Un poco preocupado">Poco preocupado (1 punto)</option>
+                                                <option value="Moderadamente preocupado">Moderadamente preocupado (2
+                                                    puntos)</option>
+                                                <option value="Muy preocupado">Muy preocupado (3 puntos)</option>
+                                                <option value="Demasiado preocupado">Extremadamente preocupado (4
+                                                    puntos)</option>
+                                            </select>
+                                        </div>
+
+                                        <!-- Pregunta 7 -->
+                                        <div class="form-group">
+                                            <label>7. Interferencia con el funcionamiento diario</label>
+                                            <select class="form-control" name="interferencia_sueno" required>
+                                                <option value="" selected disabled>Seleccione una opción</option>
+                                                <option value="No interfiere">No interfiere (0 puntos)</option>
+                                                <option value="Interfiere un poco">Interfiere un poco (1 punto)</option>
+                                                <option value="Interfiere moderadamente">Interfiere moderadamente (2
+                                                    puntos)</option>
+                                                <option value="Interfiere mucho">Interfiere mucho (3 puntos)</option>
+                                                <option value="Interfiere demasiado">Interfiere extremadamente (4
+                                                    puntos)</option>
+                                            </select>
+                                        </div>
+
+                                        <!-- Puntuación Total -->
+                                        <div class="form-group">
+                                            <label>Puntuación Total ISI</label>
+                                            <input type="number" class="form-control" name="puntuacion_total" min="0"
+                                                max="28" readonly>
+                                            <small class="form-text text-muted">La puntuación se calculará
+                                                automáticamente</small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="alert alert-warning mt-3">
+                                    <strong>Interpretación del puntaje:</strong><br>
+                                    - <strong>0-7 puntos:</strong> Sin insomnio clínicamente significativo<br>
+                                    - <strong>8-14 puntos:</strong> Insomnio subclínico (leve)<br>
+                                    - <strong>15-21 puntos:</strong> Insomnio clínico (moderado)<br>
+                                    - <strong>22-28 puntos:</strong> Insomnio clínico (severo)
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Botones de acción -->
+                        <div class="row mt-4">
+                            <div class="col-12 text-right">
+                                <button type="submit" class="btn btn-primary">Guardar Examen</button>
+                                <a href="{% url 'detalle_paciente' paciente_id %}" class="btn btn-secondary">Ver
+                                    Paciente</a>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Script para calcular automáticamente la puntuación ISI
+        const form = document.querySelector('form');
+        const puntuacionTotalInput = document.querySelector('input[name="puntuacion_total"]');
+        const selects = document.querySelectorAll('select[name^="dificultad_dormir"], select[name^="dificultad_mantener_sueno"], select[name^="despertar_temprano"], select[name^="satisfaccion_sueno"], select[name^="notabilidad_problema"], select[name^="preocupacion_sueno"], select[name^="interferencia_sueno"]');
+
+        // Mapeo de valores a puntos según el ISI
+        const puntosPorOpcion = {
+            "Ninguno": 0,
+            "Poco": 1,
+            "Moderado": 2,
+            "Severo": 3,
+            "Muy severo": 4,
+            "Muy satisfecho": 0,
+            "Satisfecho": 1,
+            "Moderadamente satisfecho": 2,
+            "Insatisfecho": 3,
+            "Muy insatisfecho": 4,
+            "No es notable": 0,
+            "Un poco notable": 1,
+            "Moderadamente notable": 2,
+            "Muy notable": 3,
+            "Demasiado notable": 4,
+            "Para nada preocupado": 0,
+            "Un poco preocupado": 1,
+            "Moderadamente preocupado": 2,
+            "Muy preocupado": 3,
+            "Demasiado preocupado": 4,
+            "No interfiere": 0,
+            "Interfiere un poco": 1,
+            "Interfiere moderadamente": 2,
+            "Interfiere mucho": 3,
+            "Interfiere demasiado": 4
+        };
+
+        function calcularPuntuacionISI() {
+            let total = 0;
+            selects.forEach(select => {
+                const selectedOption = select.options[select.selectedIndex];
+                if (selectedOption.value && puntosPorOpcion[selectedOption.value] !== undefined) {
+                    total += puntosPorOpcion[selectedOption.value];
+                }
+            });
+            puntuacionTotalInput.value = total;
+        }
+
+        // Calcular al cambiar cualquier selección
+        selects.forEach(select => {
+            select.addEventListener('change', calcularPuntuacionISI);
+        });
+
+        // Calcular al enviar el formulario
+        form.addEventListener('submit', function (e) {
+            calcularPuntuacionISI();
+        });
+    });
+</script>
+
+{% endblock %}

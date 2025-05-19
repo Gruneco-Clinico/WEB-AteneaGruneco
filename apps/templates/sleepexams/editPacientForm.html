@@ -1,0 +1,109 @@
+{% extends 'layouts/base.html' %}
+{% block title %} Editar Paciente {% endblock title %}
+
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+<div class="header bg-primary pb-6">
+  <div class="container-fluid">
+    <div class="header-body">
+      <div class="row align-items-center py-4">
+        <div class="col-lg-6 col-5">
+          <h6 class="h2 text-white d-inline-block mb-0">Editar Paciente</h6>
+          <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
+            <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
+              <li class="breadcrumb-item"><a href="#"><i class="fas fa-home"></i></a></li>
+              <li class="breadcrumb-item"><a href="/pacientes/">Pacientes</a></li>
+              <li class="breadcrumb-item active" aria-current="page">Editar Paciente</li>
+            </ol>
+          </nav>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid mt--6">
+  <div class="row">
+    <div class="col-xl-12">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="mb-0">Formulario de Edición</h3>
+        </div>
+        <div class="card-body">
+          <form method="post" action="{% url 'editar_paciente' form.instance.numero_documento %}">
+            {% csrf_token %}
+
+            <!-- Información Personal -->
+            <h6 class="heading-small text-muted mb-4">Información Personal</h6>
+            <div class="pl-lg-4">
+              <div class="row">
+                <div class="col-lg-3"><label>Primer Nombre</label>{{ form.primer_nombre }}</div>
+                <div class="col-lg-3"><label>Segundo Nombre</label>{{ form.segundo_nombre }}</div>
+                <div class="col-lg-3"><label>Primer Apellido</label>{{ form.primer_apellido }}</div>
+                <div class="col-lg-3"><label>Segundo Apellido</label>{{ form.segundo_apellido }}</div>
+              </div>
+
+              <div class="row mt-3">
+                <div class="col-lg-3"><label>Tipo Documento</label>{{ form.tipo_documento }}</div>
+                <div class="col-lg-3"><label>Número de Documento</label>{{ form.numero_documento }}</div>
+                <div class="col-lg-3">
+                  <label>Fecha de Nacimiento</label>
+                  <input type="date" class="form-control" name="fecha_nacimiento"
+                    value="{{ form.fecha_nacimiento.value|date:'Y-m-d' }}">
+                </div>
+
+                <div class="col-lg-3"><label>Edad</label>{{ form.edad }}</div>
+              </div>
+
+              <div class="row mt-3">
+                <div class="col-lg-3"><label>Género</label>{{ form.genero }}</div>
+                <div class="col-lg-3"><label>Municipio de Nacimiento</label>{{ form.municipio_nacimiento }}</div>
+                <div class="col-lg-3"><label>Departamento de Nacimiento</label>{{ form.departamento_nacimiento }}</div>
+                <div class="col-lg-3"><label>Pais de Nacimiento</label>{{ form.pais_nacimiento }}</div>
+              </div>
+            </div>
+
+            <hr class="my-3">
+            <h6 class="heading-small text-muted mb-4">Información de Contacto</h6>
+            <div class="row mt-3">
+              <div class="col-lg-3"><label>Celular</label>{{ form.celular }}</div>
+              <div class="col-lg-3"><label>Correo Electrónico</label>{{ form.correo }}</div>
+              <div class="col-lg-3"><label>Dirección</label>{{ form.direccion }}</div>
+            </div>
+
+            <div class="row mt-3">
+              <div class="col-lg-3"><label>Municipio de Residencia</label>{{ form.municipio_residencia }}</div>
+              <div class="col-lg-3"><label>Departamento de Residencia</label>{{ form.departamento_residencia }}</div>
+              <div class="col-lg-3"><label>País de Residencia</label>{{ form.pais_residencia }}</div>
+            </div>
+
+            <hr class="my-3">
+            <h6 class="heading-small text-muted mb-4">Información Adicional</h6>
+            <div class="row mt-3">
+              <div class="col-lg-3"><label>Grupo Sanguíneo</label>{{ form.grupo_sanguineo }}</div>
+              <div class="col-lg-3"><label>Religión</label>{{ form.religion }}</div>
+              <div class="col-lg-3"><label>EPS</label>{{ form.eps }}</div>
+              <div class="col-lg-3"><label>Régimen</label>{{ form.regimen }}</div>
+            </div>
+            <div class="row mt-3">
+              <div class="col-lg-3"><label>Estado Civil</label>{{ form.estado_civil }}</div>
+              <div class="col-lg-3"><label>Escolaridad</label>{{ form.escolaridad }}</div>
+              <div class="col-lg-3"><label>Ocupación</label>{{ form.ocupacion }}</div>
+              <div class="col-lg-3"><label>Lateralidad</label>{{ form.lateralidad }}</div>
+            </div>
+
+            <div class="text-right mt-4">
+              <button type="submit" class="btn btn-sm btn-primary"
+                onclick="return confirm('¿Estás seguro de que deseas editar este paciente?');">Guardar cambios</button>
+            </div>
+          </form>
+        </div>
+        <a href="{% url 'tables.html' %}" class="btn btn-secondary">
+          Cancelar
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}

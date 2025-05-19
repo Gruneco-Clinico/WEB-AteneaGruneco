@@ -1,0 +1,235 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %} Perfil de Usuario {% endblock title %}
+
+{% block content %}
+<style>
+  /* Efecto de elevación y cambio de color */
+  .card:hover {
+    transform: translateY(-5px);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Estilos para la foto de perfil */
+  .profile-picture {
+    width: 150px;
+    height: 150px;
+    border: 5px solid #fff;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Estilos para el rol del usuario */
+  .user-role {
+    background: linear-gradient(45deg, #5e72e4, #825ee4);
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    display: inline-block;
+    margin-top: 10px;
+  }
+
+  /* Estilos para las estadísticas */
+  .stats-card {
+    background: linear-gradient(45deg, #5e72e4, #825ee4);
+    color: #fff;
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+  }
+
+  .stats-card h3 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+  }
+
+  .stats-card p {
+    font-size: 1.2rem;
+    margin-bottom: 0;
+  }
+</style>
+
+<!-- Header con imagen de fondo -->
+<div class="header pb-6 d-flex align-items-center"
+  style="min-height: 300px; background-image: url(/static/assets/img/theme/tem_university.jpg); background-size: cover; background-position: center top;">
+  <!-- Máscara para el fondo -->
+  <span class="mask bg-gradient-default opacity-8"></span>
+  <!-- Contenedor del header -->
+  <div class="container-fluid d-flex align-items-center">
+    <div class="row">
+      <div class="col-lg-7 col-md-10">
+        <h1 class="display-2 text-white">Perfil de Usuario</h1>
+        <p class="text-white mt-0 mb-5" style="text-align: justify;">
+          Bienvenido a tu perfil en ATENEA. Aquí puedes ver tus datos personales, estadísticas y actividades recientes.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Contenido principal -->
+<div class="container-fluid mt--6">
+  <div class="row">
+    <!-- Columna derecha: Foto de perfil y estadísticas -->
+    <div class="col-xl-4 order-xl-2">
+      <!-- Tarjeta de perfil -->
+      <div class="card card-profile">
+        <div class="row justify-content-center">
+          <div class="col-lg-3 order-lg-2">
+            <div class="card-profile-image">
+              <a href="#">
+                <img src="/static/assets/img/theme/UdeA.jpeg" class="rounded-circle profile-picture">
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="card-body pt-0">
+          <div class="text-center">
+            <h3 class="h4">Juan Pérez</h3>
+            <div class="h5 font-weight-300">
+              <i class="ni location_pin mr-2"></i>Medellín, Colombia
+            </div>
+            <!-- Indicador de Rol -->
+            <div class="user-role">
+              <i class="ni ni-badge mr-2"></i>Investigador
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tarjeta de estadísticas -->
+      <div class="card mt-4">
+        <div class="card-body stats-card">
+          <h3>Estadísticas</h3>
+          <p>Proyectos Activos: <strong>3</strong></p>
+
+        </div>
+      </div>
+      {% if messages %}
+      <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        {% for message in messages %}
+        <p class="mb-0">{{ message }}</p>
+        {% endfor %}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Cerrar">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      {% endif %}
+
+      <!-- Formulario para cambiar la contraseña -->
+      <div class="card mt-4">
+        <div class="card-body">
+          <h3 class="card-title">Cambiar Contraseña</h3>
+          <form method="post" action="{% url 'cambiar_contrasena' %}">
+            {% csrf_token %}
+            <div class="form-group">
+              <label for="new_password">Nueva Contraseña</label>
+              <input type="password" class="form-control" id="new_password" name="new_password" required>
+            </div>
+            <div class="form-group">
+              <label for="confirm_password">Confirmar Contraseña</label>
+              <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+            </div>
+            <button type="submit" class="btn btn-primary"
+              onclick="return confirm('¿Estás seguro de que deseas cambiar la contraseña?');">
+              Cambiar Contraseña
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Columna izquierda: Información detallada -->
+    <div class="col-xl-8 order-xl-1">
+      <!-- Tarjeta de información personal -->
+      <div class="card">
+        <div class="card-header">
+          <h3 class="mb-0">Información Personal</h3>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <p><strong>Nombre:</strong> {{ request.user.username }}</p>
+              <p><strong>Correo Electrónico:</strong> {{ request.user.email }}</p>
+            </div>
+            <div class="col-md-6">
+              <p><strong>Área de Investigación:</strong> Neurociencias Cognitivas</p>
+              <p><strong>Fecha de Ingreso:</strong> {{ request.user.last_login }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tarjeta de proyectos activos -->
+      <div class="card mt-4">
+        <div class="card-header">
+          <h3 class="mb-0">Proyectos Activos</h3>
+        </div>
+        <div class="card-body">
+          <!-- Proyecto Sueño -->
+          <div class="row mt-4">
+            <div class="col-md-12">
+              <div class="card">
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col-2 d-flex align-items-center justify-content-center">
+                      <i class="ni ni-planet text-primary ni-3x"></i>
+                    </div>
+                    <div class="col-10">
+                      <h5 class="card-title text-uppercase text-muted mb-0">Proyecto Sueño</h5>
+                      <p>Investigamos el impacto del sueño en la función cognitiva, explorando su relación con la
+                        memoria, la atención y el procesamiento emocional.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Proyecto Envejecimiento -->
+          <div class="row mt-4">
+            <div class="col-md-12">
+              <div class="card">
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col-2 d-flex align-items-center justify-content-center">
+                      <i class="ni ni-single-02 text-primary ni-3x"></i>
+                    </div>
+                    <div class="col-10">
+                      <h5 class="card-title text-uppercase text-muted mb-0">Proyecto Envejecimiento</h5>
+                      <p>Estudiamos los efectos del envejecimiento en la plasticidad cerebral y la función cognitiva.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Proyecto Anosognosia -->
+          <div class="row mt-4">
+            <div class="col-md-12">
+              <div class="card">
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col-2 d-flex align-items-center justify-content-center">
+                      <i class="ni ni-world-2 text-primary ni-3x"></i>
+                    </div>
+                    <div class="col-10">
+                      <h5 class="card-title text-uppercase text-muted mb-0">Proyecto Anosognosia</h5>
+                      <p>Investigamos los mecanismos neurocognitivos de la anosognosia en diversas patologías
+                        neurológicas.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}

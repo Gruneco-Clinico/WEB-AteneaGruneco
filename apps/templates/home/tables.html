@@ -1,0 +1,163 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %} Listado de Pacientes {% endblock title %}
+
+{% block content %}
+
+<div class="header bg-primary pb-6">
+  <div class="container-fluid">
+    <div class="header-body">
+      <div class="row align-items-center py-4">
+        <div class="col-lg-6 col-5">
+          <h6 class="h2 text-white d-inline-block mb-0">Listado de Pacientes</h6>
+          <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
+            <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
+              <li class="breadcrumb-item"><a href="#"><i class="fas fa-home"></i></a></li>
+              <li class="breadcrumb-item"><a href="/pacientes/">Pacientes</a></li>
+              <li class="breadcrumb-item active" aria-current="page">Listado de Pacientes</li>
+            </ol>
+          </nav>
+        </div>
+        <div class="col-lg-6 col-7 text-right">
+          <div class="input-group">
+            <input type="text" class="form-control form-control-sm" id="searchPatient" placeholder="Buscar paciente">
+            <div class="input-group-append">
+              <button class="btn btn-sm btn-neutral" type="button" onclick="searchTable()">
+                <i class="fas fa-search"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row align-content-center py-2">
+        <div class="col-lg-12 col-7 text-right">
+          <a class="btn btn-sm btn-neutral" id="agregar-formulario">Nuevo</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Page content -->
+<div class="container-fluid mt--6">
+  <div class="row">
+    <div class="col">
+      <div class="card">
+        <!-- Card header -->
+        <div class="card-header border-0">
+          <h3 class="mb-0">Listado de Pacientes</h3>
+        </div>
+        <!-- Light table -->
+        <div class="table-responsive">
+          <table id="patientTable" class="table align-items-center table-flush">
+            <thead class="thead-light">
+              <tr>
+                <th scope="col" class="sort" data-sort="id">ID del Paciente</th>
+                <th scope="col" class="sort" data-sort="name">Nombre</th>
+                <th scope="col" class="sort" data-sort="age">Edad</th>
+                <th scope="col" class="sort" data-sort="gender">Fecha nacimiento</th>
+                <th scope="col" class="sort" data-sort="status">ocupacion</th>
+                <th scope="col">Acciones</th>
+              </tr>
+            </thead>
+            <tbody class="list">
+              {% for paciente in pacientes %}
+              <tr>
+                <td>{{ paciente.numero_documento }}</td>
+                <td>{{ paciente.primer_nombre }} {{ paciente.primer_apellido }}</td>
+                <td>{{ paciente.edad }}</td>
+                <td>{{ paciente.fecha_nacimiento}}</td> <!-- Si 'género' es un campo de elección -->
+                <td>{{ paciente.ocupacion }}</td>
+                <td>
+                  <a href="{% url 'detalle_paciente' paciente.id %}" class="btn btn-sm btn-neutral">Ver</a>
+                  <a href="{% url 'editar_paciente' paciente.numero_documento %}"
+                    class="btn btn-sm btn-neutral">Editar</a>
+                  <a>
+                    <form action="{% url 'eliminar_paciente' paciente.numero_documento %}" method="post"
+                      style="display: inline;">
+                      {% csrf_token %}
+                      <button type="submit" class="btn btn-sm btn-danger"
+                        onclick="return confirm('¿Estás seguro de que deseas eliminar este paciente?');">Eliminar</button>
+                    </form>
+                  </a>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div id="formulario-dinamicos" class="mt-3">
+        <!-- Aquí se cargarán dinámicamente los formularios -->
+      </div>
+      {% if messages %}
+      <div class="alert alert-success">
+        {% for message in messages %}
+        {{ message }}
+        {% endfor %}
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{% endblock content %}
+
+{% block javascripts %}
+<script>
+  function searchTable() {
+    // Obtener el valor del campo de búsqueda
+    const searchTerm = document.getElementById("searchPatient").value.toLowerCase();
+
+    // Obtener todas las filas de la tabla (se debe apuntar a la tabla directamente)
+    const table = document.querySelector("table");  // Selecciona la tabla de la página
+    const rows = table.getElementsByTagName("tr");
+
+    // Iterar sobre todas las filas (comenzando desde la fila 1 para omitir la cabecera)
+    for (let i = 1; i < rows.length; i++) {  // Asegúrate de que empieces en la fila 1 para evitar la cabecera
+      let row = rows[i];
+      let cells = row.getElementsByTagName("td");
+
+      let match = false;
+      // Iterar sobre las celdas de la fila y comprobar si alguna contiene el término de búsqueda
+      for (let j = 0; j < cells.length; j++) {
+        let cell = cells[j];
+        if (cell.innerText.toLowerCase().includes(searchTerm)) {
+          match = true;  // Si hay coincidencia, mostrar la fila
+          break;
+        }
+      }
+
+      // Mostrar u ocultar la fila según si hay coincidencia
+      row.style.display = match ? "" : "none";
+    }
+  }
+  function calcularEdad() {
+    // Obtener la fecha de nacimiento del campo de entrada
+    const fechaNacimiento = document.getElementById('fecha_nacimiento').value;
+    console.log(fechaNacimiento);
+    // Verificar si se ha seleccionado una fecha
+    if (fechaNacimiento) {
+      // Convertir la fecha de nacimiento a un objeto Date
+      const fechaNac = new Date(fechaNacimiento);
+      const hoy = new Date(); // Fecha actual
+
+      // Calcular la diferencia en milisegundos
+      const diferencia = hoy - fechaNac;
+
+      // Convertir la diferencia a años
+      const edad = Math.floor(diferencia / (1000 * 60 * 60 * 24 * 365.25));
+
+      // Mostrar la edad en el campo correspondiente
+      document.getElementById('edad').value = edad;
+    } else {
+      // Si no hay fecha, limpiar el campo de edad
+      document.getElementById('edad').value = '';
+    }
+  }
+
+  // Asignar el evento oninput al campo de fecha de nacimiento
+  document.getElementById('fecha_nacimiento').addEventListener('input', calcularEdad);
+
+</script>
+{% endblock javascripts %}

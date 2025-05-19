@@ -1,0 +1,79 @@
+<style>
+  /* Animación de apertura y cierre de la barra lateral */
+  .sidenav {
+    transition: width 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+  }
+
+  /* Efecto al pasar el cursor sobre los íconos y enlaces */
+  .navbar-nav .nav-link {
+    transition: background-color 0.3s ease, color 0.3s ease;
+    border-radius: 5px;
+  }
+
+  .navbar-nav .nav-link:hover {
+    background-color: rgba(0, 128, 255, 0.1);
+    color: #0056b3;
+    transform: scale(1.05);
+  }
+
+  /* Efecto de escala en los íconos */
+  .navbar-nav .nav-link i {
+    transition: transform 0.3s ease;
+  }
+
+  .navbar-nav .nav-link:hover i {
+    transform: rotate(10deg) scale(1.2);
+  }
+
+  /* Fondo dinámico en el enlace activo */
+  .navbar-nav .nav-link.active {
+    background-color: rgba(0, 128, 255, 0.2);
+    font-weight: bold;
+    transition: background-color 0.3s ease-in-out;
+  }
+</style>
+
+<nav class="sidenav navbar navbar-vertical fixed-left navbar-expand-xs navbar-light bg-white" id="sidenav-main">
+  <div class="scrollbar-inner">
+    <!-- Brand -->
+    <div class="sidenav-header align-items-center">
+      <a class="navbar-brand" href="/">
+        <img src="/static/assets/img/brand/Logo_GRUNECO_Sin_Fondo.png" class="navbar-brand-img" alt="Argon Design - Jinja Template Logo.">
+      </a>
+    </div>
+    <div class="navbar-inner">
+      <!-- Collapse -->
+      <div class="collapse navbar-collapse" id="sidenav-collapse-main">
+        <!-- Nav items -->
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link {% if 'index' in segment %} active {% endif %}" href="/index/">
+              <i class="ni ni-tv-2 text-green"></i>
+              <span class="nav-link-text">Inicio</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link {% if 'estadisticas' in segment %} active {% endif %}" href="/estadisticas/">
+              <i class="ni ni-chart-pie-35 text-blue"></i>
+              <span class="nav-link-text">Estadisticas</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link {% if 'tables' in segment %} active {% endif %}" href="/pacientes/">
+              <i class="ni ni-bullet-list-67 text-default"></i>
+              <span class="nav-link-text">Listado de Pacientes</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link {% if 'tables' in segment %} active {% endif %}" href="/proyectos/">
+              <i class="ni ni-single-copy-04 text-red"></i>
+              <span class="nav-link-text">Proyectos</span>
+            </a>
+          </li>
+        </ul>
+        <!-- Divider -->
+        <hr class="my-3">
+      </div>
+    </div>
+  </div>
+</nav>

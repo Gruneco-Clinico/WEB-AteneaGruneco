@@ -1,0 +1,165 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %} Dashboard {% endblock title %}
+
+{% block content %}
+<style>
+  /* Efecto de elevación y cambio de color */
+  .card:hover {
+    transform: translateY(-5px);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
+  }
+  }
+</style>
+<div class="header pb-6 d-flex align-items-center"
+     style="min-height: 500px; background-image: url(/static/assets/img/theme/tem_university.jpg); background-size: cover; background-position: center top;">
+  <!-- Mask -->
+  <span class="mask bg-gradient-default opacity-8"></span>
+  <!-- Header container -->
+  <div class="container-fluid d-flex align-items-center">
+    <div class="row">
+      <div class="col-lg-7 col-md-10">
+        <h1 class="display-2 text-white">
+          ATENEA
+        </h1>
+        <p class="text-white mt-0 mb-5" style="text-align: justify;">El Sistema de Historias Clínicas Electrónicas (HCE) de GRUNECO es una plataforma avanzada diseñada para la gestión eficiente y segura de la información médica de los pacientes dentro del marco de investigaciones clínicas y biomédicas. Este sistema permite almacenar, organizar y analizar datos de salud en un entorno digital, garantizando la trazabilidad, accesibilidad y confidencialidad de la información.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid mt--6">
+  <div class="row">
+    <div class="col-xl-4 order-xl-2">
+      <div div class="row justify-content-center">
+        <div class="card card-profile">
+          <img src="/static/assets/img/theme/universidad-antioquia.jpg" alt="Image placeholder" class="card-img-top">
+          <div class="row justify-content-center">
+            <div class="col-lg-3 order-lg-2">
+              <div class="card-profile-image">
+                <a href="#">
+                  <img src="/static/assets/img/theme/UdeA.jpeg" class="rounded-circle">
+                </a>
+              </div>
+            </div>
+          </div>
+          <div class="card-body pt-0">
+            <div class="text-center">
+              <div class="h5 mt-4">
+                <i class="ni business_briefcase-24 mr-2"></i>Estudiante
+              </div>
+              <div class="h5 mt-5">
+                <i class="ni education_hat mr-2"></i>UNIVERSIDAD DE ANTIOQUIA
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div div class="row justify-content-center">
+        <div class="col-md-12">
+          <div class="card">
+            <div class="card-body">
+              <div class="row">
+                <div class="col-2 d-flex align-items-center justify-content-center">
+                  <i class="ni ni-compass-04 text-primary ni-3x"></i>
+                </div>
+                <div class="col-10">
+                  <h5 class="card-title text-uppercase text-muted mb-0">Líneas de Investigación</h5>
+                  <ul class="list-unstyled">
+                    <li>Neurociencias Cognitivas</li>
+                    <li>Neurociencias e Ingeniería</li>
+                    <li>Neurociencias Clínicas</li>
+                    <li>Aprendizaje y Enseñanza de la Investigación</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div class="col-xl-8 order-xl-1">
+      <div class="card">
+        <div class="card-header">
+          <div class="row align-items-center">
+            <div class="col-8">
+              <h3 class="mb-0">Proyectos Actuales</h3>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <!-- Tarjeta Proyecto Sueño -->
+          <div class="row mt-4">
+            <div class="col-md-12">
+              <div class="card">
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col-2 d-flex align-items-center justify-content-center">
+                      <i class="ni ni-planet text-primary ni-3x"></i> <!-- Ícono de sueño/luna -->
+                    </div>
+                    <div class="col-10">
+                      <h5 class="card-title text-uppercase text-muted mb-0">Proyecto Sueño</h5>
+                      <p>Investigamos el impacto del sueño en la función cognitiva, explorando su relación con la memoria, la atención y el procesamiento emocional. Buscamos identificar alteraciones en los patrones de sueño y su posible vínculo con enfermedades neurodegenerativas.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        
+          <!-- Tarjeta Proyecto Envejecimiento -->
+          <div class="row mt-4">
+            <div class="col-md-12">
+              <div class="card">
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col-2 d-flex align-items-center justify-content-center">
+                      <i class="ni ni-single-02 text-primary ni-3x"></i> <!-- Ícono de persona mayor -->
+                    </div>
+                    <div class="col-10">
+                      <h5 class="card-title text-uppercase text-muted mb-0">Proyecto Envejecimiento</h5>
+                      <p>Estudiamos los efectos del envejecimiento en la plasticidad cerebral y la función cognitiva, desarrollando estrategias de intervención para mejorar la calidad de vida en adultos mayores y prevenir el deterioro cognitivo.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        
+          <!-- Tarjeta Proyecto Anosognosia -->
+          <div class="row mt-4">
+            <div class="col-md-12">
+              <div class="card">
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col-2 d-flex align-items-center justify-content-center">
+                      <i class="ni ni-world-2 text-primary ni-3x"></i> <!-- Ícono de cerebro/conciencia -->
+                    </div>
+                    <div class="col-10">
+                      <h5 class="card-title text-uppercase text-muted mb-0">Proyecto Anosognosia</h5>
+                      <p>Investigamos los mecanismos neurocognitivos de la anosognosia en diversas patologías neurológicas, con el objetivo de desarrollar herramientas de detección temprana y estrategias terapéuticas para mejorar la autoconciencia en pacientes afectados.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>        
+        </div>        
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% include "includes/footer.html" %}
+
+</div>
+
+{% endblock content %}
+
+<!-- Specific JS goes HERE -->
+{% block javascripts %}{% endblock javascripts %}
+

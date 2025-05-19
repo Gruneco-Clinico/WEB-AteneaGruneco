@@ -1,0 +1,262 @@
+{% extends 'layouts/base_theme.html' %}
+
+{% block stylesheets %}
+<style>
+  .form-control-lg {
+    font-size: 0.1rem;
+  }
+  .input-group-text-lg {
+    font-size: 1.25rem;
+  }
+  .btn-lg {
+    font-size: 1.25rem;
+  }
+  .centered-image {
+    display: block;
+    margin: 0 auto;
+  }
+  .featurette-heading {
+    font-size: 2.5rem;
+    font-weight: 300;
+    line-height: 1.2;
+    letter-spacing: -0.05rem;
+  }
+  .lead {
+    font-size: 1.25rem;
+    font-weight: 300;
+  }
+  .rounded-circle {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  .rounded-circle:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  }
+  .container {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    padding: 0.3rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  }
+  .mt--16 {
+    margin-top: -1rem;
+  }
+  .pt-7 {
+    padding-top: 5rem;
+  }
+  .pb-5 {
+    padding-bottom: 3rem;
+  }
+  .mt--15 {
+    margin-top: -1rem;
+  }
+  .pt-6 {
+    padding-top: 1rem;
+  }
+  .pb-4 {
+    padding-bottom: 1rem;
+  }
+  .text-center h2 {
+    margin-top: 1.1rem;
+    font-size: 1.5rem;
+    font-weight: 500;
+  }
+  .text-center p {
+    margin-top: 1.6rem;
+    font-size: 1.2rem;
+    color: #555;
+  }
+  .card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    background: white;href="/static/assets/img/theme/Gruneco_Miembros.jpeg"
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+  }
+  .card-title {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #333;
+  }
+  .card-text {href="/static/assets/img/theme/Gruneco_Miembros.jpeg"
+    font-size: 1.8rem;
+    color: #555;
+    line-height: 1.6;
+  }
+  .principles-list {
+    list-style-type: none;
+    padding-left: 0;
+  }
+  .principles-list li {
+    margin-top: 1.6rem;
+    font-size: 1.3rem;
+    color: #555;
+  }
+</style>
+
+{% endblock stylesheets %}
+
+{% block content %}
+
+<div class="w-100" style="margin:0; padding:0;">
+  <div class="header" style="width:100vw;position:relative;left:50%;right:50%;margin-left:-50vw;margin-right:-50vw;min-height:150px;background-image:url(/static/assets/img/theme/tem_university.jpg);background-size:cover;background-position:center top;">
+    <span class="mask bg-gradient-default opacity-8" style="width:100vw;min-height:150px;display:block;position:absolute;top:0;left:0;"></span>
+    <div class="header-body d-flex align-items-center justify-content-center" style="height: 100%; min-height: 180px;position:relative;z-index:2;">
+      <div class="w-100 text-center">
+        <h1 style="
+          display: inline-block;
+          background: rgba(0, 0, 0, 0.45);
+          color: #fff;
+          font-family: 'Montserrat', 'Segoe UI', Arial, sans-serif;
+          font-size: 3.7rem;
+          font-weight: 700;
+          letter-spacing: 2px;
+          border-radius: 16px;
+          padding: 1.2rem 2.5rem;
+          box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+          text-shadow: 0 4px 24px rgba(0,0,0,0.35), 0 1px 0 #222;
+          margin-top: 1rem;
+          margin-bottom: 1rem;
+          border: 2px solid rgba(255,255,255,0.18);
+          backdrop-filter: blur(2px);
+        ">
+          <i class="fas fa-brain me-2"></i> Proyectos ESI 2025
+        </h1>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container pt-5 pb-2">
+  <div class="row justify-content-center">
+    <div class="col-12 col-lg-10 col-xl-10 mb-5">
+      <div class="card shadow-sm border-0 p-4 mb-4" style="background:rgba(255,255,255,0.98);">
+        <div class="mb-3">
+          <span class="badge bg-primary fs-5 mb-2">ESI+JI 2025</span>
+          <h2 class="fw-bold mb-2" style="font-size:2.3rem; color:#1b396a;">Encuentro de Semilleros de Investigación y Jóvenes Investigadores 2025</h2>
+          <h4 class="fw-semibold text-muted mb-3">ESI 2025</h4>
+        </div>
+        <p>La Universidad de Antioquia dispone de dos estrategias fundamentales para la formación en investigación en el pregrado: los <b>Jóvenes Investigadores</b> y los <b>semilleros de investigación</b>. Estos espacios buscan que los estudiantes adquieran habilidades y actitudes relacionadas con el quehacer investigativo y que se conviertan en el potencial relevo generacional de investigadores en la Universidad y el país.</p>
+        <p>En coherencia con esto, la Vicerrectoría de Investigación y la Red de Semilleros de Investigación de la Universidad de Antioquia, con el apoyo de la Fundación Universidad de Antioquia, desean promover a través del <b>Encuentro de Semilleros de Investigación y Jóvenes Investigadores 2025</b>, espacios comunes para dinamizar estas estrategias, de manera que semilleristas y jóvenes investigadores participen de actividades de formación en investigación y presenten sus experiencias y proyectos.</p>
+        <div class="alert alert-success mt-4 mb-3" role="alert">
+          <b>¡Estamos listos para el Encuentro de Semilleros de Investigación y Jóvenes Investigadores ESI + JI 2025!</b>
+        </div>
+        <p><a href="https://www.udea.edu.co/wps/portal/udea/web/inicio/investigacion/jovenes-investigadores-semilleros-investigacion/!ut/p/z1/jZDBDoIwEES_xS_otltQjrU0WG0oTahgL4YTIVH0YPx-CTEcjCJ72-TN7M6QQGoS-ubZtc2ju_XNZdhPIT7nLlKUSTCZNlsQBp23_IjWc1KNwCaRjAoOBg40AuFUkZdWFumekbBEDz9GwDL9DBDm7SsSRmRKYFM7JIhTtSspoqTsDUwnrEYFLsmjAjPN-Bo_Hb508O-L-9X7GjrditXqBf9s48I!/?1dmy&urile=wcm%3Apath%3A/PortalUdeA/asPortalUdeA/asHomeUdeA/Investigaci%21c3%21b3n/semilleros+de+investigacion/Contenido/asContenidosMenu/ESI" target="_blank" class="btn btn-outline-primary btn-sm mb-2">Conoce más del ESI JI 2025 aquí</a></p>
+        <p><a href="https://www.udea.edu.co/wps/portal/udea/web/inicio/investigacion/jovenes-investigadores-semilleros-investigacion/!ut/p/z1/jZDBDoIwEES_xS_otltQjrU0WG0oTahgL4YTIVH0YPx-CTEcjCJ72-TN7M6QQGoS-ubZtc2ju_XNZdhPIT7nLlKUSTCZNlsQBp23_IjWc1KNwCaRjAoOBg40AuFUkZdWFumekbBEDz9GwDL9DBDm7SsSRmRKYFM7JIhTtSspoqTsDUwnrEYFLsmjAjPN-Bo_Hb508O-L-9X7GjrditXqBf9s48I!/?1dmy&urile=wcm%3Apath%3A/PortalUdeA/asPortalUdeA/asHomeUdeA/Investigaci%21c3%21b3n/semilleros+de+investigacion/Contenido/asContenidosMenu/ESI" target="_blank" class="btn btn-outline-success btn-sm mb-2">Consulta la programación aquí</a></p>
+      </div>
+    </div>
+  </div>
+  <div class="row justify-content-center flex-column align-items-center">
+    <!-- Proyecto 1 -->
+    <div class="col-12 col-lg-11 col-xl-11 mb-5">
+      <div class="card p-5 shadow-lg rounded h-100" style="max-width: 1400px; margin: 0 auto;">
+        <div class="text-center">
+          <h3 class="card-title mt-3 mb-1" style="font-size:2.1rem; font-weight:700; color:#1b396a;">Análisis de la edad cerebral en portadores de la mutación PSEN1 E280A mediante Deep Learning y Resonancia Magnética</h3>
+          <div class="mb-2">
+            <div class="mt-1" style="font-size:0.97rem;">
+              <span class="badge bg-light text-dark border me-1">Jóvenes Investigadores</span>
+              <span class="fw-normal">Verónica Ramírez-Lopera, Juan Pablo Restrepo-Mancilla</span>
+            </div>
+          </div>
+          <div class="mb-3">
+            <span class="badge rounded-pill bg-success me-1">Propuesta de investigación</span>
+            <span class="badge rounded-pill bg-info text-dark me-1">En curso</span>
+            <span class="badge rounded-pill bg-secondary">Terminado</span>
+          </div>
+        </div>
+        <div class="alert alert-primary py-2 px-3 mb-3" role="alert">
+          <b>Resumen:</b> <span style="text-align: justify; display: block;">Este estudio analiza las diferencias en edad cerebral entre portadores y no portadores de la mutación E280A, asociada a la enfermedad de Alzheimer de aparición temprana, mediante modelos de deep learning aplicados a resonancia magnética. Se analizaron 70 sujetos asintomáticos, encontrando que los portadores presentaron una diferencia de edad predicha y cronológica media de 12.91 versus -2.52 años en no portadores (p=0.0041), indicando envejecimiento cerebral acelerado. Los resultados sugieren que la estimación de edad cerebral podría servir como biomarcador no invasivo para detectar y monitorear el avance de la enfermedad en portadores de la mutación.</span>
+        </div>
+        <div class="mb-3">
+          <span class="fw-bold">Palabras clave:</span>
+          <span class="badge bg-light text-dark border ms-1">Edad Cerebral</span>
+          <span class="badge bg-light text-dark border ms-1">Mutación E280A</span>
+          <span class="badge bg-light text-dark border ms-1">Resonancia Magnética</span>
+          <span class="badge bg-light text-dark border ms-1">Alzheimer</span>
+          <span class="badge bg-light text-dark border ms-1">Inteligencia Artificial</span>
+        </div>
+        <div class="card mb-3 border-0 shadow-sm">
+          <div class="card-body pb-1 pt-2">
+            <h5 class="fw-bold mb-2" style="color:#1b396a;"><i class="bi bi-exclamation-circle me-1"></i>Problema de investigación</h5>
+            <p style="text-align: justify;">La enfermedad de Alzheimer de inicio temprano causada por la mutación E280A en el gen PSEN1 representa un desafío en Antioquia, afectando a más de 5,000 portadores (1). Las investigaciones han demostrado que estos individuos presentan alteraciones estructurales y funcionales en el cerebro años antes de manifestar síntomas, incluyendo atrofia y cambios en la conectividad funcional (2-4). Sin embargo, la comprensión de la fisiopatología sigue siendo incompleta, en parte porque los estudios actuales se basan en medidas aisladas que no capturan la complejidad total de estos cambios tempranos. Además, aunque las pruebas genéticas disponibles son efectivas para identificar portadores, no permiten caracterizar los procesos fisiológicos afectados ni el curso de la enfermedad en etapas preclínicas.<br>
+            La edad cerebral ha emergido como una métrica prometedora que integra múltiples características cerebrales mediante inteligencia artificial, demostrando mayor efectividad que las medidas tradicionales para predecir la progresión del Alzheimer (4). No obstante, a pesar de su éxito en el estudio de otras mutaciones genéticas como APOE, su aplicación en portadores de la mutación E280A permanece inexplorada. Este proyecto tiene como objetivo analizar la edad cerebral, estimada mediante resonancias magnéticas estructurales y funcionales, para detectar cambios cerebrales tempranos en portadores asintomáticos de E280A. Este enfoque podría ofrecer una herramienta más accesible y comprensible para el monitoreo temprano, optimizando recursos clínicos y facilitando la generalización a nuevos pacientes sin requerir entrenamientos específicos con datos de portadores.</p>
+            <h5 class="fw-bold mt-3">Marco referencial</h5>
+            <ul style="text-align: justify;">
+              <li><b>Edad cerebral:</b> Índice derivado de modelos de machine learning (Cole et al., 2017; Ganaie et al., 2023) que vinculan patrones de neuroimagen con la edad cronológica, permitiendo cuantificar el envejecimiento cerebral acelerado.</li>
+              <li><b>Neurodinámica de la EA:</b> Estudios (Fleisher et al., Millar et al.) muestran que alteraciones en conectividad funcional y biomarcadores reflejan envejecimiento patológico, observable mediante métricas de edad cerebral.</li>
+              <li><b>Modelos genéticos de neurodegeneración:</b> La mutación PSEN1 E280A induce cambios precoces en redes cerebrales (Fuller et al., 2019), paradigma para estudiar la interacción entre genética, edad cerebral y deterioro cognitivo.</li>
+            </ul>
+            <h5 class="fw-bold mt-3">Objetivos</h5>
+            <ul style="text-align: justify;">
+              <li><b>Objetivo principal:</b> Analizar las diferencias en la edad cerebral utilizando imágenes de resonancia magnética en individuos portadores de la mutación E280A y controles no portadores.</li>
+              <li><b>Secundarios:</b>
+                <ul>
+                  <li>Establecer un repositorio estandarizado de resonancias magnéticas armonizadas de diversas poblaciones.</li>
+                  <li>Describir un modelo de cálculo de edad cerebral para resonancia magnética estructural basado en características volumétricas y demográficas.</li>
+                  <li>Identificar un modelo de cálculo de edad cerebral basado en Deep learning para resonancia magnética funcional.</li>
+                  <li>Comparar el comportamiento de la edad cerebral entre pacientes portadores y no portadores mediante estadística analítica.</li>
+                </ul>
+              </li>
+            </ul>
+            <h5 class="fw-bold mt-3">Metodología</h5>
+            <ul style="text-align: justify;">
+              <li><b>Tipo de estudio:</b> Observacional - Transversal- Analítico.</li>
+              <li><b>Población:</b> 70 sujetos pertenecientes a familias con riesgo de EA por mutación PSEN1 E280A, seleccionados de la base de datos del Grupo de Neuropsicología y Conducta.</li>
+              <li><b>Entrenamiento del modelo:</b> 900 fMRI del repositorio 1000 Functional Connectomes y ADNI.</li>
+              <li><b>Instrumentos:</b> Técnicas de neuroimagen (RM estructural y funcional), software (Python, Bash, MATLAB), análisis estadístico (Shapiro-Wilk, Levene, T-test, Mann-Whitney-U), modelos de Deep Learning (CNN, GNN), bases de datos especializadas.</li>
+              <li><b>Procedimiento:</b> Preprocesamiento de imágenes, implementación de modelos de IA (CNN y GNN), y análisis estadístico descriptivo e inferencial.</li>
+            </ul>
+            <h5 class="fw-bold mt-3">Resultados preliminares y conclusiones</h5>
+            <ul style="text-align: justify;">
+              <li>Se realizó análisis estadístico de portadores y no portadores mediante RM estructural, con edad media de 43.0 años (DE = 10.5), 63% mujeres. Los portadores eran más jóvenes (35.9 vs. 47.1 años).</li>
+              <li>Diferencia significativa en la brecha de edad cerebral (Mann-Whitney U, p = 0.0041): portadores media 12.91 años, no portadores -2.52 años.</li>
+              <li>El índice de edad cerebral refleja envejecimiento acelerado en portadores asintomáticos. La RM estructural mostró brecha significativa, sugiriendo utilidad como herramienta de tamizaje.</li>
+              <li>En RM funcional se espera brecha aún más pronunciada, lo que podría fortalecer su uso como biomarcador en poblaciones de riesgo.</li>
+            </ul>
+            <h5 class="fw-bold mt-3">Referencias bibliográficas</h5>
+            <ol style="font-size:1rem; text-align: justify;">
+              <li>Sepulveda-Falla D, Glatzel M, Lopera F. Phenotypic Profile of Early-Onset Familial Alzheimer’s Disease Caused by Presenilin-1 E280A Mutation. J Alzheimers Dis. 2012;32(1):1-12.</li>
+              <li>Blum L, Hofmann A, Rosenbaum D, et al. Effects of aging on functional connectivity: resting state vs. task measurement using NIRS. Sci Rep. 2022;12(1):11262.</li>
+              <li>Jobson DD, Hase Y, Clarkson AN, Kalaria RN. Medial prefrontal cortex in cognition, ageing, and dementia. Brain Commun. 2021;3(3):fcab125.</li>
+              <li>Yordanova J, Falkenstein M, Kolev V. Aging alters motor theta network connectivity. Clin Neurophysiol. 2024;159:97-109.</li>
+              <li>Gaser C, Franke K, Klöppel S, et al. BrainAGE in MCI: Predicting conversion to AD.</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <!-- Aquí puedes agregar más proyectos siguiendo el mismo formato -->
+  <hr class="my-5">
+  <!-- Aquí terminan los proyectos. Se eliminaron las cartas de visión, misión, principios e información general del grupo. -->
+
+    <div class="row pt-7">
+      <!-- Miembro 1 -->
+      <div class="col-lg-6 text-center">
+        <svg class="bd-placeholder-img rounded-circle centered-image" width="140" height="140" role="img" aria-label="Placeholder" preserveAspectRatio="xMidYMid slice" focusable="false">
+          <title>Placeholder</title>
+          <rect width="100%" height="100%" fill="var(--bs-secondary-color)"></rect>
+          <image href="/static/assets/img/theme/Carlos_imagen.jpeg" width="100%" height="100%" />
+        </svg>
+        <h2 class="fw-normal mt-3">Carlos Andrés Tobón Quintero, MD, PhD</h2>
+        <p>Coordinador del Grupo</p>
+      </div>
+      <!-- Miembro 2 -->
+      <div class="col-lg-6 text-center">
+        <svg class="bd-placeholder-img rounded-circle centered-image" width="140" height="140" role="img" aria-label="Placeholder" preserveAspectRatio="xMidYMid slice" focusable="false">
+          <title>Placeholder</title>
+          <rect width="100%" height="100%" fill="var(--bs-secondary-color)"></rect>
+          <image href="/static/assets/img/theme/Jonh_Imagen.png" width="100%" height="100%" />
+        </svg>
+        <h2 class="fw-normal mt-3">John Fredy Ochoa Ph.D.</h2>
+        <p>Coordinador académico del Grupo</p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+<!-- Agrega Font Awesome para los iconos -->
+<script src="https://kit.fontawesome.com/your-fontawesome-kit.js" crossorigin="anonymous"></script>

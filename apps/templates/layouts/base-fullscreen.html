@@ -1,0 +1,66 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="canonical" href="https://udearroba.udea.edu.co/home/">
+  
+  <title>Atenea GRUNECO | {% block title %}Historias Clínicas Neurocognitivas{% endblock %}</title>
+
+  <link rel="icon" href="{% static 'assets/img/brand/favicon.png' %}" type="image/png">
+  <!-- Fuentes y Estilos -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700">
+  <link rel="stylesheet" href="{% static 'assets/vendor/nucleo/css/nucleo.css' %}" type="text/css">
+  <link rel="stylesheet" href="{% static 'assets/vendor/@fortawesome/fontawesome-free/css/all.min.css' %}" type="text/css">
+  <link rel="stylesheet" href="{% static 'assets/css/argon.css' %}?v=1.2.0" type="text/css">
+  
+  {% block stylesheets %}{% endblock stylesheets %}
+</head>
+
+<body class="bg-default">
+  <div class="main-content">
+    {% include "includes/navigation-fullscreen.html" %}
+
+    <!-- Encabezado -->
+    <header class="header bg-gradient-primary py-7 py-lg-6">
+      <div class="container">
+        <div class="header-body text-center mb-7">
+          <div class="row justify-content-center">
+            <div class="col-lg-9 col-md-6">
+              <h1 class="display-2 text-white font-weight-bold">
+                <a target="_blank" class="text-white" href="https://udearroba.udea.edu.co/home/">ATENEA GRUNECO</a>
+              </h1>
+              <p class="text-lead text-white" style="font-size: 1.5rem;">
+                <i>Sistema de Información en Atención y Evaluación Neurocognitiva.</i><br>
+                Desarrollado por  
+                <a target="_blank" href="https://github.com/JPDevOpti" class="text-light font-weight-bold">JpDevOpti</a> y  
+                <a target="_blank" href="https://github.com/lasilvi" class="text-light font-weight-bold">lasilvi</a>.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="separator separator-bottom separator-skew zindex-100">
+        <svg x="0" y="0" viewBox="0 0 2560 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+          <polygon class="fill-default" points="2560 0 2560 100 0 100"></polygon>
+        </svg>
+      </div>
+    </header>
+
+    <!-- Contenido dinámico -->
+    <main class="container">
+      {% block content %}{% endblock content %}
+    </main>
+
+    {% include "includes/footer-fullscreen.html" %}
+  </div>
+
+  {% include "includes/scripts.html" %}
+
+  {% block javascripts %}{% endblock javascripts %}
+  
+  <script src="{% static 'assets/js/argon.js' %}?v=1.2.0"></script>
+</body>
+</html>

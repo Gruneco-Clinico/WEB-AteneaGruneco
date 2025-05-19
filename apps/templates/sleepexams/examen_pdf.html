@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Resultados del Examen</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1 {
+            font-size: 24px;
+            color: #333;
+        }
+        h2 {
+            font-size: 20px;
+            color: #555;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            margin-bottom: 10px;
+        }
+        strong {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Resultados del Examen: {{ visita_examen.examen.nombre }}</h1>
+    <p><strong>Fecha:</strong> {{ visita_examen.visita.fecha }}</p>
+
+    <h2>Detalles del Examen</h2>
+    <ul>
+        {% for area, datos in resultados.items %}
+            <li>
+                <strong>{{ area }}</strong>
+                <ul>
+                    {% for clave, valor in datos.items %}
+                        <li>
+                            {{ clave|title }}:
+                            {% if valor is not None and valor != "NaN" %}
+                                {{ valor }}
+                            {% else %}
+                                NaN
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

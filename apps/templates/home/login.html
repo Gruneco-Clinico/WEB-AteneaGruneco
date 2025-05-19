@@ -1,0 +1,78 @@
+{% extends 'layouts/base-fullscreen.html' %}
+{% block title %} Iniciar Sesión {% endblock title %}
+
+{% block content %}
+<div class="container mt--8 pb-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-5 col-md-7">
+      <div class="card shadow border-0 mb-0">
+        <div class="card-header bg-transparent pb-2">
+          <div class="text-center mt-2 mb-2">
+            <h1 class="text-primary">Iniciar Sesión</h1>
+          </div>
+        </div>
+        <div class="card-body px-lg-5 py-lg-4">
+          <div class="text-center mb-4">
+          </div>
+          
+          <form role="form" method="POST" novalidate>
+            {% csrf_token %}
+            
+            <!-- Campo de Usuario -->
+            <div class="form-group mb-2">
+              <label for="username" class="form-control-label">Usuario</label>
+              <div class="input-group input-group-merge input-group-alternative">
+                <div class="input-group-prepend">
+                  <span class="input-group-text"><i class="ni ni-single-02"></i></span>
+                </div>
+                <input id="username" class="form-control form-control-lg" placeholder="Nombre de usuario" 
+                       type="text" name="username" required autofocus>
+              </div>
+            </div>
+            
+            <!-- Campo de Contraseña -->
+            <div class="form-group mb-3">
+              <label for="password" class="form-control-label">Contraseña</label>
+              <div class="input-group input-group-merge input-group-alternative">
+                <div class="input-group-prepend">
+                  <span class="input-group-text"><i class="ni ni-lock-circle-open"></i></span>
+                </div>
+                <input id="password" class="form-control form-control-lg" placeholder="Ingresa tu contraseña" 
+                       type="password" name="password" required>
+              </div>
+            </div>
+            
+            <!-- Recordarme -->
+            <div class="custom-control custom-checkbox mb-3">
+              <input class="custom-control-input" id="remember" name="remember" type="checkbox">
+              <label class="custom-control-label" for="remember">Recordarme</label>
+            </div>
+            
+            <div class="text-center">
+              <button type="submit" class="btn btn-primary btn-lg btn-block my-4">
+                Iniciar Sesión
+              </button>
+            </div>
+            
+            {% if messages %}
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+              {% for message in messages %}
+                <p class="mb-0">{{ message }}</p>
+              {% endfor %}
+              <button type="button" class="close" data-dismiss="alert" aria-label="Cerrar">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            {% endif %}
+            
+            <!-- Enlaces de ayuda -->
+            <div class="text-center mt-3">
+              <a class="text-primary">¿Olvidaste tu contraseña?</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}

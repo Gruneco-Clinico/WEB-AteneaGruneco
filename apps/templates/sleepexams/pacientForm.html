@@ -1,0 +1,247 @@
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+<div class="header bg-primary pb-6">
+  <div class="container-fluid">
+    <div class="header-body">
+      <div class="row align-items-center py-4">
+        <div class="col-lg-6 col-7">
+          <h6 class="h2 text-white d-inline-block mb-0">Registro de pacientes</h6>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid mt--6">
+  <div class="row">
+    <div class="col-xl-12">
+      <div class="card">
+        <div class="card-header">
+          <div class="row align-items-center">
+            <div class="col-8">
+              <h3 class="mb-0">Formulario de Evaluación</h3>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <form method="POST" action="{% url 'registro_demografico' %}">
+            {% csrf_token %}
+
+            <!-- Información Personal -->
+            <h6 class="heading-small text-muted mb-4">Información Personal</h6>
+            <div class="pl-lg-4">
+              <div class="row">
+                <div class="col-lg-3">
+                  <label for="primer_nombre">Primer Nombre</label>
+                  <input type="text" id="primer_nombre" name="primer_nombre" class="form-control" required>
+                </div>
+                <div class="col-lg-3">
+                  <label for="segundo_nombre">Segundo Nombre</label>
+                  <input type="text" id="segundo_nombre" name="segundo_nombre" class="form-control">
+                </div>
+                <div class="col-lg-3">
+                  <label for="primer_apellido">Primer Apellido</label>
+                  <input type="text" id="primer_apellido" name="primer_apellido" class="form-control" required>
+                </div>
+                <div class="col-lg-3">
+                  <label for="segundo_apellido">Segundo Apellido</label>
+                  <input type="text" id="segundo_apellido" name="segundo_apellido" class="form-control">
+                </div>
+              </div>
+              <hr class="my-3">
+
+              <div class="row mt-3">
+                <div class="col-lg-3">
+                  <label for="tipo_documento">Tipo Documento</label>
+                  <select class="form-control" id="tipo_documento" name="tipo_documento">
+                    <option value="CC">Cédula de Ciudadanía</option>
+                    <option value="TI">Tarjeta de Identidad</option>
+                    <option value="NUIP">Número Único de Identificación Personal</option>
+                    <option value="CE">Cédula de Extranjería</option>
+                    <option value="PS">Pasaporte</option>
+                  </select>
+                </div>
+                <div class="col-lg-3">
+                  <label for="numero_documento">Número de Documento</label>
+                  <input type="text" id="numero_documento" name="numero_documento" class="form-control" required>
+                </div>
+                <div class="col-lg-3">
+                  <label for="fecha_nacimiento">Fecha de Nacimiento</label>
+                  <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" class="form-control" oninput="calcularEdad()" required>
+                </div>
+                <div class="col-lg-3">
+                  <label for="edad">Edad</label>
+                  <input type="number" id="edad" name="edad" class="form-control" readonly required>
+                </div>
+              </div>
+              <hr class="my-3">
+              <div class="row mt-3">
+                <div class="col-lg-3">
+                  <label for="genero">Género</label>
+                  <select class="form-control" id="genero" name="genero">
+                    <option value="F">Femenino</option>
+                    <option value="M">Masculino</option>
+                    <option value="O">Otro</option>
+                  </select>
+                </div>
+                <div class="col-lg-3">
+                  <label for="municipio_nacimiento">Municipio de Nacimiento</label>
+                  <input type="text" id="municipio_nacimiento" name="municipio_nacimiento" class="form-control">
+                </div>
+                <div class="col-lg-3">
+                  <label for="departamento_nacimiento">Departamento</label>
+                  <input type="text" id="departamento_nacimiento" name="departamento_nacimiento" class="form-control">
+                </div>
+                <div class="col-lg-3">
+                  <label for="pais_nacimiento">País de Nacimiento</label>
+                  <input type="text" id="pais_nacimiento" name="pais_nacimiento" class="form-control">
+                </div>
+              </div>
+              <hr class="my-3">
+
+            <h6 class="heading-small text-muted mb-4">Información de contacto</h6>
+            <div class="row mt-3">
+              <div class="col-lg-3">
+                <label for="direccion">Dirección</label>
+                <input type="text" id="direccion" name="direccion" class="form-control">
+              </div>
+              <div class="col-lg-3">
+                <label for="municipio_residencia">Municipio de Residencia</label>
+                <input type="text" id="municipio_residencia" name="municipio_residencia" class="form-control">
+              </div>
+              <div class="col-lg-3">
+                <label for="departamento_residencia">Departamento</label>
+                <input type="text" id="departamento_residencia" name="departamento_residencia" class="form-control">
+              </div>
+              <div class="col-lg-3">
+                <label for="pais_residencia">País de Residencia</label>
+                <input type="text" id="pais_residencia" name="pais_residencia" class="form-control">
+              </div>
+            
+            </div>
+            <hr class="my-3">
+            <div class="row mt-3">
+              <div class="col-lg-3">
+                <label for="celular">Celular</label>
+                <input type="text" id="celular" name="celular" class="form-control" required>
+              </div>
+              <div class="col-lg-3">
+                <label for="correo">Correo Electrónico</label>
+                <input type="email" id="correo" name="correo" class="form-control" required>
+              </div>
+            </div>
+
+            <hr class="my-3">
+            <h6 class="heading-small text-muted mb-4">Información de adicional</h6>
+            <div class="row mt-3">
+              <div class="col-lg-3">
+                <label for="grupo_sanguineo">Grupo Sanguíneo</label>
+                <select class="form-control" id="grupo_sanguineo" name="grupo_sanguineo">
+                  <option value="O+">O+</option>
+                  <option value="O-">O-</option>
+                  <option value="A+">A+</option>
+                  <option value="A-">A-</option>
+                  <option value="B+">B+</option>
+                  <option value="B-">B-</option>
+                  <option value="AB+">AB+</option>
+                  <option value="AB-">AB-</option>
+                </select>
+              </div>
+              <div class="col-lg-3">
+                <label for="lateralidad">Lateralidad</label>
+                <select class="form-control" id="lateralidad" name="lateralidad">
+                  <option value="Diestro">Diestro</option>
+                  <option value="Zurdo">Zurdo</option>
+                  <option value="Ambidiestro">Ambidiestro</option>
+                </select>
+              </div>
+              <div class="col-lg-3">
+                <label for="religion">Religión</label>
+                <input type="text" id="religion" name="religion" class="form-control">
+              </div>
+              <div class="col-lg-3">
+                <label for="eps">EPS</label>
+                <input type="text" id="eps" name="eps" class="form-control">
+              </div>
+            </div>
+            <hr class="my-3">
+            <div class="row mt-3">
+              <div class="col-lg-3">
+                <label for="estado_civil">Estado Civil</label>
+                <select class="form-control" id="estado_civil" name="estado_civil">
+                  <option value="Soltero">Soltero(a)</option>
+                  <option value="Casado">Casado(a)</option>
+                  <option value="UnionLibre">Unión libre</option>
+                  <option value="Viudo">Viudo(a)</option>
+                </select>
+              </div>
+              <div class="col-lg-3">
+                <label for="escolaridad">Escolaridad</label>
+                <select class="form-control" id="escolaridad" name="escolaridad">
+                  <option value="primario">Primario</option>
+                  <option value="bachiller">Bachiller</option>
+                  <option value="universidad">Universidad</option>
+                  <option value="maestria">Maestría</option>
+                  <option value="doctorado">Doctorado</option>
+                  <option value="especializacion">Especialización</option>
+                </select>
+              </div>
+              <div class="col-lg-3">
+                <label for="ocupacion">Ocupación</label>
+                <input type="text" id="ocupacion" name="ocupacion" class="form-control">
+              </div>
+              <div class="col-lg-3">
+                <label for="regimen">Régimen</label>
+                <select class="form-control" id="regimen" name="regimen">
+                  <option value="Contributivo">Contributivo</option>
+                  <option value="Subsidiado">Subsidiado</option>
+                  <option value="Vinculado">Vinculado</option>
+                  <option value="Otro">Otro</option>
+                </select>
+              </div>
+            </div>
+            </div>
+            <hr class="my-4" />
+            <div class="text-right">
+              <button type="submit" class="btn btn-primary">Guardar</button>
+            </div>
+          </form>
+        </div>
+        <button type="button" class="btn btn-secondary" onclick="cerrarFormulario(this)">Cancelar</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% block javascripts %}
+<script>
+  function calcularEdad() {
+    // Obtener la fecha de nacimiento del campo de entrada
+    const fechaNacimiento = document.getElementById('fecha_nacimiento').value;
+
+    // Verificar si se ha seleccionado una fecha
+    if (fechaNacimiento) {
+      // Convertir la fecha de nacimiento a un objeto Date
+      const fechaNac = new Date(fechaNacimiento);
+      const hoy = new Date(); // Fecha actual
+
+      // Calcular la diferencia en milisegundos
+      const diferencia = hoy - fechaNac;
+
+      // Convertir la diferencia a años
+      const edad = Math.floor(diferencia / (1000 * 60 * 60 * 24 * 365.25));
+
+      // Mostrar la edad en el campo correspondiente
+      document.getElementById('edad').value = edad;
+    } else {
+      // Si no hay fecha, limpiar el campo de edad
+      document.getElementById('edad').value = '';
+    }
+  }
+
+  // Asignar el evento oninput al campo de fecha de nacimiento
+  document.getElementById('fecha_nacimiento').addEventListener('input', calcularEdad);
+</script>
+{% endblock javascripts %}
+{% endblock content %}

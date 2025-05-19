@@ -1,0 +1,247 @@
+{% extends 'layouts/base.html' %}
+
+{% block content %}
+<div class="header bg-primary pb-6">
+    <div class="container-fluid">
+        <div class="header-body">
+            <div class="row align-items-center py-4">
+                <div class="col-lg-6 col-5">
+                    <h6 class="h2 text-white d-inline-block mb-0">Información del Paciente</h6>
+                    <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
+                        <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
+                            <li class="breadcrumb-item"><a href="#"><i class="fas fa-home"></i></a></li>
+                            <li class="breadcrumb-item"><a href="/pacientes/">Pacientes</a></li>
+                            <li class="breadcrumb-item"><a href="/pacientes/">Volver</a></li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid mt--6">
+    <div class="row">
+        <div class="col">
+            <div class="card shadow">
+                <form method="post" action="{% url 'guardar_examen_Epworth' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="visita_id" id="visita_id" value="{{ visita_examen }}" />
+                    <input type="hidden" name="paciente_id" id="paciente_id" value="{{ paciente_id }}" />
+                    <input type="hidden" name="examen_id" id="examen_id" value="{{ examen_id }}" />
+                    <input type="hidden" name="puntaje_total" id="puntaje_total" value="0" />
+
+                    <!-- Card Header -->
+                    <div class="card-header border-0">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <h3 class="mb-0">Cuestionario de Epworth</h3>
+                            </div>
+                            <div class="col text-right">
+                                <span class="text-muted">Fecha: {% now "d/m/Y" %}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card Body -->
+                    <div class="card-body">
+                        <div class="card bg-gradient-default shadow-sm mb-4">
+                            <div class="card-header bg-transparent">
+                                <h4 class="text-white mb-0">Escala de Somnolencia de Epworth</h4>
+                            </div>
+                            <div class="card-body bg-white">
+                                <div class="alert alert-info">
+                                    <strong>Instrucciones:</strong> Indique qué probabilidad hay de que se quede dormido
+                                    en las siguientes situaciones, aun cuando no se sienta cansado.
+                                </div>
+
+                                <!-- Sección de preguntas -->
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label>Sentado y leyendo</label>
+                                            <select class="form-control epworth-select" name="epworth_leyendo" required>
+                                                <option value="" selected disabled>Seleccione una opción</option>
+                                                <option value="0">Nunca se ha dormido (0)</option>
+                                                <option value="1">Escasa posibilidad de dormirse (1)</option>
+                                                <option value="2">Moderada posibilidad de dormirse (2)</option>
+                                                <option value="3">Elevada posibilidad de dormirse (3)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label>Viendo la TV</label>
+                                            <select class="form-control epworth-select" name="epworth_tv" required>
+                                                <option value="" selected disabled>Seleccione una opción</option>
+                                                <option value="0">Nunca se ha dormido (0)</option>
+                                                <option value="1">Escasa posibilidad de dormirse (1)</option>
+                                                <option value="2">Moderada posibilidad de dormirse (2)</option>
+                                                <option value="3">Elevada posibilidad de dormirse (3)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Más preguntas -->
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label>Sentado, inactivo en un espectáculo (teatro)</label>
+                                            <select class="form-control epworth-select" name="epworth_teatro" required>
+                                                <option value="" selected disabled>Seleccione una opción</option>
+                                                <option value="0">Nunca se ha dormido (0)</option>
+                                                <option value="1">Escasa posibilidad de dormirse (1)</option>
+                                                <option value="2">Moderada posibilidad de dormirse (2)</option>
+                                                <option value="3">Elevada posibilidad de dormirse (3)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label>En coche, como pasajero en un viaje de una hora</label>
+                                            <select class="form-control epworth-select" name="epworth_pasajero"
+                                                required>
+                                                <option value="" selected disabled>Seleccione una opción</option>
+                                                <option value="0">Nunca se ha dormido (0)</option>
+                                                <option value="1">Escasa posibilidad de dormirse (1)</option>
+                                                <option value="2">Moderada posibilidad de dormirse (2)</option>
+                                                <option value="3">Elevada posibilidad de dormirse (3)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label>Tumbado a media tarde</label>
+                                            <select class="form-control epworth-select" name="epworth_tumbado" required>
+                                                <option value="" selected disabled>Seleccione una opción</option>
+                                                <option value="0">Nunca se ha dormido (0)</option>
+                                                <option value="1">Escasa posibilidad de dormirse (1)</option>
+                                                <option value="2">Moderada posibilidad de dormirse (2)</option>
+                                                <option value="3">Elevada posibilidad de dormirse (3)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label>Sentado y charlando con alguien</label>
+                                            <select class="form-control epworth-select" name="epworth_charlando"
+                                                required>
+                                                <option value="" selected disabled>Seleccione una opción</option>
+                                                <option value="0">Nunca se ha dormido (0)</option>
+                                                <option value="1">Escasa posibilidad de dormirse (1)</option>
+                                                <option value="2">Moderada posibilidad de dormirse (2)</option>
+                                                <option value="3">Elevada posibilidad de dormirse (3)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label>Sentado después de comer sin ingerir alcohol</label>
+                                            <select class="form-control epworth-select" name="epworth_comida" required>
+                                                <option value="" selected disabled>Seleccione una opción</option>
+                                                <option value="0">Nunca se ha dormido (0)</option>
+                                                <option value="1">Escasa posibilidad de dormirse (1)</option>
+                                                <option value="2">Moderada posibilidad de dormirse (2)</option>
+                                                <option value="3">Elevada posibilidad de dormirse (3)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label>En su coche, cuando se para debido al tráfico</label>
+                                            <select class="form-control epworth-select" name="epworth_trafico" required>
+                                                <option value="" selected disabled>Seleccione una opción</option>
+                                                <option value="0">Nunca se ha dormido (0)</option>
+                                                <option value="1">Escasa posibilidad de dormirse (1)</option>
+                                                <option value="2">Moderada posibilidad de dormirse (2)</option>
+                                                <option value="3">Elevada posibilidad de dormirse (3)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Resultado del cálculo -->
+                                <div class="alert alert-success mt-4" id="resultado-container" style="display: none;">
+                                    <h4 class="alert-heading">Resultado del Test de Epworth</h4>
+                                    <p><strong>Puntaje total:</strong> <span id="puntaje-display">0</span>/24</p>
+                                    <p><strong>Interpretación:</strong> <span id="interpretacion-display">-</span></p>
+                                </div>
+
+                                <div class="alert alert-warning mt-4">
+                                    <strong>Interpretación de la escala:</strong><br>
+                                    - <strong>0-6 puntos:</strong> Somnolencia diurna normal<br>
+                                    - <strong>7-8 puntos:</strong> Somnolencia diurna leve<br>
+                                    - <strong>9-24 puntos:</strong> Somnolencia diurna severa (posiblemente patológica)
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Botones de acción -->
+                        <div class="row mt-4">
+                            <div class="col-12 text-right">
+                                <button type="submit" class="btn btn-primary">Guardar Examen</button>
+                                <a href="{% url 'detalle_paciente' paciente_id %}" class="btn btn-secondary">Ver
+                                    Paciente</a>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const selects = document.querySelectorAll('.epworth-select');
+        const resultadoContainer = document.getElementById('resultado-container');
+        const puntajeDisplay = document.getElementById('puntaje-display');
+        const interpretacionDisplay = document.getElementById('interpretacion-display');
+        const puntajeTotalInput = document.getElementById('puntaje_total');
+
+        selects.forEach(select => {
+            select.addEventListener('change', calculateTotalScore);
+        });
+
+        function calculateTotalScore() {
+            let total = 0;
+
+            selects.forEach(select => {
+                if (select.value) {
+                    total += parseInt(select.value);
+                }
+            });
+
+            // Actualizar displays
+            puntajeDisplay.textContent = total;
+            puntajeTotalInput.value = total;
+
+            // Determinar interpretación
+            let interpretacion = "";
+            if (total <= 6) {
+                interpretacion = "Somnolencia diurna normal";
+            } else if (total <= 8) {
+                interpretacion = "Somnolencia diurna leve";
+            } else {
+                interpretacion = "Somnolencia diurna severa (posiblemente patológica)";
+            }
+
+            interpretacionDisplay.textContent = interpretacion;
+
+            // Mostrar resultado
+            resultadoContainer.style.display = 'block';
+        }
+
+        // Calcular al cargar por si hay valores precargados
+        calculateTotalScore();
+    });
+</script>
+
+{% endblock %}

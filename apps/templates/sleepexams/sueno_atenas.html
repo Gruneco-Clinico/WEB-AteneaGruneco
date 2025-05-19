@@ -1,0 +1,269 @@
+{% extends 'layouts/base.html' %}
+
+{% block content %}
+<div class="header bg-primary pb-6">
+    <div class="container-fluid">
+        <div class="header-body">
+            <div class="row align-items-center py-4">
+                <div class="col-lg-6 col-5">
+                    <h6 class="h2 text-white d-inline-block mb-0">Información del Paciente</h6>
+                    <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
+                        <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
+                            <li class="breadcrumb-item"><a href="#"><i class="fas fa-home"></i></a></li>
+                            <li class="breadcrumb-item"><a href="/pacientes/">Pacientes</a></li>
+                            <li class="breadcrumb-item"><a href="/pacientes/">Volver</a></li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid mt--6">
+    <div class="row">
+        <div class="col">
+            <div class="card shadow">
+                <form method="post" action="{% url 'guardar_examen_atenas' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="visita_id" id="visita_id" value="{{ visita_examen }}" />
+                    <input type="hidden" name="paciente_id" id="paciente_id" value="{{ paciente_id }}" />
+                    <input type="hidden" name="examen_id" id="examen_id" value="{{ examen_id }}" />
+
+                    <!-- Card Header -->
+                    <div class="card-header border-0">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <h3 class="mb-0">Índice de Calidad de Sueño de Atenas</h3>
+                            </div>
+                            <div class="col text-right">
+                                <span class="text-muted">Fecha: {% now "d/m/Y" %}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card Body -->
+                    <div class="card-body">
+                        <div class="card bg-gradient-default shadow-sm mb-4">
+                            <div class="card-header bg-transparent">
+                                <h4 class="text-white mb-0">Evaluación de Calidad de Sueño</h4>
+                            </div>
+                            <div class="card-body bg-white">
+                                <div class="alert alert-info">
+                                    <strong>Instrucciones:</strong> Evalúe cada aspecto de su sueño durante el último
+                                    mes, seleccionando la opción que mejor describa su experiencia.
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <!-- Pregunta 1 -->
+                                        <div class="form-group">
+                                            <label>1. Inducción del sueño (tiempo para quedarse dormido)</label>
+                                            <select class="form-control" name="induccion_dormir" required>
+                                                <option value="" selected disabled>Seleccione una opción</option>
+                                                <option value="Ningún problema">Ningún problema (0 puntos)</option>
+                                                <option value="Ligeramente retrasado">Ligeramente retrasado (1 punto)
+                                                </option>
+                                                <option value="Marcadamente retrasado">Marcadamente retrasado (2 puntos)
+                                                </option>
+                                                <option value="Muy retrasado o no durmió en absoluto">Muy retrasado o no
+                                                    durmió (3 puntos)</option>
+                                            </select>
+                                        </div>
+
+                                        <!-- Pregunta 2 -->
+                                        <div class="form-group">
+                                            <label>2. Despertares durante la noche</label>
+                                            <select class="form-control" name="despertares_noche" required>
+                                                <option value="" selected disabled>Seleccione una opción</option>
+                                                <option value="Ningún problema">Ningún problema (0 puntos)</option>
+                                                <option value="Problema menor">Problema menor (1 punto)</option>
+                                                <option value="Problema considerable">Problema considerable (2 puntos)
+                                                </option>
+                                                <option value="Problema serio o no durmió en absoluto">Problema serio o
+                                                    no durmió (3 puntos)</option>
+                                            </select>
+                                        </div>
+
+                                        <!-- Pregunta 3 -->
+                                        <div class="form-group">
+                                            <label>3. Despertar final más temprano de lo deseado</label>
+                                            <select class="form-control" name="despertar_temprano" required>
+                                                <option value="" selected disabled>Seleccione una opción</option>
+                                                <option value="No más temprano">No más temprano (0 puntos)</option>
+                                                <option value="Un poco más temprano">Un poco más temprano (1 punto)
+                                                </option>
+                                                <option value="Marcadamente más temprano">Marcadamente más temprano (2
+                                                    puntos)</option>
+                                                <option value="Mucho más temprano o no durmió en absoluto">Mucho más
+                                                    temprano o no durmió (3 puntos)</option>
+                                            </select>
+                                        </div>
+
+                                        <!-- Pregunta 4 -->
+                                        <div class="form-group">
+                                            <label>4. Duración total del sueño</label>
+                                            <select class="form-control" name="duracion_dormir" required>
+                                                <option value="" selected disabled>Seleccione una opción</option>
+                                                <option value="Suficiente">Suficiente (0 puntos)</option>
+                                                <option value="Ligeramente insuficiente">Ligeramente insuficiente (1
+                                                    punto)</option>
+                                                <option value="Marcadamente insuficiente">Marcadamente insuficiente (2
+                                                    puntos)</option>
+                                                <option value="Muy insuficiente o no durmió en absoluto">Muy
+                                                    insuficiente o no durmió (3 puntos)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <!-- Pregunta 5 -->
+                                        <div class="form-group">
+                                            <label>5. Calidad general del sueño</label>
+                                            <select class="form-control" name="calidad_dormir" required>
+                                                <option value="" selected disabled>Seleccione una opción</option>
+                                                <option value="Satisfactoria">Satisfactoria (0 puntos)</option>
+                                                <option value="Ligeramente insatisfactoria">Ligeramente insatisfactoria
+                                                    (1 punto)</option>
+                                                <option value="Marcadamente insatisfactoria">Marcadamente
+                                                    insatisfactoria (2 puntos)</option>
+                                                <option value="Muy insatisfactoria o no durmió en absoluto">Muy
+                                                    insatisfactoria o no durmió (3 puntos)</option>
+                                            </select>
+                                        </div>
+
+                                        <!-- Pregunta 6 -->
+                                        <div class="form-group">
+                                            <label>6. Sensación de bienestar durante el día</label>
+                                            <select class="form-control" name="bienestar_dia" required>
+                                                <option value="" selected disabled>Seleccione una opción</option>
+                                                <option value="Normal">Normal (0 puntos)</option>
+                                                <option value="Ligeramente disminuida">Ligeramente disminuida (1 punto)
+                                                </option>
+                                                <option value="Marcadamente disminuida">Marcadamente disminuida (2
+                                                    puntos)</option>
+                                                <option value="Muy disminuida">Muy disminuida (3 puntos)</option>
+                                            </select>
+                                        </div>
+
+                                        <!-- Pregunta 7 -->
+                                        <div class="form-group">
+                                            <label>7. Funcionamiento (físico y mental) durante el día</label>
+                                            <select class="form-control" name="funcionamiento_dia" required>
+                                                <option value="" selected disabled>Seleccione una opción</option>
+                                                <option value="Normal">Normal (0 puntos)</option>
+                                                <option value="Ligeramente disminuida">Ligeramente disminuida (1 punto)
+                                                </option>
+                                                <option value="Marcadamente disminuida">Marcadamente disminuida (2
+                                                    puntos)</option>
+                                                <option value="Muy disminuida">Muy disminuida (3 puntos)</option>
+                                            </select>
+                                        </div>
+
+                                        <!-- Pregunta 8 -->
+                                        <div class="form-group">
+                                            <label>8. Somnolencia durante el día</label>
+                                            <select class="form-control" name="somnolencia_dia" required>
+                                                <option value="" selected disabled>Seleccione una opción</option>
+                                                <option value="Ninguna">Ninguna (0 puntos)</option>
+                                                <option value="Leve">Leve (1 punto)</option>
+                                                <option value="Considerable">Considerable (2 puntos)</option>
+                                                <option value="Intensa">Intensa (3 puntos)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="alert alert-warning mt-3">
+                                    <strong>Interpretación del puntaje:</strong><br>
+                                    - <strong>0-5 puntos:</strong> Sin problemas de sueño<br>
+                                    - <strong>6-10 puntos:</strong> Problemas leves de sueño<br>
+                                    - <strong>11-15 puntos:</strong> Problemas moderados de sueño<br>
+                                    - <strong>16-24 puntos:</strong> Problemas severos de sueño
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Puntuación Total (se calculará automáticamente)</label>
+                                    <input type="number" class="form-control" name="puntuacion_total" min="0" max="24"
+                                        readonly>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Botones de acción -->
+                        <div class="row mt-4">
+                            <div class="col-12 text-right">
+                                <button type="submit" class="btn btn-primary">Guardar Examen</button>
+                                <a href="{% url 'detalle_paciente' paciente_id %}" class="btn btn-secondary">Ver
+                                    Paciente</a>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Script para calcular automáticamente la puntuación total
+        const form = document.querySelector('form');
+        const puntuacionTotalInput = document.querySelector('input[name="puntuacion_total"]');
+        const selects = document.querySelectorAll('select[name^="induccion_dormir"], select[name^="despertares_noche"], select[name^="despertar_temprano"], select[name^="duracion_dormir"], select[name^="calidad_dormir"], select[name^="bienestar_dia"], select[name^="funcionamiento_dia"], select[name^="somnolencia_dia"]');
+
+        // Mapeo de valores a puntos
+        const puntosPorOpcion = {
+            "Ningún problema": 0,
+            "Ligeramente retrasado": 1,
+            "Marcadamente retrasado": 2,
+            "Muy retrasado o no durmió en absoluto": 3,
+            "Problema menor": 1,
+            "Problema considerable": 2,
+            "Problema serio o no durmió en absoluto": 3,
+            "No más temprano": 0,
+            "Un poco más temprano": 1,
+            "Marcadamente más temprano": 2,
+            "Mucho más temprano o no durmió en absoluto": 3,
+            "Suficiente": 0,
+            "Ligeramente insuficiente": 1,
+            "Marcadamente insuficiente": 2,
+            "Muy insuficiente o no durmió en absoluto": 3,
+            "Satisfactoria": 0,
+            "Ligeramente insatisfactoria": 1,
+            "Marcadamente insatisfactoria": 2,
+            "Muy insatisfactoria o no durmió en absoluto": 3,
+            "Normal": 0,
+            "Ligeramente disminuida": 1,
+            "Marcadamente disminuida": 2,
+            "Muy disminuida": 3,
+            "Ninguna": 0,
+            "Leve": 1,
+            "Considerable": 2,
+            "Intensa": 3
+        };
+
+        function calcularPuntuacion() {
+            let total = 0;
+            selects.forEach(select => {
+                const selectedOption = select.options[select.selectedIndex];
+                if (selectedOption.value && puntosPorOpcion[selectedOption.value] !== undefined) {
+                    total += puntosPorOpcion[selectedOption.value];
+                }
+            });
+            puntuacionTotalInput.value = total;
+        }
+
+        // Calcular al cambiar cualquier selección
+        selects.forEach(select => {
+            select.addEventListener('change', calcularPuntuacion);
+        });
+
+        // Calcular al enviar el formulario
+        form.addEventListener('submit', function (e) {
+            calcularPuntuacion();
+        });
+    });
+</script>
+
+{% endblock %}

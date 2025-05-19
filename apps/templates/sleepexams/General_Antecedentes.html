@@ -1,0 +1,883 @@
+{% extends 'layouts/base.html' %}
+
+{% block content %}
+<div class="header bg-primary pb-6">
+  <div class="container-fluid">
+    <div class="header-body">
+      <div class="row align-items-center py-4">
+        <div class="col-lg-6 col-5">
+          <h6 class="h2 text-white d-inline-block mb-0">Información del Paciente</h6>
+          <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
+            <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
+              <li class="breadcrumb-item"><a href="#"><i class="fas fa-home"></i></a></li>
+              <li class="breadcrumb-item"><a href="#">Pacientes</a></li>
+              <li class="breadcrumb-item"><a href="#">Volver</a></li>
+            </ol>
+          </nav>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Contenido principal -->
+<div class="container-fluid mt--6">
+  <div class="row">
+    <div class="col">
+      <div class="card shadow">
+        <!-- Card Header -->
+        <div class="card-header border-0">
+          <div class="row align-items-center">
+            <div class="col">
+              <h3 class="mb-0">Antecedentes Médicos</h3>
+            </div>
+            <div class="col text-right">
+              <span class="text-muted">Fecha: {% now "d/m/Y" %}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card Body -->
+        <div class="card-body">
+          <form method="post" action="{% url 'guardar_examen_antecedentes' %}">
+            {% csrf_token %}
+            <input type="hidden" name="visita_id" id="visita_id" value="{{ visita_examen }}" />
+            <input type="hidden" name="paciente_id" id="paciente_id" value="{{ paciente_id }}" />
+            <input type="hidden" name="examen_id" id="examen_id" value="{{ examen_id }}" />
+
+            <!-- Navigation Tabs -->
+            <ul class="nav nav-pills nav-fill mb-4" id="antecedentesTabs" role="tablist">
+              <li class="nav-item">
+                <a class="nav-link active" id="patologicos-tab" data-toggle="tab" href="#patologicos"
+                  role="tab">Patológicos</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" id="quirurgicos-tab" data-toggle="tab" href="#quirurgicos"
+                  role="tab">Quirúrgicos</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" id="farmacologicos-tab" data-toggle="tab" href="#farmacologicos"
+                  role="tab">Farmacológicos</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" id="toxicos-tab" data-toggle="tab" href="#toxicos" role="tab">Tóxicos</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" id="familiares-tab" data-toggle="tab" href="#familiares" role="tab">Familiares</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" id="otros-tab" data-toggle="tab" href="#otros" role="tab">Otros</a>
+              </li>
+            </ul>
+
+            <div class="tab-content" id="antecedentesTabContent">
+              <!-- Antecedentes Patológicos -->
+              <div class="tab-pane fade show active" id="patologicos" role="tabpanel">
+                <div class="card bg-gradient-default shadow-sm mb-4">
+                  <div class="card-header bg-transparent">
+                    <h4 class="text-white mb-0">Antecedentes Patológicos</h4>
+                  </div>
+                  <div class="card-body bg-white">
+                    <div class="form-group">
+                      <div class="custom-control custom-switch">
+                        <input type="checkbox" class="custom-control-input" id="antecedente_patologico"
+                          name="antecedente_patologico" value="Si">
+                        <label class="custom-control-label" for="antecedente_patologico">¿Presenta algún antecedente
+                          patológico?</label>
+                      </div>
+                    </div>
+
+                    <div id="contenido_patologico" style="display: none;">
+                      <div class="row">
+                        <div class="col-md-6">
+                          <div class="form-group">
+                            <label class="form-control-label">Tipo de patología</label>
+                            <select class="form-control" name="tipo_patologia" id="tipo_patologia">
+                              <option value="">Seleccione...</option>
+                              <option value="Hipertensión arterial">Hipertensión arterial</option>
+                              <option value="Dislipidemia">Dislipidemia</option>
+                              <option value="Diabetes">Diabetes</option>
+                              <option value="Cáncer">Cáncer</option>
+                              <option value="Enfermedad Renal">Enfermedad Renal</option>
+                              <option value="Enfermedad Cardíaca">Enfermedad Cardíaca</option>
+                              <option value="Enfermedad Respiratoria">Enfermedad Respiratoria</option>
+                              <option value="Enfermedad Hepática">Enfermedad Hepática</option>
+                              <option value="Enfermedad Tiroidea">Enfermedad Tiroidea</option>
+                              <option value="Enfermedad Cerebrovascular">Enfermedad Cerebrovascular</option>
+                              <option value="Enfermedad Psiquiátrica">Enfermedad Psiquiátrica</option>
+                              <option value="Cefalea">Cefalea</option>
+                              <option value="Crisis Convulsivas">Crisis Convulsivas</option>
+                              <option value="Enfermedades Neurodegenerativas">Enfermedades Neurodegenerativas</option>
+                              <option value="Retardo Mental">Retardo Mental</option>
+                              <option value="Dificultades del Aprendizaje">Dificultades del Aprendizaje</option>
+                              <option value="Síndrome de Down">Síndrome de Down</option>
+                              <option value="Trastorno del desarrollo psicomotor">Trastorno del desarrollo psicomotor
+                              </option>
+                              <option value="Déficit de atención o hiperactividad">Déficit de atención o hiperactividad
+                              </option>
+                              <option value="Otros">Otros</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div class="col-md-6">
+                          <div class="form-group">
+                            <label class="form-control-label">Fecha de inicio</label>
+                            <input type="date" class="form-control" name="fecha_inicio_patologia">
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-md-4">
+                          <div class="form-group">
+                            <div class="custom-control custom-switch">
+                              <input type="checkbox" class="custom-control-input" id="tratamiento_patologico"
+                                name="tratamiento_patologico" value="Si">
+                              <label class="custom-control-label" for="tratamiento_patologico">¿Ha recibido
+                                tratamiento?</label>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-md-8">
+                          <div class="form-group">
+                            <label class="form-control-label">Tratamiento (detallar tipo y posología)</label>
+                            <input type="text" class="form-control" name="detalle_tratamiento_patologico">
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-md-4">
+                          <div class="form-group">
+                            <div class="custom-control custom-switch">
+                              <input type="checkbox" class="custom-control-input" id="complicaciones_patologico"
+                                name="complicaciones_patologico" value="Si">
+                              <label class="custom-control-label" for="complicaciones_patologico">¿Complicaciones
+                                asociadas?</label>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-md-8">
+                          <div class="form-group">
+                            <label class="form-control-label">Detallar complicaciones</label>
+                            <input type="text" class="form-control" name="detalle_complicaciones_patologico">
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-md-4">
+                          <div class="form-group">
+                            <div class="custom-control custom-switch">
+                              <input type="checkbox" class="custom-control-input" id="activo_patologico"
+                                name="activo_patologico" value="Si">
+                              <label class="custom-control-label" for="activo_patologico">¿Activo actualmente?</label>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-md-4">
+                          <div class="form-group">
+                            <label class="form-control-label">Fecha de finalización</label>
+                            <input type="date" class="form-control" name="fecha_finalizacion_patologico">
+                          </div>
+                        </div>
+                        <div class="col-md-4">
+                          <div class="form-group">
+                            <label class="form-control-label">Observaciones</label>
+                            <input type="text" class="form-control" name="observaciones_patologico">
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Antecedentes Quirúrgicos -->
+              <div class="tab-pane fade" id="quirurgicos" role="tabpanel">
+                <div class="card bg-gradient-default shadow-sm mb-4">
+                  <div class="card-header bg-transparent">
+                    <h4 class="text-white mb-0">Antecedentes Quirúrgicos</h4>
+                  </div>
+                  <div class="card-body bg-white">
+                    <div class="form-group">
+                      <div class="custom-control custom-switch">
+                        <input type="checkbox" class="custom-control-input" id="antecedente_quirurgico"
+                          name="antecedente_quirurgico" value="Si">
+                        <label class="custom-control-label" for="antecedente_quirurgico">¿Presenta algún antecedente
+                          quirúrgico?</label>
+                      </div>
+                    </div>
+
+                    <div id="contenido_quirurgico" style="display: none;">
+                      <div class="row">
+                        <div class="col-md-8">
+                          <div class="form-group">
+                            <label class="form-control-label">Descripción</label>
+                            <input type="text" class="form-control" name="descripcion_quirurgico">
+                          </div>
+                        </div>
+                        <div class="col-md-4">
+                          <div class="form-group">
+                            <label class="form-control-label">Fecha de intervención</label>
+                            <input type="date" class="form-control" name="fecha_inicio_quirurgico">
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-md-4">
+                          <div class="form-group">
+                            <div class="custom-control custom-switch">
+                              <input type="checkbox" class="custom-control-input" id="tratamiento_quirurgico"
+                                name="tratamiento_quirurgico" value="Si">
+                              <label class="custom-control-label" for="tratamiento_quirurgico">¿Ha recibido
+                                tratamiento?</label>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-md-8">
+                          <div class="form-group">
+                            <label class="form-control-label">Tratamiento (detallar tipo y posología)</label>
+                            <input type="text" class="form-control" name="detalle_tratamiento_quirurgico">
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-md-4">
+                          <div class="form-group">
+                            <div class="custom-control custom-switch">
+                              <input type="checkbox" class="custom-control-input" id="complicaciones_quirurgico"
+                                name="complicaciones_quirurgico" value="Si">
+                              <label class="custom-control-label" for="complicaciones_quirurgico">¿Complicaciones
+                                asociadas?</label>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-md-8">
+                          <div class="form-group">
+                            <label class="form-control-label">Detallar complicaciones</label>
+                            <input type="text" class="form-control" name="detalle_complicaciones_quirurgico">
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-md-4">
+                          <div class="form-group">
+                            <div class="custom-control custom-switch">
+                              <input type="checkbox" class="custom-control-input" id="activo_quirurgico"
+                                name="activo_quirurgico" value="Si">
+                              <label class="custom-control-label" for="activo_quirurgico">¿Activo actualmente?</label>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-md-4">
+                          <div class="form-group">
+                            <label class="form-control-label">Fecha de finalización</label>
+                            <input type="date" class="form-control" name="fecha_finalizacion_quirurgico">
+                          </div>
+                        </div>
+                        <div class="col-md-4">
+                          <div class="form-group">
+                            <label class="form-control-label">Observaciones</label>
+                            <input type="text" class="form-control" name="observaciones_quirurgico">
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Antecedentes Farmacológicos -->
+              <div class="tab-pane fade" id="farmacologicos" role="tabpanel">
+                <div class="card bg-gradient-default shadow-sm mb-4">
+                  <div class="card-header bg-transparent">
+                    <h4 class="text-white mb-0">Antecedentes Farmacológicos</h4>
+                  </div>
+                  <div class="card-body bg-white">
+                    <div class="form-group">
+                      <div class="custom-control custom-switch">
+                        <input type="checkbox" class="custom-control-input" id="antecedente_farmacologico"
+                          name="antecedente_farmacologico" value="Si">
+                        <label class="custom-control-label" for="antecedente_farmacologico">¿Tiene antecedentes
+                          farmacológicos?</label>
+                      </div>
+                    </div>
+
+                    <div id="contenido_farmacologico" style="display: none;">
+                      <div class="row">
+                        <div class="col-md-6">
+                          <div class="form-group">
+                            <label class="form-control-label">Descripción</label>
+                            <input type="text" class="form-control" name="descripcion_farmacologico">
+                          </div>
+                        </div>
+                        <div class="col-md-6">
+                          <div class="form-group">
+                            <label class="form-control-label">Fecha de inicio</label>
+                            <input type="date" class="form-control" name="fecha_inicio_farmacologico">
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-md-4">
+                          <div class="form-group">
+                            <div class="custom-control custom-switch">
+                              <input type="checkbox" class="custom-control-input" id="tratamiento_farmacologico"
+                                name="tratamiento_farmacologico" value="Si">
+                              <label class="custom-control-label" for="tratamiento_farmacologico">¿Recibió
+                                tratamiento?</label>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-md-8">
+                          <div class="form-group">
+                            <label class="form-control-label">Detalle del tratamiento</label>
+                            <input type="text" class="form-control" name="detalle_tratamiento_farmacologico">
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-md-4">
+                          <div class="form-group">
+                            <div class="custom-control custom-switch">
+                              <input type="checkbox" class="custom-control-input" id="complicaciones_farmacologico"
+                                name="complicaciones_farmacologico" value="Si">
+                              <label class="custom-control-label" for="complicaciones_farmacologico">¿Tuvo
+                                complicaciones?</label>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-md-8">
+                          <div class="form-group">
+                            <label class="form-control-label">Detalle de complicaciones</label>
+                            <input type="text" class="form-control" name="detalle_complicaciones_farmacologico">
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-md-4">
+                          <div class="form-group">
+                            <div class="custom-control custom-switch">
+                              <input type="checkbox" class="custom-control-input" id="activo_farmacologico"
+                                name="activo_farmacologico" value="Si">
+                              <label class="custom-control-label" for="activo_farmacologico">¿Está activo?</label>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-md-4">
+                          <div class="form-group">
+                            <label class="form-control-label">Fecha de finalización</label>
+                            <input type="date" class="form-control" name="fecha_finalizacion_farmacologico">
+                          </div>
+                        </div>
+                        <div class="col-md-4">
+                          <div class="form-group">
+                            <label class="form-control-label">Observaciones</label>
+                            <input type="text" class="form-control" name="observaciones_farmacologico">
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Antecedentes Tóxicos -->
+              <div class="tab-pane fade" id="toxicos" role="tabpanel">
+                <div class="card bg-gradient-default shadow-sm mb-4">
+                  <div class="card-header bg-transparent">
+                    <h4 class="text-white mb-0">Antecedentes Tóxicos</h4>
+                  </div>
+                  <div class="card-body bg-white">
+                    <div class="form-group">
+                      <div class="custom-control custom-switch">
+                        <input type="checkbox" class="custom-control-input" id="antecedente_toxico"
+                          name="antecedente_toxico" value="Si">
+                        <label class="custom-control-label" for="antecedente_toxico">¿Presenta algún antecedente
+                          tóxico?</label>
+                      </div>
+                    </div>
+
+                    <div id="contenido_toxico" style="display: none;">
+                      <div class="form-group">
+                        <label class="form-control-label">Tipo de antecedente</label>
+                        <div class="row">
+                          <div class="col-md-6">
+                            <div class="custom-control custom-checkbox">
+                              <input type="checkbox" class="custom-control-input" id="tabaquismo" name="tipo_toxico[]"
+                                value="Tabaquismo">
+                              <label class="custom-control-label" for="tabaquismo">Tabaquismo</label>
+                            </div>
+                            <div class="custom-control custom-checkbox">
+                              <input type="checkbox" class="custom-control-input" id="alcohol" name="tipo_toxico[]"
+                                value="Consumo de Alcohol">
+                              <label class="custom-control-label" for="alcohol">Consumo de Alcohol</label>
+                            </div>
+                            <div class="custom-control custom-checkbox">
+                              <input type="checkbox" class="custom-control-input" id="sustancias" name="tipo_toxico[]"
+                                value="Sustancias Psicoactivas">
+                              <label class="custom-control-label" for="sustancias">Sustancias Psicoactivas</label>
+                            </div>
+                          </div>
+                          <div class="col-md-6">
+                            <div class="custom-control custom-checkbox">
+                              <input type="checkbox" class="custom-control-input" id="intoxicaciones"
+                                name="tipo_toxico[]" value="Intoxicaciones">
+                              <label class="custom-control-label" for="intoxicaciones">Intoxicaciones</label>
+                            </div>
+                            <div class="custom-control custom-checkbox">
+                              <input type="checkbox" class="custom-control-input" id="alergias_medicamentos"
+                                name="tipo_toxico[]" value="Alergias a Medicamentos">
+                              <label class="custom-control-label" for="alergias_medicamentos">Alergias a
+                                Medicamentos</label>
+                            </div>
+                            <div class="custom-control custom-checkbox">
+                              <input type="checkbox" class="custom-control-input" id="otros_toxicos"
+                                name="tipo_toxico[]" value="Otros">
+                              <label class="custom-control-label" for="otros_toxicos">Otros</label>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-md-4">
+                          <div class="form-group">
+                            <label class="form-control-label">Fecha de inicio</label>
+                            <input type="date" class="form-control" name="fecha_inicio_toxico">
+                          </div>
+                        </div>
+                        <div class="col-md-4">
+                          <div class="form-group">
+                            <div class="custom-control custom-switch">
+                              <input type="checkbox" class="custom-control-input" id="tratamiento_toxico"
+                                name="tratamiento_toxico" value="Si">
+                              <label class="custom-control-label" for="tratamiento_toxico">¿Ha recibido
+                                tratamiento?</label>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-md-4">
+                          <div class="form-group">
+                            <label class="form-control-label">Tratamiento (detallar)</label>
+                            <input type="text" class="form-control" name="detalle_tratamiento_toxico">
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-md-4">
+                          <div class="form-group">
+                            <div class="custom-control custom-switch">
+                              <input type="checkbox" class="custom-control-input" id="complicaciones_toxico"
+                                name="complicaciones_toxico" value="Si">
+                              <label class="custom-control-label" for="complicaciones_toxico">¿Complicaciones
+                                asociadas?</label>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-md-8">
+                          <div class="form-group">
+                            <label class="form-control-label">Detallar complicaciones</label>
+                            <input type="text" class="form-control" name="detalle_complicaciones_toxico">
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-md-4">
+                          <div class="form-group">
+                            <div class="custom-control custom-switch">
+                              <input type="checkbox" class="custom-control-input" id="activo_toxico"
+                                name="activo_toxico" value="Si">
+                              <label class="custom-control-label" for="activo_toxico">¿Activo actualmente?</label>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-md-4">
+                          <div class="form-group">
+                            <label class="form-control-label">Fecha de finalización</label>
+                            <input type="date" class="form-control" name="fecha_finalizacion_toxico">
+                          </div>
+                        </div>
+                        <div class="col-md-4">
+                          <div class="form-group">
+                            <label class="form-control-label">Observaciones</label>
+                            <input type="text" class="form-control" name="observaciones_toxico">
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Antecedentes Familiares -->
+              <div class="tab-pane fade" id="familiares" role="tabpanel">
+                <div class="card bg-gradient-default shadow-sm mb-4">
+                  <div class="card-header bg-transparent">
+                    <h4 class="text-white mb-0">Antecedentes Familiares</h4>
+                  </div>
+                  <div class="card-body bg-white">
+                    <div class="form-group">
+                      <div class="custom-control custom-switch">
+                        <input type="checkbox" class="custom-control-input" id="antecedente_fami"
+                          name="antecedente_fami" value="Si">
+                        <label class="custom-control-label" for="antecedente_fami">¿Presenta algún antecedente
+                          familiar?</label>
+                      </div>
+                    </div>
+
+                    <div id="contenido_familiar" style="display: none;">
+                      <div class="row">
+                        <div class="col-md-6">
+                          <div class="form-group">
+                            <label class="form-control-label">Tipo de antecedente</label>
+                            <input type="text" class="form-control" name="tipo_antecedente_familiar">
+                          </div>
+                        </div>
+                        <div class="col-md-6">
+                          <div class="form-group">
+                            <label class="form-control-label">Parentesco</label>
+                            <input type="text" class="form-control" name="parentesco">
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="form-group">
+                        <label class="form-control-label">Observaciones</label>
+                        <textarea class="form-control" name="observaciones_familiar" rows="3"></textarea>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Otros Antecedentes -->
+              <div class="tab-pane fade" id="otros" role="tabpanel">
+                <div class="card bg-gradient-default shadow-sm mb-4">
+                  <div class="card-header bg-transparent">
+                    <h4 class="text-white mb-0">Otros Antecedentes</h4>
+                  </div>
+                  <div class="card-body bg-white">
+                    <!-- Alérgicos -->
+                    <div class="form-group">
+                      <div class="custom-control custom-switch">
+                        <input type="checkbox" class="custom-control-input" id="antecedente_alergico"
+                          name="antecedente_alergico" value="Si">
+                        <label class="custom-control-label" for="antecedente_alergico">¿Presenta antecedentes
+                          alérgicos?</label>
+                      </div>
+                    </div>
+
+                    <div id="contenido_alergico" style="display: none;">
+                      <div class="row">
+                        <div class="col-md-6">
+                          <div class="form-group">
+                            <label class="form-control-label">Descripción</label>
+                            <input type="text" class="form-control" name="descripcion_alergico">
+                          </div>
+                        </div>
+                        <div class="col-md-6">
+                          <div class="form-group">
+                            <label class="form-control-label">Fecha de inicio</label>
+                            <input type="date" class="form-control" name="fecha_inicio_alergico">
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-md-4">
+                          <div class="form-group">
+                            <label class="form-control-label">Tratamiento recibido</label>
+                            <input type="text" class="form-control" name="tratamiento_alergico">
+                          </div>
+                        </div>
+                        <div class="col-md-4">
+                          <div class="form-group">
+                            <label class="form-control-label">Detalles del tratamiento</label>
+                            <input type="text" class="form-control" name="detalle_tratamiento_alergico">
+                          </div>
+                        </div>
+                        <div class="col-md-4">
+                          <div class="form-group">
+                            <label class="form-control-label">Complicaciones</label>
+                            <input type="text" class="form-control" name="complicaciones_alergico">
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-md-4">
+                          <div class="form-group">
+                            <div class="custom-control custom-switch">
+                              <input type="checkbox" class="custom-control-input" id="activo_alergico"
+                                name="activo_alergico" value="Si">
+                              <label class="custom-control-label" for="activo_alergico">¿Está activo?</label>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-md-4">
+                          <div class="form-group">
+                            <label class="form-control-label">Fecha de finalización</label>
+                            <input type="date" class="form-control" name="fecha_finalizacion_alergico">
+                          </div>
+                        </div>
+                        <div class="col-md-4">
+                          <div class="form-group">
+                            <label class="form-control-label">Observaciones</label>
+                            <input type="text" class="form-control" name="observaciones_alergico">
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <!-- Traumáticos -->
+                    <div class="form-group">
+                      <div class="custom-control custom-switch">
+                        <input type="checkbox" class="custom-control-input" id="antecedente_traumatico"
+                          name="antecedente_traumatico" value="Si">
+                        <label class="custom-control-label" for="antecedente_traumatico">¿Presenta antecedentes
+                          traumáticos?</label>
+                      </div>
+                    </div>
+
+                    <div id="contenido_traumatico" style="display: none;">
+                      <div class="row">
+                        <div class="col-md-6">
+                          <div class="form-group">
+                            <label class="form-control-label">Descripción</label>
+                            <input type="text" class="form-control" name="descripcion_traumatico">
+                          </div>
+                        </div>
+                        <div class="col-md-6">
+                          <div class="form-group">
+                            <label class="form-control-label">Fecha de inicio</label>
+                            <input type="date" class="form-control" name="fecha_inicio_traumatico">
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-md-4">
+                          <div class="form-group">
+                            <label class="form-control-label">Tratamiento recibido</label>
+                            <input type="text" class="form-control" name="tratamiento_traumatico">
+                          </div>
+                        </div>
+                        <div class="col-md-4">
+                          <div class="form-group">
+                            <label class="form-control-label">Detalles del tratamiento</label>
+                            <input type="text" class="form-control" name="detalle_tratamiento_traumatico">
+                          </div>
+                        </div>
+                        <div class="col-md-4">
+                          <div class="form-group">
+                            <label class="form-control-label">Complicaciones</label>
+                            <input type="text" class="form-control" name="complicaciones_traumatico">
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-md-4">
+                          <div class="form-group">
+                            <div class="custom-control custom-switch">
+                              <input type="checkbox" class="custom-control-input" id="activo_traumatico"
+                                name="activo_traumatico" value="Si">
+                              <label class="custom-control-label" for="activo_traumatico">¿Está activo?</label>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-md-4">
+                          <div class="form-group">
+                            <label class="form-control-label">Fecha de finalización</label>
+                            <input type="date" class="form-control" name="fecha_finalizacion_traumatico">
+                          </div>
+                        </div>
+                        <div class="col-md-4">
+                          <div class="form-group">
+                            <label class="form-control-label">Observaciones</label>
+                            <input type="text" class="form-control" name="observaciones_traumatico">
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <!-- Gineco-Obstétricos -->
+                    <div class="form-group">
+                      <div class="custom-control custom-switch">
+                        <input type="checkbox" class="custom-control-input" id="antecedente_gineco"
+                          name="antecedente_gineco" value="Si">
+                        <label class="custom-control-label" for="antecedente_gineco">¿Presenta antecedentes
+                          gineco-obstétricos?</label>
+                      </div>
+                    </div>
+
+                    <div id="contenido_gineco" style="display: none;">
+                      <div class="row">
+                        <div class="col-md-4">
+                          <div class="form-group">
+                            <div class="custom-control custom-switch">
+                              <input type="checkbox" class="custom-control-input" id="menarquia" name="menarquia"
+                                value="Si">
+                              <label class="custom-control-label" for="menarquia">Menarquia</label>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-md-4">
+                          <div class="form-group">
+                            <label class="form-control-label">Edad Menarquia</label>
+                            <input type="number" class="form-control" name="edad_menarquia">
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-md-4">
+                          <div class="form-group">
+                            <div class="custom-control custom-switch">
+                              <input type="checkbox" class="custom-control-input" id="menopausia" name="menopausia"
+                                value="Si">
+                              <label class="custom-control-label" for="menopausia">Menopausia</label>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-md-4">
+                          <div class="form-group">
+                            <label class="form-control-label">Edad Menopausia</label>
+                            <input type="number" class="form-control" name="edad_menopausia">
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-md-3">
+                          <div class="form-group">
+                            <label class="form-control-label">Gravidez</label>
+                            <input type="number" class="form-control" name="gravidez">
+                          </div>
+                        </div>
+                        <div class="col-md-3">
+                          <div class="form-group">
+                            <label class="form-control-label">Abortos</label>
+                            <input type="number" class="form-control" name="abortos">
+                          </div>
+                        </div>
+                        <div class="col-md-3">
+                          <div class="form-group">
+                            <label class="form-control-label">Hijos Vivos</label>
+                            <input type="number" class="form-control" name="hijos_vivos">
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-md-4">
+                          <div class="form-group">
+                            <div class="custom-control custom-switch">
+                              <input type="checkbox" class="custom-control-input" id="metodo_planificacion"
+                                name="metodo_planificacion" value="Si">
+                              <label class="custom-control-label" for="metodo_planificacion">Método de
+                                planificación</label>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-md-4">
+                          <div class="form-group">
+                            <label class="form-control-label">Método</label>
+                            <input type="text" class="form-control" name="metodo_detalle">
+                          </div>
+                        </div>
+                        <div class="col-md-4">
+                          <div class="form-group">
+                            <label class="form-control-label">Dosis</label>
+                            <input type="text" class="form-control" name="dosis_planificacion">
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-md-4">
+                          <div class="form-group">
+                            <label class="form-control-label">Adherencia</label>
+                            <input type="text" class="form-control" name="adherencia_planificacion">
+                          </div>
+                        </div>
+                        <div class="col-md-4">
+                          <div class="form-group">
+                            <label class="form-control-label">Tolerancia</label>
+                            <input type="text" class="form-control" name="tolerancia_planificacion">
+                          </div>
+                        </div>
+                        <div class="col-md-4">
+                          <div class="form-group">
+                            <label class="form-control-label">Observaciones</label>
+                            <input type="text" class="form-control" name="observaciones_gineco">
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Botones de acción -->
+            <div class="row mt-4">
+              <div class="col-12 text-right">
+                <button type="submit" class="btn btn-primary">Guardar Antecedentes</button>
+                <a href="{% url 'detalle_paciente' paciente_id %}" class="btn btn-secondary">Ver Paciente</a>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    // Función para mostrar/ocultar opciones adicionales
+    function toggleOptions(checkboxId, optionsId) {
+      const checkbox = document.getElementById(checkboxId);
+      const options = document.getElementById(optionsId);
+
+      checkbox.addEventListener('change', function () {
+        if (checkbox.checked) {
+          options.style.display = 'block';
+        } else {
+          options.style.display = 'none';
+        }
+      });
+    }
+
+    // Llamar a la función para cada sección de antecedentes
+    toggleOptions('antecedente_fami', 'contenido_familiar');
+    toggleOptions('antecedente_gineco', 'contenido_gineco');
+    toggleOptions('antecedente_patologico', 'contenido_patologico');
+    toggleOptions('antecedente_quirurgico', 'contenido_quirurgico');
+    toggleOptions('antecedente_farmacologico', 'contenido_farmacologico');
+    toggleOptions('antecedente_traumatico', 'contenido_traumatico');
+    toggleOptions('antecedente_alergico', 'contenido_alergico');
+    toggleOptions('antecedente_toxico', 'contenido_toxico');
+    toggleOptions('antecedente_epidemiologico', 'contenido_epidemiologico');
+    toggleOptions('antecedente_inmunizacion', 'contenido_inmunizacion');
+    toggleOptions('antecedente_transfusional', 'contenido_transfusional');
+    toggleOptions('antecedente_hospitalizacion', 'contenido_hospitalizacion');
+
+    // Repite para cada sección de antecedentes
+  });
+</script>
+{% endblock content %}

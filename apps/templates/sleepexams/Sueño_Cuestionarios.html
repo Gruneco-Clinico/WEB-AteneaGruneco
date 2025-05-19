@@ -1,0 +1,1091 @@
+{% extends 'layouts/base.html' %} {% block content %}
+<div class="header bg-primary pb-6">
+    <div class="container-fluid">
+        <div class="header-body">
+            <div class="row align-items-center py-4">
+                <div class="col-lg-6 col-5">
+                    <h6 class="h2 text-white d-inline-block mb-0">
+                        Información del Paciente
+                    </h6>
+                    <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
+                        <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
+                            <li class="breadcrumb-item">
+                                <a href="#"><i class="fas fa-home"></i></a>
+                            </li>
+                            <li class="breadcrumb-item">
+                                <a href="/pacientes/">Pacientes</a>
+                            </li>
+                            <li class="breadcrumb-item"><a href="/pacientes/">Volver</a></li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid mt--6">
+    <form method="post" action="{% url 'guardar_Sueño_Cuestionarios' %}">
+        {% csrf_token %}
+        <input type="hidden" name="visita_id" id="visita_id" value="{{ visita_examen }}" />
+        <input type="hidden" name="paciente_id" id="paciente_id" value="{{ paciente_id }}" />
+        <input type="hidden" name="examen_id" id="examen_id" value="{{ examen_id }}" />
+        <div class="row">
+            <div class="col">
+                <div class="card">
+                    <div class="card-header border-0">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <h3 class="mb-0">Cuestionario de Pitsburg</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label>Hora de acostarse durante el ultimo mes</label>
+                            <input type="time" name="hora_acostarse" class="form-control">
+                        </div>
+                        <div class="mb-3">
+                            <label>Latencia de inicio de sueño (minutos)</label>
+                            <input type="number" name="latencia_sueno" class="form-control">
+                        </div>
+                        <div class="mb-3">
+                            <label>Hora de levantarse durante el ultimo mes</label>
+                            <input type="time" name="hora_levantarse" class="form-control">
+                        </div>
+                        <div class="mb-3">
+                            <label>Cuantas horas duerme verdaderamente cada noche durante el ultimo mes</label>
+                            <input type="number" name="latencia_sueno" class="form-control">
+                        </div>
+
+                        <div class="mb-3">
+                            <label>No poder conciliar el sueño</label>
+                            <select name="conciliar_sueno" class="form-control">
+                                <option>Ninguna vez</option>
+                                <option>Menos de una vez a la semana</option>
+                                <option>Una o dos veces a la semana</option>
+                                <option>Tres o más veces a la semana</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label>Despertarse durante la noche o de madrugada</label>
+                            <select name="despertarse_sueno" class="form-control">
+                                <option>Ninguna vez</option>
+                                <option>Menos de una vez a la semana</option>
+                                <option>Una o dos veces a la semana</option>
+                                <option>Tres o más veces a la semana</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label>Tener que levantarse para ir al servicio</label>
+                            <select name="levantarse_servicio_sueno" class="form-control">
+                                <option>Ninguna vez</option>
+                                <option>Menos de una vez a la semana</option>
+                                <option>Una o dos veces a la semana</option>
+                                <option>Tres o más veces a la semana</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label>No poder respirar bien</label>
+                            <select name="respirar" class="form-control">
+                                <option>Ninguna vez</option>
+                                <option>Menos de una vez a la semana</option>
+                                <option>Una o dos veces a la semana</option>
+                                <option>Tres o más veces a la semana</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label>Toser o roncar ruidosamente</label>
+                            <select name="toser_roncar_sueno" class="form-control">
+                                <option>Ninguna vez</option>
+                                <option>Menos de una vez a la semana</option>
+                                <option>Una o dos veces a la semana</option>
+                                <option>Tres o más veces a la semana</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label>Sentir frio</label>
+                            <select name="Sentir_frio_sueno" class="form-control">
+                                <option>Ninguna vez</option>
+                                <option>Menos de una vez a la semana</option>
+                                <option>Una o dos veces a la semana</option>
+                                <option>Tres o más veces a la semana</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label>Sentir demasiado calor</label>
+                            <select name="calor_sueno" class="form-control">
+                                <option>Ninguna vez</option>
+                                <option>Menos de una vez a la semana</option>
+                                <option>Una o dos veces a la semana</option>
+                                <option>Tres o más veces a la semana</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label>Tener pesadillas o "malos sueños"</label>
+                            <select name="pesadillas_sueno" class="form-control">
+                                <option>Ninguna vez</option>
+                                <option>Menos de una vez a la semana</option>
+                                <option>Una o dos veces a la semana</option>
+                                <option>Tres o más veces a la semana</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label>Sufrir dolores</label>
+                            <select name="dolores_sueno" class="form-control">
+                                <option>Ninguna vez</option>
+                                <option>Menos de una vez a la semana</option>
+                                <option>Una o dos veces a la semana</option>
+                                <option>Tres o más veces a la semana</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label>Otras razones (describir)</label>
+                            <input type="text" name="otras" class="form-control">
+                            <select name="otras_sueno" class="form-control">
+                                <option>Ninguna vez</option>
+                                <option>Menos de una vez a la semana</option>
+                                <option>Una o dos veces a la semana</option>
+                                <option>Tres o más veces a la semana</option>
+                            </select>
+                        </div>
+
+
+                        <div class="mb-3">
+                            <label>Durante el ultimo mes ¿Como valoraria en conjunto su calidad de sueño?</label>
+                            <select name="calidad_sueno" class="form-control">
+                                <option>Buena</option>
+                                <option>Bastante buena</option>
+                                <option>Mala</option>
+                                <option>Bastante mala</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label>Durante el ultimo mes ¿Cuantas veces habra tomado medicinas (por su cuenta o
+                                recetadas por medico) para dormir?</label>
+                            <select name="medicinas_sueno" class="form-control">
+                                <option>Ninguna vez</option>
+                                <option>Menos de una vez a la semana</option>
+                                <option>Una o dos veces a la semana</option>
+                                <option>Tres o más veces a la semana</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label>Durante el ultimo mes ¿Cuantas veces ha sentido somnolencia mientras conducia, comia,
+                                o desarrollaba alguna otra actividad?</label>
+                            <select name="somnolencia_sueno" class="form-control">
+                                <option>Ninguna vez</option>
+                                <option>Menos de una vez a la semana</option>
+                                <option>Una o dos veces a la semana</option>
+                                <option>Tres o más veces a la semana</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label>Durante el ultimo mes ¿ha representado mucho problema el "tener animos" para realizar
+                                alguna de las actividades detalladas en la pregunta anterior?</label>
+                            <select name="problemas_animos_sueno" class="form-control">
+                                <option>Ninguna vez</option>
+                                <option>Menos de una vez a la semana</option>
+                                <option>Una o dos veces a la semana</option>
+                                <option>Tres o más veces a la semana</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label>Duerme solo o acompañado</label>
+                            <select name="duerme_acompanado" class="form-control">
+                                <option>Solo</option>
+                                <option>Con alguien en otra habitación</option>
+                                <option>otra cama</option>
+                                <option>En la misma cama</option>
+                            </select>
+                        </div>
+                        <form>
+                            <!-- Otros campos existentes -->
+                            <hr class="my-4">
+                            <div class="mb-3">
+                                <label>Especifique solo o acompañado</label>
+                                <select id="duerme_acompanado" name="duerme_acompanado" class="form-control"
+                                    onchange="toggleFields()">
+                                    <option value="solo">Solo</option>
+                                    <option value="acompanado">Acompañado</option>
+                                </select>
+                            </div>
+
+                            <div id="acompanado_fields" style="display: none;">
+                                <div class="mb-3">
+                                    <label>Ronquidos ruidosos</label>
+                                    <select name="ronquidos_ruidosos" class="form-control">
+                                        <option>Ninguna vez en el último mes</option>
+                                        <option>Menos de una vez a la semana</option>
+                                        <option>Una o dos veces a la semana</option>
+                                        <option>Tres o más veces a la semana</option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label>Grandes pausas entre respiraciones mientras duerme</label>
+                                    <select name="pausas_respiracion" class="form-control">
+                                        <option>Ninguna vez en el último mes</option>
+                                        <option>Menos de una vez a la semana</option>
+                                        <option>Una o dos veces a la semana</option>
+                                        <option>Tres o más veces a la semana</option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label>Sacudidas o espasmos de piernas mientras duerme</label>
+                                    <select name="sacudidas_piernas" class="form-control">
+                                        <option>Ninguna vez en el último mes</option>
+                                        <option>Menos de una vez a la semana</option>
+                                        <option>Una o dos veces a la semana</option>
+                                        <option>Tres o más veces a la semana</option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label>Episodios de desorientación o confusión mientras duerme</label>
+                                    <select name="desorientacion_confusion" class="form-control">
+                                        <option>Ninguna vez en el último mes</option>
+                                        <option>Menos de una vez a la semana</option>
+                                        <option>Una o dos veces a la semana</option>
+                                        <option>Tres o más veces a la semana</option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label>Otros inconvenientes mientras duerme (describir)</label>
+                                    <select name="otros_inconvenientes" class="form-control">
+                                        <option>Ninguna vez en el último mes</option>
+                                        <option>Menos de una vez a la semana</option>
+                                        <option>Una o dos veces a la semana</option>
+                                        <option>Tres o más veces a la semana</option>
+                                    </select>
+                                    <textarea name="descripcion_inconvenientes" class="form-control"
+                                        placeholder="Describa otros inconvenientes"></textarea>
+                                </div>
+                            </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div class="card">
+                    <div class="card-header border-0">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <h3 class="mb-0">Cuestionario de Epworth</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div>
+                            <label ]>Con que frecuencia se queda dormido?</label>
+                        </div>
+                        <div class="form-group">
+                            <label>Sentado y leyendo</label>
+                            <select class="form-control" name="epworth_leyendo">
+                                <option value="">Elegir uno</option>
+                                <option value="Nunca se ha dormido">Nunca se ha dormido</option>
+                                <option value="Escasa posibilidad de dormirse">Escasa posibilidad de dormirse</option>
+                                <option value="Moderada posibilidad de dormirse">Moderada posibilidad de dormirse
+                                </option>
+                                <option value="Elevada posibilidad de dormirse">Elevada posibilidad de dormirse</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Viendo la TV</label>
+                            <select class="form-control" name="epworth_tv">
+                                <option value="">Elegir uno</option>
+                                <option value="Nunca se ha dormido">Nunca se ha dormido</option>
+                                <option value="Escasa posibilidad de dormirse">Escasa posibilidad de dormirse</option>
+                                <option value="Moderada posibilidad de dormirse">Moderada posibilidad de dormirse
+                                </option>
+                                <option value="Elevada posibilidad de dormirse">Elevada posibilidad de dormirse</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Sentado, inactivo en un espectáculo (teatro)</label>
+                            <select class="form-control" name="epworth_teatro">
+                                <option value="">Elegir uno</option>
+                                <option value="Nunca se ha dormido">Nunca se ha dormido</option>
+                                <option value="Escasa posibilidad de dormirse">Escasa posibilidad de dormirse</option>
+                                <option value="Moderada posibilidad de dormirse">Moderada posibilidad de dormirse
+                                </option>
+                                <option value="Elevada posibilidad de dormirse">Elevada posibilidad de dormirse</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>En coche, como piloto de un viaje de una hora</label>
+                            <select class="form-control" name="epworth_piloto">
+                                <option value="">Elegir uno</option>
+                                <option value="Nunca se ha dormido">Nunca se ha dormido</option>
+                                <option value="Escasa posibilidad de dormirse">Escasa posibilidad de dormirse</option>
+                                <option value="Moderada posibilidad de dormirse">Moderada posibilidad de dormirse
+                                </option>
+                                <option value="Elevada posibilidad de dormirse">Elevada posibilidad de dormirse</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Tumbado a media tarde</label>
+                            <select class="form-control" name="epworth_tumbado">
+                                <option value="">Elegir uno</option>
+                                <option value="Nunca se ha dormido">Nunca se ha dormido</option>
+                                <option value="Escasa posibilidad de dormirse">Escasa posibilidad de dormirse</option>
+                                <option value="Moderada posibilidad de dormirse">Moderada posibilidad de dormirse
+                                </option>
+                                <option value="Elevada posibilidad de dormirse">Elevada posibilidad de dormirse</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Sentado y charlando con alguien</label>
+                            <select class="form-control" name="epworth_charlando">
+                                <option value="">Elegir uno</option>
+                                <option value="Nunca se ha dormido">Nunca se ha dormido</option>
+                                <option value="Escasa posibilidad de dormirse">Escasa posibilidad de dormirse</option>
+                                <option value="Moderada posibilidad de dormirse">Moderada posibilidad de dormirse
+                                </option>
+                                <option value="Elevada posibilidad de dormirse">Elevada posibilidad de dormirse</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Sentado después de comer sin ingerir alcohol</label>
+                            <select class="form-control" name="epworth_comida">
+                                <option value="">Elegir uno</option>
+                                <option value="Nunca se ha dormido">Nunca se ha dormido</option>
+                                <option value="Escasa posibilidad de dormirse">Escasa posibilidad de dormirse</option>
+                                <option value="Moderada posibilidad de dormirse">Moderada posibilidad de dormirse
+                                </option>
+                                <option value="Elevada posibilidad de dormirse">Elevada posibilidad de dormirse</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>En su coche, cuando se para debido al tráfico</label>
+                            <select class="form-control" name="epworth_trafico">
+                                <option value="">Elegir uno</option>
+                                <option value="Nunca se ha dormido">Nunca se ha dormido</option>
+                                <option value="Escasa posibilidad de dormirse">Escasa posibilidad de dormirse</option>
+                                <option value="Moderada posibilidad de dormirse">Moderada posibilidad de dormirse
+                                </option>
+                                <option value="Elevada posibilidad de dormirse">Elevada posibilidad de dormirse</option>
+                            </select>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div class="card">
+                    <div class="card-header border-0">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <h3 class="mb-0">Cuestionario de Stop-Bang</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="ronca_fuerte" id="ronca_fuerte">
+                            <label class="form-check-label" for="ronca_fuerte">
+                                Ronca fuerte
+                            </label>
+                        </div>
+
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="cansado_frecuencia"
+                                id="cansado_frecuencia">
+                            <label class="form-check-label" for="cansado_frecuencia">
+                                Se siente cansado con frecuencia
+                            </label>
+                        </div>
+
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="deja_respirar" id="deja_respirar">
+                            <label class="form-check-label" for="deja_respirar">
+                                Lo observaron dejar de respirar o ahogarse mientras dormía
+                            </label>
+                        </div>
+
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="presion_arterial"
+                                id="presion_arterial">
+                            <label class="form-check-label" for="presion_arterial">
+                                Tiene o está recibiendo tratamiento para la presión arterial
+                            </label>
+                        </div>
+
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="imc_alto" id="imc_alto">
+                            <label class="form-check-label" for="imc_alto">
+                                Presenta un índice de masa corporal de más de 35kg/m²
+                            </label>
+                        </div>
+
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="mayor_50" id="mayor_50">
+                            <label class="form-check-label" for="mayor_50">
+                                Tiene más de 50 años
+                            </label>
+                        </div>
+
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="cuello_grande" id="cuello_grande">
+                            <label class="form-check-label" for="cuello_grande">
+                                ¿El tamaño de su cuello es grande?
+                            </label>
+                        </div>
+
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="masculino" id="masculino">
+                            <label class="form-check-label" for="masculino">
+                                Masculino
+                            </label>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div class="card">
+                    <div class="card-header border-0">
+                        <h3 class="mb-0">Cuestionario de MEW (matutinidad, vespertinidad)</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label">Si sólo pensaras en cuando te sentirías mejor y fueras totalmente
+                                libre de planificarte el día. ¿A qué hora te levantarías?</label>
+                            <select class="form-control" name="hora_levantarse_meq">
+                                <option value="Entre las 05:00 (5 AM) y 06:30 (6:30 AM) de la mañana">Entre las 05:00 (5
+                                    AM) y 06:30 (6:30 AM) de la mañana</option>
+                                <option value="Entre las 06:30 (6:30 AM) y las 07:45 (7:45 AM) de la mañana">Entre las
+                                    06:30 (6:30 AM) y las 07:45 (7:45 AM) de la mañana</option>
+                                <option value="Entre las 07:45 (7:45 AM) y las 09:45 (9:45 AM) de la mañana">Entre las
+                                    07:45 (7:45 AM) y las 09:45 (9:45 AM) de la mañana</option>
+                                <option value="Entre las 09:45 (9:45 AM) y las 11:00 (11 AM) de la mañana">Entre las
+                                    09:45 (9:45 AM) y las 11:00 (11 AM) de la mañana</option>
+                                <option value="Entre las 11 (11 AM) de la mañana y las 12 de la tarde (12 noon)">Entre
+                                    las 11 (11 AM) de la mañana y las 12 de la tarde (12 noon)
+                                </option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Si sólo pensaras en cuando te sentirías mejor y fueras totalmente
+                                libre de planificarte el día. ¿A qué hora te acostarías?</label>
+                            <select class="form-control" name="hora_acostarse_meq">
+                                <option value="A las 20:00 (8 PM) – 21:00 (9 PM)">A las 20:00 (8 PM) – 21:00 (9 PM)
+                                </option>
+                                <option value="A las 21:00 (9 PM) – 22:15 (10:15 PM)">A las 21:00 (9 PM) – 22:15 (10:15
+                                    PM)</option>
+                                <option value="A las 22:15 (10:15 PM) – 00:30 (12:30 AM)">A las 22:15 (10:15 PM) – 00:30
+                                    (12:30 AM)</option>
+                                <option value="A las 00:30 (12:30 AM) – 01:45 (1:45 AM)">A las 00:30 (12:30 AM) – 01:45
+                                    (1:45 AM)</option>
+                                <option value="A las 01:45 (1:45 AM) – 03:00 (3 AM)">A las 01:45 (1:45 AM) – 03:00 (3
+                                    AM)</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Para levantarte por la mañana a una hora específica. ¿Hasta qué
+                                punto necesitas que te avise el despertador?</label>
+                            <select class="form-control" name="uso_despertador_meq">
+                                <option value="No lo necesito">No lo necesito</option>
+                                <option value="Lo necesito poco">Lo necesito poco</option>
+                                <option value="Lo necesito bastante">Lo necesito bastante</option>
+                                <option value="Lo necesito mucho">Lo necesito mucho</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">¿Te resulta fácil levantarte por las mañanas?</label>
+                            <select class="form-control" name="facilidad_levantarse_meq">
+                                <option value="Nada fácil">Nada fácil</option>
+                                <option value="No muy fácil">No muy fácil</option>
+                                <option value="Bastante fácil">Bastante fácil</option>
+                                <option value="Muy fácil">Muy fácil</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Una vez levantado por las mañanas. ¿Qué tal te encuentras durante
+                                la primera media hora?</label>
+                            <select class="form-control" name="alerta_manana_meq">
+                                <option value="Nada alerta">Nada alerta</option>
+                                <option value="Poco alerta">Poco alerta</option>
+                                <option value="Bastante alerta">Bastante alerta</option>
+                                <option value="Muy alerta">Muy alerta</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Una vez levantado por las mañanas. ¿Cómo es tu apetito durante la
+                                primera media hora?</label>
+                            <select class="form-control" name="apetito_manana_meq">
+                                <option value="Muy escaso">Muy escaso</option>
+                                <option value="Bastante escaso">Bastante escaso</option>
+                                <option value="Bastante bueno">Bastante bueno</option>
+                                <option value="Muy bueno">Muy bueno</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Una vez levantado por las mañanas. ¿Qué tal te sientes durante la
+                                primera media hora?</label>
+                            <select class="form-control" name="descanso_manana_meq">
+                                <option value="Muy cansado">Muy cansado</option>
+                                <option value="Bastante cansado">Bastante cansado</option>
+                                <option value="Bastante descansado">Bastante descansado</option>
+                                <option value="Muy descansado">Muy descansado</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Cuando no tienes compromisos al día siguiente. ¿A qué hora te
+                                acuestas en relación con tu hora habitual?</label>
+                            <select class="form-control" name="hora_acostarse_libre_meq">
+                                <option value="Nunca o raramente o más tarde">Nunca o raramente o más tarde</option>
+                                <option value="Menos de 1 hora más tarde">Menos de 1 hora más tarde</option>
+                                <option value="De 1 a 2 horas más tarde">De 1 a 2 horas más tarde</option>
+                                <option value="Más de 2 horas más tarde">Más de 2 horas más tarde</option>
+                            </select>
+                        </div>
+
+
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <h5 class="card-title">Has decidido hacer un poco de ejercicio físico. Un amigo te
+                                    propone hacerlo una hora dos veces por
+                                    semana y según él, la mejor hora sería de 7 a 8 de la mañana. No teniendo nada más
+                                    encuenta salvo
+                                    tu propio reloj “interno”</h5>
+                                <p class="card-text">¿Cómo crees que te encontrarías?</p>
+                                <select class="form-control" name="ejercicio_fisico_meq">
+                                    <option value="Estaría en buena forma">Estaría en buena forma</option>
+                                    <option value="Estaría en una forma aceptable">Estaría en una forma aceptable
+                                    </option>
+                                    <option value="Me resultaría difícil">Me resultaría difícil</option>
+                                    <option value="Me resultaría muy difícil">Me resultaría muy difícil</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Pregunta 2 -->
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <h5 class="card-title">Has decidido hacer un poco de ejercicio físico...</h5>
+                                <h5 class="card-title">¿A qué hora aproximada de la noche te sientes cansado y como
+                                    consecuencia necesitas dormir?</h5>
+                                <select class="form-control" name="hora_cansancio_noche_meq">
+                                    <option value="20:00 - 21:00">20:00 - 21:00</option>
+                                    <option value="21:00 - 22:15">21:00 - 22:15</option>
+                                    <option value="22:15 - 00:45">22:15 - 00:45</option>
+                                    <option value="00:45 - 02:00">00:45 - 02:00</option>
+                                    <option value="02:00 - 03:00">02:00 - 03:00</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Pregunta 3 -->
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <h5 class="card-title">Quieres estar en tu punto máximo de rendimiento para una prueba
+                                    de dos horas que va a ser
+                                    mentalmente agotadora. Siendo totalmente libre de planificar el día y pensando sólo
+                                    en cuando te
+                                    sentirías mejor. ¿Qué horario elegirías?</h5>
+                                <select class="form-control" name="horario_prueba_mental_meq">
+                                    <option value="08:00 - 10:00">08:00 - 10:00</option>
+                                    <option value="11:00 - 13:00">11:00 - 13:00</option>
+                                    <option value="13:00 - 17:00">13:00 - 17:00</option>
+                                    <option value="19:00 - 21:00">19:00 - 21:00</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Pregunta 4 -->
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <h5 class="card-title">Si te acostaras a las 11 PM, ¿qué nivel de cansancio notarías?
+                                </h5>
+                                <select class="form-control" name="nivel_cansancia_11">
+                                    <option value="Ningún cansancio">Ningún cansancio</option>
+                                    <option value="Algún cansancio">Algún cansancio</option>
+                                    <option value="Bastante cansancio">Bastante cansancio</option>
+                                    <option value="Mucho cansancio">Mucho cansancio</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Pregunta 5 -->
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <h5 class="card-title">Por algún motivo te has acostado varias horas más tarde de lo
+                                    habitual, aunque al día siguiente no has
+                                    de levantarte a ninguna hora en particular. ¿Cuando crees que te despertarías?</h5>
+                                <select class="form-control" name="hora_despertarse_si_tarde">
+                                    <option value="A la hora habitual y ya no dormiría más">A la hora habitual y ya no
+                                        dormiría más</option>
+                                    <option value="A la hora habitual y dormiría un poco má">A la hora habitual y
+                                        dormiría un poco más</option>
+                                    <option value="Me despertaría más tarde de lo habitual">Me despertaría más tarde de
+                                        lo habitual</option>
+                                    <option value="Dormiría mucho más de lo habitual">Dormiría mucho más de lo habitual
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Una noche tienes que permanecer despierto de 4 a 6 de la madrugada
+                                debido a una guardia nocturna. Sin tener ningún compromiso al día siguiente, ¿qué
+                                preferirías?</label>
+                            <select class="form-control" name="guardia_nocturna">
+                                <option value="No acostarme hasta pasada la guardia">No acostarme hasta pasada la
+                                    guardia</option>
+                                <option value="Echar una siesta antes y dormir después">Echar una siesta antes y dormir
+                                    después</option>
+                                <option value="Echar un buen sueño antes y una siesta después">Echar un buen sueño antes
+                                    y una siesta después</option>
+                                <option value="Sólo dormirías antes de la guardia">Sólo dormirías antes de la guardia
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Tienes que hacer dos horas de trabajo físico pesado. Eres
+                                totalmente libre para planificarte el día. Pensando sólo en cuando te sentirías mejor,
+                                ¿qué horario escogerías?</label>
+                            <select class="form-control" name="horario_trabajo_fisico">
+                                <option value="De 08:00 (8 AM) a 10:00 (10 AM)">De 08:00 (8 AM) a 10:00 (10 AM)</option>
+                                <option value="De 11:00 (11 AM) a 13:00 (1 PM)">De 11:00 (11 AM) a 13:00 (1 PM)</option>
+                                <option value="De 13:00 (1 PM) a 17:00 (5 PM)">De 13:00 (1 PM) a 17:00 (5 PM)</option>
+                                <option value="De 19:00 (7 PM) a 21:00 (9 PM)">De 19:00 (7 PM) a 21:00 (9 PM)</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Has decidido hacer ejercicio físico intenso. Un amigo te sugiere
+                                practicar una hora dos veces por semana de 10 a 11 de la noche. Pensando sólo en cuando
+                                te sentirías mejor, ¿Cómo crees que te sentaría?</label>
+                            <select class="form-control" name="ejercicio_nocturno">
+                                <option value="Estaría en buena forma">Estaría en buena forma</option>
+                                <option value="Estaría en una forma aceptable">Estaría en una forma aceptable</option>
+                                <option value="Me resultaría difícil">Me resultaría difícil</option>
+                                <option value="Me resultaría muy difícil">Me resultaría muy difícil</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Imagínate que puedes escoger tu horario de trabajo. Supón que tu
+                                jornada es de CINCO horas al día (incluyendo los descansos) y que tu actividad es
+                                interesante y remunerada según tu rendimiento. ¿Qué CINCO HORAS CONSECUTIVAS
+                                seleccionarías? ¿Empezando en qué hora?</label>
+                            <select class="form-control" name="horario_trabajo">
+                                <option value="Entre las 04:00 (4 AM) y las 08:00 (8 AM)">Entre las 04:00 (4 AM) y las
+                                    08:00 (8 AM)</option>
+                                <option value="Entre las 08:00 (8 AM) y las 09:00 (9 AM)">Entre las 08:00 (8 AM) y las
+                                    09:00 (9 AM)</option>
+                                <option value="Entre las 09:00 (9 AM) y las 14:00 (2 PM)">Entre las 09:00 (9 AM) y las
+                                    14:00 (2 PM)</option>
+                                <option value="Entre las 14:00 (2 PM) y las 17:00 (5 PM)">Entre las 14:00 (2 PM) y las
+                                    17:00 (5 PM)</option>
+                                <option value="Entre las 17:00 (5 PM) y las 04:00 (4 AM)">Entre las 17:00 (5 PM) y las
+                                    04:00 (4 AM)</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">¿A qué hora del día crees que alcanzas tu máximo
+                                bienestar?</label>
+                            <select class="form-control" name="maximo_bienestar">
+                                <option value="Entre las 05:00 (5 AM) y las 08:00 (8 AM)">Entre las 05:00 (5 AM) y las
+                                    08:00 (8 AM)</option>
+                                <option value="Entre las 08:00 (8 AM) y las 10:00 (10 AM)">Entre las 08:00 (8 AM) y las
+                                    10:00 (10 AM)</option>
+                                <option value="Entre las 10:00 (10 AM) y las 17:00 (5 PM)">Entre las 10:00 (10 AM) y las
+                                    17:00 (5 PM)</option>
+                                <option value="Entre las 17:00 (5 PM) y las 22:00 (10 PM)">Entre las 17:00 (5 PM) y las
+                                    22:00 (10 PM)</option>
+                                <option value="Entre las 22:00 (10 PM) y las 05:00 (5 AM)">Entre las 22:00 (10 PM) y las
+                                    05:00 (5 AM)</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Se habla de personas de tipo matutino y vespertino. ¿Cuál de estos
+                                tipos te consideras ser?</label>
+                            <select class="form-control" name="tipo_persona">
+                                <option value="Un tipo claramente matutino">Un tipo claramente matutino</option>
+                                <option value="Un tipo más matutino que vespertino">Un tipo más matutino que vespertino
+                                </option>
+                                <option value="Un tipo más vespertino que matutino">Un tipo más vespertino que matutino
+                                </option>
+                                <option value="Un tipo claramente vespertino">Un tipo claramente vespertino</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Puntuación</label>
+                            <input type="text" class="form-control" name="puntuacion">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col">
+                <div class="card">
+                    <div class="card-header border-0">
+                        <h3 class="mb-0">Cuestionario de Berlín</h3>
+                    </div>
+                    <div class="card-body">
+                        <!-- Cambio de peso -->
+                        <div class="mb-3">
+                            <label class="form-label">¿Su peso ha cambiado en los últimos 5 años?</label>
+                            <select class="form-control" name="peso_cambio">
+                                <option value="Aumentado">Aumentado</option>
+                                <option value="Disminuido">Disminuido</option>
+                                <option value="No ha cambiado">No ha cambiado</option>
+                            </select>
+                        </div>
+
+                        <!-- ¿Usted ronca? -->
+                        <div class="mb-3">
+                            <label class="form-label">¿Usted ronca?</label>
+                            <select class="form-control" name="ronca">
+                                <option value="Sí">Sí</option>
+                                <option value="No">No</option>
+                                <option value="No sabe">No sabe</option>
+                            </select>
+                        </div>
+
+                        <!-- Si usted ronca, ¿su ronquido es? -->
+                        <div class="mb-3">
+                            <label class="form-label">Si usted ronca, ¿Su ronquido es?</label>
+                            <select class="form-control" name="tipo_ronquido">
+                                <option value="------">----------</option>
+                                <option value="Ligeramente más fuerte que respirar">Ligeramente más fuerte que
+                                    respirar</option>
+                                <option value="Tan fuerte como hablar">Tan fuerte como hablar</option>
+                                <option value="Más fuerte que hablar">Más fuerte que hablar</option>
+                                <option value="Muy fuerte">Muy fuerte - se puede escuchar en habitaciones adyacentes
+                                </option>
+                            </select>
+                        </div>
+
+                        <!-- ¿Con qué frecuencia ronca? -->
+                        <div class="mb-3">
+                            <label class="form-label">¿Con qué frecuencia ronca?</label>
+                            <select class="form-control" name="frecuencia_ronquidos">
+                                <option value="Todas las noches">Todas las noches</option>
+                                <option value="3-4 veces por semana">3-4 veces por semana</option>
+                                <option value="1-2 veces por semana">1-2 veces por semana</option>
+                                <option value="1-2 veces por mes">1-2 veces por mes</option>
+                                <option value="Nunca o casi nunca">Nunca o casi nunca</option>
+                            </select>
+                        </div>
+
+                        <!-- ¿Alguna vez su ronquido ha molestado a otras personas? -->
+                        <div class="mb-3">
+                            <label class="form-label">¿Alguna vez su ronquido ha molestado a otras personas?</label>
+                            <select class="form-control" name="ronquido_molesto">
+                                <option value="Sí">Sí</option>
+                                <option value="No">No</option>
+                                <option value="No sabe">No sabe</option>
+                            </select>
+                        </div>
+
+                        <!-- ¿Ha notado alguien que usted deja de respirar cuando duerme? -->
+                        <div class="mb-3">
+                            <label class="form-label">¿Ha notado alguien que usted deja de respirar cuando
+                                duerme?</label>
+                            <select class="form-control" name="apnea_observada">
+                                <option value="Casi todas las noches">Casi todas las noches</option>
+                                <option value="3-4 veces por semana">3-4 veces por semana</option>
+                                <option value="1-2 veces por semana">1-2 veces por semana</option>
+                                <option value="1-2 veces por mes">1-2 veces por mes</option>
+                                <option value="Nunca o casi nunca">Nunca o casi nunca</option>
+                            </select>
+                        </div>
+
+                        <!-- ¿Se siente cansado o fatigado al levantarse por la mañana? -->
+                        <div class="mb-3">
+                            <label class="form-label">¿Se siente cansado o fatigado al levantarse por la mañana
+                                después de dormir?</label>
+                            <select class="form-control" name="fatiga_matutina">
+                                <option value="Casi todos los días">Casi todos los días</option>
+                                <option value="3-4 veces por semana">3-4 veces por semana</option>
+                                <option value="1-2 veces por semana">1-2 veces por semana</option>
+                                <option value="1-2 veces por mes">1-2 veces por mes</option>
+                                <option value="Nunca o casi nunca">Nunca o casi nunca</option>
+                            </select>
+                        </div>
+
+                        <!-- ¿Se siente cansado o fatigado durante el día? -->
+                        <div class="mb-3">
+                            <label class="form-label">¿Se siente cansado o fatigado durante el día?</label>
+                            <select class="form-control" name="fatiga_dia">
+                                <option value="Casi todos los días">Casi todos los días</option>
+                                <option value="3-4 veces por semana">3-4 veces por semana</option>
+                                <option value="1-2 veces por semana">1-2 veces por semana</option>
+                                <option value="1-2 veces por mes">1-2 veces por mes</option>
+                                <option value="Nunca o casi nunca">Nunca o casi nunca</option>
+                            </select>
+                        </div>
+
+                        <!-- ¿Alguna vez se ha quedado dormido mientras maneja o va de pasajero? -->
+                        <div class="mb-3">
+                            <label class="form-label">¿Alguna vez se ha quedado dormido mientras maneja o va de
+                                pasajero?</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="somnolencia_conducir" value="Sí">
+                                <label class="form-check-label">Sí</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="somnolencia_conducir" value="No">
+                                <label class="form-check-label">No</label>
+                            </div>
+                        </div>
+
+                        <!-- ¿Usted tiene la presión alta? -->
+                        <div class="mb-3">
+                            <label class="form-label">¿Usted tiene la presión alta?</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="presion_alta" value="Sí">
+                                <label class="form-check-label">Sí</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="presion_alta" value="No">
+                                <label class="form-check-label">No</label>
+                            </div>
+                        </div>
+                    </div> <!-- Fin card-body -->
+                </div> <!-- Fin card -->
+            </div> <!-- Fin col -->
+        </div> <!-- Fin row -->
+        <div class="row">
+            <div class="col">
+                <div class="card">
+                    <div class="card-header border-0">
+                        <h3 class="mb-0">Examen de Atenas (Calidad del sueño)</h3>
+                    </div>
+                    <div class="card-body">
+                        <!-- Preguntas del examen -->
+                        <div class="mb-3">
+                            <label class="form-label">Inducción del dormir (tiempo que le toma quedarse dormido una vez
+                                acostado)</label>
+                            <select class="form-control" name="induccion_dormir">
+                                <option value="Ningún problema">Ningún problema</option>
+                                <option value="Ligeramente retrasado">Ligeramente retrasado</option>
+                                <option value="Marcadamente retrasado">Marcadamente retrasado</option>
+                                <option value="Muy retrasado o no durmió en absoluto">Muy retrasado o no durmió en
+                                    absoluto</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Despertares durante la noche</label>
+                            <select class="form-control" name="despertares_noche">
+                                <option value="Ningún problema">Ningún problema</option>
+                                <option value="Problema menor">Problema menor</option>
+                                <option value="Problema considerable">Problema considerable</option>
+                                <option value="Problema serio o no durmió en absoluto">Problema serio o no durmió en
+                                    absoluto</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Despertar final más temprano de lo deseado</label>
+                            <select class="form-control" name="despertar_temprano">
+                                <option value="No más temprano">No más temprano</option>
+                                <option value="Un poco más temprano">Un poco más temprano</option>
+                                <option value="Marcadamente más temprano">Marcadamente más temprano</option>
+                                <option value="Mucho más temprano o no durmió en absoluto">Mucho más temprano o no
+                                    durmió en absoluto</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Duración total del dormir</label>
+                            <select class="form-control" name="duracion_dormir">
+                                <option value="Suficiente">Suficiente</option>
+                                <option value="Ligeramente insuficiente">Ligeramente insuficiente</option>
+                                <option value="Marcadamente insuficiente">Marcadamente insuficiente</option>
+                                <option value="Muy insuficiente o no durmió en absoluto">Muy insuficiente o no durmió en
+                                    absoluto</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Calidad general del dormir (no importa cuánto tiempo
+                                durmió)</label>
+                            <select class="form-control" name="calidad_dormir">
+                                <option value="Satisfactoria">Satisfactoria</option>
+                                <option value="Ligeramente insatisfactoria">Ligeramente insatisfactoria</option>
+                                <option value="Marcadamente insatisfactoria">Marcadamente insatisfactoria</option>
+                                <option value="Muy insatisfactoria o no durmió en absoluto">Muy insatisfactoria o no
+                                    durmió en absoluto</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Sensación de bienestar durante el día</label>
+                            <select class="form-control" name="bienestar_dia">
+                                <option value="Normal">Normal</option>
+                                <option value="Ligeramente disminuid">Ligeramente disminuida</option>
+                                <option value="Marcadamente disminuida">Marcadamente disminuida</option>
+                                <option value="Muy disminuida">Muy disminuida</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Funcionamiento (físico y mental) durante el día</label>
+                            <select class="form-control" name="funcionamiento_dia">
+                                <option value="Normal">Normal</option>
+                                <option value="Ligeramente disminuid">Ligeramente disminuida</option>
+                                <option value="Marcadamente disminuida">Marcadamente disminuida</option>
+                                <option value="Muy disminuida">Muy disminuida</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Somnolencia durante el día</label>
+                            <select class="form-control" name="somnolencia_dia">
+                                <option value="Ninguna">Ninguna</option>
+                                <option value="Leve">Leve</option>
+                                <option value="Considerable">Considerable</option>
+                                <option value="Intensa">Intensa</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div class="card">
+                    <div class="card-header border-0">
+                        <h3 class="mb-0">Índice de Severidad del Insomnio (ISI)</h3>
+                    </div>
+                    <div class="card-body">
+                        <!-- Preguntas del ISI -->
+                        <div class="mb-3">
+                            <label class="form-label">Dificultad para dormir</label>
+                            <select class="form-control" name="dificultad_dormir">
+                                <option value="Muy severo">Muy severo</option>
+                                <option value="Severo">Severo</option>
+                                <option value="Moderado">Moderado</option>
+                                <option value="Poco">Poco</option>
+                                <option value="Ninguno">Ninguno</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Dificultad para mantener el sueño</label>
+                            <select class="form-control" name="dificultad_mantener_sueno">
+                                <option value="Muy severo">Muy severo</option>
+                                <option value="Severo">Severo</option>
+                                <option value="Moderado">Moderado</option>
+                                <option value="Poco">Poco</option>
+                                <option value="Ninguno">Ninguno</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Me despierto muy temprano</label>
+                            <select class="form-control" name="despertar_temprano">
+                                <option value="Muy severo">Muy severo</option>
+                                <option value="Severo">Severo</option>
+                                <option value="Moderado">Moderado</option>
+                                <option value="Poco">Poco</option>
+                                <option value="Ninguno">Ninguno</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">¿Qué tan satisfecho/insatisfecho estás con tu patrón de sueño
+                                actual?</label>
+                            <select class="form-control" name="satisfaccion_sueno">
+                                <option value="Muy insatisfecho">Muy insatisfecho</option>
+                                <option value="Insatisfecho">Insatisfecho</option>
+                                <option value="Moderadamente satisfecho">Moderadamente satisfecho</option>
+                                <option value="Satisfecho">Satisfecho</option>
+                                <option value="Muy satisfecho">Muy satisfecho</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">¿Qué tan NOTABLE para los demás cree que es su problema del
+                                sueño?</label>
+                            <select class="form-control" name="notabilidad_problema">
+                                <option value="Demasiado notable">Demasiado notable</option>
+                                <option value="Muy notable">Muy notable</option>
+                                <option value="Moderadamente notable">Moderadamente notable</option>
+                                <option value="Un poco notable">Un poco notable</option>
+                                <option value="No es notable">No es notable</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">¿Qué tan PREOCUPADO/ANGUSTIADO está por su problema de sueño
+                                actual?</label>
+                            <select class="form-control" name="preocupacion_sueno">
+                                <option value="Demasiado preocupado">Demasiado preocupado</option>
+                                <option value="Muy preocupado">Muy preocupado</option>
+                                <option value="Moderadamente preocupado">Moderadamente preocupado</option>
+                                <option value="Un poco preocupado">Un poco preocupado</option>
+                                <option value="Para nada preocupado">Para nada preocupado</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">¿Hasta qué punto su problema de sueño INTERFIERE con su
+                                funcionamiento diario?</label>
+                            <select class="form-control" name="interferencia_sueno">
+                                <option value="Interfiere demasiado">Interfiere demasiado</option>
+                                <option value="Interfiere mucho">Interfiere mucho</option>
+                                <option value="Interfiere moderadamente">Interfiere moderadamente</option>
+                                <option value="Interfiere un poco">Interfiere un poco</option>
+                                <option value="No interfiere">No interfiere</option>
+                            </select>
+                        </div>
+
+                        <div class="row mt-4">
+                            <div class="col-12 text-right">
+                                <button type="submit" class="btn btn-primary">Guardar Examen</button>
+                                <a href="{% url 'detalle_paciente'  paciente_id %}" class="btn btn-primary">
+                                    Ver Paciente
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </form>
+</div>
+
+<!-- Script para agregar dinámicamente más diagnósticos -->
+{% block javascripts %}
+<script>
+    function toggleFields() {
+        var select = document.getElementById("duerme_acompanado");
+        var fields = document.getElementById("acompanado_fields");
+        if (select.value === "acompanado") {
+            fields.style.display = "block";
+        } else {
+            fields.style.display = "none";
+        }
+    }
+</script>
+{% endblock javascripts %}
+{% endblock content %}
