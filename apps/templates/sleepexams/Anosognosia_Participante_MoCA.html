@@ -1,0 +1,381 @@
+{% extends 'layouts/base.html' %}
+{% block content %}
+
+<div class="header bg-primary pb-6">
+  <div class="container-fluid">
+    <div class="header-body">
+      <div class="row align-items-center py-4">
+        <div class="col-lg-6 col-5">
+          <h6 class="h2 text-white d-inline-block mb-0">Evaluación MoCA - Registro de Puntajes</h6>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid mt--6">
+  <div class="row">
+    <div class="col">
+      <div class="card shadow">
+        <form method="post" action="{% url 'guardar_examen_Participante_MoCA' %}">
+          {% csrf_token %}
+          <input type="hidden" name="visita_id" value="{{ visita_examen }}">
+          <input type="hidden" name="paciente_id" value="{{ paciente_id }}">
+          <input type="hidden" name="examen_id" value="{{ examen_id }}">
+
+          <div class="card-body">
+            <div class="alert alert-info">
+              <strong>Instrucciones:</strong> Este formulario permite registrar los puntajes obtenidos en la prueba MoCA aplicada en físico. Se deben seleccionar los puntos obtenidos para cada ítem. Puntaje máximo: 30.
+            </div>
+
+            <!-- Ítem 1 -->
+            <div class="form-group">
+              <label><strong>1. Alternancia visuoespacial</strong></label>
+              <p>El paciente debe seguir la secuencia: 1-A-2-B-3-C-4-D-5-E.</p>
+              <p><strong>Puntaje:</strong> 1 si completa correctamente; 0 si no corrige inmediatamente un error cualquiera que este sea.</p>
+              <select class="form-control" name="alternancia" required>
+                <option value="" disabled selected>Seleccione puntuación</option>
+                <option value="0">0 puntos</option>
+                <option value="1">1 punto</option>
+              </select>
+            </div>
+
+            <!-- Ítem 2 -->
+            <div class="form-group">
+              <label><strong>2. Copia del cubo</strong></label>
+              <p><strong>Criterios:</strong> El cubo debe ser tridimensional, todas las líneas presentes, no se añaden líneas y todas son relativamente paralelas y aproximadamente de la misma longitud (los prismas rectangulares son aceptables).</p>
+              <p><strong>Puntaje:</strong> 1 si cumple todos los criterios; 0 si no se han respetado TODOS los criterios anteriores.</p>
+              <select class="form-control" name="cubo" required>
+                <option value="" disabled selected>Seleccione puntuación</option>
+                <option value="0">0 puntos</option>
+                <option value="1">1 punto</option>
+              </select>
+            </div>
+
+            <!-- Ítem 3 -->
+            <div class="form-group">
+              <label><strong>3. Dibujo del Reloj</strong></label>
+              <p><strong>Instrucciones: </strong>El paciente debe dibujar un reloj, que incluya todos los números, y que marque las 11:10</p>
+              <p><strong>Puntaje: </strong></p>
+              <li><strong>Contorno (1 pt.):</strong> El contorno debe ser un círculo con poca deformación. (p.ej. una leve 
+                deformación al cerrar el círculo)  </li>
+              <li><strong>Números (1 pt.):</strong> Todos los números deben estar presentes, sin añadir ninguno; los números deben 
+                seguir el orden correcto y estar bien colocados; se aceptarán los números romanos, así como los 
+                números colocados fuera del contorno.</li>
+              <li><strong>Agujas (1 pt.):</strong> Las dos agujas deben indicar la hora correcta; la aguja de las horas debe ser 
+                claramente más pequeña que la aguja de los minutos. El punto de unión de las agujas debe estar 
+                cerca del centro del reloj.</li>
+                <li><strong>No se asignan puntos si no se han respetado todos los criterios anteriores.</strong></li>
+              <select class="form-control" name="reloj" required>
+                <option value="" disabled selected>Seleccione puntuación</option>
+                <option value="0">0 puntos</option>
+                <option value="1">1 punto</option>
+                <option value="2">2 puntos</option>
+                <option value="3">3 puntos</option>               
+              </select>
+            </div>
+
+            <!-- Ítem 4 -->
+            <div class="form-group">
+              <label><strong>4. Denominación</strong></label>
+              <p><strong>Puntaje: </strong>Se asigna un punto por la identificación correcta de cada uno de los dibujos: (1) camello o 
+                dromedario (2) león (3) rinoceronte. </p>
+              <select class="form-control" name="denominacion" required>
+                <option value="" disabled selected>Seleccione puntuación</option>
+                <option value="0">0 puntos</option>
+                <option value="1">1 punto</option>
+                <option value="2">2 puntos</option>
+                <option value="3">3 puntos</option>  
+              </select>
+            </div>
+
+            <!-- Ítem 5 -->
+            <div class="form-group">
+              <label><strong>5. Memoria</strong></label>
+              <p>Pedir al paciente que recuerde una lista de 5 palabras: rostro, seda, iglesia, clavel, rojo</p>
+            </div>
+
+            <div class="form-group">
+                <label><strong>6. Atención</strong></label>
+              
+                <!-- Secuencia numérica -->
+                <p><strong>Secuencia numérica (1 punto)</strong></p>
+                <p><em>Instrucciones:</em> El examinador lee una secuencia de cinco números a un ritmo de uno por segundo, luego de haber dado las siguientes instrucciones: “Le voy a leer una serie de números, y cuando haya terminado, me gustaría que repita estos números en el mismo orden en el que yo los he dicho”.</p>
+                <select class="form-control mb-3" name="atencion_secuencia" required>
+                  <option value="" disabled selected>Seleccione puntuación</option>
+                  <option value="1">1 punto</option>
+                  <option value="0">0 puntos</option>
+                </select>
+              
+                <!-- Secuencia numérica inversa -->
+                <p><strong>Secuencia numérica inversa (1 punto)</strong></p>
+                <p><em>Instrucciones:</em> El examinador lee una secuencia de 3 cifras a un ritmo de una por segundo, luego de haber dado las instrucciones: “Le voy a leer una serie de números, y cuando haya terminado, me gustaría que repita los números en el orden inverso al que yo los he dado”.</p>
+                <select class="form-control mb-3" name="atencion_inversa" required>
+                  <option value="" disabled selected>Seleccione puntuación</option>
+                  <option value="1">1 punto</option>
+                  <option value="0">0 puntos</option>
+                </select>
+              
+                <!-- Concentración -->
+                <p><strong>Concentración (1 punto)</strong></p>
+                <p><em>Instrucciones:</em> El examinador lee una serie de letras a un ritmo de una por segundo, luego de haber dado las instrucciones: “Voy a leerle una serie de letras. Cada vez que diga la letra ‘A’, dé un golpecito con la mano. Cuando diga una letra que no sea la A, no dé ningún golpecito”.</p>
+                <p><em>Puntaje:</em> No se asigna ningún punto si se comete más de un error.</p>
+                <select class="form-control mb-3" name="atencion_concentracion" required>
+                  <option value="" disabled selected>Seleccione puntuación</option>
+                  <option value="1">1 punto</option>
+                  <option value="0">0 puntos</option>
+                </select>
+              
+                <!-- Sustracción en secuencia de 7 -->
+                <p><strong>Sustracción en secuencia de 7 (máximo 3 puntos)</strong></p>
+                <p><em>Instrucciones:</em> El examinador da las instrucciones siguientes: “Ahora me gustaría que calcule 100 menos 7, y así sucesivamente: continúe restando 7 a la cifra de su respuesta anterior, hasta que le pida que pare”.</p>
+                <p><em>Puntaje:</em> 0 puntos si ninguna es correcta, 1 punto por una correcta, 2 puntos por 2 o 3 correctas, 3 puntos por 4 o 5 correctas. Se permite un error inicial si las siguientes sustracciones son correctas.</p>
+                <select class="form-control mb-3" name="atencion_sustraccion" required>
+                  <option value="" disabled selected>Seleccione puntuación</option>
+                  <option value="3">3 puntos</option>
+                  <option value="2">2 puntos</option>
+                  <option value="1">1 punto</option>
+                  <option value="0">0 puntos</option>
+                </select>
+              </div>
+              
+              <!-- Campo oculto total atención -->
+                <input type="hidden" name="atencion" id="atencion_total" value="0">
+                </div>
+
+            <!-- Ítem 7 -->
+            <div class="form-group">
+                <label><strong>7. Repetición de frases</strong></label>
+                <p>Repetir exactamente las dos frases indicadas. Se otorga 1 punto por cada frase correctamente repetida. Máximo: 2 puntos.</p>
+              
+                <div class="form-check mb-2">
+                  <input class="form-check-input repeticion-check" type="checkbox" value="1" id="frase_1" name="frase_1">
+                  <label class="form-check-label" for="frase_1">
+                    “El gato se esconde bajo el sofá cuando los perros entran en la sala”.
+                  </label>
+                </div>
+              
+                <div class="form-check mb-2">
+                  <input class="form-check-input repeticion-check" type="checkbox" value="1" id="frase_2" name="frase_2">
+                  <label class="form-check-label" for="frase_2">
+                    "Espero que él le entregue el mensaje una vez que ella se lo pida”.
+                  </label>
+                </div>
+              
+                <input type="hidden" name="repeticion" id="repeticion_total" value="0">
+            </div>
+              
+
+            <!-- Ítem 8 -->
+            <div class="form-group">
+              <label><strong>8. Fluidez verbal</strong></label>
+              <p>Decir la mayor cantidad de palabras que comiencen con "F" en un minuto. Se otorga 1 punto si dice 11 palabras o más.</p>
+              <select class="form-control" name="fluidez" required>
+                <option value="" disabled selected>Seleccione puntuación</option>
+                <option value="0">0 puntos</option>
+                <option value="1">1 punto</option>
+              </select>
+            </div>
+
+            <!-- Ítem 9 -->
+            <div class="form-group">
+              <label><strong>9. Abstracción</strong></label>
+              <p>Identificar similitudes entre pares de palabras. Puntaje máximo: 2 puntos.</p>
+              <select class="form-control" name="abstraccion" required>
+                <option value="" disabled selected>Seleccione puntuación</option>
+                <option value="0">0 puntos</option>
+                <option value="1">1 punto</option>
+                <option value="2">2 puntos</option>
+              </select>
+            </div>
+
+            <!-- Ítem 10: Recuerdo diferido -->
+            <div class="form-group">
+                <label><strong>10. Recuerdo diferido</strong></label>
+                <p>Recordar las siguientes palabras: 1 punto por cada palabra correctamente recordada. Máximo: 5 puntos.</p>
+                <div class="form-row mb-3">
+                  <div class="col text-center">
+                    <div class="form-check form-check-inline">
+                      <input class="form-check-input diferido-check" type="checkbox" value="1" id="palabra_rostro" name="palabra_rostro">
+                      <label class="form-check-label" for="palabra_rostro">rostro</label>
+                    </div>
+                  </div>
+                  <div class="col text-center">
+                    <div class="form-check form-check-inline">
+                      <input class="form-check-input diferido-check" type="checkbox" value="1" id="palabra_seda" name="palabra_seda">
+                      <label class="form-check-label" for="palabra_seda">seda</label>
+                    </div>
+                  </div>
+                  <div class="col text-center">
+                    <div class="form-check form-check-inline">
+                      <input class="form-check-input diferido-check" type="checkbox" value="1" id="palabra_iglesia" name="palabra_iglesia">
+                      <label class="form-check-label" for="palabra_iglesia">iglesia</label>
+                    </div>
+                  </div>
+                  <div class="col text-center">
+                    <div class="form-check form-check-inline">
+                      <input class="form-check-input diferido-check" type="checkbox" value="1" id="palabra_clavel" name="palabra_clavel">
+                      <label class="form-check-label" for="palabra_clavel">clavel</label>
+                    </div>
+                  </div>
+                  <div class="col text-center">
+                    <div class="form-check form-check-inline">
+                      <input class="form-check-input diferido-check" type="checkbox" value="1" id="palabra_rojo" name="palabra_rojo">
+                      <label class="form-check-label" for="palabra_rojo">rojo</label>
+                    </div>
+                  </div>
+                </div>
+                <input type="hidden" name="diferido" id="diferido_total" value="0">
+              </div>
+
+
+            <div class="form-group">
+                <label><strong>11. Orientación</strong></label>
+                <p>Responda correctamente a: <br>
+                  - Fecha exacta (año, mes, día del mes y día de la semana).<br>
+                  - Lugar exacto (nombre del sitio y localidad).
+                </p>
+                <p>1 punto por cada respuesta correcta. Total máximo: 2 puntos.</p>
+              
+                <div class="form-check mb-2">
+                  <input class="form-check-input orientacion-check" type="checkbox" value="1" id="orientacion_fecha" name="orientacion_fecha">
+                  <label class="form-check-label" for="orientacion_fecha">
+                    Fecha completa correcta (año, mes, día y día de la semana)
+                  </label>
+                </div>
+              
+                <div class="form-check mb-2">
+                  <input class="form-check-input orientacion-check" type="checkbox" value="1" id="orientacion_lugar" name="orientacion_lugar">
+                  <label class="form-check-label" for="orientacion_lugar">
+                    Lugar exacto correcto (hospital/clínica/localidad)
+                  </label>
+                </div>
+              
+                <input type="hidden" name="orientacion" id="orientacion_total" value="0">
+            </div>
+
+            <!-- Corrección por escolaridad -->
+            <div class="form-group">
+              <label><strong>¿Tiene 12 años o menos de escolaridad?</strong></label>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="educacion_baja" id="educacion_baja">
+                <label class="form-check-label" for="educacion_baja">
+                  Marque esta casilla si el paciente tiene 12 años o menos de educación formal. Se suma 1 punto al total si este es menor a 30 puntos.
+                </label>
+              </div>
+            </div>
+            
+            <div class="alert alert-success mt-4">
+                <h4 class="alert-heading">Resultado de la Escala MoCA</h4>
+                <p><strong>Puntaje Total:</strong> <span id="moca-total">0 / 30</span></p>
+                <p><strong>Interpretación:</strong> <span id="moca-interpretacion">Complete todos los campos para ver el resultado.</span></p>
+            </div>
+              
+            <!-- Botones -->
+            <div class="text-right mt-4">
+              <button type="submit" class="btn btn-primary">Guardar Evaluación MoCA</button>
+              <a href="{% url 'detalle_paciente' paciente_id %}" class="btn btn-secondary">Ver Paciente</a>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const campos = [
+        'alternancia',
+        'cubo',
+        'reloj',
+        'denominacion',
+        'memoria',
+        'atencion',
+        'repeticion',
+        'fluidez',
+        'abstraccion',
+        'diferido',
+        'orientacion'
+      ];
+  
+      function actualizarCampoDesdeCheckboxes(nombreClase, campoDestino) {
+        const checkboxes = document.querySelectorAll(`.${nombreClase}`);
+        let total = 0;
+        checkboxes.forEach(cb => {
+          if (cb.checked) total += parseInt(cb.value);
+        });
+        const campo = document.getElementById(campoDestino);
+        if (campo) campo.value = total;
+      }
+  
+      function actualizarCampoDesdeSelects(nombreSelects, campoDestino) {
+        let total = 0;
+        nombreSelects.forEach(name => {
+          const select = document.querySelector(`[name="${name}"]`);
+          if (select && select.value) {
+            total += parseInt(select.value);
+          }
+        });
+        const campo = document.getElementById(campoDestino);
+        if (campo) campo.value = total;
+      }
+  
+      function actualizarCamposEspeciales() {
+        // Atención: ahora se calcula desde <select>
+        actualizarCampoDesdeSelects(
+          ['atencion_secuencia', 'atencion_inversa', 'atencion_concentracion', 'atencion_sustraccion'],
+          'atencion_total'
+        );
+  
+        actualizarCampoDesdeCheckboxes('repeticion-check', 'repeticion_total');
+        actualizarCampoDesdeCheckboxes('diferido-check', 'diferido_total');
+        actualizarCampoDesdeCheckboxes('orientacion-check', 'orientacion_total');
+      }
+  
+      function calcularTotal() {
+        actualizarCamposEspeciales();
+  
+        let totalSinCorreccion = 0;
+        campos.forEach(nombre => {
+          const valor = document.querySelector(`[name="${nombre}"]`);
+          if (valor && valor.value) {
+            totalSinCorreccion += parseInt(valor.value);
+          }
+        });
+  
+        let totalFinal = totalSinCorreccion;
+        const escolaridadCheckbox = document.getElementById('educacion_baja');
+        if (escolaridadCheckbox && escolaridadCheckbox.checked && totalSinCorreccion < 30) {
+          totalFinal += 1;
+        }
+  
+        document.getElementById('moca-total').textContent = `${totalFinal} / 30`;
+  
+        let interpretacion = (totalFinal >= 26)
+          ? "Puntaje normal (función cognitiva preservada)"
+          : "Posible deterioro cognitivo. Se recomienda evaluación clínica adicional.";
+        document.getElementById('moca-interpretacion').textContent = interpretacion;
+      }
+  
+      // Escuchar cambios en campos normales
+      campos.forEach(nombre => {
+        const el = document.querySelector(`[name="${nombre}"]`);
+        if (el) el.addEventListener("change", calcularTotal);
+      });
+  
+      // Escuchar cambios en checkboxes
+      document.querySelectorAll('.repeticion-check, .diferido-check, .orientacion-check')
+        .forEach(cb => cb.addEventListener("change", calcularTotal));
+  
+      // Escuchar cambios en selects del ítem Atención
+      ['atencion_secuencia', 'atencion_inversa', 'atencion_concentracion', 'atencion_sustraccion']
+        .forEach(name => {
+          const el = document.querySelector(`[name="${name}"]`);
+          if (el) el.addEventListener("change", calcularTotal);
+        });
+  
+      document.getElementById('educacion_baja').addEventListener("change", calcularTotal);
+    });
+  </script>
+{% endblock %}  

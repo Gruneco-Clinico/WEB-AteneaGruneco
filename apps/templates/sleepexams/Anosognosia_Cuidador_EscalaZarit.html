@@ -1,0 +1,384 @@
+{% extends 'layouts/base.html' %}
+
+{% block content %}
+<div class="header bg-primary pb-6">
+    <div class="container-fluid">
+        <div class="header-body">
+            <div class="row align-items-center py-4">
+                <div class="col-lg-6 col-5">
+                    <h6 class="h2 text-white d-inline-block mb-0">Información del Paciente</h6>
+                    <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
+                        <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
+                            <li class="breadcrumb-item"><a href="#"><i class="fas fa-home"></i></a></li>
+                            <li class="breadcrumb-item"><a href="/pacientes/">Pacientes</a></li>
+                            <li class="breadcrumb-item"><a href="/pacientes/">Volver</a></li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid mt--6">
+    <div class="row">
+        <div class="col">
+            <div class="card shadow">
+                <form method="post" action="{% url 'guardar_examen_Participante_Cuidador_Zarit' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="visita_id" id="visita_id" value="{{ visita_examen }}" />
+                    <input type="hidden" name="paciente_id" id="paciente_id" value="{{ paciente_id }}" />
+                    <input type="hidden" name="examen_id" id="examen_id" value="{{ examen_id }}" />
+                    <input type="hidden" name="puntaje_total" id="puntaje_total" value="0" />
+
+                    <!-- Header -->
+                    <div class="card-header border-0">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <h3 class="mb-0">Escala de Zarit</h3>
+                            </div>
+                            <div class="col text-right">
+                                <span class="text-muted">Fecha: {% now "d/m/Y" %}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Body -->
+                    <div class="card-body">
+                        <div class="alert alert-info">
+                            <strong>Instrucciones:</strong> A continuación, se presenta una lista de afirmaciones, en la cuales se refleja como se sienten a veces las personas que cuidan a otra persona. Después de leer cada afirmación debe indicar con qué frecuencia se siente usted así: nunca, rara vez, algunas veces, bastantes veces, casi siempre. A la hora de responder piense que no existen respuestas acertadas o equivocadas, sino tan solo su experiencia. 
+                        </div>
+
+                        <div class="form-group">
+                            <label>1. ¿Cree que su familiar le pide más ayuda de la que realmente necesita?</label>
+                            <select class="form-control adherencia-select" name="p1" required>
+                                <option value="" selected disabled>Seleccione una opción</option>
+                                <option value="0">Nunca (0)</option>
+                                <option value="1">Rara vez (1)</option>
+                                <option value="2">Algunas veces (2)</option>
+                                <option value="3">Bastantes veces (3)</option>
+                                <option value="4">Casi siempre (4)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>2.	¿Cree que debido al tiempo que dedica a su familia no tiene suficiente tiempo para usted?</label>
+                            <select class="form-control adherencia-select" name="p2" required>
+                                <option value="" selected disabled>Seleccione una opción</option>
+                                <option value="0">Nunca (0)</option>
+                                <option value="1">Rara vez (1)</option>
+                                <option value="2">Algunas veces (2)</option>
+                                <option value="3">Bastantes veces (3)</option>
+                                <option value="4">Casi siempre (4)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>3.	¿Se siente agobiado entre cuidar a su familiar y tratar de cumplir otras responsabilidades en su trabajo o familia?</label>
+                            <select class="form-control adherencia-select" name="p3" required>
+                                <option value="" selected disabled>Seleccione una opción</option>
+                                <option value="0">Nunca (0)</option>
+                                <option value="1">Rara vez (1)</option>
+                                <option value="2">Algunas veces (2)</option>
+                                <option value="3">Bastantes veces (3)</option>
+                                <option value="4">Casi siempre (4)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>4.	¿Se siente avergonzado por la conducta de su familiar?</label>
+                            <select class="form-control adherencia-select" name="p4" required>
+                                <option value="" selected disabled>Seleccione una opción</option>
+                                <option value="0">Nunca (0)</option>
+                                <option value="1">Rara vez (1)</option>
+                                <option value="2">Algunas veces (2)</option>
+                                <option value="3">Bastantes veces (3)</option>
+                                <option value="4">Casi siempre (4)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>5.	¿Se siente enfadado cuando está cerca de su familiar?</label>
+                            <select class="form-control adherencia-select" name="p5" required>
+                                <option value="" selected disabled>Seleccione una opción</option>
+                                <option value="0">Nunca (0)</option>
+                                <option value="1">Rara vez (1)</option>
+                                <option value="2">Algunas veces (2)</option>
+                                <option value="3">Bastantes veces (3)</option>
+                                <option value="4">Casi siempre (4)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>6.	¿Piensa que su familiar afecta negativamente a su relación con otros miembros de su familia?</label>
+                            <select class="form-control adherencia-select" name="p6" required>
+                                <option value="" selected disabled>Seleccione una opción</option>
+                                <option value="0">Nunca (0)</option>
+                                <option value="1">Rara vez (1)</option>
+                                <option value="2">Algunas veces (2)</option>
+                                <option value="3">Bastantes veces (3)</option>
+                                <option value="4">Casi siempre (4)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>7.	¿Tiene miedo de lo que el futuro depare a su familiar?</label>
+                            <select class="form-control adherencia-select" name="p7" required>
+                                <option value="" selected disabled>Seleccione una opción</option>
+                                <option value="0">Nunca (0)</option>
+                                <option value="1">Rara vez (1)</option>
+                                <option value="2">Algunas veces (2)</option>
+                                <option value="3">Bastantes veces (3)</option>
+                                <option value="4">Casi siempre (4)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>8.	¿Cree que su familiar depende de usted?</label>
+                            <select class="form-control adherencia-select" name="p8" required>
+                                <option value="" selected disabled>Seleccione una opción</option>
+                                <option value="0">Nunca (0)</option>
+                                <option value="1">Rara vez (1)</option>
+                                <option value="2">Algunas veces (2)</option>
+                                <option value="3">Bastantes veces (3)</option>
+                                <option value="4">Casi siempre (4)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>9.	¿Se siente tenso cuando está cerca de su familiar?</label>
+                            <select class="form-control adherencia-select" name="p9" required>
+                                <option value="" selected disabled>Seleccione una opción</option>
+                                <option value="0">Nunca (0)</option>
+                                <option value="1">Rara vez (1)</option>
+                                <option value="2">Algunas veces (2)</option>
+                                <option value="3">Bastantes veces (3)</option>
+                                <option value="4">Casi siempre (4)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>10.	¿Cree que su salud se ha deteriorado por cuidar a su familiar?</label>
+                            <select class="form-control adherencia-select" name="p10" required>
+                                <option value="" selected disabled>Seleccione una opción</option>
+                                <option value="0">Nunca (0)</option>
+                                <option value="1">Rara vez (1)</option>
+                                <option value="2">Algunas veces (2)</option>
+                                <option value="3">Bastantes veces (3)</option>
+                                <option value="4">Casi siempre (4)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>11.	¿Cree que no tiene tanta intimidad como le gustaría debido a su familiar?</label>
+                            <select class="form-control adherencia-select" name="p11" required>
+                                <option value="" selected disabled>Seleccione una opción</option>
+                                <option value="0">Nunca (0)</option>
+                                <option value="1">Rara vez (1)</option>
+                                <option value="2">Algunas veces (2)</option>
+                                <option value="3">Bastantes veces (3)</option>
+                                <option value="4">Casi siempre (4)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>12.	¿Cree que su vida social se ha resentido por cuidar a su familiar?</label>
+                            <select class="form-control adherencia-select" name="p12" required>
+                                <option value="" selected disabled>Seleccione una opción</option>
+                                <option value="0">Nunca (0)</option>
+                                <option value="1">Rara vez (1)</option>
+                                <option value="2">Algunas veces (2)</option>
+                                <option value="3">Bastantes veces (3)</option>
+                                <option value="4">Casi siempre (4)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>13.	¿Se siente incómodo por desatender a sus amistades debido a su familiar?</label>
+                            <select class="form-control adherencia-select" name="p13" required>
+                                <option value="" selected disabled>Seleccione una opción</option>
+                                <option value="0">Nunca (0)</option>
+                                <option value="1">Rara vez (1)</option>
+                                <option value="2">Algunas veces (2)</option>
+                                <option value="3">Bastantes veces (3)</option>
+                                <option value="4">Casi siempre (4)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>14.	¿Cree que su familiar parece esperar que usted sea la persona que le cuide, como si usted fuera la única persona de quien depende?</label>
+                            <select class="form-control adherencia-select" name="p14" required>
+                                <option value="" selected disabled>Seleccione una opción</option>
+                                <option value="0">Nunca (0)</option>
+                                <option value="1">Rara vez (1)</option>
+                                <option value="2">Algunas veces (2)</option>
+                                <option value="3">Bastantes veces (3)</option>
+                                <option value="4">Casi siempre (4)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>15.	¿Cree que no tiene suficiente dinero para cuidar a su familiar además de sus otros gastos?</label>
+                            <select class="form-control adherencia-select" name="p15" required>
+                                <option value="" selected disabled>Seleccione una opción</option>
+                                <option value="0">Nunca (0)</option>
+                                <option value="1">Rara vez (1)</option>
+                                <option value="2">Algunas veces (2)</option>
+                                <option value="3">Bastantes veces (3)</option>
+                                <option value="4">Casi siempre (4)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>16.	¿Cree que será incapaz de cuidarle por mucho más tiempo?</label>
+                            <select class="form-control adherencia-select" name="p16" required>
+                                <option value="" selected disabled>Seleccione una opción</option>
+                                <option value="0">Nunca (0)</option>
+                                <option value="1">Rara vez (1)</option>
+                                <option value="2">Algunas veces (2)</option>
+                                <option value="3">Bastantes veces (3)</option>
+                                <option value="4">Casi siempre (4)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>17.	¿Siente que ha perdido el control de su vida desde la enfermedad de su familiar?</label>
+                            <select class="form-control adherencia-select" name="p17" required>
+                                <option value="" selected disabled>Seleccione una opción</option>
+                                <option value="0">Nunca (0)</option>
+                                <option value="1">Rara vez (1)</option>
+                                <option value="2">Algunas veces (2)</option>
+                                <option value="3">Bastantes veces (3)</option>
+                                <option value="4">Casi siempre (4)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>18.	¿Desearía dejar el cuidado de su familiar a otros?</label>
+                            <select class="form-control adherencia-select" name="p18" required>
+                                <option value="" selected disabled>Seleccione una opción</option>
+                                <option value="0">Nunca (0)</option>
+                                <option value="1">Rara vez (1)</option>
+                                <option value="2">Algunas veces (2)</option>
+                                <option value="3">Bastantes veces (3)</option>
+                                <option value="4">Casi siempre (4)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>19.	¿Se siente indeciso sobre qué hacer con su familiar?</label>
+                            <select class="form-control adherencia-select" name="p19" required>
+                                <option value="" selected disabled>Seleccione una opción</option>
+                                <option value="0">Nunca (0)</option>
+                                <option value="1">Rara vez (1)</option>
+                                <option value="2">Algunas veces (2)</option>
+                                <option value="3">Bastantes veces (3)</option>
+                                <option value="4">Casi siempre (4)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>20.	¿Cree que debería hacer más por su familiar?</label>
+                            <select class="form-control adherencia-select" name="p20" required>
+                                <option value="" selected disabled>Seleccione una opción</option>
+                                <option value="0">Nunca (0)</option>
+                                <option value="1">Rara vez (1)</option>
+                                <option value="2">Algunas veces (2)</option>
+                                <option value="3">Bastantes veces (3)</option>
+                                <option value="4">Casi siempre (4)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>21.	¿Cree que podría cuidar mejor de su familiar?</label>
+                            <select class="form-control adherencia-select" name="p21" required>
+                                <option value="" selected disabled>Seleccione una opción</option>
+                                <option value="0">Nunca (0)</option>
+                                <option value="1">Rara vez (1)</option>
+                                <option value="2">Algunas veces (2)</option>
+                                <option value="3">Bastantes veces (3)</option>
+                                <option value="4">Casi siempre (4)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>22.	Globalmente, ¿qué grado de carga experimenta por el hecho de cuidar a su familiar?</label>
+                            <select class="form-control adherencia-select" name="p22" required>
+                                <option value="" selected disabled>Seleccione una opción</option>
+                                <option value="0">Nunca (0)</option>
+                                <option value="1">Rara vez (1)</option>
+                                <option value="2">Algunas veces (2)</option>
+                                <option value="3">Bastantes veces (3)</option>
+                                <option value="4">Casi siempre (4)</option>
+                            </select>
+                        </div>
+
+
+                        <div class="alert alert-success mt-4" id="resultado-container" style="display: none;">
+                            <h4 class="alert-heading">Resultado de la escala de Zarit</h4>
+                            <p><strong>Puntaje total:</strong> <span id="puntaje-display">0</span>/110</p>
+                            <p><strong>Interpretación:</strong> <span id="interpretacion-display">-</span></p>
+                        </div>
+
+                        <div class="alert alert-warning mt-4">
+                            <strong>Interpretación de la escala:</strong><br>
+                            - <strong>22-46 puntos:</strong> No hay sobrecarga<br>
+                            - <strong>47-55 puntos:</strong> Sobrecarga leve<br>
+                            - <strong>56-110 puntos:</strong> Sobrecarga intensa
+                        </div>
+
+                        <div class="text-right mt-4">
+                            <button type="submit" class="btn btn-primary">Guardar Examen</button>
+                            <a href="{% url 'detalle_paciente' paciente_id %}" class="btn btn-secondary">Ver Paciente</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const selects = document.querySelectorAll('.adherencia-select');
+        const resultadoContainer = document.getElementById('resultado-container');
+        const puntajeDisplay = document.getElementById('puntaje-display');
+        const interpretacionDisplay = document.getElementById('interpretacion-display');
+        const puntajeTotalInput = document.getElementById('puntaje_total');
+
+        selects.forEach(select => {
+            select.addEventListener('change', calcularPuntaje);
+        });
+
+        function calcularPuntaje() {
+            let total = 0;
+            selects.forEach(select => {
+                const valor = parseInt(select.value);
+                if (!isNaN(valor)) {
+                    total += valor;
+                }
+            });
+
+            puntajeDisplay.textContent = total;
+            puntajeTotalInput.value = total;
+
+            let interpretacion = "";
+            if (total <= 46) {
+                interpretacion = "No hay sobrecarga";
+            } else if (total <= 55) {
+                interpretacion = "Sobrecarga leve";
+            } else {
+                interpretacion = "Sobrecarga intensa";
+            }
+
+            interpretacionDisplay.textContent = interpretacion;
+            resultadoContainer.style.display = 'block';
+        }
+
+        // Calcular al cargar por si hay valores precargados
+        calcularPuntaje();
+    });
+</script>
+
+{% endblock %}

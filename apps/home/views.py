@@ -556,6 +556,17 @@ def realizar_examen(request, visita_id, examen_id, paciente_id):
         18: "sleepexams/sueno_atenas.html",
         19: "sleepexams/sueno_ISI.html",
         20: "sleepexams/cognitivo_Anamnesis.html",
+        21: "sleepexams/Anosognosia_Participante_EuroQoL.html",
+        22: "sleepexams/Anosognosia_Participante_EVA_EuroQoL.html",
+        23: "sleepexams/Anosognosia_Participante_Yesavage.html",
+        24: "sleepexams/Anosognosia_Cuidador_NPI.html",
+        25: "sleepexams/Anosognosia_Cuidador_LawtonBrody.html",
+        26: "sleepexams/Anosognosia_Cuidador_CalidadVida_BettyFerrel.html",
+        27: "sleepexams/Anosognosia_Participante_MoCA.html",
+        28: "sleepexams/Anosognosia_Participante_AdherenciaTerapeutica.html",
+        29: "sleepexams/Anosognosia_Cuidador_EscalaZarit.html",
+        30: "sleepexams/Anosognosia_Cuidador_AQD.html",
+        31: "sleepexams/Anosognosia_Participante_AQD.html",
     }
 
     template = exam_templates.get(examen_id, "sleepexams/anamnesisTest.html")  
@@ -2164,3 +2175,648 @@ def descargar_examen(request, visita_examen_id):
 
 def profile_view(request):
     return render(request, 'home/profile.html')
+
+
+# VIEWS Anosognosia
+
+#View Yesavage
+
+@login_required
+def guardar_examen_Participante_Yesavage(request):
+    if request.method == 'POST':
+        # Preguntas que puntúan "1" si se responde "sí"
+        depresion_si = [2, 3, 4, 6, 8, 9, 10, 12, 14, 15]
+        # Preguntas que puntúan "1" si se responde "no"
+        depresion_no = [1, 5, 7, 11, 13]
+
+        total = 0
+        respuestas = {}
+
+        for i in range(1, 16):
+            key = f'p{i}'
+            respuesta = request.POST.get(key)
+            respuestas[key] = respuesta
+
+            if i in depresion_si and respuesta == 'si':
+                total += 1
+            elif i in depresion_no and respuesta == 'no':
+                total += 1
+
+        # Determinar la interpretación
+        if total <= 5:
+            interpretacion = "Normal"
+        elif total <= 9:
+            interpretacion = "Depresión leve"
+        else:
+            interpretacion = "Depresión establecida"
+
+        # Preparar diccionario de resultados
+        datos_formulario_yesavage = {
+            "Yesavage": {
+                **{f"Pregunta {i}": respuestas[f"p{i}"] for i in range(1, 16)},
+                "Puntaje_total": total,
+                "Interpretacion": interpretacion
+            }
+        }
+
+        # Obtener las instancias necesarias
+        visita_id = request.POST.get('visita_id')
+        examen_id = request.POST.get('examen_id')
+        paciente_id = request.POST.get('paciente_id')
+
+        visita = get_object_or_404(Visita, id=visita_id)
+        examen = get_object_or_404(Examen, id=examen_id)
+        paciente = get_object_or_404(DatosDemograficos, id=paciente_id)
+
+        # Obtener o crear el VisitaExamen
+        visita_examen, created = VisitaExamen.objects.get_or_create(
+            visita=visita,
+            examen=examen,
+        )
+
+        # Guardar o actualizar los resultados
+        if visita_examen.resultado:
+            visita_examen.resultado.update(datos_formulario_yesavage)
+        else:
+            visita_examen.resultado = datos_formulario_yesavage
+
+        visita_examen.save()
+
+        return redirect('detalle_paciente', paciente_id=paciente.id)
+    
+
+
+
+@login_required
+def guardar_examen_Participante_MoCA(request):
+    if request.method == 'POST':
+
+        datos_moca = {}
+        puntaje_total = 0
+
+        # Sumar subitems de atención
+        atencion_total = 0
+        for i in range(1, 4):
+            valor = int(request.POST.get(f'atencion_{i}', 0))
+            datos_moca[f'atencion_{i}'] = valor
+            atencion_total += valor
+        datos_moca['atencion_calculo'] = atencion_total
+        puntaje_total += atencion_total
+
+        # Sumar subitems de recuerdo
+        recuerdo_total = 0
+        for i in range(1, 6):
+            valor = int(request.POST.get(f'recuerdo_{i}', 0))
+            datos_moca[f'recuerdo_{i}'] = valor
+            recuerdo_total += valor
+        datos_moca['recuerdo'] = recuerdo_total
+        puntaje_total += recuerdo_total
+
+        # Campos principales
+        campos = [
+            'alternancia', 'cubo', 'reloj', 'denominacion',
+            'repeticion', 'fluidez', 'abstraccion', 'orientacion'
+        ]
+
+        for campo in campos:
+            valor = int(request.POST.get(campo, 0))
+            datos_moca[campo] = valor
+            puntaje_total += valor
+
+        # Educación baja
+        educacion_baja = request.POST.get('educacion_baja') == 'on'
+        datos_moca['educacion_baja'] = educacion_baja
+        if educacion_baja:
+            puntaje_total += 1
+
+        # Interpretación
+        interpretacion = "Normal" if puntaje_total >= 26 else "Deterioro cognitivo leve o más"
+        datos_moca["puntaje_total"] = puntaje_total
+        datos_moca["interpretacion"] = interpretacion
+
+        # Obtener relaciones
+        visita_id = request.POST.get('visita_id')
+        examen_id = request.POST.get('examen_id')
+        paciente_id = request.POST.get('paciente_id')
+
+        visita = get_object_or_404(Visita, id=visita_id)
+        examen = get_object_or_404(Examen, id=examen_id)
+        paciente = get_object_or_404(DatosDemograficos, id=paciente_id)
+
+        # Guardar
+        visita_examen, created = VisitaExamen.objects.get_or_create(
+            visita=visita,
+            examen=examen,
+            defaults={'resultado': {'MoCA': datos_moca}}
+        )
+
+        if not created:
+            if not visita_examen.resultado:
+                visita_examen.resultado = {}
+            visita_examen.resultado['MoCA'] = datos_moca
+            visita_examen.save()
+
+        return redirect('detalle_paciente', paciente_id=paciente.id)
+
+
+
+@login_required
+def guardar_examen_Cuidador_NPI(request):
+    if request.method == 'POST':
+        visita_id = request.POST.get('visita_id')
+        examen_id = request.POST.get('examen_id')
+        paciente_id = request.POST.get('paciente_id')
+
+        visita = get_object_or_404(Visita, id=visita_id)
+        examen = get_object_or_404(Examen, id=examen_id)
+        paciente = get_object_or_404(DatosDemograficos, id=paciente_id)
+
+        npi_items = [
+            "ideas_delirantes", "alucinaciones", "agitacion", "depresion",
+            "ansiedad", "euforia", "apatia", "desinhibicion",
+            "irritabilidad", "conducta_motor", "sueno", "apetito"
+        ]
+
+        resultado_npi = {}
+        for item in npi_items:
+            resultado_npi[item] = {
+                "presente": request.POST.get(item),
+                "frecuencia": request.POST.get(f"{item}_frecuencia"),
+                "gravedad": request.POST.get(f"{item}_gravedad"),
+                "distres": request.POST.get(f"{item}_distres"),
+            }
+
+        datos_formulario = {
+            "NPI": resultado_npi
+        }
+
+        visita_examen, created = VisitaExamen.objects.get_or_create(
+            visita=visita,
+            examen=examen
+        )
+
+        if visita_examen.resultado:
+            visita_examen.resultado.update(datos_formulario)
+        else:
+            visita_examen.resultado = datos_formulario
+
+        visita_examen.save()
+        return redirect(reverse('detalle_paciente', args=[int(paciente.id)]))
+
+@login_required
+def guardar_examen_Cuidador_LawtonBrody(request):
+    if request.method == 'POST':
+        # Obtener valores del formulario
+        genero = request.POST.get("genero")
+        puntaje_total = 0
+        diagnostico = ""
+
+        # Recolectar respuestas
+        items = {}
+        valores = {}
+
+        for i in range(1, 9):
+            clave = f"item_{i}"
+            valor = int(request.POST.get(clave))
+            texto = request.POST.get(f"{clave}_text")
+            items[clave] = texto  # guardar solo texto
+            valores[clave] = valor  # para el cálculo
+
+
+        # Cálculo del puntaje total según el género
+        if genero == "mujer":
+            puntaje_total = sum(valores.values())
+            if puntaje_total == 8:
+                diagnostico = "Autónoma"
+            elif puntaje_total >= 6:
+                diagnostico = "Dependencia ligera"
+            elif puntaje_total >= 4:
+                diagnostico = "Dependencia moderada"
+            elif puntaje_total >= 2:
+                diagnostico = "Dependencia grave"
+            else:
+                diagnostico = "Dependencia total"
+
+        elif genero == "hombre":
+            indices = ["item_1", "item_2", "item_6", "item_7", "item_8"]
+            puntaje_total = sum([valores[i] for i in indices])
+            if puntaje_total == 5:
+                diagnostico = "Autónomo"
+            elif puntaje_total == 4:
+                diagnostico = "Dependencia ligera"
+            elif puntaje_total >= 2:
+                diagnostico = "Dependencia moderada"
+            elif puntaje_total == 1:
+                diagnostico = "Dependencia grave"
+            else:
+                diagnostico = "Dependencia total"
+
+
+        # Armar estructura para guardar en JSONField
+        datos_formulario_lawton = {
+            "Lawton_Brody": {
+                "genero": genero,
+                "respuestas": items,
+                "puntaje_total": puntaje_total,
+                "diagnostico": diagnostico
+            }
+        }
+
+        # Obtener relaciones
+        visita_id = request.POST.get('visita_id')
+        examen_id = request.POST.get('examen_id')
+        paciente_id = request.POST.get('paciente_id')
+
+        visita = get_object_or_404(Visita, id=visita_id)
+        examen = get_object_or_404(Examen, id=examen_id)
+        paciente = get_object_or_404(DatosDemograficos, id=paciente_id)
+
+        # Obtener o crear el registro VisitaExamen
+        visita_examen, created = VisitaExamen.objects.get_or_create(
+            visita=visita, examen=examen
+        )
+
+        # Guardar datos
+        if visita_examen.resultado:
+            visita_examen.resultado.update(datos_formulario_lawton)
+        else:
+            visita_examen.resultado = datos_formulario_lawton
+
+        visita_examen.save()
+        return redirect(reverse('detalle_paciente', args=[int(paciente.id)]))
+
+
+
+@login_required
+def guardar_examen_Participante_EuroQoL(request):
+    if request.method == 'POST':
+        # Capturar los datos del formulario
+        datos_formulario_euroqol = {
+            "EuroQol_5D_5L": {
+                "movilidad": request.POST.get("movilidad"),
+                "cuidado_personal": request.POST.get("cuidado_personal"),
+                "actividades": request.POST.get("actividades"),
+                "dolor": request.POST.get("dolor"),
+                "ansiedad": request.POST.get("ansiedad")
+            }
+        }
+
+        # Obtener los IDs de la visita, examen y paciente
+        visita_id = request.POST.get("visita_id")
+        examen_id = request.POST.get("examen_id")
+        paciente_id = request.POST.get("paciente_id")
+
+        # Buscar las instancias correspondientes
+        visita = get_object_or_404(Visita, id=visita_id)
+        examen = get_object_or_404(Examen, id=examen_id)
+        paciente = get_object_or_404(DatosDemograficos, id=paciente_id)
+
+        # Obtener o crear el objeto VisitaExamen
+        visita_examen, created = VisitaExamen.objects.get_or_create(
+            visita=visita,
+            examen=examen
+        )
+
+        # Guardar o actualizar el resultado
+        if visita_examen.resultado:
+            visita_examen.resultado.update(datos_formulario_euroqol)
+        else:
+            visita_examen.resultado = datos_formulario_euroqol
+
+        visita_examen.save()
+
+        # Redirigir al detalle del paciente
+        return redirect(reverse('detalle_paciente', args=[int(paciente.id)]))
+
+
+
+@login_required
+def guardar_examen_Participante_EVA_EuroQoL(request):
+    if request.method == 'POST':
+        # Capturar el valor del termómetro
+        datos_formulario_eva = {
+            "EVA_EuroQol": {
+                "termometro_estado_salud": int(request.POST.get("termometro_estado_salud"))
+            }
+        }
+
+        # Obtener los IDs de la visita, examen y paciente
+        visita_id = request.POST.get("visita_id")
+        examen_id = request.POST.get("examen_id")
+        paciente_id = request.POST.get("paciente_id")
+
+        # Buscar las instancias correspondientes
+        visita = get_object_or_404(Visita, id=visita_id)
+        examen = get_object_or_404(Examen, id=examen_id)
+        paciente = get_object_or_404(DatosDemograficos, id=paciente_id)
+
+        # Obtener o crear el objeto VisitaExamen
+        visita_examen, created = VisitaExamen.objects.get_or_create(
+            visita=visita,
+            examen=examen
+        )
+
+        # Guardar o actualizar el resultado
+        if visita_examen.resultado:
+            visita_examen.resultado.update(datos_formulario_eva)
+        else:
+            visita_examen.resultado = datos_formulario_eva
+
+        visita_examen.save()
+
+        # Redirigir al detalle del paciente
+        return redirect(reverse('detalle_paciente', args=[int(paciente.id)]))
+
+@login_required
+def guardar_examen_Cuidador_BettyFerrel(request):
+    if request.method == 'POST':
+        # Agrupación por dimensiones
+        datos_formulario = {
+            "Ferrell": {
+                "fisico": {
+                    "agotamiento": request.POST.get("agotamiento"),
+                    "cambios_alimentarios": request.POST.get("cambios_alimentarios"),
+                    "dolor": request.POST.get("dolor"),
+                    "cambios_sueno": request.POST.get("cambios_sueno"),
+                    "salud_fisica_general": request.POST.get("salud_fisica_general")
+                },
+                "psicologico": {
+                    "facilidad_enfrentar": request.POST.get("facilidad_enfrentar"),
+                    "felicidad": request.POST.get("felicidad"),
+                    "control_vida": request.POST.get("control_vida"),
+                    "satisfaccion_vida": request.POST.get("satisfaccion_vida"),
+                    "concentracion": request.POST.get("concentracion"),
+                    "utilidad_personal": request.POST.get("utilidad_personal"),
+                    "angustia_diagnostico": request.POST.get("angustia_diagnostico"),
+                    "angustia_tratamiento": request.POST.get("angustia_tratamiento"),
+                    "ansiedad": request.POST.get("ansiedad"),
+                    "depresion": request.POST.get("depresion"),
+                    "miedo_otra_enfermedad": request.POST.get("miedo_otra_enfermedad"),
+                    "miedo_retroceso": request.POST.get("miedo_retroceso"),
+                    "miedo_avance": request.POST.get("miedo_avance"),
+                    "estado_psicologico": request.POST.get("estado_psicologico")
+                },
+                "social": {
+                    "angustia_familiar": request.POST.get("angustia_familiar"),
+                    "nivel_ayuda": request.POST.get("nivel_ayuda"),
+                    "relaciones_personales": request.POST.get("relaciones_personales"),
+                    "vida_sexual": request.POST.get("vida_sexual"),
+                    "trabajo": request.POST.get("trabajo"),
+                    "actividades_hogar": request.POST.get("actividades_hogar"),
+                    "aislamiento": request.POST.get("aislamiento"),
+                    "carga_economica": request.POST.get("carga_economica"),
+                    "estado_social": request.POST.get("estado_social")
+                },
+                "espiritual": {
+                    "actividades_religiosas": request.POST.get("actividades_religiosas"),
+                    "actividades_espirituales_personales": request.POST.get("actividades_espirituales_personales"),
+                    "incertidumbre_futuro": request.POST.get("incertidumbre_futuro"),
+                    "cambios_positivos": request.POST.get("cambios_positivos"),
+                    "proposito_vida": request.POST.get("proposito_vida"),
+                    "esperanza": request.POST.get("esperanza"),
+                    "estado_espiritual": request.POST.get("estado_espiritual")
+                }
+            }
+        }
+
+        # Obtener IDs
+        visita_id = request.POST.get("visita_id")
+        examen_id = request.POST.get("examen_id")
+        paciente_id = request.POST.get("paciente_id")
+
+        # Instancias
+        visita = get_object_or_404(Visita, id=visita_id)
+        examen = get_object_or_404(Examen, id=examen_id)
+        paciente = get_object_or_404(DatosDemograficos, id=paciente_id)
+
+        # Crear o actualizar resultado
+        visita_examen, created = VisitaExamen.objects.get_or_create(visita=visita, examen=examen)
+        if visita_examen.resultado:
+            visita_examen.resultado.update(datos_formulario)
+        else:
+            visita_examen.resultado = datos_formulario
+
+        visita_examen.save()
+
+        return redirect(reverse('detalle_paciente', args=[paciente.id]))
+
+
+@login_required
+def guardar_examen_Participante_AdherenciaTerapeutica(request):
+    if request.method == 'POST':
+        # Recolectar las respuestas del cuestionario
+        respuestas = {}
+        for i in range(1, 31):
+            respuestas[f"p{i}"] = int(request.POST.get(f"p{i}", 0))
+
+        # Recolectar puntajes por factor
+        factor1 = int(request.POST.get('factor1', 0))
+        factor2 = int(request.POST.get('factor2', 0))
+        factor3 = int(request.POST.get('factor3', 0))
+
+        # Calcular interpretaciones de cada factor
+        def interpretar(factor, rangos):
+            if factor <= rangos[0]:
+                return "Adherencia baja"
+            elif factor <= rangos[1]:
+                return "Adherencia regular o moderada"
+            else:
+                return "Adherencia alta"
+
+        interpretacion1 = interpretar(factor1, (27, 54))
+        interpretacion2 = interpretar(factor2, (10, 20))
+        interpretacion3 = interpretar(factor3, (13, 27))
+
+        # Construir diccionario de resultados
+        datos = {
+            "Adherencia_Terapéutica": {
+                **respuestas,
+                "factor1": factor1,
+                "interpretacion_factor1": interpretacion1,
+                "factor2": factor2,
+                "interpretacion_factor2": interpretacion2,
+                "factor3": factor3,
+                "interpretacion_factor3": interpretacion3
+            }
+        }
+
+        # Obtener visita, examen, paciente
+        visita_id = request.POST.get("visita_id")
+        examen_id = request.POST.get("examen_id")
+        paciente_id = request.POST.get("paciente_id")
+
+        visita = get_object_or_404(Visita, id=visita_id)
+        examen = get_object_or_404(Examen, id=examen_id)
+        paciente = get_object_or_404(DatosDemograficos, id=paciente_id)
+
+        # Obtener o crear VisitaExamen
+        visita_examen, _ = VisitaExamen.objects.get_or_create(
+            visita=visita,
+            examen=examen
+        )
+
+        # Actualizar resultado si ya existe
+        if visita_examen.resultado:
+            visita_examen.resultado.update(datos)
+        else:
+            visita_examen.resultado = datos
+
+        visita_examen.save()
+
+        return redirect(reverse("detalle_paciente", args=[paciente.id]))
+
+@login_required
+def guardar_examen_Participante_Cuidador_Zarit(request):
+    if request.method == 'POST':
+        # Obtener respuestas p1 a p22
+        respuestas = {}
+        for i in range(1, 23):
+            respuestas[f"p{i}"] = int(request.POST.get(f"p{i}", 0))
+
+        # Obtener puntaje total calculado en el formulario
+        puntaje_total = int(request.POST.get("puntaje_total", 0))
+
+        # Interpretación clínica del puntaje
+        if puntaje_total <= 46:
+            interpretacion = "No hay sobrecarga"
+        elif puntaje_total <= 55:
+            interpretacion = "Sobrecarga leve"
+        else:
+            interpretacion = "Sobrecarga intensa"
+
+        # Construir el diccionario a guardar
+        resultado_zarit = {
+            "zarit": {
+                **respuestas,
+                "puntaje_total": puntaje_total,
+                "interpretacion": interpretacion
+            }
+        }
+
+        # Obtener IDs de relaciones
+        visita_id = request.POST.get("visita_id")
+        examen_id = request.POST.get("examen_id")
+        paciente_id = request.POST.get("paciente_id")
+
+        visita = get_object_or_404(Visita, id=visita_id)
+        examen = get_object_or_404(Examen, id=examen_id)
+        paciente = get_object_or_404(DatosDemograficos, id=paciente_id)
+
+        # Obtener o crear VisitaExamen
+        visita_examen, _ = VisitaExamen.objects.get_or_create(
+            visita=visita,
+            examen=examen
+        )
+
+        # Guardar resultados en campo JSONField
+        if visita_examen.resultado:
+            visita_examen.resultado.update(resultado_zarit)
+        else:
+            visita_examen.resultado = resultado_zarit
+
+        visita_examen.save()
+
+        # Redirigir al detalle del paciente
+        return redirect(reverse("detalle_paciente", args=[paciente.id]))
+
+
+@login_required
+def guardar_examen_Cuidador_AQD(request):
+    if request.method == 'POST':
+        # Obtener IDs
+        visita_id = request.POST.get('visita_id')
+        examen_id = request.POST.get('examen_id')
+        paciente_id = request.POST.get('paciente_id')
+
+        visita = get_object_or_404(Visita, id=visita_id)
+        examen = get_object_or_404(Examen, id=examen_id)
+        paciente = get_object_or_404(DatosDemograficos, id=paciente_id)
+
+        # Respuestas
+        respuestas = {}
+        total = 0
+        for i in range(1, 31):  # Del 1 al 30
+            clave = f"p{i}"
+            valor = int(request.POST.get(clave, 0))
+            respuestas[clave] = valor
+            total += valor
+
+        # Interpretación (AJUSTAR)
+        if total <= 21:
+            interpretacion = "Sin alteración aparente"
+        elif total <= 42:
+            interpretacion = "Alteración leve"
+        elif total <= 63:
+            interpretacion = "Alteración moderada"
+        else:
+            interpretacion = "Alteración severa"
+
+        # Formato de resultado
+        resultado = {
+            "AQ-D Cuidador": {
+                "respuestas": respuestas,
+                "puntaje_total": total,
+                "interpretacion": interpretacion
+            }
+        }
+
+        # Guardar en VisitaExamen
+        visita_examen, _ = VisitaExamen.objects.get_or_create(visita=visita, examen=examen)
+        if visita_examen.resultado:
+            visita_examen.resultado.update(resultado)
+        else:
+            visita_examen.resultado = resultado
+
+        visita_examen.save()
+        return redirect(reverse('detalle_paciente', args=[paciente.id]))
+
+
+@login_required
+def guardar_examen_Participante_AQD(request):
+    if request.method == 'POST':
+        # Obtener IDs
+        visita_id = request.POST.get('visita_id')
+        examen_id = request.POST.get('examen_id')
+        paciente_id = request.POST.get('paciente_id')
+
+        visita = get_object_or_404(Visita, id=visita_id)
+        examen = get_object_or_404(Examen, id=examen_id)
+        paciente = get_object_or_404(DatosDemograficos, id=paciente_id)
+
+        # Respuestas
+        respuestas = {}
+        total = 0
+        for i in range(1, 31):  # Del 1 al 21
+            clave = f"p{i}"
+            valor = int(request.POST.get(clave, 0))
+            respuestas[clave] = valor
+            total += valor
+
+        # Interpretación (AJUSTAR)
+        if total <= 21:
+            interpretacion = "Sin alteración aparente"
+        elif total <= 42:
+            interpretacion = "Alteración leve"
+        elif total <= 63:
+            interpretacion = "Alteración moderada"
+        else:
+            interpretacion = "Alteración severa"
+
+        # Formato de resultado
+        resultado = {
+            "AQ-D Participante": {
+                "respuestas": respuestas,
+                "puntaje_total": total,
+                "interpretacion": interpretacion
+            }
+        }
+
+        # Guardar en VisitaExamen
+        visita_examen, _ = VisitaExamen.objects.get_or_create(visita=visita, examen=examen)
+        if visita_examen.resultado:
+            visita_examen.resultado.update(resultado)
+        else:
+            visita_examen.resultado = resultado
+
+        visita_examen.save()
+        return redirect(reverse('detalle_paciente', args=[paciente.id]))

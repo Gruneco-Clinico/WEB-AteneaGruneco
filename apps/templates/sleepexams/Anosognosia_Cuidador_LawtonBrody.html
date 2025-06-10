@@ -1,0 +1,228 @@
+{% extends 'layouts/base.html' %}
+{% block content %}
+
+<div class="header bg-primary pb-6">
+  <div class="container-fluid">
+    <div class="header-body">
+      <div class="row align-items-center py-4">
+        <div class="col-lg-6 col-5">
+          <h6 class="h2 text-white d-inline-block mb-0">Escala de Lawton y Brody</h6>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid mt--6">
+  <div class="row">
+    <div class="col">
+      <div class="card shadow">
+        <form method="post" action="{% url 'guardar_examen_Cuidador_LawtonBrody' %}">
+          {% csrf_token %}
+          <input type="hidden" name="visita_id" value="{{ visita_examen }}">
+          <input type="hidden" name="paciente_id" value="{{ paciente_id }}">
+          <input type="hidden" name="examen_id" value="{{ examen_id }}">
+
+          <div class="card-body">
+            <div class="alert alert-info">
+              <strong>Instrucciones:</strong> Seleccione la opción que mejor describa la capacidad funcional del paciente en cada actividad.
+            </div>
+
+            <!-- Género -->
+            <div class="form-group">
+              <label><strong>Género del paciente</strong></label>
+              <select class="form-control" name="genero" id="genero" required>
+                <option value="" disabled selected>Seleccione género</option>
+                <option value="mujer">Mujer</option>
+                <option value="hombre">Hombre</option>
+              </select>
+            </div>
+
+            <!-- Ítem 1 -->
+            <div class="form-group">
+              <label><strong>1. Capacidad para usar el teléfono</strong></label>
+              <select class="form-control lawton-item" name="item_1" required>
+                <option value="" disabled selected>Seleccione una opción</option>
+                <option value="1" data-text="Utiliza el teléfono por iniciativa propia">Utiliza el teléfono por iniciativa propia</option>
+                <option value="1" data-text="Marca algunos números familiares">Marca algunos números familiares</option>
+                <option value="1" data-text="Contesta pero no marca">Contesta pero no marca</option>
+                <option value="0" data-text="No utiliza el teléfono">No utiliza el teléfono</option>
+              </select>
+              <input type="hidden" name="item_1_text">
+
+            </div>
+
+            <!-- Ítem 2 -->
+            <div class="form-group">
+              <label><strong>2. Hacer compras</strong></label>
+              <select class="form-control lawton-item" name="item_2" required>
+                <option value="" disabled selected>Seleccione una opción</option>
+                <option value="1" data-text="Realiza todas las compras independientemente">Realiza todas las compras independientemente</option>
+                <option value="0" data-text="Realiza pequeñas compras">Realiza pequeñas compras</option>
+                <option value="0" data-text="Necesita acompañamiento">Necesita acompañamiento</option>
+                <option value="0" data-text="Totalmente incapaz de comprar">Totalmente incapaz de comprar</option>
+              </select>
+              <input type="hidden" name="item_2_text">
+
+            </div>
+
+            <!-- Ítem 3 -->
+            <div class="form-group">
+              <label><strong>3. Preparación de la comida</strong></label>
+              <select class="form-control lawton-item" name="item_3" required>
+                <option value="" disabled selected>Seleccione una opción</option>
+                <option value="1" data-text="Organiza, prepara y sirve solo">Organiza, prepara y sirve solo</option>
+                <option value="0" data-text="Prepara si se le dan ingredientes">Prepara si se le dan ingredientes</option>
+                <option value="0" data-text="Calienta pero no sigue dieta">Calienta pero no sigue dieta</option>
+                <option value="0" data-text="Necesita que le preparen">Necesita que le preparen</option>
+              </select>
+              <input type="hidden" name="item_3_text">
+
+            </div>
+
+            <!-- Ítem 4 -->
+            <div class="form-group">
+              <label><strong>4. Cuidado de la casa</strong></label>
+              <select class="form-control lawton-item" name="item_4" required>
+                <option value="" disabled selected>Seleccione una opción</option>
+                <option value="1" data-text="Mantiene la casa solo o con ayuda ocasional">Mantiene la casa solo o con ayuda ocasional</option>
+                <option value="1" data-text="Realiza tareas ligeras como lavar platos">Realiza tareas ligeras como lavar platos</option>
+                <option value="1" data-text="Hace tareas pero no mantiene limpieza adecuada">Hace tareas pero no mantiene limpieza adecuada</option>
+                <option value="1" data-text="Necesita ayuda en todas las tareas">Necesita ayuda en todas las tareas</option>
+                <option value="0" data-text="No participa en las labores">No participa en las labores</option>
+              </select>
+              <input type="hidden" name="item_4_text">
+
+            </div>
+
+            <!-- Ítem 5 -->
+            <div class="form-group">
+              <label><strong>5. Lavado de la ropa</strong></label>
+              <select class="form-control lawton-item" name="item_5" required>
+                <option value="" disabled selected>Seleccione una opción</option>
+                <option value="1" data-text="Lava toda la ropa solo">Lava toda la ropa solo</option>
+                <option value="1" data-text="Lava solo prendas pequeñas">Lava solo prendas pequeñas</option>
+                <option value="0" data-text="Todo el lavado lo hace otra persona">Todo el lavado lo hace otra persona</option>
+              </select>
+              <input type="hidden" name="item_5_text">
+
+            </div>
+
+            <!-- Ítem 6 -->
+            <div class="form-group">
+              <label><strong>6. Uso de transporte</strong></label>
+              <select class="form-control lawton-item" name="item_6" required>
+                <option value="" disabled selected>Seleccione una opción</option>
+                <option value="1" data-text="Viaja solo o conduce su coche">Viaja solo o conduce su coche</option>
+                <option value="1" data-text="Puede tomar taxi pero no otros medios">Puede tomar taxi pero no otros medios</option>
+                <option value="1" data-text="Viaja solo con compañía">Viaja solo con compañía</option>
+                <option value="0" data-text="Solo viaja con ayuda">Solo viaja con ayuda</option>
+                <option value="0" data-text="No viaja">No viaja</option>
+              </select>
+              <input type="hidden" name="item_6_text">
+
+            </div>
+
+            <!-- Ítem 7 -->
+            <div class="form-group">
+              <label><strong>7. Responsabilidad con la medicación</strong></label>
+              <select class="form-control lawton-item" name="item_7" required>
+                <option value="" disabled selected>Seleccione una opción</option>
+                <option value="1" data-text="Toma medicación a dosis y hora adecuada">Toma medicación a dosis y hora adecuada</option>
+                <option value="0" data-text="Solo si está preparada">Solo si está preparada</option>
+                <option value="0" data-text="No puede administrarse">No puede administrarse</option>
+              </select>
+              <input type="hidden" name="item_7_text">
+
+            </div>
+
+            <!-- Ítem 8 -->
+            <div class="form-group">
+              <label><strong>8. Manejo del dinero</strong></label>
+              <select class="form-control lawton-item" name="item_8" required>
+                <option value="" disabled selected>Seleccione una opción</option>
+                <option value="1" data-text="Se encarga solo de su economía">Se encarga solo de su economía</option>
+                <option value="1" data-text="Necesita ayuda con bancos o grandes compras">Necesita ayuda con bancos o grandes compras</option>
+                <option value="0" data-text="No maneja dinero">No maneja dinero</option>
+              </select>
+              <input type="hidden" name="item_8_text">
+
+            </div>
+
+            <!-- Resultado -->
+            <div class="alert alert-success mt-4">
+              <h4 class="alert-heading">Resultado de la Escala</h4>
+              <p><strong>Puntaje Total:</strong> <span id="puntaje-lawton">0</span></p>
+              <p><strong>Diagnóstico:</strong> <span id="diagnostico-lawton">Seleccione género y opciones para ver el diagnóstico.</span></p>
+            </div>
+
+            <!-- Botones -->
+            <div class="text-right mt-4">
+              <button type="submit" class="btn btn-primary">Guardar Evaluación</button>
+              <a href="{% url 'detalle_paciente' paciente_id %}" class="btn btn-secondary">Ver Paciente</a>
+            </div>
+
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const selects = document.querySelectorAll(".lawton-item");
+    const generoSelect = document.getElementById("genero");
+    const puntajeSpan = document.getElementById("puntaje-lawton");
+    const diagnosticoSpan = document.getElementById("diagnostico-lawton");
+
+    function calcularPuntaje() {
+      let total = 0;
+
+      selects.forEach((s) => {
+        const value = s.value;
+        const selectedOption = s.options[s.selectedIndex];
+        const hiddenInput = document.querySelector(`input[name="${s.name}_text"]`);
+        if (hiddenInput && selectedOption) {
+          hiddenInput.value = selectedOption.getAttribute("data-text") || selectedOption.text;
+        }
+        if (value !== "") {
+          total += parseInt(value);
+        }
+      });
+
+      const genero = generoSelect.value;
+      let diagnostico = "";
+
+      if (genero === "mujer") {
+        puntajeSpan.textContent = total;
+        if (total === 8) diagnostico = "Autónoma";
+        else if (total >= 6) diagnostico = "Dependencia ligera";
+        else if (total >= 4) diagnostico = "Dependencia moderada";
+        else if (total >= 2) diagnostico = "Dependencia grave";
+        else diagnostico = "Dependencia total";
+      } else if (genero === "hombre") {
+        const indicesHombre = [0, 1, 5, 6, 7]; // item_1, item_2, item_6, item_7, item_8
+        let subtotal = 0;
+        indicesHombre.forEach((i) => {
+          const val = parseInt(selects[i].value || 0);
+          subtotal += isNaN(val) ? 0 : val;
+        });
+        puntajeSpan.textContent = subtotal;
+        if (subtotal === 5) diagnostico = "Autónomo";
+        else if (subtotal === 4) diagnostico = "Dependencia ligera";
+        else if (subtotal >= 2) diagnostico = "Dependencia moderada";
+        else if (subtotal === 1) diagnostico = "Dependencia grave";
+        else diagnostico = "Dependencia total";
+      }
+
+      diagnosticoSpan.textContent = diagnostico || "Seleccione género para ver diagnóstico.";
+    }
+
+    selects.forEach((s) => s.addEventListener("change", calcularPuntaje));
+    generoSelect.addEventListener("change", calcularPuntaje);
+  });
+</script>
+
+
+{% endblock %}

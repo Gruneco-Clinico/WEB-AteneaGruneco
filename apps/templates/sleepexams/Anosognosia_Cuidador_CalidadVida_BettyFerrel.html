@@ -1,0 +1,258 @@
+{% extends 'layouts/base.html' %}
+{% block content %}
+
+<div class="header bg-primary pb-6">
+  <div class="container-fluid">
+    <div class="header-body">
+      <div class="row align-items-center py-4">
+        <div class="col-lg-6 col-5">
+          <h6 class="h2 text-white d-inline-block mb-0">Escala de Calidad de Vida - Betty Ferrell</h6>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid mt--6">
+  <div class="row">
+    <div class="col">
+      <div class="card shadow">
+        <form method="post" action="{% url 'guardar_examen_Cuidador_BettyFerrel' %}">
+          {% csrf_token %}
+          <input type="hidden" name="visita_id" value="{{ visita_examen }}">
+          <input type="hidden" name="paciente_id" value="{{ paciente_id }}">
+          <input type="hidden" name="examen_id" value="{{ examen_id }}">
+
+          <!-- Navegación por pestañas -->
+          <ul class="nav nav-pills nav-fill mb-4" role="tablist">
+            <li class="nav-item"><a class="nav-link active" data-toggle="tab" href="#fisico">Bienestar Físico</a></li>
+            <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#psicologico">Bienestar Psicológico</a></li>
+            <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#social">Bienestar Social</a></li>
+            <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#espiritual">Bienestar Espiritual</a></li>
+          </ul>
+
+          <div class="tab-content">
+
+            <!-- BIENESTAR FÍSICO -->
+            <div class="tab-pane fade show active" id="fisico">
+              <div class="card bg-gradient-default shadow-sm mb-4">
+                <div class="card-header bg-transparent"><h4 class="text-white mb-0">Bienestar Físico</h4></div>
+                <div class="card-body bg-white">
+                  {% comment %} Selecciones de 0 a 3: Ausencia / Algo / Problema / Muchísimo {% endcomment %}
+                  <div class="form-group"><label>Agotamiento</label><select class="form-control" name="agotamiento" required>
+                    <option value="" disabled selected>Seleccione una opción</option><option value="0">Ausencia de problema</option>
+                    <option value="1">Algo de problema</option><option value="2">Problema</option><option value="3">Muchísimo problema</option>
+                  </select></div>
+                  <div class="form-group"><label>Cambios en los hábitos alimentarios</label><select class="form-control" name="cambios_alimentarios" required>
+                    <option value="" disabled selected>Seleccione una opción</option><option value="0">Ausencia de problema</option>
+                    <option value="1">Algo de problema</option><option value="2">Problema</option><option value="3">Muchísimo problema</option>
+                  </select></div>
+                  <div class="form-group"><label>Dolor</label><select class="form-control" name="dolor" required>
+                    <option value="" disabled selected>Seleccione una opción</option><option value="0">Ausencia de problema</option>
+                    <option value="1">Algo de problema</option><option value="2">Problema</option><option value="3">Muchísimo problema</option>
+                  </select></div>
+                  <div class="form-group"><label>Cambios en el sueño</label><select class="form-control" name="cambios_sueno" required>
+                    <option value="" disabled selected>Seleccione una opción</option><option value="0">Ausencia de problema</option>
+                    <option value="1">Algo de problema</option><option value="2">Problema</option><option value="3">Muchísimo problema</option>
+                  </select></div>
+                  <div class="form-group"><label>Clasifique su salud física en general</label><select class="form-control" name="salud_fisica_general" required>
+                    <option value="" disabled selected>Seleccione una opción</option><option value="0">Sumamente mala</option>
+                    <option value="1">Regular</option><option value="2">Buena</option><option value="3">Excelente</option>
+                  </select></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- BIENESTAR PSICOLÓGICO -->
+            <div class="tab-pane fade" id="psicologico">
+              <div class="card bg-gradient-default shadow-sm mb-4">
+                <div class="card-header bg-transparent"><h4 class="text-white mb-0">Bienestar Psicológico</h4></div>
+                <div class="card-body bg-white">
+
+                  <div class="form-group"><label>¿Qué tan fácil es enfrentar su vida con un pariente enfermo?</label><select class="form-control" name="facilidad_enfrentar" required>
+                    <option value="" disabled selected>Seleccione una opción</option><option value="0">Muy fácil</option>
+                    <option value="1">Fácil</option><option value="2">Difícil</option><option value="3">Muy difícil</option>
+                  </select></div>
+
+                  <div class="form-group"><label>¿Cuánta felicidad siente?</label><select class="form-control" name="felicidad" required>
+                    <option value="" disabled selected>Seleccione una opción</option><option value="0">Nada</option>
+                    <option value="1">Algo</option><option value="2">Moderado</option><option value="3">Muchísimo</option>
+                  </select></div>
+
+                  <div class="form-group"><label>¿Siente que tiene el control de su vida?</label><select class="form-control" name="control_vida" required>
+                    <option value="" disabled selected>Seleccione una opción</option><option value="0">Nada</option>
+                    <option value="1">Algo</option><option value="2">Moderado</option><option value="3">Muchísimo</option>
+                  </select></div>
+
+                  <div class="form-group"><label>¿Qué tan satisfecho está con su vida?</label><select class="form-control" name="satisfaccion_vida" required>
+                    <option value="" disabled selected>Seleccione una opción</option><option value="0">Nada</option>
+                    <option value="1">Algo</option><option value="2">Moderado</option><option value="3">Muchísimo</option>
+                  </select></div>
+
+                  <div class="form-group"><label>Capacidad para concentrarse o recordar</label><select class="form-control" name="concentracion" required>
+                    <option value="" disabled selected>Seleccione una opción</option><option value="0">Sumamente mala</option>
+                    <option value="1">Regular</option><option value="2">Buena</option><option value="3">Excelente</option>
+                  </select></div>
+
+                  <div class="form-group"><label>¿Qué tan útil se siente?</label><select class="form-control" name="utilidad_personal" required>
+                    <option value="" disabled selected>Seleccione una opción</option><option value="0">Nada</option>
+                    <option value="1">Algo</option><option value="2">Moderado</option><option value="3">Muchísimo</option>
+                  </select></div>
+
+                  <div class="form-group"><label>¿Cuánta angustia le causó el diagnóstico?</label><select class="form-control" name="angustia_diagnostico" required>
+                    <option value="" disabled selected>Seleccione una opción</option><option value="0">Nada</option>
+                    <option value="1">Algo</option><option value="2">Moderado</option><option value="3">Muchísimo</option>
+                  </select></div>
+
+                  <div class="form-group"><label>¿Cuánta angustia le causó el tratamiento?</label><select class="form-control" name="angustia_tratamiento" required>
+                    <option value="" disabled selected>Seleccione una opción</option><option value="0">Nada</option>
+                    <option value="1">Algo</option><option value="2">Moderado</option><option value="3">Muchísimo</option>
+                  </select></div>
+
+                  <div class="form-group"><label>¿Cuánta ansiedad siente?</label><select class="form-control" name="ansiedad" required>
+                    <option value="" disabled selected>Seleccione una opción</option><option value="0">Nada</option>
+                    <option value="1">Algo</option><option value="2">Moderado</option><option value="3">Muchísimo</option>
+                  </select></div>
+
+                  <div class="form-group"><label>¿Cuánta depresión siente?</label><select class="form-control" name="depresion" required>
+                    <option value="" disabled selected>Seleccione una opción</option><option value="0">Nada</option>
+                    <option value="1">Algo</option><option value="2">Moderado</option><option value="3">Muchísimo</option>
+                  </select></div>
+
+                  <div class="form-group"><label>¿Tiene miedo de otra enfermedad crónica?</label><select class="form-control" name="miedo_otra_enfermedad" required>
+                    <option value="" disabled selected>Seleccione una opción</option><option value="0">Nada</option>
+                    <option value="1">Algo</option><option value="2">Moderado</option><option value="3">Muchísimo</option>
+                  </select></div>
+
+                  <div class="form-group"><label>¿Tiene miedo de retroceso en su pariente?</label><select class="form-control" name="miedo_retroceso" required>
+                    <option value="" disabled selected>Seleccione una opción</option><option value="0">Nada</option>
+                    <option value="1">Algo</option><option value="2">Moderado</option><option value="3">Muchísimo</option>
+                  </select></div>
+
+                  <div class="form-group"><label>¿Tiene miedo del avance de la enfermedad?</label><select class="form-control" name="miedo_avance" required>
+                    <option value="" disabled selected>Seleccione una opción</option><option value="0">Nada</option>
+                    <option value="1">Algo</option><option value="2">Moderado</option><option value="3">Muchísimo</option>
+                  </select></div>
+
+                  <div class="form-group"><label>Clasifique su estado psicológico en general</label><select class="form-control" name="estado_psicologico" required>
+                    <option value="" disabled selected>Seleccione una opción</option><option value="0">Sumamente malo</option>
+                    <option value="1">Regular</option><option value="2">Bueno</option><option value="3">Excelente</option>
+                  </select></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- BIENESTAR SOCIAL -->
+            <div class="tab-pane fade" id="social">
+              <div class="card bg-gradient-default shadow-sm mb-4">
+                <div class="card-header bg-transparent"><h4 class="text-white mb-0">Bienestar Social</h4></div>
+                <div class="card-body bg-white">
+                  
+                    <div class="form-group"><label>¿Cuánta angustia le ha ocasionado la enfermedad de su familiar?</label><select class="form-control" name="angustia_familiar" required>
+                        <option value="" disabled selected>Seleccione una opción</option><option value="0">Nada</option>
+                        <option value="1">Algo</option><option value="2">Moderado</option><option value="3">Muchísimo</option>
+                    </select></div>
+
+                    <div class="form-group"><label>¿El nivel de ayuda que recibe de otras personas es suficiente para satisfacer sus necesidades?</label><select class="form-control" name="nivel_ayuda" required>
+                        <option value="" disabled selected>Seleccione una opción</option><option value="0">Nada</option>
+                        <option value="1">Algo</option><option value="2">Moderado</option><option value="3">Muchísimo</option>
+                    </select></div>
+
+                    <div class="form-group"><label>¿Hasta qué punto la enfermedad y tratamiento de su pariente han obstaculizado sus relaciones personales?</label><select class="form-control" name="relaciones_personales" required>
+                        <option value="" disabled selected>Seleccione una opción</option><option value="0">Nada</option>
+                        <option value="1">Algo</option><option value="2">Moderado</option><option value="3">Muchísimo</option>
+                    </select></div>
+
+                    <div class="form-group"><label>¿Hasta qué punto la enfermedad y tratamiento de su pariente han afectado su vida sexual?</label><select class="form-control" name="vida_sexual" required>
+                        <option value="" disabled selected>Seleccione una opción</option><option value="0">Nada</option>
+                        <option value="1">Algo</option><option value="2">Moderado</option><option value="3">Muchísimo</option>
+                    </select></div>
+
+                    <div class="form-group"><label>¿Hasta qué punto la enfermedad y tratamiento de su pariente han afectado su trabajo?</label><select class="form-control" name="trabajo" required>
+                        <option value="" disabled selected>Seleccione una opción</option><option value="0">Nada</option>
+                        <option value="1">Algo</option><option value="2">Moderado</option><option value="3">Muchísimo</option>
+                    </select></div>
+
+                    <div class="form-group"><label>¿Hasta qué punto la enfermedad y tratamiento de su pariente, han afectado las actividades que usted realiza en el hogar?</label><select class="form-control" name="actividades_hogar" required>
+                        <option value="" disabled selected>Seleccione una opción</option><option value="0">Nada</option>
+                        <option value="1">Algo</option><option value="2">Moderado</option><option value="3">Muchísimo</option>
+                    </select></div>
+
+                    <div class="form-group"><label>¿Qué tan aislado se siente usted a causa de la enfermedad y el tratamiento de su pariente?</label><select class="form-control" name="aislamiento" required>
+                        <option value="" disabled selected>Seleccione una opción</option><option value="0">Nada</option>
+                        <option value="1">Algo</option><option value="2">Moderado</option><option value="3">Muchísimo</option>
+                    </select></div>
+
+                    <div class="form-group"><label>¿Cuánta carga económica le ha ocasionado la enfermedad y tratamiento de su pariente?</label><select class="form-control" name="carga_economica" required>
+                        <option value="" disabled selected>Seleccione una opción</option><option value="0">Nada</option>
+                        <option value="1">Algo</option><option value="2">Moderado</option><option value="3">Muchísimo</option>
+                    </select></div>
+
+                    <div class="form-group"><label>Clasifique su estado social general</label><select class="form-control" name="estado_social" required>
+                        <option value="" disabled selected>Seleccione una opción</option><option value="0">Sumamente malo</option>
+                        <option value="1">Regular</option><option value="2">Bueno</option><option value="3">Excelente</option>
+                      </select></div>
+
+                </div>
+              </div>
+            </div>
+
+            <!-- BIENESTAR ESPIRITUAL -->
+            <div class="tab-pane fade" id="espiritual">
+              <div class="card bg-gradient-default shadow-sm mb-4">
+                <div class="card-header bg-transparent"><h4 class="text-white mb-0">Bienestar Espiritual</h4></div>
+                <div class="card-body bg-white">
+                  
+                    <div class="form-group"><label>¿El nivel de ayuda que recibe de sus actividades religiosas, tales como ir a la iglesia o al templo, satisfacen sus necesidades?</label><select class="form-control" name="actividades_religiosas" required>
+                        <option value="" disabled selected>Seleccione una opción</option><option value="0">Nada</option>
+                        <option value="1">Algo</option><option value="2">Moderado</option><option value="3">Muchísimo</option>
+                    </select></div>
+
+                    <div class="form-group"><label>¿El nivel de ayuda que recibe de sus actividades espirituales personales, tales como meditar u orar, es suficiente para satisfacer sus necesidades?</label><select class="form-control" name="actividades_espirituales_personales" required>
+                        <option value="" disabled selected>Seleccione una opción</option><option value="0">Nada</option>
+                        <option value="1">Algo</option><option value="2">Moderado</option><option value="3">Muchísimo</option>
+                    </select></div>
+
+                    <div class="form-group"><label>¿Cuánta incertidumbre siente usted respecto al futuro de su pariente?</label><select class="form-control" name="incertidumbre_futuro" required>
+                        <option value="" disabled selected>Seleccione una opción</option><option value="0">Nada</option>
+                        <option value="1">Algo</option><option value="2">Moderado</option><option value="3">Muchísimo</option>
+                    </select></div>
+
+                    <div class="form-group"><label>¿Hasta qué punto la enfermedad de su pariente ha causado cambios positivos en su vida?</label><select class="form-control" name="cambios_positivos" required>
+                        <option value="" disabled selected>Seleccione una opción</option><option value="0">Nada</option>
+                        <option value="1">Algo</option><option value="2">Moderado</option><option value="3">Muchísimo</option>
+                    </select></div>
+
+                    <div class="form-group"><label>¿Usted siente que tiene un propósito en su vida o una razón para vivir?</label><select class="form-control" name="proposito_vida" required>
+                        <option value="" disabled selected>Seleccione una opción</option><option value="0">Nada</option>
+                        <option value="1">Algo</option><option value="2">Moderado</option><option value="3">Muchísimo</option>
+                    </select></div>
+
+                    <div class="form-group"><label>¿Cuánta esperanza siente usted?</label><select class="form-control" name="esperanza" required>
+                        <option value="" disabled selected>Seleccione una opción</option><option value="0">Nada</option>
+                        <option value="1">Algo</option><option value="2">Moderado</option><option value="3">Muchísimo</option>
+                    </select></div>
+
+                    <div class="form-group"><label>Clasifique su estado espiritual de manera general</label><select class="form-control" name="estado_espiritual" required>
+                        <option value="" disabled selected>Seleccione una opción</option><option value="0">Sumamente malo</option>
+                        <option value="1">Regular</option><option value="2">Bueno</option><option value="3">Excelente</option>
+                    </select></div>
+
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Botón de envío -->
+          <div class="text-right mt-4 mb-4 mr-4">
+            <button type="submit" class="btn btn-primary">Guardar Evaluación</button>
+          </div>
+          
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,140 @@
+{% extends 'layouts/base.html' %}
+
+{% block content %}
+<div class="header bg-primary pb-6">
+    <div class="container-fluid">
+        <div class="header-body">
+            <div class="row align-items-center py-4">
+                <div class="col-lg-6 col-5">
+                    <h6 class="h2 text-white d-inline-block mb-0">Información del Paciente</h6>
+                    <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
+                        <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
+                            <li class="breadcrumb-item"><a href="#"><i class="fas fa-home"></i></a></li>
+                            <li class="breadcrumb-item"><a href="/pacientes/">Pacientes</a></li>
+                            <li class="breadcrumb-item"><a href="/pacientes/">Volver</a></li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid mt--6">
+    <div class="row">
+        <div class="col">
+            <div class="card shadow">
+                <form method="post" action="{% url 'guardar_examen_Participante_Yesavage' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="visita_id" id="visita_id" value="{{ visita_examen }}" />
+                    <input type="hidden" name="paciente_id" id="paciente_id" value="{{ paciente_id }}" />
+                    <input type="hidden" name="examen_id" id="examen_id" value="{{ examen_id }}" />
+                    <input type="hidden" name="puntaje_total" id="puntaje_total" value="0" />
+
+                    <!-- Header -->
+                    <div class="card-header border-0">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <h3 class="mb-0">Escala de Depresión Geriátrica de Yesavage</h3>
+                            </div>
+                            <div class="col text-right">
+                                <span class="text-muted">Fecha: {% now "d/m/Y" %}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Body -->
+                    <div class="card-body">
+                        <div class="alert alert-info">
+                            <strong>Instrucciones:</strong> Responda a cada pregunta con "SÍ" o "NO" según se haya sentido en la última semana.
+                        </div>
+
+                        <div class="form-group"><label>1. ¿Está básicamente satisfecho con su vida?</label><select class="form-control yesavage-select" name="p1" required><option value="" selected disabled>Seleccione una opción</option><option value="si">SÍ</option><option value="no">NO</option></select></div>
+                        <div class="form-group"><label>2. ¿Ha disminuido o abandonado muchas de sus actividades o intereses?</label><select class="form-control yesavage-select" name="p2" required><option value="" selected disabled>Seleccione una opción</option><option value="si">SÍ</option><option value="no">NO</option></select></div>
+                        <div class="form-group"><label>3. ¿Siente que su vida está vacía?</label><select class="form-control yesavage-select" name="p3" required><option value="" selected disabled>Seleccione una opción</option><option value="si">SÍ</option><option value="no">NO</option></select></div>
+                        <div class="form-group"><label>4. ¿Se siente aburrido frecuentemente?</label><select class="form-control yesavage-select" name="p4" required><option value="" selected disabled>Seleccione una opción</option><option value="si">SÍ</option><option value="no">NO</option></select></div>
+                        <div class="form-group"><label>5. ¿La mayoría del tiempo está de buen ánimo?</label><select class="form-control yesavage-select" name="p5" required><option value="" selected disabled>Seleccione una opción</option><option value="si">SÍ</option><option value="no">NO</option></select></div>
+                        <div class="form-group"><label>6. ¿Está preocupado o teme que algo malo le pueda pasar?</label><select class="form-control yesavage-select" name="p6" required><option value="" selected disabled>Seleccione una opción</option><option value="si">SÍ</option><option value="no">NO</option></select></div>
+                        <div class="form-group"><label>7. ¿Se siente feliz gran parte de su tiempo?</label><select class="form-control yesavage-select" name="p7" required><option value="" selected disabled>Seleccione una opción</option><option value="si">SÍ</option><option value="no">NO</option></select></div>
+                        <div class="form-group"><label>8. ¿Se siente con frecuencia desamparado, que no vale nada o desvalido?</label><select class="form-control yesavage-select" name="p8" required><option value="" selected disabled>Seleccione una opción</option><option value="si">SÍ</option><option value="no">NO</option></select></div>
+                        <div class="form-group"><label>9. ¿Prefiere quedarse en casa en vez de salir y hacer cosas nuevas?</label><select class="form-control yesavage-select" name="p9" required><option value="" selected disabled>Seleccione una opción</option><option value="si">SÍ</option><option value="no">NO</option></select></div>
+                        <div class="form-group"><label>10. ¿Siente que tiene más problemas con su memoria que otras personas de su edad?</label><select class="form-control yesavage-select" name="p10" required><option value="" selected disabled>Seleccione una opción</option><option value="si">SÍ</option><option value="no">NO</option></select></div>
+                        <div class="form-group"><label>11. ¿Cree usted que es maravilloso estar vivo?</label><select class="form-control yesavage-select" name="p11" required><option value="" selected disabled>Seleccione una opción</option><option value="si">SÍ</option><option value="no">NO</option></select></div>
+                        <div class="form-group"><label>12. ¿Se siente inútil?</label><select class="form-control yesavage-select" name="p12" required><option value="" selected disabled>Seleccione una opción</option><option value="si">SÍ</option><option value="no">NO</option></select></div>
+                        <div class="form-group"><label>13. ¿Se siente lleno de energía?</label><select class="form-control yesavage-select" name="p13" required><option value="" selected disabled>Seleccione una opción</option><option value="si">SÍ</option><option value="no">NO</option></select></div>
+                        <div class="form-group"><label>14. ¿Se siente sin esperanza ante su condición actual?</label><select class="form-control yesavage-select" name="p14" required><option value="" selected disabled>Seleccione una opción</option><option value="si">SÍ</option><option value="no">NO</option></select></div>
+                        <div class="form-group"><label>15. ¿Cree que las otras personas están, en general, mejor que usted?</label><select class="form-control yesavage-select" name="p15" required><option value="" selected disabled>Seleccione una opción</option><option value="si">SÍ</option><option value="no">NO</option></select></div>
+
+                        <div class="alert alert-success mt-4" id="resultado-container" style="display: none;">
+                            <h4 class="alert-heading">Resultado del Test de Yesavage</h4>
+                            <p><strong>Puntaje total:</strong> <span id="puntaje-display">0</span>/15</p>
+                            <p><strong>Interpretación:</strong> <span id="interpretacion-display">-</span></p>
+                        </div>
+
+                        <div class="alert alert-warning mt-4">
+                            <strong>Interpretación de la escala:</strong><br>
+                            - <strong>0-5 puntos:</strong> Normal<br>
+                            - <strong>6-9 puntos:</strong> Depresión leve<br>
+                            - <strong>10-15 puntos:</strong> Depresión establecida
+                        </div>
+
+                        <div class="text-right mt-4">
+                            <button type="submit" class="btn btn-primary">Guardar Examen</button>
+                            <a href="{% url 'detalle_paciente' paciente_id %}" class="btn btn-secondary">Ver Paciente</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const preguntasDepresionSI = [2, 3, 4, 6, 8, 9, 10, 12, 14, 15];
+        const preguntasDepresionNO = [1, 5, 7, 11, 13];
+
+        const selects = document.querySelectorAll('.yesavage-select');
+        const resultadoContainer = document.getElementById('resultado-container');
+        const puntajeDisplay = document.getElementById('puntaje-display');
+        const interpretacionDisplay = document.getElementById('interpretacion-display');
+        const puntajeTotalInput = document.getElementById('puntaje_total');
+
+        selects.forEach(select => {
+            select.addEventListener('change', calcularPuntaje);
+        });
+
+        function calcularPuntaje() {
+            let total = 0;
+            selects.forEach((select, index) => {
+                const numPregunta = index + 1;
+                const valor = select.value.toLowerCase();
+
+                if (preguntasDepresionSI.includes(numPregunta) && valor === 'si') {
+                    total += 1;
+                }
+                if (preguntasDepresionNO.includes(numPregunta) && valor === 'no') {
+                    total += 1;
+                }
+            });
+
+            puntajeDisplay.textContent = total;
+            puntajeTotalInput.value = total;
+
+            let interpretacion = "";
+            if (total <= 5) {
+                interpretacion = "Normal";
+            } else if (total <= 9) {
+                interpretacion = "Depresión leve";
+            } else {
+                interpretacion = "Depresión establecida";
+            }
+
+            interpretacionDisplay.textContent = interpretacion;
+            resultadoContainer.style.display = 'block';
+        }
+
+        calcularPuntaje();
+    });
+</script>
+{% endblock %}

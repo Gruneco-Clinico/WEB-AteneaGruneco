@@ -1,0 +1,76 @@
+{% extends 'layouts/base.html' %}
+{% block content %}
+
+<div class="header bg-primary pb-6">
+  <div class="container-fluid">
+    <div class="header-body">
+      <div class="row align-items-center py-4">
+        <div class="col-lg-6 col-5">
+          <h6 class="h2 text-white d-inline-block mb-0">Autovaloración del Estado de Salud - EuroQol</h6>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid mt--6">
+  <div class="row">
+    <div class="col">
+      <div class="card shadow">
+        <form method="post" action="{% url 'guardar_examen_Participante_EVA_EuroQoL' %}">
+          {% csrf_token %}
+          <input type="hidden" name="visita_id" value="{{ visita_examen }}">
+          <input type="hidden" name="paciente_id" value="{{ paciente_id }}">
+          <input type="hidden" name="examen_id" value="{{ examen_id }}">
+
+          <div class="card-body">
+            <div class="alert alert-info">
+              <strong>Instrucciones:</strong> Esta escala le permite indicar qué tan bueno o malo considera su estado de salud el día de hoy. Mueva el control deslizante hacia el número que mejor represente su salud.
+            </div>
+
+            <!-- Termómetro EuroQol -->
+            <div class="form-group text-center">
+              <label for="termometro_estado_salud">
+                <strong>Termómetro EuroQol de Autovaloración del Estado de Salud</strong>
+              </label>
+              <p class="text-muted" style="font-size: 0.9rem;">
+                Este termómetro representa su salud general el día de HOY. El 100 es el mejor estado de salud imaginable y el 0 el peor.
+              </p>
+
+              <div class="d-flex flex-column align-items-center">
+                <span>100 (Mejor estado imaginable)</span>
+                <input
+                  type="range"
+                  class="form-control-range"
+                  id="termometro_estado_salud"
+                  name="termometro_estado_salud"
+                  min="0"
+                  max="100"
+                  value="50"
+                  style="writing-mode: bt-lr; -webkit-appearance: slider-vertical; height: 300px; width: 30px;"
+                >
+                <span>0 (Peor estado imaginable)</span>
+                <p class="mt-2">Valor actual: <strong id="valor_termometro">50</strong></p>
+              </div>
+            </div>
+
+            <div class="text-right">
+              <button type="submit" class="btn btn-primary">Guardar</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const slider = document.getElementById("termometro_estado_salud");
+  const valor = document.getElementById("valor_termometro");
+
+  slider.addEventListener("input", () => {
+    valor.textContent = slider.value;
+  });
+</script>
+
+{% endblock %}

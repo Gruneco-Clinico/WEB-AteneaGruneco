@@ -1,0 +1,42 @@
+<div class="form-group">
+  <label><strong>{{ numero }}. {{ label }}</strong></label>
+  <select class="form-control toggle-subitems" name="{{ nombre }}" data-target="grupo{{ numero }}" required>
+    <option value="" disabled selected>Seleccione una opción</option>
+    <option value="si">Sí</option>
+    <option value="no">No</option>
+    <option value="ns">No Sabe</option>
+  </select>
+</div>
+
+<div class="ml-4 mb-3 border-left pl-3 d-none" id="grupo{{ numero }}">
+  <div class="form-group">
+    <label>Frecuencia</label>
+    <select class="form-control" name="{{ nombre }}_frecuencia">
+      <option value="" disabled selected>Seleccione una opción</option>
+      <option value="1">1. Ocasionalmente</option>
+      <option value="2">2. A menudo</option>
+      <option value="3">3. Frecuentemente</option>
+      <option value="4">4. Muy frecuentemente</option>
+    </select>
+  </div>
+  <div class="form-group">
+    <label>Gravedad</label>
+    <select class="form-control" name="{{ nombre }}_gravedad">
+      <option value="" disabled selected>Seleccione una opción</option>
+      <option value="1">1. Leve</option>
+      <option value="2">2. Moderada</option>
+      <option value="3">3. Marcada</option>
+    </select>
+  </div>
+  <div class="form-group">
+    <label>Distrés</label>
+    <select class="form-control" name="{{ nombre }}_distres">
+      <option value="" disabled selected>Seleccione una opción</option>
+      <option value="1">1. Nada</option>
+      <option value="2">2. Leve</option>
+      <option value="3">3. Moderada</option>
+      <option value="4">4. Marcada</option>
+      <option value="5">5. Extrema</option>
+    </select>
+  </div>
+</div>

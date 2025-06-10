@@ -1,0 +1,536 @@
+{% extends 'layouts/base.html' %}
+
+{% block content %}
+<div class="header bg-primary pb-6">
+    <div class="container-fluid">
+        <div class="header-body">
+            <div class="row align-items-center py-4">
+                <div class="col-lg-6 col-5">
+                    <h6 class="h2 text-white d-inline-block mb-0">Información del Paciente</h6>
+                    <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
+                        <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
+                            <li class="breadcrumb-item"><a href="#"><i class="fas fa-home"></i></a></li>
+                            <li class="breadcrumb-item"><a href="/pacientes/">Pacientes</a></li>
+                            <li class="breadcrumb-item"><a href="/pacientes/">Volver</a></li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid mt--6">
+    <div class="row">
+        <div class="col">
+            <div class="card shadow">
+                <form method="post" action="{% url 'guardar_examen_Participante_AdherenciaTerapeutica' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="visita_id" id="visita_id" value="{{ visita_examen }}" />
+                    <input type="hidden" name="paciente_id" id="paciente_id" value="{{ paciente_id }}" />
+                    <input type="hidden" name="examen_id" id="examen_id" value="{{ examen_id }}" />
+                    <input type="hidden" name="factor1" id="factor1" value="0" />
+                    <input type="hidden" name="factor2" id="factor2" value="0" />
+                    <input type="hidden" name="factor3" id="factor3" value="0" />
+
+                    <!-- Header -->
+                    <div class="card-header border-0">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <h3 class="mb-0">Escala de Adherencia Terapéutica</h3>
+                            </div>
+                            <div class="col text-right">
+                                <span class="text-muted">Fecha: {% now "d/m/Y" %}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Body -->
+                    <div class="card-body">
+                        <div class="alert alert-info">
+                            <strong>Instrucciones:</strong> Responda cada ítem según su comportamiento con respecto al tratamiento en una escala de 0 (Nunca) a 5 (Siempre).
+                        </div>
+
+                        <!-- Preguntas -->
+                        <div class="form-group">
+                            <label>1. Respeto la dieta indicada, aunque ésta sea rigurosa.</label>
+                            <select class="form-control adherencia-select" name="p1" required>
+                                <option value="" selected disabled>Seleccione una opción</option>
+                                <option value="0">Nunca (0)</option>
+                                <option value="1">Casi nunca (1)</option>
+                                <option value="2">Pocas veces (2)</option>
+                                <option value="3">Frecuentemente (3)</option>
+                                <option value="4">Casi siempre (4)</option>
+                                <option value="5">Siempre (5)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>2. Asisto a mis consultas de manera puntual.</label>
+                            <select class="form-control adherencia-select" name="p2" required>
+                                <option value="" selected disabled>Seleccione una opción</option>
+                                <option value="0">Nunca (0)</option>
+                                <option value="1">Casi nunca (1)</option>
+                                <option value="2">Pocas veces (2)</option>
+                                <option value="3">Frecuentemente (3)</option>
+                                <option value="4">Casi siempre (4)</option>
+                                <option value="5">Siempre (5)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>3. Estoy al pendiente de cualquier síntoma que pueda afectar mi estado de salud.</label>
+                            <select class="form-control adherencia-select" name="p3" required>
+                                <option value="" selected disabled>Seleccione una opción</option>
+                                <option value="0">Nunca (0)</option>
+                                <option value="1">Casi nunca (1)</option>
+                                <option value="2">Pocas veces (2)</option>
+                                <option value="3">Frecuentemente (3)</option>
+                                <option value="4">Casi siempre (4)</option>
+                                <option value="5">Siempre (5)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>4. Atiendo todas las recomendaciones del médico, en cuanto a los cambios en mi estilo de vida (por ejemplo, dejar de fumar, no consumir alcohol, sal, azúcar, picante, etc.).</label>
+                            <select class="form-control adherencia-select" name="p4" required>
+                                <option value="" selected disabled>Seleccione una opción</option>
+                                <option value="0">Nunca (0)</option>
+                                <option value="1">Casi nunca (1)</option>
+                                <option value="2">Pocas veces (2)</option>
+                                <option value="3">Frecuentemente (3)</option>
+                                <option value="4">Casi siempre (4)</option>
+                                <option value="5">Siempre (5)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>5. Como sólo aquellos alimentos que el médico me permite.</label>
+                            <select class="form-control adherencia-select" name="p5" required>
+                                <option value="" selected disabled>Seleccione una opción</option>
+                                <option value="0">Nunca (0)</option>
+                                <option value="1">Casi nunca (1)</option>
+                                <option value="2">Pocas veces (2)</option>
+                                <option value="3">Frecuentemente (3)</option>
+                                <option value="4">Casi siempre (4)</option>
+                                <option value="5">Siempre (5)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>6. Si el médico me inspira confianza, entonces sigo el tratamiento.</label>
+                            <select class="form-control adherencia-select" name="p6" required>
+                                <option value="" selected disabled>Seleccione una opción</option>
+                                <option value="0">Nunca (0)</option>
+                                <option value="1">Casi nunca (1)</option>
+                                <option value="2">Pocas veces (2)</option>
+                                <option value="3">Frecuentemente (3)</option>
+                                <option value="4">Casi siempre (4)</option>
+                                <option value="5">Siempre (5)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>7. Después de haber terminado un tratamiento, regreso a consulta si el médico me indica que es necesario para verificar mi estado de salud.</label>
+                            <select class="form-control adherencia-select" name="p7" required>
+                                <option value="" selected disabled>Seleccione una opción</option>
+                                <option value="0">Nunca (0)</option>
+                                <option value="1">Casi nunca (1)</option>
+                                <option value="2">Pocas veces (2)</option>
+                                <option value="3">Frecuentemente (3)</option>
+                                <option value="4">Casi siempre (4)</option>
+                                <option value="5">Siempre (5)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>8. Cuando me dan los resultados de mis análisis clínicos, estoy más seguro (a) de lo que tengo y me apego más al tratamiento.</label>
+                            <select class="form-control adherencia-select" name="p8" required>
+                                <option value="" selected disabled>Seleccione una opción</option>
+                                <option value="0">Nunca (0)</option>
+                                <option value="1">Casi nunca (1)</option>
+                                <option value="2">Pocas veces (2)</option>
+                                <option value="3">Frecuentemente (3)</option>
+                                <option value="4">Casi siempre (4)</option>
+                                <option value="5">Siempre (5)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>9. Cuando tengo muchas cosas que hacer, se me olvida tomar mis medicamentos.</label>
+                            <select class="form-control adherencia-select" name="p9" required>
+                                <option value="" selected disabled>Seleccione una opción</option>
+                                <option value="0">Nunca (0)</option>
+                                <option value="1">Casi nunca (1)</option>
+                                <option value="2">Pocas veces (2)</option>
+                                <option value="3">Frecuentemente (3)</option>
+                                <option value="4">Casi siempre (4)</option>
+                                <option value="5">Siempre (5)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>10. Cuando los síntomas desaparecen dejo el tratamiento aunque éste no esté concluido.</label>
+                            <select class="form-control adherencia-select" name="p10" required>
+                                <option value="" selected disabled>Seleccione una opción</option>
+                                <option value="0">Nunca (0)</option>
+                                <option value="1">Casi nunca (1)</option>
+                                <option value="2">Pocas veces (2)</option>
+                                <option value="3">Frecuentemente (3)</option>
+                                <option value="4">Casi siempre (4)</option>
+                                <option value="5">Siempre (5)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>11. Si en poco tiempo no percibo mejoría en mi salud, dejo el tratamiento.</label>
+                            <select class="form-control adherencia-select" name="p11" required>
+                                <option value="" selected disabled>Seleccione una opción</option>
+                                <option value="0">Nunca (0)</option>
+                                <option value="1">Casi nunca (1)</option>
+                                <option value="2">Pocas veces (2)</option>
+                                <option value="3">Frecuentemente (3)</option>
+                                <option value="4">Casi siempre (4)</option>
+                                <option value="5">Siempre (5)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>12. Si el tratamiento exige hacer ejercicio, lo hago.</label>
+                            <select class="form-control adherencia-select" name="p12" required>
+                                <option value="" selected disabled>Seleccione una opción</option>
+                                <option value="0">Nunca (0)</option>
+                                <option value="1">Casi nunca (1)</option>
+                                <option value="2">Pocas veces (2)</option>
+                                <option value="3">Frecuentemente (3)</option>
+                                <option value="4">Casi siempre (4)</option>
+                                <option value="5">Siempre (5)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>13. Para que yo siga el tratamiento es necesario que otros me recuerden que debo tomar mis medicamentos.</label>
+                            <select class="form-control adherencia-select" name="p13" required>
+                                <option value="" selected disabled>Seleccione una opción</option>
+                                <option value="0">Nunca (0)</option>
+                                <option value="1">Casi nunca (1)</option>
+                                <option value="2">Pocas veces (2)</option>
+                                <option value="3">Frecuentemente (3)</option>
+                                <option value="4">Casi siempre (4)</option>
+                                <option value="5">Siempre (5)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>14. Como me lo recomienda el médico, acudo a realizarme análisis clínicos periódicamente, aunque no me sienta mal.</label>
+                            <select class="form-control adherencia-select" name="p14" required>
+                                <option value="" selected disabled>Seleccione una opción</option>
+                                <option value="0">Nunca (0)</option>
+                                <option value="1">Casi nunca (1)</option>
+                                <option value="2">Pocas veces (2)</option>
+                                <option value="3">Frecuentemente (3)</option>
+                                <option value="4">Casi siempre (4)</option>
+                                <option value="5">Siempre (5)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>15. Me inspira confianza que el médico demuestre conocer mi enfermedad.</label>
+                            <select class="form-control adherencia-select" name="p15" required>
+                                <option value="" selected disabled>Seleccione una opción</option>
+                                <option value="0">Nunca (0)</option>
+                                <option value="1">Casi nunca (1)</option>
+                                <option value="2">Pocas veces (2)</option>
+                                <option value="3">Frecuentemente (3)</option>
+                                <option value="4">Casi siempre (4)</option>
+                                <option value="5">Siempre (5)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>16. Si se sospecha que mi enfermedad es grave, hago todo lo que esté en mis manos para mejorar.</label>
+                            <select class="form-control adherencia-select" name="p16" required>
+                                <option value="" selected disabled>Seleccione una opción</option>
+                                <option value="0">Nunca (0)</option>
+                                <option value="1">Casi nunca (1)</option>
+                                <option value="2">Pocas veces (2)</option>
+                                <option value="3">Frecuentemente (3)</option>
+                                <option value="4">Casi siempre (4)</option>
+                                <option value="5">Siempre (5)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>17. Me apego al tratamiento, aunque éste sea complicado.</label>
+                            <select class="form-control adherencia-select" name="p17" required>
+                                <option value="" selected disabled>Seleccione una opción</option>
+                                <option value="0">Nunca (0)</option>
+                                <option value="1">Casi nunca (1)</option>
+                                <option value="2">Pocas veces (2)</option>
+                                <option value="3">Frecuentemente (3)</option>
+                                <option value="4">Casi siempre (4)</option>
+                                <option value="5">Siempre (5)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>18. Si el médico me explica detalladamente en qué consiste mi enfermedad y qué es lo que tengo que hacer para mejorar mi salud, entonces me adhiero al tratamiento.</label>
+                            <select class="form-control adherencia-select" name="p18" required>
+                                <option value="" selected disabled>Seleccione una opción</option>
+                                <option value="0">Nunca (0)</option>
+                                <option value="1">Casi nunca (1)</option>
+                                <option value="2">Pocas veces (2)</option>
+                                <option value="3">Frecuentemente (3)</option>
+                                <option value="4">Casi siempre (4)</option>
+                                <option value="5">Siempre (5)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>19. Si el medicamento es costoso, ingiero cantidades menores a las indicadas por el médico.</label>
+                            <select class="form-control adherencia-select" name="p19" required>
+                                <option value="" selected disabled>Seleccione una opción</option>
+                                <option value="0">Nunca (0)</option>
+                                <option value="1">Casi nunca (1)</option>
+                                <option value="2">Pocas veces (2)</option>
+                                <option value="3">Frecuentemente (3)</option>
+                                <option value="4">Casi siempre (4)</option>
+                                <option value="5">Siempre (5)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>20. Le tengo más confianza a los medicamentos de patente que a los remedios naturales u homeopáticos.</label>
+                            <select class="form-control adherencia-select" name="p20" required>
+                                <option value="" selected disabled>Seleccione una opción</option>
+                                <option value="0">Nunca (0)</option>
+                                <option value="1">Casi nunca (1)</option>
+                                <option value="2">Pocas veces (2)</option>
+                                <option value="3">Frecuentemente (3)</option>
+                                <option value="4">Casi siempre (4)</option>
+                                <option value="5">Siempre (5)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>21. Ingiero mis medicamentos respetando la dosis indicada por el médico.</label>
+                            <select class="form-control adherencia-select" name="p21" required>
+                                <option value="" selected disabled>Seleccione una opción</option>
+                                <option value="0">Nunca (0)</option>
+                                <option value="1">Casi nunca (1)</option>
+                                <option value="2">Pocas veces (2)</option>
+                                <option value="3">Frecuentemente (3)</option>
+                                <option value="4">Casi siempre (4)</option>
+                                <option value="5">Siempre (5)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>22. Asisto a revisiones periódicas, aunque no me sienta mal.</label>
+                            <select class="form-control adherencia-select" name="p22" required>
+                                <option value="" selected disabled>Seleccione una opción</option>
+                                <option value="0">Nunca (0)</option>
+                                <option value="1">Casi nunca (1)</option>
+                                <option value="2">Pocas veces (2)</option>
+                                <option value="3">Frecuentemente (3)</option>
+                                <option value="4">Casi siempre (4)</option>
+                                <option value="5">Siempre (5)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>23. Acudo al médico, únicamente cuando presento algún síntoma.</label>
+                            <select class="form-control adherencia-select" name="p23" required>
+                                <option value="" selected disabled>Seleccione una opción</option>
+                                <option value="0">Nunca (0)</option>
+                                <option value="1">Casi nunca (1)</option>
+                                <option value="2">Pocas veces (2)</option>
+                                <option value="3">Frecuentemente (3)</option>
+                                <option value="4">Casi siempre (4)</option>
+                                <option value="5">Siempre (5)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>24. Notar mejoría en mi estado de salud, favorece que me adhiera al tratamiento.</label>
+                            <select class="form-control adherencia-select" name="p24" required>
+                                <option value="" selected disabled>Seleccione una opción</option>
+                                <option value="0">Nunca (0)</option>
+                                <option value="1">Casi nunca (1)</option>
+                                <option value="2">Pocas veces (2)</option>
+                                <option value="3">Frecuentemente (3)</option>
+                                <option value="4">Casi siempre (4)</option>
+                                <option value="5">Siempre (5)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>25. Cuando presento síntomas de deterioro, me adhiero más al tratamiento.</label>
+                            <select class="form-control adherencia-select" name="p25" required>
+                                <option value="" selected disabled>Seleccione una opción</option>
+                                <option value="0">Nunca (0)</option>
+                                <option value="1">Casi nunca (1)</option>
+                                <option value="2">Pocas veces (2)</option>
+                                <option value="3">Frecuentemente (3)</option>
+                                <option value="4">Casi siempre (4)</option>
+                                <option value="5">Siempre (5)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>26. Realizo las mediciones indicadas en casa, por ejemplo, tomas de presión arterial, el nivel de glucosa, etc.</label>
+                            <select class="form-control adherencia-select" name="p26" required>
+                                <option value="" selected disabled>Seleccione una opción</option>
+                                <option value="0">Nunca (0)</option>
+                                <option value="1">Casi nunca (1)</option>
+                                <option value="2">Pocas veces (2)</option>
+                                <option value="3">Frecuentemente (3)</option>
+                                <option value="4">Casi siempre (4)</option>
+                                <option value="5">Siempre (5)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>27. Respeto la dieta indicada por el médico, sin importar el lugar donde me encuentre.</label>
+                            <select class="form-control adherencia-select" name="p27" required>
+                                <option value="" selected disabled>Seleccione una opción</option>
+                                <option value="0">Nunca (0)</option>
+                                <option value="1">Casi nunca (1)</option>
+                                <option value="2">Pocas veces (2)</option>
+                                <option value="3">Frecuentemente (3)</option>
+                                <option value="4">Casi siempre (4)</option>
+                                <option value="5">Siempre (5)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>28. Realizo algún tipo de modificación al tratamiento, sin consultarlo con el médico.</label>
+                            <select class="form-control adherencia-select" name="p28" required>
+                                <option value="" selected disabled>Seleccione una opción</option>
+                                <option value="0">Nunca (0)</option>
+                                <option value="1">Casi nunca (1)</option>
+                                <option value="2">Pocas veces (2)</option>
+                                <option value="3">Frecuentemente (3)</option>
+                                <option value="4">Casi siempre (4)</option>
+                                <option value="5">Siempre (5)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>29. Hago todo lo que está en mis manos para mantenerme controlado (a).</label>
+                            <select class="form-control adherencia-select" name="p29" required>
+                                <option value="" selected disabled>Seleccione una opción</option>
+                                <option value="0">Nunca (0)</option>
+                                <option value="1">Casi nunca (1)</option>
+                                <option value="2">Pocas veces (2)</option>
+                                <option value="3">Frecuentemente (3)</option>
+                                <option value="4">Casi siempre (4)</option>
+                                <option value="5">Siempre (5)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>30. Estoy más seguro (a) de lo que tengo cuando me informan los resultados arrojados en los análisis clínicos.</label>
+                            <select class="form-control adherencia-select" name="p30" required>
+                                <option value="" selected disabled>Seleccione una opción</option>
+                                <option value="0">Nunca (0)</option>
+                                <option value="1">Casi nunca (1)</option>
+                                <option value="2">Pocas veces (2)</option>
+                                <option value="3">Frecuentemente (3)</option>
+                                <option value="4">Casi siempre (4)</option>
+                                <option value="5">Siempre (5)</option>
+                            </select>
+                        </div>
+
+
+                        <!-- Resultado -->
+                        <div class="alert alert-success mt-4" id="resultado-container" style="display: none;">
+                            <h4 class="alert-heading">Resultado del Cuestionario</h4>
+                            <p><strong>Factor 1 (Atención médica):</strong> <span id="f1-display">0</span>/80 — <span id="f1-interpretacion">-</span></p>
+                            <p><strong>Factor 2 (Estilo de vida):</strong> <span id="f2-display">0</span>/30 — <span id="f2-interpretacion">-</span></p>
+                            <p><strong>Factor 3 (Barreras ante la medicación):</strong> <span id="f3-display">0</span>/40 — <span id="f3-interpretacion">-</span></p>
+                        </div>
+
+                        <div class="alert alert-warning mt-4">
+                            <strong>Interpretación de cada factor:</strong><br>
+                            <u>Factor 1 (Atención médica)</u>:<br>
+                            - 0–27: Adherencia baja<br>
+                            - 28–54: Adherencia regular o moderada<br>
+                            - 55–80: Adherencia alta<br><br>
+                            <u>Factor 2 (Estilo de vida)</u>:<br>
+                            - 0–10: Adherencia baja<br>
+                            - 11–20: Adherencia regular o moderada<br>
+                            - 21–30: Adherencia alta<br><br>
+                            <u>Factor 3 (Barreras ante la medicación)</u>:<br>
+                            - 0–13: Adherencia baja<br>
+                            - 14–27: Adherencia regular o moderada<br>
+                            - 28–40: Adherencia alta<br>
+                        </div>
+
+                        <div class="text-right mt-4">
+                            <button type="submit" class="btn btn-primary">Guardar Examen</button>
+                            <a href="{% url 'detalle_paciente' paciente_id %}" class="btn btn-secondary">Ver Paciente</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const factor1Items = [2, 3, 6, 7, 8, 14, 15, 16, 17, 18, 21, 22, 24, 25, 29, 30];
+        const factor2Items = [1, 4, 5, 12, 26, 27];
+        const factor3Items = [9, 10, 11, 13, 19, 20, 23, 28];
+
+        const selects = document.querySelectorAll('.adherencia-select');
+        const f1Display = document.getElementById('f1-display');
+        const f2Display = document.getElementById('f2-display');
+        const f3Display = document.getElementById('f3-display');
+        const f1Input = document.getElementById('factor1');
+        const f2Input = document.getElementById('factor2');
+        const f3Input = document.getElementById('factor3');
+
+        const f1Interpretacion = document.getElementById('f1-interpretacion');
+        const f2Interpretacion = document.getElementById('f2-interpretacion');
+        const f3Interpretacion = document.getElementById('f3-interpretacion');
+        const resultadoContainer = document.getElementById('resultado-container');
+
+        selects.forEach(select => {
+            select.addEventListener('change', calcularFactores);
+        });
+
+        function calcularFactores() {
+            let f1 = 0, f2 = 0, f3 = 0;
+
+            selects.forEach((select, i) => {
+                const num = i + 1;
+                let valor = parseInt(select.value);
+                if (isNaN(valor)) valor = 0;
+
+                if (factor3Items.includes(num)) {
+                    valor = 5 - valor; // recodificar ítems negativos
+                }
+
+                if (factor1Items.includes(num)) f1 += valor;
+                if (factor2Items.includes(num)) f2 += valor;
+                if (factor3Items.includes(num)) f3 += valor;
+            });
+
+            f1Display.textContent = f1;
+            f2Display.textContent = f2;
+            f3Display.textContent = f3;
+            f1Input.value = f1;
+            f2Input.value = f2;
+            f3Input.value = f3;
+
+            f1Interpretacion.textContent = f1 <= 27 ? "Adherencia baja" : f1 <= 54 ? "Adherencia regular o moderada" : "Adherencia alta";
+            f2Interpretacion.textContent = f2 <= 10 ? "Adherencia baja" : f2 <= 20 ? "Adherencia regular o moderada" : "Adherencia alta";
+            f3Interpretacion.textContent = f3 <= 13 ? "Adherencia baja" : f3 <= 27 ? "Adherencia regular o moderada" : "Adherencia alta";
+
+            resultadoContainer.style.display = 'block';
+        }
+    });
+</script>
+{% endblock %}

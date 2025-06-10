@@ -1,0 +1,389 @@
+{% extends 'layouts/base.html' %}
+
+{% block content %}
+<div class="header bg-primary pb-6">
+    <div class="container-fluid">
+        <div class="header-body">
+            <div class="row align-items-center py-4">
+                <div class="col-lg-6 col-5">
+                    <h6 class="h2 text-white d-inline-block mb-0">Información del Paciente</h6>
+                    <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
+                        <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
+                            <li class="breadcrumb-item"><a href="#"><i class="fas fa-home"></i></a></li>
+                            <li class="breadcrumb-item"><a href="/pacientes/">Pacientes</a></li>
+                            <li class="breadcrumb-item"><a href="/pacientes/">Volver</a></li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid mt--6">
+    <div class="row">
+        <div class="col">
+            <div class="card shadow">
+                <form method="post" action="{% url 'guardar_examen_Participante_AQD' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="visita_id" id="visita_id" value="{{ visita_examen }}" />
+                    <input type="hidden" name="paciente_id" id="paciente_id" value="{{ paciente_id }}" />
+                    <input type="hidden" name="examen_id" id="examen_id" value="{{ examen_id }}" />
+                    <input type="hidden" name="puntaje_total" id="puntaje_total" value="0" />
+
+                    <!-- Header -->
+                    <div class="card-header border-0">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <h3 class="mb-0">Escala AQ-D Formato A</h3>
+                            </div>
+                            <div class="col text-right">
+                                <span class="text-muted">Fecha: {% now "d/m/Y" %}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Body -->
+                    <div class="card-body">
+                        <div class="alert alert-info">
+                            <strong>Instrucciones:</strong> Responda cada ítem considerando su conducta durante el último mes en una escala de 1 (Nunca) a 4 (Siempre).
+                        </div>
+
+                        <!-- Preguntas -->
+                        <div class="form-group">
+                            <label>1. ¿Tiene usted dificultades para recordar la fecha?</label>
+                            <select class="form-control adherencia-select" name="p1" required>
+                                <option value="" selected disabled>Seleccione una opción</option>
+                                <option value="1">Nunca (1)</option>
+                                <option value="2">A veces (2)</option>
+                                <option value="3">Casi siempre (3)</option>
+                                <option value="4">Siempre (4)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                          <label>2.	¿Tiene usted dificultades para orientarse en lugares nuevos?</label>
+                          <select class="form-control adherencia-select" name="p2" required>
+                              <option value="" selected disabled>Seleccione una opción</option>
+                              <option value="1">Nunca (1)</option>
+                              <option value="2">A veces (2)</option>
+                              <option value="3">Casi siempre (3)</option>
+                              <option value="4">Siempre (4)</option>
+                          </select>
+                        </div>
+
+                        <div class="form-group">
+                          <label>3.	¿Tiene usted dificultades para recordar llamadas telefónicas?</label>
+                          <select class="form-control adherencia-select" name="p3" required>
+                              <option value="" selected disabled>Seleccione una opción</option>
+                              <option value="1">Nunca (1)</option>
+                              <option value="2">A veces (2)</option>
+                              <option value="3">Casi siempre (3)</option>
+                              <option value="4">Siempre (4)</option>
+                          </select>
+                        </div>
+
+                        <div class="form-group">
+                          <label>4.	¿Tiene usted dificultades para entender conversaciones? </label>
+                          <select class="form-control adherencia-select" name="p4" required>
+                              <option value="" selected disabled>Seleccione una opción</option>
+                              <option value="1">Nunca (1)</option>
+                              <option value="2">A veces (2)</option>
+                              <option value="3">Casi siempre (3)</option>
+                              <option value="4">Siempre (4)</option>
+                          </select>
+                        </div>
+
+                        <div class="form-group">
+                          <label>5.	¿Tiene usted dificultades para firmar?</label>
+                          <select class="form-control adherencia-select" name="p5" required>
+                              <option value="" selected disabled>Seleccione una opción</option>
+                              <option value="1">Nunca (1)</option>
+                              <option value="2">A veces (2)</option>
+                              <option value="3">Casi siempre (3)</option>
+                              <option value="4">Siempre (4)</option>
+                          </select>
+                        </div>
+
+                        <div class="form-group">
+                          <label>6.	¿Tiene usted dificultades para entender lo que lee?</label>
+                          <select class="form-control adherencia-select" name="p6" required>
+                              <option value="" selected disabled>Seleccione una opción</option>
+                              <option value="1">Nunca (1)</option>
+                              <option value="2">A veces (2)</option>
+                              <option value="3">Casi siempre (3)</option>
+                              <option value="4">Siempre (4)</option>
+                          </select>
+                        </div>
+
+                        <div class="form-group">
+                          <label>7.	¿Tiene usted dificultades para mantener en orden sus cosas?</label>
+                          <select class="form-control adherencia-select" name="p7" required>
+                              <option value="" selected disabled>Seleccione una opción</option>
+                              <option value="1">Nunca (1)</option>
+                              <option value="2">A veces (2)</option>
+                              <option value="3">Casi siempre (3)</option>
+                              <option value="4">Siempre (4)</option>
+                          </select>
+                        </div>
+
+                        <div class="form-group">
+                          <label>8.	¿Tiene usted dificultades para recordar dónde deja los objetos en su casa?</label>
+                          <select class="form-control adherencia-select" name="p8" required>
+                              <option value="" selected disabled>Seleccione una opción</option>
+                              <option value="1">Nunca (1)</option>
+                              <option value="2">A veces (2)</option>
+                              <option value="3">Casi siempre (3)</option>
+                              <option value="4">Siempre (4)</option>
+                          </select>
+                        </div>
+
+                        <div class="form-group">
+                          <label>9.	¿Tiene usted dificultades para escribir?</label>
+                          <select class="form-control adherencia-select" name="p9" required>
+                              <option value="" selected disabled>Seleccione una opción</option>
+                              <option value="1">Nunca (1)</option>
+                              <option value="2">A veces (2)</option>
+                              <option value="3">Casi siempre (3)</option>
+                              <option value="4">Siempre (4)</option>
+                          </select>
+                        </div>
+
+                        <div class="form-group">
+                          <label>10.	¿Tiene usted dificultades para manejar dinero?</label>
+                          <select class="form-control adherencia-select" name="p10" required>
+                              <option value="" selected disabled>Seleccione una opción</option>
+                              <option value="1">Nunca (1)</option>
+                              <option value="2">A veces (2)</option>
+                              <option value="3">Casi siempre (3)</option>
+                              <option value="4">Siempre (4)</option>
+                          </select>
+                        </div>
+
+                        <div class="form-group">
+                          <label>11.	¿Tiene usted dificultades para orientarse en la zona donde vive?</label>
+                          <select class="form-control adherencia-select" name="p11" required>
+                              <option value="" selected disabled>Seleccione una opción</option>
+                              <option value="1">Nunca (1)</option>
+                              <option value="2">A veces (2)</option>
+                              <option value="3">Casi siempre (3)</option>
+                              <option value="4">Siempre (4)</option>
+                          </select>
+                        </div>
+
+                        <div class="form-group">
+                          <label>12.	¿Tiene usted dificultades para recordar citas (ejemplo: cuándo ir al médico)?</label>
+                          <select class="form-control adherencia-select" name="p12" required>
+                              <option value="" selected disabled>Seleccione una opción</option>
+                              <option value="1">Nunca (1)</option>
+                              <option value="2">A veces (2)</option>
+                              <option value="3">Casi siempre (3)</option>
+                              <option value="4">Siempre (4)</option>
+                          </select>
+                        </div>
+
+                        <div class="form-group">
+                          <label>13.	¿Tiene usted dificultades para practicar sus pasatiempos?</label>
+                          <select class="form-control adherencia-select" name="p13" required>
+                              <option value="" selected disabled>Seleccione una opción</option>
+                              <option value="1">Nunca (1)</option>
+                              <option value="2">A veces (2)</option>
+                              <option value="3">Casi siempre (3)</option>
+                              <option value="4">Siempre (4)</option>
+                          </select>
+                        </div>
+
+                        <div class="form-group">
+                          <label>14.	¿Tiene usted dificultades para comunicarse con las personas?</label>
+                          <select class="form-control adherencia-select" name="p14" required>
+                              <option value="" selected disabled>Seleccione una opción</option>
+                              <option value="1">Nunca (1)</option>
+                              <option value="2">A veces (2)</option>
+                              <option value="3">Casi siempre (3)</option>
+                              <option value="4">Siempre (4)</option>
+                          </select>
+                        </div>
+
+                        <div class="form-group">
+                          <label>15.	¿Tiene usted dificultades para hacer cálculos mentales? (por ejemplo: sumar, restar, multiplicar, dividir).</label>
+                          <select class="form-control adherencia-select" name="p15" required>
+                              <option value="" selected disabled>Seleccione una opción</option>
+                              <option value="1">Nunca (1)</option>
+                              <option value="2">A veces (2)</option>
+                              <option value="3">Casi siempre (3)</option>
+                              <option value="4">Siempre (4)</option>
+                          </select>
+                        </div>
+
+                        <div class="form-group">
+                          <label>16.	¿Tiene usted dificultades para recordar las cosas que va a comprar?</label>
+                          <select class="form-control adherencia-select" name="p16" required>
+                              <option value="" selected disabled>Seleccione una opción</option>
+                              <option value="1">Nunca (1)</option>
+                              <option value="2">A veces (2)</option>
+                              <option value="3">Casi siempre (3)</option>
+                              <option value="4">Siempre (4)</option>
+                          </select>
+                        </div>
+
+                        <div class="form-group">
+                          <label>17.	¿Tiene usted dificultades para contener la orina?</label>
+                          <select class="form-control adherencia-select" name="p17" required>
+                              <option value="" selected disabled>Seleccione una opción</option>
+                              <option value="1">Nunca (1)</option>
+                              <option value="2">A veces (2)</option>
+                              <option value="3">Casi siempre (3)</option>
+                              <option value="4">Siempre (4)</option>
+                          </select>
+                        </div>
+
+                        <div class="form-group">
+                          <label>18.	¿Tiene usted dificultades para entender una película?</label>
+                          <select class="form-control adherencia-select" name="p18" required>
+                              <option value="" selected disabled>Seleccione una opción</option>
+                              <option value="1">Nunca (1)</option>
+                              <option value="2">A veces (2)</option>
+                              <option value="3">Casi siempre (3)</option>
+                              <option value="4">Siempre (4)</option>
+                          </select>
+                        </div>
+
+                        <div class="form-group">
+                          <label>19.	¿Tiene usted dificultades para orientarse dentro de su casa?</label>
+                          <select class="form-control adherencia-select" name="p19" required>
+                              <option value="" selected disabled>Seleccione una opción</option>
+                              <option value="1">Nunca (1)</option>
+                              <option value="2">A veces (2)</option>
+                              <option value="3">Casi siempre (3)</option>
+                              <option value="4">Siempre (4)</option>
+                          </select>
+                        </div>
+
+                        <div class="form-group">
+                          <label>20.	¿Tiene usted dificultades para realizar tareas del hogar como cocinar, limpiar, etc.?</label>
+                          <select class="form-control adherencia-select" name="p20" required>
+                              <option value="" selected disabled>Seleccione una opción</option>
+                              <option value="1">Nunca (1)</option>
+                              <option value="2">A veces (2)</option>
+                              <option value="3">Casi siempre (3)</option>
+                              <option value="4">Siempre (4)</option>
+                          </select>
+                        </div>
+
+                        <div class="form-group">
+                          <label>21.	¿Tiene usted dificultades para comer solo?</label>
+                          <select class="form-control adherencia-select" name="p21" required>
+                              <option value="" selected disabled>Seleccione una opción</option>
+                              <option value="1">Nunca (1)</option>
+                              <option value="2">A veces (2)</option>
+                              <option value="3">Casi siempre (3)</option>
+                              <option value="4">Siempre (4)</option>
+                          </select>
+                        </div>
+
+                        <div class="form-group">
+                          <label>22.	¿Tiene usted dificultades para realizar trámites? (por ejemplo: ir al banco, a la EPS, etc.).</label>
+                          <select class="form-control adherencia-select" name="p22" required>
+                              <option value="" selected disabled>Seleccione una opción</option>
+                              <option value="1">Nunca (1)</option>
+                              <option value="2">A veces (2)</option>
+                              <option value="3">Casi siempre (3)</option>
+                              <option value="4">Siempre (4)</option>
+                          </select>
+                        </div>
+
+                        <div class="form-group">
+                          <label>23. ¿Se siente usted menos flexible para tomar decisiones y sin poder adaptarse a cosas nuevas?</label>
+                          <select class="form-control adherencia-select" name="p23" required>
+                              <option value="" selected disabled>Seleccione una opción</option>
+                              <option value="1">Nunca (1)</option>
+                              <option value="2">A veces (2)</option>
+                              <option value="3">Casi siempre (3)</option>
+                              <option value="4">Siempre (4)</option>
+                          </select>
+                        </div>
+
+                        <div class="form-group">
+                          <label>24.	¿Ha notado que usted está más egoísta y no presta atención a las necesidades de los demás?</label>
+                          <select class="form-control adherencia-select" name="p24" required>
+                              <option value="" selected disabled>Seleccione una opción</option>
+                              <option value="1">Nunca (1)</option>
+                              <option value="2">A veces (2)</option>
+                              <option value="3">Casi siempre (3)</option>
+                              <option value="4">Siempre (4)</option>
+                          </select>
+                        </div>
+
+                        <div class="form-group">
+                          <label>25.	¿Ha notado que usted se enoja por pequeñeces y pierde la paciencia con más facilidad?</label>
+                          <select class="form-control adherencia-select" name="p25" required>
+                              <option value="" selected disabled>Seleccione una opción</option>
+                              <option value="1">Nunca (1)</option>
+                              <option value="2">A veces (2)</option>
+                              <option value="3">Casi siempre (3)</option>
+                              <option value="4">Siempre (4)</option>
+                          </select>
+                        </div>
+
+                        <div class="form-group">
+                          <label>26.	¿Ha notado usted que llora con excesiva facilidad?</label>
+                          <select class="form-control adherencia-select" name="p26" required>
+                              <option value="" selected disabled>Seleccione una opción</option>
+                              <option value="1">Nunca (1)</option>
+                              <option value="2">A veces (2)</option>
+                              <option value="3">Casi siempre (3)</option>
+                              <option value="4">Siempre (4)</option>
+                          </select>
+                        </div>
+
+                        <div class="form-group">
+                          <label>27.	¿Ha notado usted que se ríe en situaciones inapropiadas?</label>
+                          <select class="form-control adherencia-select" name="p27" required>
+                              <option value="" selected disabled>Seleccione una opción</option>
+                              <option value="1">Nunca (1)</option>
+                              <option value="2">A veces (2)</option>
+                              <option value="3">Casi siempre (3)</option>
+                              <option value="4">Siempre (4)</option>
+                          </select>
+                        </div>
+
+                        <div class="form-group">
+                          <label>28.	¿Ha notado que usted está más interesado en temas sexuales, y habla permanentemente de esos temas?</label>
+                          <select class="form-control adherencia-select" name="p28" required>
+                              <option value="" selected disabled>Seleccione una opción</option>
+                              <option value="1">Nunca (1)</option>
+                              <option value="2">A veces (2)</option>
+                              <option value="3">Casi siempre (3)</option>
+                              <option value="4">Siempre (4)</option>
+                          </select>
+                        </div>
+
+                        <div class="form-group">
+                          <label>29.	¿Ha notado usted falta de interés en cosas que antes le interesaban?</label>
+                          <select class="form-control adherencia-select" name="p29" required>
+                              <option value="" selected disabled>Seleccione una opción</option>
+                              <option value="1">Nunca (1)</option>
+                              <option value="2">A veces (2)</option>
+                              <option value="3">Casi siempre (3)</option>
+                              <option value="4">Siempre (4)</option>
+                          </select>
+                        </div>
+
+                        <div class="form-group">
+                          <label>30.	¿Se ha sentido más deprimido?</label>
+                          <select class="form-control adherencia-select" name="p30" required>
+                              <option value="" selected disabled>Seleccione una opción</option>
+                              <option value="1">Nunca (1)</option>
+                              <option value="2">A veces (2)</option>
+                              <option value="3">Casi siempre (3)</option>
+                              <option value="4">Siempre (4)</option>
+                          </select>
+                        </div>
+
+                        <div class="text-right mt-4">
+                          <button type="submit" class="btn btn-primary">Guardar Examen</button>
+                          <a href="{% url 'detalle_paciente' paciente_id %}" class="btn btn-secondary">Ver Paciente</a>
+                        </div>
+
+{% endblock %}
+                        <!-- Resultado -->

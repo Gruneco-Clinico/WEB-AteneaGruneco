@@ -75,4 +75,17 @@ urlpatterns = [
 
     # Estadísticas
     path('estadisticas/', views.estadisticas, name='estadisticas'),
+
+    #Formularios proyecto Anosognosia
+    path('guardar_examen_Participante_Yesavage', views.guardar_examen_Participante_Yesavage, name='guardar_examen_Participante_Yesavage'),
+    path('guardar_examen_Participante_MoCA', views.guardar_examen_Participante_MoCA, name='guardar_examen_Participante_MoCA'),
+    path('guardar_examen_Participante_EVA_EuroQoL', views.guardar_examen_Participante_EVA_EuroQoL, name='guardar_examen_Participante_EVA_EuroQoL'),
+    path('guardar_examen_Participante_EuroQoL', views.guardar_examen_Participante_EuroQoL, name='guardar_examen_Participante_EuroQoL'),
+    path('guardar_examen_Participante_AQD', views.guardar_examen_Participante_AQD, name='guardar_examen_Participante_AQD'),
+    path('guardar_examen_Participante_AdherenciaTerapeutica', views.guardar_examen_Participante_AdherenciaTerapeutica, name='guardar_examen_Participante_AdherenciaTerapeutica'),
+    path('guardar_examen_Cuidador_NPI', views.guardar_examen_Cuidador_NPI, name='guardar_examen_Cuidador_NPI'),
+    path('guardar_examen_Cuidador_LawtonBrody', views.guardar_examen_Cuidador_LawtonBrody, name='guardar_examen_Cuidador_LawtonBrody'),
+    path('guardar_examen_Participante_Cuidador_Zarit', views.guardar_examen_Participante_Cuidador_Zarit, name='guardar_examen_Participante_Cuidador_Zarit'),
+    path('guardar_examen_Cuidador_BettyFerrel', views.guardar_examen_Cuidador_BettyFerrel, name='guardar_examen_Cuidador_BettyFerrel'),
+    path('guardar_examen_Cuidador_AQD', views.guardar_examen_Cuidador_AQD, name='guardar_examen_Cuidador_AQD'),
 ]

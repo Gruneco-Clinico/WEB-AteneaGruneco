@@ -1,0 +1,72 @@
+{% extends 'layouts/base.html' %}
+{% block content %}
+
+<div class="header bg-primary pb-6">
+  <div class="container-fluid">
+    <div class="header-body">
+      <div class="row align-items-center py-4">
+        <div class="col-lg-6 col-5">
+          <h6 class="h2 text-white d-inline-block mb-0">Inventario Neuropsiquiátrico (NPI)</h6>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid mt--6">
+  <div class="row">
+    <div class="col">
+      <div class="card shadow">
+        <form method="post" action="{% url 'guardar_examen_Cuidador_NPI' %}">
+          {% csrf_token %}
+          <input type="hidden" name="visita_id" value="{{ visita_examen }}">
+          <input type="hidden" name="paciente_id" value="{{ paciente_id }}">
+          <input type="hidden" name="examen_id" value="{{ examen_id }}">
+
+          <div class="card-body">
+            <div class="alert alert-info">
+              <strong>Instrucciones:</strong> Seleccione "Sí", "No" o "No Sabe" para cada ítem. Si selecciona "Sí", aparecerán los campos de Frecuencia, Gravedad y Distrés.
+            </div>
+
+            {% comment %} Reemplaza este bloque por cada ítem {% endcomment %}
+            {% include "includes/npi_item.html" with numero=1 nombre="ideas_delirantes" label="Ideas delirantes" %}
+            {% include "includes/npi_item.html" with numero=2 nombre="alucinaciones" label="Alucinaciones" %}
+            {% include "includes/npi_item.html" with numero=3 nombre="agitacion" label="Agitación/Agresión" %}
+            {% include "includes/npi_item.html" with numero=4 nombre="depresion" label="Depresión/Disforia" %}
+            {% include "includes/npi_item.html" with numero=5 nombre="ansiedad" label="Ansiedad" %}
+            {% include "includes/npi_item.html" with numero=6 nombre="euforia" label="Euforia/Alegría" %}
+            {% include "includes/npi_item.html" with numero=7 nombre="apatia" label="Apatía/Indiferencia" %}
+            {% include "includes/npi_item.html" with numero=8 nombre="desinhibicion" label="Desinhibición" %}
+            {% include "includes/npi_item.html" with numero=9 nombre="irritabilidad" label="Irritabilidad/Labilidad" %}
+            {% include "includes/npi_item.html" with numero=10 nombre="conducta_motor" label="Conducta Motora Aberrante" %}
+            {% include "includes/npi_item.html" with numero=11 nombre="sueno" label="Sueño" %}
+            {% include "includes/npi_item.html" with numero=12 nombre="apetito" label="Apetito/Alimentación" %}
+
+            <div class="text-right mt-4">
+              <button type="submit" class="btn btn-primary">Guardar NPI</button>
+              <a href="{% url 'detalle_paciente' paciente_id %}" class="btn btn-secondary">Ver Paciente</a>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const toggles = document.querySelectorAll('.toggle-subitems');
+    toggles.forEach(select => {
+      const targetId = select.dataset.target;
+      const container = document.getElementById(targetId);
+      if (select.value === 'si') container.classList.remove('d-none');
+
+      select.addEventListener('change', function () {
+        const cont = document.getElementById(this.dataset.target);
+        cont.classList.toggle('d-none', this.value !== 'si');
+      });
+    });
+  });
+</script>
+
+{% endblock %}

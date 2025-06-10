@@ -1,3 +1,4 @@
+
 -- --------------------------------------------------------
 -- Host:                         127.0.0.1
 -- Server version:               11.6.2-MariaDB - mariadb.org binary distribution
