@@ -1,0 +1,747 @@
+{% extends 'layouts/base.html' %}
+{% block content %}
+
+<div class="header bg-primary pb-6">
+  <div class="container-fluid">
+    <div class="header-body">
+      <div class="row align-items-center py-4">
+        <div class="col-lg-6 col-5">
+          <h6 class="h2 text-white d-inline-block mb-0">RedLat Spanish - Evaluación Funcional</h6>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid mt--6">
+  <div class="row">
+    <div class="col">
+      <div class="card shadow">
+        <form method="post" action="{% url 'guardar_examen_Cuidador_RedLatSpanish' %}">
+          {% csrf_token %}
+          <input type="hidden" name="visita_id" value="{{ visita_examen }}">
+          <input type="hidden" name="paciente_id" value="{{ paciente_id }}">
+          <input type="hidden" name="examen_id" value="{{ examen_id }}">
+
+          <div class="alert alert-info">
+            <strong>Instrucciones:</strong> Marque la alternativa que mejor describa la situación actual de él(la) paciente con respecto a las actividades que se mencionan a continuación.
+          </div>
+
+          <!-- Tabs de navegación -->
+          <ul class="nav nav-pills nav-fill mb-4" role="tablist">
+            <li class="nav-item"><a class="nav-link active" data-toggle="tab" href="#autocuidado">Autocuidado</a></li>
+            <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#hogar">Cuidado del hogar</a></li>
+            <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#trabajo">Trabajo y Recreación</a></li>
+            <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#compras">Compras y dinero</a></li>
+            <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#viajes">Viajes</a></li>
+            <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#comunicacion">Comunicación</a></li>
+            <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#tecnologia">Tecnología</a></li>
+          </ul>
+
+          <div class="tab-content">
+
+            <!-- Sección 1: Autocuidado -->
+            <div class="tab-pane fade show active" id="autocuidado">
+              <div class="card bg-gradient-default shadow-sm mb-4">
+                <div class="card-header bg-transparent">
+                  <h4 class="text-white mb-0">Autocuidado</h4>
+                </div>
+                <div class="card-body bg-white">
+
+                  <!-- Ejemplo de ítem -->
+                  <div class="form-group">
+                    <label>A) Comer</label>
+                    <select class="form-control autocuidado" name="comer" required>
+                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="3" data-text="No tiene problemas">No tiene problemas</option>
+                      <option value="2" data-text="Es independiente, pero come despacio o derrama un poco">Es independiente, pero come despacio o derrama un poco</option>
+                      <option value="1" data-text="Necesita ayuda para cortar o servir líquidos; derrama mucho">Necesita ayuda para cortar o servir líquidos; derrama mucho</option>
+                      <option value="0" data-text="Se le debe dar de comer la mayoría de los alimentos">Se le debe dar de comer la mayoría de los alimentos</option>
+                      <option value="-1" data-text = "No sé">No sé</option>
+                    </select>
+                    <input type="hidden" name="comer_texto">
+                  </div>
+                  
+                  <div class="form-group">
+                    <label>B) Vestirse</label>
+                    <select class="form-control autocuidado" name="vestirse" required>
+                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="3" data-text="No tiene problemas">No tiene problemas.</option>
+                      <option value="2" data-text="Es independiente, pero se viste de manera lenta o torpe.">Es independiente, pero se viste de manera lenta o torpe.</option>
+                      <option value="1" data-text="Se equivoca en el orden, olvida algunas prendas.">Se equivoca en el orden, olvida algunas prendas.</option>
+                      <option value="0" data-text="Necesita ayuda para vestirse.">Necesita ayuda para vestirse.</option>
+                      <option value="-1" data-text = "No sé">No sé</option>
+                    </select>
+                    <input type="hidden" name="vestirse_texto">
+                  </div>
+  
+                  <div class="form-group">
+                    <label>C) Bañarse o Ducharse</label>
+                    <select class="form-control autocuidado" name="banarse" required>
+                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="3" data-text="No tiene problemas">No tiene problemas</option>
+                      <option value="2" data-text="Se baña solo, pero necesita que se lo recuerden.">Se baña solo, pero necesita que se lo recuerden.</option>
+                      <option value="1" data-text="Se baña con ayuda.">Se baña con ayuda.</option>
+                      <option value="0" data-text="Debe ser bañado(a) por otro.">Debe ser bañado(a) por otro.</option>
+                      <option value="-1" data-text = "No sé">No sé</option>
+                    </select>
+                    <input type="hidden" name="banarse_texto">
+                  </div>
+  
+                  <div class="form-group">
+                    <label>D) Ir al baño (orinar y defecar)</label>
+                    <select class="form-control autocuidado" name="bano" required>
+                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="3" data-text="Va al baño de manera independiente">Va al baño de manera independiente</option>
+                      <option value="2" data-text="Va al baño cuando se lo recuerdan; tiene algunos accidentes, ensucia.">Va al baño cuando se lo recuerdan; tiene algunos accidentes, ensucia.</option>
+                      <option value="1" data-text="Necesita ayuda para ir al baño">Necesita ayuda para ir al baño</option>
+                      <option value="0" data-text="No tiene control sobre orinar o defecar">No tiene control sobre orinar o defecar</option>
+                      <option value="-1" data-text = "No sé">No sé</option>
+                    </select>
+                    <input type="hidden" name="bano_texto">
+                  </div>
+  
+                  <div class="form-group">
+                    <label>E) Ingesta de medicamentos</label>
+                    <select class="form-control autocuidado" name="medicamentos" required>
+                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="4" data-text="No toma usualmente medicamentos">No toma usualmente medicamentos</option>
+                      <option value="3" data-text="Se acuerda sin ayuda.">Se acuerda sin ayuda.</option>
+                      <option value="2" data-text="Se acuerda si sus medicamentos se mantienen en un lugar especial.">Se acuerda si sus medicamentos se mantienen en un lugar especial.</option>
+                      <option value="1" data-text="Necesita recordatorio hablado o escrito.">Necesita recordatorio hablado o escrito.</option>
+                      <option value="0" data-text="Hay que darle los medicamentos.">Hay que darle los medicamentos.</option>
+                      <option value="-1" data-text = "No sé">No sé</option>
+                    </select>
+                    <input type="hidden" name="medicamentos_texto">
+                  </div>
+  
+                  <div class="form-group">
+                    <label>F) Interés en apariencia personal</label>
+                    <select class="form-control autocuidado" name="apariencia" required>
+                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="3" data-text="Igual que siempre.">Igual que siempre.</option>
+                      <option value="2" data-text="Se interesa sólo cuando va a salir, pero no cuando está en su casa">Se interesa sólo cuando va a salir, pero no cuando está en su casa.</option>
+                      <option value="1" data-text="Permite que lo(a) arreglen, o sólo lo hace cuando se lo piden">Permite que lo(a) arreglen, o sólo lo hace cuando se lo piden.</option>
+                      <option value="0" data-text="Resiste los esfuerzos del cuidador para limpiarlo(a) y arreglarlo(a)">Resiste los esfuerzos del cuidador para limpiarlo(a) y arreglarlo(a).</option>
+                      <option value="-1" data-text = "No sé">No sé</option>
+                    </select>
+                    <input type="hidden" name="apariencia_texto">
+                  </div>
+
+                  <div class="form-group">
+                    <label><strong>Puntaje total Autocuidado:</strong></label>
+                    <input type="text" name="puntaje_autocuidado" id="puntaje_autocuidado" class="form-control" readonly>
+                  </div>
+                  
+                  <div class="text-right mt-4">
+                    <button type="button" class="btn btn-outline-primary btn-next" data-next="#hogar">Siguiente sección</button>
+                    <a href="{% url 'detalle_paciente' paciente_id %}" class="btn btn-secondary">Ver Paciente</a>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+            <!-- Sección 2: Cuidado del hogar -->
+            <div class="tab-pane fade" id="hogar">
+              <div class="card bg-gradient-default shadow-sm mb-4">
+                <div class="card-header bg-transparent">
+                  <h4 class="text-white mb-0">Cuidado del hogar</h4>
+                </div>
+                <div class="card-body bg-white">
+                  <div class="form-group">
+
+                    <label>A) Preparar alimentos, cocinar</label>
+                    <select class="form-control cuidado_hogar" name="cocinar" required>
+                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="3" data-text="Nunca hizo esta actividad">Nunca hizo esta actividad</option>
+                      <option value="2" data-text="Planifica y prepara comida sin dificultad">Planifica y prepara comida sin dificultad</option>
+                      <option value="1" data-text="Prepara algunas comidas, pero menos que lo habitual o con menos variedad">Prepara algunas comidas, pero menos que lo habitual o con menos variedad</option>
+                      <option value="0" data-text="Se sirve comida sólo si esta ya ha sido preparada">Se sirve comida sólo si esta ya ha sido preparada</option>
+                      <option value="-1" data-text="No hace nada para preparar comida">No hace nada para preparar comidas</option>
+                      <option value="-1" data-text = "No sé">No sé</option>
+                    </select>
+                    <input type="hidden" name="cocinar_texto">
+                  </div>
+                  
+                  <div class="form-group">
+                    <label>B) Poner la mesa</label>
+                    <select class="form-control cuidado_hogar" name="poner_mesa" required>
+                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="3" data-text="Nunca hizo esta actividad">Nunca hizo esta actividad</option>
+                      <option value="2" data-text="Sin problemas">Sin problemas</option>
+                      <option value="1" data-text="Es independiente, pero de manera lenta o torpe.">Es independiente, pero de manera lenta o torpe.</option>
+                      <option value="0" data-text="Olvida elementos o los pone en el lugar equivocado">Olvida elementos o los pone en el lugar equivocado.</option>
+                      <option value="-1" data-text="Ya no realiza esta actividad.">Ya no realiza esta actividad.</option>
+                      <option value="-1" data-text = "No sé">No sé</option>
+                    </select>
+                    <input type="hidden" name="poner_mesa_texto">
+                  </div>
+
+                  <div class="form-group">
+                    <label>C) Aseo del hogar</label>
+                    <select class="form-control cuidado_hogar" name="aseo_hogar" required>
+                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="3" data-text="Nunca hizo esta actividad">Nunca hizo esta actividad</option>
+                      <option value="2" data-text="Mantiene la casa como siempre">Mantiene la casa como siempre</option>
+                      <option value="1" data-text="Realiza al menos la mitad de la labor">Realiza al menos la mitad de la labor</option>
+                      <option value="0" data-text="Ocasionalmente sacude o realiza pequeños trabajos">Ocasionalmente sacude o realiza pequeños trabajos</option>
+                      <option value="-1" data-text="Ya no realiza el aseo del hogar.">Ya no realiza el aseo del hogar.</option>
+                      <option value="-1" data-text = "No sé">No sé</option>
+                    </select>
+                    <input type="hidden" name="aseo_hogar_texto">
+                  </div>
+
+                  <div class="form-group">
+                    <label>D) Mantención de la casa</label>
+                    <select class="form-control cuidado_hogar" name="mantener_casa" required>
+                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="3" data-text="Nunca hizo esta actividad">Nunca hizo esta actividad</option>
+                      <option value="2" data-text="Realiza todas las tareas habituales">Realiza todas las tareas habituales</option>
+                      <option value="1" data-text="Realiza al menos la mitad de las tareas usuales">Realiza al menos la mitad de las tareas usuales</option>
+                      <option value="0" data-text="Barre ocasionalmente o realiza otras labores simples">Barre ocasionalmente o realiza otras labores simples</option>
+                      <option value="-1" data-text="Ya no realiza labores domésticas.">Ya no realiza labores domésticas.</option>
+                      <option value="-1" data-text = "No sé">No sé</option>
+                    </select>
+                    <input type="hidden" name="mantener_casa_texto">
+                  </div>
+
+                  <div class="form-group">
+                    <label>E) Reparaciones del hogar</label>
+                    <select class="form-control cuidado_hogar" name="reparar_hogar" required>
+                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="3" data-text="Nunca hizo esta actividad">Nunca hizo esta actividad</option>
+                      <option value="2" data-text="Realiza todas las reparaciones usuales">Realiza todas las reparaciones usuales</option>
+                      <option value="1" data-text="Realiza por lo menos la mitad de las reparaciones usuales">Realiza por lo menos la mitad de las reparaciones usuales</option>
+                      <option value="0" data-text="Ocasionalmente realiza reparaciones menores">Ocasionalmente realiza reparaciones menores</option>
+                      <option value="-1" data-text="Ya no realiza ninguna reparación">Ya no realiza ninguna reparación</option>
+                      <option value="-1" data-text = "No sé">No sé</option>
+                    </select>
+                    <input type="hidden" name="reparar_hogar_texto">
+                  </div>
+
+                  <div class="form-group">
+                    <label>F) Lavado de ropa</label>
+                    <select class="form-control cuidado_hogar" name="lavado_ropa" required>
+                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="3" data-text="Nunca hizo esta actividad">Nunca hizo esta actividad</option>
+                      <option value="2"  data-text="Realiza el lavado de ropa como siempre (mismo horario, misma rutina)">Realiza el lavado de ropa como siempre (mismo horario, misma rutina)</option>
+                      <option value="1" data-text="Realiza el lavado de ropa con menor frecuencia">Realiza el lavado de ropa con menor frecuencia</option>
+                      <option value="0" data-text="Realiza el lavado de ropa sólo si se lo recuerdan; deja fuera el detergente, olvida pasos">Realiza el lavado de ropa sólo si se lo recuerdan; deja fuera el detergente, olvida pasos</option>
+                      <option value="-1" data-text="Ya no realiza el lavado">Ya no realiza el lavado</option>
+                      <option value="-1" data-text = "No sé">No sé</option>
+                    </select>
+                    <input type="hidden" name="lavado_ropa_texto">
+                  </div>
+
+                  <div class="form-group">
+                    <label><strong>Puntaje total Cuidado del hogar:</strong></label>
+                    <input type="text" name="puntaje_cuidado_hogar" id="puntaje_cuidado_hogar" class="form-control" readonly>
+                  </div>
+
+                  <div class="text-right mt-4">
+                    <button type="button" class="btn btn-outline-primary btn-next" data-next="#trabajo">Siguiente sección</button>
+                    <a href="{% url 'detalle_paciente' paciente_id %}" class="btn btn-secondary">Ver Paciente</a>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+            <!-- Sección 3: Trabajo y recreación -->
+            <div class="tab-pane fade" id="trabajo">
+              <div class="card bg-gradient-default shadow-sm mb-4">
+                <div class="card-header bg-transparent">
+                  <h4 class="text-white mb-0">Trabajo y recreación</h4>
+                </div>
+                <div class="card-body bg-white">
+
+                  <div class="form-group">
+                    <label>A) Trabajo</label>
+                    <select class="form-control trabajo_recreacion" name="trabajo" required>
+                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="3" data-text="Nunca ha trabajado o se retiró antes de la enfermedad">Nunca ha trabajado o se retiró antes de la enfermedad</option>
+                      <option value="2" data-text="Continúa trabajando como habitualmente">Continúa trabajando como habitualmente</option>
+                      <option value="1" data-text="Tiene leves dificultades con las responsabilidades habituales">Tiene leves dificultades con las responsabilidades habituales.</option>
+                      <option value="0" data-text="Trabaja en un lugar menos exigente o en jornada parcial; está en riesgo de perder su trabajo">Trabaja en un lugar menos exigente o en jornada parcial; está en riesgo de perder su trabajo</option>
+                      <option value="-1" data-text="Ya no trabaja">Ya no trabaja</option>
+                      <option value="-1" data-text = "No sé">No sé</option>
+                    </select>
+                    <input type="hidden" name="trabajo_texto">
+                  </div>
+
+                  <div class="form-group">
+                    <label>B) Recreación</label>
+                    <select class="form-control trabajo_recreacion" name="recreacion" required>
+                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="3" data-text="Nunca ha participado de actividades de recreación o dejó de hacerlo antes de la enfermedad">Nunca ha participado de actividades de recreación o dejó de hacerlo antes de la enfermedad</option>
+                      <option value="2" data-text="Igual que siempre">Igual que siempre</option>
+                      <option value="1" data-text="Participa con menor frecuencia en actividades recreativas">Participa con menor frecuencia en actividades recreativas</option>
+                      <option value="0" data-text="Ha perdido algunas habilidades necesarias para actividades recreativas (por ejemplo: fútbol, jugar a las cartas); se le debe convencer para participar">Ha perdido algunas habilidades necesarias para actividades recreativas (por ejemplo: fútbol, jugar a las cartas); se le debe convencer para participar</option>
+                      <option value="-1" data-text="Ya no realiza actividades recreativas">Ya no realiza actividades recreativas</option>
+                      <option value="-1" data-text = "No sé">No sé</option>
+                    </select>
+                    <input type="hidden" name="recreacion_texto">
+                  </div>
+
+                  <div class="form-group">
+                    <label>C) Organizaciones</label>
+                    <select class="form-control trabajo_recreacion" name="organizaciones" required>
+                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="3" data-text="Nunca ha participado en organizaciones o dejó de hacerlo antes de la enfermedad">Nunca ha participado en organizaciones o dejó de hacerlo antes de la enfermedad</option>
+                      <option value="2" data-text="Asiste a reuniones y toma responsabilidades como habitualmente">Asiste a reuniones y toma responsabilidades como habitualmente</option>
+                      <option value="1" data-text="Asiste con menor frecuencia a reuniones">Asiste con menor frecuencia a reuniones</option>
+                      <option value="0" data-text="Asiste ocasionalmente; no tiene mayores responsabilidades">Asiste ocasionalmente; no tiene mayores responsabilidades</option>
+                      <option value="-1" data-text="Ya no asiste">Ya no asiste</option>
+                      <option value="-1" data-text = "No sé">No sé</option>
+                    </select>
+                    <input type="hidden" name="organizaciones_texto">
+                  </div>
+
+                  <div class="form-group">
+                    <label>D) Desplazamiento</label>
+                    <select class="form-control trabajo_recreacion" name="desplazamiento" required>
+                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="3" data-text="Igual que siempre">Igual que siempre</option>
+                      <option value="2" data-text="Sale si otro maneja">Sale si otro maneja</option>
+                      <option value="1" data-text="Sale en silla de ruedas">Sale en silla de ruedas</option>
+                      <option value="0" data-text="Está confinado a su casa o al hospital">Está confinado a su casa o al hospital</option>
+                      <option value="-1" data-text = "No sé">No sé</option>
+                    </select>
+                    <input type="hidden" name="desplazamiento_texto">
+                  </div>
+
+                  <div class="form-group">
+                    <label><strong>Puntaje total Trabajo y recreación:</strong></label>
+                    <input type="text" name="puntaje_trabajo_recreacion" id="puntaje_trabajo_recreacion" class="form-control" readonly>
+                  </div>
+
+                  <div class="text-right mt-4">
+                    <button type="button" class="btn btn-outline-primary btn-next" data-next="#compras">Siguiente sección</button>
+                    <a href="{% url 'detalle_paciente' paciente_id %}" class="btn btn-secondary">Ver Paciente</a>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+            <!-- Sección 4: Compras y dinero -->
+            <div class="tab-pane fade" id="compras">
+              <div class="card bg-gradient-default shadow-sm mb-4">
+                <div class="card-header bg-transparent">
+                  <h4 class="text-white mb-0">Compras y dinero</h4>
+                </div>
+                <div class="card-body bg-white">
+
+                  <div class="form-group">
+                    <label>A) Compra de alimentos</label>
+                    <select class="form-control compras_dinero" name="alimentos" required>
+                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="3" data-text="Nunca ha tenido esta responsabilidad">Nunca ha tenido esta responsabilidad</option>
+                      <option value="2" data-text="Sin problemas">Sin problemas</option>
+                      <option value="1" data-text="Olvida productos o compra productos innecesarios">Olvida productos o compra productos innecesarios</option>
+                      <option value="0" data-text="Necesita estar acompañado(a) o supervisado(a)">Necesita estar acompañado(a) o supervisado(a)</option>
+                      <option value="-1" data-text="Ya no realiza compras">Ya no realiza compras</option>
+                      <option value="-1" data-text = "No sé">No sé</option>
+                    </select>
+                    <input type="hidden" name="alimentos_texto">
+                  </div>
+
+                  <div class="form-group">
+                    <label>B) Manejar dinero en efectivo</label>
+                    <select class="form-control compras_dinero" name="dinero_efectivo" required>
+                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="3" data-text="Nunca ha tenido esta responsabilidad">Nunca ha tenido esta responsabilidad</option>
+                      <option value="2" data-text="No tiene problemas">No tiene problemas</option>
+                      <option value="1" data-text="Tiene dificultad para pagar el monto apropiado, contar">Tiene dificultad para pagar el monto apropiado, contar</option>
+                      <option value="0" data-text="Pierde el dinero u olvida dónde lo dejó">Pierde el dinero u olvida dónde lo dejó</option>
+                      <option value="-1" data-text="Ya no maneja dinero">Ya no maneja dinero</option>
+                      <option value="-1" data-text = "No sé">No sé</option>
+                    </select>
+                    <input type="hidden" name="dinero_efectivo_texto">
+                  </div>
+
+                  <div class="form-group">
+                    <label>C) Manejar de las finanzas</label>
+                    <select class="form-control compras_dinero" name="finanzas" required>
+                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="3" data-text="Nunca ha tenido esta responsabilidad">Nunca ha tenido esta responsabilidad</option>
+                      <option value="2" data-text="No tiene problemas para pagar cuentas e ir al banco">No tiene problemas para pagar cuentas e ir al banco</option>
+                      <option value="1" data-text="Paga tarde las cuentas; tiene algunos problemas para hacer cheques">Paga tarde las cuentas; tiene algunos problemas para hacer cheques</option>
+                      <option value="0" data-text="Olvida pagar las cuentas; tiene problemas para manejas sus finanzas; necesita ayuda de otros">Olvida pagar las cuentas; tiene problemas para manejas sus finanzas; necesita ayuda de otros</option>
+                      <option value="-1" data-text="Ya no maneja las finanzas">Ya no maneja las finanzas</option>
+                      <option value="-1" data-text = "No sé">No sé</option>
+                    </select>
+                    <input type="hidden" name="finanzas_texto">
+                  </div>
+
+                  <div class="form-group">
+                    <label><strong>Puntaje total Compras y dinero:</strong></label>
+                    <input type="text" name="puntaje_compras_dinero" id="puntaje_compras_dinero" class="form-control" readonly>
+                  </div>
+
+                  <div class="text-right mt-4">
+                    <button type="button" class="btn btn-outline-primary btn-next" data-next="#viajes">Siguiente sección</button>
+                    <a href="{% url 'detalle_paciente' paciente_id %}" class="btn btn-secondary">Ver Paciente</a>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+            <!-- Sección 4: Viajes -->
+            <div class="tab-pane fade" id="viajes">
+              <div class="card bg-gradient-default shadow-sm mb-4">
+                <div class="card-header bg-transparent">
+                  <h4 class="text-white mb-0">Viajes</h4>
+                </div>
+                <div class="card-body bg-white">
+
+                  <div class="form-group">
+                    <label>A) Transporte público</label>
+                    <select class="form-control viajes" name="transporte_publico" required>
+                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="3" data-text="Nunca ha usado el transporte público con regularidad">Nunca ha usado el transporte público con regularidad</option>
+                      <option value="2" data-text="Utiliza el transporte público como habitualmente">Utiliza el transporte público como habitualmente</option>
+                      <option value="1" data-text="Utiliza el transporte público con menor frecuencia">Utiliza el transporte público con menor frecuencia</option>
+                      <option value="0" data-text="Se ha perdido usando el transporte público">Se ha perdido usando el transporte público</option>
+                      <option value="-1" data-text="Ya no usa el transporte público">Ya no usa el transporte público</option>
+                      <option value="-1" data-text = "No sé">No sé</option>
+                    </select>
+                    <input type="hidden" name="transporte_publico_texto">
+                  </div>
+
+                  <div class="form-group">
+                    <label>B) Manejo de vehículos</label>
+                    <select class="form-control viajes" name="manejo_vehiculos" required>
+                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="3" data-text="Nunca ha manejado">Nunca ha manejado</option>
+                      <option value="2" data-text="Maneja como siempre">Maneja como siempre</option>
+                      <option value="1" data-text="Maneja de manera más cautelosa">Maneja de manera más cautelosa</option>
+                      <option value="0" data-text="Maneja de forma más descuidada; se ha perdido manejando">Maneja de forma más descuidada; se ha perdido manejando</option>
+                      <option value="-1" data-text="Ya no maneja">Ya no maneja</option>
+                      <option value="-1" data-text = "No sé">No sé</option>
+                    </select>
+                    <input type="hidden" name="manejo_vehiculos_texto">
+                  </div>
+
+                  <div class="form-group">
+                    <label>C) Movilidad en su barrio</label>
+                    <select class="form-control viajes" name="movilidad_barrio" required>
+                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="3" data-text="Esta actividad la tenía restringida desde antes de la enfermedad">Esta actividad la tenía restringida desde antes de la enfermedad</option>
+                      <option value="2" data-text="Igual que siempre">Igual que siempre</option>
+                      <option value="1" data-text="Sale con menos frecuencia">Sale con menos frecuencia</option>
+                      <option value="0" data-text="Se ha perdido en su barrio">Se ha perdido en su barrio</option>
+                      <option value="-1" data-text="Ya no sale sin estar acompañado">Ya no sale sin estar acompañado</option>
+                      <option value="-1" data-text = "No sé">No sé</option>
+                    </select>
+                    <input type="hidden" name="movilidad_barrio_texto">
+                  </div>
+
+                  <div class="form-group">
+                    <label>D) Viajes fuera del ambiente familiar</label>
+                    <select class="form-control viajes" name="viajes_fuera" required>
+                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="3" data-text="">Nunca realizó esta actividad</option>
+                      <option value="2" data-text="Igual que siempre">Igual que siempre</option>
+                      <option value="1" data-text="Ocasionalmente se desorienta en entornos no familiares">Ocasionalmente se desorienta en entornos no familiares</option>
+                      <option value="0" data-text="Se desorienta con facilidad pero se las arregla si está acompañado">Se desorienta con facilidad pero se las arregla si está acompañado</option>
+                      <option value="-1" data-text="Ya no puede viajar">Ya no puede viajar</option>
+                      <option value="-1" data-text = "No sé">No sé</option>
+                      <input type="hidden" name="viajes_fuera_texto">
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label><strong>Puntaje total Viajes:</strong></label>
+                    <input type="text" name="puntaje_viajes" id="puntaje_viajes" class="form-control" readonly>
+                  </div>
+
+                  <div class="text-right mt-4">
+                    <button type="button" class="btn btn-outline-primary btn-next" data-next="#comunicacion">Siguiente sección</button>
+                    <a href="{% url 'detalle_paciente' paciente_id %}" class="btn btn-secondary">Ver Paciente</a>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+
+            <!-- Sección 5: Comunicación -->
+            <div class="tab-pane fade" id="comunicacion">
+              <div class="card bg-gradient-default shadow-sm mb-4">
+                <div class="card-header bg-transparent">
+                  <h4 class="text-white mb-0">Comunicación</h4>
+                </div>
+                <div class="card-body bg-white">
+
+                  <div class="form-group">
+                    <label>A) Uso del teléfono</label>
+                    <select class="form-control comunicacion" name="telefono" required>
+                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="3" data-text="Nunca ha usado el teléfono">Nunca ha usado el teléfono</option>
+                      <option value="2" data-text="Igual que siempre">Igual que siempre</option>
+                      <option value="1" data-text="Llama a unos pocos números conocidos">Llama a unos pocos números conocidos</option>
+                      <option value="0" data-text="Solo contesta el teléfono (no realiza llamadas)">Solo contesta el teléfono (no realiza llamadas)</option>
+                      <option value="-1" data-text="No usa el teléfono para nada">No usa el teléfono para nada</option>
+                      <option value="-1" data-text = "No sé">No sé</option>
+                    </select>
+                    <input type="hidden" name="telefono_texto">
+                  </div>
+
+                  <div class="form-group">
+                    <label>B) Conversación</label>
+                    <select class="form-control comunicacion" name="conversacion" required>
+                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="3" data-text="Igual que siempre">Igual que siempre</option>
+                      <option value="2" data-text="Menos conversador; tiene dificultades para recordar palabras o nombres">Menos conversador; tiene dificultades para recordar palabras o nombres</option>
+                      <option value="1" data-text="Comete ocasionalmente errores al hablar">Comete ocasionalmente errores al hablar</option>
+                      <option value="0" data-text="Su lenguaje casi no se entiende">Su lenguaje casi no se entiende</option>
+                      <option value="-1" data-text = "No sé">No sé</option>
+                    </select>
+                    <input type="hidden" name="conversacion_texto">
+                  </div>
+
+                  <div class="form-group">
+                    <label>C) Comprensión</label>
+                    <select class="form-control comunicacion" name="comprension" required>
+                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="3" data-text="Comprende todo lo que se le dice usualmente">Comprende todo lo que se le dice usualmente</option>
+                      <option value="2" data-text="Pide que le repitan lo que se le dijo">Pide que le repitan lo que se le dijo</option>
+                      <option value="1" data-text="Ocasionalmente tiene problemas en comprender conversaciones o algunas palabras">Ocasionalmente tiene problemas en comprender conversaciones o algunas palabras</option>
+                      <option value="0" data-text="La mayoría de veces no entiende lo que la gente dice">La mayoría de veces no entiende lo que la gente dice</option>
+                      <option value="-1" data-text = "No sé">No sé</option>
+                    </select>
+                    <input type="hidden" name="comprension_texto">
+                  </div>
+
+                  <div class="form-group">
+                    <label>D) Lectura</label>
+                    <select class="form-control comunicacion" name="lectura" required>
+                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="3" data-text="Nunca leyó mucho">Nunca leyó mucho</option>
+                      <option value="2" data-text="Lee igual que siempre">Lee igual que siempre</option>
+                      <option value="1" data-text="Lee con menor frecuencia">Lee con menor frecuencia</option>
+                      <option value="0" data-text="Tiene dificultad para comprender o recordar lo leído">Tiene dificultad para comprender o recordar lo leído</option>
+                      <option value="-1" data-text="Ya no lee">Ya no lee</option>
+                      <option value="-1" data-text = "No sé">No sé</option>
+                    </select>
+                    <input type="hidden" name="lectura_texto">
+                  </div>
+
+                  <div class="form-group">
+                    <label>E) Escritura</label>
+                    <select class="form-control comunicacion" name="escritura" required>
+                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="3" data-text="Nunca escribió mucho">Nunca escribió mucho</option>
+                      <option value="2" data-text="Igual que siempre">Igual que siempre</option>
+                      <option value="1" data-text="Escribe con menor frecuencia, comete ocasionalmente errores de ortografía">Escribe con menor frecuencia, comete ocasionalmente errores de ortografía</option>
+                      <option value="0" data-text="Escribe su nombre, pero nada más">Escribe su nombre, pero nada más</option>
+                      <option value="-1" data-text="Nunca escribe">Nunca escribe</option>
+                      <option value="-1" data-text = "No sé">No sé</option>
+                    </select>
+                    <input type="hidden" name="escritura_texto">
+                  </div>
+                  
+                  <div class="form-group">
+                    <label><strong>Puntaje total Comunicación:</strong></label>
+                    <input type="text" name="puntaje_comunicacion" id="puntaje_comunicacion" class="form-control" readonly>
+                  </div>
+
+                  <div class="text-right mt-4">
+                    <button type="button" class="btn btn-outline-primary btn-next" data-next="#tecnologia">Siguiente sección</button>
+                    <a href="{% url 'detalle_paciente' paciente_id %}" class="btn btn-secondary">Ver Paciente</a>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+            <!-- Sección 5: Tecnología -->
+            <div class="tab-pane fade" id="tecnologia">
+              <div class="card bg-gradient-default shadow-sm mb-4">
+                <div class="card-header bg-transparent">
+                  <h4 class="text-white mb-0">Tecnología</h4>
+                </div>
+                <div class="card-body bg-white">
+
+                  <div class="form-group">
+                    <label>A) Uso del computador</label>
+                    <select class="form-control tecnologia" name="computador" required>
+                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="3" data-text="Nunca lo ha ocupado antes">Nunca lo ha ocupado antes</option>
+                      <option value="2" data-text="Utiliza el computador regularmente. Realiza tareas en diferentes programas">Utiliza el computador regularmente. Realiza tareas en diferentes programas</option>
+                      <option value="1" data-text="Puede prender el computador y realizar tareas básicas">Puede prender el computador y realizar tareas básicas</option>
+                      <option value="0" data-text="Solo recuerda cómo prender y/o apagar el computador">Solo recuerda cómo prender y/o apagar el computador</option>
+                      <option value="-1" data-text="Ya no ocupa el computador">Ya no ocupa el computador</option>
+                      <option value="-1" data-text = "No sé">No sé</option>
+                    </select>
+                    <input type="hidden" name="computador_texto">
+                  </div>
+
+                  <div class="form-group">
+                    <label>B) Uso del teléfono celular</label>
+                    <select class="form-control tecnologia" name="telefono_celular" required>
+                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="3" data-text="Nunca ha usado celular">Nunca ha usado celular</option>
+                      <option value="2" data-text="Utiliza el teléfono celular de manera regular, maneja sin dificultades sus diferentes funciones">Utiliza el teléfono celular de manera regular, maneja sin dificultades sus diferentes funciones</option>
+                      <option value="1" data-text="Sabe cómo contestar o realizar llamadas con el teléfono celular">Sabe cómo contestar o realizar llamadas con el teléfono celular</option>
+                      <option value="0" data-text="Tiene dificultades para recordar cómo contestar una llamada">Tiene dificultades para recordar cómo contestar una llamada</option>
+                      <option value="-1" data-text="Ya no sabe cómo ocuparlo">Ya no sabe cómo ocuparlo</option>
+                      <option value="-1" data-text = "No sé">No sé</option>
+                    </select>
+                    <input type="hidden" name="telefono_celular_texto">
+                  </div>
+
+                  <div class="form-group">
+                    <label>C) Uso del cajero automático</label>
+                    <select class="form-control tecnologia" name="cajero" required>
+                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="3" data-text="Nunca ha ocupado cajero automático">Nunca ha ocupado cajero automático</option>
+                      <option value="2" data-text="Utiliza el cajero automático, saca dinero y/o realiza diversas transacciones">Utiliza el cajero automático, saca dinero y/o realiza diversas transacciones</option>
+                      <option value="1" data-text="Tiene algunos problemas para recordar cómo sacar dinero">Tiene algunos problemas para recordar cómo sacar dinero</option>
+                      <option value="0" data-text="No recuerda la clave para ingresar a su cuenta">No recuerda la clave para ingresar a su cuenta</option>
+                      <option value="-1" data-text="Ya no ocupa el cajero automático">Ya no ocupa el cajero automático</option>
+                      <option value="-1" data-text = "No sé">No sé</option>
+                    </select>
+                    <input type="hidden" name="cajero_texto">
+                  </div>
+
+                  <div class="form-group">
+                    <label>D) Acceso a internet</label>
+                    <select class="form-control tecnologia" name="internet" required>
+                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="3" data-text="Nunca ha ocupado internet">Nunca ha ocupado internet</option>
+                      <option value="2" data-text="Busca fluidamente información en Internet, utiliza sitios de su interés">Busca fluidamente información en Internet, utiliza sitios de su interés</option>
+                      <option value="1" data-text="Navega en Internet con alguna ayuda">Navega en Internet con alguna ayuda</option>
+                      <option value="0" data-text="Olvida contraseñas y sitios web para revisar su información">Olvida contraseñas y sitios web para revisar su información</option>
+                      <option value="-1" data-text="Ya no ocupa Internet">Ya no ocupa Internet</option>
+                      <option value="-1" data-text = "No sé">No sé</option>
+                    </select>
+                    <input type="hidden" name="internet_texto">
+                  </div>
+
+                  <div class="form-group">
+                    <label>E) Uso del correo electrónico</label>
+                    <select class="form-control tecnologia" name="email" required>
+                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="3" data-text="Nunca ha usado correo electrónico">Nunca ha usado correo electrónico</option>
+                      <option value="2" data-text="Ocupa regularmente el email para comunicarse con sus contactos, recibe y envía archivos adjuntos">Ocupa regularmente el email para comunicarse con sus contactos, recibe y envía archivos adjuntos</option>
+                      <option value="1" data-text="Sólo revisa y responde correos. No sabe adjuntar datos">Sólo revisa y responde correos. No sabe adjuntar datos.</option>
+                      <option value="0" data-text="No recuerda su contraseña o el sitio web donde tiene su correo electrónico">No recuerda su contraseña o el sitio web donde tiene su correo electrónico</option>
+                      <option value="-1" data-text="Ya no usa su correo para comunicarse">Ya no usa su correo para comunicarse</option>
+                      <option value="-1" data-text = "No sé">No sé</option>
+                    </select>
+                    <input type="hidden" name="email_texto">
+                  </div>
+
+                  <div class="form-group">
+                    <label>F) Uso de redes sociales</label>
+                    <select class="form-control tecnologia" name="redes_sociales" required>
+                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="3" data-text="Nunca ha utilizado redes">Nunca ha utilizado redes</option>
+                      <option value="2" data-text="Ocupa regularmente las redes socailes, tales como Facebook, Twitter, WhatsApp, entre otros.">Ocupa regularmente las redes socailes, tales como Facebook, Twitter, WhatsApp, entre otros.</option>
+                      <option value="1" data-text="Puede ocupar las funciones básicas de las redes sociales, pero tiene dificultades para usar opciones avanzadas sin ayuda (ejemplo: subir una foto, publicar un comentario, jugar un juego)">Puede ocupar las funciones básicas de las redes sociales, pero tiene dificultades para usar opciones avanzadas sin ayuda (ejemplo: subir una foto, publicar un comentario, jugar un juego)</option>
+                      <option value="0" data-text="Solo puede ocupar las redes sociales con ayuda">Solo puede ocupar las redes sociales con ayuda</option>
+                      <option value="-1" data-text="Ya no sabe cómo usar las redes sociales">Ya no sabe cómo usar las redes sociales</option>
+                      <option value="-1" data-text = "No sé">No sé</option>
+                    </select>
+                    <input type="hidden" name="redes_sociales_texto">
+                  </div>
+
+                  <div class="form-group">
+                    <label><strong>Puntaje total Tecnología:</strong></label>
+                    <input type="text" name="puntaje_tecnologia" id="puntaje_tecnologia" class="form-control" readonly>
+                  </div>
+                </div>
+              </div>
+              <!-- Botón de envío final -->
+              <div class="text-right mt-4 mb-4 mr-4">
+                <button type="submit" class="btn btn-primary">Guardar</button>
+                <a href="{% url 'detalle_paciente' paciente_id %}" class="btn btn-secondary">Ver Paciente</a>
+              </div>
+            </div>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+
+    // Función para calcular el puntaje
+    function calcularPuntaje(clase, outputId) {
+      const selects = document.querySelectorAll(`.${clase}`);
+      let suma = 0;
+      let respuestasValidas = 0;
+
+      selects.forEach(select => {
+        const valor = parseInt(select.value);
+        if (!isNaN(valor) && valor >= 0) {
+          suma += valor;
+          respuestasValidas += 1;
+        }
+
+        // Guardar texto en el input hidden
+        const selectedOption = select.options[select.selectedIndex];
+        const texto = selectedOption?.getAttribute("data-text") || "";
+        const hiddenInput = document.querySelector(`input[name="${select.name}_texto"]`);
+        if (hiddenInput) hiddenInput.value = texto.trim();
+      });
+
+      const puntaje = respuestasValidas > 0 ? Math.round((suma / (respuestasValidas * 3)) * 100) : 0;
+      const resultado = document.getElementById(outputId);
+      if (resultado) resultado.value = puntaje + "%";
+    }
+
+    // Lista de secciones con clase e ID de campo de puntaje
+    const secciones = [
+      { clase: 'autocuidado', id: 'puntaje_autocuidado' },
+      { clase: 'cuidado_hogar', id: 'puntaje_cuidado_hogar' },
+      { clase: 'trabajo_recreacion', id: 'puntaje_trabajo_recreacion' },
+      { clase: 'compras_dinero', id: 'puntaje_compras_dinero' },
+      { clase: 'viajes', id: 'puntaje_viajes' },
+      { clase: 'comunicacion', id: 'puntaje_comunicacion' },
+      { clase: 'tecnologia', id: 'puntaje_tecnologia' },
+    ];
+
+    // Listeners para calcular puntaje y guardar textos
+    secciones.forEach(seccion => {
+      const selects = document.querySelectorAll(`.${seccion.clase}`);
+      selects.forEach(select => {
+        select.addEventListener('change', () => {
+          calcularPuntaje(seccion.clase, seccion.id);
+        });
+      });
+    });
+
+    // Botones "Siguiente sección"
+    const nextButtons = document.querySelectorAll('.btn-next');
+    nextButtons.forEach(button => {
+      button.addEventListener('click', function () {
+        const nextTabId = this.getAttribute('data-next');
+        if (!nextTabId) return;
+
+        // Desactivar pestaña actual
+        document.querySelector('.tab-pane.active').classList.remove('show', 'active');
+        document.querySelector('.nav-link.active').classList.remove('active');
+
+        // Activar la siguiente
+        const nextPane = document.querySelector(nextTabId);
+        const nextNavLink = document.querySelector(`.nav-link[href="${nextTabId}"]`);
+        if (nextPane && nextNavLink) {
+          nextPane.classList.add('show', 'active');
+          nextNavLink.classList.add('active');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      });
+    });
+
+  });
+</script>
+
+{% endblock %}

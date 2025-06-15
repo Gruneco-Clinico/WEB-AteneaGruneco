@@ -23,6 +23,9 @@
           <input type="hidden" name="paciente_id" value="{{ paciente_id }}">
           <input type="hidden" name="examen_id" value="{{ examen_id }}">
 
+          <div class="alert alert-info">
+            <strong>Instrucciones:</strong> Indique la opción de respuesta que mejor describa sus experiencias basándose en su vida en este momento.
+          </div>
           <!-- Navegación por pestañas -->
           <ul class="nav nav-pills nav-fill mb-4" role="tablist">
             <li class="nav-item"><a class="nav-link active" data-toggle="tab" href="#fisico">Bienestar Físico</a></li>
@@ -40,25 +43,31 @@
                 <div class="card-body bg-white">
                   {% comment %} Selecciones de 0 a 3: Ausencia / Algo / Problema / Muchísimo {% endcomment %}
                   <div class="form-group"><label>Agotamiento</label><select class="form-control" name="agotamiento" required>
-                    <option value="" disabled selected>Seleccione una opción</option><option value="0">Ausencia de problema</option>
-                    <option value="1">Algo de problema</option><option value="2">Problema</option><option value="3">Muchísimo problema</option>
-                  </select></div>
+                    <option value="" disabled selected>Seleccione una opción</option><option value="0" data-text="0. Ausencia de problema">0. Ausencia de problema</option>
+                    <option value="1" data-text="1. Algo de problema">1. Algo de problema</option><option value="2" data-text="2. Problema">2. Problema</option><option value="3" data-text="Muchísimo problema">3. Muchísimo problema</option>
+                  </select><input type="hidden" name="agotamiento_texto"></div>
                   <div class="form-group"><label>Cambios en los hábitos alimentarios</label><select class="form-control" name="cambios_alimentarios" required>
-                    <option value="" disabled selected>Seleccione una opción</option><option value="0">Ausencia de problema</option>
-                    <option value="1">Algo de problema</option><option value="2">Problema</option><option value="3">Muchísimo problema</option>
-                  </select></div>
+                    <option value="" disabled selected>Seleccione una opción</option><option value="0" data-text="0. Ausencia de problema">0. Ausencia de problema</option>
+                    <option value="1" data-text="1. Algo de problema">1. Algo de problema</option><option value="2" data-text="2. Problema">2. Problema</option><option value="3" data-text="Muchísimo problema">3. Muchísimo problema</option>
+                  </select><input type="hidden" name="cambios_alimenticios_texto"></div>
                   <div class="form-group"><label>Dolor</label><select class="form-control" name="dolor" required>
-                    <option value="" disabled selected>Seleccione una opción</option><option value="0">Ausencia de problema</option>
-                    <option value="1">Algo de problema</option><option value="2">Problema</option><option value="3">Muchísimo problema</option>
-                  </select></div>
+                    <option value="" disabled selected>Seleccione una opción</option><option value="0" data-text="0. Ausencia de problema">0. Ausencia de problema</option>
+                    <option value="1" data-text="1. Algo de problema">1. Algo de problema</option><option value="2" data-text="2. Problema">2. Problema</option><option value="3" data-text="Muchísimo problema">3. Muchísimo problema</option>
+                  </select><input type="hidden" name="dolor_texto"></div>
                   <div class="form-group"><label>Cambios en el sueño</label><select class="form-control" name="cambios_sueno" required>
-                    <option value="" disabled selected>Seleccione una opción</option><option value="0">Ausencia de problema</option>
-                    <option value="1">Algo de problema</option><option value="2">Problema</option><option value="3">Muchísimo problema</option>
-                  </select></div>
+                    <option value="" disabled selected>Seleccione una opción</option><option value="0" data-text="0. Ausencia de problema">0. Ausencia de problema</option>
+                    <option value="1" data-text="1. Algo de problema">1. Algo de problema</option><option value="2" data-text="2. Problema">2. Problema</option><option value="3" data-text="Muchísimo problema">3. Muchísimo problema</option>
+                  </select><input type="hidden" name="cambios_sueno_texto"></div>
                   <div class="form-group"><label>Clasifique su salud física en general</label><select class="form-control" name="salud_fisica_general" required>
-                    <option value="" disabled selected>Seleccione una opción</option><option value="0">Sumamente mala</option>
-                    <option value="1">Regular</option><option value="2">Buena</option><option value="3">Excelente</option>
-                  </select></div>
+                    <option value="" disabled selected>Seleccione una opción</option><option value="0" data-text="0. Sumamente mala">0. Sumamente mala</option>
+                    <option value="1" data-text="1. Regular">1. Regular</option><option value="2. Buena" data-text="">2. Buena</option><option value="3" data-text="3. Excelente">3. Excelente</option>
+                  </select><input type="hidden" name="salud_fisica_general_texto"></div>
+
+                  <div class="text-right mt-4">
+                    <button type="button" class="btn btn-outline-primary btn-next" data-next="#psicologico">Siguiente sección</button>
+                    <a href="{% url 'detalle_paciente' paciente_id %}" class="btn btn-secondary">Ver Paciente</a>
+                  </div>
+
                 </div>
               </div>
             </div>
@@ -70,74 +79,80 @@
                 <div class="card-body bg-white">
 
                   <div class="form-group"><label>¿Qué tan fácil es enfrentar su vida con un pariente enfermo?</label><select class="form-control" name="facilidad_enfrentar" required>
-                    <option value="" disabled selected>Seleccione una opción</option><option value="0">Muy fácil</option>
-                    <option value="1">Fácil</option><option value="2">Difícil</option><option value="3">Muy difícil</option>
-                  </select></div>
+                    <option value="" disabled selected>Seleccione una opción</option><option value="0" data-text="0. Muy fácil">0. Muy fácil</option>
+                    <option value="1" data-text="1. Fácil">1. Fácil</option><option value="2" data-text="2. Difícil">2. Difícil</option><option value="3" data-text="3. Muy difícil">3. Muy difícil</option>
+                  </select><input type="hidden" name="facilidad_enfrentar_texto"></div>
 
                   <div class="form-group"><label>¿Cuánta felicidad siente?</label><select class="form-control" name="felicidad" required>
-                    <option value="" disabled selected>Seleccione una opción</option><option value="0">Nada</option>
-                    <option value="1">Algo</option><option value="2">Moderado</option><option value="3">Muchísimo</option>
-                  </select></div>
+                    <option value="" disabled selected>Seleccione una opción</option><option value="0" data-text="0. Nada">0. Nada</option>
+                    <option value="1" data-text="1. Algo">1. Algo</option><option value="2" data-text="2. Moderado">2. Moderado</option><option value="3" data-text="3. Muchísimo">3. Muchísimo</option>
+                  </select><input type="hidden" name="felicidad_texto"></div>
 
                   <div class="form-group"><label>¿Siente que tiene el control de su vida?</label><select class="form-control" name="control_vida" required>
-                    <option value="" disabled selected>Seleccione una opción</option><option value="0">Nada</option>
-                    <option value="1">Algo</option><option value="2">Moderado</option><option value="3">Muchísimo</option>
-                  </select></div>
+                    <option value="" disabled selected>Seleccione una opción</option><option value="0" data-text="0. Nada">0. Nada</option>
+                    <option value="1" data-text="1. Algo">1. Algo</option><option value="2" data-text="2. Moderado">2. Moderado</option><option value="3" data-text="3. Muchísimo">3. Muchísimo</option>
+                  </select><input type="hidden" name="control_vida_texto"></div>
 
                   <div class="form-group"><label>¿Qué tan satisfecho está con su vida?</label><select class="form-control" name="satisfaccion_vida" required>
-                    <option value="" disabled selected>Seleccione una opción</option><option value="0">Nada</option>
-                    <option value="1">Algo</option><option value="2">Moderado</option><option value="3">Muchísimo</option>
-                  </select></div>
+                    <option value="" disabled selected>Seleccione una opción</option><option value="0" data-text="0. Nada">0. Nada</option>
+                    <option value="1" data-text="1. Algo">1. Algo</option><option value="2" data-text="2. Moderado">2. Moderado</option><option value="3" data-text="3. Muchísimo">3. Muchísimo</option>
+                  </select><input type="hidden" name="satisfaccion_vida_texto"></div>
 
                   <div class="form-group"><label>Capacidad para concentrarse o recordar</label><select class="form-control" name="concentracion" required>
                     <option value="" disabled selected>Seleccione una opción</option><option value="0">Sumamente mala</option>
                     <option value="1">Regular</option><option value="2">Buena</option><option value="3">Excelente</option>
-                  </select></div>
+                  </select><input type="hidden" name="concentracion_texto"></div>
 
                   <div class="form-group"><label>¿Qué tan útil se siente?</label><select class="form-control" name="utilidad_personal" required>
-                    <option value="" disabled selected>Seleccione una opción</option><option value="0">Nada</option>
-                    <option value="1">Algo</option><option value="2">Moderado</option><option value="3">Muchísimo</option>
-                  </select></div>
+                    <option value="" disabled selected>Seleccione una opción</option><option value="0" data-text="0. Nada">0. Nada</option>
+                    <option value="1" data-text="1. Algo">1. Algo</option><option value="2" data-text="2. Moderado">2. Moderado</option><option value="3" data-text="3. Muchísimo">3. Muchísimo</option>
+                  </select><input type="hidden" name="utilidad_personal_texto"></div>
 
                   <div class="form-group"><label>¿Cuánta angustia le causó el diagnóstico?</label><select class="form-control" name="angustia_diagnostico" required>
-                    <option value="" disabled selected>Seleccione una opción</option><option value="0">Nada</option>
-                    <option value="1">Algo</option><option value="2">Moderado</option><option value="3">Muchísimo</option>
-                  </select></div>
+                    <option value="" disabled selected>Seleccione una opción</option><option value="0" data-text="0. Nada">0. Nada</option>
+                    <option value="1" data-text="1. Algo">1. Algo</option><option value="2" data-text="2. Moderado">2. Moderado</option><option value="3" data-text="3. Muchísimo">3. Muchísimo</option>
+                  </select><input type="hidden" name="angustia_diagnostico_texto"></div>
 
                   <div class="form-group"><label>¿Cuánta angustia le causó el tratamiento?</label><select class="form-control" name="angustia_tratamiento" required>
-                    <option value="" disabled selected>Seleccione una opción</option><option value="0">Nada</option>
-                    <option value="1">Algo</option><option value="2">Moderado</option><option value="3">Muchísimo</option>
-                  </select></div>
+                    <option value="" disabled selected>Seleccione una opción</option><option value="0" data-text="0. Nada">0. Nada</option>
+                    <option value="1" data-text="1. Algo">1. Algo</option><option value="2" data-text="2. Moderado">2. Moderado</option><option value="3" data-text="3. Muchísimo">3. Muchísimo</option>
+                  </select><input type="hidden" name="angustia_tratamiento_texto"></div>
 
                   <div class="form-group"><label>¿Cuánta ansiedad siente?</label><select class="form-control" name="ansiedad" required>
-                    <option value="" disabled selected>Seleccione una opción</option><option value="0">Nada</option>
-                    <option value="1">Algo</option><option value="2">Moderado</option><option value="3">Muchísimo</option>
-                  </select></div>
+                    <option value="" disabled selected>Seleccione una opción</option><option value="0" data-text="0. Nada">0. Nada</option>
+                    <option value="1" data-text="1. Algo">1. Algo</option><option value="2" data-text="2. Moderado">2. Moderado</option><option value="3" data-text="3. Muchísimo">3. Muchísimo</option>
+                  </select><input type="hidden" name="ansiedad_texto"></div>
 
                   <div class="form-group"><label>¿Cuánta depresión siente?</label><select class="form-control" name="depresion" required>
-                    <option value="" disabled selected>Seleccione una opción</option><option value="0">Nada</option>
-                    <option value="1">Algo</option><option value="2">Moderado</option><option value="3">Muchísimo</option>
-                  </select></div>
+                    <option value="" disabled selected>Seleccione una opción</option><option value="0" data-text="0. Nada">0. Nada</option>
+                    <option value="1" data-text="1. Algo">1. Algo</option><option value="2" data-text="2. Moderado">2. Moderado</option><option value="3" data-text="3. Muchísimo">3. Muchísimo</option>
+                  </select><input type="hidden" name="depresion_texto"></div>
 
                   <div class="form-group"><label>¿Tiene miedo de otra enfermedad crónica?</label><select class="form-control" name="miedo_otra_enfermedad" required>
-                    <option value="" disabled selected>Seleccione una opción</option><option value="0">Nada</option>
-                    <option value="1">Algo</option><option value="2">Moderado</option><option value="3">Muchísimo</option>
-                  </select></div>
+                    <option value="" disabled selected>Seleccione una opción</option><option value="0" data-text="0. Nada">0. Nada</option>
+                    <option value="1" data-text="1. Algo">1. Algo</option><option value="2" data-text="2. Moderado">2. Moderado</option><option value="3" data-text="3. Muchísimo">3. Muchísimo</option>
+                  </select><input type="hidden" name="miedo_otra_enfermedad_texto"></div>
 
                   <div class="form-group"><label>¿Tiene miedo de retroceso en su pariente?</label><select class="form-control" name="miedo_retroceso" required>
-                    <option value="" disabled selected>Seleccione una opción</option><option value="0">Nada</option>
-                    <option value="1">Algo</option><option value="2">Moderado</option><option value="3">Muchísimo</option>
-                  </select></div>
+                    <option value="" disabled selected>Seleccione una opción</option><option value="0" data-text="0. Nada">0. Nada</option>
+                    <option value="1" data-text="1. Algo">1. Algo</option><option value="2" data-text="2. Moderado">2. Moderado</option><option value="3" data-text="3. Muchísimo">3. Muchísimo</option>
+                  </select><input type="hidden" name="miedo_retroceso_texto"></div>
 
                   <div class="form-group"><label>¿Tiene miedo del avance de la enfermedad?</label><select class="form-control" name="miedo_avance" required>
-                    <option value="" disabled selected>Seleccione una opción</option><option value="0">Nada</option>
-                    <option value="1">Algo</option><option value="2">Moderado</option><option value="3">Muchísimo</option>
-                  </select></div>
+                    <option value="" disabled selected>Seleccione una opción</option><option value="0" data-text="0. Nada">0. Nada</option>
+                    <option value="1" data-text="1. Algo">1. Algo</option><option value="2" data-text="2. Moderado">2. Moderado</option><option value="3" data-text="3. Muchísimo">3. Muchísimo</option>
+                  </select><input type="hidden" name="miedo_avance_texto"></div>
 
                   <div class="form-group"><label>Clasifique su estado psicológico en general</label><select class="form-control" name="estado_psicologico" required>
-                    <option value="" disabled selected>Seleccione una opción</option><option value="0">Sumamente malo</option>
-                    <option value="1">Regular</option><option value="2">Bueno</option><option value="3">Excelente</option>
-                  </select></div>
+                    <option value="" disabled selected>Seleccione una opción</option><option value="0" data-text="0. Sumamente malo">0. Sumamente malo</option>
+                        <option value="1" data-text="1. Regular">1. Regular</option><option value="2" data-text="2. Bueno">2. Bueno</option><option value="3" data-text="3. Excelente">3. Excelente</option>
+                  </select><input type="hidden" name="estado_psicologico_texto"></div>
+
+                  <div class="text-right mt-4">
+                    <button type="button" class="btn btn-outline-primary btn-next" data-next="#social">Siguiente sección</button>
+                    <a href="{% url 'detalle_paciente' paciente_id %}" class="btn btn-secondary">Ver Paciente</a>
+                  </div>
+
                 </div>
               </div>
             </div>
@@ -149,49 +164,54 @@
                 <div class="card-body bg-white">
                   
                     <div class="form-group"><label>¿Cuánta angustia le ha ocasionado la enfermedad de su familiar?</label><select class="form-control" name="angustia_familiar" required>
-                        <option value="" disabled selected>Seleccione una opción</option><option value="0">Nada</option>
-                        <option value="1">Algo</option><option value="2">Moderado</option><option value="3">Muchísimo</option>
-                    </select></div>
+                      <option value="" disabled selected>Seleccione una opción</option><option value="0" data-text="0. Nada">0. Nada</option>
+                      <option value="1" data-text="1. Algo">1. Algo</option><option value="2" data-text="2. Moderado">2. Moderado</option><option value="3" data-text="3. Muchísimo">3. Muchísimo</option>
+                    </select><input type="hidden" name="angustia_familiar_texto"></div>
 
                     <div class="form-group"><label>¿El nivel de ayuda que recibe de otras personas es suficiente para satisfacer sus necesidades?</label><select class="form-control" name="nivel_ayuda" required>
-                        <option value="" disabled selected>Seleccione una opción</option><option value="0">Nada</option>
-                        <option value="1">Algo</option><option value="2">Moderado</option><option value="3">Muchísimo</option>
-                    </select></div>
+                      <option value="" disabled selected>Seleccione una opción</option><option value="0" data-text="0. Nada">0. Nada</option>
+                      <option value="1" data-text="1. Algo">1. Algo</option><option value="2" data-text="2. Moderado">2. Moderado</option><option value="3" data-text="3. Muchísimo">3. Muchísimo</option>
+                    </select><input type="hidden" name="nivel_ayuda_texto"></div>
 
                     <div class="form-group"><label>¿Hasta qué punto la enfermedad y tratamiento de su pariente han obstaculizado sus relaciones personales?</label><select class="form-control" name="relaciones_personales" required>
-                        <option value="" disabled selected>Seleccione una opción</option><option value="0">Nada</option>
-                        <option value="1">Algo</option><option value="2">Moderado</option><option value="3">Muchísimo</option>
-                    </select></div>
+                      <option value="" disabled selected>Seleccione una opción</option><option value="0" data-text="0. Nada">0. Nada</option>
+                      <option value="1" data-text="1. Algo">1. Algo</option><option value="2" data-text="2. Moderado">2. Moderado</option><option value="3" data-text="3. Muchísimo">3. Muchísimo</option>
+                    </select><input type="hidden" name="relaciones_personales_texto"></div>
 
                     <div class="form-group"><label>¿Hasta qué punto la enfermedad y tratamiento de su pariente han afectado su vida sexual?</label><select class="form-control" name="vida_sexual" required>
-                        <option value="" disabled selected>Seleccione una opción</option><option value="0">Nada</option>
-                        <option value="1">Algo</option><option value="2">Moderado</option><option value="3">Muchísimo</option>
-                    </select></div>
+                      <option value="" disabled selected>Seleccione una opción</option><option value="0" data-text="0. Nada">0. Nada</option>
+                      <option value="1" data-text="1. Algo">1. Algo</option><option value="2" data-text="2. Moderado">2. Moderado</option><option value="3" data-text="3. Muchísimo">3. Muchísimo</option>
+                    </select><input type="hidden" name="vida_sexual_texto"></div>
 
                     <div class="form-group"><label>¿Hasta qué punto la enfermedad y tratamiento de su pariente han afectado su trabajo?</label><select class="form-control" name="trabajo" required>
-                        <option value="" disabled selected>Seleccione una opción</option><option value="0">Nada</option>
-                        <option value="1">Algo</option><option value="2">Moderado</option><option value="3">Muchísimo</option>
-                    </select></div>
+                      <option value="" disabled selected>Seleccione una opción</option><option value="0" data-text="0. Nada">0. Nada</option>
+                      <option value="1" data-text="1. Algo">1. Algo</option><option value="2" data-text="2. Moderado">2. Moderado</option><option value="3" data-text="3. Muchísimo">3. Muchísimo</option>
+                    </select><input type="hidden" name="trabajo_texto"></div>
 
                     <div class="form-group"><label>¿Hasta qué punto la enfermedad y tratamiento de su pariente, han afectado las actividades que usted realiza en el hogar?</label><select class="form-control" name="actividades_hogar" required>
-                        <option value="" disabled selected>Seleccione una opción</option><option value="0">Nada</option>
-                        <option value="1">Algo</option><option value="2">Moderado</option><option value="3">Muchísimo</option>
-                    </select></div>
+                      <option value="" disabled selected>Seleccione una opción</option><option value="0" data-text="0. Nada">0. Nada</option>
+                      <option value="1" data-text="1. Algo">1. Algo</option><option value="2" data-text="2. Moderado">2. Moderado</option><option value="3" data-text="3. Muchísimo">3. Muchísimo</option>
+                    </select><input type="hidden" name="actividades_hogar_texto"></div>
 
                     <div class="form-group"><label>¿Qué tan aislado se siente usted a causa de la enfermedad y el tratamiento de su pariente?</label><select class="form-control" name="aislamiento" required>
-                        <option value="" disabled selected>Seleccione una opción</option><option value="0">Nada</option>
-                        <option value="1">Algo</option><option value="2">Moderado</option><option value="3">Muchísimo</option>
-                    </select></div>
+                      <option value="" disabled selected>Seleccione una opción</option><option value="0" data-text="0. Nada">0. Nada</option>
+                      <option value="1" data-text="1. Algo">1. Algo</option><option value="2" data-text="2. Moderado">2. Moderado</option><option value="3" data-text="3. Muchísimo">3. Muchísimo</option>
+                    </select><input type="hidden" name="aislamiento_texto"></div>
 
                     <div class="form-group"><label>¿Cuánta carga económica le ha ocasionado la enfermedad y tratamiento de su pariente?</label><select class="form-control" name="carga_economica" required>
-                        <option value="" disabled selected>Seleccione una opción</option><option value="0">Nada</option>
-                        <option value="1">Algo</option><option value="2">Moderado</option><option value="3">Muchísimo</option>
-                    </select></div>
+                      <option value="" disabled selected>Seleccione una opción</option><option value="0" data-text="0. Nada">0. Nada</option>
+                      <option value="1" data-text="1. Algo">1. Algo</option><option value="2" data-text="2. Moderado">2. Moderado</option><option value="3" data-text="3. Muchísimo">3. Muchísimo</option>
+                    </select><input type="hidden" name="carga_economica_texto"></div>
 
                     <div class="form-group"><label>Clasifique su estado social general</label><select class="form-control" name="estado_social" required>
-                        <option value="" disabled selected>Seleccione una opción</option><option value="0">Sumamente malo</option>
-                        <option value="1">Regular</option><option value="2">Bueno</option><option value="3">Excelente</option>
-                      </select></div>
+                      <option value="" disabled selected>Seleccione una opción</option><option value="0" data-text="0. Sumamente malo">0. Sumamente malo</option>
+                      <option value="1" data-text="1. Regular">1. Regular</option><option value="2" data-text="2. Bueno">2. Bueno</option><option value="3" data-text="3. Excelente">3. Excelente</option>
+                      </select><input type="hidden" name="estado_social_texto"></div>
+
+                    <div class="text-right mt-4">
+                      <button type="button" class="btn btn-outline-primary btn-next" data-next="#espiritual">Siguiente sección</button>
+                      <a href="{% url 'detalle_paciente' paciente_id %}" class="btn btn-secondary">Ver Paciente</a>
+                    </div>
 
                 </div>
               </div>
@@ -204,49 +224,52 @@
                 <div class="card-body bg-white">
                   
                     <div class="form-group"><label>¿El nivel de ayuda que recibe de sus actividades religiosas, tales como ir a la iglesia o al templo, satisfacen sus necesidades?</label><select class="form-control" name="actividades_religiosas" required>
-                        <option value="" disabled selected>Seleccione una opción</option><option value="0">Nada</option>
-                        <option value="1">Algo</option><option value="2">Moderado</option><option value="3">Muchísimo</option>
-                    </select></div>
+                      <option value="" disabled selected>Seleccione una opción</option><option value="0" data-text="0. Nada">0. Nada</option>
+                      <option value="1" data-text="1. Algo">1. Algo</option><option value="2" data-text="2. Moderado">2. Moderado</option><option value="3" data-text="3. Muchísimo">3. Muchísimo</option>
+                    </select><input type="hidden" name="actividades_religiosas_texto"></div>
 
                     <div class="form-group"><label>¿El nivel de ayuda que recibe de sus actividades espirituales personales, tales como meditar u orar, es suficiente para satisfacer sus necesidades?</label><select class="form-control" name="actividades_espirituales_personales" required>
-                        <option value="" disabled selected>Seleccione una opción</option><option value="0">Nada</option>
-                        <option value="1">Algo</option><option value="2">Moderado</option><option value="3">Muchísimo</option>
-                    </select></div>
+                      <option value="" disabled selected>Seleccione una opción</option><option value="0" data-text="0. Nada">0. Nada</option>
+                      <option value="1" data-text="1. Algo">1. Algo</option><option value="2" data-text="2. Moderado">2. Moderado</option><option value="3" data-text="3. Muchísimo">3. Muchísimo</option>
+                    </select><input type="hidden" name="actividades_espirituales_personales_texto"></div>
 
                     <div class="form-group"><label>¿Cuánta incertidumbre siente usted respecto al futuro de su pariente?</label><select class="form-control" name="incertidumbre_futuro" required>
-                        <option value="" disabled selected>Seleccione una opción</option><option value="0">Nada</option>
-                        <option value="1">Algo</option><option value="2">Moderado</option><option value="3">Muchísimo</option>
-                    </select></div>
+                      <option value="" disabled selected>Seleccione una opción</option><option value="0" data-text="0. Nada">0. Nada</option>
+                      <option value="1" data-text="1. Algo">1. Algo</option><option value="2" data-text="2. Moderado">2. Moderado</option><option value="3" data-text="3. Muchísimo">3. Muchísimo</option>
+                    </select><input type="hidden" name="incertidumbre_futuro_texto"></div>
 
                     <div class="form-group"><label>¿Hasta qué punto la enfermedad de su pariente ha causado cambios positivos en su vida?</label><select class="form-control" name="cambios_positivos" required>
-                        <option value="" disabled selected>Seleccione una opción</option><option value="0">Nada</option>
-                        <option value="1">Algo</option><option value="2">Moderado</option><option value="3">Muchísimo</option>
-                    </select></div>
+                      <option value="" disabled selected>Seleccione una opción</option><option value="0" data-text="0. Nada">0. Nada</option>
+                      <option value="1" data-text="1. Algo">1. Algo</option><option value="2" data-text="2. Moderado">2. Moderado</option><option value="3" data-text="3. Muchísimo">3. Muchísimo</option>
+                    </select><input type="hidden" name="cambios_positivos_texto"></div>
 
                     <div class="form-group"><label>¿Usted siente que tiene un propósito en su vida o una razón para vivir?</label><select class="form-control" name="proposito_vida" required>
-                        <option value="" disabled selected>Seleccione una opción</option><option value="0">Nada</option>
-                        <option value="1">Algo</option><option value="2">Moderado</option><option value="3">Muchísimo</option>
-                    </select></div>
+                      <option value="" disabled selected>Seleccione una opción</option><option value="0" data-text="0. Nada">0. Nada</option>
+                      <option value="1" data-text="1. Algo">1. Algo</option><option value="2" data-text="2. Moderado">2. Moderado</option><option value="3" data-text="3. Muchísimo">3. Muchísimo</option>
+                    </select><input type="hidden" name="proposito_vida_texto"></div>
 
                     <div class="form-group"><label>¿Cuánta esperanza siente usted?</label><select class="form-control" name="esperanza" required>
-                        <option value="" disabled selected>Seleccione una opción</option><option value="0">Nada</option>
-                        <option value="1">Algo</option><option value="2">Moderado</option><option value="3">Muchísimo</option>
-                    </select></div>
+                      <option value="" disabled selected>Seleccione una opción</option><option value="0" data-text="0. Nada">0. Nada</option>
+                      <option value="1" data-text="1. Algo">1. Algo</option><option value="2" data-text="2. Moderado">2. Moderado</option><option value="3" data-text="3. Muchísimo">3. Muchísimo</option>
+                    </select><input type="hidden" name="esperanza_texto"></div>
 
                     <div class="form-group"><label>Clasifique su estado espiritual de manera general</label><select class="form-control" name="estado_espiritual" required>
-                        <option value="" disabled selected>Seleccione una opción</option><option value="0">Sumamente malo</option>
-                        <option value="1">Regular</option><option value="2">Bueno</option><option value="3">Excelente</option>
-                    </select></div>
+                        <option value="" disabled selected>Seleccione una opción</option><option value="0" data-text="0. Sumamente malo">0. Sumamente malo</option>
+                        <option value="1" data-text="1. Regular">1. Regular</option><option value="2" data-text="2. Bueno">2. Bueno</option><option value="3" data-text="3. Excelente">3. Excelente</option>
+                    </select><input type="hidden" name="estado_espiritual_texto"></div>
+
+                    <!-- Botón de envío -->
+                    <div class="text-right mt-4">
+                      <button type="submit" class="btn btn-primary">Guardar Evaluación</button>
+                      <a href="{% url 'detalle_paciente' paciente_id %}" class="btn btn-secondary">Ver Paciente</a>
+                    </div>
 
                 </div>
+
+
               </div>
             </div>
 
-          </div>
-
-          <!-- Botón de envío -->
-          <div class="text-right mt-4 mb-4 mr-4">
-            <button type="submit" class="btn btn-primary">Guardar Evaluación</button>
           </div>
           
         </form>
@@ -254,5 +277,50 @@
     </div>
   </div>
 </div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const selects = document.querySelectorAll('select.form-control');
+
+    function actualizarTexto(select) {
+      const selectedOption = select.options[select.selectedIndex];
+      if (!selectedOption) return;
+
+      const texto = selectedOption.getAttribute('data-text') || selectedOption.textContent || '';
+      const hiddenInput = document.querySelector(`input[name="${select.name}_texto"]`);
+      if (hiddenInput) {
+        hiddenInput.value = texto.trim();
+      }
+    }
+
+    selects.forEach(select => {
+      actualizarTexto(select); // Inicializar si ya hay valor
+      select.addEventListener('change', function () {
+        actualizarTexto(this);
+      });
+    });
+
+    // --- Navegación por secciones ---
+    const nextButtons = document.querySelectorAll('.btn-next');
+
+    nextButtons.forEach(btn => {
+      btn.addEventListener('click', function () {
+        const nextTabId = this.getAttribute('data-next');
+        if (!nextTabId) return;
+
+        // Ocultar pestaña actual
+        document.querySelector('.tab-pane.active').classList.remove('show', 'active');
+        document.querySelector('.nav-link.active').classList.remove('active');
+
+        // Mostrar siguiente pestaña
+        document.querySelector(nextTabId).classList.add('show', 'active');
+        document.querySelector(`.nav-link[href="${nextTabId}"]`).classList.add('active');
+
+        // Scroll al inicio
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    });
+  });
+</script>
 
 {% endblock %}

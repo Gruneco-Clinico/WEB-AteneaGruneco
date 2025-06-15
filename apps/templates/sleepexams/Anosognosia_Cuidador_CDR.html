@@ -1,0 +1,836 @@
+{% extends 'layouts/base.html' %}
+{% block content %}
+
+<div class="header bg-primary pb-6">
+  <div class="container-fluid">
+    <div class="header-body">
+      <div class="row align-items-center py-4">
+        <div class="col-lg-6 col-5">
+          <h6 class="h2 text-white d-inline-block mb-0">Evaluación CDR - Anosognosia Cuidador</h6>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid mt--6">
+  <div class="row">
+    <div class="col">
+      <div class="card shadow">
+        <form method="post" action="{% url 'guardar_examen_Cuidador_CDR' %}">
+          {% csrf_token %}
+          <input type="hidden" name="visita_id" value="{{ visita_examen }}">
+          <input type="hidden" name="paciente_id" value="{{ paciente_id }}">
+          <input type="hidden" name="examen_id" value="{{ examen_id }}">
+
+          <div class="alert alert-info">
+            <strong>Instrucciones:</strong> Responda las siguientes preguntas sobre el comportamiento del paciente. Este formulario está dirigido al informante/cuidador.
+          </div>
+
+          <!-- Navegación por pestañas -->
+          <ul class="nav nav-pills nav-fill mb-4" role="tablist">
+            <li class="nav-item"><a class="nav-link active" data-toggle="tab" href="#memoria">Memoria</a></li>
+            <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#orientacion">Orientación</a></li>
+            <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#juicio">Juicio y resolución de problemas</a></li>
+            <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#comunitarias">Actividades Comunitarias</a></li>
+            <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#pasatiempos">Actividades Domésticas y Pasatiempos</a></li>
+            <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#cuidado_personal">Cuidado Personal</a></li>
+          </ul>
+
+          <div class="tab-content">
+
+            <!-- PESTAÑA: Memoria -->
+            <div class="tab-pane fade show active" id="memoria">
+              <div class="card bg-gradient-default shadow-sm mb-4">
+                <div class="card-header bg-transparent"><h4 class="text-white mb-0">Dominio: Memoria</h4></div>
+                <div class="card-body bg-white">
+
+                  <div class="form-group">
+                    <label for="memoria_p1">1. ¿Ha notado pérdida de memoria reciente?</label>
+                    <select class="form-control" name="memoria_p1" id="memoria_p1" required>
+                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="si">Sí</option>
+                      <option value="no">No</option>
+                    </select>
+                  
+                    <!-- Subpregunta de la P1 -->
+                    <div id="memoria_p1_1_container" style="display: none; margin-top: 10px; margin-left: 15px;">
+                      <label for="memoria_p1_1">¿Es este un problema constante (a diferencia de esporádico)?</label>
+                      <select class="form-control" name="memoria_p1_1" id="memoria_p1_1">
+                        <option value="" disabled selected>Seleccione una opción</option>
+                        <option value="si">Sí</option>
+                        <option value="no">No</option>
+                      </select>
+                    </div>
+                  </div>
+                  
+                  <div class="form-group">
+                    <label>2. ¿Puede él/ella recordar eventos recientes?</label>
+                    <select class="form-control" name="memoria_p2" required>
+                      <option value="" disabled selected>Seleccione</option>
+                      <option value="generalmente">Generalmente</option>
+                      <option value="a_veces">A veces</option>
+                      <option value="raramente">Raramente</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label>3. ¿Puede él/ella recordar una lista breve de artículos (compras)?</label>
+                    <select class="form-control" name="memoria_p3" required>
+                      <option value="" disabled selected>Seleccione</option>
+                      <option value="generalmente">Generalmente</option>
+                      <option value="a_veces">A veces</option>
+                      <option value="raramente">Raramente</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label>4. ¿Se ha registrado algún deterioro en su memoria durante el último año?</label>
+                    <select class="form-control" name="memoria_p4" required>
+                      <option value="" disabled selected>Seleccione</option>
+                      <option value="si">Sí</option>
+                      <option value="no">No</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label>5. ¿Se encuentra su memoria deteriorada a tal punto que habría interferido con la realización de sus 
+                      actividades cotidianas habituales de años atrás (o actividades previas a la jubilación)? (opinión de 
+                      fuentes colaterales).</label>
+                    <select class="form-control" name="memoria_p5" required>
+                      <option value="" disabled selected>Seleccione</option>
+                      <option value="Si">Sí</option>
+                      <option value="No">No</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label>6. ¿Se olvida él/ella completamente de un evento importante (ej., viaje, fiesta, matrimonio familiar) a 
+                      pocas semanas del evento? </label>
+                    <select class="form-control" name="memoria_p6" required>
+                      <option value="" disabled selected>Seleccione</option>
+                      <option value="generalmente">Generalmente</option>
+                      <option value="a_veces">A veces</option>
+                      <option value="raramente">Raramente</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label>7. ¿Se olvida él/ella de detalles relevantes del evento importante?</label>
+                    <select class="form-control" name="memoria_p7" required>
+                      <option value="" disabled selected>Seleccione</option>
+                      <option value="generalmente">Generalmente</option>
+                      <option value="a_veces">A veces</option>
+                      <option value="raramente">Raramente</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label>8. ¿Se olvida él/ella completamente de información importante del pasado lejano (ej. fecha de 
+                      cumpleaños, fecha de matrimonio, lugar de trabajo)?</label>
+                    <select class="form-control" name="memoria_p8" required>
+                      <option value="" disabled selected>Seleccione</option>
+                      <option value="generalmente">Generalmente</option>
+                      <option value="a_veces">A veces</option>
+                      <option value="raramente">Raramente</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="memoria_evento_reciente">9. Cuénteme sobre algún evento reciente en la vida de él/ella que él/ella debería recordar.</label>
+                    <p class="text-muted" style="margin-bottom: 8px;">
+                      (Para una comparación posterior con las respuestas del sujeto, obtenga detalles tales como el lugar del evento, la hora del día, los participantes, duración del evento, cuándo terminó y cómo llegó hasta ahí el sujeto o los demás participantes).
+                    </p>
+                    <!-- Subpreguntas -->
+                    <div class="mt-3 ml-3">
+                      <label>En el curso de una semana</label>
+                      <input type="text" class="form-control" name="evento_recuerda_semana" id="evento_recuerda_semana" rows="3" required>
+                  
+                  
+                      <label>En el curso de un mes</label>
+                      <input type="text" class="form-control" name="evento_recuerda_mes" id="evento_recuerda_mes" rows="3" required>
+                    </div>
+                  </div>
+                  
+
+                  <!-- Pregunta 10 -->
+                  <div class="form-group">
+                    <label for="nacimiento_fecha">10. ¿Cuándo nació él/ella?</label>
+                    <input type="date" class="form-control" name="nacimiento_fecha" id="nacimiento_fecha" required>
+                  </div>
+
+                  <!-- Pregunta 11 -->
+                  <div class="form-group">
+                    <label for="nacimiento_lugar">11. ¿Dónde nació él/ella?</label>
+                    <input type="text" class="form-control" name="nacimiento_lugar" id="nacimiento_lugar" required>
+                  </div>
+
+                  <!-- Pregunta 12 -->
+                  <div class="form-group">
+                    <label>12. ¿Cuál fue el último colegio al que él/ella asistió?</label>
+                    <div class="ml-3 mt-2">
+                      <label for="colegio_nombre">Nombre:</label>
+                      <input type="text" class="form-control mb-2" name="colegio_nombre" id="colegio_nombre" required>
+
+                      <label for="colegio_lugar">Lugar:</label>
+                      <input type="text" class="form-control mb-2" name="colegio_lugar" id="colegio_lugar" required>
+
+                      <label for="colegio_grado">Grado:</label>
+                      <input type="text" class="form-control" name="colegio_grado" id="colegio_grado" required>
+                    </div>
+                  </div>
+
+
+                  <!-- Pregunta 13 -->
+                  <div class="form-group">
+                    <label for="ocupacion_principal">13. ¿Cuál fue la principal ocupación de él/ella (o la ocupación del cónyuge si el sujeto no trabajaba)?</label>
+                    <input type="text" class="form-control" name="ocupacion_principal" id="ocupacion_principal" required>
+                  </div>
+
+                  <!-- Pregunta 14 -->
+                  <div class="form-group">
+                    <label for="ultimo_trabajo">14. ¿Cuál fue el último trabajo de él/ella (o trabajo del cónyuge si el sujeto no trabajaba)?</label>
+                    <input type="text" class="form-control" name="ultimo_trabajo" id="ultimo_trabajo" required>
+                  </div>
+
+                  <!-- Pregunta 15 -->
+                  <div class="form-group">
+                    <label for="jubilacion">15. ¿Cuándo se jubiló él/ella (o cónyuge) y por qué?</label>
+                    <textarea class="form-control" name="jubilacion" id="jubilacion" rows="3" required></textarea>
+                  </div>
+
+                  <div class="text-right mt-4">
+                    <button type="button" class="btn btn-outline-primary btn-next" data-next="#orientacion">Siguiente sección</button>
+                    <a href="{% url 'detalle_paciente' paciente_id %}" class="btn btn-secondary">Ver Paciente</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- PESTAÑA: Orientación -->
+            <div class="tab-pane fade" id="orientacion">
+              <div class="card bg-gradient-default shadow-sm mb-4">
+                <div class="card-header bg-transparent"><h4 class="text-white mb-0">Dominio: Orientación</h4></div>
+                <div class="card-body bg-white">
+
+                  <div class="form-group">
+                    <label>1. ¿Con qué frecuencia sabe él/ella exactamente la fecha del día?</label>
+                    <select class="form-control" name="orientacion_p1"required>
+                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="generalmente">Generalmente</option>
+                      <option value="A veces">A veces</option>
+                      <option value="Raramente">Raramente</option>
+                      <option value="No sé">No sé</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label>2. ¿Con qué frecuencia sabe él/ella exactamente el mes?</label>
+                    <select class="form-control" name="orientacion_p2"required>
+                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="generalmente">Generalmente</option>
+                      <option value="A veces">A veces</option>
+                      <option value="Raramente">Raramente</option>
+                      <option value="No sé">No sé</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label>3. ¿Con qué frecuencia sabe él/ella exactamente el año?</label>
+                    <select class="form-control" name="orientacion_p3" required>
+                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="generalmente">Generalmente</option>
+                      <option value="A veces">A veces</option>
+                      <option value="Raramente">Raramente</option>
+                      <option value="No sé">No sé</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label>4. ¿Con qué frecuencia sabe él/ella exactamente el día de la semana</label>
+                    <select class="form-control" name="orientacion_p4" required>
+                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="generalmente">Generalmente</option>
+                      <option value="A veces">A veces</option>
+                      <option value="Raramente">Raramente</option>
+                      <option value="No sé">No sé</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label>5. ¿Presenta él/ella dificultad para relacionar acontecimientos en el tiempo (cuándo ocurrieron unos 
+                      eventos en relación con los otros)?</label>
+                    <select class="form-control" name="orientacion_p5" required>
+                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="generalmente">Generalmente</option>
+                      <option value="A veces">A veces</option>
+                      <option value="Raramente">Raramente</option>
+                      <option value="No sé">No sé</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label>6. ¿Puede él/ella orientarse en calles que le son conocidas? </label>
+                    <select class="form-control" name="orientacion_p6" required>
+                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="generalmente">Generalmente</option>
+                      <option value="A veces">A veces</option>
+                      <option value="Raramente">Raramente</option>
+                      <option value="No sé">No sé</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label>7. ¿Con qué frecuencia sabe él/ella cómo llegar de un lugar a otro cuando se encuentra fuera de su 
+                      vecindario? </label>
+                    <select class="form-control" name="orientacion_p7" required>
+                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="generalmente">Generalmente</option>
+                      <option value="A veces">A veces</option>
+                      <option value="Raramente">Raramente</option>
+                      <option value="No sé">No sé</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label>8. ¿Con qué frecuencia puede él/ella orientarse dentro de su casa? </label>
+                    <select class="form-control" name="orientacion_p8" required>
+                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="Generalmente">Generalmente</option>
+                      <option value="A veces">A veces</option>
+                      <option value="Raramente">Raramente</option>
+                      <option value="No sé">No sé</option>
+                    </select>
+                  </div>
+
+                  <div class="text-right mt-4">
+                    <button type="button" class="btn btn-outline-primary btn-next" data-next="#juicio">Siguiente sección</button>
+                    <a href="{% url 'detalle_paciente' paciente_id %}" class="btn btn-secondary">Ver Paciente</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- PESTAÑA: Juicio y resolución de problemas -->
+            <div class="tab-pane fade" id="juicio">
+              <div class="card bg-gradient-default shadow-sm mb-4">
+                <div class="card-header bg-transparent"><h4 class="text-white mb-0">Dominio: Orientación</h4></div>
+                <div class="card-body bg-white">
+
+                  <div class="form-group">
+                    <label>1. En general, si Ud. tuviera que evaluar la capacidad de él/ella para resolver problemas en este 
+                      momento, Ud. la consideraría: </label>
+                    <select class="form-control" name="juicio_p1" required>
+                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="Tan buena como ha sido siempre">Tan buena como ha sido siempre</option>
+                      <option value="Buena, pero no tan buena como lo era antes">Buena, pero no tan buena como lo era antes</option>
+                      <option value="Regular">Regular</option>
+                      <option value="Pobre">Pobre</option>
+                      <option value="No tiene ninguna capacidad">No tiene ninguna capacidad</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label>2. Evalúe la capacidad de él/ella para manejar pequeñas sumas de dinero (ej. dar cambio, dejar una 
+                      pequeña propina): </label>
+                    <select class="form-control" name="juicio_p2" required>
+                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="Sin pérdida">Sin pérdida</option>
+                      <option value="Algo de pérdida">Buena, pero no tan buena como lo era antes</option>
+                      <option value="Pérdida severa">Pérdida severa</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label>3. Evalúe la capacidad de él/ella para manejar transacciones financieras o de negocios complicadas (ej. 
+                      balancear una chequera, pagar cuentas): </label>
+                    <select class="form-control" name="juicio_p3" required>
+                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="Sin pérdida">Sin pérdida</option>
+                      <option value="Algo de pérdida">Buena, pero no tan buena como lo era antes</option>
+                      <option value="Pérdida severa">Pérdida severa</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label>4. ¿Puede él/ella manejar una emergencia doméstica (ej. gotera en las cañerías, pequeño incendio)? </label>
+                    <select class="form-control" name="juicio_p3" required>
+                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="Tan bien como antes">Tan bien como antes</option>
+                      <option value="Peor que antes debido a problemas en el pensamiento">Peor que antes debido a problemas en el pensamiento</option>
+                      <option value="Peor que antes, por alguna otra razón">Peor que antes, por alguna otra razón (ADD CAMPO)</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label>5. ¿Puede él/ella comprender situaciones o explicaciones? </label>
+                    <select class="form-control" name="juicio_p5" required>
+                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="Generalmente">Generalmente</option>
+                      <option value="A veces">A veces</option>
+                      <option value="Raramente">Raramente</option>
+                      <option value="No sé">No sé</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label>6. ¿Se comporta* apropiadamente (es decir, como usualmente se comportaba antes de la aparición de 
+                      su enfermedad) en situaciones sociales e interacciones con otra gente?  </label>
+                      <p class="text-muted" style="margin-bottom: 8px;">* Este ítem evalúa el comportamiento, no la apariencia.</p>
+                    <select class="form-control" name="juicio_p6" required>
+                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="Generalmente">Generalmente</option>
+                      <option value="A veces">A veces</option>
+                      <option value="Raramente">Raramente</option>
+                      <option value="No sé">No sé</option>
+                    </select>
+                  </div>
+
+
+                  <div class="text-right mt-4">
+                    <button type="button" class="btn btn-outline-primary btn-next" data-next="#comunitarias">Siguiente sección</button>
+                    <a href="{% url 'detalle_paciente' paciente_id %}" class="btn btn-secondary">Ver Paciente</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+
+            <!-- PESTAÑA: Actividades Comunitarias -->
+            <div class="tab-pane fade" id="comunitarias">
+              <div class="card bg-gradient-default shadow-sm mb-4">
+                <div class="card-header bg-transparent"><h4 class="text-white mb-0">Dominio: Actividades Comunitarias</h4></div>
+                <div class="card-body bg-white">
+
+                  <!-- OCUPACIONAL -->
+                  <div class="form-group">
+                    <label>1. ¿Él/Ella sigue trabajando?</label>
+                    <select class="form-control" name="trabaja_actualmente" id="trabaja_actualmente" required>
+                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="na">N/A</option>
+                      <option value="si">Sí</option>
+                      <option value="no">No</option>
+                    </select>
+                  </div>
+
+                  <!-- Si NO trabaja -->
+                  <div class="form-group" id="trabajo_pregunta2" style="display: none; margin-left: 20px;">
+                    <label>2. ¿Problemas con la memoria o el pensamiento de él/ella contribuyeron a su decisión de jubilarse?</label>
+                    <select class="form-control" name="memoria_causa_jubilacion">
+                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="si">Sí</option>
+                      <option value="no">No</option>
+                      <option value="nose">No sé</option>
+                    </select>
+                  </div>
+
+                  <!-- Si SÍ trabaja -->
+                  <div class="form-group" id="trabajo_pregunta3" style="display: none; margin-left: 20px;">
+                    <label>3. ¿Él/Ella presenta dificultades significativas en el trabajo debido a problemas con su memoria o pensamiento?</label>
+                    <select class="form-control" name="dificultades_trabajo_memoria">
+                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="raramente">Raramente o nunca</option>
+                      <option value="a_veces">A veces</option>
+                      <option value="generalmente">Generalmente</option>
+                      <option value="nose">No sé</option>
+                    </select>
+                  </div>
+
+                  <hr>
+
+                  <!-- SOCIAL -->
+                  <div class="form-group">
+                    <label>4. ¿Condujo él/ella alguna vez un carro?</label>
+                    <select class="form-control" name="condujo_alguna_vez" id="condujo_alguna_vez" required>
+                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="si">Sí</option>
+                      <option value="no">No</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label>¿Actualmente, él/ella conduce un carro?</label>
+                    <select class="form-control" name="conduce_actualmente" id="conduce_actualmente">
+                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="si">Sí</option>
+                      <option value="no">No</option>
+                    </select>
+                  </div>
+
+                  <!-- Si NO conduce actualmente -->
+                  <div class="form-group" id="conduccion_pregunta" style="display: none; margin-left: 20px;">
+                    <label>¿Se debe esto a problemas con su memoria o pensamiento?</label>
+                    <select class="form-control" name="dejo_de_conducir_por_memoria">
+                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="si">Sí</option>
+                      <option value="no">No</option>
+                    </select>
+                  </div>
+
+                  <!-- Si SÍ conduce -->
+                  <div class="form-group" id="conduce_riesgo" style="display: none; margin-left: 20px;">
+                    <label>5. Si él/ella todavía conduce, ¿existen problemas o riesgos debido a un pensamiento pobre?</label>
+                    <select class="form-control" name="riesgos_conduccion">
+                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="si">Sí</option>
+                      <option value="no">No</option>
+                    </select>
+                  </div>
+
+                  <!-- Pregunta 6 -->
+                  <div class="form-group">
+                    <label>6. ¿Es él/ella todavía capaz de salir a comprar lo que necesita en forma independiente?</label>
+                    <select class="form-control" name="compras_independientes" required>
+                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="raramente">Raramente o nunca (Necesita ser acompañado/a siempre)</option>
+                      <option value="a_veces">A veces (Compra una cantidad limitada de artículos, duplica la compra o se olvida de artículos)</option>
+                      <option value="generalmente">Generalmente</option>
+                      <option value="no_sabe">No sé</option>
+                    </select>
+                  </div>
+
+                  <!-- Pregunta 7 -->
+                  <div class="form-group">
+                    <label>7. ¿Es él/ella capaz de llevar a cabo actividades fuera del hogar en forma independiente?</label>
+                    <select class="form-control" name="actividades_fuera_hogar" required>
+                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="raramente">Raramente o nunca (Incapaz sin ayuda)</option>
+                      <option value="a_veces">A veces (Limitadas y/o rutinarias)</option>
+                      <option value="generalmente">Generalmente (Participación significativa)</option>
+                      <option value="no_sabe">No sé</option>
+                    </select>
+                  </div>
+
+                  <!-- Pregunta 8 -->
+                  <div class="form-group">
+                    <label>8. ¿Asiste él/ella a funciones sociales fuera del hogar familiar?</label>
+                    <select class="form-control" name="asiste_funciones_sociales" id="asiste_funciones_sociales" required>
+                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="si">Sí</option>
+                      <option value="no">No</option>
+                    </select>
+
+                    <!-- Subpregunta si responde "No" -->
+                    <div id="funciones_sociales_motivo_container" style="display: none; margin-top: 10px;">
+                      <label for="motivo_no_funciones">En caso negativo, ¿por qué no?</label>
+                      <textarea class="form-control" name="motivo_no_funciones" id="motivo_no_funciones" rows="2"></textarea>
+                    </div>
+                  </div>
+
+                  <!-- Pregunta 9 -->
+                  <div class="form-group">
+                    <label>9. ¿Alguien que no conozca al sujeto y observara su comportamiento pensaría que éste/a se encuentra enfermo/a?</label>
+                    <select class="form-control" name="parece_enfermo" required>
+                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="si">Sí</option>
+                      <option value="no">No</option>
+                    </select>
+                  </div>
+
+                  <!-- Pregunta 10 -->
+                  <div class="form-group">
+                    <label>10. Si el sujeto se encuentra en un hogar geriátrico, ¿participa activamente él/ella en actividades sociales (con participación intelectual)?</label>
+                    <select class="form-control" name="participa_hogar_geriatrico" required>
+                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="si">Sí</option>
+                      <option value="no">No</option>
+                    </select>
+                  </div>
+
+                  <!-- Confirmación de información suficiente -->
+                  <div class="form-group">
+                    <label>¿Existe suficiente información disponible para evaluar el grado de deterioro del sujeto en las actividades comunitarias?</label>
+                    <select class="form-control" name="info_suficiente_comunitarias" required>
+                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="si">Sí</option>
+                      <option value="no">No</option>
+                    </select>
+                  </div>
+
+                  <!-- Notas -->
+                  <div class="form-group">
+                    <label>Notas adicionales (si desea clarificar el nivel de funcionamiento en actividades comunitarias):</label>
+                    <textarea class="form-control" name="notas_comunitarias" rows="3"></textarea>
+                  </div>
+
+                  <div class="text-right mt-4">
+                    <button type="button" class="btn btn-outline-primary btn-next" data-next="#pasatiempos">Siguiente sección</button>
+                    <a href="{% url 'detalle_paciente' paciente_id %}" class="btn btn-secondary">Ver Paciente</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- PESTAÑA: Actividades Domésticas y Pasatiempos -->
+            <div class="tab-pane fade" id="pasatiempos">
+              <div class="card bg-gradient-default shadow-sm mb-4">
+                <div class="card-header bg-transparent">
+                  <h4 class="text-white mb-0">Dominio: Actividades Domésticas y Pasatiempos</h4>
+                </div>
+                <div class="card-body bg-white">
+
+                  <!-- Pregunta 1a -->
+                  <div class="form-group">
+                    <label for="cambios_tareas_domesticas">
+                      1. a) ¿Qué cambios se han registrado en las habilidades de él/ella para realizar tareas domésticas?
+                    </label>
+                    <textarea class="form-control" name="cambios_tareas_domesticas" id="cambios_tareas_domesticas" rows="3" required></textarea>
+                  </div>
+
+                  <!-- Pregunta 1b -->
+                  <div class="form-group">
+                    <label for="cosas_que_aun_realiza_domesticas">
+                      1. b) ¿Qué cosas puede él/ella todavía realizar bien?
+                    </label>
+                    <textarea class="form-control" name="cosas_que_aun_realiza_domesticas" id="cosas_que_aun_realiza_domesticas" rows="3" required></textarea>
+                  </div>
+
+                  <!-- Pregunta 2a -->
+                  <div class="form-group">
+                    <label for="cambios_pasatiempos">
+                      2. a) ¿Qué cambios se han registrado en las habilidades de él/ella para realizar pasatiempos?
+                    </label>
+                    <textarea class="form-control" name="cambios_pasatiempos" id="cambios_pasatiempos" rows="3" required></textarea>
+                  </div>
+
+                  <!-- Pregunta 2b -->
+                  <div class="form-group">
+                    <label for="cosas_que_aun_realiza_pasatiempos">
+                      2. b) ¿Qué cosas puede él/ella todavía realizar bien?
+                    </label>
+                    <textarea class="form-control" name="cosas_que_aun_realiza_pasatiempos" id="cosas_que_aun_realiza_pasatiempos" rows="3" required></textarea>
+                  </div>
+
+                  <!-- Pregunta 3 -->
+                  <div class="form-group">
+                    <label for="actividades_no_realiza_en_hogar">
+                      3. Si el sujeto se encuentra en un hogar geriátrico, ¿qué cosas ya no puede realizar bien (actividades domésticas y pasatiempos)?
+                    </label>
+                    <textarea class="form-control" name="actividades_no_realiza_en_hogar" id="actividades_no_realiza_en_hogar" rows="3"></textarea>
+                  </div>
+
+                  <!-- Pregunta 4 -->
+                  <div class="form-group">
+                    <label for="habilidad_domestica_dementia_scale">
+                      4. Habilidad para realizar tareas domésticas (Dementia Scale of Blessed)
+                    </label>
+                    <select class="form-control" name="habilidad_domestica_dementia_scale" required>
+                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="0">0 - Sin pérdida</option>
+                      <option value="0.5">0.5 - Pérdida leve</option>
+                      <option value="1">1 - Pérdida severa</option>
+                    </select>
+                  </div>
+
+                  <!-- Descripción adicional -->
+                  <div class="form-group">
+                    <label for="descripcion_habilidad_domestica">
+                      Por favor describa:
+                    </label>
+                    <textarea class="form-control" name="descripcion_habilidad_domestica" id="descripcion_habilidad_domestica" rows="4" required></textarea>
+                  </div>
+
+                  <!-- Pregunta 5: Nivel actual de desempeño -->
+                  <div class="form-group">
+                    <label for="nivel_desempeno_domestico">
+                      5. ¿En qué nivel es él/ella capaz de realizar tareas domésticas?
+                    </label>
+                    <select class="form-control" name="nivel_desempeno_domestico" id="nivel_desempeno_domestico" required>
+                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="muy_limitado">Desempeño muy limitado (solo bajo estrecha supervisión)</option>
+                      <option value="limitado">Se desempeña solo en actividades limitadas (cierta supervisión)</option>
+                      <option value="independiente_algunas">Se desempeña independientemente en algunas actividades</option>
+                      <option value="no_al_nivel_usual">Se desempeña en actividades habituales, pero no con el nivel usual</option>
+                      <option value="normal">Se desempeña normalmente en actividades habituales</option>
+                    </select>
+                  </div>
+
+                  <!-- Notas -->
+                  <div class="form-group">
+                    <label for="notas_domesticas_pasatiempos">
+                      <strong>Notas adicionales</strong> (si desea aclarar nivel de funcionamiento):
+                    </label>
+                    <textarea class="form-control" name="notas_domesticas_pasatiempos" id="notas_domesticas_pasatiempos" rows="4"></textarea>
+                  </div>
+
+                  <div class="text-right mt-4">
+                    <button type="button" class="btn btn-outline-primary btn-next" data-next="#cuidado_personal">Siguiente sección</button>
+                    <a href="{% url 'detalle_paciente' paciente_id %}" class="btn btn-secondary">Ver Paciente</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+
+
+            <!-- PESTAÑA: Cuidado personal -->
+            <div class="tab-pane fade" id="cuidado_personal">
+              <div class="card bg-gradient-default shadow-sm mb-4">
+                <div class="card-header bg-transparent"><h4 class="text-white mb-0">Dominio: Cuidado personal</h4></div>
+                <div class="card-body bg-white">
+
+                  <div class="form-group">
+                    <label>A. Vestirse (The Dementia Scale of Blessed)</label>
+                    <select class="form-control" name="cuidado_p1" required>
+                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="0">Sin ayuda</option>
+                      <option value="1">Ocasionalmente botones mal abotonados, etc</option>
+                      <option value="2">Secuencia equivocada. Cosas frecuentemente olvidadas</option>
+                      <option value="3">Incapaz de vestirse solo/a</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label>B. Lavado, aseo</label>
+                    <select class="form-control" name="cuidado_p2" required>
+                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="0">Sin ayuda</option>
+                      <option value="1">Necesita recordatorios</option>
+                      <option value="2">A veces necesita ayuda</option>
+                      <option value="3">Siempre o casi siempre necesita ayuda</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label>C. Hábitos de alimentación</label>
+                    <select class="form-control" name="cuidado_p3" required>
+                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="0">Limpio; utiliza los utensilios correctos</option>
+                      <option value="1">Desordenado; cuchara</option>
+                      <option value="2">Sólidos simples</option>
+                      <option value="3">Se le debe dar de comer en todo momento</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label>D. Control de esfínteres (The Dementia Scale of Blessed)</label>
+                    <select class="form-control" name="cuidado_p4" required>
+                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="0">Control completo normal</option>
+                      <option value="1">Ocasionalmente moja la cama</option>
+                      <option value="2">Frecuentemente moja la cama</option>
+                      <option value="3">Incontinencia doble</option>
+                    </select>
+                  </div>
+
+                  <div class="text-right mt-4">
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                    <a href="{% url 'detalle_paciente' paciente_id %}" class="btn btn-secondary">Ver Paciente</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+
+          </div> <!-- fin tab-content -->
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // --- BOTÓN "SIGUIENTE SECCIÓN" ---
+    const botonesSiguiente = document.querySelectorAll(".btn-next");
+    botonesSiguiente.forEach(boton => {
+      boton.addEventListener("click", function () {
+        const nextTabId = this.getAttribute("data-next");
+        if (!nextTabId) return;
+
+        // Cambiar pestaña
+        document.querySelectorAll('.tab-pane').forEach(tab => tab.classList.remove('show', 'active'));
+        document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+
+        const nextTab = document.querySelector(nextTabId);
+        const nextNav = document.querySelector(`a[data-toggle="tab"][href="${nextTabId}"]`);
+
+        if (nextTab && nextNav) {
+          nextTab.classList.add('show', 'active');
+          nextNav.classList.add('active');
+        }
+      });
+    });
+
+    // --- SUBPREGUNTA: ¿Memoria reciente? ¿Es constante? ---
+    const memoriaSelect = document.getElementById("memoria_problema");
+    const memoriaConstanteContainer = document.getElementById("memoria_constante_container");
+
+    if (memoriaSelect && memoriaConstanteContainer) {
+      memoriaSelect.addEventListener("change", function () {
+        if (this.value === "si") {
+          memoriaConstanteContainer.style.display = "block";
+        } else {
+          memoriaConstanteContainer.style.display = "none";
+          const subSelect = memoriaConstanteContainer.querySelector("select");
+          if (subSelect) subSelect.value = "";
+        }
+      });
+    }
+
+    // --- LÓGICA: Ocultar/mostrar subpreguntas trabajo (P2 y P3) ---
+    const trabajoSelect = document.getElementById("trabaja_actualmente");
+    const trabajoP2 = document.getElementById("trabajo_pregunta2");
+    const trabajoP3 = document.getElementById("trabajo_pregunta3");
+
+    if (trabajoSelect) {
+      trabajoSelect.addEventListener("change", function () {
+        const val = this.value;
+        if (trabajoP2) trabajoP2.style.display = (val === "no") ? "block" : "none";
+        if (trabajoP3) trabajoP3.style.display = (val === "si") ? "block" : "none";
+
+        // Reset campos si se ocultan
+        if (val !== "no" && trabajoP2) {
+          const select = trabajoP2.querySelector("select");
+          if (select) select.value = "";
+        }
+        if (val !== "si" && trabajoP3) {
+          const select = trabajoP3.querySelector("select");
+          if (select) select.value = "";
+        }
+      });
+    }
+
+    // --- LÓGICA: Subpreguntas sobre conducción (memoria o riesgo) ---
+    const conduceSelect = document.getElementById("conduce_actualmente");
+    const dejaConducir = document.getElementById("conduccion_pregunta");
+    const riesgoConduce = document.getElementById("conduce_riesgo");
+
+    if (conduceSelect) {
+      conduceSelect.addEventListener("change", function () {
+        const val = this.value;
+        if (dejaConducir) dejaConducir.style.display = (val === "no") ? "block" : "none";
+        if (riesgoConduce) riesgoConduce.style.display = (val === "si") ? "block" : "none";
+
+        // Reset si se ocultan
+        if (val !== "no" && dejaConducir) {
+          const select = dejaConducir.querySelector("select");
+          if (select) select.value = "";
+        }
+        if (val !== "si" && riesgoConduce) {
+          const select = riesgoConduce.querySelector("select");
+          if (select) select.value = "";
+        }
+      });
+    }
+
+    // --- PREGUNTA 8: ¿Asiste a funciones sociales? Mostrar motivo si responde "No" ---
+    const funcionesSelect = document.getElementById("asiste_funciones_sociales");
+    const motivoContainer = document.getElementById("funciones_sociales_motivo_container");
+
+    if (funcionesSelect && motivoContainer) {
+      funcionesSelect.addEventListener("change", function () {
+        if (this.value === "no") {
+          motivoContainer.style.display = "block";
+        } else {
+          motivoContainer.style.display = "none";
+          const textarea = motivoContainer.querySelector("textarea");
+          if (textarea) textarea.value = "";
+        }
+      });
+    }
+  });
+</script>
+
+{% endblock %}

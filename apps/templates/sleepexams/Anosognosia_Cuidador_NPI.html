@@ -43,7 +43,7 @@
             {% include "includes/npi_item.html" with numero=12 nombre="apetito" label="Apetito/Alimentación" %}
 
             <div class="text-right mt-4">
-              <button type="submit" class="btn btn-primary">Guardar NPI</button>
+              <button type="submit" class="btn btn-primary">Guardar</button>
               <a href="{% url 'detalle_paciente' paciente_id %}" class="btn btn-secondary">Ver Paciente</a>
             </div>
           </div>
@@ -53,20 +53,67 @@
   </div>
 </div>
 
+
 <script>
   document.addEventListener('DOMContentLoaded', function () {
-    const toggles = document.querySelectorAll('.toggle-subitems');
-    toggles.forEach(select => {
+    const items = [
+      "ideas_delirantes", "alucinaciones", "agitacion", "depresion",
+      "ansiedad", "euforia", "apatia", "desinhibicion",
+      "irritabilidad", "conducta_motor", "sueno", "apetito"
+    ];
+
+    function actualizarResultadoYTextos(item) {
+      const frec = document.querySelector(`select[name="${item}_frecuencia"]`);
+      const grav = document.querySelector(`select[name="${item}_gravedad"]`);
+      const dist = document.querySelector(`select[name="${item}_distres"]`);
+      const resultado = document.getElementById(`${item}_resultado`);
+      const frec_texto = document.getElementById(`${item}_frecuencia_texto`);
+      const grav_texto = document.getElementById(`${item}_gravedad_texto`);
+      const dist_texto = document.getElementById(`${item}_distres_texto`);
+
+      if (frec && frec_texto) {
+        const opt = frec.options[frec.selectedIndex];
+        frec_texto.value = opt.dataset.text || "";
+      }
+
+      if (grav && grav_texto) {
+        const opt = grav.options[grav.selectedIndex];
+        grav_texto.value = opt.dataset.text || "";
+      }
+
+      if (dist && dist_texto) {
+        const opt = dist.options[dist.selectedIndex];
+        dist_texto.value = opt.dataset.text || "";
+      }
+
+      const frec_val = parseInt(frec?.value || 0);
+      const grav_val = parseInt(grav?.value || 0);
+      if (resultado) resultado.value = frec_val * grav_val;
+    }
+
+    // Mostrar subitems al cargar
+    document.querySelectorAll('.toggle-subitems').forEach(select => {
       const targetId = select.dataset.target;
       const container = document.getElementById(targetId);
       if (select.value === 'si') container.classList.remove('d-none');
 
       select.addEventListener('change', function () {
-        const cont = document.getElementById(this.dataset.target);
-        cont.classList.toggle('d-none', this.value !== 'si');
+        container.classList.toggle('d-none', this.value !== 'si');
+      });
+    });
+
+    // Listeners para frecuencia, gravedad y distres
+    items.forEach(item => {
+      ["frecuencia", "gravedad", "distres"].forEach(tipo => {
+        const select = document.querySelector(`select[name="${item}_${tipo}"]`);
+        if (select) {
+          select.addEventListener('change', () => actualizarResultadoYTextos(item));
+        }
       });
     });
   });
 </script>
+
+
 
 {% endblock %}

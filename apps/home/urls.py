@@ -85,7 +85,11 @@ urlpatterns = [
     path('guardar_examen_Participante_AdherenciaTerapeutica', views.guardar_examen_Participante_AdherenciaTerapeutica, name='guardar_examen_Participante_AdherenciaTerapeutica'),
     path('guardar_examen_Cuidador_NPI', views.guardar_examen_Cuidador_NPI, name='guardar_examen_Cuidador_NPI'),
     path('guardar_examen_Cuidador_LawtonBrody', views.guardar_examen_Cuidador_LawtonBrody, name='guardar_examen_Cuidador_LawtonBrody'),
-    path('guardar_examen_Participante_Cuidador_Zarit', views.guardar_examen_Participante_Cuidador_Zarit, name='guardar_examen_Participante_Cuidador_Zarit'),
+    path('guardar_examen_Cuidador_Zarit', views.guardar_examen_Cuidador_Zarit, name='guardar_examen_Cuidador_Zarit'),
     path('guardar_examen_Cuidador_BettyFerrel', views.guardar_examen_Cuidador_BettyFerrel, name='guardar_examen_Cuidador_BettyFerrel'),
     path('guardar_examen_Cuidador_AQD', views.guardar_examen_Cuidador_AQD, name='guardar_examen_Cuidador_AQD'),
+    path('guardar_examen_Cuidador_RedLatSpanish', views.guardar_examen_Cuidador_RedLatSpanish, name='guardar_examen_Cuidador_RedLatSpanish'),
+    path('guardar_examen_Cuidador_CDR', views.guardar_examen_Cuidador_CDR, name='guardar_examen_Cuidador_CDR'),
+    path('guardar_examen_Participante_CDR', views.guardar_examen_Participante_CDR, name='guardar_examen_Participante_CDR'),
+
 ]

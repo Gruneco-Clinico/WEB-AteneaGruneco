@@ -1,0 +1,704 @@
+{% extends 'layouts/base.html' %}
+{% block content %}
+
+<div class="header bg-primary pb-6">
+  <div class="container-fluid">
+    <div class="header-body">
+      <div class="row align-items-center py-4">
+        <div class="col-lg-6 col-5">
+          <h6 class="h2 text-white d-inline-block mb-0">Evaluación CDR - Participante</h6>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid mt--6">
+  <div class="row">
+    <div class="col">
+      <div class="card shadow">
+        <form method="post" action="{% url 'guardar_examen_Participante_CDR' %}">
+          {% csrf_token %}
+          <input type="hidden" name="visita_id" value="{{ visita_examen }}">
+          <input type="hidden" name="paciente_id" value="{{ paciente_id }}">
+          <input type="hidden" name="examen_id" value="{{ examen_id }}">
+
+          <div class="alert alert-info">
+            <strong>Instrucciones:</strong> Evaluación clínica de demencia. Responda las siguientes preguntas sobre su comportamiento.
+          </div>
+
+          <!-- Navegación por pestañas -->
+          <ul class="nav nav-pills nav-fill mb-4" role="tablist">
+            <li class="nav-item"><a class="nav-link active" data-toggle="tab" href="#memoria">Memoria</a></li>
+            <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#orientacion">Orientación</a></li>
+            <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#juicio">Juicio y resolución de problemas</a></li>
+            <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#evaluacion"><strong>Evaluación clínica</strong></a></li>
+          </ul>
+
+          <div class="tab-content">
+
+            <!-- PESTAÑA: Memoria -->
+            <div class="tab-pane fade show active" id="memoria">
+              <div class="card bg-gradient-default shadow-sm mb-4">
+                <div class="card-header bg-transparent"><h4 class="text-white mb-0">Dominio: Memoria</h4></div>
+                <div class="card-body bg-white">
+                  
+                  <div class="form-group">
+                    <label>1. ¿Tiene usted problemas con su memoria o pensamiento?</label>
+                    <select class="form-control" name="memoria_p1" required>
+                      <option value="" disabled selected>Seleccione</option>
+                      <option value="si">Sí</option>
+                      <option value="no">No</option>
+                    </select>
+                  </div>
+
+                  <!-- Pregunta 2 -->
+                  <div class="form-group">
+                    <label for="memoria_evento_reciente">
+                      2. Hace algunos momentos su (cónyuge, etc.) me contó acerca de algunas de sus experiencias 
+                      recientes. ¿Me podría Ud. contar algo acerca de esas experiencias?
+                    </label>
+                    <p class="text-muted" style="margin-bottom: 8px;">
+                      (Incitar al sujeto para que dé detalles, si fueren necesarios, tales como lugar del evento, hora del día, participantes, cuánto duró el evento, cuándo terminó y cómo llegaron hasta ahí el sujeto o los otros participantes).
+                    </p>
+                    <!-- Subpreguntas -->
+                    <div class="mt-3 ml-3">
+                      <label>En el curso de una semana</label>
+                      <textarea class="form-control mb-2" name="evento_recuerda_semana" id="evento_recuerda_semana" rows="3" required></textarea>
+                      <select class="form-control mb-4" name="memoria_semana_calificacion" required>
+                        <option value="" disabled selected>Seleccione</option>
+                        <option value="1">1.0: Mayormente correcto</option>
+                        <option value="0.5">0.5: Parcialmente correcto</option>
+                        <option value="0">0.0: Mayormente incorrecto</option>
+                      </select>
+
+                      <label>En el curso de un mes</label>
+                      <textarea class="form-control mb-2" name="evento_recuerda_mes" id="evento_recuerda_mes" rows="3" required></textarea>
+                      <select class="form-control" name="memoria_mes_calificacion" required>
+                        <option value="" disabled selected>Seleccione</option>
+                        <option value="1">1.0: Mayormente correcto</option>
+                        <option value="0.5">0.5: Parcialmente correcto</option>
+                        <option value="0">0.0: Mayormente incorrecto</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <!-- Pregunta 3 -->
+                  <div class="form-group mt-4">
+                    <label>
+                      3. Le voy a dar un nombre y una dirección para que Ud. recuerde por unos minutos. Repita este nombre 
+                      y dirección después de mí:
+                    </label>
+                    <p class="text-muted mb-2">
+                      (Repetir hasta que la frase sea correctamente repetida o hasta un máximo de 3 ensayos).
+                    </p>
+
+                    <!-- Ensayo 1 -->
+                    <div class="mb-3">
+                      <label><strong>Ensayo 1:</strong></label><br>
+                      <div class="form-check form-check-inline">
+                        <label class="form-check-label mr-3">
+                          Juan <input class="form-check-input ml-1" type="checkbox" name="ensayo1_juan">
+                        </label>
+                        <label class="form-check-label mr-3">
+                          Pérez <input class="form-check-input ml-1" type="checkbox" name="ensayo1_perez">
+                        </label>
+                        <label class="form-check-label mr-3">
+                          Calle 42 <input class="form-check-input ml-1" type="checkbox" name="ensayo1_calle">
+                        </label>
+                        <label class="form-check-label mr-3">
+                          Avenida Boyacá <input class="form-check-input ml-1" type="checkbox" name="ensayo1_avenida">
+                        </label>
+                        <label class="form-check-label">
+                          Cali <input class="form-check-input ml-1" type="checkbox" name="ensayo1_cali">
+                        </label>
+                      </div>
+                    </div>
+
+                    <!-- Ensayo 2 -->
+                    <div class="mb-3">
+                      <label><strong>Ensayo 2:</strong></label><br>
+                      <div class="form-check form-check-inline">
+                        <label class="form-check-label mr-3">
+                          Juan <input class="form-check-input ml-1" type="checkbox" name="ensayo2_juan">
+                        </label>
+                        <label class="form-check-label mr-3">
+                          Pérez <input class="form-check-input ml-1" type="checkbox" name="ensayo2_perez">
+                        </label>
+                        <label class="form-check-label mr-3">
+                          Calle 42 <input class="form-check-input ml-1" type="checkbox" name="ensayo2_calle">
+                        </label>
+                        <label class="form-check-label mr-3">
+                          Avenida Boyacá <input class="form-check-input ml-1" type="checkbox" name="ensayo2_avenida">
+                        </label>
+                        <label class="form-check-label">
+                          Cali <input class="form-check-input ml-1" type="checkbox" name="ensayo2_cali">
+                        </label>
+                      </div>
+                    </div>
+
+                    <!-- Ensayo 3 -->
+                    <div class="mb-3">
+                      <label><strong>Ensayo 3:</strong></label><br>
+                      <div class="form-check form-check-inline">
+                        <label class="form-check-label mr-3">
+                          Juan <input class="form-check-input ml-1" type="checkbox" name="ensayo3_juan">
+                        </label>
+                        <label class="form-check-label mr-3">
+                          Pérez <input class="form-check-input ml-1" type="checkbox" name="ensayo3_perez">
+                        </label>
+                        <label class="form-check-label mr-3">
+                          Calle 42 <input class="form-check-input ml-1" type="checkbox" name="ensayo3_calle">
+                        </label>
+                        <label class="form-check-label mr-3">
+                          Avenida Boyacá <input class="form-check-input ml-1" type="checkbox" name="ensayo3_avenida">
+                        </label>
+                        <label class="form-check-label">
+                          Cali <input class="form-check-input ml-1" type="checkbox" name="ensayo3_cali">
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+
+
+                  <!-- Pregunta 4 -->
+                  <div class="form-group mt-4">
+                    <label for="fecha_nacimiento">4. ¿Cuándo nació?</label>
+                    <input type="date" class="form-control" name="fecha_nacimiento" id="fecha_nacimiento" required>
+                  </div>
+
+                  <!-- Pregunta 5 -->
+                  <div class="form-group">
+                    <label for="lugar_nacimiento">5. ¿Dónde nació?</label>
+                    <input type="text" class="form-control" name="lugar_nacimiento" id="lugar_nacimiento" required>
+                  </div>
+
+                  <!-- Pregunta 6 -->
+                  <div class="form-group">
+                    <label>6. ¿Cuál fue el último colegio al que asistió?</label>
+                    <div class="ml-3 mt-2">
+                      <label for="colegio_nombre">Nombre:</label>
+                      <input type="text" class="form-control mb-2" name="colegio_nombre" required>
+
+                      <label for="colegio_lugar">Lugar:</label>
+                      <input type="text" class="form-control mb-2" name="colegio_lugar" required>
+
+                      <label for="colegio_grado">Grado:</label>
+                      <input type="text" class="form-control" name="colegio_grado" required>
+                    </div>
+                  </div>
+
+                  <!-- Pregunta 7 -->
+                  <div class="form-group">
+                    <label for="ocupacion_principal">7. ¿Cuál era su principal ocupación/trabajo o la de su cónyuge, si Ud. no estaba empleado/a?</label>
+                    <input type="text" class="form-control" name="ocupacion_principal" id="ocupacion_principal" required>
+                  </div>
+
+                  <!-- Pregunta 8 -->
+                  <div class="form-group">
+                    <label for="ultimo_trabajo">8. ¿Cuál fue su último trabajo importante (o el de su cónyuge, si Ud. no estaba empleado/a)?</label>
+                    <input type="text" class="form-control" name="ultimo_trabajo" id="ultimo_trabajo" required>
+                  </div>
+
+                  <!-- Pregunta 9 -->
+                  <div class="form-group">
+                    <label for="jubilacion">9. ¿Cuándo se jubiló (o su cónyuge) y por qué?</label>
+                    <textarea class="form-control" name="jubilacion" id="jubilacion" rows="3" required></textarea>
+                  </div>
+
+                  <!-- Pregunta 10 -->
+                  <div class="form-group">
+                    <label>
+                      10. Repita el nombre y la dirección que le pedí que recuerde:
+                    </label>
+                    <p class="text-muted mb-2">(Seleccionar los elementos repetidos correctamente)</p>
+                    <div class="form-check form-check-inline">
+                      <label class="form-check-label mr-3">
+                        Juan <input class="form-check-input ml-1" type="checkbox" name="repeticion_juan">
+                      </label>
+                      <label class="form-check-label mr-3">
+                        Pérez <input class="form-check-input ml-1" type="checkbox" name="repeticion_perez">
+                      </label>
+                      <label class="form-check-label mr-3">
+                        Calle 42 <input class="form-check-input ml-1" type="checkbox" name="repeticion_calle">
+                      </label>
+                      <label class="form-check-label mr-3">
+                        Avenida Boyacá <input class="form-check-input ml-1" type="checkbox" name="repeticion_avenida">
+                      </label>
+                      <label class="form-check-label">
+                        Cali <input class="form-check-input ml-1" type="checkbox" name="repeticion_cali">
+                      </label>
+                    </div>
+                  </div>
+
+                  <!-- Botón para siguiente pestaña -->
+
+                  <div class="text-right mt-4">
+                    <button type="button" class="btn btn-outline-primary btn-next" data-next="#orientacion">Siguiente sección</button>
+                    <a href="{% url 'detalle_paciente' paciente_id %}" class="btn btn-secondary">Ver Paciente</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- PESTAÑA: Orientación -->
+            <div class="tab-pane fade" id="orientacion">
+              <div class="card bg-gradient-default shadow-sm mb-4">
+                <div class="card-header bg-transparent"><h4 class="text-white mb-0">Dominio: Orientación</h4></div>
+                <div class="card-body bg-white">
+
+                  <div class="form-group">
+                    <label>1. ¿Qué fecha es hoy?</label>
+                    <select class="form-control" name="orientacion_p1"required>
+                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="Correcto">Correcto</option>
+                      <option value="Incorrecto">Incorrecto</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label>2. ¿Què día de la semana es hoy?</label>
+                    <select class="form-control" name="orientacion_p2"required>
+                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="Correcto">Correcto</option>
+                      <option value="Incorrecto">Incorrecto</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label>3. ¿En qué mes estamos?</label>
+                    <select class="form-control" name="orientacion_p3" required>
+                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="Correcto">Correcto</option>
+                      <option value="Incorrecto">Incorrecto</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label>4. ¿En qué año estamos?</label>
+                    <select class="form-control" name="orientacion_p4" required>
+                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="Correcto">Correcto</option>
+                      <option value="Incorrecto">Incorrecto</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label>5. ¿Cómo se llama este lugar?</label>
+                    <select class="form-control" name="orientacion_p5" required>
+                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="Correcto">Correcto</option>
+                      <option value="Incorrecto">Incorrecto</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label>6. ¿En qué pueblo o ciudad estamos?</label>
+                    <select class="form-control" name="orientacion_p6" required>
+                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="Correcto">Correcto</option>
+                      <option value="Incorrecto">Incorrecto</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label>7. ¿Qué hora es?</label>
+                    <select class="form-control" name="orientacion_p7" required>
+                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="Correcto">Correcto</option>
+                      <option value="Incorrecto">Incorrecto</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label>8. ¿Sabe el sujeto quién es el informante (según el criterio del entrevistador)? </label>
+                    <select class="form-control" name="orientacion_p8" required>
+                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="Correcto">Correcto</option>
+                      <option value="Incorrecto">Incorrecto</option>
+                    </select>
+                  </div>
+
+                  <div class="text-right mt-4">
+                    <button type="button" class="btn btn-outline-primary btn-next" data-next="#juicio">Siguiente sección</button>
+                    <a href="{% url 'detalle_paciente' paciente_id %}" class="btn btn-secondary">Ver Paciente</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- PESTAÑA: Juicio y resolución de problemas -->
+            <div class="tab-pane fade" id="juicio">
+              <div class="card bg-gradient-default shadow-sm mb-4">
+                <div class="card-header bg-transparent">
+                  <h4 class="text-white mb-0">Dominio: Juicio y resolución de problemas</h4>
+                </div>
+                <div class="card-body bg-white">
+
+                  <!-- Pregunta 1 -->
+                  <div class="form-group">
+                    <label>1. ¿En qué se parecen un rábano y una coliflor?</label>
+                    <p class="text-muted" style="margin-bottom: 8px;">
+                      0: Verduras<br>
+                      1: Alimentos comestibles, cosas que viven, se pueden cocinar, etc<br>
+                      2: Respuestas no pertinentes; diferencias, que se compran
+                    </p>
+                    <input type="text" class="form-control mb-2" name="juicio_p1_respuesta" required>
+                    <select class="form-control" name="juicio_p1_puntaje" required>
+                      <option value="" disabled selected>Seleccione puntuación</option>
+                      <option value="0">0: Verduras</option>
+                      <option value="1">1: Alimentos, cosas vivas, se pueden cocinar</option>
+                      <option value="2">2: Respuesta no pertinente, diferencias, que se compran</option>
+                    </select>
+                  </div>
+
+                  <!-- Pregunta 2 -->
+                  <div class="form-group">
+                    <label>2. ¿En qué se parecen un escritorio y una estantería?</label>
+                    <p class="text-muted" style="margin-bottom: 8px;">
+                      0: Muebles, muebles de oficina, ambos sostienen libros<br>
+                      1: Madera, patas<br>
+                      2: Respuestas no pertinentes; diferencias
+                    </p>
+                    <input type="text" class="form-control mb-2" name="juicio_p2_respuesta" required>
+                    <select class="form-control" name="juicio_p2_puntaje" required>
+                      <option value="" disabled selected>Seleccione puntuación</option>
+                      <option value="0">0: Muebles, sostienen libros</option>
+                      <option value="1">1: Hechos de madera, tienen patas</option>
+                      <option value="2">2: No pertinente, diferencias</option>
+                    </select>
+                  </div>
+
+                  <!-- Pregunta 3 -->
+                  <div class="form-group">
+                    <label>3. ¿Cuál es la diferencia entre una mentira y una equivocación?</label>
+                    <p class="text-muted" style="margin-bottom: 8px;">
+                      0: Una es deliberada, la otra sin intención<br>
+                      1: Una mala y la otra buena; o explica sólo una<br>
+                      2: Cualquier otra cosa; semejanzas
+                    </p>
+                    <input type="text" class="form-control mb-2" name="juicio_p3_respuesta" required>
+                    <select class="form-control" name="juicio_p3_puntaje" required>
+                      <option value="" disabled selected>Seleccione puntuación</option>
+                      <option value="0">0: Una es deliberada, la otra sin intención</option>
+                      <option value="1">1: Una mala y la otra buena, o explica solo una</option>
+                      <option value="2">2: Cualquier otra cosa; semejanzas</option>
+                    </select>
+                  </div>
+
+                  <!-- Pregunta 4 -->
+                  <div class="form-group">
+                    <label>4. ¿Cuál es la diferencia entre un río y un canal?</label>
+                    <p class="text-muted" style="margin-bottom: 8px;">
+                      0: Natural - artificial<br>
+                      2: Cualquier otra cosa
+                    </p>
+                    <input type="text" class="form-control mb-2" name="juicio_p4_respuesta" required>
+                    <select class="form-control" name="juicio_p4_puntaje" required>
+                      <option value="" disabled selected>Seleccione puntuación</option>
+                      <option value="0">0: natural - artificial</option>
+                      <option value="2">2: Cualquier otra cosa</option>
+                    </select>
+                  </div>
+
+                  <!-- Pregunta 5 -->
+                  <div class="form-group">
+                    <label>5. ¿Cuántos centavos hay en un peso?</label>
+                    <p class="text-muted" style="margin-bottom: 8px;">Respuesta: En 1 peso hay 100 centavos</p>
+                    <div class="form-check">
+                      <label class="form-check-label">
+                        <input type="checkbox" class="form-check-input" name="juicio_p5_correcto"> Correcto
+                      </label>
+                    </div>
+                  </div>
+
+                  <!-- Pregunta 6 -->
+                  <div class="form-group">
+                    <label>6. ¿Cuántas monedas de 50 pesos hay en $1,350?</label>
+                    <p class="text-muted" style="margin-bottom: 8px;">Respuesta: Hay 27 monedas de 50 pesos en $1,350</p>
+                    <div class="form-check">
+                      <label class="form-check-label">
+                        <input type="checkbox" class="form-check-input" name="juicio_p6_correcto"> Correcto
+                      </label>
+                    </div>
+                  </div>
+
+                  <!-- Pregunta 7 -->
+                  <div class="form-group">
+                    <label>7. Restar 3 de 20 y continuar hasta llegar a 2 o 1</label>                    <div class="form-check">
+                      <label class="form-check-label">
+                        <input type="checkbox" class="form-check-input" name="juicio_p7_correcto"> Correcto
+                      </label>
+                    </div>
+                  </div>
+
+                  <!-- Pregunta 8 -->
+                  <div class="form-group">
+                    <label>8. Al llegar a una ciudad extraña, ¿cómo localizaría usted a un amigo?</label>
+                    <p class="text-muted" style="margin-bottom: 8px;">
+                      0: Intentaría con la guía de teléfonos, Internet, ir al juzgado para conseguir un directorio; llamas a un amigo en común<br>
+                      1: Llamar a la policía, llamar a la operadora (generalmente no darán direcciones)<br>
+                      2: No brinda una respuesta clara
+                    </p>
+                    <select class="form-control" name="juicio_p8_puntaje" required>
+                      <option value="" disabled selected>Seleccione puntuación</option>
+                      <option value="0">0: Guía telefónica, internet, amigo común</option>
+                      <option value="1">1: Policía, operadora</option>
+                      <option value="2">2: No brinda respuesta clara</option>
+                    </select>
+                  </div>
+
+                  <!-- Pregunta 9 -->
+                  <div class="form-group">
+                    <label>9. Evaluación por parte del sujeto con respecto a su discapacidad y su posición social y comprensión de 
+                      por qué se encuentra actualmente en el test (estos aspectos pueden ya estar cubiertos pero por favor 
+                      dé su opinión personal aquí): </label>
+                    <select class="form-control" name="juicio_p9" required>
+                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="Buena percepción">Buena percepción</option>
+                      <option value="Percepción parcial">Percepción parcial</option>
+                      <option value="Poca percepción">Poca percepción</option>
+                    </select>
+                  </div>
+
+                  <div class="text-right mt-4">
+                    <button type="button" class="btn btn-outline-primary btn-next" data-next="#evaluacion">Siguiente sección</button>
+                    <a href="{% url 'detalle_paciente' paciente_id %}" class="btn btn-secondary">Ver Paciente</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- PESTAÑA: Evaluación Clínica -->
+            <div class="tab-pane fade" id="evaluacion">
+              <div class="card bg-gradient-default shadow-sm mb-4">
+                <div class="card-header bg-transparent">
+                  <h4 class="text-white mb-0">Evaluación Clínica de Demencia (CDR)</h4>
+                </div>
+                <div class="card-body bg-white">
+                  <p class="text-muted">
+                    Califique cada dominio según la descripción que mejor se ajuste al funcionamiento actual del paciente debido a deterioro cognitivo. No considere limitaciones físicas o emocionales.
+                  </p>
+
+                  <!-- Memoria -->
+                  <div class="form-group">
+                    <label for="cdr_memoria">1. Memoria</label>
+                    <select class="form-control" name="cdr_memoria" id="cdr_memoria">
+                      <option value="">Seleccione</option>
+                      <option value="0" data-description="No hay pérdida de memoria o hay un leve olvido esporádico ">0: Ausencia de demencia</option>
+                      <option value="0.5" data-description="Leve olvido persistente; recuerdo parcial de eventos, olvido “benigno” ">0.5: Diagnóstico incierto o pospuesto</option>
+                      <option value="1" data-description="Pérdida moderada de la memoria; más marcada para eventos recientes; el defecto interfiere con las actividades cotidianas ">1:Demencia leve</option>
+                      <option value="2" data-description="Severa pérdida de la memoria; solo retiene material muy aprendido; rápida pérdida de nuevo material ">2: Demencia moderada</option>
+                      <option value="3" data-description="Severa pérdida de memoria; sólo quedan fragmentos">3: Demencia severa</option>
+                    </select>
+                    <div class="descripcion-campo text-muted mt-2" id="desc_cdr_memoria"></div>
+                  </div>
+
+                  <!-- Orientación -->
+                  <div class="form-group">
+                    <label for="cdr_orientacion">2. Orientación</label>
+                    <select class="form-control" name="cdr_orientacion" id="cdr_orientacion">
+                      <option value="">Seleccione</option>
+                      <option value="0" data-description="Completamente orientado/a">0: Ausencia de demencia</option>
+                      <option value="0.5" data-description="Completamente orientado/a salvo una leve dificultad con las relaciones temporales ">0.5: Diagnóstico incierto o pospuesto</option>
+                      <option value="1" data-description="Moderada dificultad con relaciones temporales; orientado/a en cuanto al lugar al momento del test; puede sufrir desorientación geográfica en algún otro lugar ">1:Demencia leve</option>
+                      <option value="2" data-description="Severa dificultad con relaciones temporales; generalmente desorientado/a en cuanto al tiempo, frecuentemente en cuanto al lugar  ">2: Demencia moderada</option>
+                      <option value="3" data-description="Orientado/a solamente a la persona">3: Demencia severa</option>
+                    </select>
+                    <div class="descripcion-campo text-muted mt-2" id="desc_cdr_orientacion"></div>
+                  </div>
+
+                  <!-- Juicio y resolución de problemas -->
+                  <div class="form-group">
+                    <label for="cdr_juicio">3. Juicio y resolución de problemas</label>
+                    <select class="form-control" name="cdr_juicio" id="cdr_juicio">
+                      <option value="">Seleccione</option>
+                      <option value="0" data-description="Soluciona bien los problemas cotidianos; buen juicio en relación con desempeño pasado ">0: Ausencia de demencia</option>
+                      <option value="0.5" data-description="Leve deterioro en la solución de problemas, semejanzas y diferencias ">0.5: Diagnóstico incierto o pospuesto</option>
+                      <option value="1" data-description="Moderada dificultad en el manejo de problemas, semejanzas y diferencias; juicio social generalmente conservado">1:Demencia leve</option>
+                      <option value="2" data-description="Severamente deteriorado/a en el manejo de problemas, semejanzas y diferencias; juicio social generalmente deteriorado">2: Demencia moderada</option>
+                      <option value="3" data-description="Incapaz de realizar juicios o de solucionar problemas ">3: Demencia severa</option>
+                    </select>
+                    <div class="descripcion-campo text-muted mt-2" id="desc_cdr_juicio"></div>
+                  </div>
+
+                  <!-- Actividades Comunitarias -->
+                  <div class="form-group">
+                    <label for="cdr_comunitarias">4. Juicio y resolución de problemas</label>
+                    <select class="form-control" name="cdr_comunitarias" id="cdr_comunitarias">
+                      <option value="">Seleccione</option>
+                      <option value="0" data-description="Funcionamiento independiente y en el nivel usual en el trabajo, compras, asuntos de negocios y financieros, voluntariado y grupos sociales ">0: Ausencia de demencia</option>
+                      <option value="0.5" data-description="Leve deterioro en estas actividades ">0.5: Diagnóstico incierto o pospuesto</option>
+                      <option value="1" data-description="Incapaz de funcionar independientemente en estas actividades, aunque todavía puede estar involucrado/a en alguna de ellas; a simple vista, da la impresión de normalidad ">1:Demencia leve</option>
+                      <option value="2" data-description="Aparenta estar lo suficientemente bien como para tener actividad social fuera del hogar ">2: Demencia moderada</option>
+                      <option value="3" data-description="Aparenta estar demasiado enfermo/a como para tener actividad social fuera del ámbito hogareño ">3: Demencia severa</option>
+                    </select>
+                    <div class="descripcion-campo text-muted mt-2" id="desc_cdr_comunitarias"></div>
+                  </div>
+
+                  <!-- Hogar y Pasatiempos -->
+                  <div class="form-group">
+                    <label for="cdr_pasatiempos">5. Juicio y resolución de problemas</label>
+                    <select class="form-control" name="cdr_pasatiempos" id="cdr_pasatiempos">
+                      <option value="">Seleccione</option>
+                      <option value="0" data-description="Vida hogareña, pasatiempos e intereses intelectuales bien conservados ">0: Ausencia de demencia</option>
+                      <option value="0.5" data-description="Vida hogareña, pasatiempos e intereses intelectuales levemente deteriorados ">0.5: Diagnóstico incierto o pospuesto</option>
+                      <option value="1" data-description="Deterioro leve pero definitivo de su funcionamiento dentro del hogar; las tareas domésticas más difíciles son abandonadas; los intereses y los pasatiempos más complicados son abandonados ">1:Demencia leve</option>
+                      <option value="2" data-description="Sólo se encuentran conservados los quehaceres simples; intereses muy restringidos, pobremente conservados ">2: Demencia moderada</option>
+                      <option value="3" data-description="No cumple función significativa dentro del hogar ">3: Demencia severa</option>
+                    </select>
+                    <div class="descripcion-campo text-muted mt-2" id="desc_cdr_pasatiempos"></div>
+                  </div>
+
+                  <!-- Cuidado Personal -->
+                  <div class="form-group">
+                    <label for="cdr_cuidado">6. Cuidado personal</label>
+                    <select class="form-control" name="cdr_cuidado" id="cdr_cuidado">
+                      <option value="">Seleccione</option>
+                      <option value="0" data-description="Completamente capaz de cuidar de sí mismo/a ">0: Ausencia de demencia</option>
+                      <option value="1" data-description="Necesita recordatorios ">1:Demencia leve</option>
+                      <option value="2" data-description="Requiere asistencia para vestirse, asearse, y para el cuidado de sus efectos personales ">2: Demencia moderada</option>
+                      <option value="3" data-description="Requiere mucha ayuda con el cuidado personal; frecuentemente incontinente ">3: Demencia severa</option>
+                    </select>
+                    <div class="descripcion-campo text-muted mt-2" id="desc_cdr_cuidado"></div>
+                  </div>
+
+                  <!-- Resultado Global -->
+                  <div class="form-group mt-4">
+                    <label for="cdr_global"><strong>CDR Global (calculado automáticamente)</strong></label>
+                    <input type="text" class="form-control" id="cdr_global" name="cdr_global" readonly placeholder="Será calculado automáticamente">
+                  </div>
+
+                  <div class="text-right mt-4">
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                    <a href="{% url 'detalle_paciente' paciente_id %}" class="btn btn-secondary">Ver Paciente</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div> <!-- fin tab-content -->
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // --- BOTÓN "SIGUIENTE SECCIÓN" ---
+    const botonesSiguiente = document.querySelectorAll(".btn-next");
+    botonesSiguiente.forEach(boton => {
+      boton.addEventListener("click", function () {
+        const nextTabId = this.getAttribute("data-next");
+        if (!nextTabId) return;
+
+        document.querySelectorAll('.tab-pane').forEach(tab => tab.classList.remove('show', 'active'));
+        document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+
+        const nextTab = document.querySelector(nextTabId);
+        const nextNav = document.querySelector(`a[data-toggle="tab"][href="${nextTabId}"]`);
+
+        if (nextTab && nextNav) {
+          nextTab.classList.add('show', 'active');
+          nextNav.classList.add('active');
+        }
+      });
+    });
+
+    // --- CÁLCULO DEL CDR GLOBAL ---
+    const memoria = document.querySelector('[name="cdr_memoria"]');
+    const orientacion = document.querySelector('[name="cdr_orientacion"]');
+    const juicio = document.querySelector('[name="cdr_juicio"]');
+    const comunitarias = document.querySelector('[name="cdr_comunitarias"]');
+    const pasatiempos = document.querySelector('[name="cdr_pasatiempos"]');
+    const cuidado = document.querySelector('[name="cdr_cuidado"]');
+    const globalInput = document.getElementById("cdr_global");
+
+    function calcularCDRGlobal() {
+      const m = parseFloat(memoria.value || -1);
+      const o = parseFloat(orientacion.value || -1);
+      const j = parseFloat(juicio.value || -1);
+      const c = parseFloat(comunitarias.value || -1);
+      const h = parseFloat(pasatiempos.value || -1);
+      const p = parseFloat(cuidado.value || -1);
+
+      if ([m, o, j, c, h, p].includes(-1)) {
+        globalInput.value = "";
+        return;
+      }
+
+      let iguales = 0, mayores = 0, menores = 0;
+
+      if (o === m) iguales++;
+      if (j === m) iguales++;
+      if (c === m) iguales++;
+      if (h === m) iguales++;
+      if (p === m) iguales++;
+
+      if (o > m) mayores++; else if (o < m) menores++;
+      if (j > m) mayores++; else if (j < m) menores++;
+      if (c > m) mayores++; else if (c < m) menores++;
+      if (h > m) mayores++; else if (h < m) menores++;
+      if (p > m) mayores++; else if (p < m) menores++;
+
+      if (m === 0) {
+        const count05oMas = (o >= 0.5 ? 1 : 0) + (j >= 0.5 ? 1 : 0) + (c >= 0.5 ? 1 : 0) + (h >= 0.5 ? 1 : 0) + (p >= 0.5 ? 1 : 0);
+        globalInput.value = count05oMas >= 2 ? "0.5" : "0";
+        return;
+      }
+
+      if (m === 0.5) {
+        const count1oMas = (o >= 1 ? 1 : 0) + (j >= 1 ? 1 : 0) + (c >= 1 ? 1 : 0) + (h >= 1 ? 1 : 0) + (p >= 1 ? 1 : 0);
+        globalInput.value = count1oMas >= 3 ? "1" : "0.5";
+        return;
+      }
+
+      if (iguales >= 3) {
+        globalInput.value = m.toString();
+        return;
+      }
+
+      if (mayores > menores) {
+        const mayoresArr = [o, j, c, h, p].filter(x => x > m);
+        globalInput.value = moda(mayoresArr).toString();
+        return;
+      } else if (menores > mayores) {
+        const menoresArr = [o, j, c, h, p].filter(x => x < m);
+        globalInput.value = moda(menoresArr).toString();
+        return;
+      }
+
+      globalInput.value = m.toString();
+    }
+
+    function moda(arr) {
+      let counts = {};
+      arr.forEach(n => counts[n] = (counts[n] || 0) + 1);
+      let max = Math.max(...Object.values(counts));
+      return parseFloat(Object.keys(counts).find(k => counts[k] === max));
+    }
+
+    // Escuchar cambios en cada campo del CDR y mostrar descripción textual
+    [memoria, orientacion, juicio, comunitarias, pasatiempos, cuidado].forEach(select => {
+      select.addEventListener("change", function () {
+        calcularCDRGlobal();
+
+        const selectedOption = this.options[this.selectedIndex];
+        const description = selectedOption.getAttribute('data-description');
+        const descDiv = document.getElementById("desc_" + this.name); // debe existir en el HTML
+
+        if (descDiv && description) {
+          descDiv.textContent = description;
+        } else if (descDiv) {
+          descDiv.textContent = "";
+        }
+      });
+    });
+  });
+</script>
+
+
+
+
+{% endblock %}

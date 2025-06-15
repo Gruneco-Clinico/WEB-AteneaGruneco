@@ -92,53 +92,67 @@
             <!-- Ítem 5 -->
             <div class="form-group">
               <label><strong>5. Memoria</strong></label>
-              <p>Pedir al paciente que recuerde una lista de 5 palabras: rostro, seda, iglesia, clavel, rojo</p>
+              <p>Pedir al paciente que recuerde una lista de 5 palabras: rostro, seda, iglesia, clavel, rojo. Haga 2 intentos. Recuérdeselas 5 minutos más tarde.</p>
             </div>
 
             <div class="form-group">
                 <label><strong>6. Atención</strong></label>
               
                 <!-- Secuencia numérica -->
-                <p><strong>Secuencia numérica (1 punto)</strong></p>
-                <p><em>Instrucciones:</em> El examinador lee una secuencia de cinco números a un ritmo de uno por segundo, luego de haber dado las siguientes instrucciones: “Le voy a leer una serie de números, y cuando haya terminado, me gustaría que repita estos números en el mismo orden en el que yo los he dicho”.</p>
+                <p><strong>Secuencia numérica: 2 1 8 5 4</strong></p>
+                <p><em>Instrucciones:</em> Lea la secuencia de números a un ritmo de uno por segundo, luego de haber dado las siguientes instrucciones: “Le voy a leer una serie de números, y cuando haya terminado, me gustaría que repita estos números en el mismo orden en el que yo los he dicho”.</p>
                 <select class="form-control mb-3" name="atencion_secuencia" required>
                   <option value="" disabled selected>Seleccione puntuación</option>
-                  <option value="1">1 punto</option>
                   <option value="0">0 puntos</option>
+                  <option value="1">1 punto</option>
                 </select>
               
                 <!-- Secuencia numérica inversa -->
-                <p><strong>Secuencia numérica inversa (1 punto)</strong></p>
+                <p><strong>Secuencia numérica inversa: 7 4 2</strong></p>
                 <p><em>Instrucciones:</em> El examinador lee una secuencia de 3 cifras a un ritmo de una por segundo, luego de haber dado las instrucciones: “Le voy a leer una serie de números, y cuando haya terminado, me gustaría que repita los números en el orden inverso al que yo los he dado”.</p>
                 <select class="form-control mb-3" name="atencion_inversa" required>
                   <option value="" disabled selected>Seleccione puntuación</option>
-                  <option value="1">1 punto</option>
                   <option value="0">0 puntos</option>
+                  <option value="1">1 punto</option>
                 </select>
               
                 <!-- Concentración -->
                 <p><strong>Concentración (1 punto)</strong></p>
                 <p><em>Instrucciones:</em> El examinador lee una serie de letras a un ritmo de una por segundo, luego de haber dado las instrucciones: “Voy a leerle una serie de letras. Cada vez que diga la letra ‘A’, dé un golpecito con la mano. Cuando diga una letra que no sea la A, no dé ningún golpecito”.</p>
                 <p><em>Puntaje:</em> No se asigna ningún punto si se comete más de un error.</p>
-                <select class="form-control mb-3" name="atencion_concentracion" required>
-                  <option value="" disabled selected>Seleccione puntuación</option>
-                  <option value="1">1 punto</option>
-                  <option value="0">0 puntos</option>
-                </select>
+                <div class="form-check mb-2">
+                  <input class="form-check-input repeticion-check" type="checkbox" value="1" id="frase_1" name="frase_1">
+                  <label class="form-check-label" for="frase_1">
+                    F B A C M N A A J K L B A F A K D E A A A J A M O F A A B
+                  </label>
+                </div>
               
                 <!-- Sustracción en secuencia de 7 -->
                 <p><strong>Sustracción en secuencia de 7 (máximo 3 puntos)</strong></p>
                 <p><em>Instrucciones:</em> El examinador da las instrucciones siguientes: “Ahora me gustaría que calcule 100 menos 7, y así sucesivamente: continúe restando 7 a la cifra de su respuesta anterior, hasta que le pida que pare”.</p>
                 <p><em>Puntaje:</em> 0 puntos si ninguna es correcta, 1 punto por una correcta, 2 puntos por 2 o 3 correctas, 3 puntos por 4 o 5 correctas. Se permite un error inicial si las siguientes sustracciones son correctas.</p>
-                <select class="form-control mb-3" name="atencion_sustraccion" required>
-                  <option value="" disabled selected>Seleccione puntuación</option>
-                  <option value="3">3 puntos</option>
-                  <option value="2">2 puntos</option>
-                  <option value="1">1 punto</option>
-                  <option value="0">0 puntos</option>
-                </select>
-              </div>
-              
+                
+                <div class="form-check mb-2">
+                  <input class="form-check-input sustraccion-check" type="checkbox" value="1" id="sustr_1" name="sustraccion_7">
+                  <label class="form-check-label" for="sustr_1">93</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input sustraccion-check" type="checkbox" value="1" id="sustr_2" name="sustraccion_7">
+                  <label class="form-check-label" for="sustr_2">86</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input sustraccion-check" type="checkbox" value="1" id="sustr_3" name="sustraccion_7">
+                  <label class="form-check-label" for="sustr_3">79</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input sustraccion-check" type="checkbox" value="1" id="sustr_4" name="sustraccion_7">
+                  <label class="form-check-label" for="sustr_4">72</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input sustraccion-check" type="checkbox" value="1" id="sustr_5" name="sustraccion_7">
+                  <label class="form-check-label" for="sustr_5">65</label>
+                </div>
+                
               <!-- Campo oculto total atención -->
                 <input type="hidden" name="atencion" id="atencion_total" value="0">
                 </div>
@@ -169,7 +183,7 @@
             <!-- Ítem 8 -->
             <div class="form-group">
               <label><strong>8. Fluidez verbal</strong></label>
-              <p>Decir la mayor cantidad de palabras que comiencen con "F" en un minuto. Se otorga 1 punto si dice 11 palabras o más.</p>
+              <p>Decir la mayor cantidad de palabras que comiencen con "F" en un minuto. Se otorga 1 punto si dice 11 palabras o más en un minuto.</p>
               <select class="form-control" name="fluidez" required>
                 <option value="" disabled selected>Seleccione puntuación</option>
                 <option value="0">0 puntos</option>
@@ -192,7 +206,7 @@
             <!-- Ítem 10: Recuerdo diferido -->
             <div class="form-group">
                 <label><strong>10. Recuerdo diferido</strong></label>
-                <p>Recordar las siguientes palabras: 1 punto por cada palabra correctamente recordada. Máximo: 5 puntos.</p>
+                <p>Recordar las siguientes palabras: 1 punto por cada palabra correctamente recordada espontáneamente, sin pistas. Máximo: 5 puntos.</p>
                 <div class="form-row mb-3">
                   <div class="col text-center">
                     <div class="form-check form-check-inline">
@@ -235,24 +249,38 @@
                   - Fecha exacta (año, mes, día del mes y día de la semana).<br>
                   - Lugar exacto (nombre del sitio y localidad).
                 </p>
-                <p>1 punto por cada respuesta correcta. Total máximo: 2 puntos.</p>
+                <p>1 punto por cada respuesta correcta. Máximo: 6 puntos</p>
               
                 <div class="form-check mb-2">
                   <input class="form-check-input orientacion-check" type="checkbox" value="1" id="orientacion_fecha" name="orientacion_fecha">
-                  <label class="form-check-label" for="orientacion_fecha">
-                    Fecha completa correcta (año, mes, día y día de la semana)
-                  </label>
-                </div>
+                  <label class="form-check-label" for="orientacion_fecha">Día del mes (fecha)</label></div>
               
                 <div class="form-check mb-2">
-                  <input class="form-check-input orientacion-check" type="checkbox" value="1" id="orientacion_lugar" name="orientacion_lugar">
-                  <label class="form-check-label" for="orientacion_lugar">
-                    Lugar exacto correcto (hospital/clínica/localidad)
-                  </label>
-                </div>
+                  <input class="form-check-input orientacion-check" type="checkbox" value="1" id="orientacion_lugar" name="orientacion_mes">
+                  <label class="form-check-label" for="orientacion_lugar">Mes</label></div>
               
+                <div class="form-check mb-2">
+                  <input class="form-check-input orientacion-check" type="checkbox" value="1" id="orientacion_anio" name="orientacion_anio">
+                  <label class="form-check-label" for="orientacion_anio">Año</label>
+                </div>
+                
+                <div class="form-check mb-2">
+                  <input class="form-check-input orientacion-check" type="checkbox" value="1" id="orientacion_dia_semana" name="orientacion_dia_semana">
+                  <label class="form-check-label" for="orientacion_dia_semana">Día de la semana</label>
+                </div>
+                
+                <div class="form-check mb-2">
+                  <input class="form-check-input orientacion-check" type="checkbox" value="1" id="orientacion_lugar" name="orientacion_lugar">
+                  <label class="form-check-label" for="orientacion_lugar">Lugar</label>
+                </div>
+                
+                <div class="form-check mb-2">
+                  <input class="form-check-input orientacion-check" type="checkbox" value="1" id="orientacion_localidad" name="orientacion_localidad">
+                  <label class="form-check-label" for="orientacion_localidad">Localidad</label>
+                </div>
+
                 <input type="hidden" name="orientacion" id="orientacion_total" value="0">
-            </div>
+
 
             <!-- Corrección por escolaridad -->
             <div class="form-group">
@@ -273,7 +301,7 @@
               
             <!-- Botones -->
             <div class="text-right mt-4">
-              <button type="submit" class="btn btn-primary">Guardar Evaluación MoCA</button>
+              <button type="submit" class="btn btn-primary">Guardar</button>
               <a href="{% url 'detalle_paciente' paciente_id %}" class="btn btn-secondary">Ver Paciente</a>
             </div>
           </div>
@@ -284,98 +312,122 @@
 </div>
 
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      const campos = [
-        'alternancia',
-        'cubo',
-        'reloj',
-        'denominacion',
-        'memoria',
-        'atencion',
-        'repeticion',
-        'fluidez',
-        'abstraccion',
-        'diferido',
-        'orientacion'
-      ];
-  
-      function actualizarCampoDesdeCheckboxes(nombreClase, campoDestino) {
-        const checkboxes = document.querySelectorAll(`.${nombreClase}`);
-        let total = 0;
-        checkboxes.forEach(cb => {
-          if (cb.checked) total += parseInt(cb.value);
-        });
-        const campo = document.getElementById(campoDestino);
-        if (campo) campo.value = total;
-      }
-  
-      function actualizarCampoDesdeSelects(nombreSelects, campoDestino) {
-        let total = 0;
-        nombreSelects.forEach(name => {
-          const select = document.querySelector(`[name="${name}"]`);
-          if (select && select.value) {
-            total += parseInt(select.value);
-          }
-        });
-        const campo = document.getElementById(campoDestino);
-        if (campo) campo.value = total;
-      }
-  
-      function actualizarCamposEspeciales() {
-        // Atención: ahora se calcula desde <select>
-        actualizarCampoDesdeSelects(
-          ['atencion_secuencia', 'atencion_inversa', 'atencion_concentracion', 'atencion_sustraccion'],
-          'atencion_total'
-        );
-  
-        actualizarCampoDesdeCheckboxes('repeticion-check', 'repeticion_total');
-        actualizarCampoDesdeCheckboxes('diferido-check', 'diferido_total');
-        actualizarCampoDesdeCheckboxes('orientacion-check', 'orientacion_total');
-      }
-  
-      function calcularTotal() {
-        actualizarCamposEspeciales();
-  
-        let totalSinCorreccion = 0;
-        campos.forEach(nombre => {
-          const valor = document.querySelector(`[name="${nombre}"]`);
-          if (valor && valor.value) {
-            totalSinCorreccion += parseInt(valor.value);
-          }
-        });
-  
-        let totalFinal = totalSinCorreccion;
-        const escolaridadCheckbox = document.getElementById('educacion_baja');
-        if (escolaridadCheckbox && escolaridadCheckbox.checked && totalSinCorreccion < 30) {
-          totalFinal += 1;
-        }
-  
-        document.getElementById('moca-total').textContent = `${totalFinal} / 30`;
-  
-        let interpretacion = (totalFinal >= 26)
-          ? "Puntaje normal (función cognitiva preservada)"
-          : "Posible deterioro cognitivo. Se recomienda evaluación clínica adicional.";
-        document.getElementById('moca-interpretacion').textContent = interpretacion;
-      }
-  
-      // Escuchar cambios en campos normales
-      campos.forEach(nombre => {
-        const el = document.querySelector(`[name="${nombre}"]`);
-        if (el) el.addEventListener("change", calcularTotal);
+  document.addEventListener("DOMContentLoaded", function () {
+    const campos = [
+      'alternancia',
+      'cubo',
+      'reloj',
+      'denominacion',
+      'memoria',
+      'atencion',
+      'repeticion',
+      'fluidez',
+      'abstraccion',
+      'diferido',
+      'orientacion'
+    ];
+
+    function actualizarCampoDesdeCheckboxes(nombreClase, campoDestino) {
+      const checkboxes = document.querySelectorAll(`.${nombreClase}`);
+      let total = 0;
+      checkboxes.forEach(cb => {
+        if (cb.checked) total += parseInt(cb.value);
       });
-  
-      // Escuchar cambios en checkboxes
-      document.querySelectorAll('.repeticion-check, .diferido-check, .orientacion-check')
-        .forEach(cb => cb.addEventListener("change", calcularTotal));
-  
-      // Escuchar cambios en selects del ítem Atención
-      ['atencion_secuencia', 'atencion_inversa', 'atencion_concentracion', 'atencion_sustraccion']
-        .forEach(name => {
-          const el = document.querySelector(`[name="${name}"]`);
-          if (el) el.addEventListener("change", calcularTotal);
-        });
-  
-      document.getElementById('educacion_baja').addEventListener("change", calcularTotal);
+      const campo = document.getElementById(campoDestino);
+      if (campo) campo.value = total;
+    }
+
+    function actualizarCampoDesdeSelects(nombreSelects, campoDestino) {
+      let total = 0;
+      nombreSelects.forEach(name => {
+        const select = document.querySelector(`[name="${name}"]`);
+        if (select && select.value) {
+          total += parseInt(select.value);
+        }
+      });
+      const campo = document.getElementById(campoDestino);
+      if (campo) campo.value = total;
+    }
+
+    function calcularPuntajeSustraccion() {
+      const checks = document.querySelectorAll('.sustraccion-check');
+      let count = 0;
+      checks.forEach(chk => {
+        if (chk.checked) count++;
+      });
+
+      let puntaje = 0;
+      if (count >= 4) puntaje = 3;
+      else if (count >= 2) puntaje = 2;
+      else if (count === 1) puntaje = 1;
+
+      return puntaje;
+    }
+
+    function actualizarCamposEspeciales() {
+      // Calcular secciones de atención (secuencia + inversa + sustracción)
+      const valSecuencia = parseInt(document.querySelector('[name="atencion_secuencia"]')?.value || 0);
+      const valInversa = parseInt(document.querySelector('[name="atencion_inversa"]')?.value || 0);
+      const valConcentracion = parseInt(document.querySelector('[name="atencion_concentracion"]')?.value || 0);
+      const valSustraccion = calcularPuntajeSustraccion();
+
+      const totalAtencion = valSecuencia + valInversa + valConcentracion + valSustraccion;
+      const atencionInput = document.getElementById("atencion_total");
+      if (atencionInput) atencionInput.value = totalAtencion;
+
+      // Otras secciones
+      actualizarCampoDesdeCheckboxes('repeticion-check', 'repeticion_total');
+      actualizarCampoDesdeCheckboxes('diferido-check', 'diferido_total');
+      actualizarCampoDesdeCheckboxes('orientacion-check', 'orientacion_total');
+    }
+
+    function calcularTotal() {
+      actualizarCamposEspeciales();
+
+      let totalSinCorreccion = 0;
+      campos.forEach(nombre => {
+        const valor = document.querySelector(`[name="${nombre}"]`);
+        if (valor && valor.value) {
+          totalSinCorreccion += parseInt(valor.value);
+        }
+      });
+
+      let totalFinal = totalSinCorreccion;
+      const escolaridadCheckbox = document.getElementById('educacion_baja');
+      if (escolaridadCheckbox && escolaridadCheckbox.checked && totalSinCorreccion < 30) {
+        totalFinal += 1;
+      }
+
+      document.getElementById('moca-total').textContent = `${totalFinal} / 30`;
+
+      let interpretacion = (totalFinal >= 26)
+        ? "Puntaje normal (función cognitiva preservada)"
+        : "Posible deterioro cognitivo. Se recomienda evaluación clínica adicional.";
+      document.getElementById('moca-interpretacion').textContent = interpretacion;
+    }
+
+    // Escuchar cambios
+    campos.forEach(nombre => {
+      const el = document.querySelector(`[name="${nombre}"]`);
+      if (el) el.addEventListener("change", calcularTotal);
     });
-  </script>
+
+    document.querySelectorAll('.repeticion-check, .diferido-check, .orientacion-check, .sustraccion-check')
+      .forEach(cb => cb.addEventListener("change", calcularTotal));
+
+    ['atencion_secuencia', 'atencion_inversa', 'atencion_concentracion'].forEach(name => {
+      const el = document.querySelector(`[name="${name}"]`);
+      if (el) el.addEventListener("change", calcularTotal);
+    });
+
+    document.getElementById('educacion_baja')?.addEventListener("change", calcularTotal);
+
+    // Inicial
+    calcularTotal();
+  });
+</script>
+
+
+
+
 {% endblock %}  
