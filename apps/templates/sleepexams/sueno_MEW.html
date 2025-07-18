@@ -44,292 +44,288 @@
 
                     <!-- Card Body -->
                     <div class="card-body">
-                        <div class="card bg-gradient-default shadow-sm mb-4">
-                            <div class="card-header bg-transparent">
-                                <h4 class="text-white mb-0">Hábitos de Sueño</h4>
-                            </div>
-                            <div class="card-body bg-white">
-                                <div class="alert alert-info">
-                                    <strong>Instrucciones:</strong> Responda considerando sus preferencias naturales,
-                                    sin influencia de horarios laborales u obligaciones.
-                                </div>
-
-                                <!-- Pregunta 1 -->
-                                <div class="form-group">
-                                    <label>1. Si sólo pensaras en cuando te sentirías mejor y fueras totalmente libre de
-                                        planificarte el día. ¿A qué hora te levantarías?</label>
-                                    <select class="form-control" name="hora_levantarse_meq" required>
-                                        <option value="" selected disabled>Seleccione una opción</option>
-                                        <option value="Entre las 05:00 (5 AM) y 06:30 (6:30 AM) de la mañana">05:00 -
-                                            06:30 AM</option>
-                                        <option value="Entre las 06:30 (6:30 AM) y las 07:45 (7:45 AM) de la mañana">
-                                            06:30 - 07:45 AM</option>
-                                        <option value="Entre las 07:45 (7:45 AM) y las 09:45 (9:45 AM) de la mañana">
-                                            07:45 - 09:45 AM</option>
-                                        <option value="Entre las 09:45 (9:45 AM) y las 11:00 (11 AM) de la mañana">09:45
-                                            - 11:00 AM</option>
-                                        <option
-                                            value="Entre las 11 (11 AM) de la mañana y las 12 de la tarde (12 noon)">
-                                            11:00 AM - 12:00 PM</option>
-                                    </select>
-                                </div>
-
-                                <!-- Pregunta 2 -->
-                                <div class="form-group">
-                                    <label>2. Si sólo pensaras en cuando te sentirías mejor y fueras totalmente libre de
-                                        planificarte el día. ¿A qué hora te acostarías?</label>
-                                    <select class="form-control" name="hora_acostarse_meq" required>
-                                        <option value="" selected disabled>Seleccione una opción</option>
-                                        <option value="A las 20:00 (8 PM) – 21:00 (9 PM)">20:00 - 21:00</option>
-                                        <option value="A las 21:00 (9 PM) – 22:15 (10:15 PM)">21:00 - 22:15</option>
-                                        <option value="A las 22:15 (10:15 PM) – 00:30 (12:30 AM)">22:15 - 00:30</option>
-                                        <option value="A las 00:30 (12:30 AM) – 01:45 (1:45 AM)">00:30 - 01:45</option>
-                                        <option value="A las 01:45 (1:45 AM) – 03:00 (3 AM)">01:45 - 03:00</option>
-                                    </select>
-                                </div>
-
-                                <!-- Pregunta 3 -->
-                                <div class="form-group">
-                                    <label>3. Para levantarte por la mañana a una hora específica. ¿Hasta qué punto
-                                        necesitas que te avise el despertador?</label>
-                                    <select class="form-control" name="uso_despertador_meq" required>
-                                        <option value="" selected disabled>Seleccione una opción</option>
-                                        <option value="No lo necesito">No lo necesito</option>
-                                        <option value="Lo necesito poco">Lo necesito poco</option>
-                                        <option value="Lo necesito bastante">Lo necesito bastante</option>
-                                        <option value="Lo necesito mucho">Lo necesito mucho</option>
-                                    </select>
-                                </div>
-
-                                <!-- Pregunta 4 -->
-                                <div class="form-group">
-                                    <label>4. ¿Te resulta fácil levantarte por las mañanas?</label>
-                                    <select class="form-control" name="facilidad_levantarse_meq" required>
-                                        <option value="" selected disabled>Seleccione una opción</option>
-                                        <option value="Nada fácil">Nada fácil</option>
-                                        <option value="No muy fácil">No muy fácil</option>
-                                        <option value="Bastante fácil">Bastante fácil</option>
-                                        <option value="Muy fácil">Muy fácil</option>
-                                    </select>
-                                </div>
-
-                                <!-- Pregunta 5 -->
-                                <div class="form-group">
-                                    <label>5. Una vez levantado por las mañanas. ¿Qué tal te encuentras durante la
-                                        primera media hora?</label>
-                                    <select class="form-control" name="alerta_manana_meq" required>
-                                        <option value="" selected disabled>Seleccione una opción</option>
-                                        <option value="Nada alerta">Nada alerta</option>
-                                        <option value="Poco alerta">Poco alerta</option>
-                                        <option value="Bastante alerta">Bastante alerta</option>
-                                        <option value="Muy alerta">Muy alerta</option>
-                                    </select>
-                                </div>
-
-                                <!-- Pregunta 6 -->
-                                <div class="form-group">
-                                    <label>6. Una vez levantado por las mañanas. ¿Cómo es tu apetito durante la primera
-                                        media hora?</label>
-                                    <select class="form-control" name="apetito_manana_meq" required>
-                                        <option value="" selected disabled>Seleccione una opción</option>
-                                        <option value="Muy escaso">Muy escaso</option>
-                                        <option value="Bastante escaso">Bastante escaso</option>
-                                        <option value="Bastante bueno">Bastante bueno</option>
-                                        <option value="Muy bueno">Muy bueno</option>
-                                    </select>
-                                </div>
-
-                                <!-- Pregunta 7 -->
-                                <div class="form-group">
-                                    <label>7. Una vez levantado por las mañanas. ¿Qué tal te sientes durante la primera
-                                        media hora?</label>
-                                    <select class="form-control" name="descanso_manana_meq" required>
-                                        <option value="" selected disabled>Seleccione una opción</option>
-                                        <option value="Muy cansado">Muy cansado</option>
-                                        <option value="Bastante cansado">Bastante cansado</option>
-                                        <option value="Bastante descansado">Bastante descansado</option>
-                                        <option value="Muy descansado">Muy descansado</option>
-                                    </select>
-                                </div>
-
-                                <!-- Pregunta 8 -->
-                                <div class="form-group">
-                                    <label>8. Cuando no tienes compromisos al día siguiente. ¿A qué hora te acuestas en
-                                        relación con tu hora habitual?</label>
-                                    <select class="form-control" name="hora_acostarse_libre_meq" required>
-                                        <option value="" selected disabled>Seleccione una opción</option>
-                                        <option value="Nunca o raramente o más tarde">Nunca o raramente o más tarde
-                                        </option>
-                                        <option value="Menos de 1 hora más tarde">Menos de 1 hora más tarde</option>
-                                        <option value="De 1 a 2 horas más tarde">De 1 a 2 horas más tarde</option>
-                                        <option value="Más de 2 horas más tarde">Más de 2 horas más tarde</option>
-                                    </select>
-                                </div>
-
-                                <!-- Pregunta 9 -->
-                                <div class="form-group">
-                                    <label>9. ¿A qué hora aproximada de la noche te sientes cansado y como consecuencia
-                                        necesitas dormir?</label>
-                                    <select class="form-control" name="hora_cansancio_noche_meq" required>
-                                        <option value="" selected disabled>Seleccione una opción</option>
-                                        <option value="20:00 - 21:00">20:00 - 21:00</option>
-                                        <option value="21:00 - 22:15">21:00 - 22:15</option>
-                                        <option value="22:15 - 00:45">22:15 - 00:45</option>
-                                        <option value="00:45 - 02:00">00:45 - 02:00</option>
-                                        <option value="02:00 - 03:00">02:00 - 03:00</option>
-                                    </select>
-                                </div>
-
-                                <!-- Pregunta 10 -->
-                                <div class="form-group">
-                                    <label>10. Si te acostaras a las 11 PM, ¿qué nivel de cansancio notarías?</label>
-                                    <select class="form-control" name="nivel_cansancia_11" required>
-                                        <option value="" selected disabled>Seleccione una opción</option>
-                                        <option value="Ningún cansancio">Ningún cansancio</option>
-                                        <option value="Algún cansancio">Algún cansancio</option>
-                                        <option value="Bastante cansancio">Bastante cansancio</option>
-                                        <option value="Mucho cansancio">Mucho cansancio</option>
-                                    </select>
+                        <div class="row">
+                            <!-- Columna 1: Hábitos de Sueño -->
+                            <div class="col-md-6">
+                                <div class="card bg-gradient-default shadow-sm mb-4">
+                                    <div class="card-header bg-transparent">
+                                        <h4 class="text-white mb-0">Hábitos de Sueño</h4>
+                                    </div>
+                                    <div class="card-body bg-white">
+                                        <!-- Pregunta 1 -->
+                                        <div class="form-group">
+                                            <label>1. ¿A qué hora te levantarías?</label>
+                                            <select class="form-control" name="hora_levantarse_meq" required>
+                                                <option value="" selected disabled>Seleccione una opción</option>
+                                                <option value="(5 AM) y (6:30 AM) ">05:00 - 06:30 AM</option>
+                                                <option value="(6:30 AM) y (7:45 AM) ">06:30 - 07:45 AM</option>
+                                                <option value="(7:45 AM) y (9:45 AM) ">07:45 - 09:45 AM</option>
+                                                <option value="(9:45 AM) y (11 AM) ">09:45- 11:00 AM</option>
+                                                <option value="(11 AM) y (12 pm)">11:00 AM - 12:00 PM</option>
+                                            </select>
+                                        </div>
+                                        <!-- Pregunta 2 -->
+                                        <div class="form-group">
+                                            <label>2. ¿A qué hora te acostarías?</label>
+                                            <select class="form-control" name="hora_acostarse_meq" required>
+                                                <option value="" selected disabled>Seleccione una opción</option>
+                                                <option value="A las 20:00 (8 PM) – 21:00 (9 PM)">20:00 - 21:00</option>
+                                                <option value="A las 21:00 (9 PM) – 22:15 (10:15 PM)">21:00 - 22:15
+                                                </option>
+                                                <option value="A las 22:15 (10:15 PM) – 00:30 (12:30 AM)">22:15 - 00:30
+                                                </option>
+                                                <option value="A las 00:30 (12:30 AM) – 01:45 (1:45 AM)">00:30 - 01:45
+                                                </option>
+                                                <option value="A las 01:45 (1:45 AM) – 03:00 (3 AM)">01:45 - 03:00
+                                                </option>
+                                            </select>
+                                        </div>
+                                        <!-- Pregunta 3 -->
+                                        <div class="form-group">
+                                            <label>3. ¿Hasta qué punto necesitas despertador?</label>
+                                            <select class="form-control" name="uso_despertador_meq" required>
+                                                <option value="" selected disabled>Seleccione una opción</option>
+                                                <option value="No lo necesito">No lo necesito</option>
+                                                <option value="Lo necesito poco">Lo necesito poco</option>
+                                                <option value="Lo necesito bastante">Lo necesito bastante</option>
+                                                <option value="Lo necesito mucho">Lo necesito mucho</option>
+                                            </select>
+                                        </div>
+                                        <!-- Pregunta 4 -->
+                                        <div class="form-group">
+                                            <label>4. ¿Te resulta fácil levantarte por las mañanas?</label>
+                                            <select class="form-control" name="facilidad_levantarse_meq" required>
+                                                <option value="" selected disabled>Seleccione una opción</option>
+                                                <option value="Nada fácil">Nada fácil</option>
+                                                <option value="No muy fácil">No muy fácil</option>
+                                                <option value="Bastante fácil">Bastante fácil</option>
+                                                <option value="Muy fácil">Muy fácil</option>
+                                            </select>
+                                        </div>
+                                        <!-- Pregunta 5 -->
+                                        <div class="form-group">
+                                            <label>5. ¿Qué tal te encuentras durante la primera media hora?</label>
+                                            <select class="form-control" name="alerta_manana_meq" required>
+                                                <option value="" selected disabled>Seleccione una opción</option>
+                                                <option value="Nada alerta">Nada alerta</option>
+                                                <option value="Poco alerta">Poco alerta</option>
+                                                <option value="Bastante alerta">Bastante alerta</option>
+                                                <option value="Muy alerta">Muy alerta</option>
+                                            </select>
+                                        </div>
+                                        <!-- Pregunta 6 -->
+                                        <div class="form-group">
+                                            <label>6. ¿Cómo es tu apetito durante la primera media hora?</label>
+                                            <select class="form-control" name="apetito_manana_meq" required>
+                                                <option value="" selected disabled>Seleccione una opción</option>
+                                                <option value="Muy escaso">Muy escaso</option>
+                                                <option value="Bastante escaso">Bastante escaso</option>
+                                                <option value="Bastante bueno">Bastante bueno</option>
+                                                <option value="Muy bueno">Muy bueno</option>
+                                            </select>
+                                        </div>
+                                        <!-- Pregunta 7 -->
+                                        <div class="form-group">
+                                            <label>7. ¿Qué tal te sientes durante la primera media hora?</label>
+                                            <select class="form-control" name="descanso_manana_meq" required>
+                                                <option value="" selected disabled>Seleccione una opción</option>
+                                                <option value="Muy cansado">Muy cansado</option>
+                                                <option value="Bastante cansado">Bastante cansado</option>
+                                                <option value="Bastante descansado">Bastante descansado</option>
+                                                <option value="Muy descansado">Muy descansado</option>
+                                            </select>
+                                        </div>
+                                        <!-- Pregunta 8 -->
+                                        <div class="form-group">
+                                            <label>8. ¿A qué hora te acuestas cuando eres libre?</label>
+                                            <select class="form-control" name="hora_acostarse_libre_meq" required>
+                                                <option value="" selected disabled>Seleccione una opción</option>
+                                                <option value="Nunca o raramente o más tarde">Nunca o raramente o más
+                                                    tarde
+                                                </option>
+                                                <option value="Menos de 1 hora más tarde">Menos de 1 hora más tarde
+                                                </option>
+                                                <option value="De 1 a 2 horas más tarde">De 1 a 2 horas más tarde
+                                                </option>
+                                                <option value="Más de 2 horas más tarde">Más de 2 horas más tarde
+                                                </option>
+                                            </select>
+                                        </div>
+                                        <!-- Pregunta 9 -->
+                                        <div class="form-group">
+                                            <label>9. ¿A qué hora necesitas dormir por cansancio?</label>
+                                            <select class="form-control" name="hora_cansancio_noche_meq" required>
+                                                <option value="" selected disabled>Seleccione una opción</option>
+                                                <option value="20:00 - 21:00">20:00 - 21:00</option>
+                                                <option value="21:00 - 22:15">21:00 - 22:15</option>
+                                                <option value="22:15 - 00:45">22:15 - 00:45</option>
+                                                <option value="00:45 - 02:00">00:45 - 02:00</option>
+                                                <option value="02:00 - 03:00">02:00 - 03:00</option>
+                                            </select>
+                                        </div>
+                                        <!-- Pregunta 10 -->
+                                        <div class="form-group">
+                                            <label>10. Si te acostaras a las 11 PM, ¿qué nivel de cansancio
+                                                notarías?</label>
+                                            <select class="form-control" name="nivel_cansancia_11" required>
+                                                <option value="" selected disabled>Seleccione una opción</option>
+                                                <option value="Ningún cansancio">Ningún cansancio</option>
+                                                <option value="Algún cansancio">Algún cansancio</option>
+                                                <option value="Bastante cansancio">Bastante cansancio</option>
+                                                <option value="Mucho cansancio">Mucho cansancio</option>
+                                            </select>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-
-                        <div class="card bg-gradient-default shadow-sm mb-4">
-                            <div class="card-header bg-transparent">
-                                <h4 class="text-white mb-0">Actividades y Rendimiento</h4>
-                            </div>
-                            <div class="card-body bg-white">
-                                <!-- Pregunta 11 -->
-                                <div class="form-group">
-                                    <label>11. Has decidido hacer ejercicio físico. Un amigo te propone hacerlo de 7 a 8
-                                        de la mañana. ¿Cómo crees que te encontrarías?</label>
-                                    <select class="form-control" name="ejercicio_fisico_meq" required>
-                                        <option value="" selected disabled>Seleccione una opción</option>
-                                        <option value="Estaría en buena forma">Estaría en buena forma</option>
-                                        <option value="Estaría en una forma aceptable">Estaría en una forma aceptable
-                                        </option>
-                                        <option value="Me resultaría difícil">Me resultaría difícil</option>
-                                        <option value="Me resultaría muy difícil">Me resultaría muy difícil</option>
-                                    </select>
-                                </div>
-
-                                <!-- Pregunta 12 -->
-                                <div class="form-group">
-                                    <label>12. Por algún motivo te has acostado varias horas más tarde de lo habitual.
-                                        ¿Cuándo crees que te despertarías?</label>
-                                    <select class="form-control" name="hora_despertarse_si_tarde" required>
-                                        <option value="" selected disabled>Seleccione una opción</option>
-                                        <option value="A la hora habitual y ya no dormiría más">A la hora habitual y ya
-                                            no dormiría más</option>
-                                        <option value="A la hora habitual y dormiría un poco má">A la hora habitual y
-                                            dormiría un poco más</option>
-                                        <option value="Me despertaría más tarde de lo habitual">Me despertaría más tarde
-                                            de lo habitual</option>
-                                        <option value="Dormiría mucho más de lo habitual">Dormiría mucho más de lo
-                                            habitual</option>
-                                    </select>
-                                </div>
-
-                                <!-- Pregunta 13 -->
-                                <div class="form-group">
-                                    <label>13. Una noche tienes que permanecer despierto de 4 a 6 de la madrugada. ¿Qué
-                                        preferirías?</label>
-                                    <select class="form-control" name="guardia_nocturna" required>
-                                        <option value="" selected disabled>Seleccione una opción</option>
-                                        <option value="No acostarme hasta pasada la guardia">No acostarme hasta pasada
-                                            la guardia</option>
-                                        <option value="Echar una siesta antes y dormir después">Echar una siesta antes y
-                                            dormir después</option>
-                                        <option value="Echar un buen sueño antes y una siesta después">Echar un buen
-                                            sueño antes y una siesta después</option>
-                                        <option value="Sólo dormirías antes de la guardia">Sólo dormir antes de la
-                                            guardia</option>
-                                    </select>
-                                </div>
-
-                                <!-- Pregunta 14 -->
-                                <div class="form-group">
-                                    <label>14. Tienes que hacer dos horas de trabajo físico pesado. ¿Qué horario
-                                        escogerías?</label>
-                                    <select class="form-control" name="horario_trabajo_fisico" required>
-                                        <option value="" selected disabled>Seleccione una opción</option>
-                                        <option value="De 08:00 (8 AM) a 10:00 (10 AM)">08:00 - 10:00</option>
-                                        <option value="De 11:00 (11 AM) a 13:00 (1 PM)">11:00 - 13:00</option>
-                                        <option value="De 13:00 (1 PM) a 17:00 (5 PM)">13:00 - 17:00</option>
-                                        <option value="De 19:00 (7 PM) a 21:00 (9 PM)">19:00 - 21:00</option>
-                                    </select>
-                                </div>
-
-                                <!-- Pregunta 15 -->
-                                <div class="form-group">
-                                    <label>15. Has decidido hacer ejercicio físico intenso a las 10-11 PM. ¿Cómo crees
-                                        que te sentaría?</label>
-                                    <select class="form-control" name="ejercicio_nocturno" required>
-                                        <option value="" selected disabled>Seleccione una opción</option>
-                                        <option value="Estaría en buena forma">Estaría en buena forma</option>
-                                        <option value="Estaría en una forma aceptable">Estaría en una forma aceptable
-                                        </option>
-                                        <option value="Me resultaría difícil">Me resultaría difícil</option>
-                                        <option value="Me resultaría muy difícil">Me resultaría muy difícil</option>
-                                    </select>
-                                </div>
-
-                                <!-- Pregunta 16 -->
-                                <div class="form-group">
-                                    <label>16. Imagínate que puedes escoger tu horario de trabajo (5 horas al día). ¿Qué
-                                        horario seleccionarías?</label>
-                                    <select class="form-control" name="horario_trabajo" required>
-                                        <option value="" selected disabled>Seleccione una opción</option>
-                                        <option value="Entre las 04:00 (4 AM) y las 08:00 (8 AM)">04:00 - 08:00</option>
-                                        <option value="Entre las 08:00 (8 AM) y las 09:00 (9 AM)">08:00 - 09:00</option>
-                                        <option value="Entre las 09:00 (9 AM) y las 14:00 (2 PM)">09:00 - 14:00</option>
-                                        <option value="Entre las 14:00 (2 PM) y las 17:00 (5 PM)">14:00 - 17:00</option>
-                                        <option value="Entre las 17:00 (5 PM) y las 04:00 (4 AM)">17:00 - 04:00</option>
-                                    </select>
-                                </div>
-
-                                <!-- Pregunta 17 -->
-                                <div class="form-group">
-                                    <label>17. ¿A qué hora del día alcanzas tu máximo bienestar?</label>
-                                    <select class="form-control" name="maximo_bienestar" required>
-                                        <option value="" selected disabled>Seleccione una opción</option>
-                                        <option value="Entre las 05:00 (5 AM) y las 08:00 (8 AM)">05:00 - 08:00</option>
-                                        <option value="Entre las 08:00 (8 AM) y las 10:00 (10 AM)">08:00 - 10:00
-                                        </option>
-                                        <option value="Entre las 10:00 (10 AM) y las 17:00 (5 PM)">10:00 - 17:00
-                                        </option>
-                                        <option value="Entre las 17:00 (5 PM) y las 22:00 (10 PM)">17:00 - 22:00
-                                        </option>
-                                        <option value="Entre las 22:00 (10 PM) y las 05:00 (5 AM)">22:00 - 05:00
-                                        </option>
-                                    </select>
-                                </div>
-
-                                <!-- Pregunta 18 -->
-                                <div class="form-group">
-                                    <label>18. ¿Te consideras una persona de tipo matutino o vespertino?</label>
-                                    <select class="form-control" name="tipo_persona" required>
-                                        <option value="" selected disabled>Seleccione una opción</option>
-                                        <option value="Un tipo claramente matutino">Claramente matutino</option>
-                                        <option value="Un tipo más matutino que vespertino">Más matutino que vespertino
-                                        </option>
-                                        <option value="Un tipo más vespertino que matutino">Más vespertino que matutino
-                                        </option>
-                                        <option value="Un tipo claramente vespertino">Claramente vespertino</option>
-                                    </select>
-                                </div>
-
-                                <!-- Pregunta 19 -->
-                                <div class="form-group">
-                                    <label>19. Puntuación MEQ (se calculará automáticamente)</label>
-                                    <input type="number" class="form-control" name="puntuacion" min="16" max="86"
-                                        readonly>
-                                    <small class="form-text text-muted">La puntuación se calculará al enviar el
-                                        formulario.</small>
+                            <!-- Columna 2: Actividades y Rendimiento -->
+                            <div class="col-md-6">
+                                <div class="card bg-gradient-default shadow-sm mb-4">
+                                    <div class="card-header bg-transparent">
+                                        <h4 class="text-white mb-0">Actividades y Rendimiento</h4>
+                                    </div>
+                                    <div class="card-body bg-white">
+                                        <!-- Pregunta 11 -->
+                                        <div class="form-group">
+                                            <label>11. Ejercicio físico de 7 a 8 AM. ¿Cómo te encontrarías?</label>
+                                            <select class="form-control" name="ejercicio_fisico_meq" required>
+                                                <option value="" selected disabled>Seleccione una opción</option>
+                                                <option value="Estaría en buena forma">Estaría en buena forma</option>
+                                                <option value="Estaría en una forma aceptable">Estaría en una forma
+                                                    aceptable
+                                                </option>
+                                                <option value="Me resultaría difícil">Me resultaría difícil</option>
+                                                <option value="Me resultaría muy difícil">Me resultaría muy difícil
+                                                </option>
+                                            </select>
+                                        </div>
+                                        <!-- Pregunta 12 -->
+                                        <div class="form-group">
+                                            <label>12. ¿Cuándo te despertarías tras acostarte tarde?</label>
+                                            <select class="form-control" name="hora_despertarse_si_tarde" required>
+                                                <option value="" selected disabled>Seleccione una opción</option>
+                                                <option value="A la hora habitual y ya no dormiría más">A la hora
+                                                    habitual y ya no dormiría más
+                                                </option>
+                                                <option value="A la hora habitual y dormiría un poco má">A la hora
+                                                    habitual y dormiría un poco más
+                                                </option>
+                                                <option value="Me despertaría más tarde de lo habitual">Me despertaría
+                                                    más tarde de lo habitual
+                                                </option>
+                                                <option value="Dormiría mucho más de lo habitual">Dormiría mucho más de
+                                                    lo habitual
+                                                </option>
+                                            </select>
+                                        </div>
+                                        <!-- Pregunta 13 -->
+                                        <div class="form-group">
+                                            <label>13. Si tienes que permanecer despierto de 4 a 6 AM, ¿qué
+                                                preferirías?</label>
+                                            <select class="form-control" name="guardia_nocturna" required>
+                                                <option value="" selected disabled>Seleccione una opción</option>
+                                                <option value="No acostarme hasta pasada la guardia">No acostarme hasta
+                                                    pasada la guardia
+                                                </option>
+                                                <option value="Echar una siesta antes y dormir después">Echar una siesta
+                                                    antes y dormir después
+                                                </option>
+                                                <option value="Echar un buen sueño antes y una siesta después">Echar un
+                                                    buen sueño antes y una siesta después
+                                                </option>
+                                                <option value="Sólo dormirías antes de la guardia">Sólo dormir antes de
+                                                    la guardia
+                                                </option>
+                                            </select>
+                                        </div>
+                                        <!-- Pregunta 14 -->
+                                        <div class="form-group">
+                                            <label>14. ¿Qué horario escogerías para trabajo físico pesado?</label>
+                                            <select class="form-control" name="horario_trabajo_fisico" required>
+                                                <option value="" selected disabled>Seleccione una opción</option>
+                                                <option value="De 08:00 (8 AM) a 10:00 (10 AM)">08:00 - 10:00</option>
+                                                <option value="De 11:00 (11 AM) a 13:00 (1 PM)">11:00 - 13:00</option>
+                                                <option value="De 13:00 (1 PM) a 17:00 (5 PM)">13:00 - 17:00</option>
+                                                <option value="De 19:00 (7 PM) a 21:00 (9 PM)">19:00 - 21:00</option>
+                                            </select>
+                                        </div>
+                                        <!-- Pregunta 15 -->
+                                        <div class="form-group">
+                                            <label>15. Ejercicio físico intenso a las 10-11 PM. ¿Cómo te
+                                                sentaría?</label>
+                                            <select class="form-control" name="ejercicio_nocturno" required>
+                                                <option value="" selected disabled>Seleccione una opción</option>
+                                                <option value="Estaría en buena forma">Estaría en buena forma</option>
+                                                <option value="Estaría en una forma aceptable">Estaría en una forma
+                                                    aceptable
+                                                </option>
+                                                <option value="Me resultaría difícil">Me resultaría difícil</option>
+                                                <option value="Me resultaría muy difícil">Me resultaría muy difícil
+                                                </option>
+                                            </select>
+                                        </div>
+                                        <!-- Pregunta 16 -->
+                                        <div class="form-group">
+                                            <label>16. ¿Qué horario seleccionarías para trabajar 5 horas al día?</label>
+                                            <select class="form-control" name="horario_trabajo" required>
+                                                <option value="" selected disabled>Seleccione una opción</option>
+                                                <option value="Entre las 04:00 (4 AM) y las 08:00 (8 AM)">04:00 - 08:00
+                                                </option>
+                                                <option value="Entre las 08:00 (8 AM) y las 09:00 (9 AM)">08:00 - 09:00
+                                                </option>
+                                                <option value="Entre las 09:00 (9 AM) y las 14:00 (2 PM)">09:00 - 14:00
+                                                </option>
+                                                <option value="Entre las 14:00 (2 PM) y las 17:00 (5 PM)">14:00 - 17:00
+                                                </option>
+                                                <option value="Entre las 17:00 (5 PM) y las 04:00 (4 AM)">17:00 - 04:00
+                                                </option>
+                                            </select>
+                                        </div>
+                                        <!-- Pregunta 17 -->
+                                        <div class="form-group">
+                                            <label>17. ¿A qué hora alcanzas tu máximo bienestar?</label>
+                                            <select class="form-control" name="maximo_bienestar" required>
+                                                <option value="" selected disabled>Seleccione una opción</option>
+                                                <option value="Entre las 05:00 (5 AM) y las 08:00 (8 AM)">05:00 - 08:00
+                                                </option>
+                                                <option value="Entre las 08:00 (8 AM) y las 10:00 (10 AM)">08:00 - 10:00
+                                                </option>
+                                                <option value="Entre las 10:00 (10 AM) y las 17:00 (5 PM)">10:00 - 17:00
+                                                </option>
+                                                <option value="Entre las 17:00 (5 PM) y las 22:00 (10 PM)">17:00 - 22:00
+                                                </option>
+                                                <option value="Entre las 22:00 (10 PM) y las 05:00 (5 AM)">22:00 - 05:00
+                                                </option>
+                                            </select>
+                                        </div>
+                                        <!-- Pregunta 18 -->
+                                        <div class="form-group">
+                                            <label>18. ¿Te consideras una persona de tipo matutino o vespertino?</label>
+                                            <select class="form-control" name="tipo_persona" required>
+                                                <option value="" selected disabled>Seleccione una opción</option>
+                                                <option value="Un tipo claramente matutino">Claramente matutino</option>
+                                                <option value="Un tipo más matutino que vespertino">Más matutino que
+                                                    vespertino
+                                                </option>
+                                                <option value="Un tipo más vespertino que matutino">Más vespertino que
+                                                    matutino
+                                                </option>
+                                                <option value="Un tipo claramente vespertino">Claramente vespertino
+                                                </option>
+                                            </select>
+                                        </div>
+                                        <!-- Pregunta 19 -->
+                                        <div class="form-group">
+                                            <label>19. Puntuación MEQ (se calculará automáticamente)</label>
+                                            <input type="number" class="form-control" name="puntuacion" min="16"
+                                                max="86" readonly>
+                                            <small class="form-text text-muted">La puntuación se calculará al enviar el
+                                                formulario.</small>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-
                         <!-- Botones de acción -->
                         <div class="row mt-4">
                             <div class="col-12 text-right">
@@ -347,9 +343,9 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        // Script para calcular automáticamente la puntuación MEQ
         const form = document.querySelector('form');
         const puntuacionInput = document.querySelector('input[name="puntuacion"]');
+        const selects = document.querySelectorAll('select');
 
         // Mapeo de puntuaciones para cada pregunta (ejemplo simplificado)
         const puntuaciones = {
@@ -359,23 +355,28 @@
                 'Entre las 07:45 (7:45 AM) y las 09:45 (9:45 AM) de la mañana': 3,
                 'Entre las 09:45 (9:45 AM) y las 11:00 (11 AM) de la mañana': 2,
                 'Entre las 11 (11 AM) de la mañana y las 12 de la tarde (12 noon)': 1
-            },
-            // Agregar mapeos para todas las preguntas...
+            }
+            // Agrega los mapeos para todas las preguntas aquí
         };
 
-        form.addEventListener('submit', function (e) {
+        function calcularPuntuacion() {
             let puntuacionTotal = 0;
-
-            // Calcular puntuación para cada pregunta
-            document.querySelectorAll('select').forEach(select => {
+            selects.forEach(select => {
                 const selectedOption = select.options[select.selectedIndex];
                 if (selectedOption.value && puntuaciones[select.name]) {
                     puntuacionTotal += puntuaciones[select.name][selectedOption.value] || 0;
                 }
             });
-
             puntuacionInput.value = puntuacionTotal;
+        }
+
+        // Calcula la puntuación cada vez que cambie una pregunta
+        selects.forEach(select => {
+            select.addEventListener('change', calcularPuntuacion);
         });
+
+        // También calcula antes de enviar por seguridad
+        form.addEventListener('submit', calcularPuntuacion);
     });
 </script>
 
