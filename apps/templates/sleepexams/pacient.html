@@ -124,13 +124,11 @@
               <hr class="my-2">
               <h5 class="card-title text-uppercase text-muted mb-3">{{ proyecto.nombre }}</h5>
               <div class="mb-3">
-                <button class="btn btn-primary mt-3" data-bs-toggle="modal"
+                <button class="btn btn-success btn-sm" data-bs-toggle="modal"
                   data-bs-target="#modalAgregarVisita-{{ proyecto.id }}">
-                  Agregar Visita
+                  <i class="fas fa-plus"></i> Agregar Visita
                 </button>
               </div>
-
-
               {% for visita in visitas_paciente %}
               {% if visita.Tipo_visita.proyecto == proyecto %}
               <div class="card mb-3">
@@ -144,114 +142,73 @@
                         <strong>Tipo de Visita:</strong> {{ visita.Tipo_visita.nombre }}
                       </p>
                     </div>
-                    <div style="display: flex; align-items: center; justify-content: center; gap: 10px;">
-                      <h3>Exámenes</h3>
-                      <button class="btn btn-info" data-toggle="collapse" data-target="#examenes-visita-{{ visita.id }}"
-                        data-toggle="tooltip" data-placement="mid" title="Ver Exámenes">
-                        <i class="fas fa-list"></i>
+
+                  </div>
+                  <div class="d-flex justify-content-end align-items-center gap-2 mt-3">
+                    <!-- Botón Exámenes -->
+                    <button class="btn btn-info btn-sm" data-toggle="collapse"
+                      data-target="#examenes-visita-{{ visita.id }}" data-toggle="tooltip" data-placement="mid"
+                      title="Ver Exámenes">
+                      <i class="fas fa-list"></i> Exámenes
+                    </button>
+                    <!-- Botón Editar Visita -->
+                    <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal"
+                      data-bs-target="#modalEditarVisita-{{ visita.id }}">
+                      <i class="fas fa-edit"></i> Editar
+                    </button>
+                    <!-- Botón Eliminar Visita -->
+                    <form action="{% url 'eliminar_v' visita.id %}" method="POST"
+                      onsubmit="return confirm('¿Estás seguro de eliminar esta visita?');" style="display:inline;">
+                      {% csrf_token %}
+                      <button type="submit" class="btn btn-danger btn-sm">
+                        <i class="fas fa-trash"></i> Eliminar
                       </button>
-                    </div>
+                    </form>
                   </div>
                   <div id="examenes-visita-{{ visita.id }}" class="collapse mt-3">
                     {% for visita_examen in visita.visita_examenes.all %}
-                    <p>
-                      <strong>Examen:</strong> {{ visita_examen.examen.nombre }}<br>
-                      {% if visita_examen.resultado %}
-                      <a href="#" class="btn btn-info btn-sm" data-bs-toggle="modal"
-                        data-bs-target="#modalExamen{{ visita_examen.id }}"
-                        data-nombre="{{ visita_examen.examen.nombre}}"
-                        data-resultado="{{ visita_examen.resultado }}">Ver Resultado</a>
-
-                      <!-- Modal para cada examen (con ID único) -->
-                    <div class="modal fade" id="modalExamen{{ visita_examen.id }}" tabindex="-1" aria-hidden="true">
-                      <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-                        <div class="modal-content">
-                          <div class="modal-header bg-primary text-white">
-                            <h5 class="modal-title">Resultado: {{ visita_examen.examen.nombre }}</h5>
-                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-                              aria-label="Close"></button>
-                          </div>
-                          <div class="modal-body">
-                            <div class="container-fluid">
-                              <!-- Información básica -->
-                              <div class="row mb-4">
-                                <div class="col-md-6">
-                                  <div class="card border-primary mb-3">
-                                    <div class="card-header bg-primary text-white">
-                                      <i class="fas fa-user me-2"></i>Información del Paciente
-                                    </div>
-                                    <div class="card-body">
-                                      <p><strong>Nombre:</strong> {{ visita_examen.visita.paciente.primer_nombre }}
-                                        {{visita_examen.visita.paciente.primer_apellido }}</p>
-                                      <p><strong>Fecha:</strong> {{ visita_examen.visita.fecha|date:"d/m/Y" }}</p>
-                                    </div>
-                                  </div>
-                                </div>
-                                <div class="col-md-6">
-                                  <div class="card border-primary mb-3">
-                                    <div class="card-header bg-primary text-white">
-                                      <i class="fas fa-info-circle me-2"></i>Detalles del Examen
-                                    </div>
-                                    <div class="card-body">
-                                      <p><strong>Tipo:</strong> {{ visita_examen.examen.nombre }}</p>
-                                      <p><strong>Estado:</strong> <span class="badge bg-success">Completado</span></p>
-                                    </div>
-                                  </div>
-                                </div>
+                    <div class="card mb-2">
+                      <div class="card-body">
+                        <strong>Examen:</strong>
+                        <button class="btn btn-link" type="button"
+                          onclick="document.getElementById('resultado-{{ visita_examen.id }}').classList.toggle('d-none')">
+                          {{ visita_examen.examen.nombre }}
+                        </button>
+                        <div id="resultado-{{ visita_examen.id }}" class="d-none mt-2">
+                          {% if visita_examen.atenasresult or visita_examen.isiresult or visita_examen.stopbangresult or
+                          visita_examen.suenofisicoresult or visita_examen.suenoanamnesisresult %}
+                          <button class="btn btn-info btn-sm" data-bs-toggle="modal"
+                            data-bs-target="#modalResultadoGenerico" data-examen-id="{{ visita_examen.id }}"
+                            data-model="{% if visita_examen.atenasresult %}atenasresult{% elif visita_examen.isiresult %}isiresult{% elif visita_examen.stopbangresult %}stopbangresult{% elif visita_examen.suenofisicoresult %}suenofisicoresult{% elif visita_examen.suenoanamnesisresult %}suenoanamnesisresult{% endif %}">
+                            <i class="fas fa-eye"></i> Ver resultado
+                          </button>
+                          {% endif %}
+                          {% else %}
+                          <a href="{% url 'realizar_examen' visita_examen.visita.id visita_examen.examen.id visita_examen.visita.paciente.id %}"
+                            class="btn btn-primary btn-sm">Realizar Examen</a>
+                          {% endif %}
+                        </div>
+                        <div class="modal fade" id="modalResultadoGenerico" tabindex="-1"
+                          aria-labelledby="modalResultadoLabel" aria-hidden="true">
+                          <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                              <div class="modal-header">
+                                <h5 class="modal-title" id="modalResultadoLabel">Resultado del Examen</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                               </div>
-
-                              <!-- Resultados -->
-                              <div class="card border-primary mb-4">
-                                <div class="card-header bg-primary text-white">
-                                  <i class="fas fa-clipboard-list me-2"></i>Resultados
-                                </div>
-                                <div class="card-body">
-                                  <div>{{ visita_examen.resultado }}</div>
-                                </div>
+                              <div class="modal-body">
+                                <table class="table table-bordered" id="tablaResultadoExamen">
+                                  <!-- Aquí se insertan los resultados dinámicamente -->
+                                </table>
                               </div>
                             </div>
-                          </div>
-                          <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                              <i class="fas fa-times me-2"></i>Cerrar
-                            </button>
-                            <button type="button" class="btn btn-primary" onclick="window.print()">
-                              <i class="fas fa-print me-2"></i>Imprimir
-                            </button>
                           </div>
                         </div>
                       </div>
                     </div>
-
-                    <form method="POST"
-                      action="{% url 'eliminar_resultado_examen' visita_examen.visita.id visita_examen.examen.id visita_examen.visita.paciente.id %}"
-                      style="display:inline;">
-                      {% csrf_token %}
-                      <button type="submit" class="btn btn-danger" data-toggle="tooltip" data-placement="top"
-                        title="Eliminar examen" style="font-size: 1rem; padding: 5px 5px;">
-                        <i class="fas fa-trash"></i>
-                      </button>
-                    </form>
-                    {% else %}
-                    <a href="{% url 'realizar_examen' visita_examen.visita.id visita_examen.examen.id visita_examen.visita.paciente.id %}"
-                      class="btn btn-primary btn-sm">Realizar Examen</a>
-                    {% endif %}
-                    </p>
-                    {% empty %}
-                    <p>No se realizaron exámenes en esta visita.</p>
                     {% endfor %}
                   </div>
-                  <div class="d-flex justify-content-end mt-3">
-                    <form action="{% url 'eliminar_v' visita.id %}" method="POST"
-                      onsubmit="return confirm('¿Estás seguro de eliminar esta visita?');">
-                      {% csrf_token %}
-                      <button type="submit" class="btn btn-danger btn-sm me-2">Eliminar visita</button>
-                    </form>
-                    <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal"
-                      data-bs-target="#modalEditarVisita-{{ visita.id }}">
-                      Editar Visita
-                    </button>
-                  </div>
+
                 </div>
               </div>
 
@@ -510,28 +467,6 @@
   });
 
   document.addEventListener("DOMContentLoaded", function () {
-    var modalExamen = document.getElementById("modalExamen");
-
-    modalExamen.addEventListener("show.bs.modal", function (event) {
-      var button = event.relatedTarget;  // Botón que abrió el modal
-      var nombre = button.getAttribute("data-nombre");
-      var resultado = button.getAttribute("data-resultado");
-
-      // Si el resultado es JSON, lo convertimos a texto legible
-      try {
-        resultado = JSON.parse(resultado);
-        resultado = JSON.stringify(resultado, null, 2); // Formatear bonito
-      } catch (e) {
-        resultado = resultado || "No disponible";
-      }
-
-      // Insertar los valores en el modal
-      document.getElementById("examenNombre").textContent = nombre;
-      document.getElementById("examenResultado").textContent = resultado;
-    });
-  });
-
-  document.addEventListener("DOMContentLoaded", function () {
     document.querySelectorAll(".agregar-examen").forEach(button => {
       button.addEventListener("click", function () {
         let visitaId = this.getAttribute("data-visita-id");
@@ -556,6 +491,59 @@
       });
     });
   });
+
+  document.addEventListener("DOMContentLoaded", function () {
+    var modal = document.getElementById("modalResultadoGenerico");
+    modal.addEventListener("show.bs.modal", function (event) {
+      var button = event.relatedTarget;
+      var examenId = button.getAttribute("data-examen-id");
+      var modelName = button.getAttribute("data-model");
+      var tabla = document.getElementById("tablaResultadoExamen");
+      tabla.innerHTML = "<tr><td colspan='2'>Cargando...</td></tr>";
+
+      // Busca el objeto en la variable global de Django (puedes pasar los datos en el contexto como JSON)
+      var resultado = null;
+      {% for visita in visitas_paciente %}
+        {% for visita_examen in visita.visita_examenes.all %}
+          {% if visita_examen.atenasresult %}
+            if (examenId == "{{ visita_examen.id }}" && modelName == "atenasresult") {
+              resultado = {{ visita_examen.atenasresult|safe }};
+            }
+          {% elif visita_examen.isiresult %}
+            if (examenId == "{{ visita_examen.id }}" && modelName == "isiresult") {
+              resultado = {{ visita_examen.isiresult|safe }};
+            }
+          {% elif visita_examen.stopbangresult %}
+            if (examenId == "{{ visita_examen.id }}" && modelName == "stopbangresult") {
+              resultado = {{ visita_examen.stopbangresult|safe }};
+            }
+          {% elif visita_examen.suenofisicoresult %}
+            if (examenId == "{{ visita_examen.id }}" && modelName == "suenofisicoresult") {
+              resultado = {{ visita_examen.suenofisicoresult|safe }};
+            }
+          {% elif visita_examen.suenoanamnesisresult %}
+            if (examenId == "{{ visita_examen.id }}" && modelName == "suenoanamnesisresult") {
+              resultado = {{ visita_examen.suenoanamnesisresult|safe }};
+            }
+          {% endif %}
+        {% endfor %}
+      {% endfor %}
+
+      // Si hay resultado, recorre los campos y muestra en la tabla
+      if (resultado) {
+        tabla.innerHTML = "";
+        for (var key in resultado) {
+          if (resultado.hasOwnProperty(key)) {
+            tabla.innerHTML += "<tr><th>" + key.replace(/_/g, " ") + "</th><td>" + resultado[key] + "</td></tr>";
+          }
+        }
+      } else {
+        tabla.innerHTML = "<tr><td colspan='2'>No hay datos disponibles.</td></tr>";
+      }
+    });
+  });
+
+
 
 </script>
 
