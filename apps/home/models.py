@@ -5,6 +5,8 @@ Copyright (c) 2019 - present AppSeed.us
 
 from django.db import models
 from django.contrib.auth.models import AbstractUser, Group, Permission
+from django.utils import timezone
+from django.urls import reverse, NoReverseMatch
 
 
 class CustomUser(AbstractUser):
@@ -254,12 +256,263 @@ class VisitaExamen(models.Model):
     examen = models.ForeignKey(
         Examen, on_delete=models.CASCADE, related_name="examenes_realizados"
     )
-    resultado = models.JSONField(
-        verbose_name="Respuestas del Examen", null=True, blank=True
+
+    # Estado del examen
+    estado = models.CharField(
+        max_length=20,
+        choices=[
+            ("pendiente", "Pendiente"),
+            ("en_progreso", "En Progreso"),
+            ("completado", "Completado"),
+            ("cancelado", "Cancelado"),
+        ],
+        default="pendiente",
+        verbose_name="Estado del Examen",
     )
 
+    # Fechas de seguimiento
+    fecha_creacion = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    fecha_inicio = models.DateTimeField(null=True, blank=True)
+    fecha_completado = models.DateTimeField(null=True, blank=True)
+
+    # Metadatos adicionales
+    notas_examinador = models.TextField(
+        blank=True, null=True, verbose_name="Notas del Examinador"
+    )
+
+    # Campos opcionales para seguimiento
+    evaluador = models.CharField(
+        max_length=100, blank=True, null=True, verbose_name="Evaluador"
+    )
+    tiempo_duracion = models.DurationField(
+        null=True, blank=True, verbose_name="Tiempo de Duración"
+    )
+
+    class Meta:
+        unique_together = ["visita", "examen"]
+        verbose_name = "Examen de Visita"
+        verbose_name_plural = "Exámenes de Visita"
+        ordering = ["fecha_creacion"]
+
     def __str__(self):
-        return f"{self.visita.nombre} - {self.examen.nombre}"
+        return (
+            f"{self.visita.nombre} - {self.examen.nombre} ({self.get_estado_display()})"
+        )
+
+    @property
+    def esta_realizado(self):
+        """Verifica si el examen está completado"""
+        return self.estado == "completado" or self.tiene_resultado_especifico()
+
+    @property
+    def puede_editarse(self):
+        """Verifica si el examen puede editarse"""
+        return self.estado in ["completado"] and self.tiene_resultado_especifico()
+
+    @property
+    def puede_iniciarse(self):
+        """Verifica si el examen puede iniciarse"""
+        return self.estado == "pendiente"
+
+    @property
+    def puede_continuarse(self):
+        """Verifica si el examen puede continuarse"""
+        return self.estado == "en_progreso"
+
+    def marcar_como_iniciado(self):
+        """Marca el examen como iniciado"""
+        if self.estado == "pendiente":
+            self.estado = "en_progreso"
+            self.fecha_inicio = timezone.now()
+            self.save()
+
+    def marcar_como_completado(self):
+        """Marca el examen como completado"""
+        if self.estado in ["pendiente", "en_progreso"]:
+            self.estado = "completado"
+            self.fecha_completado = timezone.now()
+            if self.fecha_inicio and self.fecha_completado:
+                self.tiempo_duracion = self.fecha_completado - self.fecha_inicio
+            self.save()
+
+    def marcar_como_cancelado(self):
+        """Marca el examen como cancelado"""
+        if self.estado != "completado":
+            self.estado = "cancelado"
+            self.save()
+
+    def tiene_resultado_especifico(self):
+        """Verifica si el examen tiene un modelo de resultado específico asociado"""
+        examen_nombre = self.examen.nombre.lower().replace(" ", "").replace("-", "")
+
+        # Mapeo de nombres de examen a atributos de modelo
+        modelo_mapping = {
+            "pittsburgh": "pittsburghresult",
+            "epworth": "epworthresult",
+            "mew": "mewresult",
+            "berlin": "berlinresult",
+            "suenoanamnesis": "suenoaramnesisresult",
+            "atenas": "atenasresult",
+            "suenofisico": "suenofisicoresult",
+            "isi": "isiresult",
+            "stopbang": "stopbangresult",
+        }
+
+        modelo_attr = modelo_mapping.get(examen_nombre)
+        if modelo_attr:
+            try:
+                return (
+                    hasattr(self, modelo_attr)
+                    and getattr(self, modelo_attr) is not None
+                )
+            except:
+                return False
+
+        return False
+
+    def get_resultado_instance(self):
+        """Retorna la instancia del resultado específico del examen"""
+        examen_nombre = self.examen.nombre.lower().replace(" ", "").replace("-", "")
+
+        modelo_mapping = {
+            "pittsburgh": "pittsburghresult",
+            "epworth": "epworthresult",
+            "mew": "mewresult",
+            "berlin": "berlinresult",
+            "suenoanamnesis": "suenoaramnesisresult",
+            "atenas": "atenasresult",
+            "suenofisico": "suenofisicoresult",
+            "isi": "isiresult",
+            "stopbang": "stopbangresult",
+        }
+
+        modelo_attr = modelo_mapping.get(examen_nombre)
+        if modelo_attr and hasattr(self, modelo_attr):
+            try:
+                return getattr(self, modelo_attr)
+            except:
+                return None
+        return None
+
+    def get_nombre_examen_normalizado(self):
+        """Retorna el nombre del examen normalizado para URLs"""
+        return self.examen.nombre.lower().replace(" ", "").replace("-", "")
+
+    def get_url_realizar(self):
+        """Retorna la URL para realizar el examen específico"""
+        examen_nombre = self.get_nombre_examen_normalizado()
+
+        url_mapping = {
+            "pittsburgh": "realizar_pittsburgh",
+            "epworth": "realizar_epworth",
+            "mew": "realizar_mew",
+            "berlin": "realizar_berlin",
+            "suenoanamnesis": "realizar_sueno_anamnesis",
+            "atenas": "realizar_atenas",
+            "suenofisico": "realizar_sueno_fisico",
+            "isi": "realizar_isi",
+            "stopbang": "realizar_stopbang",
+        }
+
+        url_name = url_mapping.get(examen_nombre)
+        if url_name:
+            try:
+                return reverse(
+                    url_name,
+                    args=[self.visita.id, self.examen.id, self.visita.paciente.id],
+                )
+            except NoReverseMatch:
+                pass
+
+        # URL temporal mientras desarrollas las vistas
+        return f"/examenes/realizar/{self.visita.id}/{self.examen.id}/{self.visita.paciente.id}/"
+
+    def get_url_ver(self):
+        """Retorna la URL para ver los resultados del examen"""
+        if not self.esta_realizado:
+            return "#"
+
+        examen_nombre = self.get_nombre_examen_normalizado()
+
+        url_mapping = {
+            "pittsburgh": "ver_pittsburgh",
+            "epworth": "ver_epworth",
+            "mew": "ver_mew",
+            "berlin": "ver_berlin",
+            "suenoanamnesis": "ver_sueno_anamnesis",
+            "atenas": "ver_atenas",
+            "suenofisico": "ver_sueno_fisico",
+            "isi": "ver_isi",
+            "stopbang": "ver_stopbang",
+        }
+
+        url_name = url_mapping.get(examen_nombre)
+        if url_name:
+            try:
+                return reverse(url_name, args=[self.id])
+            except NoReverseMatch:
+                pass
+
+        return f"/examenes/ver/{self.id}/"
+
+    def get_url_editar(self):
+        """Retorna la URL para editar el examen"""
+        if not self.puede_editarse:
+            return "#"
+
+        examen_nombre = self.get_nombre_examen_normalizado()
+
+        url_mapping = {
+            "pittsburgh": "editar_pittsburgh",
+            "epworth": "editar_epworth",
+            "mew": "editar_mew",
+            "berlin": "editar_berlin",
+            "suenoanamnesis": "editar_sueno_anamnesis",
+            "atenas": "editar_atenas",
+            "suenofisico": "editar_sueno_fisico",
+            "isi": "editar_isi",
+            "stopbang": "editar_stopbang",
+        }
+
+        url_name = url_mapping.get(examen_nombre)
+        if url_name:
+            try:
+                return reverse(url_name, args=[self.id])
+            except NoReverseMatch:
+                pass
+
+        return f"/examenes/editar/{self.id}/"
+
+    def get_progreso_porcentaje(self):
+        """Retorna el porcentaje de progreso del examen"""
+        if self.estado == "completado":
+            return 100
+        elif self.estado == "en_progreso":
+            return 50
+        elif self.estado == "cancelado":
+            return 0
+        else:  # pendiente
+            return 0
+
+    def get_icono_estado(self):
+        """Retorna el icono FontAwesome para el estado"""
+        iconos = {
+            "pendiente": "fas fa-hourglass-start",
+            "en_progreso": "fas fa-clock",
+            "completado": "fas fa-check-circle",
+            "cancelado": "fas fa-times-circle",
+        }
+        return iconos.get(self.estado, "fas fa-question-circle")
+
+    def get_color_badge(self):
+        """Retorna la clase CSS para el badge del estado"""
+        colores = {
+            "pendiente": "badge-secondary",
+            "en_progreso": "badge-warning",
+            "completado": "badge-success",
+            "cancelado": "badge-danger",
+        }
+        return colores.get(self.estado, "badge-light")
 
 
 ################################################################################################################################################
