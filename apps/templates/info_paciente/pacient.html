@@ -135,31 +135,57 @@
               {% if visita.Tipo_visita.proyecto == proyecto %}
               <div class="card mb-3">
                 <div class="card-body">
-                  <div class="d-flex justify-content-between">
-                    <div class="me-2">
-                      <p>
+                  <!-- Información principal de la visita y botones de acción -->
+                  <div class="row align-items-center mb-3">
+                    <div class="col-md-8">
+                      <p class="mb-0">
                         <strong>Visita:</strong> {{ visita.nombre }}<br>
                         <strong>Fecha:</strong> {{ visita.fecha }}<br>
                         <strong>Evaluador:</strong> {{ visita.evaluador }}<br>
                         <strong>Tipo de Visita:</strong> {{ visita.Tipo_visita.nombre }}
                       </p>
                     </div>
-                    <div style="display: flex; align-items: center; justify-content: center; gap: 10px;">
-                      <h3>Exámenes</h3>
-                      <button class="btn btn-info" data-toggle="collapse" data-target="#examenes-visita-{{ visita.id }}"
-                        data-toggle="tooltip" data-placement="mid" title="Ver Exámenes">
-                        <i class="fas fa-list"></i>
-                      </button>
+                    <div class="col-md-4 text-right">
+                      <!-- Botones de acción en la misma fila -->
+                      <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-info btn-sm" data-toggle="collapse"
+                          data-target="#examenes-visita-{{ visita.id }}" data-toggle="tooltip" data-placement="top"
+                          title="Ver/Ocultar Exámenes">
+                          <i class="fas fa-list"></i> Exámenes
+                        </button>
+
+                        <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal"
+                          data-bs-target="#modalEditarVisita-{{ visita.id }}" data-toggle="tooltip" data-placement="top"
+                          title="Editar Visita">
+                          <i class="fas fa-edit"></i> Editar
+                        </button>
+
+                        <form action="{% url 'eliminar_v' visita.id %}" method="POST" style="display: inline;"
+                          onsubmit="return confirm('¿Estás seguro de eliminar esta visita?');">
+                          {% csrf_token %}
+                          <button type="submit" class="btn btn-danger btn-sm" data-toggle="tooltip" data-placement="top"
+                            title="Eliminar Visita">
+                            <i class="fas fa-trash"></i> Eliminar
+                          </button>
+                        </form>
+                      </div>
                     </div>
                   </div>
-                  <div id="examenes-visita-{{ visita.id }}" class="collapse mt-3">
+
+                  <!-- Lista de exámenes (colapsable) -->
+                  <div id="examenes-visita-{{ visita.id }}" class="collapse">
+                    <hr>
+                    <h6 class="text-muted mb-3">
+                      <i class="fas fa-clipboard-list"></i> Exámenes de la Visita
+                    </h6>
+
                     {% for visita_examen in visita.visita_examenes.all %}
-                    <div class="card mb-2">
-                      <div class="card-body">
+                    <div class="card mb-2 border-left-primary">
+                      <div class="card-body py-2">
                         <div class="row align-items-center">
-                          <div class="col-md-8">
+                          <div class="col-md-6">
                             <p class="mb-1">
-                              <strong>Examen:</strong> {{ visita_examen.examen.nombre }}<br>
+                              <strong>{{ visita_examen.examen.nombre }}</strong><br>
                               <span class="badge {{ visita_examen.get_color_badge }}">
                                 <i class="{{ visita_examen.get_icono_estado }}"></i> {{ visita_examen.get_estado_display
                                 }}
@@ -167,32 +193,33 @@
                             </p>
                           </div>
 
-                          <div class="col-md-4 text-right">
-                            <!-- Botones según el estado -->
+                          <div class="col-md-6 text-right">
+                            <!-- Botones de examen según el estado -->
                             {% if visita_examen.estado == 'completado' %}
                             <!-- Examen completado: Ver y Editar -->
-                            <a href="#" class="btn btn-info btn-sm" data-bs-toggle="modal"
+                            <a href="#" class="btn btn-info btn-sm me-1" data-bs-toggle="modal"
                               data-bs-target="#modalExamen{{ visita_examen.id }}"
                               data-nombre="{{ visita_examen.examen.nombre}}"
-                              data-resultado="{{ visita_examen.resultado }}">
+                              data-resultado="{{ visita_examen.resultado }}" data-toggle="tooltip"
+                              title="Ver Resultado">
                               <i class="fas fa-eye"></i> Ver
                             </a>
                             <a href="{% url 'realizar_examen' visita_examen.visita.id visita_examen.examen.id visita_examen.visita.paciente.id %}"
-                              class="btn btn-warning btn-sm">
+                              class="btn btn-warning btn-sm" data-toggle="tooltip" title="Editar Examen">
                               <i class="fas fa-edit"></i> Editar
                             </a>
 
                             {% elif visita_examen.estado == 'en_progreso' %}
                             <!-- Examen en progreso: Continuar -->
                             <a href="{% url 'realizar_examen' visita_examen.visita.id visita_examen.examen.id visita_examen.visita.paciente.id %}"
-                              class="btn btn-warning btn-sm">
+                              class="btn btn-warning btn-sm" data-toggle="tooltip" title="Continuar Examen">
                               <i class="fas fa-play-circle"></i> Continuar
                             </a>
 
                             {% else %}
                             <!-- Examen pendiente: Realizar -->
                             <a href="{% url 'realizar_examen' visita_examen.visita.id visita_examen.examen.id visita_examen.visita.paciente.id %}"
-                              class="btn btn-primary btn-sm">
+                              class="btn btn-primary btn-sm" data-toggle="tooltip" title="Realizar Examen">
                               <i class="fas fa-plus-circle"></i> Realizar
                             </a>
                             {% endif %}
@@ -201,7 +228,7 @@
                       </div>
                     </div>
 
-                    <!-- Modal para ver resultado (mantener el existente) -->
+                    <!-- Modal para ver resultado (mantener existente) -->
                     {% if visita_examen.estado == 'completado' %}
                     <div class="modal fade" id="modalExamen{{ visita_examen.id }}" tabindex="-1" aria-hidden="true">
                       <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
@@ -265,19 +292,10 @@
                     {% endif %}
 
                     {% empty %}
-                    <p>No se realizaron exámenes en esta visita.</p>
+                    <div class="alert alert-info">
+                      <i class="fas fa-info-circle"></i> No se realizaron exámenes en esta visita.
+                    </div>
                     {% endfor %}
-                  </div>
-                  <div class="d-flex justify-content-end mt-3">
-                    <form action="{% url 'eliminar_v' visita.id %}" method="POST"
-                      onsubmit="return confirm('¿Estás seguro de eliminar esta visita?');">
-                      {% csrf_token %}
-                      <button type="submit" class="btn btn-danger btn-sm me-2">Eliminar visita</button>
-                    </form>
-                    <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal"
-                      data-bs-target="#modalEditarVisita-{{ visita.id }}">
-                      Editar Visita
-                    </button>
                   </div>
                 </div>
               </div>

@@ -159,11 +159,10 @@ def registro_demografico(request):
         except Exception as e:
             messages.error(request, f"Error al guardar los datos: {str(e)}")
 
-        pacientes = DatosDemograficos.objects.all()
         return redirect("tables.html")
 
     if request.method == "GET":
-        return render(request, "sleepexams/pacientForm.html")
+        return render(request, "info_paciente/pacientForm.html")
 
 
 @login_required
@@ -204,7 +203,7 @@ def editar_paciente(request, numero_documento):
                 request,
                 f"❌ Error en el formulario. Verifica los campos. {str(form.errors)}",
             )
-            return render(request, "sleepexams/editPacientForm.html", {"form": form})
+            return render(request, "info_paciente/editPacientForm.html", {"form": form})
             # Para depuración en la consola
 
     # Redirigir a una página de detalle del paciente
@@ -212,7 +211,7 @@ def editar_paciente(request, numero_documento):
         form = RegistroDemograficoForm(
             instance=paciente
         )  # Cargar el formulario con los datos del paciente
-        return render(request, "sleepexams/editPacientForm.html", {"form": form})
+        return render(request, "info_paciente/editPacientForm.html", {"form": form})
 
 
 @login_required
@@ -240,7 +239,7 @@ def detalle_paciente(request, paciente_id):
 
     return render(
         request,
-        "sleepexams/pacient.html",
+        "info_paciente/pacient.html",
         {
             "paciente": paciente,
             "proyectos": proyectos,
@@ -336,7 +335,7 @@ def crear_visita(request, paciente_id):
 
     return render(
         request,
-        "sleepexams/pacient.html",
+        "info_paciente/pacient.html",
         {
             "paciente": paciente,
             "proyectos_asociados": proyectos_asociados,
@@ -422,7 +421,7 @@ def editar_v(request, visita_id):
         return redirect("detalle_paciente", paciente_id=paciente.id)
     return render(
         request,
-        "sleepexams/editar_visita.html",
+        "info_paciente/editar_visita.html",
         {
             "visita": visita,
             "paciente": paciente,
@@ -645,12 +644,18 @@ def editar_visita(request, visita_id):
 def realizar_examen(request, visita_id, examen_id, paciente_id):
     # Diccionario de configuración de exámenes
     exam_config = {
-        3: {"template": "sleepexams/General_ExamenFísico.html", "model": None},
-        4: {"template": "sleepexams/General_RevisiónSistemas.html", "model": None},
-        5: {"template": "sleepexams/General_Antecedentes.html", "model": None},
-        7: {"template": "sleepexams/General_Análisis.html", "model": None},
-        8: {"template": "sleepexams/General_Medicamentos.html", "model": None},
-        9: {"template": "sleepexams/General_ExamenNeurológico.html", "model": None},
+        3: {"template": "examenes_general/General_ExamenFísico.html", "model": None},
+        4: {
+            "template": "examenes_general/General_RevisiónSistemas.html",
+            "model": None,
+        },
+        5: {"template": "examenes_general/General_Antecedentes.html", "model": None},
+        7: {"template": "examenes_general/General_Análisis.html", "model": None},
+        8: {"template": "examenes_general/General_Medicamentos.html", "model": None},
+        9: {
+            "template": "examenes_general/General_ExamenNeurológico.html",
+            "model": None,
+        },
         10: {
             "template": "examenes_sueno/Sueno_anamnesis.html",
             "model": SuenoAnamnesisResult,
