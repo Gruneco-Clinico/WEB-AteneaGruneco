@@ -154,15 +154,55 @@
                   </div>
                   <div id="examenes-visita-{{ visita.id }}" class="collapse mt-3">
                     {% for visita_examen in visita.visita_examenes.all %}
-                    <p>
-                      <strong>Examen:</strong> {{ visita_examen.examen.nombre }}<br>
-                      {% if visita_examen.resultado %}
-                      <a href="#" class="btn btn-info btn-sm" data-bs-toggle="modal"
-                        data-bs-target="#modalExamen{{ visita_examen.id }}"
-                        data-nombre="{{ visita_examen.examen.nombre}}"
-                        data-resultado="{{ visita_examen.resultado }}">Ver Resultado</a>
+                    <div class="card mb-2">
+                      <div class="card-body">
+                        <div class="row align-items-center">
+                          <div class="col-md-8">
+                            <p class="mb-1">
+                              <strong>Examen:</strong> {{ visita_examen.examen.nombre }}<br>
+                              <span class="badge {{ visita_examen.get_color_badge }}">
+                                <i class="{{ visita_examen.get_icono_estado }}"></i> {{ visita_examen.get_estado_display
+                                }}
+                              </span>
+                            </p>
+                          </div>
 
-                      <!-- Modal para cada examen (con ID único) -->
+                          <div class="col-md-4 text-right">
+                            <!-- Botones según el estado -->
+                            {% if visita_examen.estado == 'completado' %}
+                            <!-- Examen completado: Ver y Editar -->
+                            <a href="#" class="btn btn-info btn-sm" data-bs-toggle="modal"
+                              data-bs-target="#modalExamen{{ visita_examen.id }}"
+                              data-nombre="{{ visita_examen.examen.nombre}}"
+                              data-resultado="{{ visita_examen.resultado }}">
+                              <i class="fas fa-eye"></i> Ver
+                            </a>
+                            <a href="{% url 'realizar_examen' visita_examen.visita.id visita_examen.examen.id visita_examen.visita.paciente.id %}"
+                              class="btn btn-warning btn-sm">
+                              <i class="fas fa-edit"></i> Editar
+                            </a>
+
+                            {% elif visita_examen.estado == 'en_progreso' %}
+                            <!-- Examen en progreso: Continuar -->
+                            <a href="{% url 'realizar_examen' visita_examen.visita.id visita_examen.examen.id visita_examen.visita.paciente.id %}"
+                              class="btn btn-warning btn-sm">
+                              <i class="fas fa-play-circle"></i> Continuar
+                            </a>
+
+                            {% else %}
+                            <!-- Examen pendiente: Realizar -->
+                            <a href="{% url 'realizar_examen' visita_examen.visita.id visita_examen.examen.id visita_examen.visita.paciente.id %}"
+                              class="btn btn-primary btn-sm">
+                              <i class="fas fa-plus-circle"></i> Realizar
+                            </a>
+                            {% endif %}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Modal para ver resultado (mantener el existente) -->
+                    {% if visita_examen.estado == 'completado' %}
                     <div class="modal fade" id="modalExamen{{ visita_examen.id }}" tabindex="-1" aria-hidden="true">
                       <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
                         <div class="modal-content">
@@ -222,21 +262,8 @@
                         </div>
                       </div>
                     </div>
-
-                    <form method="POST"
-                      action="{% url 'eliminar_resultado_examen' visita_examen.visita.id visita_examen.examen.id visita_examen.visita.paciente.id %}"
-                      style="display:inline;">
-                      {% csrf_token %}
-                      <button type="submit" class="btn btn-danger" data-toggle="tooltip" data-placement="top"
-                        title="Eliminar examen" style="font-size: 1rem; padding: 5px 5px;">
-                        <i class="fas fa-trash"></i>
-                      </button>
-                    </form>
-                    {% else %}
-                    <a href="{% url 'realizar_examen' visita_examen.visita.id visita_examen.examen.id visita_examen.visita.paciente.id %}"
-                      class="btn btn-primary btn-sm">Realizar Examen</a>
                     {% endif %}
-                    </p>
+
                     {% empty %}
                     <p>No se realizaron exámenes en esta visita.</p>
                     {% endfor %}

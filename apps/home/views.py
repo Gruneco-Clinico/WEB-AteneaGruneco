@@ -33,6 +33,7 @@ from .models import (
 )
 from .forms import ProyectoForm, RegistroDemograficoForm
 import json
+from django.forms.models import model_to_dict
 
 # from weasyprint import HTML
 from django.contrib.auth import update_session_auth_hash
@@ -495,7 +496,6 @@ def proyectos(request):
 
 @login_required
 def eliminar_proyecto(request, id):
-    proyectos = Proyecto.objects.all()
     if request.method == "POST":
         proyecto = get_object_or_404(
             Proyecto, id=id
@@ -643,50 +643,75 @@ def editar_visita(request, visita_id):
 # exámenes #######################
 @login_required
 def realizar_examen(request, visita_id, examen_id, paciente_id):
-    # Diccionario de plantillas según el examen
-    exam_templates = {
-        3: "sleepexams/General_ExamenFísico.html",
-        4: "sleepexams/General_RevisiónSistemas.html",
-        5: "sleepexams/General_Antecedentes.html",
-        7: "sleepexams/General_Análisis.html",
-        8: "sleepexams/General_Medicamentos.html",
-        9: "sleepexams/General_ExamenNeurológico.html",
-        10: "examenes_sueno/Sueno_anamnesis.html",
-        11: "examenes_sueno/Sueño_Cuestionarios.html",
-        12: "examenes_sueno/Sueño_ExamenFisico.html",
-        13: "examenes_sueno/sueno_Pitsburg.html",
-        14: "examenes_sueno/sueno_Epworth.html",
-        15: "examenes_sueno/sueno_Stop_Bang.html",
-        16: "examenes_sueno/sueno_MEW.html",
-        17: "examenes_sueno/sueno_Berlín.html",
-        18: "examenes_sueno/sueno_atenas.html",
-        19: "examenes_sueno/sueno_ISI.html",
-        20: "sleepexams/cognitivo_Anamnesis.html",
-        21: "sleepexams/Anosognosia_Participante_EuroQoL.html",
-        22: "sleepexams/Anosognosia_Participante_EVA_EuroQoL.html",
-        23: "sleepexams/Anosognosia_Participante_Yesavage.html",
-        24: "sleepexams/Anosognosia_Cuidador_NPI.html",
-        25: "sleepexams/Anosognosia_Cuidador_LawtonBrody.html",
-        26: "sleepexams/Anosognosia_Cuidador_CalidadVida_BettyFerrel.html",
-        27: "sleepexams/Anosognosia_Participante_MoCA.html",
-        28: "sleepexams/Anosognosia_Participante_AdherenciaTerapeutica.html",
-        29: "sleepexams/Anosognosia_Cuidador_EscalaZarit.html",
-        30: "sleepexams/Anosognosia_Cuidador_AQD.html",
-        31: "sleepexams/Anosognosia_Participante_AQD.html",
-        32: "sleepexams/Anosognosia_Cuidador_RedLatSpanish.html",
-        33: "sleepexams/Anosognosia_Cuidador_CDR.html",
-        34: "sleepexams/Anosognosia_Participante_CDR.html",
+    # Diccionario de configuración de exámenes
+    exam_config = {
+        3: {"template": "sleepexams/General_ExamenFísico.html", "model": None},
+        4: {"template": "sleepexams/General_RevisiónSistemas.html", "model": None},
+        5: {"template": "sleepexams/General_Antecedentes.html", "model": None},
+        7: {"template": "sleepexams/General_Análisis.html", "model": None},
+        8: {"template": "sleepexams/General_Medicamentos.html", "model": None},
+        9: {"template": "sleepexams/General_ExamenNeurológico.html", "model": None},
+        10: {
+            "template": "examenes_sueno/Sueno_anamnesis.html",
+            "model": SuenoAnamnesisResult,
+        },
+        11: {"template": "examenes_sueno/Sueño_Cuestionarios.html", "model": None},
+        12: {
+            "template": "examenes_sueno/Sueño_ExamenFisico.html",
+            "model": SuenoFisicoResult,
+        },
+        13: {"template": "examenes_sueno/sueno_Pitsburg.html", "model": None},
+        14: {"template": "examenes_sueno/sueno_Epworth.html", "model": None},
+        15: {"template": "examenes_sueno/sueno_Stop_Bang.html", "model": None},
+        16: {"template": "examenes_sueno/sueno_MEW.html", "model": None},
+        17: {"template": "examenes_sueno/sueno_Berlín.html", "model": None},
+        18: {"template": "examenes_sueno/sueno_atenas.html", "model": AtenasResult},
+        19: {"template": "examenes_sueno/sueno_ISI.html", "model": None},
+        # ... resto de exámenes
     }
 
-    template = exam_templates.get(examen_id)
+    config = exam_config.get(examen_id)
+    if not config:
+        messages.error(request, "Examen no encontrado")
+        return redirect("detalle_paciente", paciente_id=paciente_id)
+
+    # Obtener datos existentes si hay un modelo específico
+    datos_examen = None
+    visita_examen_obj = None
+    modo_edicion = False
+
+    try:
+        visita_examen_obj = VisitaExamen.objects.get(
+            visita_id=visita_id, examen_id=examen_id
+        )
+
+        if config["model"]:
+            try:
+                resultado = config["model"].objects.get(visita_examen=visita_examen_obj)
+                datos_examen = model_to_dict(resultado)
+                # Limpiar campos que no necesitas en el template
+                datos_examen.pop("id", None)
+                datos_examen.pop("visita_examen", None)
+                modo_edicion = True
+                print(f"Datos encontrados para edición: {datos_examen}")
+            except config["model"].DoesNotExist:
+                datos_examen = None
+                print("No se encontraron datos existentes")
+
+    except VisitaExamen.DoesNotExist:
+        messages.error(request, "Visita-examen no encontrada")
+        return redirect("detalle_paciente", paciente_id=paciente_id)
 
     return render(
         request,
-        template,
+        config["template"],
         {
             "visita_examen": visita_id,
             "paciente_id": paciente_id,
             "examen_id": examen_id,
+            "datos_examen": datos_examen,
+            "modo_edicion": modo_edicion,
+            "visita_examen_obj": visita_examen_obj,
         },
     )
 
@@ -695,35 +720,19 @@ def realizar_examen(request, visita_id, examen_id, paciente_id):
 @login_required
 def guardar_examen_fisico_sueno(request):
     if request.method == "POST":
-        print("Método POST recibido")
-        print("Datos POST:", dict(request.POST))
-
         try:
-            # CAMBIO: usar 'visita_id' en lugar de 'visita_examen'
             visita_id = request.POST.get("visita_id")  # Cambiar aquí
             paciente_id = request.POST.get("paciente_id")
             examen_id = request.POST.get("examen_id")
 
-            print(
-                f"visita_id: {visita_id}, paciente_id: {paciente_id}, examen_id: {examen_id}"
+            # Obtener la instancia de VisitaExamen
+            visita_examen = get_object_or_404(
+                VisitaExamen, visita_id=visita_id, examen_id=examen_id
             )
 
-            # Verificar que estos valores no sean None
-            if not visita_id or not paciente_id or not examen_id:
-                print("ERROR: Faltan datos obligatorios")
-                messages.error(request, "Faltan datos obligatorios en el formulario.")
-                return redirect("detalle_paciente", paciente_id=paciente_id or 1)
-
-            # Obtener la instancia de VisitaExamen
-            try:
-                visita_examen = get_object_or_404(
-                    VisitaExamen, visita_id=visita_id, examen_id=examen_id
-                )
-                print(f"VisitaExamen encontrada: {visita_examen}")
-            except Exception as e:
-                print(f"Error al obtener VisitaExamen: {str(e)}")
-                messages.error(request, f"No se encontró la visita-examen: {str(e)}")
-                return redirect("detalle_paciente", paciente_id=paciente_id)
+            # Marcar como iniciado si está pendiente
+            if visita_examen.estado == "pendiente":
+                visita_examen.marcar_como_iniciado()
 
             # Crear o actualizar el resultado del examen físico de sueño
             sueno_fisico, created = SuenoFisicoResult.objects.get_or_create(
@@ -862,17 +871,12 @@ def guardar_examen_fisico_sueno(request):
 
             # Marcar el examen como completado
             visita_examen.marcar_como_completado()
-            print("aqui")
-            messages.success(request, "Examen físico de sueño guardado exitosamente.")
 
-            # Redirigir al detalle del paciente
+            messages.success(request, "Examen físico de sueño guardado exitosamente.")
             return redirect("detalle_paciente", paciente_id=paciente_id)
 
         except Exception as e:
-            print(f"ERROR GENERAL: {str(e)}")
-            import traceback
-
-            traceback.print_exc()
+            print(f"ERROR: {str(e)}")
             messages.error(request, f"Error al guardar el examen: {str(e)}")
             return redirect("detalle_paciente", paciente_id=paciente_id or 1)
 

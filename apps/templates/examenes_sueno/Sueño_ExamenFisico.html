@@ -38,7 +38,13 @@
                     <div class="card-header border-0">
                         <div class="row align-items-center">
                             <div class="col">
-                                <h3 class="mb-0">Examen Físico de Sueño</h3>
+                                <h3>
+                                    {% if modo_edicion %}
+                                    <i class="fas fa-edit"></i> Editar Examen Físico de Sueño
+                                    {% else %}
+                                    <i class="fas fa-plus"></i> Realizar Examen Físico de Sueño
+                                    {% endif %}
+                                </h3>
                             </div>
                             <div class="col text-right">
                                 <span class="text-muted">Fecha: {% now "d/m/Y" %}</span>
@@ -76,15 +82,17 @@
                                             <div class="col-md-6">
                                                 <div class="form-group">
                                                     <label for="peso">Peso (Kg):</label>
-                                                    <input type="number" class="form-control" id="peso" name="peso"
-                                                        step="0.1" required>
+                                                    <input type="number" step="0.01" name="peso" id="peso"
+                                                        value="{% if datos_examen.peso %}{{ datos_examen.peso|floatformat:0.1|cut:',' }}{% endif %}"
+                                                        class="form-control" placeholder="Ej: 70.5">
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="form-group">
                                                     <label for="talla">Talla (cm):</label>
-                                                    <input type="number" class="form-control" id="talla" name="talla"
-                                                        step="0.1" required>
+                                                    <input type="number" step="0.01" name="talla" id="talla"
+                                                        value="{% if datos_examen.talla %}{{ datos_examen.talla|floatformat:0.1|cut:',' }}{% endif %}"
+                                                        class="form-control" placeholder="Ej: 170">
                                                 </div>
                                             </div>
                                         </div>
@@ -92,15 +100,18 @@
                                             <div class="col-md-6">
                                                 <div class="form-group">
                                                     <label for="imc">Índice de Masa Corporal (IMC):</label>
-                                                    <input type="text" class="form-control" id="imc" name="imc"
-                                                        readonly>
+                                                    <input type="number" step="0.01" name="imc" id="imc"
+                                                        value="{% if datos_examen.imc %}{{ datos_examen.imc|floatformat:0.1|cut:',' }}{% endif %}"
+                                                        class="form-control" readonly>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="form-group">
                                                     <label for="rango_imc">Rango IMC:</label>
                                                     <input type="text" class="form-control" id="rango_imc"
-                                                        name="rango_imc" readonly>
+                                                        name="rango_imc"
+                                                        value="{% if datos_examen.rango_imc %}{{ datos_examen.rango_imc }}{% endif %}"
+                                                        readonly>
                                                 </div>
                                             </div>
                                         </div>
@@ -110,7 +121,9 @@
                                                     <label for="circunferencia_cuello">Circunferencia de cuello
                                                         (cm):</label>
                                                     <input type="number" class="form-control" id="circunferencia_cuello"
-                                                        name="circunferencia_cuello" step="0.1" required>
+                                                        name="circunferencia_cuello" step="0.1"
+                                                        value="{% if datos_examen.circunferencia_cuello %}{{ datos_examen.circunferencia_cuello|floatformat:0.1|cut:',' }}{% endif %}"
+                                                        required>
                                                     <small class="form-text text-muted">Límite superior: Hombres: 42 cm
                                                         | Mujeres: 38 cm</small>
                                                 </div>
@@ -119,7 +132,9 @@
                                                 <div class="form-group">
                                                     <label for="perimetro_abdominal">Perímetro abdominal (cm):</label>
                                                     <input type="number" class="form-control" id="perimetro_abdominal"
-                                                        name="perimetro_abdominal" step="0.1" required>
+                                                        name="perimetro_abdominal" step="0.1"
+                                                        value="{% if datos_examen.perimetro_abdominal %}{{ datos_examen.perimetro_abdominal|floatformat:0.1|cut:',' }}{% endif %}"
+                                                        required>
                                                     <small class="form-text text-muted">Límite superior: Hombres: 110 cm
                                                         | Mujeres: 100 cm</small>
                                                 </div>
@@ -142,10 +157,18 @@
                                                     <label for="simetria_narinas">Simetría de las narinas:</label>
                                                     <select class="form-control" id="simetria_narinas"
                                                         name="simetria_narinas">
-                                                        <option value="" selected disabled>Seleccione una opción
-                                                        </option>
+                                                        {% if datos_examen.simetria_narinas %}
+                                                        <option value="{{ datos_examen.simetria_narinas }}" selected>
+                                                            {{ datos_examen.simetria_narinas }}</option>
+                                                        {% else %}
+                                                        <option value="">Seleccione una opción</option>
+                                                        {% endif %}
+                                                        {% if datos_examen.simetria_narinas != "Si" %}
                                                         <option value="Si">Sí</option>
+                                                        {% endif %}
+                                                        {% if datos_examen.simetria_narinas != "No" %}
                                                         <option value="No">No</option>
+                                                        {% endif %}
                                                     </select>
                                                 </div>
                                             </div>
@@ -153,13 +176,26 @@
                                                 <div class="form-group">
                                                     <label for="tipo_narina">Tipo de narina:</label>
                                                     <select class="form-control" id="tipo_narina" name="tipo_narina">
-                                                        <option value="" selected disabled>Seleccione un tipo</option>
+                                                        {% if datos_examen.tipo_narina %}
+                                                        <option value="{{ datos_examen.tipo_narina }}" selected>
+                                                            {{ datos_examen.tipo_narina }}</option>
+                                                        {% else %}
+                                                        <option value="">Seleccione un tipo</option>
+                                                        {% endif %}
+                                                        {% if datos_examen.tipo_narina != "Tipo 1" %}
                                                         <option value="Tipo 1">Narinas anchas (Tipo 1)</option>
+                                                        {% endif %}
+                                                        {% if datos_examen.tipo_narina != "Tipo 2" %}
                                                         <option value="Tipo 2">Narinas estrechas (Tipo 2)</option>
+                                                        {% endif %}
+                                                        {% if datos_examen.tipo_narina != "Tipo 3" %}
                                                         <option value="Tipo 3">Columela corta y narinas estrechas (Tipo
                                                             3)</option>
+                                                        {% endif %}
+                                                        {% if datos_examen.tipo_narina != "Tipo 4" %}
                                                         <option value="Tipo 4">Columela corta pies crus alaris
                                                             prominente (Tipo 4)</option>
+                                                        {% endif %}
                                                     </select>
                                                     <a href="#" data-toggle="modal" data-target="#narinaModal"
                                                         class="small">Ver referencia</a>
@@ -173,8 +209,12 @@
                                                         septo:</label>
                                                     <select class="form-control" id="desviacion_septo"
                                                         name="desviacion_septo">
-                                                        <option value="" selected disabled>Seleccione una opción
-                                                        </option>
+                                                        {% if datos_examen.desviacion_septo %}
+                                                        <option value="{{ datos_examen.desviacion_septo }}" selected>
+                                                            {{ datos_examen.desviacion_septo }}</option>
+                                                        {% else %}
+                                                        <option value="">Seleccione una opción</option>
+                                                        {% endif %}
                                                         <option value="Si">Sí</option>
                                                         <option value="No">No</option>
                                                     </select>
@@ -186,8 +226,13 @@
                                                         nasales:</label>
                                                     <select class="form-control" id="hipertrofia_cornetes"
                                                         name="hipertrofia_cornetes">
-                                                        <option value="" selected disabled>Seleccione una opción
-                                                        </option>
+                                                        {% if datos_examen.hipertrofia_cornetes %}
+                                                        <option value="{{ datos_examen.hipertrofia_cornetes }}"
+                                                            selected>
+                                                            {{ datos_examen.hipertrofia_cornetes }}</option>
+                                                        {% else %}
+                                                        <option value="">Seleccione una opción</option>
+                                                        {% endif %}
                                                         <option value="Si">Sí</option>
                                                         <option value="No">No</option>
                                                     </select>
@@ -199,7 +244,12 @@
                                                 <div class="form-group">
                                                     <label for="grado">Grado de obstrucción:</label>
                                                     <select class="form-control" id="grado" name="grado">
-                                                        <option value="" selected disabled>Seleccione un grado</option>
+                                                        {% if datos_examen.hipertrofia_cornetes %}
+                                                        <option value="{{ datos_examen.grado }}" selected>
+                                                            {{ datos_examen.grado }}</option>
+                                                        {% else %}
+                                                        <option value="">Seleccione una opción</option>
+                                                        {% endif %}
                                                         <option value="Normal">Normal</option>
                                                         <option value="Moderado">Moderado</option>
                                                         <option value="Severo">Severo</option>
@@ -212,8 +262,12 @@
                                                     <label for="hipertrofia_uvula">Hipertrofia de úvula:</label>
                                                     <select class="form-control" id="hipertrofia_uvula"
                                                         name="hipertrofia_uvula">
-                                                        <option value="" selected disabled>Seleccione una opción
-                                                        </option>
+                                                        {% if datos_examen.hipertrofia_uvula %}
+                                                        <option value="{{ datos_examen.hipertrofia_uvula }}" selected>
+                                                            {{ datos_examen.hipertrofia_uvula }}</option>
+                                                        {% else %}
+                                                        <option value="">Seleccione una opción</option>
+                                                        {% endif %}
                                                         <option value="Si">Sí</option>
                                                         <option value="No">No</option>
                                                     </select>
@@ -225,6 +279,12 @@
                                                 <div class="form-group">
                                                     <label for="mallampati">Clasificación de Mallampati:</label>
                                                     <select class="form-control" id="mallampati" name="mallampati">
+                                                        {% if datos_examen.hipertrofia_cornetes %}
+                                                        <option value="{{ datos_examen.mallampati }}" selected>
+                                                            {{ datos_examen.mallampati }}</option>
+                                                        {% else %}
+                                                        <option value="">Seleccione una opción</option>
+                                                        {% endif %}
                                                         <option value="Clase 1">Clase 1</option>
                                                         <option value="Clase 2">Clase 2</option>
                                                         <option value="Clase 3">Clase 3</option>
@@ -239,6 +299,12 @@
                                                     <label for="amigdalas">Hipertrofía de amígdalas (Escala de
                                                         Friedman):</label>
                                                     <select class="form-control" id="amigdalas" name="amigdalas">
+                                                        {% if datos_examen.hipertrofia_cornetes %}
+                                                        <option value="{{ datos_examen.amigdalas }}" selected>
+                                                            {{ datos_examen.amigdalas }}</option>
+                                                        {% else %}
+                                                        <option value="">Seleccione una opción</option>
+                                                        {% endif %}
                                                         <option value="Grado 0">Grado 0</option>
                                                         <option value="Grado 1">Grado 1</option>
                                                         <option value="Grado 2">Grado 2</option>
@@ -266,8 +332,12 @@
                                                 <div class="form-group">
                                                     <label for="biotipo">Biotipo:</label>
                                                     <select class="form-control" id="biotipo" name="biotipo">
-                                                        <option value="" selected disabled>Seleccione un biotipo
-                                                        </option>
+                                                        {% if datos_examen.hipertrofia_cornetes %}
+                                                        <option value="{{ datos_examen.biotipo }}" selected>
+                                                            {{ datos_examen.biotipo }}</option>
+                                                        {% else %}
+                                                        <option value="">Seleccione una opción</option>
+                                                        {% endif %}
                                                         <option value="Ectomorfo">Ectomorfo</option>
                                                         <option value="Mesomorfo">Mesomorfo</option>
                                                         <option value="Endomorfo">Endomorfo</option>
@@ -280,6 +350,12 @@
                                                 <div class="form-group">
                                                     <label for="tipo_mordida">Tipo de mordida:</label>
                                                     <select class="form-control" id="tipo_mordida" name="tipo_mordida">
+                                                        {% if datos_examen.hipertrofia_cornetes %}
+                                                        <option value="{{ datos_examen.tipo_mordida }}" selected>
+                                                            {{ datos_examen.tipo_mordida }}</option>
+                                                        {% else %}
+                                                        <option value="">Seleccione una opción</option>
+                                                        {% endif %}
                                                         <option value="Clase 1">Clase 1</option>
                                                         <option value="Clase 2">Clase 2</option>
                                                         <option value="Clase 3">Clase 3</option>
@@ -296,7 +372,8 @@
                                                 <div class="form-group">
                                                     <label for="alteracion_craneo">Alteración cráneo o cara:</label>
                                                     <textarea class="form-control" id="alteracion_craneo"
-                                                        name="alteracion_craneo" rows="3"></textarea>
+                                                        name="alteracion_craneo"
+                                                        rows="3">{{ datos_examen.alteracion_craneo }}</textarea>
                                                 </div>
                                             </div>
                                         </div>
@@ -308,9 +385,16 @@
                         <!-- Botones de acción -->
                         <div class="row mt-4">
                             <div class="col-12 text-right">
-                                <button type="submit" class="btn btn-primary">Guardar Examen</button>
-                                <a href="{% url 'detalle_paciente' paciente_id %}" class="btn btn-secondary">Ver
-                                    Paciente</a>
+                                <button type="submit" class="btn btn-primary">
+                                    {% if modo_edicion %}
+                                    <i class="fas fa-save"></i> Actualizar Examen
+                                    {% else %}
+                                    <i class="fas fa-save"></i> Guardar Examen
+                                    {% endif %}
+                                </button>
+                                <a href="{% url 'detalle_paciente' paciente_id %}" class="btn btn-secondary">
+                                    <i class="fas fa-arrow-left"></i> Ver Paciente
+                                </a>
                             </div>
                         </div>
                     </div>
