@@ -30,6 +30,12 @@ from .models import (
     ActividadEnCamaSueno,
     AtenasResult,
     ActividadFisicaSueno,
+    PittsburghResult,
+    EpworthResult,
+    StopBangResult,
+    MEWResult,
+    BerlinResult,
+    ISIResult,
 )
 from .forms import ProyectoForm, RegistroDemograficoForm
 import json
@@ -225,16 +231,17 @@ def detalle_paciente(request, paciente_id):
         id__in=proyectos_asociados.values_list("id", flat=True)
     )
 
-    # Obtener las visitas asociadas al paciente
-    visitas_paciente = Visita.objects.filter(paciente=paciente)
+    # Obtener las visitas con sus exámenes relacionados (optimización)
+    visitas_paciente = Visita.objects.filter(paciente=paciente).prefetch_related(
+        "visita_examenes__examen"
+    )
 
     if request.method == "POST":
         proyecto_id = request.POST.get("proyecto_id")
-        pacientes_ids = request.POST.get("paciente_id")  # Lista de IDs seleccionados
+        pacientes_ids = request.POST.get("paciente_id")
         paciente = DatosDemograficos.objects.get(id=pacientes_ids)
         proyecto = Proyecto.objects.get(id=proyecto_id)
-        proyecto.pacientes.add(paciente)  # Asigna los pacientes al proyecto
-
+        proyecto.pacientes.add(paciente)
         proyecto.save()
 
     return render(
@@ -664,23 +671,28 @@ def realizar_examen(request, visita_id, examen_id, paciente_id):
         12: {
             "template": "examenes_sueno/Sueño_ExamenFisico.html",
             "model": SuenoFisicoResult,
+        },  # CORREGIDO: Era el examen físico, no Pittsburgh
+        13: {
+            "template": "examenes_sueno/sueno_Pitsburg.html",
+            "model": None,
+        },  # CORREGIDO: Este es Pittsburgh
+        14: {"template": "examenes_sueno/sueno_Epworth.html", "model": EpworthResult},
+        15: {
+            "template": "examenes_sueno/sueno_Stop_Bang.html",
+            "model": StopBangResult,
         },
-        13: {"template": "examenes_sueno/sueno_Pitsburg.html", "model": None},
-        14: {"template": "examenes_sueno/sueno_Epworth.html", "model": None},
-        15: {"template": "examenes_sueno/sueno_Stop_Bang.html", "model": None},
-        16: {"template": "examenes_sueno/sueno_MEW.html", "model": None},
-        17: {"template": "examenes_sueno/sueno_Berlín.html", "model": None},
+        16: {"template": "examenes_sueno/sueno_MEW.html", "model": MEWResult},
+        17: {"template": "examenes_sueno/sueno_Berlín.html", "model": BerlinResult},
         18: {"template": "examenes_sueno/sueno_atenas.html", "model": AtenasResult},
-        19: {"template": "examenes_sueno/sueno_ISI.html", "model": None},
-        # ... resto de exámenes
+        19: {"template": "examenes_sueno/sueno_ISI.html", "model": ISIResult},
     }
 
-    config = exam_config.get(examen_id)
+    config = exam_config.get(int(examen_id))  # CAMBIO: Asegurar que sea entero
     if not config:
         messages.error(request, "Examen no encontrado")
         return redirect("detalle_paciente", paciente_id=paciente_id)
 
-    # Obtener datos existentes si hay un modelo específico
+    # Obtener datos existentes usando los nuevos métodos
     datos_examen = None
     visita_examen_obj = None
     modo_edicion = False
@@ -690,18 +702,16 @@ def realizar_examen(request, visita_id, examen_id, paciente_id):
             visita_id=visita_id, examen_id=examen_id
         )
 
-        if config["model"]:
-            try:
-                resultado = config["model"].objects.get(visita_examen=visita_examen_obj)
+        # CAMBIO: Usar el nuevo método get_resultado_instance()
+        if config["model"] and visita_examen_obj.esta_realizado:
+            resultado = visita_examen_obj.get_resultado_instance()
+            if resultado and isinstance(resultado, config["model"]):
                 datos_examen = model_to_dict(resultado)
                 # Limpiar campos que no necesitas en el template
                 datos_examen.pop("id", None)
                 datos_examen.pop("visita_examen", None)
                 modo_edicion = True
                 print(f"Datos encontrados para edición: {datos_examen}")
-            except config["model"].DoesNotExist:
-                datos_examen = None
-                print("No se encontraron datos existentes")
 
     except VisitaExamen.DoesNotExist:
         messages.error(request, "Visita-examen no encontrada")
@@ -726,7 +736,7 @@ def realizar_examen(request, visita_id, examen_id, paciente_id):
 def guardar_examen_fisico_sueno(request):
     if request.method == "POST":
         try:
-            visita_id = request.POST.get("visita_id")  # Cambiar aquí
+            visita_id = request.POST.get("visita_id")
             paciente_id = request.POST.get("paciente_id")
             examen_id = request.POST.get("examen_id")
 
@@ -735,9 +745,11 @@ def guardar_examen_fisico_sueno(request):
                 VisitaExamen, visita_id=visita_id, examen_id=examen_id
             )
 
-            # Marcar como iniciado si está pendiente
+            # CAMBIO: Usar el nuevo método para marcar como iniciado
             if visita_examen.estado == "pendiente":
-                visita_examen.marcar_como_iniciado()
+                visita_examen.estado = "en_progreso"
+                visita_examen.fecha_inicio = timezone.now()
+                visita_examen.save()
 
             # Crear o actualizar el resultado del examen físico de sueño
             sueno_fisico, created = SuenoFisicoResult.objects.get_or_create(
@@ -874,8 +886,10 @@ def guardar_examen_fisico_sueno(request):
                 )
                 sueno_fisico.save()
 
-            # Marcar el examen como completado
-            visita_examen.marcar_como_completado()
+            # CAMBIO: Marcar el examen como completado usando el nuevo método
+            visita_examen.estado = "completado"
+            visita_examen.fecha_completado = timezone.now()
+            visita_examen.save()
 
             messages.success(request, "Examen físico de sueño guardado exitosamente.")
             return redirect("detalle_paciente", paciente_id=paciente_id)
@@ -888,3 +902,57 @@ def guardar_examen_fisico_sueno(request):
     else:
         messages.error(request, "Método no permitido.")
         return redirect("index")
+
+
+@login_required
+def ver_resultado_examen(request, visita_examen_id):
+    """Vista genérica para mostrar resultados de cualquier examen"""
+    visita_examen = get_object_or_404(VisitaExamen, id=visita_examen_id)
+
+    # Verificar que el examen esté completado
+    if not visita_examen.esta_realizado:
+        messages.error(request, "Este examen aún no ha sido completado.")
+        return redirect(
+            "detalle_paciente", paciente_id=visita_examen.visita.paciente.id
+        )
+
+    # Obtener el resultado específico del examen
+    resultado = visita_examen.get_resultado_instance()
+
+    if not resultado:
+        messages.error(request, "No se encontraron resultados para este examen.")
+        return redirect(
+            "detalle_paciente", paciente_id=visita_examen.visita.paciente.id
+        )
+
+    # Convertir el resultado a diccionario para el template
+    datos_resultado = {}
+    for field in resultado._meta.fields:
+        if field.name != "visita_examen":  # Excluir la relación
+            valor = getattr(resultado, field.name)
+            datos_resultado[field.verbose_name or field.name] = valor
+
+    # Determinar el template específico basado en el tipo de examen
+    template_mapping = {
+        "SuenoFisicoResult": "examenes_resultados/resultado_sueno_fisico.html",
+        "AtenasResult": "examenes_resultados/resultado_atenas.html",
+        "PittsburghResult": "examenes_resultados/resultado_pittsburgh.html",
+        "EpworthResult": "examenes_resultados/resultado_epworth.html",
+        # Agregar más según tus exámenes
+    }
+
+    tipo_resultado = resultado.__class__.__name__
+    template = template_mapping.get(
+        tipo_resultado, "examenes_resultados/resultado_generico.html"
+    )
+
+    return render(
+        request,
+        template,
+        {
+            "visita_examen": visita_examen,
+            "resultado": resultado,
+            "datos_resultado": datos_resultado,
+            "paciente": visita_examen.visita.paciente,
+        },
+    )

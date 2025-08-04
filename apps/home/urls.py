@@ -50,7 +50,12 @@ urlpatterns = [
     path("visita/<int:paciente_id>/", views.crear_visita, name="crear_visita"),
     path("eliminar-visita/<int:visita_id>/", views.eliminar_v, name="eliminar_v"),
     path("editar-visita/<int:visita_id>/", views.editar_v, name="editar_v"),
-    # exmanaes
+    # examenes
+    path(
+        "examen/resultado/<int:visita_examen_id>/",
+        views.ver_resultado_examen,
+        name="ver_resultado_examen",
+    ),
     path(
         "realizar_examen/<int:visita_id>/<int:examen_id>/<int:paciente_id>/",
         views.realizar_examen,

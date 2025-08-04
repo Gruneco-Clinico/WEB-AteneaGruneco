@@ -299,100 +299,78 @@ class VisitaExamen(models.Model):
             f"{self.visita.nombre} - {self.examen.nombre} ({self.get_estado_display()})"
         )
 
+    def get_resultado_instance(self):
+        """Retorna la instancia del resultado específico del examen si existe."""
+        if not hasattr(self, "_resultado_cache"):
+            self._resultado_cache = None
+            print(
+                f"DEBUG get_resultado_instance - Buscando resultado para VisitaExamen ID: {self.id}"
+            )
+
+            # Lista de related_names que Django generará automáticamente
+            possible_related_names = [
+                "suenofisicoresult_resultado",
+                "atenasresult_resultado",
+                "pittsburghresult_resultado",
+                "epworthresult_resultado",
+                "mewresult_resultado",
+                "berlinresult_resultado",
+                "suenoanamnesisresult_resultado",
+                "isiresult_resultado",
+                "stopbangresult_resultado",
+            ]
+
+            for related_name in possible_related_names:
+                try:
+                    print(f"DEBUG - Probando: {related_name}")
+                    resultado = getattr(self, related_name)
+                    self._resultado_cache = resultado
+                    print(
+                        f"DEBUG - ¡ENCONTRADO! {related_name}: {type(resultado).__name__}"
+                    )
+                    break
+                except AttributeError:
+                    print(f"DEBUG - No existe atributo: {related_name}")
+                    continue
+                except Exception as e:
+                    print(f"DEBUG - Error en {related_name}: {str(e)}")
+                    continue
+
+            if self._resultado_cache is None:
+                print(
+                    f"DEBUG - NINGÚN resultado encontrado para VisitaExamen {self.id}"
+                )
+
+        return self._resultado_cache
+
     @property
     def esta_realizado(self):
-        """Verifica si el examen está completado"""
-        return self.estado == "completado" or self.tiene_resultado_especifico()
+        """Verifica si el examen está completado y tiene un resultado concreto asociado."""
+        print(f"DEBUG esta_realizado - ID: {self.id}, Estado: {self.estado}")
+
+        estado_completado = self.estado == "completado"
+        print(f"DEBUG esta_realizado - Estado completado: {estado_completado}")
+
+        resultado = self.get_resultado_instance()
+        tiene_resultado = resultado is not None
+        print(f"DEBUG esta_realizado - Tiene resultado: {tiene_resultado}")
+
+        if resultado:
+            print(
+                f"DEBUG esta_realizado - Tipo de resultado: {type(resultado).__name__}"
+            )
+
+        final_result = estado_completado and tiene_resultado
+        print(f"DEBUG esta_realizado - Resultado final: {final_result}")
+
+        return final_result
 
     @property
     def puede_editarse(self):
-        """Verifica si el examen puede editarse"""
-        return self.estado in ["completado"] and self.tiene_resultado_especifico()
-
-    @property
-    def puede_iniciarse(self):
-        """Verifica si el examen puede iniciarse"""
-        return self.estado == "pendiente"
-
-    @property
-    def puede_continuarse(self):
-        """Verifica si el examen puede continuarse"""
-        return self.estado == "en_progreso"
-
-    def marcar_como_iniciado(self):
-        """Marca el examen como iniciado"""
-        if self.estado == "pendiente":
-            self.estado = "en_progreso"
-            self.fecha_inicio = timezone.now()
-            self.save()
-
-    def marcar_como_completado(self):
-        """Marca el examen como completado"""
-        if self.estado in ["pendiente", "en_progreso"]:
-            self.estado = "completado"
-            self.fecha_completado = timezone.now()
-            if self.fecha_inicio and self.fecha_completado:
-                self.tiempo_duracion = self.fecha_completado - self.fecha_inicio
-            self.save()
-
-    def marcar_como_cancelado(self):
-        """Marca el examen como cancelado"""
-        if self.estado != "completado":
-            self.estado = "cancelado"
-            self.save()
-
-    def tiene_resultado_especifico(self):
-        """Verifica si el examen tiene un modelo de resultado específico asociado"""
-        examen_nombre = self.examen.nombre.lower().replace(" ", "").replace("-", "")
-
-        # Mapeo de nombres de examen a atributos de modelo
-        modelo_mapping = {
-            "pittsburgh": "pittsburghresult",
-            "epworth": "epworthresult",
-            "mew": "mewresult",
-            "berlin": "berlinresult",
-            "suenoanamnesis": "suenoaramnesisresult",
-            "atenas": "atenasresult",
-            "suenofisico": "suenofisicoresult",
-            "isi": "isiresult",
-            "stopbang": "stopbangresult",
-        }
-
-        modelo_attr = modelo_mapping.get(examen_nombre)
-        if modelo_attr:
-            try:
-                return (
-                    hasattr(self, modelo_attr)
-                    and getattr(self, modelo_attr) is not None
-                )
-            except:
-                return False
-
-        return False
-
-    def get_resultado_instance(self):
-        """Retorna la instancia del resultado específico del examen"""
-        examen_nombre = self.examen.nombre.lower().replace(" ", "").replace("-", "")
-
-        modelo_mapping = {
-            "pittsburgh": "pittsburghresult",
-            "epworth": "epworthresult",
-            "mew": "mewresult",
-            "berlin": "berlinresult",
-            "suenoanamnesis": "suenoaramnesisresult",
-            "atenas": "atenasresult",
-            "suenofisico": "suenofisicoresult",
-            "isi": "isiresult",
-            "stopbang": "stopbangresult",
-        }
-
-        modelo_attr = modelo_mapping.get(examen_nombre)
-        if modelo_attr and hasattr(self, modelo_attr):
-            try:
-                return getattr(self, modelo_attr)
-            except:
-                return None
-        return None
+        """Verifica si el examen puede editarse."""
+        puede_editar = self.esta_realizado
+        print(f"DEBUG puede_editarse - ID: {self.id}, Puede editar: {puede_editar}")
+        return puede_editar
 
     def get_nombre_examen_normalizado(self):
         """Retorna el nombre del examen normalizado para URLs"""
@@ -515,12 +493,27 @@ class VisitaExamen(models.Model):
         return colores.get(self.estado, "badge-light")
 
 
+# Este modelo abstracto servirá como padre para todos los resultados de exámenes.
+class ResultadoExamenBase(models.Model):
+    # CORRECTO: Usar %(class)s para generar related_names únicos
+    visita_examen = models.OneToOneField(
+        VisitaExamen,
+        on_delete=models.CASCADE,
+        related_name="%(class)s_resultado",  # Esto genera nombres únicos
+    )
+
+    class Meta:
+        abstract = True
+
+    def __str__(self):
+        return f"Resultado para {self.visita_examen}"
+
+
 ################################################################################################################################################
 # sueno examenes
 
 
-class PittsburghResult(models.Model):
-    visita_examen = models.OneToOneField("VisitaExamen", on_delete=models.CASCADE)
+class PittsburghResult(ResultadoExamenBase):
     hora_acostarse = models.CharField(max_length=10)
     latencia_sueno = models.IntegerField()
     hora_levantarse = models.CharField(max_length=10)
@@ -549,8 +542,7 @@ class PittsburghResult(models.Model):
     descripcion_inconvenientes = models.CharField(max_length=100, blank=True, null=True)
 
 
-class EpworthResult(models.Model):
-    visita_examen = models.OneToOneField("VisitaExamen", on_delete=models.CASCADE)
+class EpworthResult(ResultadoExamenBase):
     sentado_leyendo = models.IntegerField()
     viendo_tv = models.IntegerField()
     sentado_teatro = models.IntegerField()
@@ -562,8 +554,7 @@ class EpworthResult(models.Model):
     puntaje_total = models.IntegerField()
 
 
-class MEWResult(models.Model):
-    visita_examen = models.OneToOneField("VisitaExamen", on_delete=models.CASCADE)
+class MEWResult(ResultadoExamenBase):
     hora_levantarse = models.CharField(max_length=150)
     hora_acostarse = models.CharField(max_length=150)
     uso_despertador = models.CharField(max_length=150)
@@ -585,8 +576,7 @@ class MEWResult(models.Model):
     puntuacion = models.IntegerField()
 
 
-class BerlinResult(models.Model):
-    visita_examen = models.OneToOneField("VisitaExamen", on_delete=models.CASCADE)
+class BerlinResult(ResultadoExamenBase):
     peso_cambio = models.CharField(max_length=50)
     ronca = models.CharField(max_length=10)
     tipo_ronquido = models.CharField(max_length=50)
@@ -599,8 +589,7 @@ class BerlinResult(models.Model):
     presion_alta = models.CharField(max_length=50)
 
 
-class SuenoAnamnesisResult(models.Model):
-    visita_examen = models.OneToOneField("VisitaExamen", on_delete=models.CASCADE)
+class SuenoAnamnesisResult(ResultadoExamenBase):
     motivo_consulta = models.CharField(max_length=255, blank=True, null=True)
     enfermedad_actual = models.TextField(blank=True, null=True)
     presenta_queja = models.BooleanField(default=False)
@@ -754,8 +743,7 @@ class SintomaDiurnoSueno(models.Model):
     observaciones = models.CharField(max_length=255, blank=True, null=True)
 
 
-class AtenasResult(models.Model):
-    visita_examen = models.OneToOneField("VisitaExamen", on_delete=models.CASCADE)
+class AtenasResult(ResultadoExamenBase):
     induccion_dormir = models.CharField(max_length=50)
     despertares_noche = models.CharField(max_length=50)
     despertar_temprano = models.CharField(max_length=50)
@@ -770,8 +758,7 @@ class AtenasResult(models.Model):
         return f"Atenas - {self.visita_examen_id}"
 
 
-class SuenoFisicoResult(models.Model):
-    visita_examen = models.OneToOneField("VisitaExamen", on_delete=models.CASCADE)
+class SuenoFisicoResult(ResultadoExamenBase):
     peso = models.FloatField(blank=True, null=True)
     talla = models.FloatField(blank=True, null=True)
     imc = models.FloatField(blank=True, null=True)
@@ -794,8 +781,7 @@ class SuenoFisicoResult(models.Model):
         return f"Examen físico de sueño - {self.visita_examen_id}"
 
 
-class ISIResult(models.Model):
-    visita_examen = models.OneToOneField("VisitaExamen", on_delete=models.CASCADE)
+class ISIResult(ResultadoExamenBase):
     dificultad_dormir = models.CharField(max_length=50)
     dificultad_mantener_sueno = models.CharField(max_length=50)
     despertar_temprano = models.CharField(max_length=50)
@@ -809,8 +795,7 @@ class ISIResult(models.Model):
         return f"ISI - {self.visita_examen_id}"
 
 
-class StopBangResult(models.Model):
-    visita_examen = models.OneToOneField("VisitaExamen", on_delete=models.CASCADE)
+class StopBangResult(ResultadoExamenBase):
     ronca_fuerte = models.BooleanField(default=False)
     cansado_frecuencia = models.BooleanField(default=False)
     deja_respirar = models.BooleanField(default=False)
