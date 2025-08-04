@@ -231,6 +231,17 @@ class Visita(models.Model):
     fecha = models.DateField(blank=True, null=True)
     evaluador = models.CharField(max_length=50, null=True, blank=True)
 
+    # NUEVO CAMPO: Estado de la visita
+    estado_visita = models.CharField(
+        max_length=20,
+        choices=[
+            ("abierta", "Abierta"),
+            ("cerrada", "Cerrada"),
+        ],
+        default="abierta",
+        verbose_name="Estado de la Visita",
+    )
+
     # Campos del acompañante
     acompanante_nombre = models.CharField(
         max_length=255, verbose_name="Nombre del Acompañante", blank=True, null=True
@@ -368,8 +379,14 @@ class VisitaExamen(models.Model):
     @property
     def puede_editarse(self):
         """Verifica si el examen puede editarse."""
-        puede_editar = self.esta_realizado
-        print(f"DEBUG puede_editarse - ID: {self.id}, Puede editar: {puede_editar}")
+        # NUEVO: Solo puede editarse si la visita está abierta Y el examen está realizado
+        visita_abierta = self.visita.estado_visita == "abierta"
+        examen_realizado = self.esta_realizado
+
+        puede_editar = visita_abierta and examen_realizado
+        print(
+            f"DEBUG puede_editarse - ID: {self.id}, Visita abierta: {visita_abierta}, Examen realizado: {examen_realizado}, Puede editar: {puede_editar}"
+        )
         return puede_editar
 
     def get_nombre_examen_normalizado(self):

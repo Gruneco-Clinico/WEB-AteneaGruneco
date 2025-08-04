@@ -152,13 +152,13 @@
                         <button type="button" class="btn btn-info btn-sm" data-toggle="collapse"
                           data-target="#examenes-visita-{{ visita.id }}" data-toggle="tooltip" data-placement="top"
                           title="Ver/Ocultar Exámenes">
-                          <i class="fas fa-list"></i> Exámenes
+                          <i class="fas fa-list"></i>
                         </button>
 
                         <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal"
                           data-bs-target="#modalEditarVisita-{{ visita.id }}" data-toggle="tooltip" data-placement="top"
                           title="Editar Visita">
-                          <i class="fas fa-edit"></i> Editar
+                          <i class="fas fa-edit"></i>
                         </button>
 
                         <form action="{% url 'eliminar_v' visita.id %}" method="POST" style="display: inline;"
@@ -166,7 +166,7 @@
                           {% csrf_token %}
                           <button type="submit" class="btn btn-danger btn-sm" data-toggle="tooltip" data-placement="top"
                             title="Eliminar Visita">
-                            <i class="fas fa-trash"></i> Eliminar
+                            <i class="fas fa-trash"></i>
                           </button>
                         </form>
                       </div>
@@ -188,57 +188,23 @@
                             <p class="mb-1">
                               <strong>{{ visita_examen.examen.nombre }}</strong><br>
                               <span class="badge {{ visita_examen.get_color_badge }}">
-                                <i class="{{ visita_examen.get_icono_estado }}"></i> {{ visita_examen.get_estado_display
-                                }}
+                                <i class="{{ visita_examen.get_icono_estado }}"></i>
                               </span>
-
-                              <!-- DEBUG TEMPORAL - ELIMINAR DESPUÉS -->
-                              <br><small style="color: red; font-weight: bold;">
-                                DEBUG: Estado="{{ visita_examen.estado }}"<br>
-                                Esta_realizado={{ visita_examen.esta_realizado }}<br>
-                                Puede_editarse={{ visita_examen.puede_editarse }}<br>
-                                Resultado={{ visita_examen.get_resultado_instance|yesno:"Existe,No existe" }}
-                              </small>
-
-                              {% if visita_examen.esta_realizado %}
-                              <br><small class="text-muted">
-                                <i class="fas fa-calendar-check"></i> Completado: {{
-                                visita_examen.fecha_completado|date:"d/m/Y H:i" }}
-                              </small>
-                              {% elif visita_examen.estado == 'en_progreso' %}
-                              <br><small class="text-muted">
-                                <i class="fas fa-play-circle"></i> Iniciado: {{ visita_examan.fecha_inicio|date:"d/m/Y
-                                H:i" }}
-                              </small>
-                              {% endif %}
                             </p>
                           </div>
 
                           <div class="col-md-6 text-right">
-                            <!-- ACTUALIZADO: Botones de examen según el estado usando los nuevos métodos -->
-
-                            <!-- DEBUG: Mostrar qué condición se está cumpliendo -->
-                            <small style="color: blue; display: block;">
-                              DEBUG Botones:
-                              {% if visita_examen.esta_realizado %}
-                              MOSTRANDO: Ver/Editar
-                              {% elif visita_examen.estado == 'en_progreso' %}
-                              MOSTRANDO: Continuar
-                              {% else %}
-                              MOSTRANDO: Realizar
-                              {% endif %}
-                            </small>
 
                             {% if visita_examen.esta_realizado %}
                             <!-- Examen completado: Ver y Editar -->
-                            <a href="{% url 'ver_resultado_examen' visita_examen.id %}" class="btn btn-info btn-sm me-1"
-                              data-toggle="tooltip" title="Ver Resultado Completo">
-                              <i class="fas fa-eye"></i> Ver Resultado
+                            <a href="{% url 'ver_resultado_examen' visita_examen.id %}"
+                              class="btn btn-success btn-sm me-1" data-toggle="tooltip" title="Ver Resultado Completo">
+                              <i class="fas fa-eye"></i>
                             </a>
                             {% if visita_examen.puede_editarse %}
                             <a href="{% url 'realizar_examen' visita_examen.visita.id visita_examen.examen.id visita_examen.visita.paciente.id %}"
                               class="btn btn-warning btn-sm" data-toggle="tooltip" title="Editar Examen">
-                              <i class="fas fa-edit"></i> Editar
+                              <i class="fas fa-edit"></i>
                             </a>
                             {% endif %}
 
@@ -253,7 +219,7 @@
                             <!-- Examen pendiente: Realizar -->
                             <a href="{% url 'realizar_examen' visita_examen.visita.id visita_examen.examen.id visita_examen.visita.paciente.id %}"
                               class="btn btn-primary btn-sm" data-toggle="tooltip" title="Realizar Examen">
-                              <i class="fas fa-plus-circle"></i> Realizar
+                              <i class="fas fa-plus-circle"></i>
                             </a>
                             {% endif %}
                           </div>
