@@ -1445,3 +1445,111 @@ def guardar_berlin(request):
     else:
         messages.error(request, "❌ Método no permitido.")
         return redirect("index")
+
+
+@login_required
+def guardar_examen_Epworth(request):
+    if request.method == "POST":
+        try:
+            visita_id = request.POST.get("visita_id")
+            paciente_id = request.POST.get("paciente_id")
+            examen_id = request.POST.get("examen_id")
+
+            print(
+                f"DEBUG: visita_id={visita_id}, examen_id={examen_id}, paciente_id={paciente_id}"
+            )
+            print("=== DEBUG: TODOS LOS CAMPOS POST ===")
+            for key, value in request.POST.items():
+                if not key.startswith("csrf"):
+                    print(f"Campo: '{key}' = '{value}'")
+            print("=== FIN DEBUG ===")
+
+            # Obtener la instancia de VisitaExamen
+            visita_examen = get_object_or_404(
+                VisitaExamen, visita_id=visita_id, examen_id=examen_id
+            )
+
+            # Marcar como iniciado si está pendiente
+            if visita_examen.estado == "pendiente":
+                visita_examen.estado = "en_progreso"
+                visita_examen.fecha_inicio = timezone.now()
+                visita_examen.save()
+
+            # Obtener las respuestas según los nombres en tu HTML
+            sentado_leyendo = request.POST.get("epworth_leyendo", "0")
+            viendo_tv = request.POST.get("epworth_tv", "0")
+            sentado_teatro = request.POST.get("epworth_teatro", "0")
+            pasajero_coche = request.POST.get("epworth_pasajero", "0")
+            tumbado_tarde = request.POST.get("epworth_tumbado", "0")
+            charlando = request.POST.get("epworth_charlando", "0")
+            despues_comer = request.POST.get("epworth_comida", "0")
+            trafico = request.POST.get("epworth_trafico", "0")
+
+            # Calcular puntuación total
+            puntaje_total = (
+                sentado_leyendo
+                + viendo_tv
+                + sentado_teatro
+                + pasajero_coche
+                + tumbado_tarde
+                + charlando
+                + despues_comer
+                + trafico
+            )
+
+            # Crear o actualizar el resultado de Epworth usando los campos exactos del modelo
+            epworth, created = EpworthResult.objects.update_or_create(
+                visita_examen=visita_examen,
+                defaults={
+                    # Campos exactos según tu modelo EpworthResult
+                    "sentado_leyendo": sentado_leyendo,
+                    "viendo_tv": viendo_tv,
+                    "sentado_teatro": sentado_teatro,
+                    "pasajero_coche": pasajero_coche,
+                    "tumbado_tarde": tumbado_tarde,
+                    "charlando": charlando,
+                    "despues_comer": despues_comer,
+                    "trafico": trafico,
+                    "puntaje_total": puntaje_total,
+                },
+            )
+
+            print(
+                f"DEBUG: Epworth {'creado' if created else 'actualizado'} con ID: {epworth.id}"
+            )
+
+            # Verificar que se guardó correctamente
+            print(f"DEBUG: Verificación - sentado_leyendo: {epworth.sentado_leyendo}")
+            print(f"DEBUG: Verificación - puntaje_total: {epworth.puntaje_total}")
+
+            # Marcar el examen como completado
+            visita_examen.estado = "completado"
+            visita_examen.fecha_completado = timezone.now()
+            visita_examen.save()
+
+            messages.success(request, f"✅ Escala de Epworth guardada exitosamente.\n")
+            return redirect("detalle_paciente", paciente_id=paciente_id)
+
+        except Exception as e:
+            print(f"ERROR en Epworth: {str(e)}")
+            import traceback
+
+            traceback.print_exc()
+
+            # Revertir estado si hubo error
+            try:
+                if "visita_examen" in locals():
+                    visita_examen.estado = "pendiente"
+                    visita_examen.save()
+                    print("DEBUG: Estado revertido a pendiente")
+            except:
+                pass
+
+            messages.error(
+                request, f"❌ Error al guardar la escala de Epworth: {str(e)}"
+            )
+            return redirect("detalle_paciente", paciente_id=paciente_id or 1)
+
+    else:
+        messages.error(request, "❌ Método no permitido.")
+        return redirect("index")

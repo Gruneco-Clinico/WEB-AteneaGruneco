@@ -61,7 +61,20 @@
                                         <div class="form-group">
                                             <label>Sentado y leyendo</label>
                                             <select class="form-control epworth-select" name="epworth_leyendo" required>
-                                                <option value="" selected disabled>Seleccione una opción</option>
+                                                {% if datos_examen.sentado_leyendo %}
+                                                <option value="{{ datos_examen.sentado_leyendo }}" selected>
+                                                    {% if datos_examen.sentado_leyendo == 0 %}Nunca se ha dormido (0)
+                                                    {% elif datos_examen.sentado_leyendo == 1 %}Escasa posibilidad de
+                                                    dormirse (1)
+                                                    {% elif datos_examen.sentado_leyendo == 2 %}Moderada posibilidad de
+                                                    dormirse (2)
+                                                    {% elif datos_examen.sentado_leyendo == 3 %}Elevada posibilidad de
+                                                    dormirse (3)
+                                                    {% endif %}
+                                                </option>
+                                                {% else %}
+                                                <option value="">Seleccione una opción</option>
+                                                {% endif %}
                                                 <option value="0">Nunca se ha dormido (0)</option>
                                                 <option value="1">Escasa posibilidad de dormirse (1)</option>
                                                 <option value="2">Moderada posibilidad de dormirse (2)</option>
@@ -73,7 +86,20 @@
                                         <div class="form-group">
                                             <label>Viendo la TV</label>
                                             <select class="form-control epworth-select" name="epworth_tv" required>
-                                                <option value="" selected disabled>Seleccione una opción</option>
+                                                {% if datos_examen.viendo_tv %}
+                                                <option value="{{ datos_examen.viendo_tv }}" selected>
+                                                    {% if datos_examen.viendo_tv == 0 %}Nunca se ha dormido (0)
+                                                    {% elif datos_examen.viendo_tv == 1 %}Escasa posibilidad de
+                                                    dormirse (1)
+                                                    {% elif datos_examen.viendo_tv == 2 %}Moderada posibilidad de
+                                                    dormirse (2)
+                                                    {% elif datos_examen.viendo_tv == 3 %}Elevada posibilidad de
+                                                    dormirse (3)
+                                                    {% endif %}
+                                                </option>
+                                                {% else %}
+                                                <option value="">Seleccione una opción</option>
+                                                {% endif %}
                                                 <option value="0">Nunca se ha dormido (0)</option>
                                                 <option value="1">Escasa posibilidad de dormirse (1)</option>
                                                 <option value="2">Moderada posibilidad de dormirse (2)</option>
@@ -89,7 +115,20 @@
                                         <div class="form-group">
                                             <label>Sentado, inactivo en un espectáculo (teatro)</label>
                                             <select class="form-control epworth-select" name="epworth_teatro" required>
-                                                <option value="" selected disabled>Seleccione una opción</option>
+                                                {% if datos_examen.sentado_teatro %}
+                                                <option value="{{ datos_examen.sentado_teatro }}" selected>
+                                                    {% if datos_examen.sentado_teatro == 0 %}Nunca se ha dormido (0)
+                                                    {% elif datos_examen.sentado_teatro == 1 %}Escasa posibilidad de
+                                                    dormirse (1)
+                                                    {% elif datos_examen.sentado_teatro == 2 %}Moderada posibilidad de
+                                                    dormirse (2)
+                                                    {% elif datos_examen.sentado_teatro == 3 %}Elevada posibilidad de
+                                                    dormirse (3)
+                                                    {% endif %}
+                                                </option>
+                                                {% else %}
+                                                <option value="">Seleccione una opción</option>
+                                                {% endif %}
                                                 <option value="0">Nunca se ha dormido (0)</option>
                                                 <option value="1">Escasa posibilidad de dormirse (1)</option>
                                                 <option value="2">Moderada posibilidad de dormirse (2)</option>
@@ -102,7 +141,20 @@
                                             <label>En coche, como pasajero en un viaje de una hora</label>
                                             <select class="form-control epworth-select" name="epworth_pasajero"
                                                 required>
-                                                <option value="" selected disabled>Seleccione una opción</option>
+                                                {% if datos_examen.pasajero_coche %}
+                                                <option value="{{ datos_examen.pasajero_coche }}" selected>
+                                                    {% if datos_examen.pasajero_coche == 0 %}Nunca se ha dormido (0)
+                                                    {% elif datos_examen.pasajero_coche == 1 %}Escasa posibilidad de
+                                                    dormirse (1)
+                                                    {% elif datos_examen.pasajero_coche == 2 %}Moderada posibilidad de
+                                                    dormirse (2)
+                                                    {% elif datos_examen.pasajero_coche == 3 %}Elevada posibilidad de
+                                                    dormirse (3)
+                                                    {% endif %}
+                                                </option>
+                                                {% else %}
+                                                <option value="">Seleccione una opción</option>
+                                                {% endif %}
                                                 <option value="0">Nunca se ha dormido (0)</option>
                                                 <option value="1">Escasa posibilidad de dormirse (1)</option>
                                                 <option value="2">Moderada posibilidad de dormirse (2)</option>
@@ -117,7 +169,20 @@
                                         <div class="form-group">
                                             <label>Tumbado a media tarde</label>
                                             <select class="form-control epworth-select" name="epworth_tumbado" required>
-                                                <option value="" selected disabled>Seleccione una opción</option>
+                                                {% if datos_examen.tumbado_tarde %}
+                                                <option value="{{ datos_examen.tumbado_tarde }}" selected>
+                                                    {% if datos_examen.tumbado_tarde == 0 %}Nunca se ha dormido (0)
+                                                    {% elif datos_examen.tumbado_tarde == 1 %}Escasa posibilidad de
+                                                    dormirse (1)
+                                                    {% elif datos_examen.tumbado_tarde == 2 %}Moderada posibilidad de
+                                                    dormirse (2)
+                                                    {% elif datos_examen.tumbado_tarde == 3 %}Elevada posibilidad de
+                                                    dormirse (3)
+                                                    {% endif %}
+                                                </option>
+                                                {% else %}
+                                                <option value="">Seleccione una opción</option>
+                                                {% endif %}
                                                 <option value="0">Nunca se ha dormido (0)</option>
                                                 <option value="1">Escasa posibilidad de dormirse (1)</option>
                                                 <option value="2">Moderada posibilidad de dormirse (2)</option>
@@ -130,7 +195,20 @@
                                             <label>Sentado y charlando con alguien</label>
                                             <select class="form-control epworth-select" name="epworth_charlando"
                                                 required>
-                                                <option value="" selected disabled>Seleccione una opción</option>
+                                                {% if datos_examen.charlando %}
+                                                <option value="{{ datos_examen.charlando }}" selected>
+                                                    {% if datos_examen.charlando == 0 %}Nunca se ha dormido (0)
+                                                    {% elif datos_examen.charlando == 1 %}Escasa posibilidad de
+                                                    dormirse (1)
+                                                    {% elif datos_examen.charlando == 2 %}Moderada posibilidad de
+                                                    dormirse (2)
+                                                    {% elif datos_examen.charlando == 3 %}Elevada posibilidad de
+                                                    dormirse (3)
+                                                    {% endif %}
+                                                </option>
+                                                {% else %}
+                                                <option value="">Seleccione una opción</option>
+                                                {% endif %}
                                                 <option value="0">Nunca se ha dormido (0)</option>
                                                 <option value="1">Escasa posibilidad de dormirse (1)</option>
                                                 <option value="2">Moderada posibilidad de dormirse (2)</option>
@@ -145,7 +223,20 @@
                                         <div class="form-group">
                                             <label>Sentado después de comer sin ingerir alcohol</label>
                                             <select class="form-control epworth-select" name="epworth_comida" required>
-                                                <option value="" selected disabled>Seleccione una opción</option>
+                                                {% if datos_examen.despues_comer %}
+                                                <option value="{{ datos_examen.despues_comer }}" selected>
+                                                    {% if datos_examen.despues_comer == 0 %}Nunca se ha dormido (0)
+                                                    {% elif datos_examen.despues_comer == 1 %}Escasa posibilidad de
+                                                    dormirse (1)
+                                                    {% elif datos_examen.despues_comer == 2 %}Moderada posibilidad de
+                                                    dormirse (2)
+                                                    {% elif datos_examen.despues_comer == 3 %}Elevada posibilidad de
+                                                    dormirse (3)
+                                                    {% endif %}
+                                                </option>
+                                                {% else %}
+                                                <option value="">Seleccione una opción</option>
+                                                {% endif %}
                                                 <option value="0">Nunca se ha dormido (0)</option>
                                                 <option value="1">Escasa posibilidad de dormirse (1)</option>
                                                 <option value="2">Moderada posibilidad de dormirse (2)</option>
@@ -157,7 +248,20 @@
                                         <div class="form-group">
                                             <label>En su coche, cuando se para debido al tráfico</label>
                                             <select class="form-control epworth-select" name="epworth_trafico" required>
-                                                <option value="" selected disabled>Seleccione una opción</option>
+                                                {% if datos_examen.trafico %}
+                                                <option value="{{ datos_examen.trafico }}" selected>
+                                                    {% if datos_examen.trafico == 0 %}Nunca se ha dormido (0)
+                                                    {% elif datos_examen.trafico == 1 %}Escasa posibilidad de
+                                                    dormirse (1)
+                                                    {% elif datos_examen.trafico == 2 %}Moderada posibilidad de
+                                                    dormirse (2)
+                                                    {% elif datos_examen.trafico == 3 %}Elevada posibilidad de
+                                                    dormirse (3)
+                                                    {% endif %}
+                                                </option>
+                                                {% else %}
+                                                <option value="">Seleccione una opción</option>
+                                                {% endif %}
                                                 <option value="0">Nunca se ha dormido (0)</option>
                                                 <option value="1">Escasa posibilidad de dormirse (1)</option>
                                                 <option value="2">Moderada posibilidad de dormirse (2)</option>
