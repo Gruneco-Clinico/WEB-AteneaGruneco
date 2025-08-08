@@ -1343,3 +1343,105 @@ def guardar_atenas(request):
     else:
         messages.error(request, "❌ Método no permitido.")
         return redirect("index")
+
+
+@login_required
+def guardar_berlin(request):
+    if request.method == "POST":
+        try:
+            visita_id = request.POST.get("visita_id")
+            paciente_id = request.POST.get("paciente_id")
+            examen_id = request.POST.get("examen_id")
+
+            print(
+                f"DEBUG: visita_id={visita_id}, examen_id={examen_id}, paciente_id={paciente_id}"
+            )
+            print("=== DEBUG: TODOS LOS CAMPOS POST ===")
+            for key, value in request.POST.items():
+                if not key.startswith("csrf"):
+                    print(f"Campo: '{key}' = '{value}'")
+            print("=== FIN DEBUG ===")
+
+            # Obtener la instancia de VisitaExamen
+            visita_examen = get_object_or_404(
+                VisitaExamen, visita_id=visita_id, examen_id=examen_id
+            )
+
+            # Marcar como iniciado si está pendiente
+            if visita_examen.estado == "pendiente":
+                visita_examen.estado = "en_progreso"
+                visita_examen.fecha_inicio = timezone.now()
+                visita_examen.save()
+
+            # Obtener los campos según tu modelo BerlinResult
+            peso_cambio = request.POST.get("peso_cambio", "")
+            ronca = request.POST.get("ronca", "")
+            tipo_ronquido = request.POST.get("tipo_ronquido", "")
+            frecuencia_ronquidos = request.POST.get("frecuencia_ronquidos", "")
+            ronquido_molesto = request.POST.get("ronquido_molesto", "")
+            apnea_observada = request.POST.get("apnea_observada", "")
+            fatiga_matutina = request.POST.get("fatiga_matutina", "")
+            fatiga_dia = request.POST.get("fatiga_dia", "")
+            somnolencia_conducir = request.POST.get("somnolencia_conducir", "")
+            presion_alta = request.POST.get("presion_alta", "")
+
+            # Crear o actualizar el resultado de Berlín usando los campos exactos del modelo
+            berlin, created = BerlinResult.objects.update_or_create(
+                visita_examen=visita_examen,
+                defaults={
+                    # Campos exactos según tu modelo BerlinResult
+                    "peso_cambio": peso_cambio,
+                    "ronca": ronca,
+                    "tipo_ronquido": tipo_ronquido,
+                    "frecuencia_ronquidos": frecuencia_ronquidos,
+                    "ronquido_molesto": ronquido_molesto,
+                    "apnea_observada": apnea_observada,
+                    "fatiga_matutina": fatiga_matutina,
+                    "fatiga_dia": fatiga_dia,
+                    "somnolencia_conducir": somnolencia_conducir,
+                    "presion_alta": presion_alta,
+                },
+            )
+
+            print(
+                f"DEBUG: Berlin {'creado' if created else 'actualizado'} con ID: {berlin.id}"
+            )
+
+            # Verificar que se guardó correctamente
+            print(f"DEBUG: Verificación - ronca: {berlin.ronca}")
+            print(f"DEBUG: Verificación - tipo_ronquido: {berlin.tipo_ronquido}")
+            print(f"DEBUG: Verificación - presion_alta: {berlin.presion_alta}")
+
+            # Marcar el examen como completado
+            visita_examen.estado = "completado"
+            visita_examen.fecha_completado = timezone.now()
+            visita_examen.save()
+
+            messages.success(
+                request, "✅ Cuestionario de Berlín guardado exitosamente."
+            )
+            return redirect("detalle_paciente", paciente_id=paciente_id)
+
+        except Exception as e:
+            print(f"ERROR en Berlín: {str(e)}")
+            import traceback
+
+            traceback.print_exc()
+
+            # Revertir estado si hubo error
+            try:
+                if "visita_examen" in locals():
+                    visita_examen.estado = "pendiente"
+                    visita_examen.save()
+                    print("DEBUG: Estado revertido a pendiente")
+            except:
+                pass
+
+            messages.error(
+                request, f"❌ Error al guardar el cuestionario de Berlín: {str(e)}"
+            )
+            return redirect("detalle_paciente", paciente_id=paciente_id or 1)
+
+    else:
+        messages.error(request, "❌ Método no permitido.")
+        return redirect("index")

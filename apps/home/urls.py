@@ -72,4 +72,5 @@ urlpatterns = [
         name="guardar_examen_anamnesis",
     ),
     path("guardar_atenas/", views.guardar_atenas, name="guardar_atenas"),
+    path("guardar_berlin/", views.guardar_berlin, name="guardar_berlin"),
 ]
