@@ -66,4 +66,10 @@ urlpatterns = [
         views.guardar_examen_fisico_sueno,
         name="guardar_examen_sueno_fisico",
     ),
+    path(
+        "guardar_sueno_anamnesis/",
+        views.guardar_sueno_anamnesis,
+        name="guardar_examen_anamnesis",
+    ),
+    path("guardar_atenas/", views.guardar_atenas, name="guardar_atenas"),
 ]

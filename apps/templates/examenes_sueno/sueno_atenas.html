@@ -24,7 +24,7 @@
     <div class="row">
         <div class="col">
             <div class="card shadow">
-                <form method="post" action="{% url 'guardar_examen_atenas' %}">
+                <form method="post" action="{% url 'guardar_atenas' %}">
                     {% csrf_token %}
                     <input type="hidden" name="visita_id" id="visita_id" value="{{ visita_examen }}" />
                     <input type="hidden" name="paciente_id" id="paciente_id" value="{{ paciente_id }}" />
@@ -60,7 +60,12 @@
                                         <div class="form-group">
                                             <label>1. Inducción del sueño (tiempo para quedarse dormido)</label>
                                             <select class="form-control" name="induccion_dormir" required>
-                                                <option value="" selected disabled>Seleccione una opción</option>
+                                                {% if datos_examen.induccion_dormir %}
+                                                <option value="{{ datos_examen.induccion_dormir }}" selected>
+                                                    {{ datos_examen.induccion_dormir }}</option>
+                                                {% else %}
+                                                <option value="">Seleccione una opción</option>
+                                                {% endif %}
                                                 <option value="Ningún problema">Ningún problema (0 puntos)</option>
                                                 <option value="Ligeramente retrasado">Ligeramente retrasado (1 punto)
                                                 </option>
@@ -75,7 +80,12 @@
                                         <div class="form-group">
                                             <label>2. Despertares durante la noche</label>
                                             <select class="form-control" name="despertares_noche" required>
-                                                <option value="" selected disabled>Seleccione una opción</option>
+                                                {% if datos_examen.despertares_noche %}
+                                                <option value="{{ datos_examen.despertares_noche }}" selected>
+                                                    {{ datos_examen.despertares_noche }}</option>
+                                                {% else %}
+                                                <option value="">Seleccione una opción</option>
+                                                {% endif %}
                                                 <option value="Ningún problema">Ningún problema (0 puntos)</option>
                                                 <option value="Problema menor">Problema menor (1 punto)</option>
                                                 <option value="Problema considerable">Problema considerable (2 puntos)
@@ -89,13 +99,22 @@
                                         <div class="form-group">
                                             <label>3. Despertar final más temprano de lo deseado</label>
                                             <select class="form-control" name="despertar_temprano" required>
-                                                <option value="" selected disabled>Seleccione una opción</option>
-                                                <option value="No más temprano">No más temprano (0 puntos)</option>
-                                                <option value="Un poco más temprano">Un poco más temprano (1 punto)
+                                                {% if datos_examen.despertar_temprano %}
+                                                <option value="{{ datos_examen.despertar_temprano }}" selected>
+                                                    {{ datos_examen.despertar_temprano }}</option>
+                                                {% else %}
+                                                <option value="">Seleccione una opción</option>
+                                                {% endif %}
+                                                <option value="No más temprano">No más temprano (0 puntos)
                                                 </option>
-                                                <option value="Marcadamente más temprano">Marcadamente más temprano (2
+                                                <option value="Un poco más temprano">Un poco más temprano (1
+                                                    punto)
+                                                </option>
+                                                <option value="Marcadamente más temprano">Marcadamente más
+                                                    temprano (2
                                                     puntos)</option>
-                                                <option value="Mucho más temprano o no durmió en absoluto">Mucho más
+                                                <option value="Mucho más temprano o no durmió en absoluto">
+                                                    Mucho más
                                                     temprano o no durmió (3 puntos)</option>
                                             </select>
                                         </div>
@@ -104,7 +123,12 @@
                                         <div class="form-group">
                                             <label>4. Duración total del sueño</label>
                                             <select class="form-control" name="duracion_dormir" required>
-                                                <option value="" selected disabled>Seleccione una opción</option>
+                                                {% if datos_examen.duracion_dormir %}
+                                                <option value="{{ datos_examen.duracion_dormir }}" selected>
+                                                    {{ datos_examen.duracion_dormir }}</option>
+                                                {% else %}
+                                                <option value="">Seleccione una opción</option>
+                                                {% endif %}
                                                 <option value="Suficiente">Suficiente (0 puntos)</option>
                                                 <option value="Ligeramente insuficiente">Ligeramente insuficiente (1
                                                     punto)</option>
@@ -121,7 +145,12 @@
                                         <div class="form-group">
                                             <label>5. Calidad general del sueño</label>
                                             <select class="form-control" name="calidad_dormir" required>
-                                                <option value="" selected disabled>Seleccione una opción</option>
+                                                {% if datos_examen.calidad_dormir %}
+                                                <option value="{{ datos_examen.calidad_dormir }}" selected>
+                                                    {{ datos_examen.calidad_dormir }}</option>
+                                                {% else %}
+                                                <option value="">Seleccione una opción</option>
+                                                {% endif %}
                                                 <option value="Satisfactoria">Satisfactoria (0 puntos)</option>
                                                 <option value="Ligeramente insatisfactoria">Ligeramente insatisfactoria
                                                     (1 punto)</option>
@@ -136,7 +165,12 @@
                                         <div class="form-group">
                                             <label>6. Sensación de bienestar durante el día</label>
                                             <select class="form-control" name="bienestar_dia" required>
-                                                <option value="" selected disabled>Seleccione una opción</option>
+                                                {% if datos_examen.bienestar_dia %}
+                                                <option value="{{ datos_examen.bienestar_dia }}" selected>
+                                                    {{ datos_examen.bienestar_dia }}</option>
+                                                {% else %}
+                                                <option value="">Seleccione una opción</option>
+                                                {% endif %}
                                                 <option value="Normal">Normal (0 puntos)</option>
                                                 <option value="Ligeramente disminuida">Ligeramente disminuida (1 punto)
                                                 </option>
@@ -150,7 +184,12 @@
                                         <div class="form-group">
                                             <label>7. Funcionamiento (físico y mental) durante el día</label>
                                             <select class="form-control" name="funcionamiento_dia" required>
-                                                <option value="" selected disabled>Seleccione una opción</option>
+                                                {% if datos_examen.funcionamiento_dia %}
+                                                <option value="{{ datos_examen.funcionamiento_dia }}" selected>
+                                                    {{ datos_examen.funcionamiento_dia }}</option>
+                                                {% else %}
+                                                <option value="">Seleccione una opción</option>
+                                                {% endif %}
                                                 <option value="Normal">Normal (0 puntos)</option>
                                                 <option value="Ligeramente disminuida">Ligeramente disminuida (1 punto)
                                                 </option>
@@ -164,7 +203,12 @@
                                         <div class="form-group">
                                             <label>8. Somnolencia durante el día</label>
                                             <select class="form-control" name="somnolencia_dia" required>
-                                                <option value="" selected disabled>Seleccione una opción</option>
+                                                {% if datos_examen.somnolencia_dia %}
+                                                <option value="{{ datos_examen.somnolencia_dia }}" selected>
+                                                    {{ datos_examen.somnolencia_dia }}</option>
+                                                {% else %}
+                                                <option value="">Seleccione una opción</option>
+                                                {% endif %}
                                                 <option value="Ninguna">Ninguna (0 puntos)</option>
                                                 <option value="Leve">Leve (1 punto)</option>
                                                 <option value="Considerable">Considerable (2 puntos)</option>
@@ -184,8 +228,9 @@
 
                                 <div class="form-group">
                                     <label>Puntuación Total (se calculará automáticamente)</label>
-                                    <input type="number" class="form-control" name="puntuacion_total" min="0" max="24"
-                                        readonly>
+                                    <input type="number"
+                                        value="{% if datos_examen.puntuacion_total %}{{ datos_examen.puntuacion_total }}{% endif %}"
+                                        class="form-control" name="puntuacion_total" min="0" max="24" readonly>
                                 </div>
                             </div>
                         </div>

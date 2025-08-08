@@ -46,10 +46,19 @@
           <div class="card-header border-0">
             <div class="row align-items-center">
               <div class="col">
-                <h3 class="mb-0">Examen sueno anamnesis</h3>
+                <h3 class="mb-0">
+                  {% if resultado %}
+                  Editar Anamnesis de Sueño
+                  {% else %}
+                  Examen Sueño Anamnesis
+                  {% endif %}
+                </h3>
               </div>
               <div class="col text-right">
                 <span class="text-muted">Fecha: {% now "d/m/Y" %}</span>
+                {% if resultado %}
+                <br><span class="badge badge-success">Completado</span>
+                {% endif %}
               </div>
             </div>
           </div>
@@ -93,12 +102,13 @@
                     <!-- Sección: Motivo de consulta y Enfermedad actual -->
                     <div class="form-group">
                       <label for="motivo_consulta">Motivo de consulta</label>
-                      <textarea class="form-control" id="motivo_consulta" name="motivo_consulta" rows="3"></textarea>
+                      <textarea class="form-control" id="motivo_consulta" name="motivo_consulta"
+                        rows="3">{{ resultado.motivo_consulta|default:"" }}</textarea>
                     </div>
                     <div class="form-group">
                       <label for="enfermedad_actual">Enfermedad actual</label>
                       <textarea class="form-control" id="enfermedad_actual" name="enfermedad_actual"
-                        rows="3"></textarea>
+                        rows="3">{{ resultado.enfermedad_actual|default:"" }}</textarea>
                     </div>
                   </div>
                 </div>

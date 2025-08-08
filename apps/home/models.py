@@ -607,63 +607,97 @@ class BerlinResult(ResultadoExamenBase):
 
 
 class SuenoAnamnesisResult(ResultadoExamenBase):
-    motivo_consulta = models.CharField(max_length=255, blank=True, null=True)
+    # Motivo de consulta y enfermedad actual
+    motivo_consulta = models.TextField(blank=True, null=True)
     enfermedad_actual = models.TextField(blank=True, null=True)
-    presenta_queja = models.BooleanField(default=False)
-    observaciones_queja = models.TextField(blank=True, null=True)
-    causa_conocida = models.BooleanField(default=False)
-    especificacion_causa = models.CharField(max_length=255, blank=True, null=True)
-    rutina_dormir = models.CharField(max_length=255, blank=True, null=True)
-    describa_rutina = models.TextField(blank=True, null=True)
-    jornada_laboral = models.CharField(max_length=255, blank=True, null=True)
-    hora_acostarse_laboral = models.CharField(max_length=10, blank=True, null=True)
-    tiempo_dormirse_laboral = models.CharField(max_length=10, blank=True, null=True)
-    hora_intencion_dormir_laboral = models.CharField(
-        max_length=10, blank=True, null=True
+
+    # Queja de sueño - CORREGIDO: CharField en lugar de Boolean
+    presenta_queja = models.CharField(
+        max_length=10, blank=True, null=True, default="no"
     )
-    hora_despertar_laboral = models.CharField(max_length=10, blank=True, null=True)
-    tiempo_salir_cama_laboral = models.CharField(max_length=10, blank=True, null=True)
-    sueno_reparador_laboral = models.CharField(max_length=10, blank=True, null=True)
+    observaciones_queja = models.TextField(blank=True, null=True)
+    causa_conocida = models.CharField(
+        max_length=10, blank=True, null=True, default="no"
+    )
+    especificacion_causa = models.TextField(blank=True, null=True)
+
+    # Rutina de sueño
+    rutina_dormir = models.CharField(max_length=10, blank=True, null=True, default="no")
+    describa_rutina = models.TextField(blank=True, null=True)
+
+    # Horarios laborales - CORREGIDO: Campos más flexibles
+    jornada_laboral = models.CharField(max_length=255, blank=True, null=True)
+    hora_acostarse_laboral = models.CharField(max_length=20, blank=True, null=True)
+    tiempo_dormirse_laboral = models.CharField(max_length=20, blank=True, null=True)
+    hora_intencion_dormir_laboral = models.CharField(
+        max_length=20, blank=True, null=True
+    )
+    hora_despertar_laboral = models.CharField(max_length=20, blank=True, null=True)
+    tiempo_salir_cama_laboral = models.CharField(max_length=20, blank=True, null=True)
+    sueno_reparador_laboral = models.CharField(max_length=20, blank=True, null=True)
     companero_cama_laboral = models.CharField(max_length=10, blank=True, null=True)
     despertador_laboral = models.CharField(max_length=10, blank=True, null=True)
+
+    # Fin de semana
     jornada_fds = models.CharField(max_length=255, blank=True, null=True)
-    hora_acostarse_fds = models.CharField(max_length=10, blank=True, null=True)
-    tiempo_dormirse_fds = models.CharField(max_length=10, blank=True, null=True)
-    hora_intencion_dormir_fds = models.CharField(max_length=10, blank=True, null=True)
-    hora_despertar_fds = models.CharField(max_length=10, blank=True, null=True)
-    tiempo_salir_cama_fds = models.CharField(max_length=10, blank=True, null=True)
-    sueno_reparador_fds = models.CharField(max_length=10, blank=True, null=True)
+    hora_acostarse_fds = models.CharField(max_length=20, blank=True, null=True)
+    tiempo_dormirse_fds = models.CharField(max_length=20, blank=True, null=True)
+    hora_intencion_dormir_fds = models.CharField(max_length=20, blank=True, null=True)
+    hora_despertar_fds = models.CharField(max_length=20, blank=True, null=True)
+    tiempo_salir_cama_fds = models.CharField(max_length=20, blank=True, null=True)
+    sueno_reparador_fds = models.CharField(max_length=20, blank=True, null=True)
     companero_cama_fds = models.CharField(max_length=10, blank=True, null=True)
     despertador_fds = models.CharField(max_length=10, blank=True, null=True)
-    hora_acostarse_vacaciones = models.CharField(max_length=10, blank=True, null=True)
-    tiempo_dormirse_vacaciones = models.CharField(max_length=10, blank=True, null=True)
+
+    # Vacaciones
+    hora_acostarse_vacaciones = models.CharField(max_length=20, blank=True, null=True)
+    tiempo_dormirse_vacaciones = models.CharField(max_length=20, blank=True, null=True)
     hora_intencion_dormir_vacaciones = models.CharField(
-        max_length=10, blank=True, null=True
+        max_length=20, blank=True, null=True
     )
-    hora_despertar_vacaciones = models.CharField(max_length=10, blank=True, null=True)
+    hora_despertar_vacaciones = models.CharField(max_length=20, blank=True, null=True)
     tiempo_salir_cama_vacaciones = models.CharField(
-        max_length=10, blank=True, null=True
+        max_length=20, blank=True, null=True
     )
-    sueno_reparador_vacaciones = models.CharField(max_length=10, blank=True, null=True)
+    sueno_reparador_vacaciones = models.CharField(max_length=20, blank=True, null=True)
     companero_cama_vacaciones = models.CharField(max_length=10, blank=True, null=True)
     despertador_vacaciones = models.CharField(max_length=10, blank=True, null=True)
-    realiza_siestas = models.BooleanField(default=False)
-    numero_siestas = models.IntegerField(blank=True, null=True)
-    duracion_siestas = models.CharField(max_length=10, blank=True, null=True)
-    siesta_frecuencia = models.CharField(max_length=50, blank=True, null=True)
-    siesta_reparadora = models.CharField(max_length=50, blank=True, null=True)
-    periodo_siestas = models.CharField(max_length=50, blank=True, null=True)
+
+    # Siestas - CORREGIDO: CharField para compatibilidad
+    realiza_siestas = models.CharField(
+        max_length=10, blank=True, null=True, default="no"
+    )
+    numero_siestas = models.CharField(max_length=10, blank=True, null=True)
+    duracion_siestas = models.CharField(max_length=20, blank=True, null=True)
+    siesta_frecuencia = models.CharField(max_length=100, blank=True, null=True)
+    siesta_reparadora = models.CharField(max_length=10, blank=True, null=True)
+    periodo_siestas = models.CharField(max_length=100, blank=True, null=True)
+
+    # Ambiente
     iluminacion = models.CharField(max_length=255, blank=True, null=True)
     comodidad = models.CharField(max_length=255, blank=True, null=True)
     ruido = models.CharField(max_length=255, blank=True, null=True)
-    consume = models.BooleanField(default=False)
-    consume_medicamento = models.BooleanField(default=False)
-    usa_pantallas = models.BooleanField(default=False)
-    cama_actividades = models.CharField(max_length=255, blank=True, null=True)
-    actividad_fisica = models.CharField(max_length=255, blank=True, null=True)
-    sintomas_sueno = models.CharField(max_length=255, blank=True, null=True)
-    sintomas_diurnos = models.CharField(max_length=255, blank=True, null=True)
+
+    # Consumo - CORREGIDO: CharField
+    consume = models.CharField(max_length=10, blank=True, null=True, default="no")
+    consume_medicamento = models.CharField(
+        max_length=10, blank=True, null=True, default="no"
+    )
+    usa_pantallas = models.CharField(max_length=10, blank=True, null=True, default="no")
+
+    # Actividades
+    cama_actividades = models.TextField(blank=True, null=True)
+    actividad_fisica = models.TextField(blank=True, null=True)
+
+    # Síntomas
+    sintomas_sueno = models.TextField(blank=True, null=True)
+    sintomas_diurnos = models.TextField(blank=True, null=True)
+
+    # Observaciones
     observaciones = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return f"Anamnesis de Sueño - {self.visita_examen}"
 
 
 class TipoQuejaSueno(models.Model):

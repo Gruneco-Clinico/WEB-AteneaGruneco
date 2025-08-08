@@ -3,6 +3,7 @@
 Copyright (c) 2019 - present AppSeed.us
 """
 
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.template import loader
@@ -43,6 +44,10 @@ from django.forms.models import model_to_dict
 
 # from weasyprint import HTML
 from django.contrib.auth import update_session_auth_hash
+
+
+def is_superuser(user):
+    return user.is_superuser
 
 
 # vista principal #############################################################
@@ -440,6 +445,7 @@ def editar_v(request, visita_id):
 
 # proyectos ############################################################
 @login_required
+@user_passes_test(is_superuser, login_url="/login/")
 def proyectos(request):
     if not request.user.is_superuser:
         messages.error(request, "No tienes permisos para acceder a esta página.")
@@ -501,6 +507,7 @@ def proyectos(request):
 
 
 @login_required
+@user_passes_test(is_superuser, login_url="/login/")
 def eliminar_proyecto(request, id):
     if request.method == "POST":
         proyecto = get_object_or_404(
@@ -517,6 +524,7 @@ def eliminar_proyecto(request, id):
 
 
 @login_required
+@user_passes_test(is_superuser, login_url="/login/")
 # tipos de visita visitas
 def agregar_visita(request):
     proyectos = Proyecto.objects.all()
@@ -583,6 +591,7 @@ def agregar_visita(request):
 
 
 @login_required
+@user_passes_test(is_superuser, login_url="/login/")
 def eliminar_visita(request, id):
     # Obtener la visita o devolver un error 404 si no existe
     visita = get_object_or_404(TipoVisita, id=id)
@@ -601,6 +610,8 @@ def eliminar_visita(request, id):
     return redirect("proyectos")
 
 
+@login_required
+@user_passes_test(is_superuser, login_url="/login/")
 def editar_visita(request, visita_id):
     visita = get_object_or_404(TipoVisita, id=visita_id)
 
@@ -727,6 +738,60 @@ def realizar_examen(request, visita_id, examen_id, paciente_id):
             "datos_examen": datos_examen,
             "modo_edicion": modo_edicion,
             "visita_examen_obj": visita_examen_obj,
+        },
+    )
+
+
+@login_required
+def ver_resultado_examen(request, visita_examen_id):
+    """Vista genérica para mostrar resultados de cualquier examen"""
+    visita_examen = get_object_or_404(VisitaExamen, id=visita_examen_id)
+
+    # Verificar que el examen esté completado
+    if not visita_examen.esta_realizado:
+        messages.error(request, "Este examen aún no ha sido completado.")
+        return redirect(
+            "detalle_paciente", paciente_id=visita_examen.visita.paciente.id
+        )
+
+    # Obtener el resultado específico del examen
+    resultado = visita_examen.get_resultado_instance()
+
+    if not resultado:
+        messages.error(request, "No se encontraron resultados para este examen.")
+        return redirect(
+            "detalle_paciente", paciente_id=visita_examen.visita.paciente.id
+        )
+
+    # Convertir el resultado a diccionario para el template
+    datos_resultado = {}
+    for field in resultado._meta.fields:
+        if field.name != "visita_examen":  # Excluir la relación
+            valor = getattr(resultado, field.name)
+            datos_resultado[field.verbose_name or field.name] = valor
+
+    # Determinar el template específico basado en el tipo de examen
+    template_mapping = {
+        "SuenoFisicoResult": "examenes_resultados/resultado_sueno_fisico.html",
+        "AtenasResult": "examenes_resultados/resultado_atenas.html",
+        "PittsburghResult": "examenes_resultados/resultado_pittsburgh.html",
+        "EpworthResult": "examenes_resultados/resultado_epworth.html",
+        # Agregar más según tus exámenes
+    }
+
+    tipo_resultado = resultado.__class__.__name__
+    template = template_mapping.get(
+        tipo_resultado, "examenes_resultados/resultado_generico.html"
+    )
+
+    return render(
+        request,
+        template,
+        {
+            "visita_examen": visita_examen,
+            "resultado": resultado,
+            "datos_resultado": datos_resultado,
+            "paciente": visita_examen.visita.paciente,
         },
     )
 
@@ -905,54 +970,376 @@ def guardar_examen_fisico_sueno(request):
 
 
 @login_required
-def ver_resultado_examen(request, visita_examen_id):
-    """Vista genérica para mostrar resultados de cualquier examen"""
-    visita_examen = get_object_or_404(VisitaExamen, id=visita_examen_id)
+def guardar_sueno_anamnesis(request):
+    if request.method == "POST":
+        try:
+            visita_id = request.POST.get("visita_id")
+            paciente_id = request.POST.get("paciente_id")
+            examen_id = request.POST.get("examen_id")
 
-    # Verificar que el examen esté completado
-    if not visita_examen.esta_realizado:
-        messages.error(request, "Este examen aún no ha sido completado.")
-        return redirect(
-            "detalle_paciente", paciente_id=visita_examen.visita.paciente.id
-        )
+            # Obtener la instancia de VisitaExamen
+            visita_examen = get_object_or_404(
+                VisitaExamen, visita_id=visita_id, examen_id=examen_id
+            )
 
-    # Obtener el resultado específico del examen
-    resultado = visita_examen.get_resultado_instance()
+            # Marcar como iniciado si está pendiente
+            if visita_examen.estado == "pendiente":
+                visita_examen.estado = "en_progreso"
+                visita_examen.fecha_inicio = timezone.now()
+                visita_examen.save()
 
-    if not resultado:
-        messages.error(request, "No se encontraron resultados para este examen.")
-        return redirect(
-            "detalle_paciente", paciente_id=visita_examen.visita.paciente.id
-        )
+            # Crear o actualizar el resultado de anamnesis de sueño
+            anamnesis, created = SuenoAnamnesisResult.objects.get_or_create(
+                visita_examen=visita_examen,
+                defaults={
+                    # Motivo de consulta
+                    "motivo_consulta": request.POST.get("motivo_consulta", ""),
+                    # Enfermedad actual
+                    "enfermedad_actual": request.POST.get("enfermedad_actual", ""),
+                    # Antecedentes del sueño
+                    "inicio_problemas_sueno": request.POST.get(
+                        "inicio_problemas_sueno", ""
+                    ),
+                    "factor_desencadenante": request.POST.get(
+                        "factor_desencadenante", ""
+                    ),
+                    "evolucion_problema": request.POST.get("evolucion_problema", ""),
+                    # Higiene del sueño
+                    "horario_acostarse": request.POST.get("horario_acostarse", ""),
+                    "horario_levantarse": request.POST.get("horario_levantarse", ""),
+                    "tiempo_dormirse": request.POST.get("tiempo_dormirse", ""),
+                    "despertares_nocturnos": request.POST.get(
+                        "despertares_nocturnos", ""
+                    ),
+                    "causa_despertares": request.POST.get("causa_despertares", ""),
+                    "tiempo_volver_dormir": request.POST.get(
+                        "tiempo_volver_dormir", ""
+                    ),
+                    "despertar_final": request.POST.get("despertar_final", ""),
+                    "calidad_sueno": request.POST.get("calidad_sueno", ""),
+                    # Ambiente de sueño
+                    "habitacion_propia": request.POST.get("habitacion_propia") == "si",
+                    "comparte_cama": request.POST.get("comparte_cama", ""),
+                    "temperatura_habitacion": request.POST.get(
+                        "temperatura_habitacion", ""
+                    ),
+                    "ruido_ambiente": request.POST.get("ruido_ambiente", ""),
+                    "iluminacion": request.POST.get("iluminacion", ""),
+                    # Hábitos pre-sueño
+                    "actividades_antes_dormir": request.POST.get(
+                        "actividades_antes_dormir", ""
+                    ),
+                    "uso_dispositivos": request.POST.get("uso_dispositivos") == "si",
+                    "tiempo_dispositivos": request.POST.get("tiempo_dispositivos", ""),
+                    "comida_antes_dormir": request.POST.get("comida_antes_dormir", ""),
+                    "bebidas_antes_dormir": request.POST.get(
+                        "bebidas_antes_dormir", ""
+                    ),
+                    # Síntomas diurnos
+                    "somnolencia_diurna": request.POST.get("somnolencia_diurna", ""),
+                    "fatiga": request.POST.get("fatiga", ""),
+                    "dificultad_concentracion": request.POST.get(
+                        "dificultad_concentracion", ""
+                    ),
+                    "cambios_humor": request.POST.get("cambios_humor", ""),
+                    "microsuenos": request.POST.get("microsuenos") == "si",
+                    # Síntomas nocturnos
+                    "ronquidos": request.POST.get("ronquidos", ""),
+                    "apneas_observadas": request.POST.get("apneas_observadas") == "si",
+                    "movimientos_piernas": request.POST.get("movimientos_piernas")
+                    == "si",
+                    "parasomnia": request.POST.get("parasomnia", ""),
+                    "sudoracion_nocturna": request.POST.get("sudoracion_nocturna")
+                    == "si",
+                    "nicturia": request.POST.get("nicturia", ""),
+                    # Factores relacionados
+                    "estres_actual": request.POST.get("estres_actual", ""),
+                    "cambios_trabajo": request.POST.get("cambios_trabajo", ""),
+                    "trabajo_turnos": request.POST.get("trabajo_turnos") == "si",
+                    "tipo_turnos": request.POST.get("tipo_turnos", ""),
+                    "viajes_frecuentes": request.POST.get("viajes_frecuentes") == "si",
+                    # Tratamientos previos
+                    "tratamientos_previos": request.POST.get(
+                        "tratamientos_previos", ""
+                    ),
+                    "medicamentos_sueno": request.POST.get("medicamentos_sueno", ""),
+                    "efectividad_tratamientos": request.POST.get(
+                        "efectividad_tratamientos", ""
+                    ),
+                    # Impacto funcional
+                    "impacto_trabajo": request.POST.get("impacto_trabajo", ""),
+                    "impacto_social": request.POST.get("impacto_social", ""),
+                    "impacto_familiar": request.POST.get("impacto_familiar", ""),
+                    "escala_impacto": request.POST.get("escala_impacto", ""),
+                    # Observaciones
+                    "observaciones_adicionales": request.POST.get(
+                        "observaciones_adicionales", ""
+                    ),
+                },
+            )
 
-    # Convertir el resultado a diccionario para el template
-    datos_resultado = {}
-    for field in resultado._meta.fields:
-        if field.name != "visita_examen":  # Excluir la relación
-            valor = getattr(resultado, field.name)
-            datos_resultado[field.verbose_name or field.name] = valor
+            # Si no es nuevo, actualizar los campos
+            if not created:
+                # Motivo de consulta
+                anamnesis.motivo_consulta = request.POST.get("motivo_consulta", "")
+                anamnesis.enfermedad_actual = request.POST.get("enfermedad_actual", "")
 
-    # Determinar el template específico basado en el tipo de examen
-    template_mapping = {
-        "SuenoFisicoResult": "examenes_resultados/resultado_sueno_fisico.html",
-        "AtenasResult": "examenes_resultados/resultado_atenas.html",
-        "PittsburghResult": "examenes_resultados/resultado_pittsburgh.html",
-        "EpworthResult": "examenes_resultados/resultado_epworth.html",
-        # Agregar más según tus exámenes
-    }
+                # Antecedentes del sueño
+                anamnesis.inicio_problemas_sueno = request.POST.get(
+                    "inicio_problemas_sueno", ""
+                )
+                anamnesis.factor_desencadenante = request.POST.get(
+                    "factor_desencadenante", ""
+                )
+                anamnesis.evolucion_problema = request.POST.get(
+                    "evolucion_problema", ""
+                )
 
-    tipo_resultado = resultado.__class__.__name__
-    template = template_mapping.get(
-        tipo_resultado, "examenes_resultados/resultado_generico.html"
-    )
+                # Higiene del sueño
+                anamnesis.horario_acostarse = request.POST.get("horario_acostarse", "")
+                anamnesis.horario_levantarse = request.POST.get(
+                    "horario_levantarse", ""
+                )
+                anamnesis.tiempo_dormirse = request.POST.get("tiempo_dormirse", "")
+                anamnesis.despertares_nocturnos = request.POST.get(
+                    "despertares_nocturnos", ""
+                )
+                anamnesis.causa_despertares = request.POST.get("causa_despertares", "")
+                anamnesis.tiempo_volver_dormir = request.POST.get(
+                    "tiempo_volver_dormir", ""
+                )
+                anamnesis.despertar_final = request.POST.get("despertar_final", "")
+                anamnesis.calidad_sueno = request.POST.get("calidad_sueno", "")
 
-    return render(
-        request,
-        template,
-        {
-            "visita_examen": visita_examen,
-            "resultado": resultado,
-            "datos_resultado": datos_resultado,
-            "paciente": visita_examen.visita.paciente,
-        },
-    )
+                # Ambiente de sueño
+                anamnesis.habitacion_propia = (
+                    request.POST.get("habitacion_propia") == "si"
+                )
+                anamnesis.comparte_cama = request.POST.get("comparte_cama", "")
+                anamnesis.temperatura_habitacion = request.POST.get(
+                    "temperatura_habitacion", ""
+                )
+                anamnesis.ruido_ambiente = request.POST.get("ruido_ambiente", "")
+                anamnesis.iluminacion = request.POST.get("iluminacion", "")
+
+                # Hábitos pre-sueño
+                anamnesis.actividades_antes_dormir = request.POST.get(
+                    "actividades_antes_dormir", ""
+                )
+                anamnesis.uso_dispositivos = (
+                    request.POST.get("uso_dispositivos") == "si"
+                )
+                anamnesis.tiempo_dispositivos = request.POST.get(
+                    "tiempo_dispositivos", ""
+                )
+                anamnesis.comida_antes_dormir = request.POST.get(
+                    "comida_antes_dormir", ""
+                )
+                anamnesis.bebidas_antes_dormir = request.POST.get(
+                    "bebidas_antes_dormir", ""
+                )
+
+                # Síntomas diurnos
+                anamnesis.somnolencia_diurna = request.POST.get(
+                    "somnolencia_diurna", ""
+                )
+                anamnesis.fatiga = request.POST.get("fatiga", "")
+                anamnesis.dificultad_concentracion = request.POST.get(
+                    "dificultad_concentracion", ""
+                )
+                anamnesis.cambios_humor = request.POST.get("cambios_humor", "")
+                anamnesis.microsuenos = request.POST.get("microsuenos") == "si"
+
+                # Síntomas nocturnos
+                anamnesis.ronquidos = request.POST.get("ronquidos", "")
+                anamnesis.apneas_observadas = (
+                    request.POST.get("apneas_observadas") == "si"
+                )
+                anamnesis.movimientos_piernas = (
+                    request.POST.get("movimientos_piernas") == "si"
+                )
+                anamnesis.parasomnia = request.POST.get("parasomnia", "")
+                anamnesis.sudoracion_nocturna = (
+                    request.POST.get("sudoracion_nocturna") == "si"
+                )
+                anamnesis.nicturia = request.POST.get("nicturia", "")
+
+                # Factores relacionados
+                anamnesis.estres_actual = request.POST.get("estres_actual", "")
+                anamnesis.cambios_trabajo = request.POST.get("cambios_trabajo", "")
+                anamnesis.trabajo_turnos = request.POST.get("trabajo_turnos") == "si"
+                anamnesis.tipo_turnos = request.POST.get("tipo_turnos", "")
+                anamnesis.viajes_frecuentes = (
+                    request.POST.get("viajes_frecuentes") == "si"
+                )
+
+                # Tratamientos previos
+                anamnesis.tratamientos_previos = request.POST.get(
+                    "tratamientos_previos", ""
+                )
+                anamnesis.medicamentos_sueno = request.POST.get(
+                    "medicamentos_sueno", ""
+                )
+                anamnesis.efectividad_tratamientos = request.POST.get(
+                    "efectividad_tratamientos", ""
+                )
+
+                # Impacto funcional
+                anamnesis.impacto_trabajo = request.POST.get("impacto_trabajo", "")
+                anamnesis.impacto_social = request.POST.get("impacto_social", "")
+                anamnesis.impacto_familiar = request.POST.get("impacto_familiar", "")
+                anamnesis.escala_impacto = request.POST.get("escala_impacto", "")
+
+                # Observaciones
+                anamnesis.observaciones_adicionales = request.POST.get(
+                    "observaciones_adicionales", ""
+                )
+
+                anamnesis.save()
+
+            # Procesar las relaciones ManyToMany
+            # Sustancias
+            sustancias_ids = request.POST.getlist("sustancias")
+            if sustancias_ids:
+                anamnesis.sustancias.set(sustancias_ids)
+
+            # Síntomas
+            sintomas_ids = request.POST.getlist("sintomas")
+            if sintomas_ids:
+                anamnesis.sintomas.set(sintomas_ids)
+
+            # Pantallas
+            pantallas_ids = request.POST.getlist("pantallas")
+            if pantallas_ids:
+                anamnesis.pantallas.set(pantallas_ids)
+
+            # Tipos de queja
+            quejas_ids = request.POST.getlist("tipos_queja")
+            if quejas_ids:
+                anamnesis.tipos_queja.set(quejas_ids)
+
+            # Medicamentos
+            medicamentos_ids = request.POST.getlist("medicamentos")
+            if medicamentos_ids:
+                anamnesis.medicamentos.set(medicamentos_ids)
+
+            # Síntomas diurnos
+            sintomas_diurnos_ids = request.POST.getlist("sintomas_diurnos")
+            if sintomas_diurnos_ids:
+                anamnesis.sintomas_diurnos.set(sintomas_diurnos_ids)
+
+            # Actividades en cama
+            actividades_cama_ids = request.POST.getlist("actividades_cama")
+            if actividades_cama_ids:
+                anamnesis.actividades_cama.set(actividades_cama_ids)
+
+            # Actividades físicas
+            actividades_fisicas_ids = request.POST.getlist("actividades_fisicas")
+            if actividades_fisicas_ids:
+                anamnesis.actividades_fisicas.set(actividades_fisicas_ids)
+
+            # Marcar el examen como completado
+            visita_examen.estado = "completado"
+            visita_examen.fecha_completado = timezone.now()
+            visita_examen.save()
+
+            messages.success(request, "Anamnesis de sueño guardada exitosamente.")
+            return redirect("detalle_paciente", paciente_id=paciente_id)
+
+        except Exception as e:
+            print(f"ERROR en anamnesis: {str(e)}")
+            messages.error(request, f"Error al guardar la anamnesis: {str(e)}")
+            return redirect("detalle_paciente", paciente_id=paciente_id or 1)
+
+    else:
+        messages.error(request, "Método no permitido.")
+        return redirect("index")
+
+
+@login_required
+def guardar_atenas(request):
+    if request.method == "POST":
+        try:
+            visita_id = request.POST.get("visita_id")
+            paciente_id = request.POST.get("paciente_id")
+            examen_id = request.POST.get("examen_id")
+
+            print(
+                f"DEBUG: visita_id={visita_id}, examen_id={examen_id}, paciente_id={paciente_id}"
+            )
+
+            # Obtener la instancia de VisitaExamen
+            visita_examen = get_object_or_404(
+                VisitaExamen, visita_id=visita_id, examen_id=examen_id
+            )
+
+            # Marcar como iniciado si está pendiente
+            if visita_examen.estado == "pendiente":
+                visita_examen.estado = "en_progreso"
+                visita_examen.fecha_inicio = timezone.now()
+                visita_examen.save()
+
+            # Obtener respuestas de las preguntas (1-8)
+            pregunta_1 = request.POST.get("induccion_dormir", "0")
+            pregunta_2 = request.POST.get("despertares_noche", "0")
+            pregunta_3 = request.POST.get("despertar_temprano", "0")
+            pregunta_4 = request.POST.get("duracion_dormir", "0")
+            pregunta_5 = request.POST.get("calidad_dormir", "0")
+            pregunta_6 = request.POST.get("bienestar_dia", "0")
+            pregunta_7 = request.POST.get("funcionamiento_dia", "0")
+            pregunta_8 = request.POST.get("somnolencia_dia", "0")
+
+            # Calcular puntuación total
+            puntuacion_total = request.POST.get("puntuacion_total", "0")
+
+            # Crear o actualizar el resultado de Atenas
+            atenas, created = AtenasResult.objects.update_or_create(
+                visita_examen=visita_examen,
+                defaults={
+                    # Preguntas individuales
+                    "induccion_dormir": pregunta_1,
+                    "despertares_noche": pregunta_2,
+                    "despertar_temprano": pregunta_3,
+                    "duracion_dormir": pregunta_4,
+                    "calidad_dormir": pregunta_5,
+                    "bienestar_dia": pregunta_6,
+                    "funcionamiento_dia": pregunta_7,
+                    "somnolencia_dia": pregunta_8,
+                    # Puntuación y interpretación
+                    "puntuacion_total": puntuacion_total,
+                },
+            )
+
+            # Marcar el examen como completado
+            visita_examen.estado = "completado"
+            visita_examen.fecha_completado = timezone.now()
+            visita_examen.save()
+
+            messages.success(
+                request,
+                f"✅ Escala de Atenas guardada exitosamente. Puntuación: {puntuacion_total}",
+            )
+            return redirect("detalle_paciente", paciente_id=paciente_id)
+
+        except Exception as e:
+            print(f"ERROR en Atenas: {str(e)}")
+            import traceback
+
+            traceback.print_exc()
+
+            # Revertir estado si hubo error
+            try:
+                if "visita_examen" in locals():
+                    visita_examen.estado = "pendiente"
+                    visita_examen.save()
+            except:
+                pass
+
+            messages.error(
+                request, f"❌ Error al guardar la escala de Atenas: {str(e)}"
+            )
+            return redirect("detalle_paciente", paciente_id=paciente_id or 1)
+
+    else:
+        messages.error(request, "❌ Método no permitido.")
+        return redirect("index")
