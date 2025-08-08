@@ -1553,3 +1553,93 @@ def guardar_examen_Epworth(request):
     else:
         messages.error(request, "❌ Método no permitido.")
         return redirect("index")
+
+
+@login_required
+def guardar_examen_ISI(request):
+    if request.method == "POST":
+        try:
+            visita_id = request.POST.get("visita_id")
+            paciente_id = request.POST.get("paciente_id")
+            examen_id = request.POST.get("examen_id")
+
+            print(
+                f"DEBUG: visita_id={visita_id}, examen_id={examen_id}, paciente_id={paciente_id}"
+            )
+            print("=== DEBUG: TODOS LOS CAMPOS POST ===")
+            for key, value in request.POST.items():
+                if not key.startswith("csrf"):
+                    print(f"Campo: '{key}' = '{value}'")
+            print("=== FIN DEBUG ===")
+
+            # Obtener la instancia de VisitaExamen
+            visita_examen = get_object_or_404(
+                VisitaExamen, visita_id=visita_id, examen_id=examen_id
+            )
+
+            # Marcar como iniciado si está pendiente
+            if visita_examen.estado == "pendiente":
+                visita_examen.estado = "en_progreso"
+                visita_examen.fecha_inicio = timezone.now()
+                visita_examen.save()
+
+            # Obtener las respuestas del formulario
+            dificultad_dormir = request.POST.get("dificultad_dormir", "")
+            dificultad_mantener_sueno = request.POST.get(
+                "dificultad_mantener_sueno", ""
+            )
+            despertar_temprano = request.POST.get("despertar_temprano", "")
+            satisfaccion_sueno = request.POST.get("satisfaccion_sueno", "")
+            notabilidad_problema = request.POST.get("notabilidad_problema", "")
+            preocupacion_sueno = request.POST.get("preocupacion_sueno", "")
+            interferencia_sueno = request.POST.get("interferencia_sueno", "")
+
+            puntuacion = request.POST.get("puntuacion_total", "0")
+
+            # Crear o actualizar el resultado ISI
+            isi_result, created = ISIResult.objects.update_or_create(
+                visita_examen=visita_examen,
+                defaults={
+                    "dificultad_dormir": dificultad_dormir,
+                    "dificultad_mantener_sueno": dificultad_mantener_sueno,
+                    "despertar_temprano": despertar_temprano,
+                    "satisfaccion_sueno": satisfaccion_sueno,
+                    "notabilidad_problema": notabilidad_problema,
+                    "preocupacion_sueno": preocupacion_sueno,
+                    "interferencia_sueno": interferencia_sueno,
+                    "puntuacion_total": puntuacion,
+                },
+            )
+
+            # Marcar el examen como completado
+            visita_examen.estado = "completado"
+            visita_examen.fecha_completado = timezone.now()
+            visita_examen.save()
+
+            messages.success(
+                request,
+                f"✅ Índice de Severidad del Insomnio (ISI) guardado exitosamente.\n",
+            )
+            return redirect("detalle_paciente", paciente_id=paciente_id)
+
+        except Exception as e:
+            print(f"ERROR en ISI: {str(e)}")
+            import traceback
+
+            traceback.print_exc()
+
+            # Revertir estado si hubo error
+            try:
+                if "visita_examen" in locals():
+                    visita_examen.estado = "pendiente"
+                    visita_examen.save()
+                    print("DEBUG: Estado revertido a pendiente")
+            except:
+                pass
+
+            messages.error(request, f"❌ Error al guardar el ISI: {str(e)}")
+            return redirect("detalle_paciente", paciente_id=paciente_id or 1)
+
+    else:
+        messages.error(request, "❌ Método no permitido.")
+        return redirect("index")
