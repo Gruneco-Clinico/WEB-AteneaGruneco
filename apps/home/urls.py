@@ -79,4 +79,5 @@ urlpatterns = [
         name="guardar_examen_Epworth",
     ),
     path("guardar_examen_ISI/", views.guardar_examen_ISI, name="guardar_examen_ISI"),
+    path("guardar_examen_MEW/", views.guardar_examen_MEW, name="guardar_examen_MEW"),
 ]

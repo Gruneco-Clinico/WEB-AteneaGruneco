@@ -56,7 +56,12 @@
                                         <div class="form-group">
                                             <label>1. ¿A qué hora te levantarías?</label>
                                             <select class="form-control" name="hora_levantarse_meq" required>
+                                                {% if datos_examen and datos_examen.hora_levantarse %}
+                                                <option value="{{ datos_examen.hora_levantarse }}" selected>
+                                                    {{datos_examen.hora_levantarse }}</option>
+                                                {% else %}
                                                 <option value="" selected disabled>Seleccione una opción</option>
+                                                {% endif %}
                                                 <option value="(5 AM) y (6:30 AM) ">05:00 - 06:30 AM</option>
                                                 <option value="(6:30 AM) y (7:45 AM) ">06:30 - 07:45 AM</option>
                                                 <option value="(7:45 AM) y (9:45 AM) ">07:45 - 09:45 AM</option>
@@ -68,7 +73,12 @@
                                         <div class="form-group">
                                             <label>2. ¿A qué hora te acostarías?</label>
                                             <select class="form-control" name="hora_acostarse_meq" required>
+                                                {% if datos_examen and datos_examen.hora_acostarse %}
+                                                <option value="{{ datos_examen.hora_acostarse }}" selected>
+                                                    {{ datos_examen.hora_acostarse }}</option>
+                                                {% else %}
                                                 <option value="" selected disabled>Seleccione una opción</option>
+                                                {% endif %}
                                                 <option value="A las 20:00 (8 PM) – 21:00 (9 PM)">20:00 - 21:00</option>
                                                 <option value="A las 21:00 (9 PM) – 22:15 (10:15 PM)">21:00 - 22:15
                                                 </option>
@@ -84,7 +94,12 @@
                                         <div class="form-group">
                                             <label>3. ¿Hasta qué punto necesitas despertador?</label>
                                             <select class="form-control" name="uso_despertador_meq" required>
+                                                {% if datos_examen and datos_examen.uso_despertador %}
+                                                <option value="{{ datos_examen.uso_despertador }}" selected>
+                                                    {{ datos_examen.uso_despertador }}</option>
+                                                {% else %}
                                                 <option value="" selected disabled>Seleccione una opción</option>
+                                                {% endif %}
                                                 <option value="No lo necesito">No lo necesito</option>
                                                 <option value="Lo necesito poco">Lo necesito poco</option>
                                                 <option value="Lo necesito bastante">Lo necesito bastante</option>
@@ -96,6 +111,12 @@
                                             <label>4. ¿Te resulta fácil levantarte por las mañanas?</label>
                                             <select class="form-control" name="facilidad_levantarse_meq" required>
                                                 <option value="" selected disabled>Seleccione una opción</option>
+                                                {% if datos_examen and datos_examen.facilidad_levantarse %}
+                                                <option value="{{ datos_examen.facilidad_levantarse }}" selected>
+                                                    {{ datos_examen.facilidad_levantarse }}</option>
+                                                {% else %}
+                                                <option value="" selected disabled>Seleccione una opción</option>
+                                                {% endif %}
                                                 <option value="Nada fácil">Nada fácil</option>
                                                 <option value="No muy fácil">No muy fácil</option>
                                                 <option value="Bastante fácil">Bastante fácil</option>
@@ -106,7 +127,13 @@
                                         <div class="form-group">
                                             <label>5. ¿Qué tal te encuentras durante la primera media hora?</label>
                                             <select class="form-control" name="alerta_manana_meq" required>
+
+                                                {% if datos_examen and datos_examen.alerta_manana %}
+                                                <option value="{{ datos_examen.alerta_manana }}" selected>
+                                                    {{ datos_examen.alerta_manana }}</option>
+                                                {% else %}
                                                 <option value="" selected disabled>Seleccione una opción</option>
+                                                {% endif %}
                                                 <option value="Nada alerta">Nada alerta</option>
                                                 <option value="Poco alerta">Poco alerta</option>
                                                 <option value="Bastante alerta">Bastante alerta</option>
@@ -118,6 +145,12 @@
                                             <label>6. ¿Cómo es tu apetito durante la primera media hora?</label>
                                             <select class="form-control" name="apetito_manana_meq" required>
                                                 <option value="" selected disabled>Seleccione una opción</option>
+                                                {% if datos_examen and datos_examen.apetito_manana %}
+                                                <option value="{{ datos_examen.apetito_manana }}" selected>
+                                                    {{ datos_examen.apetito_manana }}</option>
+                                                {% else %}
+                                                <option value="" selected disabled>Seleccione una opción</option>
+                                                {% endif %}
                                                 <option value="Muy escaso">Muy escaso</option>
                                                 <option value="Bastante escaso">Bastante escaso</option>
                                                 <option value="Bastante bueno">Bastante bueno</option>
@@ -128,7 +161,12 @@
                                         <div class="form-group">
                                             <label>7. ¿Qué tal te sientes durante la primera media hora?</label>
                                             <select class="form-control" name="descanso_manana_meq" required>
+                                                {% if datos_examen and datos_examen.descanso_manana %}
+                                                <option value="{{ datos_examen.descanso_manana }}" selected>
+                                                    {{ datos_examen.descanso_manana }}</option>
+                                                {% else %}
                                                 <option value="" selected disabled>Seleccione una opción</option>
+                                                {% endif %}
                                                 <option value="Muy cansado">Muy cansado</option>
                                                 <option value="Bastante cansado">Bastante cansado</option>
                                                 <option value="Bastante descansado">Bastante descansado</option>
@@ -140,6 +178,12 @@
                                             <label>8. ¿A qué hora te acuestas cuando eres libre?</label>
                                             <select class="form-control" name="hora_acostarse_libre_meq" required>
                                                 <option value="" selected disabled>Seleccione una opción</option>
+                                                {% if datos_examen and datos_examen.hora_acostarse_libre %}
+                                                <option value="{{ datos_examen.hora_acostarse_libre }}" selected>
+                                                    {{ datos_examen.hora_acostarse_libre }}</option>
+                                                {% else %}
+                                                <option value="" selected disabled>Seleccione una opción</option>
+                                                {% endif %}
                                                 <option value="Nunca o raramente o más tarde">Nunca o raramente o más
                                                     tarde
                                                 </option>
@@ -156,6 +200,12 @@
                                             <label>9. ¿A qué hora necesitas dormir por cansancio?</label>
                                             <select class="form-control" name="hora_cansancio_noche_meq" required>
                                                 <option value="" selected disabled>Seleccione una opción</option>
+                                                {% if datos_examen and datos_examen.hora_cansancio_noche %}
+                                                <option value="{{ datos_examen.hora_cansancio_noche }}" selected>
+                                                    {{ datos_examen.hora_cansancio_noche }}</option>
+                                                {% else %}
+                                                <option value="" selected disabled>Seleccione una opción</option>
+                                                {% endif %}
                                                 <option value="20:00 - 21:00">20:00 - 21:00</option>
                                                 <option value="21:00 - 22:15">21:00 - 22:15</option>
                                                 <option value="22:15 - 00:45">22:15 - 00:45</option>
@@ -168,7 +218,13 @@
                                             <label>10. Si te acostaras a las 11 PM, ¿qué nivel de cansancio
                                                 notarías?</label>
                                             <select class="form-control" name="nivel_cansancia_11" required>
+
+                                                {% if datos_examen and datos_examen.nivel_cansancia_11 %}
+                                                <option value="{{ datos_examen.nivel_cansancia_11 }}" selected>
+                                                    {{ datos_examen.nivel_cansancia_11 }}</option>
+                                                {% else %}
                                                 <option value="" selected disabled>Seleccione una opción</option>
+                                                {% endif %}
                                                 <option value="Ningún cansancio">Ningún cansancio</option>
                                                 <option value="Algún cansancio">Algún cansancio</option>
                                                 <option value="Bastante cansancio">Bastante cansancio</option>
@@ -189,7 +245,12 @@
                                         <div class="form-group">
                                             <label>11. Ejercicio físico de 7 a 8 AM. ¿Cómo te encontrarías?</label>
                                             <select class="form-control" name="ejercicio_fisico_meq" required>
+                                                {% if datos_examen and datos_examen.ejercicio_fisico %}
+                                                <option value="{{ datos_examen.ejercicio_fisico }}" selected>
+                                                    {{ datos_examen.ejercicio_fisico }}</option>
+                                                {% else %}
                                                 <option value="" selected disabled>Seleccione una opción</option>
+                                                {% endif %}
                                                 <option value="Estaría en buena forma">Estaría en buena forma</option>
                                                 <option value="Estaría en una forma aceptable">Estaría en una forma
                                                     aceptable
@@ -204,6 +265,12 @@
                                             <label>12. ¿Cuándo te despertarías tras acostarte tarde?</label>
                                             <select class="form-control" name="hora_despertarse_si_tarde" required>
                                                 <option value="" selected disabled>Seleccione una opción</option>
+                                                {% if datos_examen and datos_examen.hora_despertarse_si_tarde %}
+                                                <option value="{{ datos_examen.hora_despertarse_si_tarde }}" selected>
+                                                    {{ datos_examen.hora_despertarse_si_tarde }}</option>
+                                                {% else %}
+                                                <option value="" selected disabled>Seleccione una opción</option>
+                                                {% endif %}
                                                 <option value="A la hora habitual y ya no dormiría más">A la hora
                                                     habitual y ya no dormiría más
                                                 </option>
@@ -223,7 +290,12 @@
                                             <label>13. Si tienes que permanecer despierto de 4 a 6 AM, ¿qué
                                                 preferirías?</label>
                                             <select class="form-control" name="guardia_nocturna" required>
+                                                {% if datos_examen and datos_examen.guardia_nocturna %}
+                                                <option value="{{ datos_examen.guardia_nocturna }}" selected>
+                                                    {{ datos_examen.guardia_nocturna }}</option>
+                                                {% else %}
                                                 <option value="" selected disabled>Seleccione una opción</option>
+                                                {% endif %}
                                                 <option value="No acostarme hasta pasada la guardia">No acostarme hasta
                                                     pasada la guardia
                                                 </option>
@@ -242,7 +314,12 @@
                                         <div class="form-group">
                                             <label>14. ¿Qué horario escogerías para trabajo físico pesado?</label>
                                             <select class="form-control" name="horario_trabajo_fisico" required>
+                                                {% if datos_examen and datos_examen.horario_trabajo_fisico %}
+                                                <option value="{{ datos_examen.horario_trabajo_fisico }}" selected>
+                                                    {{ datos_examen.horario_trabajo_fisico }}</option>
+                                                {% else %}
                                                 <option value="" selected disabled>Seleccione una opción</option>
+                                                {% endif %}
                                                 <option value="De 08:00 (8 AM) a 10:00 (10 AM)">08:00 - 10:00</option>
                                                 <option value="De 11:00 (11 AM) a 13:00 (1 PM)">11:00 - 13:00</option>
                                                 <option value="De 13:00 (1 PM) a 17:00 (5 PM)">13:00 - 17:00</option>
@@ -254,7 +331,12 @@
                                             <label>15. Ejercicio físico intenso a las 10-11 PM. ¿Cómo te
                                                 sentaría?</label>
                                             <select class="form-control" name="ejercicio_nocturno" required>
+                                                {% if datos_examen and datos_examen.ejercicio_nocturno %}
+                                                <option value="{{ datos_examen.ejercicio_nocturno }}" selected>
+                                                    {{ datos_examen.ejercicio_nocturno }}</option>
+                                                {% else %}
                                                 <option value="" selected disabled>Seleccione una opción</option>
+                                                {% endif %}
                                                 <option value="Estaría en buena forma">Estaría en buena forma</option>
                                                 <option value="Estaría en una forma aceptable">Estaría en una forma
                                                     aceptable
@@ -268,7 +350,12 @@
                                         <div class="form-group">
                                             <label>16. ¿Qué horario seleccionarías para trabajar 5 horas al día?</label>
                                             <select class="form-control" name="horario_trabajo" required>
+                                                {% if datos_examen and datos_examen.horario_trabajo %}
+                                                <option value="{{ datos_examen.horario_trabajo }}" selected>
+                                                    {{ datos_examen.horario_trabajo }}</option>
+                                                {% else %}
                                                 <option value="" selected disabled>Seleccione una opción</option>
+                                                {% endif %}
                                                 <option value="Entre las 04:00 (4 AM) y las 08:00 (8 AM)">04:00 - 08:00
                                                 </option>
                                                 <option value="Entre las 08:00 (8 AM) y las 09:00 (9 AM)">08:00 - 09:00
@@ -285,7 +372,12 @@
                                         <div class="form-group">
                                             <label>17. ¿A qué hora alcanzas tu máximo bienestar?</label>
                                             <select class="form-control" name="maximo_bienestar" required>
+                                                {% if datos_examen and datos_examen.maximo_bienestar %}
+                                                <option value="{{ datos_examen.maximo_bienestar }}" selected>
+                                                    {{ datos_examen.maximo_bienestar }}</option>
+                                                {% else %}
                                                 <option value="" selected disabled>Seleccione una opción</option>
+                                                {% endif %}
                                                 <option value="Entre las 05:00 (5 AM) y las 08:00 (8 AM)">05:00 - 08:00
                                                 </option>
                                                 <option value="Entre las 08:00 (8 AM) y las 10:00 (10 AM)">08:00 - 10:00
@@ -302,7 +394,12 @@
                                         <div class="form-group">
                                             <label>18. ¿Te consideras una persona de tipo matutino o vespertino?</label>
                                             <select class="form-control" name="tipo_persona" required>
+                                                {% if datos_examen and datos_examen.tipo_persona %}
+                                                <option value="{{ datos_examen.tipo_persona }}" selected>
+                                                    {{ datos_examen.tipo_persona }}</option>
+                                                {% else %}
                                                 <option value="" selected disabled>Seleccione una opción</option>
+                                                {% endif %}
                                                 <option value="Un tipo claramente matutino">Claramente matutino</option>
                                                 <option value="Un tipo más matutino que vespertino">Más matutino que
                                                     vespertino
