@@ -88,7 +88,6 @@ def profile_view(request):
 @login_required
 def cambiar_contrasena(request):
     if request.method == "POST":
-        print("aqui")
         new_password = request.POST.get("new_password")
         confirm_password = request.POST.get("confirm_password")
 
@@ -308,9 +307,6 @@ def crear_visita(request, paciente_id):
         if examenes_seleccionados:
             try:
                 lista_ids_examenes = json.loads(examenes_seleccionados)
-                print(
-                    f"Exámenes seleccionados para la visita {nueva_visita.id}: {lista_ids_examenes}"
-                )
 
                 # Crear un registro VisitaExamen para cada examen seleccionado
                 for examen_id in lista_ids_examenes:
@@ -329,10 +325,6 @@ def crear_visita(request, paciente_id):
                 )
 
             except json.JSONDecodeError as e:
-                print(
-                    f"Error al decodificar JSON de exámenes: {examenes_seleccionados}"
-                )
-                print(f"Error específico: {str(e)}")
                 messages.error(request, "Error al procesar los exámenes seleccionados.")
 
             # Mensaje de éxito
@@ -377,17 +369,15 @@ def editar_v(request, visita_id):
     examenes_tipo_visita = [
         int(examen["id"]) for examen in tipo_visita.examenes
     ]  # Este es un JSONField con los exámenes permitidos
-    print(examenes_tipo_visita)
+
     examenes_actuales = VisitaExamen.objects.filter(visita=visita).values_list(
         "examen_id", flat=True
     )
-    print(examenes_actuales)
     # Exámenes ya asociados
-    print("aqui")
     examenes_disponibles = Examen.objects.filter(id__in=examenes_tipo_visita).exclude(
         id__in=examenes_actuales
     )
-    print(examenes_disponibles)
+
     if request.method == "POST":
         # Obtener datos del formulario
         visita.nombre = request.POST.get("nombre", visita.nombre)
@@ -413,10 +403,6 @@ def editar_v(request, visita_id):
 
         # Procesar los exámenes seleccionados
         examenes_seleccionados = request.POST.getlist("examenes_seleccionados")
-        if examenes_seleccionados:
-            print(
-                f"Exámenes seleccionados para actualizar en la visita {visita.id}: {examenes_seleccionados}"
-            )
 
         for examen_id in examenes_seleccionados:
             examen = Examen.objects.get(id=int(examen_id))  # Convertimos ID a entero
@@ -685,7 +671,7 @@ def realizar_examen(request, visita_id, examen_id, paciente_id):
         },  # CORREGIDO: Era el examen físico, no Pittsburgh
         13: {
             "template": "examenes_sueno/sueno_Pitsburg.html",
-            "model": None,
+            "model": PittsburghResult,
         },  # CORREGIDO: Este es Pittsburgh
         14: {"template": "examenes_sueno/sueno_Epworth.html", "model": EpworthResult},
         15: {
@@ -722,7 +708,6 @@ def realizar_examen(request, visita_id, examen_id, paciente_id):
                 datos_examen.pop("id", None)
                 datos_examen.pop("visita_examen", None)
                 modo_edicion = True
-                print(f"Datos encontrados para edición: {datos_examen}")
 
     except VisitaExamen.DoesNotExist:
         messages.error(request, "Visita-examen no encontrada")
@@ -960,7 +945,6 @@ def guardar_examen_fisico_sueno(request):
             return redirect("detalle_paciente", paciente_id=paciente_id)
 
         except Exception as e:
-            print(f"ERROR: {str(e)}")
             messages.error(request, f"Error al guardar el examen: {str(e)}")
             return redirect("detalle_paciente", paciente_id=paciente_id or 1)
 
@@ -1247,7 +1231,6 @@ def guardar_sueno_anamnesis(request):
             return redirect("detalle_paciente", paciente_id=paciente_id)
 
         except Exception as e:
-            print(f"ERROR en anamnesis: {str(e)}")
             messages.error(request, f"Error al guardar la anamnesis: {str(e)}")
             return redirect("detalle_paciente", paciente_id=paciente_id or 1)
 
@@ -1263,10 +1246,6 @@ def guardar_atenas(request):
             visita_id = request.POST.get("visita_id")
             paciente_id = request.POST.get("paciente_id")
             examen_id = request.POST.get("examen_id")
-
-            print(
-                f"DEBUG: visita_id={visita_id}, examen_id={examen_id}, paciente_id={paciente_id}"
-            )
 
             # Obtener la instancia de VisitaExamen
             visita_examen = get_object_or_404(
@@ -1322,7 +1301,6 @@ def guardar_atenas(request):
             return redirect("detalle_paciente", paciente_id=paciente_id)
 
         except Exception as e:
-            print(f"ERROR en Atenas: {str(e)}")
             import traceback
 
             traceback.print_exc()
@@ -1352,15 +1330,6 @@ def guardar_berlin(request):
             visita_id = request.POST.get("visita_id")
             paciente_id = request.POST.get("paciente_id")
             examen_id = request.POST.get("examen_id")
-
-            print(
-                f"DEBUG: visita_id={visita_id}, examen_id={examen_id}, paciente_id={paciente_id}"
-            )
-            print("=== DEBUG: TODOS LOS CAMPOS POST ===")
-            for key, value in request.POST.items():
-                if not key.startswith("csrf"):
-                    print(f"Campo: '{key}' = '{value}'")
-            print("=== FIN DEBUG ===")
 
             # Obtener la instancia de VisitaExamen
             visita_examen = get_object_or_404(
@@ -1402,16 +1371,6 @@ def guardar_berlin(request):
                     "presion_alta": presion_alta,
                 },
             )
-
-            print(
-                f"DEBUG: Berlin {'creado' if created else 'actualizado'} con ID: {berlin.id}"
-            )
-
-            # Verificar que se guardó correctamente
-            print(f"DEBUG: Verificación - ronca: {berlin.ronca}")
-            print(f"DEBUG: Verificación - tipo_ronquido: {berlin.tipo_ronquido}")
-            print(f"DEBUG: Verificación - presion_alta: {berlin.presion_alta}")
-
             # Marcar el examen como completado
             visita_examen.estado = "completado"
             visita_examen.fecha_completado = timezone.now()
@@ -1423,7 +1382,6 @@ def guardar_berlin(request):
             return redirect("detalle_paciente", paciente_id=paciente_id)
 
         except Exception as e:
-            print(f"ERROR en Berlín: {str(e)}")
             import traceback
 
             traceback.print_exc()
@@ -1433,7 +1391,6 @@ def guardar_berlin(request):
                 if "visita_examen" in locals():
                     visita_examen.estado = "pendiente"
                     visita_examen.save()
-                    print("DEBUG: Estado revertido a pendiente")
             except:
                 pass
 
@@ -1454,15 +1411,6 @@ def guardar_examen_Epworth(request):
             visita_id = request.POST.get("visita_id")
             paciente_id = request.POST.get("paciente_id")
             examen_id = request.POST.get("examen_id")
-
-            print(
-                f"DEBUG: visita_id={visita_id}, examen_id={examen_id}, paciente_id={paciente_id}"
-            )
-            print("=== DEBUG: TODOS LOS CAMPOS POST ===")
-            for key, value in request.POST.items():
-                if not key.startswith("csrf"):
-                    print(f"Campo: '{key}' = '{value}'")
-            print("=== FIN DEBUG ===")
 
             # Obtener la instancia de VisitaExamen
             visita_examen = get_object_or_404(
@@ -1514,14 +1462,6 @@ def guardar_examen_Epworth(request):
                 },
             )
 
-            print(
-                f"DEBUG: Epworth {'creado' if created else 'actualizado'} con ID: {epworth.id}"
-            )
-
-            # Verificar que se guardó correctamente
-            print(f"DEBUG: Verificación - sentado_leyendo: {epworth.sentado_leyendo}")
-            print(f"DEBUG: Verificación - puntaje_total: {epworth.puntaje_total}")
-
             # Marcar el examen como completado
             visita_examen.estado = "completado"
             visita_examen.fecha_completado = timezone.now()
@@ -1531,7 +1471,6 @@ def guardar_examen_Epworth(request):
             return redirect("detalle_paciente", paciente_id=paciente_id)
 
         except Exception as e:
-            print(f"ERROR en Epworth: {str(e)}")
             import traceback
 
             traceback.print_exc()
@@ -1541,7 +1480,6 @@ def guardar_examen_Epworth(request):
                 if "visita_examen" in locals():
                     visita_examen.estado = "pendiente"
                     visita_examen.save()
-                    print("DEBUG: Estado revertido a pendiente")
             except:
                 pass
 
@@ -1562,15 +1500,6 @@ def guardar_examen_ISI(request):
             visita_id = request.POST.get("visita_id")
             paciente_id = request.POST.get("paciente_id")
             examen_id = request.POST.get("examen_id")
-
-            print(
-                f"DEBUG: visita_id={visita_id}, examen_id={examen_id}, paciente_id={paciente_id}"
-            )
-            print("=== DEBUG: TODOS LOS CAMPOS POST ===")
-            for key, value in request.POST.items():
-                if not key.startswith("csrf"):
-                    print(f"Campo: '{key}' = '{value}'")
-            print("=== FIN DEBUG ===")
 
             # Obtener la instancia de VisitaExamen
             visita_examen = get_object_or_404(
@@ -1623,7 +1552,6 @@ def guardar_examen_ISI(request):
             return redirect("detalle_paciente", paciente_id=paciente_id)
 
         except Exception as e:
-            print(f"ERROR en ISI: {str(e)}")
             import traceback
 
             traceback.print_exc()
@@ -1633,7 +1561,6 @@ def guardar_examen_ISI(request):
                 if "visita_examen" in locals():
                     visita_examen.estado = "pendiente"
                     visita_examen.save()
-                    print("DEBUG: Estado revertido a pendiente")
             except:
                 pass
 
@@ -1652,15 +1579,6 @@ def guardar_examen_MEW(request):
             visita_id = request.POST.get("visita_id")
             paciente_id = request.POST.get("paciente_id")
             examen_id = request.POST.get("examen_id")
-
-            print(
-                f"DEBUG: visita_id={visita_id}, examen_id={examen_id}, paciente_id={paciente_id}"
-            )
-            print("=== DEBUG: TODOS LOS CAMPOS POST ===")
-            for key, value in request.POST.items():
-                if not key.startswith("csrf"):
-                    print(f"Campo: '{key}' = '{value}'")
-            print("=== FIN DEBUG ===")
 
             # Obtener la instancia de VisitaExamen
             visita_examen = get_object_or_404(
@@ -1776,9 +1694,6 @@ def guardar_examen_MEW(request):
             except:
                 puntuacion_final = puntuacion_calculada
 
-            print(f"DEBUG: Puntuación calculada: {puntuacion_calculada}")
-            print(f"DEBUG: Puntuación final: {puntuacion_final}")
-
             # Determinar cronotipo según puntuación MEW
             if puntuacion_final >= 70:
                 tipo_persona_calculado = "Definitivamente matutino"
@@ -1831,7 +1746,6 @@ def guardar_examen_MEW(request):
             return redirect("detalle_paciente", paciente_id=paciente_id)
 
         except Exception as e:
-            print(f"ERROR en MEW: {str(e)}")
             import traceback
 
             traceback.print_exc()
@@ -1846,6 +1760,162 @@ def guardar_examen_MEW(request):
 
             messages.error(
                 request, f"❌ Error al guardar el cuestionario MEW: {str(e)}"
+            )
+            return redirect("detalle_paciente", paciente_id=paciente_id or 1)
+
+    else:
+        messages.error(request, "❌ Método no permitido.")
+        return redirect("index")
+
+
+@login_required
+def guardar_examen_Pitsburg(request):
+    if request.method == "POST":
+        try:
+            visita_id = request.POST.get("visita_id")
+            paciente_id = request.POST.get("paciente_id")
+            examen_id = request.POST.get("examen_id")
+
+            print(
+                f"DEBUG: visita_id={visita_id}, examen_id={examen_id}, paciente_id={paciente_id}"
+            )
+            print("=== DEBUG: TODOS LOS CAMPOS POST ===")
+            for key, value in request.POST.items():
+                if not key.startswith("csrf"):
+                    print(f"Campo: '{key}' = '{value}'")
+            print("=== FIN DEBUG ===")
+
+            # Obtener la instancia de VisitaExamen
+            visita_examen = get_object_or_404(
+                VisitaExamen, visita_id=visita_id, examen_id=examen_id
+            )
+
+            # Marcar como iniciado si está pendiente
+            if visita_examen.estado == "pendiente":
+                visita_examen.estado = "en_progreso"
+                visita_examen.fecha_inicio = timezone.now()
+                visita_examen.save()
+
+            # Obtener los campos según los NOMBRES EXACTOS del modelo PittsburghResult
+            hora_acostarse = request.POST.get("hora_acostarse", "")
+            hora_levantarse = request.POST.get("hora_levantarse", "")
+            latencia_sueno = request.POST.get("latencia_sueno", "0")
+            horas_dormidas = request.POST.get(
+                "horas_sueno_real", "0"
+            )  # ✅ CAMPO CORRECTO DEL MODELO
+
+            # Problemas durante el sueño - NOMBRES EXACTOS DEL MODELO
+            conciliar_sueno = request.POST.get("conciliar_sueno", "")
+            despertarse_sueno = request.POST.get("despertarse_sueno", "")
+            levantarse_servicio_sueno = request.POST.get(
+                "levantarse_servicio_sueno", ""
+            )
+            respirar = request.POST.get("respirar", "")
+            toser_roncar_sueno = request.POST.get("toser_roncar_sueno", "")
+            sentir_frio_sueno = request.POST.get(
+                "sentir_frio_sueno", ""
+            )  # ✅ Sin mayúscula
+            calor_sueno = request.POST.get("calor_sueno", "")
+            pesadillas_sueno = request.POST.get("pesadillas_sueno", "")
+            dolores_sueno = request.POST.get("dolores_sueno", "")
+            otras_razones = request.POST.get(
+                "otras_razones", ""
+            )  # ✅ NOMBRE CORRECTO DEL MODELO
+            otras_sueno = request.POST.get("otras_sueno", "")
+
+            # Evaluación general - NOMBRES EXACTOS DEL MODELO
+            calidad_sueno = request.POST.get("calidad_sueno", "")
+            medicinas_sueno = request.POST.get("medicinas_sueno", "")
+            somnolencia_sueno = request.POST.get("somnolencia_sueno", "")
+            problemas_animos_sueno = request.POST.get("problemas_animos_sueno", "")
+
+            # Información de compañía - NOMBRES EXACTOS DEL MODELO
+            duerme_acompanado = request.POST.get("duerme_acompanado", "")
+            ronquidos_ruidosos = request.POST.get("ronquidos_ruidosos", "")
+            pausas_respiracion = request.POST.get("pausas_respiracion", "")
+            sacudidas_piernas = request.POST.get("sacudidas_piernas", "")
+            desorientacion_confusion = request.POST.get("desorientacion_confusion", "")
+            descripcion_inconvenientes = request.POST.get(
+                "descripcion_inconvenientes", ""
+            )
+            otros_inconvenientes = request.POST.get("otros_inconvenientes", "")
+            # Convertir valores numéricos
+            try:
+                latencia_sueno_num = float(latencia_sueno) if latencia_sueno else 0
+                horas_sueno_real_num = (
+                    float(horas_dormidas) if horas_dormidas else 0
+                )  # ✅ VARIABLE CORRECTA
+            except ValueError:
+                latencia_sueno_num = 0
+                horas_sueno_real_num = 0
+
+            # Crear o actualizar el resultado Pittsburgh usando los CAMPOS EXACTOS del modelo
+            pitsburg_result, created = PittsburghResult.objects.update_or_create(
+                visita_examen=visita_examen,
+                defaults={
+                    # Campos de tiempo - NOMBRES EXACTOS DEL MODELO
+                    "hora_acostarse": hora_acostarse,
+                    "hora_levantarse": hora_levantarse,
+                    "latencia_sueno": latencia_sueno_num,
+                    "horas_dormidas": horas_sueno_real_num,  # ✅ CAMPO CORRECTO DEL MODELO
+                    # Problemas durante el sueño - NOMBRES EXACTOS DEL MODELO
+                    "conciliar_sueno": conciliar_sueno,
+                    "despertarse_sueno": despertarse_sueno,
+                    "levantarse_servicio_sueno": levantarse_servicio_sueno,
+                    "respirar": respirar,
+                    "toser_roncar_sueno": toser_roncar_sueno,
+                    "sentir_frio_sueno": sentir_frio_sueno,
+                    "calor_sueno": calor_sueno,
+                    "pesadillas_sueno": pesadillas_sueno,
+                    "dolores_sueno": dolores_sueno,
+                    "otras_razones": otras_razones,  # ✅ CAMPO CORRECTO DEL MODELO
+                    "otras_sueno": otras_sueno,
+                    # Evaluación general - NOMBRES EXACTOS DEL MODELO
+                    "calidad_sueno": calidad_sueno,
+                    "medicinas_sueno": medicinas_sueno,
+                    "somnolencia_sueno": somnolencia_sueno,
+                    "problemas_animos_sueno": problemas_animos_sueno,
+                    # Información de compañía - NOMBRES EXACTOS DEL MODELO
+                    "duerme_acompanado": duerme_acompanado,
+                    "ronquidos_ruidosos": ronquidos_ruidosos,
+                    "pausas_respiracion": pausas_respiracion,
+                    "sacudidas_piernas": sacudidas_piernas,
+                    "desorientacion_confusion": desorientacion_confusion,
+                    "descripcion_inconvenientes": descripcion_inconvenientes,
+                    "otros_inconvenientes": otros_inconvenientes,
+                },
+            )
+
+            # Marcar el examen como completado
+            visita_examen.estado = "completado"
+            visita_examen.fecha_completado = timezone.now()
+            visita_examen.save()
+
+            messages.success(
+                request,
+                f"✅ Cuestionario de Pittsburgh guardado exitosamente.\n"
+                f"📊 Hora acostarse: {hora_acostarse} | Hora levantarse: {hora_levantarse}\n"
+                f"🛏️ Calidad de sueño: {calidad_sueno}\n"
+                f"⏰ Horas de sueño: {horas_sueno_real_num}",
+            )
+            return redirect("detalle_paciente", paciente_id=paciente_id)
+
+        except Exception as e:
+            print(f"ERROR en Pittsburgh: {str(e)}")
+            import traceback
+
+            traceback.print_exc()
+
+            # Revertir estado si hubo error
+            try:
+                if "visita_examen" in locals():
+                    visita_examen.estado = "pendiente"
+                    visita_examen.save()
+            except:
+                pass
+
+            messages.error(
+                request, f"❌ Error al guardar el cuestionario de Pittsburgh: {str(e)}"
             )
             return redirect("detalle_paciente", paciente_id=paciente_id or 1)
 

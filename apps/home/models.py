@@ -549,7 +549,7 @@ class PittsburghResult(ResultadoExamenBase):
     medicinas_sueno = models.CharField(max_length=100)
     somnolencia_sueno = models.CharField(max_length=100)
     problemas_animos_sueno = models.CharField(max_length=100)
-    duerme_acompanado = models.CharField(max_length=10)
+    duerme_acompanado = models.CharField(max_length=100)
     ronquidos_ruidosos = models.CharField(max_length=100, blank=True, null=True)
     pausas_respiracion = models.CharField(max_length=100, blank=True, null=True)
     sacudidas_piernas = models.CharField(max_length=100, blank=True, null=True)

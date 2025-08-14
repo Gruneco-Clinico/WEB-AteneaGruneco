@@ -80,4 +80,9 @@ urlpatterns = [
     ),
     path("guardar_examen_ISI/", views.guardar_examen_ISI, name="guardar_examen_ISI"),
     path("guardar_examen_MEW/", views.guardar_examen_MEW, name="guardar_examen_MEW"),
+    path(
+        "guardar_examen_Pitsburg/",
+        views.guardar_examen_Pitsburg,
+        name="guardar_examen_Pitsburg",
+    ),
 ]
