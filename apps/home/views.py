@@ -1922,3 +1922,184 @@ def guardar_examen_Pitsburg(request):
     else:
         messages.error(request, "❌ Método no permitido.")
         return redirect("index")
+
+
+@login_required
+def guardar_examen_StopBang(request):
+    if request.method == "POST":
+        try:
+            visita_id = request.POST.get("visita_id")
+            paciente_id = request.POST.get("paciente_id")
+            examen_id = request.POST.get("examen_id")
+
+            # Obtener la instancia de VisitaExamen
+            visita_examen = get_object_or_404(
+                VisitaExamen, visita_id=visita_id, examen_id=examen_id
+            )
+
+            # Marcar como iniciado si está pendiente
+            if visita_examen.estado == "pendiente":
+                visita_examen.estado = "en_progreso"
+                visita_examen.fecha_inicio = timezone.now()
+                visita_examen.save()
+
+            # Obtener los campos según los NOMBRES EXACTOS del modelo StopBangResult
+            ronquidos_fuertes = request.POST.get("ronquidos_fuertes", "")  # S - Snoring
+            cansancio_diurno = request.POST.get("cansancio_diurno", "")  # T - Tired
+            apneas_observadas = request.POST.get(
+                "apneas_observadas", ""
+            )  # O - Observed
+            presion_arterial = request.POST.get("presion_arterial", "")  # P - Pressure
+            imc_alto = request.POST.get("imc_alto", "")  # B - BMI
+            edad_mayor_50 = request.POST.get("edad_mayor_50", "")  # A - Age
+            circunferencia_cuello = request.POST.get(
+                "circunferencia_cuello", ""
+            )  # N - Neck
+            genero_masculino = request.POST.get("genero_masculino", "")  # G - Gender
+
+            print(f"DEBUG: Campos STOP-BANG obtenidos:")
+            print(f"  S - Ronquidos fuertes: '{ronquidos_fuertes}'")
+            print(f"  T - Cansancio diurno: '{cansancio_diurno}'")
+            print(f"  O - Apneas observadas: '{apneas_observadas}'")
+            print(f"  P - Presión arterial: '{presion_arterial}'")
+            print(f"  B - IMC alto: '{imc_alto}'")
+            print(f"  A - Edad mayor 50: '{edad_mayor_50}'")
+            print(f"  N - Circunferencia cuello: '{circunferencia_cuello}'")
+            print(f"  G - Género masculino: '{genero_masculino}'")
+
+            # Función para calcular puntuación STOP-BANG
+            def calcular_puntuacion_stopbang(campos):
+                """Calcula la puntuación del cuestionario STOP-BANG (0-8 puntos)"""
+                puntuacion = 0
+
+                # Cada "Sí" suma 1 punto
+                if campos.get("ronquidos_fuertes", "").lower() in ["sí", "si", "yes"]:
+                    puntuacion += 1
+                if campos.get("cansancio_diurno", "").lower() in ["sí", "si", "yes"]:
+                    puntuacion += 1
+                if campos.get("apneas_observadas", "").lower() in ["sí", "si", "yes"]:
+                    puntuacion += 1
+                if campos.get("presion_arterial", "").lower() in ["sí", "si", "yes"]:
+                    puntuacion += 1
+                if campos.get("imc_alto", "").lower() in ["sí", "si", "yes"]:
+                    puntuacion += 1
+                if campos.get("edad_mayor_50", "").lower() in ["sí", "si", "yes"]:
+                    puntuacion += 1
+                if campos.get("circunferencia_cuello", "").lower() in [
+                    "sí",
+                    "si",
+                    "yes",
+                ]:
+                    puntuacion += 1
+                if campos.get("genero_masculino", "").lower() in ["sí", "si", "yes"]:
+                    puntuacion += 1
+
+                return puntuacion
+
+            # Calcular puntuación automáticamente
+            campos_stopbang = {
+                "ronquidos_fuertes": ronquidos_fuertes,
+                "cansancio_diurno": cansancio_diurno,
+                "apneas_observadas": apneas_observadas,
+                "presion_arterial": presion_arterial,
+                "imc_alto": imc_alto,
+                "edad_mayor_50": edad_mayor_50,
+                "circunferencia_cuello": circunferencia_cuello,
+                "genero_masculino": genero_masculino,
+            }
+
+            puntuacion_calculada = calcular_puntuacion_stopbang(campos_stopbang)
+            puntuacion_form = request.POST.get(
+                "puntuacion_total", str(puntuacion_calculada)
+            )
+
+            try:
+                puntuacion_total = (
+                    int(puntuacion_form)
+                    if puntuacion_form.isdigit()
+                    else puntuacion_calculada
+                )
+            except:
+                puntuacion_total = puntuacion_calculada
+
+            print(f"DEBUG: Puntuación calculada: {puntuacion_calculada}")
+            print(f"DEBUG: Puntuación final: {puntuacion_total}")
+
+            # Determinar interpretación según puntuación STOP-BANG
+            if puntuacion_total <= 2:
+                interpretacion = "Bajo riesgo de apnea del sueño"
+                categoria_riesgo = "Bajo"
+            elif puntuacion_total <= 4:
+                interpretacion = "Riesgo intermedio de apnea del sueño"
+                categoria_riesgo = "Intermedio"
+            else:
+                interpretacion = "Alto riesgo de apnea del sueño"
+                categoria_riesgo = "Alto"
+
+            # Crear o actualizar el resultado STOP-BANG usando los CAMPOS EXACTOS del modelo
+            stopbang_result, created = StopBangResult.objects.update_or_create(
+                visita_examen=visita_examen,
+                defaults={
+                    # Campos exactos según tu modelo StopBangResult
+                    "ronquidos_fuertes": ronquidos_fuertes,
+                    "cansancio_diurno": cansancio_diurno,
+                    "apneas_observadas": apneas_observadas,
+                    "presion_arterial": presion_arterial,
+                    "imc_alto": imc_alto,
+                    "edad_mayor_50": edad_mayor_50,
+                    "circunferencia_cuello": circunferencia_cuello,
+                    "genero_masculino": genero_masculino,
+                    "puntuacion_total": puntuacion_total,
+                    "interpretacion": interpretacion,
+                },
+            )
+
+            print(
+                f"DEBUG: STOP-BANG {'creado' if created else 'actualizado'} con ID: {stopbang_result.id}"
+            )
+            print(
+                f"DEBUG: Verificación - ronquidos_fuertes: {stopbang_result.ronquidos_fuertes}"
+            )
+            print(
+                f"DEBUG: Verificación - puntuacion_total: {stopbang_result.puntuacion_total}"
+            )
+            print(
+                f"DEBUG: Verificación - interpretacion: {stopbang_result.interpretacion}"
+            )
+
+            # Marcar el examen como completado
+            visita_examen.estado = "completado"
+            visita_examen.fecha_completado = timezone.now()
+            visita_examen.save()
+
+            messages.success(
+                request,
+                f"✅ Cuestionario STOP-BANG guardado exitosamente.\n"
+                f"📊 Puntuación: {puntuacion_total}/8 - {categoria_riesgo} riesgo\n"
+                f"🔍 Interpretación: {interpretacion}",
+            )
+            return redirect("detalle_paciente", paciente_id=paciente_id)
+
+        except Exception as e:
+            print(f"ERROR en STOP-BANG: {str(e)}")
+            import traceback
+
+            traceback.print_exc()
+
+            # Revertir estado si hubo error
+            try:
+                if "visita_examen" in locals():
+                    visita_examen.estado = "pendiente"
+                    visita_examen.save()
+                    print("DEBUG: Estado revertido a pendiente")
+            except:
+                pass
+
+            messages.error(
+                request, f"❌ Error al guardar el cuestionario STOP-BANG: {str(e)}"
+            )
+            return redirect("detalle_paciente", paciente_id=paciente_id or 1)
+
+    else:
+        messages.error(request, "❌ Método no permitido.")
+        return redirect("index")

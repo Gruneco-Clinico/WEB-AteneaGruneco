@@ -85,4 +85,9 @@ urlpatterns = [
         views.guardar_examen_Pitsburg,
         name="guardar_examen_Pitsburg",
     ),
+    path(
+        "guardar_examen_StopBang/",
+        views.guardar_examen_StopBang,
+        name="guardar_examen_StopBang",
+    ),
 ]
