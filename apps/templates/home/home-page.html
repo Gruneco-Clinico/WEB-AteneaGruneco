@@ -1,308 +1,820 @@
+<!-- filepath: c:\Users\sofir\OneDrive - Universidad de Antioquia\Documentos\TDG\WEB-AteneaGruneco\apps\templates\home\home-page.html -->
 {% extends 'layouts/base_theme.html' %}
 
 {% block stylesheets %}
 <style>
-  .form-control-lg {
-    font-size: 0.1rem;
+  /* ===== SISTEMA DE DISEÑO - PALETA VERDE ===== */
+  :root {
+    --verde-primario: #1B5E20;
+    /* Verde oscuro principal */
+    --verde-secundario: #388E3C;
+    /* Verde medio */
+    --verde-acento: #4CAF50;
+    /* Verde vibrante */
+    --verde-claro: #C8E6C9;
+    /* Verde suave */
+    --verde-muy-claro: #E8F5E8;
+    /* Verde de fondo */
+
+    --blanco: #FFFFFF;
+    --gris-claro: #F5F5F5;
+    --gris-medio: #757575;
+    --gris-oscuro: #424242;
+
+    --sombra-suave: 0 4px 20px rgba(27, 94, 32, 0.1);
+    --sombra-media: 0 8px 32px rgba(27, 94, 32, 0.15);
+    --sombra-fuerte: 0 12px 40px rgba(27, 94, 32, 0.2);
+
+    --transicion: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --radio-base: 16px;
+    --radio-grande: 24px;
   }
 
-  .input-group-text-lg {
-    font-size: 1.25rem;
+  /* ===== TIPOGRAFÍA Y JERARQUÍA ===== */
+  .titulo-hero {
+    font-size: clamp(3rem, 6vw, 5rem);
+    font-weight: 800;
+    color: var(--blanco);
+    text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.4);
+    margin-bottom: 1rem;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
   }
 
-  .btn-lg {
-    font-size: 1.25rem;
-  }
-
-  .centered-image {
-    display: block;
-    margin: 0 auto;
-  }
-
-  .featurette-heading {
-    font-size: 2.5rem;
+  .subtitulo-hero {
+    font-size: clamp(1.2rem, 3vw, 1.6rem);
+    color: rgba(255, 255, 255, 0.9);
     font-weight: 300;
+    margin-bottom: 2.5rem;
+    line-height: 1.4;
+  }
+
+  .titulo-seccion {
+    font-size: clamp(2.2rem, 4vw, 3rem);
+    font-weight: 700;
+    color: var(--verde-primario);
+    margin-bottom: 1rem;
+    position: relative;
+  }
+
+  .titulo-seccion::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 0;
+    width: 60px;
+    height: 4px;
+    background: linear-gradient(90deg, var(--verde-acento), var(--verde-secundario));
+    border-radius: 2px;
+  }
+
+  /* ===== HEADER HERO REDISEÑADO ===== */
+  .seccion-hero {
+    position: relative;
+    min-height: 85vh;
+    background: linear-gradient(135deg,
+        var(--verde-primario) 0%,
+        var(--verde-secundario) 60%,
+        var(--verde-acento) 100%);
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+  }
+
+  .overlay-patron {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image:
+      radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 75% 75%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
+    z-index: 1;
+  }
+
+  .contenido-hero {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    padding: 4rem 0;
+  }
+
+  /* ===== CAROUSEL PROFESIONAL ===== */
+  .contenedor-carousel {
+    background: var(--blanco);
+    border-radius: var(--radio-grande);
+    padding: 2rem;
+    box-shadow: var(--sombra-fuerte);
+    margin-top: 3rem;
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .carousel-personalizado .carousel-item img {
+    height: 320px;
+    object-fit: contain;
+    border-radius: var(--radio-base);
+    transition: var(--transicion);
+  }
+
+  .carousel-personalizado .carousel-control-prev,
+  .carousel-personalizado .carousel-control-next {
+    width: 60px;
+    height: 60px;
+    background: var(--verde-secundario);
+    border-radius: 50%;
+    top: 50%;
+    transform: translateY(-50%);
+    border: 3px solid var(--blanco);
+    transition: var(--transicion);
+  }
+
+  .carousel-personalizado .carousel-control-prev:hover,
+  .carousel-personalizado .carousel-control-next:hover {
+    background: var(--verde-primario);
+    transform: translateY(-50%) scale(1.1);
+  }
+
+  .carousel-personalizado .carousel-indicators {
+    bottom: -50px;
+  }
+
+  .carousel-personalizado .carousel-indicators button {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 2px solid var(--verde-secundario);
+    background: transparent;
+    margin: 0 8px;
+    transition: var(--transicion);
+  }
+
+  .carousel-personalizado .carousel-indicators button.active {
+    background: var(--verde-secundario);
+    transform: scale(1.2);
+  }
+
+  /* ===== CONTENEDOR PRINCIPAL ===== */
+  .contenedor-principal {
+    background: linear-gradient(180deg, var(--verde-muy-claro) 0%, var(--blanco) 50%);
+    margin-top: -120px;
+    position: relative;
+    z-index: 3;
+    border-radius: 48px 48px 0 0;
+    padding: 8rem 0 4rem;
+  }
+
+  /* ===== SECCIÓN ACERCA DE ===== */
+  .seccion-acerca {
+    padding: 6rem 0;
+    background: var(--blanco);
+    border-radius: var(--radio-grande);
+    margin: 3rem 0;
+    box-shadow: var(--sombra-suave);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .grid-acerca {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5rem;
+    align-items: center;
+  }
+
+  .contenido-texto h2 {
+    font-size: clamp(2.2rem, 4vw, 3.2rem);
+    font-weight: 700;
+    color: var(--verde-primario);
+    margin-bottom: 2rem;
     line-height: 1.2;
-    letter-spacing: -0.05rem;
   }
 
-  .lead {
-    font-size: 1.25rem;
-    font-weight: 300;
+  .contenido-texto p {
+    font-size: 1.3rem;
+    color: var(--gris-oscuro);
+    line-height: 1.6;
+    text-align: justify;
+    margin-bottom: 2rem;
   }
 
-  .rounded-circle {
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  .imagen-acerca {
+    border-radius: var(--radio-grande);
+    overflow: hidden;
+    box-shadow: var(--sombra-media);
+    transition: var(--transicion);
+    position: relative;
   }
 
-  .rounded-circle:hover {
-    transform: scale(1.05);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  .imagen-acerca:hover {
+    transform: translateY(-12px) rotate(2deg);
+    box-shadow: var(--sombra-fuerte);
   }
 
-  .container {
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-    padding: 0.3rem;
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  .imagen-acerca img {
+    width: 100%;
+    height: 450px;
+    object-fit: cover;
+    transition: var(--transicion);
   }
 
-  .mt--16 {
-    margin-top: -1rem;
+  .imagen-acerca:hover img {
+    transform: scale(1.08);
   }
 
-  .pt-7 {
-    padding-top: 5rem;
+  /* ===== TARJETAS MODERNAS ===== */
+  .grid-tarjetas {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 2.5rem;
+    margin-top: 4rem;
   }
 
-  .pb-5 {
-    padding-bottom: 3rem;
+  .tarjeta-moderna {
+    background: var(--blanco);
+    border-radius: var(--radio-grande);
+    padding: 3rem 2.5rem;
+    box-shadow: var(--sombra-suave);
+    transition: var(--transicion);
+    position: relative;
+    overflow: hidden;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
   }
 
-  .mt--15 {
-    margin-top: -1rem;
+  .tarjeta-moderna::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 6px;
+    background: linear-gradient(90deg, var(--verde-acento), var(--verde-secundario));
+    transform: scaleX(0);
+    transition: var(--transicion);
   }
 
-  .pt-6 {
-    padding-top: 1rem;
+  .tarjeta-moderna:hover {
+    transform: translateY(-20px);
+    box-shadow: var(--sombra-fuerte);
   }
 
-  .pb-4 {
-    padding-bottom: 1rem;
+  .tarjeta-moderna:hover::before {
+    transform: scaleX(1);
   }
 
-  .text-center h2 {
-    margin-top: 1.1rem;
-    font-size: 1.5rem;
+  .icono-tarjeta {
+    width: 90px;
+    height: 90px;
+    background: linear-gradient(135deg, var(--verde-acento), var(--verde-secundario));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 2.5rem;
+    transition: var(--transicion);
+    position: relative;
+  }
+
+  .icono-tarjeta::after {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    right: -5px;
+    bottom: -5px;
+    border: 2px solid var(--verde-claro);
+    border-radius: 50%;
+    opacity: 0;
+    transition: var(--transicion);
+  }
+
+  .tarjeta-moderna:hover .icono-tarjeta {
+    transform: scale(1.15) rotate(10deg);
+  }
+
+  .tarjeta-moderna:hover .icono-tarjeta::after {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+
+  .icono-tarjeta i {
+    font-size: 2.8rem;
+    color: var(--blanco);
+  }
+
+  .titulo-tarjeta {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--verde-primario);
+    margin-bottom: 2rem;
+    text-align: center;
+  }
+
+  .lista-caracteristicas {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    flex-grow: 1;
+  }
+
+  .lista-caracteristicas li {
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--verde-muy-claro);
+    font-size: 1.2rem;
+    color: var(--gris-oscuro);
+    display: flex;
+    align-items: center;
+    transition: var(--transicion);
+    position: relative;
+  }
+
+  .lista-caracteristicas li:last-child {
+    border-bottom: none;
+  }
+
+  .lista-caracteristicas li:hover {
+    color: var(--verde-primario);
+    transform: translateX(8px);
     font-weight: 500;
   }
 
-  .text-center p {
-    margin-top: 1.6rem;
+  .lista-caracteristicas li i {
+    margin-right: 1.2rem;
+    color: var(--verde-acento);
+    font-size: 1.1rem;
+    transition: var(--transicion);
+  }
+
+  .lista-caracteristicas li:hover i {
+    transform: scale(1.3);
+    color: var(--verde-secundario);
+  }
+
+  /* ===== SECCIÓN EQUIPO ===== */
+  .seccion-equipo {
+    padding: 6rem 0;
+    background: var(--verde-muy-claro);
+    border-radius: var(--radio-grande);
+    margin: 4rem 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .grid-equipo {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 4rem;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .miembro-equipo {
+    text-align: center;
+    transition: var(--transicion);
+  }
+
+  .miembro-equipo:hover {
+    transform: translateY(-15px);
+  }
+
+  .contenedor-imagen {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin: 0 auto 2.5rem;
+    position: relative;
+    border: 6px solid var(--blanco);
+    box-shadow: var(--sombra-media);
+    transition: var(--transicion);
+  }
+
+  .contenedor-imagen::before {
+    content: '';
+    position: absolute;
+    top: -6px;
+    left: -6px;
+    right: -6px;
+    bottom: -6px;
+    border: 3px solid var(--verde-acento);
+    border-radius: 50%;
+    opacity: 0;
+    transition: var(--transicion);
+  }
+
+  .miembro-equipo:hover .contenedor-imagen {
+    transform: scale(1.08);
+    box-shadow: var(--sombra-fuerte);
+  }
+
+  .miembro-equipo:hover .contenedor-imagen::before {
+    opacity: 1;
+  }
+
+  .contenedor-imagen img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: var(--transicion);
+  }
+
+  .miembro-equipo:hover .contenedor-imagen img {
+    transform: scale(1.1);
+  }
+
+  .nombre-miembro {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--verde-primario);
+    margin-bottom: 0.8rem;
+    line-height: 1.3;
+  }
+
+  .rol-miembro {
     font-size: 1.2rem;
-    color: #555;
+    color: var(--gris-medio);
+    font-style: italic;
+    font-weight: 400;
   }
 
-  .card {
+  /* ===== BOTÓN CTA ===== */
+  .boton-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8rem;
+    background: linear-gradient(135deg, var(--verde-acento), var(--verde-secundario));
+    color: var(--blanco);
     border: none;
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    background: white;
-    href="/static/assets/img/theme/Gruneco_Miembros.jpeg"
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-  }
-
-  .card-title {
-    font-size: 2rem;
+    padding: 1.2rem 2.8rem;
+    border-radius: 60px;
+    font-size: 1.2rem;
     font-weight: 600;
-    color: #333;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    transition: var(--transicion);
+    box-shadow: var(--sombra-media);
+    text-decoration: none;
+    margin-top: 2.5rem;
   }
 
-  .card-text {
-    href="/static/assets/img/theme/Gruneco_Miembros.jpeg"
-    font-size: 1.8rem;
-    color: #555;
-    line-height: 1.6;
+  .boton-cta:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--sombra-fuerte);
+    color: var(--blanco);
+    background: linear-gradient(135deg, var(--verde-secundario), var(--verde-primario));
   }
 
-  .principles-list {
-    list-style-type: none;
-    padding-left: 0;
+  .boton-cta i {
+    font-size: 1.1rem;
+    transition: var(--transicion);
   }
 
-  .principles-list li {
-    margin-top: 1.6rem;
-    font-size: 1.3rem;
-    color: #555;
+  .boton-cta:hover i {
+    transform: translateX(4px);
+  }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 1200px) {
+    .grid-acerca {
+      gap: 3rem;
+    }
+  }
+
+  @media (max-width: 992px) {
+    .grid-acerca {
+      grid-template-columns: 1fr;
+      gap: 3rem;
+    }
+
+    .seccion-hero {
+      min-height: 70vh;
+    }
+
+    .contenedor-principal {
+      margin-top: -80px;
+      padding: 6rem 0 3rem;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .contenedor-carousel {
+      padding: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    .carousel-personalizado .carousel-item img {
+      height: 280px;
+    }
+
+    .tarjeta-moderna {
+      padding: 2.5rem 2rem;
+    }
+
+    .imagen-acerca img {
+      height: 350px;
+    }
+
+    .contenedor-imagen {
+      width: 170px;
+      height: 170px;
+    }
+  }
+
+  @media (max-width: 576px) {
+    .contenido-hero {
+      padding: 2.5rem 0;
+    }
+
+    .carousel-personalizado .carousel-item img {
+      height: 220px;
+    }
+
+    .tarjeta-moderna {
+      padding: 2rem 1.5rem;
+    }
+
+    .titulo-seccion::after {
+      width: 40px;
+    }
+
+    .grid-equipo {
+      gap: 3rem;
+    }
+  }
+
+  /* ===== ANIMACIONES ===== */
+  @keyframes aparecer-desde-abajo {
+    from {
+      opacity: 0;
+      transform: translateY(40px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animacion-entrada {
+    animation: aparecer-desde-abajo 0.8s ease-out forwards;
+  }
+
+  .animacion-entrada-retrasada {
+    opacity: 0;
+    animation: aparecer-desde-abajo 0.8s ease-out 0.3s forwards;
+  }
+
+  /* ===== ELEMENTOS DECORATIVOS ===== */
+  .elemento-decorativo {
+    position: absolute;
+    width: 240px;
+    height: 240px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--verde-claro), transparent);
+    opacity: 0.06;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .decorativo-superior {
+    top: 5%;
+    right: 8%;
+    animation: rotar-lento 20s linear infinite;
+  }
+
+  .decorativo-inferior {
+    bottom: 5%;
+    left: 8%;
+    animation: rotar-lento 25s linear infinite reverse;
+  }
+
+  @keyframes rotar-lento {
+    from {
+      transform: rotate(0deg);
+    }
+
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  /* ===== ACCESIBILIDAD ===== */
+  .solo-lectores {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* ===== FOCUS STATES ===== */
+  .boton-cta:focus,
+  .carousel-personalizado .carousel-control-prev:focus,
+  .carousel-personalizado .carousel-control-next:focus {
+    outline: 3px solid var(--verde-claro);
+    outline-offset: 2px;
   }
 </style>
-
 {% endblock stylesheets %}
 
 {% block content %}
-<div class="header pt-6 pb-4 pt-lg-8"
-  style="min-height: 200px; background-image: url(/static/assets/img/theme/tem_university.jpg); background-size: cover; background-position: center top;">
-  <span class="mask bg-gradient-default opacity-8"></span>
-  <div class="header-body text-center mb-7">
-    <div class="row justify-content-center">
-      <div class="col-12">
-        <div id="carouselExampleDark" class="carousel slide" data-bs-ride="carousel">
+<!-- SECCIÓN HERO -->
+<section class="seccion-hero">
+  <div class="overlay-patron"></div>
+  <div class="elemento-decorativo decorativo-superior"></div>
+  <div class="elemento-decorativo decorativo-inferior"></div>
+
+  <div class="container">
+    <div class="contenido-hero animacion-entrada">
+      <h1 class="titulo-hero">ATENEA</h1>
+      <p class="subtitulo-hero">Plataforma Avanzada de Evaluación Neuropsicológica<br>del Grupo GRUNECO</p>
+
+      <!-- CAROUSEL PROFESIONAL -->
+      <div class="contenedor-carousel animacion-entrada-retrasada">
+        <div id="carouselPrincipal" class="carousel slide carousel-personalizado" data-bs-ride="carousel">
           <div class="carousel-indicators">
-            <button type="button" data-bs-target="#carouselExampleDark" data-bs-slide-to="0" class="active"
-              aria-current="true" aria-label="Slide 1"></button>
-            <button type="button" data-bs-target="#carouselExampleDark" data-bs-slide-to="1"
-              aria-label="Slide 2"></button>
-            <button type="button" data-bs-target="#carouselExampleDark" data-bs-slide-to="2"
-              aria-label="Slide 3"></button>
-            <button type="button" data-bs-target="#carouselExampleDark" data-bs-slide-to="3"
-              aria-label="Slide 4"></button>
+            <button type="button" data-bs-target="#carouselPrincipal" data-bs-slide-to="0" class="active"
+              aria-current="true" aria-label="Diapositiva 1"></button>
+            <button type="button" data-bs-target="#carouselPrincipal" data-bs-slide-to="1"
+              aria-label="Diapositiva 2"></button>
+            <button type="button" data-bs-target="#carouselPrincipal" data-bs-slide-to="2"
+              aria-label="Diapositiva 3"></button>
+            <button type="button" data-bs-target="#carouselPrincipal" data-bs-slide-to="3"
+              aria-label="Diapositiva 4"></button>
           </div>
+
           <div class="carousel-inner">
-            <div class="carousel-item active" data-bs-interval="3000">
-              <a href="https://www.udea.edu.co/wps/portal/udea/web/inicio/investigacion/jovenes-investigadores-semilleros-investigacion/!ut/p/z1/jZDBDoIwEES_xS_otltQjrU0WG0oTahgL4YTIVH0YPx-CTEcjCJ72-TN7M6QQGoS-ubZtc2ju_XNZdhPIT7nLlKUSTCZNlsQBp23_IjWc1KNwCaRjAoOBg40AuFUkZdWFumekbBEDz9GwDL9DBDm7SsSRmRKYFM7JIhTtSspoqTsDUwnrEYFLsmjAjPN-Bo_Hb508O-L-9X7GjrditXqBf9s48I!/?1dmy&urile=wcm%3Apath%3A/PortalUdeA/asPortalUdeA/asHogmeUdeA/Investigaci!c3!b3n/semilleros+de+investigacion/Contenido/asContenidosMenu/ESI"
-                target="_blank">
-                <img src="/static/assets/img/brand/rotador-esi.png" class="d-block mx-auto" alt="banner esi+ji"
-                  style="max-height: 300px; background-color: white;">
+            <div class="carousel-item active" data-bs-interval="4000">
+              <a href="https://www.udea.edu.co/wps/portal/udea/web/inicio/investigacion/jovenes-investigadores-semilleros-investigacion/"
+                target="_blank" rel="noopener">
+                <img src="/static/assets/img/brand/rotador-esi.png" class="d-block w-100"
+                  alt="Programa ESI + JI Universidad de Antioquia">
               </a>
-              <div class="carousel-caption d-none d-md-block">
-              </div>
             </div>
-            <div class="carousel-item" data-bs-interval="3000">
+            <div class="carousel-item" data-bs-interval="4000">
               <a href="https://udea.edu.co/wps/portal/udea/web/inicio/investigacion/grupos-investigacion/ciencias-medicas-salud/neuropsicologia-conducta"
-                target="_blank">
-                <img src="/static/assets/img/theme/GRUNECO_CPT_T.png" class="d-block mx-auto" alt="banner 1"
-                  style="max-height: 300px; background-color: white;">
+                target="_blank" rel="noopener">
+                <img src="/static/assets/img/theme/GRUNECO_CPT_T.png" class="d-block w-100"
+                  alt="Grupo GRUNECO - Neuropsicología y Conducta">
               </a>
-              <div class="carousel-caption d-none d-md-block">
-              </div>
             </div>
-            <div class="carousel-item" data-bs-interval="3000">
-              <a href="https://enlace-generico.com/3" target="_blank">
-                <img src="/static/assets/img/brand/Publicidad_Hombre_Invisible.png" class="d-block mx-auto"
-                  alt="banner 2" style="max-height: 300px; background-color: white;">
+            <div class="carousel-item" data-bs-interval="4000">
+              <a href="#" target="_blank" rel="noopener">
+                <img src="/static/assets/img/brand/Publicidad_Hombre_Invisible.png" class="d-block w-100"
+                  alt="Investigación en Neurociencias">
               </a>
-              <div class="carousel-caption d-none d-md-block">
-              </div>
             </div>
-            <div class="carousel-item" data-bs-interval="3000">
-              <a href="https://enlace-generico.com/4" target="_blank">
-                <img src="/static/assets/img/brand/jovenes.JPG" class="d-block mx-auto" alt="banner 3"
-                  style="max-height: 300px; background-color: white;">
+            <div class="carousel-item" data-bs-interval="4000">
+              <a href="#" target="_blank" rel="noopener">
+                <img src="/static/assets/img/brand/jovenes.JPG" class="d-block w-100"
+                  alt="Formación de Jóvenes Investigadores">
               </a>
-              <div class="carousel-caption d-none d-md-block">
-              </div>
             </div>
           </div>
-          <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleDark"
-            data-bs-slide="prev">
+
+          <button class="carousel-control-prev" type="button" data-bs-target="#carouselPrincipal" data-bs-slide="prev">
             <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Anterior</span>
+            <span class="solo-lectores">Anterior</span>
           </button>
-          <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleDark"
-            data-bs-slide="next">
+          <button class="carousel-control-next" type="button" data-bs-target="#carouselPrincipal" data-bs-slide="next">
             <span class="carousel-control-next-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Siguiente</span>
+            <span class="solo-lectores">Siguiente</span>
           </button>
         </div>
       </div>
     </div>
   </div>
-</div>
+</section>
 
-<div class="container mt--16 pt-7 pb-5">
-  <div class="row justify-content-center">
-    <div class="row">
-      <div class="row justify-content-center">
-        <div class="row featurette">
-          <div class="col-md-7">
-            <h2 class="featurette-heading fw-normal lh-1">Grupo Neuropsicología y Conducta <span
-                class="text-body-secondary"></span></h2>
-            <p class="lead">Somos un grupo interdisciplinar de investigación, perteneciente a la Facultad de Medicina de
-              la Universidad de Antioquia, que a través de la estructuración y ejecución de proyectos de investigación
-              formamos talento humano en investigación en los niveles de pre y posgrado, al igual que contribuimos a la
-              generación de conocimiento enfocado en soluciones clínicas y tecnológicas en el área de las neurociencias
-              cognitivas.</p>
+<!-- CONTENEDOR PRINCIPAL -->
+<div class="contenedor-principal">
+  <div class="container">
+
+    <!-- SECCIÓN ACERCA DEL GRUPO -->
+    <section class="seccion-acerca">
+      <div class="container">
+        <div class="grid-acerca">
+          <div class="contenido-texto">
+            <h2 class="titulo-seccion">Grupo Neuropsicología y Conducta</h2>
+            <p>Somos un grupo interdisciplinar de investigación, perteneciente a la Facultad de Medicina de la
+              Universidad de Antioquia, que a través de la estructuración y ejecución de proyectos de investigación
+              formamos talento humano en investigación en los niveles de pre y posgrado.</p>
+            <p>Contribuimos a la generación de conocimiento enfocado en soluciones clínicas y tecnológicas en el área de
+              las neurociencias cognitivas, siempre con el compromiso de excelencia académica y impacto social.</p>
+            <a href="#" class="boton-cta">
+              Conocer más
+              <i class="fas fa-arrow-right"></i>
+            </a>
           </div>
-          <div class="col-md-5">
-            <svg class="bd-placeholder-img bd-placeholder-img-lg featurette-image img-fluid mx-auto" width="500"
-              height="500" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: 500x500"
-              preserveAspectRatio="xMidYMid slice" focusable="false">
-              <image href="/static/assets/img/theme/Gruneco_Miembros.jpeg" width="100%" height="100%" />
-            </svg>
+          <div class="imagen-acerca">
+            <img src="/static/assets/img/theme/Gruneco_Miembros.jpeg" alt="Miembros del Grupo GRUNECO">
           </div>
         </div>
       </div>
-    </div>
-  </div>
-</div>
+    </section>
 
-
-<!-- Tarjetas de Visión, Líneas de Investigación y Principios -->
-<div class="row pt-3">
-  <!-- Tarjeta de Visión -->
-  <div class="col-md-4 mb-4">
-    <div class="card h-100 text-center p-4 shadow-lg rounded">
-      <div class="card-body d-flex flex-column">
-        <div class="mb-3">
-          <i class="fas fa-eye fa-4x text-primary"></i>
+    <!-- TARJETAS INFORMATIVAS -->
+    <div class="grid-tarjetas">
+      <!-- Tarjeta Visión -->
+      <article class="tarjeta-moderna">
+        <div class="icono-tarjeta">
+          <i class="fas fa-eye"></i>
         </div>
-        <h3 class="card-title">Visión</h3>
-        <ul class="list-unstyled flex-grow-1 fs-5"> <!-- Texto más grande -->
-          En el 2030 GRUNECO será reconocido a nivel internacional por la calidad científica de las investigaciones
-          desarrolladas con una estructura administrativa sostenible que le permitirá brindar espacios continuos de
-          formación investigativa interdisciplinar de alto nivel en pregrado y posgrado.
+        <h3 class="titulo-tarjeta">Visión</h3>
+        <div class="lista-caracteristicas">
+          <p style="font-size: 1.1rem; color: var(--gris-oscuro); line-height: 1.6; text-align: justify;">
+            En el 2030 GRUNECO será reconocido a nivel internacional por la calidad científica de las investigaciones
+            desarrolladas con una estructura administrativa sostenible que le permitirá brindar espacios continuos de
+            formación investigativa interdisciplinar de alto nivel en pregrado y posgrado.
           </p>
-      </div>
-    </div>
-  </div>
-
-  <!-- Tarjeta de Líneas de Investigación -->
-  <div class="col-md-4 mb-4">
-    <div class="card h-100 text-center p-4 shadow-lg rounded">
-      <div class="card-body d-flex flex-column">
-        <div class="mb-3">
-          <i class="fas fa-brain fa-4x text-primary"></i>
         </div>
-        <h3 class="card-title">Líneas de Investigación</h3>
-        <ul class="list-unstyled flex-grow-1 fs-5"> <!-- Texto más grande -->
-          <li class="py-2"><i class="fas fa-check-circle text-primary"></i> Neurociencias Cognitivas</li>
-          <li class="py-2"><i class="fas fa-check-circle text-primary"></i> Neurociencias e Ingeniería</li>
-          <li class="py-2"><i class="fas fa-check-circle text-primary"></i> Neurociencias Clínica</li>
-          <li class="py-2"><i class="fas fa-check-circle text-primary"></i> Aprendizaje y Enseñanza de la Investigación
-          </li>
-          </p>
-      </div>
-    </div>
-  </div>
+      </article>
 
-  <!-- Tarjeta de Principios -->
-  <div class="col-md-4 mb-4">
-    <div class="card h-100 text-center p-4 shadow-lg rounded">
-      <div class="card-body d-flex flex-column">
-        <div class="mb-3">
-          <i class="fas fa-handshake fa-4x text-primary"></i> <!-- Ícono más grande -->
+      <!-- Tarjeta Líneas de Investigación -->
+      <article class="tarjeta-moderna">
+        <div class="icono-tarjeta">
+          <i class="fas fa-brain"></i>
         </div>
-        <h3 class="card-title fs-3">Principios</h2> <!-- Título más grande -->
-          <ul class="list-unstyled flex-grow-1 fs-5"> <!-- Texto más grande -->
-            <li class="py-2"><i class="fas fa-check-circle text-primary"></i> Trabajo en equipo</li>
-            <li class="py-2"><i class="fas fa-check-circle text-primary"></i> Responsabilidad</li>
-            <li class="py-2"><i class="fas fa-check-circle text-primary"></i> Respeto</li>
-            <li class="py-2"><i class="fas fa-check-circle text-primary"></i> Disciplina</li>
-            <li class="py-2"><i class="fas fa-check-circle text-primary"></i> Pasión</li>
-          </ul>
-      </div>
+        <h3 class="titulo-tarjeta">Líneas de Investigación</h3>
+        <ul class="lista-caracteristicas">
+          <li><i class="fas fa-check-circle"></i> Neurociencias Cognitivas</li>
+          <li><i class="fas fa-check-circle"></i> Neurociencias e Ingeniería</li>
+          <li><i class="fas fa-check-circle"></i> Neurociencias Clínica</li>
+          <li><i class="fas fa-check-circle"></i> Aprendizaje y Enseñanza de la Investigación</li>
+        </ul>
+      </article>
+
+      <!-- Tarjeta Principios -->
+      <article class="tarjeta-moderna">
+        <div class="icono-tarjeta">
+          <i class="fas fa-handshake"></i>
+        </div>
+        <h3 class="titulo-tarjeta">Principios</h3>
+        <ul class="lista-caracteristicas">
+          <li><i class="fas fa-users"></i> Trabajo en equipo</li>
+          <li><i class="fas fa-user-check"></i> Responsabilidad</li>
+          <li><i class="fas fa-heart"></i> Respeto</li>
+          <li><i class="fas fa-clock"></i> Disciplina</li>
+          <li><i class="fas fa-fire"></i> Pasión</li>
+        </ul>
+      </article>
     </div>
+
+    <!-- SECCIÓN EQUIPO -->
+    <section class="seccion-equipo">
+      <div class="container">
+        <h2 class="titulo-seccion" style="text-align: center; margin-bottom: 4rem;">Nuestro Equipo</h2>
+        <div class="grid-equipo">
+          <!-- Coordinador -->
+          <article class="miembro-equipo">
+            <div class="contenedor-imagen">
+              <img src="/static/assets/img/theme/Carlos_imagen.jpeg" alt="Dr. Carlos Andrés Tobón Quintero">
+            </div>
+            <h3 class="nombre-miembro">Carlos Andrés Tobón Quintero</h3>
+            <p class="rol-miembro">MD, PhD - Coordinador del Grupo</p>
+          </article>
+
+          <!-- Coordinador Académico -->
+          <article class="miembro-equipo">
+            <div class="contenedor-imagen">
+              <img src="/static/assets/img/theme/Jonh_Imagen.png" alt="Dr. John Fredy Ochoa">
+            </div>
+            <h3 class="nombre-miembro">John Fredy Ochoa</h3>
+            <p class="rol-miembro">Ph.D. - Coordinador Académico del Grupo</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
   </div>
 </div>
 
-<div class="row pt-7">
-  <!-- Miembro 1 -->
-  <div class="col-lg-6 text-center">
-    <svg class="bd-placeholder-img rounded-circle centered-image" width="140" height="140" role="img"
-      aria-label="Placeholder" preserveAspectRatio="xMidYMid slice" focusable="false">
-      <title>Placeholder</title>
-      <rect width="100%" height="100%" fill="var(--bs-secondary-color)"></rect>
-      <image href="/static/assets/img/theme/Carlos_imagen.jpeg" width="100%" height="100%" />
-    </svg>
-    <h2 class="fw-normal mt-3">Carlos Andrés Tobón Quintero, MD, PhD</h2>
-    <p>Coordinador del Grupo</p>
-  </div>
-  <!-- Miembro 2 -->
-  <div class="col-lg-6 text-center">
-    <svg class="bd-placeholder-img rounded-circle centered-image" width="140" height="140" role="img"
-      aria-label="Placeholder" preserveAspectRatio="xMidYMid slice" focusable="false">
-      <title>Placeholder</title>
-      <rect width="100%" height="100%" fill="var(--bs-secondary-color)"></rect>
-      <image href="/static/assets/img/theme/Jonh_Imagen.png" width="100%" height="100%" />
-    </svg>
-    <h2 class="fw-normal mt-3">John Fredy Ochoa Ph.D.</h2>
-    <p>Coordinador académico del Grupo</p>
-  </div>
-</div>
-</div>
-</div>
+<script>
+  // Animaciones de scroll suaves
+  document.addEventListener('DOMContentLoaded', function () {
+    const observador = new IntersectionObserver((entradas) => {
+      entradas.forEach(entrada => {
+        if (entrada.isIntersecting) {
+          entrada.target.style.opacity = '1';
+          entrada.target.style.transform = 'translateY(0)';
+        }
+      });
+    });
+
+    document.querySelectorAll('.tarjeta-moderna, .miembro-equipo').forEach(elemento => {
+      elemento.style.opacity = '0';
+      elemento.style.transform = 'translateY(30px)';
+      elemento.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+      observador.observe(elemento);
+    });
+  });
+</script>
 {% endblock content %}
-
-<!-- Agrega Font Awesome para los iconos -->
-<script src="https://kit.fontawesome.com/your-fontawesome-kit.js" crossorigin="anonymous"></script>

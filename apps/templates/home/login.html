@@ -1,78 +1,823 @@
-{% extends 'layouts/base-fullscreen.html' %}
-{% block title %} Iniciar Sesión {% endblock title %}
+{% extends 'layouts/base_theme.html' %}
+{% block title %} Iniciar Sesión - ATENEA {% endblock title %}
+
+{% block stylesheets %}
+<style>
+  /* ===== SISTEMA DE DISEÑO - PALETA VERDE CONSISTENTE ===== */
+  :root {
+    --verde-primario: #1B5E20;
+    /* Verde oscuro principal */
+    --verde-secundario: #388E3C;
+    /* Verde medio */
+    --verde-acento: #4CAF50;
+    /* Verde vibrante */
+    --verde-claro: #C8E6C9;
+    /* Verde suave */
+    --verde-muy-claro: #E8F5E8;
+    /* Verde de fondo */
+
+    --blanco: #FFFFFF;
+    --gris-claro: #F5F5F5;
+    --gris-medio: #757575;
+    --gris-oscuro: #424242;
+    --rojo-error: #E57373;
+
+    --sombra-suave: 0 4px 20px rgba(27, 94, 32, 0.1);
+    --sombra-media: 0 8px 32px rgba(27, 94, 32, 0.15);
+    --sombra-fuerte: 0 12px 40px rgba(27, 94, 32, 0.2);
+    --sombra-flotante: 0 20px 60px rgba(27, 94, 32, 0.25);
+
+    --transicion: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --radio-base: 16px;
+    --radio-grande: 24px;
+  }
+
+  /* ===== FONDO HERO CONSISTENTE ===== */
+  .fondo-login {
+    min-height: 100vh;
+    background: linear-gradient(135deg,
+        var(--verde-primario) 0%,
+        var(--verde-secundario) 60%,
+        var(--verde-acento) 100%);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 0;
+  }
+
+  /* ===== ELEMENTOS DECORATIVOS ===== */
+  .patron-decorativo {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image:
+      radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.08) 0%, transparent 50%),
+      radial-gradient(circle at 75% 75%, rgba(255, 255, 255, 0.05) 0%, transparent 50%),
+      radial-gradient(circle at 50% 80%, rgba(255, 255, 255, 0.03) 0%, transparent 60%);
+    z-index: 1;
+  }
+
+  .elemento-flotante {
+    position: absolute;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+    animation: flotar 6s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  .flotante-1 {
+    width: 120px;
+    height: 120px;
+    top: 10%;
+    left: 10%;
+    animation-delay: 0s;
+  }
+
+  .flotante-2 {
+    width: 80px;
+    height: 80px;
+    top: 20%;
+    right: 15%;
+    animation-delay: 2s;
+  }
+
+  .flotante-3 {
+    width: 200px;
+    height: 200px;
+    bottom: 15%;
+    left: 5%;
+    animation-delay: 4s;
+  }
+
+  .flotante-4 {
+    width: 60px;
+    height: 60px;
+    bottom: 25%;
+    right: 20%;
+    animation-delay: 1s;
+  }
+
+  @keyframes flotar {
+
+    0%,
+    100% {
+      transform: translateY(0px) rotate(0deg);
+      opacity: 0.6;
+    }
+
+    50% {
+      transform: translateY(-20px) rotate(180deg);
+      opacity: 0.8;
+    }
+  }
+
+  /* ===== CONTENEDOR PRINCIPAL ===== */
+  .contenedor-login {
+    position: relative;
+    z-index: 3;
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+  }
+
+  /* ===== TARJETA DE LOGIN ===== */
+  .tarjeta-login {
+    background: var(--blanco);
+    border-radius: var(--radio-grande);
+    box-shadow: var(--sombra-flotante);
+    overflow: hidden;
+    position: relative;
+    animation: aparecerTarjeta 0.8s ease-out;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  @keyframes aparecerTarjeta {
+    from {
+      opacity: 0;
+      transform: translateY(50px) scale(0.95);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  /* ===== HEADER DE LA TARJETA ===== */
+  .header-login {
+    background: linear-gradient(135deg, var(--verde-acento), var(--verde-secundario));
+    padding: 3rem 2.5rem 2rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .header-login::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+    animation: ondas 8s linear infinite;
+  }
+
+  @keyframes ondas {
+    0% {
+      transform: rotate(0deg);
+    }
+
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+  .logo-contenedor {
+    width: 100px;
+    height: 100px;
+    background: var(--blanco);
+    border-radius: 50%;
+    margin: 0 auto 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--sombra-media);
+    position: relative;
+    z-index: 2;
+    animation: pulso 2s ease-in-out infinite;
+  }
+
+  @keyframes pulso {
+
+    0%,
+    100% {
+      transform: scale(1);
+      box-shadow: var(--sombra-media);
+    }
+
+    50% {
+      transform: scale(1.05);
+      box-shadow: var(--sombra-fuerte);
+    }
+  }
+
+  .logo-contenedor i {
+    font-size: 3rem;
+    color: var(--verde-primario);
+  }
+
+  .titulo-login {
+    font-size: 2.8rem;
+    font-weight: 800;
+    color: var(--blanco);
+    margin-bottom: 0.5rem;
+    letter-spacing: 2px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    position: relative;
+    z-index: 2;
+  }
+
+  .subtitulo-login {
+    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 300;
+    letter-spacing: 0.5px;
+    position: relative;
+    z-index: 2;
+  }
+
+  /* ===== CUERPO DE LA TARJETA ===== */
+  .cuerpo-login {
+    padding: 3rem 2.5rem;
+    background: var(--blanco);
+  }
+
+  /* ===== GRUPOS DE FORMULARIO ===== */
+  .grupo-campo {
+    margin-bottom: 2rem;
+    position: relative;
+  }
+
+  .etiqueta-campo {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--verde-primario);
+    margin-bottom: 0.8rem;
+    display: block;
+    transition: var(--transicion);
+  }
+
+  .contenedor-input {
+    position: relative;
+    transition: var(--transicion);
+  }
+
+  .contenedor-input::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--verde-acento), var(--verde-secundario));
+    transform: scaleX(0);
+    transition: var(--transicion);
+    border-radius: 1px;
+  }
+
+  .contenedor-input.activo::before {
+    transform: scaleX(1);
+  }
+
+  .input-personalizado {
+    width: 100%;
+    padding: 1rem 1rem 1rem 3.5rem;
+    border: 2px solid var(--verde-muy-claro);
+    border-radius: var(--radio-base);
+    font-size: 1.1rem;
+    background: var(--blanco);
+    transition: var(--transicion);
+    outline: none;
+    color: var(--gris-oscuro);
+  }
+
+  .input-personalizado:focus {
+    border-color: var(--verde-acento);
+    box-shadow: 0 0 0 4px rgba(76, 175, 80, 0.1);
+    transform: translateY(-2px);
+  }
+
+  .input-personalizado::placeholder {
+    color: var(--gris-medio);
+    font-weight: 400;
+  }
+
+  .icono-input {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.3rem;
+    color: var(--verde-secundario);
+    transition: var(--transicion);
+    z-index: 2;
+  }
+
+  .input-personalizado:focus+.icono-input {
+    color: var(--verde-acento);
+    transform: translateY(-50%) scale(1.1);
+  }
+
+  /* ===== CHECKBOX PERSONALIZADO ===== */
+  .contenedor-checkbox {
+    display: flex;
+    align-items: center;
+    margin-bottom: 2rem;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .checkbox-personalizado {
+    position: relative;
+    width: 22px;
+    height: 22px;
+    margin-right: 1rem;
+  }
+
+  .checkbox-personalizado input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .checkmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 22px;
+    width: 22px;
+    background: var(--blanco);
+    border: 2px solid var(--verde-claro);
+    border-radius: 6px;
+    transition: var(--transicion);
+  }
+
+  .checkmark::after {
+    content: "";
+    position: absolute;
+    display: none;
+    left: 6px;
+    top: 2px;
+    width: 6px;
+    height: 12px;
+    border: solid var(--blanco);
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+  }
+
+  .checkbox-personalizado input:checked~.checkmark {
+    background: var(--verde-acento);
+    border-color: var(--verde-acento);
+    transform: scale(1.1);
+  }
+
+  .checkbox-personalizado input:checked~.checkmark::after {
+    display: block;
+  }
+
+  .etiqueta-checkbox {
+    font-size: 1rem;
+    color: var(--gris-oscuro);
+    font-weight: 500;
+  }
+
+  /* ===== BOTÓN PRINCIPAL ===== */
+  .boton-login {
+    width: 100%;
+    padding: 1.2rem 2rem;
+    background: linear-gradient(135deg, var(--verde-acento), var(--verde-secundario));
+    border: none;
+    border-radius: var(--radio-base);
+    color: var(--blanco);
+    font-size: 1.2rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: var(--transicion);
+    box-shadow: var(--sombra-media);
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 2rem;
+  }
+
+  .boton-login::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: var(--transicion);
+  }
+
+  .boton-login:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--sombra-fuerte);
+    background: linear-gradient(135deg, var(--verde-secundario), var(--verde-primario));
+  }
+
+  .boton-login:hover::before {
+    left: 100%;
+  }
+
+  .boton-login:active {
+    transform: translateY(-1px);
+  }
+
+  /* ===== ALERTAS ===== */
+  .alerta-error {
+    background: linear-gradient(135deg, #FFEBEE, #FFCDD2);
+    border: 1px solid var(--rojo-error);
+    border-radius: var(--radio-base);
+    padding: 1.2rem 1.5rem;
+    margin-bottom: 2rem;
+    position: relative;
+    animation: aparecerAlerta 0.5s ease-out;
+  }
+
+  @keyframes aparecerAlerta {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .alerta-error .mensaje {
+    color: #C62828;
+    font-weight: 500;
+    margin: 0;
+    display: flex;
+    align-items: center;
+  }
+
+  .alerta-error .mensaje i {
+    margin-right: 0.8rem;
+    font-size: 1.2rem;
+  }
+
+  /* ===== ENLACES ===== */
+  .enlace-ayuda {
+    color: var(--verde-secundario);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 1rem;
+    transition: var(--transicion);
+    position: relative;
+  }
+
+  .enlace-ayuda::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--verde-acento);
+    transition: var(--transicion);
+  }
+
+  .enlace-ayuda:hover {
+    color: var(--verde-acento);
+    text-decoration: none;
+  }
+
+  .enlace-ayuda:hover::after {
+    width: 100%;
+  }
+
+  /* ===== PIE DE PÁGINA ===== */
+  .pie-login {
+    text-align: center;
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--verde-muy-claro);
+  }
+
+  .info-institucional {
+    color: var(--gris-medio);
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+    line-height: 1.4;
+  }
+
+  .logo-institucion {
+    width: 120px;
+    opacity: 0.7;
+    transition: var(--transicion);
+  }
+
+  .logo-institucion:hover {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 768px) {
+    .contenedor-login {
+      max-width: 400px;
+      padding: 0 1rem;
+    }
+
+    .cuerpo-login,
+    .header-login {
+      padding: 2rem 1.5rem;
+    }
+
+    .titulo-login {
+      font-size: 2.2rem;
+    }
+
+    .logo-contenedor {
+      width: 80px;
+      height: 80px;
+    }
+
+    .logo-contenedor i {
+      font-size: 2.5rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .fondo-login {
+      padding: 1rem 0;
+    }
+
+    .contenedor-login {
+      max-width: 350px;
+    }
+
+    .cuerpo-login,
+    .header-login {
+      padding: 1.5rem 1rem;
+    }
+
+    .titulo-login {
+      font-size: 2rem;
+      letter-spacing: 1px;
+    }
+  }
+
+  /* ===== ANIMACIONES DE ENTRADA ===== */
+  @keyframes aparecerElemento {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animacion-entrada {
+    animation: aparecerElemento 0.6s ease-out forwards;
+  }
+
+  .animacion-entrada-retrasada {
+    opacity: 0;
+    animation: aparecerElemento 0.6s ease-out 0.2s forwards;
+  }
+
+  /* ===== ACCESIBILIDAD ===== */
+  .boton-login:focus,
+  .input-personalizado:focus,
+  .enlace-ayuda:focus {
+    outline: 3px solid var(--verde-claro);
+    outline-offset: 2px;
+  }
+
+  /* ===== ESTADOS DE CARGA ===== */
+  .boton-login.cargando {
+    pointer-events: none;
+    opacity: 0.7;
+  }
+
+  .boton-login.cargando::after {
+    content: '';
+    width: 20px;
+    height: 20px;
+    border: 2px solid transparent;
+    border-top: 2px solid var(--blanco);
+    border-radius: 50%;
+    animation: girar 1s linear infinite;
+    display: inline-block;
+    margin-left: 10px;
+  }
+
+  @keyframes girar {
+    0% {
+      transform: rotate(0deg);
+    }
+
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+</style>
+{% endblock stylesheets %}
 
 {% block content %}
-<div class="container mt--8 pb-5">
-  <div class="row justify-content-center">
-    <div class="col-lg-5 col-md-7">
-      <div class="card shadow border-0 mb-0">
-        <div class="card-header bg-transparent pb-2">
-          <div class="text-center mt-2 mb-2">
-            <h1 class="text-primary">Iniciar Sesión</h1>
-          </div>
+<div class="fondo-login">
+  <!-- Elementos decorativos -->
+  <div class="patron-decorativo"></div>
+  <div class="elemento-flotante flotante-1"></div>
+  <div class="elemento-flotante flotante-2"></div>
+  <div class="elemento-flotante flotante-3"></div>
+  <div class="elemento-flotante flotante-4"></div>
+
+  <div class="contenedor-login">
+    <div class="tarjeta-login">
+      <!-- Header de la tarjeta -->
+      <div class="header-login">
+        <div class="logo-contenedor">
+          <i class="fas fa-brain"></i>
         </div>
-        <div class="card-body px-lg-5 py-lg-4">
-          <div class="text-center mb-4">
+        <h1 class="titulo-login">ATENEA</h1>
+        <p class="subtitulo-login">Plataforma de Evaluación Neuropsicológica</p>
+      </div>
+
+      <!-- Cuerpo de la tarjeta -->
+      <div class="cuerpo-login">
+        <form role="form" method="POST" novalidate id="formLogin">
+          {% csrf_token %}
+
+          <!-- Campo de Usuario -->
+          <div class="grupo-campo animacion-entrada">
+            <label for="username" class="etiqueta-campo">Usuario</label>
+            <div class="contenedor-input">
+              <input id="username" class="input-personalizado" placeholder="Ingresa tu nombre de usuario" type="text"
+                name="username" required autofocus>
+              <i class="fas fa-user icono-input"></i>
+            </div>
           </div>
-          
-          <form role="form" method="POST" novalidate>
-            {% csrf_token %}
-            
-            <!-- Campo de Usuario -->
-            <div class="form-group mb-2">
-              <label for="username" class="form-control-label">Usuario</label>
-              <div class="input-group input-group-merge input-group-alternative">
-                <div class="input-group-prepend">
-                  <span class="input-group-text"><i class="ni ni-single-02"></i></span>
-                </div>
-                <input id="username" class="form-control form-control-lg" placeholder="Nombre de usuario" 
-                       type="text" name="username" required autofocus>
-              </div>
+
+          <!-- Campo de Contraseña -->
+          <div class="grupo-campo animacion-entrada-retrasada">
+            <label for="password" class="etiqueta-campo">Contraseña</label>
+            <div class="contenedor-input">
+              <input id="password" class="input-personalizado" placeholder="Ingresa tu contraseña" type="password"
+                name="password" required>
+              <i class="fas fa-lock icono-input"></i>
             </div>
-            
-            <!-- Campo de Contraseña -->
-            <div class="form-group mb-3">
-              <label for="password" class="form-control-label">Contraseña</label>
-              <div class="input-group input-group-merge input-group-alternative">
-                <div class="input-group-prepend">
-                  <span class="input-group-text"><i class="ni ni-lock-circle-open"></i></span>
-                </div>
-                <input id="password" class="form-control form-control-lg" placeholder="Ingresa tu contraseña" 
-                       type="password" name="password" required>
-              </div>
-            </div>
-            
-            <!-- Recordarme -->
-            <div class="custom-control custom-checkbox mb-3">
-              <input class="custom-control-input" id="remember" name="remember" type="checkbox">
-              <label class="custom-control-label" for="remember">Recordarme</label>
-            </div>
-            
-            <div class="text-center">
-              <button type="submit" class="btn btn-primary btn-lg btn-block my-4">
-                Iniciar Sesión
-              </button>
-            </div>
-            
-            {% if messages %}
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-              {% for message in messages %}
-                <p class="mb-0">{{ message }}</p>
-              {% endfor %}
-              <button type="button" class="close" data-dismiss="alert" aria-label="Cerrar">
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            {% endif %}
-            
-            <!-- Enlaces de ayuda -->
-            <div class="text-center mt-3">
-              <a class="text-primary">¿Olvidaste tu contraseña?</a>
-            </div>
-          </form>
+          </div>
+
+          <!-- Recordarme -->
+          <div class="contenedor-checkbox animacion-entrada-retrasada">
+            <label class="checkbox-personalizado">
+              <input type="checkbox" id="remember" name="remember">
+              <span class="checkmark"></span>
+            </label>
+            <span class="etiqueta-checkbox">Recordar mis credenciales</span>
+          </div>
+
+          <!-- Mostrar errores -->
+          {% if messages %}
+          <div class="alerta-error">
+            {% for message in messages %}
+            <p class="mensaje">
+              <i class="fas fa-exclamation-triangle"></i>
+              {{ message }}
+            </p>
+            {% endfor %}
+          </div>
+          {% endif %}
+
+          <!-- Botón de login -->
+          <button type="submit" class="boton-login" id="btnLogin">
+            Iniciar Sesión
+          </button>
+
+          <!-- Enlaces de ayuda -->
+          <div class="text-center">
+            <a href="#" class="enlace-ayuda">¿Olvidaste tu contraseña?</a>
+          </div>
+        </form>
+
+        <!-- Pie de página -->
+        <div class="pie-login">
+          <p class="info-institucional">
+            Grupo de Investigación en Neuropsicología y Conducta<br>
+            Universidad de Antioquia
+          </p>
+          <img src="/static/assets/img/brand/logo-udea.png" alt="Universidad de Antioquia" class="logo-institucion">
         </div>
       </div>
     </div>
   </div>
 </div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    // Animaciones de entrada
+    const elementos = document.querySelectorAll('.animacion-entrada, .animacion-entrada-retrasada');
+    elementos.forEach((elemento, index) => {
+      setTimeout(() => {
+        elemento.style.opacity = '1';
+        elemento.style.transform = 'translateY(0)';
+      }, index * 100);
+    });
+
+    // Efectos de foco en inputs
+    const inputs = document.querySelectorAll('.input-personalizado');
+    inputs.forEach(input => {
+      const contenedor = input.closest('.contenedor-input');
+
+      input.addEventListener('focus', () => {
+        contenedor.classList.add('activo');
+      });
+
+      input.addEventListener('blur', () => {
+        if (!input.value) {
+          contenedor.classList.remove('activo');
+        }
+      });
+
+      // Mantener activo si hay valor inicial
+      if (input.value) {
+        contenedor.classList.add('activo');
+      }
+    });
+
+    // Efecto de carga en el botón
+    const formLogin = document.getElementById('formLogin');
+    const btnLogin = document.getElementById('btnLogin');
+
+    formLogin.addEventListener('submit', function () {
+      btnLogin.classList.add('cargando');
+      btnLogin.textContent = 'Iniciando sesión...';
+    });
+
+    // Validación en tiempo real
+    inputs.forEach(input => {
+      input.addEventListener('input', function () {
+        if (this.value.length > 0) {
+          this.style.borderColor = 'var(--verde-acento)';
+        } else {
+          this.style.borderColor = 'var(--verde-muy-claro)';
+        }
+      });
+    });
+
+    // Efecto de partículas en el header (opcional)
+    const header = document.querySelector('.header-login');
+    let particulasActivas = true;
+
+    function crearParticula() {
+      if (!particulasActivas) return;
+
+      const particula = document.createElement('div');
+      particula.style.cssText = `
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: rgba(255,255,255,0.6);
+      border-radius: 50%;
+      pointer-events: none;
+      left: ${Math.random() * 100}%;
+      top: 100%;
+      animation: subirParticula 3s linear infinite;
+    `;
+
+      const keyframes = `
+      @keyframes subirParticula {
+        to {
+          transform: translateY(-${header.offsetHeight + 50}px);
+          opacity: 0;
+        }
+      }
+    `;
+
+      if (!document.querySelector('#keyframes-particulas')) {
+        const style = document.createElement('style');
+        style.id = 'keyframes-particulas';
+        style.textContent = keyframes;
+        document.head.appendChild(style);
+      }
+
+      header.appendChild(particula);
+
+      setTimeout(() => {
+        if (header.contains(particula)) {
+          header.removeChild(particula);
+        }
+      }, 3000);
+    }
+
+    // Crear partículas cada 500ms
+    setInterval(crearParticula, 500);
+
+    // Detener partículas cuando el usuario esté escribiendo
+    inputs.forEach(input => {
+      input.addEventListener('focus', () => particulasActivas = false);
+      input.addEventListener('blur', () => {
+        setTimeout(() => particulasActivas = true, 1000);
+      });
+    });
+  });
+</script>
 {% endblock content %}
