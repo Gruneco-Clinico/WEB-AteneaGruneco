@@ -37,6 +37,20 @@ from .models import (
     MEWResult,
     BerlinResult,
     ISIResult,
+    LawtonBrodyResult,
+    CuidadorNPIResult,
+    AdherenciaTerapeuticaResult,
+    EuroQol5D5LResult,
+    EuroQolEVASaludResult,
+    MoCAResult,
+    ParticipanteYesavageResult,
+    ZaritResult,
+    AQDCuidadorResult,
+    AQDParticipanteResult,
+    CDRCuidadorResult,
+    CDRParticipanteResult,
+    RedLatSpanishResult
+
 )
 from .forms import ProyectoForm, RegistroDemograficoForm
 import json
@@ -2059,6 +2073,1051 @@ def guardar_examen_StopBang(request):
 
             messages.error(
                 request, f"❌ Error al guardar el cuestionario STOP-BANG: {str(e)}"
+            )
+            return redirect("detalle_paciente", paciente_id=paciente_id or 1)
+
+    else:
+        messages.error(request, "❌ Método no permitido.")
+        return redirect("index")
+
+
+### Anosognosia
+
+
+@login_required
+def guardar_examen_Participante_EuroQoL(request):
+    if request.method == "POST":
+        try:
+            visita_id = request.POST.get("visita_id")
+            paciente_id = request.POST.get("paciente_id")
+            examen_id = request.POST.get("examen_id")
+
+            # Obtener la instancia de VisitaExamen
+            visita_examen = get_object_or_404(
+                VisitaExamen, visita_id=visita_id, examen_id=examen_id
+            )
+
+            # Marcar como iniciado si está pendiente
+            if visita_examen.estado == "pendiente":
+                visita_examen.estado = "en_progreso"
+                visita_examen.fecha_inicio = timezone.now()
+                visita_examen.save()
+
+            # Obtener las respuestas del formulario
+            movilidad = request.POST.get("movilidad")
+            cuidado_personal = request.POST.get("cuidado_personal")
+            actividades = request.POST.get("actividades")
+            dolor = request.POST.get("dolor")
+            ansiedad = request.POST.get("ansiedad")
+
+            # Crear o actualizar el resultado del EuroQol
+            euroqol, created = EuroQol5D5LResult.objects.update_or_create(
+                visita_examen=visita_examen,
+                defaults={
+                    "movilidad": movilidad,
+                    "cuidado_personal": cuidado_personal,
+                    "actividades": actividades,
+                    "dolor": dolor,
+                    "ansiedad": ansiedad,
+                },
+            )
+
+            # Marcar el examen como completado
+            visita_examen.estado = "completado"
+            visita_examen.fecha_completado = timezone.now()
+            visita_examen.save()
+
+            messages.success(
+                request, "✅ Cuestionario EuroQol-5D-5L guardado exitosamente."
+            )
+            return redirect("detalle_paciente", paciente_id=paciente_id)
+
+        except Exception as e:
+            import traceback
+
+            traceback.print_exc()
+
+            # Revertir estado si hubo error
+            try:
+                if "visita_examen" in locals():
+                    visita_examen.estado = "pendiente"
+                    visita_examen.save()
+            except:
+                pass
+
+            messages.error(
+                request, f"❌ Error al guardar el cuestionario EuroQol-5D-5L: {str(e)}"
+            )
+            return redirect("detalle_paciente", paciente_id=paciente_id or 1)
+
+    else:
+        messages.error(request, "❌ Método no permitido.")
+        return redirect("index")
+    
+@login_required
+def guardar_examen_Cuidador_LawtonBrody(request):
+    if request.method == "POST":
+        try:
+            visita_id = request.POST.get("visita_id")
+            paciente_id = request.POST.get("paciente_id")
+            examen_id = request.POST.get("examen_id")
+
+            # Buscar la visita-examen
+            visita_examen = get_object_or_404(
+                VisitaExamen, visita_id=visita_id, examen_id=examen_id
+            )
+
+            # Si está pendiente, lo pasamos a en progreso
+            if visita_examen.estado == "pendiente":
+                visita_examen.estado = "en_progreso"
+                visita_examen.fecha_inicio = timezone.now()
+                visita_examen.save()
+
+            # Extraer respuestas
+            genero = request.POST.get("genero")
+
+            usar_telefono = request.POST.get("usar_telefono_text")
+            hacer_compras = request.POST.get("hacer_compras_text")
+            preparar_comida = request.POST.get("preparar_comida_text")
+            cuidado_casa = request.POST.get("cuidado_casa_text")
+            lavar_ropa = request.POST.get("lavar_ropa_text")
+            uso_transporte = request.POST.get("uso_transporte_text")
+            medicacion = request.POST.get("medicacion_text")
+            manejo_dinero = request.POST.get("manejo_dinero_text")
+
+            puntaje_total = request.POST.get("total")
+            diagnostico = request.POST.get("diagnostico")
+
+            # Guardar o actualizar resultado
+            lawtonbrody, created = LawtonBrodyResult.objects.update_or_create(
+                visita_examen=visita_examen,
+                defaults={
+                    "genero": genero,
+                    "usar_telefono": usar_telefono,
+                    "hacer_compras": hacer_compras,
+                    "preparar_comida": preparar_comida,
+                    "cuidado_casa": cuidado_casa,
+                    "lavar_ropa": lavar_ropa,
+                    "uso_transporte": uso_transporte,
+                    "medicacion": medicacion,
+                    "manejo_dinero": manejo_dinero,
+                    "puntaje_total": puntaje_total,
+                    "diagnostico": diagnostico,
+                },
+            )
+
+            # Marcar como completado
+            visita_examen.estado = "completado"
+            visita_examen.fecha_completado = timezone.now()
+            visita_examen.save()
+
+            messages.success(request, "✅ Escala de Lawton y Brody guardada exitosamente.")
+            return redirect("detalle_paciente", paciente_id=paciente_id)
+
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+
+            try:
+                if "visita_examen" in locals():
+                    visita_examen.estado = "pendiente"
+                    visita_examen.save()
+            except:
+                pass
+
+            messages.error(request, f"❌ Error al guardar el examen Lawton y Brody: {str(e)}")
+            return redirect("detalle_paciente", paciente_id=paciente_id or 1)
+
+    else:
+        messages.error(request, "❌ Método no permitido.")
+        return redirect("index")
+
+    
+@login_required
+def guardar_examen_Participante_Yesavage(request):
+    if request.method == "POST":
+        try:
+            visita_id = request.POST.get("visita_id")
+            paciente_id = request.POST.get("paciente_id")
+            examen_id = request.POST.get("examen_id")
+
+            # Obtener instancia de VisitaExamen
+            visita_examen = get_object_or_404(
+                VisitaExamen, visita_id=visita_id, examen_id=examen_id
+            )
+
+            # Marcar como iniciado si está pendiente
+            if visita_examen.estado == "pendiente":
+                visita_examen.estado = "en_progreso"
+                visita_examen.fecha_inicio = timezone.now()
+                visita_examen.save()
+
+            # Extraer respuestas
+            campos = [
+                "satisfaccion_vida", "disminuir_actividades", "vida_vacia", "aburrido_frecuente",
+                "buen_animo", "preocupacion", "felicidad", "frecuencia_desamparado",
+                "quedarse_casa", "problemas_memoria", "maravilla_vivir", "inutil",
+                "lleno_energia", "sin_esperanza", "otras_personas_mejor"
+            ]
+            respuestas = {campo: request.POST.get(campo) for campo in campos}
+
+            puntaje_total = request.POST.get("puntaje_total")
+            interpretacion = request.POST.get("interpretacion")
+
+            # Guardar en la BD
+            yesavage, created = ParticipanteYesavageResult.objects.update_or_create(
+                visita_examen=visita_examen,
+                defaults={
+                    **respuestas,
+                    "puntaje_total": puntaje_total,
+                    "interpretacion": interpretacion,
+                },
+            )
+
+            # Marcar examen como completado
+            visita_examen.estado = "completado"
+            visita_examen.fecha_completado = timezone.now()
+            visita_examen.save()
+
+            messages.success(
+                request, "✅ Escala de Depresión Geriátrica de Yesavage guardada exitosamente."
+            )
+            return redirect("detalle_paciente", paciente_id=paciente_id)
+
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+
+            # Revertir estado si hay error
+            try:
+                if "visita_examen" in locals():
+                    visita_examen.estado = "pendiente"
+                    visita_examen.save()
+            except:
+                pass
+
+            messages.error(
+                request, f"❌ Error al guardar el examen de Yesavage: {str(e)}"
+            )
+            return redirect("detalle_paciente", paciente_id=paciente_id or 1)
+
+    else:
+        messages.error(request, "❌ Método no permitido.")
+        return redirect("index")
+    
+@login_required
+def guardar_examen_Cuidador_Zarit(request):
+    if request.method == "POST":
+        try:
+            visita_id = request.POST.get("visita_id")
+            paciente_id = request.POST.get("paciente_id")
+            examen_id = request.POST.get("examen_id")
+
+            # Obtener la visita asociada
+            visita_examen = get_object_or_404(
+                VisitaExamen, visita_id=visita_id, examen_id=examen_id
+            )
+
+            # Marcar como en progreso si está pendiente
+            if visita_examen.estado == "pendiente":
+                visita_examen.estado = "en_progreso"
+                visita_examen.fecha_inicio = timezone.now()
+                visita_examen.save()
+
+            # Obtener respuestas de las preguntas
+
+            pide_ayuda= request.POST.get("pide_ayuda_texto")
+            falta_tiempo_propio= request.POST.get("falta_tiempo_propio_texto")
+            agobio= request.POST.get("agobio_texto")
+            verguenza_conducta= request.POST.get("verguenza_conducta_texto")
+            sentir_enfado= request.POST.get("sentir_enfado_texto")
+            afectar_relacion_negativamente= request.POST.get("afectar_relacion_negativamente_texto")
+            miedo_futuro= request.POST.get("miedo_futuro_texto")
+            dependencia= request.POST.get("dependencia_texto")
+            sentir_tension= request.POST.get("sentir_tension_texto")
+            deterioro_salud= request.POST.get("deterioro_salud_texto")
+            menos_intimidad= request.POST.get("menos_intimidad_texto")
+            resentir_vida_social= request.POST.get("resentir_vida_social_texto")
+            desatender_amistades= request.POST.get("desatender_amistades_texto")
+            unica_dependencia= request.POST.get("unica_dependencia_texto")
+            dinero_insuficiente= request.POST.get("dinero_insuficiente_texto")
+            incapaz_mas_tiempo= request.POST.get("incapaz_mas_tiempo_texto")
+            perder_control_vida= request.POST.get("perder_control_vida_texto")
+            cuidado_a_otros= request.POST.get("cuidado_a_otros_texto")
+            indecision_que_hacer= request.POST.get("indecision_que_hacer_texto")
+            hacer_mas= request.POST.get("hacer_mas_texto")
+            cuidar_mejor= request.POST.get("cuidar_mejor_texto")
+            grado_carga= request.POST.get("grado_carga_texto")
+
+            puntaje_total = request.POST.get("puntaje_total")
+            interpretacion = request.POST.get("interpretacion")
+
+            zarit, created = ZaritResult.objects.update_or_create(
+                visita_examen=visita_examen,
+                defaults={
+                    "pide_ayuda":pide_ayuda,
+                    "falta_tiempo_propio":falta_tiempo_propio,
+                    "agobio":agobio,
+                    "verguenza_conducta":verguenza_conducta,
+                    "sentir_enfado":sentir_enfado,
+                    "afectar_relacion_negativamente":afectar_relacion_negativamente,
+                    "miedo_futuro":miedo_futuro,
+                    "dependencia":dependencia,
+                    "sentir_tension":sentir_tension,
+                    "deterioro_salud":deterioro_salud,
+                    "menos_intimidad":menos_intimidad,
+                    "resentir_vida_social":resentir_vida_social,
+                    "desatender_amistades":desatender_amistades,
+                    "unica_dependencia":unica_dependencia,
+                    "dinero_insuficiente":dinero_insuficiente,
+                    "incapaz_mas_tiempo":incapaz_mas_tiempo,
+                    "perder_control_vida":perder_control_vida,
+                    "cuidado_a_otros":cuidado_a_otros,
+                    "indecision_que_hacer":indecision_que_hacer,
+                    "hacer_mas":hacer_mas,
+                    "cuidar_mejor":cuidar_mejor,
+                    "grado_carga":grado_carga,
+                    "puntaje_total": puntaje_total,
+                    "interpretacion": interpretacion,
+                },
+            )
+
+            # Marcar como completado
+            visita_examen.estado = "completado"
+            visita_examen.fecha_completado = timezone.now()
+            visita_examen.save()
+
+            messages.success(
+                request,
+                "✅ Escala de Zarit guardada exitosamente."
+            )
+            return redirect("detalle_paciente", paciente_id=paciente_id)
+
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+
+            # Revertir estado si falla
+            try:
+                if "visita_examen" in locals():
+                    visita_examen.estado = "pendiente"
+                    visita_examen.save()
+            except:
+                pass
+
+            messages.error(
+                request,
+                f"❌ Error al guardar la escala de Zarit: {str(e)}"
+            )
+            return redirect("detalle_paciente", paciente_id=paciente_id or 1)
+
+    else:
+        messages.error(request, "❌ Método no permitido.")
+        return redirect("index")
+
+
+
+@login_required
+def guardar_examen_Participante_EVA_EuroQoL(request):
+    if request.method == "POST":
+        try:
+            visita_id = request.POST.get("visita_id")
+            paciente_id = request.POST.get("paciente_id")
+            examen_id = request.POST.get("examen_id")
+
+            # Obtener la instancia de VisitaExamen
+            visita_examen = get_object_or_404(
+                VisitaExamen, visita_id=visita_id, examen_id=examen_id
+            )
+
+            # Marcar como iniciado si está pendiente
+            if visita_examen.estado == "pendiente":
+                visita_examen.estado = "en_progreso"
+                visita_examen.fecha_inicio = timezone.now()
+                visita_examen.save()
+
+            # Obtener el valor del termómetro
+            termometro_estado_salud = request.POST.get("termometro_estado_salud")
+
+            # Crear o actualizar el resultado
+            evaeuroqol, created = EuroQolEVASaludResult.objects.update_or_create(
+                visita_examen=visita_examen,
+                defaults={
+                    "termometro_estado_salud": termometro_estado_salud,
+                },
+            )
+
+            # Marcar el examen como completado
+            visita_examen.estado = "completado"
+            visita_examen.fecha_completado = timezone.now()
+            visita_examen.save()
+
+            messages.success(
+                request, "✅ Autovaloración del Estado de Salud (EVA EuroQol) guardada exitosamente."
+            )
+            return redirect("detalle_paciente", paciente_id=paciente_id)
+
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+
+            # Revertir estado si hubo error
+            try:
+                if "visita_examen" in locals():
+                    visita_examen.estado = "pendiente"
+                    visita_examen.save()
+            except:
+                pass
+
+            messages.error(
+                request, f"❌ Error al guardar la Autovaloración del Estado de Salud (EVA EuroQol): {str(e)}"
+            )
+            return redirect("detalle_paciente", paciente_id=paciente_id or 1)
+
+    else:
+        messages.error(request, "❌ Método no permitido.")
+        return redirect("index")
+
+
+@login_required
+def guardar_examen_Cuidador_NPI(request):
+    if request.method == "POST":
+        try:
+            visita_id = request.POST.get("visita_id")
+            paciente_id = request.POST.get("paciente_id")
+            examen_id = request.POST.get("examen_id")
+
+            # Obtener la instancia de VisitaExamen
+            visita_examen = get_object_or_404(
+                VisitaExamen, visita_id=visita_id, examen_id=examen_id
+            )
+
+            # Marcar como iniciado si está pendiente
+            if visita_examen.estado == "pendiente":
+                visita_examen.estado = "en_progreso"
+                visita_examen.fecha_inicio = timezone.now()
+                visita_examen.save()
+
+            # Lista de ítems del NPI
+            items = [
+                "ideas_delirantes", "alucinaciones", "agitacion", "depresion",
+                "ansiedad", "euforia", "apatia", "desinhibicion",
+                "irritabilidad", "conducta_motor", "sueno", "apetito"
+            ]
+
+            data = {}
+            for item in items:
+                data[item] = request.POST.get(item)
+                data[f"{item}_frecuencia"] = request.POST.get(f"{item}_frecuencia_texto")
+                data[f"{item}_gravedad"] = request.POST.get(f"{item}_gravedad_texto")
+                data[f"{item}_F_G"] = request.POST.get(f"{item}_resultado")
+                data[f"{item}_distres"] = request.POST.get(f"{item}_distres_texto")
+
+            # Crear o actualizar el resultado del NPI
+            npi, created = CuidadorNPIResult.objects.update_or_create(
+                visita_examen=visita_examen,
+                defaults=data
+            )
+
+            # Marcar el examen como completado
+            visita_examen.estado = "completado"
+            visita_examen.fecha_completado = timezone.now()
+            visita_examen.save()
+
+            messages.success(request, "✅ Inventario Neuropsiquiátrico (NPI) guardado exitosamente.")
+            return redirect("detalle_paciente", paciente_id=paciente_id)
+
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+
+            # Revertir estado si hubo error
+            try:
+                if "visita_examen" in locals():
+                    visita_examen.estado = "pendiente"
+                    visita_examen.save()
+            except:
+                pass
+
+            messages.error(
+                request, f"❌ Error al guardar el Inventario Neuropsiquiátrico (NPI): {str(e)}"
+            )
+            return redirect("detalle_paciente", paciente_id=paciente_id or 1)
+
+    else:
+        messages.error(request, "❌ Método no permitido.")
+        return redirect("index")
+    
+@login_required
+def guardar_examen_Cuidador_AQD(request):
+    if request.method == "POST":
+        try:
+            visita_id = request.POST.get("visita_id")
+            paciente_id = request.POST.get("paciente_id")
+            examen_id = request.POST.get("examen_id")
+
+            # Buscar la visita asociada
+            visita_examen = get_object_or_404(
+                VisitaExamen, visita_id=visita_id, examen_id=examen_id
+            )
+
+            # Cambiar estado si estaba pendiente
+            if visita_examen.estado == "pendiente":
+                visita_examen.estado = "en_progreso"
+                visita_examen.fecha_inicio = timezone.now()
+                visita_examen.save()
+
+            # Campos de la escala (30 ítems)
+            campos = [
+                "recordar_fecha", "orientacion_lugares_nuevos", "recordar_llamadas",
+                "entender_conversacion", "firmar", "entender_lectura", "mantener_orden",
+                "recordar_lugar_objetos", "escribir", "manejar_dinero",
+                "orientacion_zona_donde_vive", "recordar_citas", "pasatiempos",
+                "comunicarse_con_gente", "calculos_mentales", "recordar_compras",
+                "contener_orina", "entender_pelicula", "orientacion_en_casa",
+                "hacer_tareas_hogar", "comer_solo", "realizar_tramites",
+                "decisiones_y_adaptacion", "egoismo", "enojo_menos_paciencia",
+                "llorar_con_facilidad", "reir_situaciones_inapropiadas", "temas_sexuales",
+                "falta_de_interes", "deprimido"
+            ]
+
+            # Extraer respuestas
+            respuestas = {campo: request.POST.get(campo+"_texto") for campo in campos}
+
+            # Calcular puntaje total (30 a 120)
+            puntaje_total = 0
+            for campo in campos:
+                try:
+                    valor = int(request.POST.get(campo, 0))
+                    puntaje_total += valor
+                except ValueError:
+                    pass
+
+            # Guardar o actualizar registro
+            aqdcuidador, created = AQDCuidadorResult.objects.update_or_create(
+                visita_examen=visita_examen,
+                defaults={
+                    **respuestas,
+                    # "puntaje_total": puntaje_total,  # si luego agregas este campo al modelo
+                },
+            )
+
+            # Marcar como completado
+            visita_examen.estado = "completado"
+            visita_examen.fecha_completado = timezone.now()
+            visita_examen.save()
+
+            messages.success(
+                request,
+                f"✅ Escala AQ-D Cuidador guardada correctamente. Puntaje total: {puntaje_total}"
+            )
+            return redirect("detalle_paciente", paciente_id=paciente_id)
+
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+
+            try:
+                if "visita_examen" in locals():
+                    visita_examen.estado = "pendiente"
+                    visita_examen.save()
+            except:
+                pass
+
+            messages.error(
+                request,
+                f"❌ Error al guardar la escala AQ-D Cuidador: {str(e)}"
+            )
+            return redirect("detalle_paciente", paciente_id=paciente_id or 1)
+
+    else:
+        messages.error(request, "❌ Método no permitido.")
+        return redirect("index")
+
+    
+@login_required
+def guardar_examen_Participante_AQD(request):
+    if request.method == "POST":
+        try:
+            visita_id = request.POST.get("visita_id")
+            paciente_id = request.POST.get("paciente_id")
+            examen_id = request.POST.get("examen_id")
+
+            # Buscar la visita asociada
+            visita_examen = get_object_or_404(
+                VisitaExamen, visita_id=visita_id, examen_id=examen_id
+            )
+
+            # Marcar como en progreso si está pendiente
+            if visita_examen.estado == "pendiente":
+                visita_examen.estado = "en_progreso"
+                visita_examen.fecha_inicio = timezone.now()
+                visita_examen.save()
+
+            # Campos (30 ítems)
+            campos = [
+                "recordar_fecha", "orientacion_lugares_nuevos", "recordar_llamadas",
+                "entender_conversacion", "firmar", "entender_lectura", "mantener_orden",
+                "recordar_lugar_objetos", "escribir", "manejar_dinero",
+                "orientacion_zona_donde_vive", "recordar_citas", "pasatiempos",
+                "comunicarse_con_gente", "calculos_mentales", "recordar_compras",
+                "contener_orina", "entender_pelicula", "orientacion_en_casa",
+                "hacer_tareas_hogar", "comer_solo", "realizar_tramites",
+                "decisiones_y_adaptacion", "egoismo", "enojo_menos_paciencia",
+                "llorar_con_facilidad", "reir_situaciones_inapropiadas", "temas_sexuales",
+                "falta_de_interes", "deprimido"
+            ]
+
+            # Extraer respuestas
+            respuestas = {campo: request.POST.get(campo+"_texto") for campo in campos}
+
+            # Calcular puntaje total
+            puntaje_total = 0
+            for campo in campos:
+                try:
+                    valor = int(request.POST.get(campo, 0))
+                    puntaje_total += valor
+                except ValueError:
+                    pass
+
+            # Guardar en BD (update si ya existe)
+            aqdparticipante, created =AQDParticipanteResult.objects.update_or_create(
+                visita_examen=visita_examen,
+                defaults={
+                    **respuestas,
+                    # Si luego necesitas un campo en el modelo, lo puedes añadir
+                    # "puntaje_total": puntaje_total,
+                },
+            )
+
+            # Marcar como completado
+            visita_examen.estado = "completado"
+            visita_examen.fecha_completado = timezone.now()
+            visita_examen.save()
+
+            messages.success(
+                request,
+                f"✅ Escala AQ-D Participante guardada exitosamente. Puntaje total: {puntaje_total}"
+            )
+            return redirect("detalle_paciente", paciente_id=paciente_id)
+
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+
+            # Revertir estado si falla
+            try:
+                if "visita_examen" in locals():
+                    visita_examen.estado = "pendiente"
+                    visita_examen.save()
+            except:
+                pass
+
+            messages.error(
+                request,
+                f"❌ Error al guardar la escala AQ-D Participante: {str(e)}"
+            )
+            return redirect("detalle_paciente", paciente_id=paciente_id or 1)
+
+    else:
+        messages.error(request, "❌ Método no permitido.")
+        return redirect("index")
+
+
+
+
+@login_required
+def guardar_examen_Participante_CDR(request):
+    if request.method == "POST":
+        try:
+            visita_id = request.POST.get("visita_id")
+            paciente_id = request.POST.get("paciente_id")
+            examen_id = request.POST.get("examen_id")
+
+            # Obtener la instancia de VisitaExamen
+            visita_examen = get_object_or_404(
+                VisitaExamen, visita_id=visita_id, examen_id=examen_id
+            )
+
+            # Marcar como iniciado si está pendiente
+            if visita_examen.estado == "pendiente":
+                visita_examen.estado = "en_progreso"
+                visita_examen.fecha_inicio = timezone.now()
+                visita_examen.save()
+
+            # Construimos diccionario con TODAS las respuestas
+            defaults = {}
+
+            # Iteramos sobre los campos definidos en el modelo
+            for field in CDRParticipanteResult._meta.get_fields():
+                if field.name in ["id", "visita_examen", "resultadoexamenbase_ptr"]:
+                    continue  # ignorar claves y herencia
+                if hasattr(field, "get_internal_type") and field.get_internal_type() == "BooleanField":
+                    defaults[field.name] = bool(request.POST.get(field.name))
+                else:
+                    value = request.POST.get(field.name)
+                    defaults[field.name] = value if value != "" else None
+
+            # Crear o actualizar el resultado
+            cdrparticipante, created = CDRParticipanteResult.objects.update_or_create(
+                visita_examen=visita_examen,
+                defaults=defaults,
+            )
+
+            # Marcar el examen como completado
+            visita_examen.estado = "completado"
+            visita_examen.fecha_completado = timezone.now()
+            visita_examen.save()
+
+            messages.success(request, "✅ Cuestionario CDR - Participante guardado exitosamente.")
+            return redirect("detalle_paciente", paciente_id=paciente_id)
+
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+
+            # Revertir estado si hubo error
+            try:
+                if "visita_examen" in locals():
+                    visita_examen.estado = "pendiente"
+                    visita_examen.save()
+            except:
+                pass
+
+            messages.error(request, f"❌ Error al guardar el cuestionario CDR - Participante: {str(e)}")
+            return redirect("detalle_paciente", paciente_id=paciente_id or 1)
+
+    else:
+        messages.error(request, "❌ Método no permitido.")
+        return redirect("index")
+    
+@login_required
+def guardar_examen_Participante_MoCA(request):
+    if request.method == "POST":
+        try:
+            visita_id = request.POST.get("visita_id")
+            paciente_id = request.POST.get("paciente_id")
+            examen_id = request.POST.get("examen_id")
+
+            # Obtener la instancia de VisitaExamen
+            visita_examen = get_object_or_404(
+                VisitaExamen, visita_id=visita_id, examen_id=examen_id
+            )
+
+            # Marcar como iniciado si está pendiente
+            if visita_examen.estado == "pendiente":
+                visita_examen.estado = "en_progreso"
+                visita_examen.fecha_inicio = timezone.now()
+                visita_examen.save()
+
+            # Obtener los campos EXACTOS del modelo MoCAResult
+            alternancia = int(request.POST.get("alternancia", 0))
+            cubo = int(request.POST.get("cubo", 0))
+            reloj = int(request.POST.get("reloj", 0))
+            denominacion = int(request.POST.get("denominacion", 0))
+            atencion = int(request.POST.get("atencion", 0))
+            repeticion = int(request.POST.get("repeticion", 0))
+            fluidez = int(request.POST.get("fluidez", 0))
+            abstraccion = int(request.POST.get("abstraccion", 0))
+            diferido = int(request.POST.get("diferido", 0))
+            orientacion = int(request.POST.get("orientacion", 0))
+            educacion_baja = True if request.POST.get("educacion_baja") == "on" else False
+
+            # Calcular puntaje total
+            puntaje_total = (
+                alternancia
+                + cubo
+                + reloj
+                + denominacion
+                + atencion
+                + repeticion
+                + fluidez
+                + abstraccion
+                + diferido
+                + orientacion
+            )
+
+            if educacion_baja and puntaje_total < 30:
+                puntaje_total += 1
+
+            # Determinar interpretación
+            if puntaje_total >= 26:
+                interpretacion = "Puntaje normal (función cognitiva preservada)"
+            else:
+                interpretacion = "Posible deterioro cognitivo. Se recomienda evaluación clínica adicional."
+
+            # Crear o actualizar el resultado
+            moca, created = MoCAResult.objects.update_or_create(
+                visita_examen=visita_examen,
+                defaults={
+                    "alternancia": alternancia,
+                    "cubo": cubo,
+                    "reloj": reloj,
+                    "denominacion": denominacion,
+                    "atencion": atencion,
+                    "repeticion": repeticion,
+                    "fluidez": fluidez,
+                    "abstraccion": abstraccion,
+                    "diferido": diferido,
+                    "orientacion": orientacion,
+                    "educacion_baja": educacion_baja,
+                    "puntaje_total": puntaje_total,
+                    "interpretacion": interpretacion,
+                },
+            )
+
+            print(
+                f"DEBUG: MoCA {'creado' if created else 'actualizado'} con ID: {moca.id}"
+            )
+            print(f"DEBUG: Puntaje total: {moca.puntaje_total}")
+            print(f"DEBUG: Interpretación: {moca.interpretacion}")
+
+            # Marcar el examen como completado
+            visita_examen.estado = "completado"
+            visita_examen.fecha_completado = timezone.now()
+            visita_examen.save()
+
+            messages.success(
+                request,
+                f"✅ Escala MoCA guardada exitosamente.\n"
+                f"📊 Puntaje: {puntaje_total}/30\n"
+                f"🔍 Interpretación: {interpretacion}",
+            )
+            return redirect("detalle_paciente", paciente_id=paciente_id)
+
+        except Exception as e:
+            import traceback
+
+            traceback.print_exc()
+
+            # Revertir estado si hubo error
+            try:
+                if "visita_examen" in locals():
+                    visita_examen.estado = "pendiente"
+                    visita_examen.save()
+                    print("DEBUG: Estado revertido a pendiente")
+            except:
+                pass
+
+            messages.error(
+                request, f"❌ Error al guardar la escala MoCA: {str(e)}"
+            )
+            return redirect("detalle_paciente", paciente_id=paciente_id or 1)
+
+    else:
+        messages.error(request, "❌ Método no permitido.")
+        return redirect("index")
+    
+@login_required
+def guardar_examen_Cuidador_CDR(request):
+    if request.method == "POST":
+        try:
+            visita_id = request.POST.get("visita_id")
+            paciente_id = request.POST.get("paciente_id")
+            examen_id = request.POST.get("examen_id")
+
+            # Obtener visita_examen
+            visita_examen = get_object_or_404(
+                VisitaExamen, visita_id=visita_id, examen_id=examen_id
+            )
+
+            # Marcar como en progreso si está pendiente
+            if visita_examen.estado == "pendiente":
+                visita_examen.estado = "en_progreso"
+                visita_examen.fecha_inicio = timezone.now()
+                visita_examen.save()
+
+            # Recoger todos los campos EXACTOS del modelo
+            campos = {
+                "memoria_p1": request.POST.get("memoria_p1", ""),
+                "memoria_p1_1": request.POST.get("memoria_p1_1", ""),
+                "memoria_p2": request.POST.get("memoria_p2", ""),
+                "memoria_p3": request.POST.get("memoria_p3", ""),
+                "memoria_p4": request.POST.get("memoria_p4", ""),
+                "memoria_p5": request.POST.get("memoria_p5", ""),
+                "memoria_p6": request.POST.get("memoria_p6", ""),
+                "memoria_p7": request.POST.get("memoria_p7", ""),
+                "memoria_p8": request.POST.get("memoria_p8", ""),
+                "evento_recuerda_semana": request.POST.get("evento_recuerda_semana", ""),
+                "evento_recuerda_mes": request.POST.get("evento_recuerda_mes", ""),
+                "nacimiento_fecha": request.POST.get("nacimiento_fecha") or None,
+                "nacimiento_lugar": request.POST.get("nacimiento_lugar", ""),
+                "colegio_nombre": request.POST.get("colegio_nombre", ""),
+                "colegio_lugar": request.POST.get("colegio_lugar", ""),
+                "colegio_grado": request.POST.get("colegio_grado", ""),
+                "ocupacion_principal": request.POST.get("ocupacion_principal", ""),
+                "ultimo_trabajo": request.POST.get("ultimo_trabajo", ""),
+                "jubilacion": request.POST.get("jubilacion", ""),
+                "orientacion_p1": request.POST.get("orientacion_p1", ""),
+                "orientacion_p2": request.POST.get("orientacion_p2", ""),
+                "orientacion_p3": request.POST.get("orientacion_p3", ""),
+                "orientacion_p4": request.POST.get("orientacion_p4", ""),
+                "orientacion_p5": request.POST.get("orientacion_p5", ""),
+                "orientacion_p6": request.POST.get("orientacion_p6", ""),
+                "orientacion_p7": request.POST.get("orientacion_p7", ""),
+                "orientacion_p8": request.POST.get("orientacion_p8", ""),
+                "juicio_p1": request.POST.get("juicio_p1", ""),
+                "juicio_p2": request.POST.get("juicio_p2", ""),
+                "juicio_p3": request.POST.get("juicio_p3", ""),
+                "juicio_p4": request.POST.get("juicio_p4", ""),
+                "juicio_p5": request.POST.get("juicio_p5", ""),
+                "juicio_p6": request.POST.get("juicio_p6", ""),
+                "trabaja_actualmente": request.POST.get("trabaja_actualmente", ""),
+                "memoria_causa_jubilacion": request.POST.get("memoria_causa_jubilacion", ""),
+                "dificultades_trabajo_memoria": request.POST.get("dificultades_trabajo_memoria", ""),
+                "condujo_alguna_vez": request.POST.get("condujo_alguna_vez", ""),
+                "conduce_actualmente": request.POST.get("conduce_actualmente", ""),
+                "dejo_de_conducir_por_memoria": request.POST.get("dejo_de_conducir_por_memoria", ""),
+                "riesgos_conduccion": request.POST.get("riesgos_conduccion", ""),
+                "compras_independientes": request.POST.get("compras_independientes", ""),
+                "actividades_fuera_hogar": request.POST.get("actividades_fuera_hogar", ""),
+                "asiste_funciones_sociales": request.POST.get("asiste_funciones_sociales", ""),
+                "motivo_no_funciones": request.POST.get("motivo_no_funciones", ""),
+                "parece_enfermo": request.POST.get("parece_enfermo", ""),
+                "participa_hogar_geriatrico": request.POST.get("participa_hogar_geriatrico", ""),
+                "info_suficiente_comunitarias": request.POST.get("info_suficiente_comunitarias", ""),
+                "notas_comunitarias": request.POST.get("notas_comunitarias", ""),
+                "cambios_tareas_domesticas": request.POST.get("cambios_tareas_domesticas", ""),
+                "cosas_que_aun_realiza_domesticas": request.POST.get("cosas_que_aun_realiza_domesticas", ""),
+                "cambios_pasatiempos": request.POST.get("cambios_pasatiempos", ""),
+                "cosas_que_aun_realiza_pasatiempos": request.POST.get("cosas_que_aun_realiza_pasatiempos", ""),
+                "actividades_no_realiza_en_hogar": request.POST.get("actividades_no_realiza_en_hogar", ""),
+                "habilidad_domestica_dementia_scale": request.POST.get("habilidad_domestica_dementia_scale") or None,
+                "descripcion_habilidad_domestica": request.POST.get("descripcion_habilidad_domestica", ""),
+                "nivel_desempeno_domestico": request.POST.get("nivel_desempeno_domestico", ""),
+                "notas_domesticas_pasatiempos": request.POST.get("notas_domesticas_pasatiempos", ""),
+                "cuidado_p1": request.POST.get("cuidado_p1") or None,
+                "cuidado_p2": request.POST.get("cuidado_p2") or None,
+                "cuidado_p3": request.POST.get("cuidado_p3") or None,
+                "cuidado_p4": request.POST.get("cuidado_p4") or None,
+            }
+
+            # Guardar o actualizar
+            cdrcuidador, created = CDRCuidadorResult.objects.update_or_create(
+                visita_examen=visita_examen, defaults=campos
+            )
+
+            print(f"DEBUG: CDR Cuidador {'creado' if created else 'actualizado'} con ID {cdrcuidador.id}")
+
+            # Marcar examen como completado
+            visita_examen.estado = "completado"
+            visita_examen.fecha_completado = timezone.now()
+            visita_examen.save()
+
+            messages.success(
+                request,
+                "✅ Escala CDR (Cuidador) guardada exitosamente."
+            )
+            return redirect("detalle_paciente", paciente_id=paciente_id)
+
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            try:
+                if "visita_examen" in locals():
+                    visita_examen.estado = "pendiente"
+                    visita_examen.save()
+            except:
+                pass
+            messages.error(
+                request,
+                f"❌ Error al guardar el cuestionario CDR (Cuidador): {str(e)}"
+            )
+            return redirect("detalle_paciente", paciente_id=paciente_id or 1)
+
+    else:
+        messages.error(request, "❌ Método no permitido.")
+        return redirect("index")
+    
+@login_required
+def guardar_examen_Cuidador_RedLatSpanish(request):
+    if request.method == "POST":
+        try:
+            visita_id = request.POST.get("visita_id")
+            paciente_id = request.POST.get("paciente_id")
+            examen_id = request.POST.get("examen_id")
+
+            # Obtener la instancia de la visita
+            visita_examen = get_object_or_404(
+                VisitaExamen, visita_id=visita_id, examen_id=examen_id
+            )
+
+            # Si está pendiente, marcar como en progreso
+            if visita_examen.estado == "pendiente":
+                visita_examen.estado = "en_progreso"
+                visita_examen.fecha_inicio = timezone.now()
+                visita_examen.save()
+
+            # Recoger los campos EXACTOS del modelo
+            campos = {k: request.POST.get(k+"_texto", "") for k in [
+                # Autocuidado
+                "comer","vestirse","banarse","bano","medicamentos","apariencia",
+                
+                # Cuidado del hogar
+                "cocinar","poner_mesa","aseo_hogar","mantener_casa","reparar_hogar","lavado_ropa",
+                
+                # Trabajo y recreación
+                "trabajo","recreacion","organizaciones","desplazamiento",
+                
+                # Compras y dinero
+                "alimentos","dinero_efectivo","finanzas",
+                
+                # Viajes
+                "transporte_publico","manejo_vehiculos","movilidad_barrio","viajes_fuera",
+                
+                # Comunicación
+                "telefono","conversacion","comprension","lectura","escritura",
+            
+                # Tecnología
+                "computador","telefono_celular","cajero","internet","email","redes_sociales",
+            ]}
+
+            # Recoger los puntajes de cada sección
+            puntajes = {
+                "puntaje_autocuidado": request.POST.get("puntaje_autocuidado"),
+                "puntaje_cuidado_hogar": request.POST.get("puntaje_cuidado_hogar"),
+                "puntaje_trabajo_recreacion": request.POST.get("puntaje_trabajo_recreacion"),
+                "puntaje_compras_dinero": request.POST.get("puntaje_compras_dinero"),
+                "puntaje_viajes": request.POST.get("puntaje_viajes"),
+                "puntaje_comunicacion": request.POST.get("puntaje_comunicacion"),
+                "puntaje_tecnologia": request.POST.get("puntaje_tecnologia"),
+            }
+
+            # Combinar campos de texto y puntajes
+            defaults = {**campos, **puntajes}
+
+            # Crear o actualizar
+            redlatspanish, created = RedLatSpanishResult.objects.update_or_create(
+                visita_examen=visita_examen,  # campo de búsqueda
+                defaults=defaults
+            )
+
+            print(f"DEBUG: RedLatSpanish {'creado' if created else 'actualizado'} con ID {redlatspanish.id}")
+
+            # Marcar el examen como completado
+            visita_examen.estado = "completado"
+            visita_examen.fecha_completado = timezone.now()
+            visita_examen.save()
+
+            messages.success(
+                request, "✅ Evaluación RedLat Spanish guardada exitosamente."
+            )
+            return redirect("detalle_paciente", paciente_id=paciente_id)
+
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+
+            # Revertir estado si hubo error
+            try:
+                if "visita_examen" in locals():
+                    visita_examen.estado = "pendiente"
+                    visita_examen.save()
+            except:
+                pass
+
+            messages.error(
+                request, f"❌ Error al guardar la Evaluación RedLat Spanish: {str(e)}"
             )
             return redirect("detalle_paciente", paciente_id=paciente_id or 1)
 
