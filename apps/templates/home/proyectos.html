@@ -29,7 +29,7 @@
   </div>
   {% endif %}
   <div class="row">
-    <div class="col-xl-6 order-xl-1">
+    <div class="col-xl-4 order-xl-1">
       <div class="card">
         <div class="card-header">
           <h3 class="mb-0">Crear Nuevo Proyecto</h3>
@@ -71,185 +71,222 @@
       </div>
     </div>
     <!-- Mostrar Proyectos Existentes -->
-    <div class="col-xl-6 order-xl-2">
+    <div class="col-xl-8 order-xl-2">
       <div class="card">
         <div class="card-header">
-          <h3 class="mb-0">Proyectos Existentes</h3>
+          <div class="row align-items-center">
+            <div class="col">
+              <h3 class="mb-0">
+                <i class="fas fa-folder-open mr-2 text-primary"></i>
+                Proyectos Existentes
+              </h3>
+              <p class="text-muted small mb-0">Gestiona tus proyectos de investigación</p>
+            </div>
+            <div class="col-auto">
+              <span class="badge badge-primary badge-lg">{{ proyectos|length }} Proyectos</span>
+            </div>
+          </div>
         </div>
+
         <div class="card-body">
-          <ul class="list-group">
-            {% for proyecto in proyectos %}
-            <li class="list-group-item">
-              <!-- Encabezado del proyecto -->
-              <div class="d-flex justify-content-between align-items-center mb-3">
-                <h5 class="card-title text-uppercase text-muted mb-0">{{ proyecto.nombre }}</h5>
-                <div>
-                  <!-- Botón para ver la descripción del proyecto -->
-                  <button class="btn btn-sm btn-info" data-toggle="modal" data-target="#modalDescripcionProyecto"
-                    data-id="{{ proyecto.id }}" data-nombre="{{ proyecto.nombre }}"
-                    data-fecha-inicio="{{ proyecto.fecha_inicio|date:'Y-m-d' }}"
-                    data-fecha-financiacion="{{ proyecto.fecha_financiacion|date:'Y-m-d' }}"
-                    data-investigador="{{ proyecto.investigador_principal }}"
-                    data-codigo-siu="{{ proyecto.codigo_siu }}" data-descripcion="{{ proyecto.descripcion }}"
-                    data-proyectoData="{{ proyecto_data }}" data-toggle="tooltip" data-placement="top"
-                    title="Ver Descripción">
-                    <i class="fas fa-info-circle"></i> <!-- Ícono de Font Awesome -->
-                  </button>
+          {% for proyecto in proyectos %}
 
-                  <!-- Botón para agregar visita -->
-                  <button class="btn btn-sm btn-secondary" data-toggle="modal" data-target="#modalAgregarVisita"
-                    data-proyecto-id="{{ proyecto.id }}" data-nombre="{{ proyecto.nombre }}" data-toggle="tooltip"
-                    data-placement="top" title="Agregar Visita">
-                    <i class="fas fa-plus"></i> <!-- Ícono de Font Awesome -->
-                  </button>
-
-                  <!-- Formulario para eliminar proyecto -->
-                  <form method="POST" action="{% url 'eliminar_proyecto' id=proyecto.id %}" style="display:inline;">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-sm btn-danger" data-toggle="tooltip" data-placement="top"
-                      title="Eliminar Proyecto">
-                      <i class="fas fa-trash"></i> <!-- Ícono de Font Awesome -->
+          <!-- TARJETA DE PROYECTO -->
+          <div class="card shadow-sm mb-4 border-left-primary">
+            <!-- Header del Proyecto -->
+            <div class="card-header bg-gradient-primary text-white">
+              <div class="row align-items-center">
+                <div class="col-md-8">
+                  <h4 class="mb-1 text-white">
+                    <i class="fas fa-flask mr-2"></i>
+                    {{ proyecto.nombre }}
+                  </h4>
+                  <small class="text-white-50">
+                    <i class="fas fa-user-tie mr-1"></i>
+                    {{ proyecto.investigador_principal|default:"Sin investigador asignado" }}
+                  </small>
+                </div>
+                <div class="col-md-4 text-right">
+                  <!-- Botones de Acción del Proyecto -->
+                  <div class="btn-group btn-group-sm" role="group">
+                    <button class="btn btn-light" data-toggle="modal" data-target="#modalDescripcionProyecto"
+                      data-id="{{ proyecto.id }}" data-nombre="{{ proyecto.nombre }}"
+                      data-fecha-inicio="{{ proyecto.fecha_inicio|date:'Y-m-d' }}"
+                      data-fecha-financiacion="{{ proyecto.fecha_financiacion|date:'Y-m-d' }}"
+                      data-investigador="{{ proyecto.investigador_principal }}"
+                      data-codigo-siu="{{ proyecto.codigo_siu }}" data-descripcion="{{ proyecto.descripcion }}"
+                      title="Ver Información">
+                      <i class="fas fa-info-circle"></i>
                     </button>
-                  </form>
+
+                    <button class="btn btn-light" data-toggle="modal" data-target="#modalAgregarVisita"
+                      data-proyecto-id="{{ proyecto.id }}" data-nombre="{{ proyecto.nombre }}"
+                      title="Agregar Tipo de Visita">
+                      <i class="fas fa-plus"></i>
+                    </button>
+
+                    <form method="POST" action="{% url 'eliminar_proyecto' id=proyecto.id %}" class="d-inline"
+                      onsubmit="return confirm('¿Eliminar este proyecto y todas sus visitas?');">
+                      {% csrf_token %}
+                      <button type="submit" class="btn btn-outline-light text-danger" title="Eliminar Proyecto">
+                        <i class="fas fa-trash"></i>
+                      </button>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Información del Proyecto -->
+            <div class="card-body">
+              <!-- Metadatos del Proyecto -->
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <small class="text-muted d-block">Código SIU</small>
+                  <strong>{{ proyecto.codigo_siu|default:"No asignado" }}</strong>
+                </div>
+                <div class="col-md-6">
+                  <small class="text-muted d-block">Fecha de Inicio</small>
+                  <strong>{{ proyecto.fecha_inicio|date:"d/m/Y"|default:"No definida" }}</strong>
                 </div>
               </div>
 
-              <!-- Lista de visitas del proyecto -->
-              <div class="mt-3">
+              <!-- Contador de Visitas -->
+
+
+              <!-- Lista de Tipos de Visita -->
+              <div class="visitas-container">
                 {% for key, visitas in proyecto_data.items %}
                 {% if key == proyecto.id and visitas %}
-                <ul class="list-group">
+
+                <h6 class="text-muted mb-3">
+                  <i class="fas fa-calendar-alt mr-2"></i>
+                  Tipos de Visita Configurados
+                </h6>
+
+                <div class="row">
                   {% for visita in visitas %}
-                  <li class="list-group-item d-flex justify-content-between align-items-center">
-                    <span class="font-weight-bold">Visita: {{ visita.nombre }}</span>
+                  <div class="col-md-12 mb-3">
+                    <!-- TARJETA DE TIPO DE VISITA -->
+                    <div class="card border-left-secondary">
+                      <div class="card-body p-3">
+                        <!-- Header del Tipo de Visita -->
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                          <div>
+                            <h6 class="card-title mb-1">
+                              <i class="fas fa-stethoscope mr-2 text-primary"></i>
+                              {{ visita.nombre }}
+                            </h6>
+                            {% if visita.observaciones %}
+                            <small class="text-muted">{{ visita.observaciones|truncatechars:60 }}</small>
+                            {% endif %}
+                          </div>
 
-                    <div class="d-flex gap-2"> <!-- Contenedor flex para alinear los botones -->
-                      <!-- Botón Eliminar Visita -->
-                      <form method="POST" action="{% url 'eliminar_visita' id=visita.id %}" class="m-0">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-sm btn-danger" data-toggle="tooltip" data-placement="top"
-                          title="Eliminar Visita">
-                          <i class="fas fa-trash"></i>
-                        </button>
-                      </form>
+                          <!-- Botones de Acción del Tipo de Visita -->
+                          <div class="btn-group btn-group-sm" role="group">
+                            <button class="btn btn-outline-info" data-toggle="collapse"
+                              data-target="#examenes-visita-{{ proyecto.id }}-{{ forloop.counter }}"
+                              title="Ver Exámenes">
+                              <i class="fas fa-list"></i>
+                            </button>
 
-                      <!-- Botón Ver Exámenes -->
-                      <button class="btn btn-sm btn-info" data-toggle="collapse"
-                        data-target="#examenes-visita-{{ proyecto.id }}-{{ forloop.counter }}" data-toggle="tooltip"
-                        data-placement="top" title="Ver Exámenes">
-                        <i class="fas fa-list"></i>
-                      </button>
+                            <button type="button" class="btn btn-outline-warning" data-toggle="modal"
+                              data-target="#modalEditarVisita-{{ visita.id }}" title="Editar Tipo de Visita">
+                              <i class="fas fa-edit"></i>
+                            </button>
 
-                      <!-- Botón Editar Visita -->
-                      <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal"
-                        data-bs-target="#modalEditarVisita-{{ visita.id }}" data-visita-id="{{ visita.id }}"
-                        data-nombre="{{ visita.nombre }}" data-observaciones="{{ visita.observaciones }}"
-                        data-proyecto="{{ visita.proyecto }}" data-examenes="{{ visita.examenes }}">
-                        <i class="fas fa-edit"></i>
-                      </button>
-                    </div>
-
-                    <!-- Contenedor de exámenes (colapsable) -->
-                    <div id="examenes-visita-{{ proyecto.id }}-{{ forloop.counter }}" class="collapse mt-3">
-                      <ul class="list-group">
-                        <!-- Iterar sobre los exámenes de la visita -->
-                        {% for examen in visita.examenes %}
-                        <li class="list-group-item">
-                          <strong>Examen:</strong> {{ examen }}
-                        </li>
-                        {% endfor %}
-                      </ul>
-                    </div>
-                  </li>
-
-                  <div class="modal fade" id="modalEditarVisita-{{ visita.id }}" tabindex="-1"
-                    aria-labelledby="modalLabel" aria-hidden="true">
-                    <div class="modal-dialog modal-lg">
-                      <div class="modal-content">
-                        <div class="modal-header">
-                          <h5 class="modal-title">Editar Visita</h5>
-                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            <form method="POST" action="{% url 'eliminar_visita' id=visita.id %}" class="d-inline"
+                              onsubmit="return confirm('¿Eliminar este tipo de visita?');">
+                              {% csrf_token %}
+                              <button type="submit" class="btn btn-outline-danger" title="Eliminar">
+                                <i class="fas fa-trash"></i>
+                              </button>
+                            </form>
+                          </div>
                         </div>
-                        <form method="POST" action="{% url 'editar_visita' visita.id %}">
-                          {% csrf_token %}
-                          <div class="modal-body">
-                            <input type="hidden" name="proyecto_id" value="{{ proyecto.id  }}">
-                            <!-- Nombre -->
-                            <div class="mb-3">
-                              <label class="form-label">Nombre del Tipo de Visita</label>
-                              <input type="text" class="form-control" name="nombre_visita" value="{{ visita.nombre }}"
-                                required>
-                            </div>
 
-                            <!-- Observaciones -->
-                            <div class="mb-3">
-                              <label class="form-label">Observaciones</label>
-                              <textarea class="form-control" name="observaciones">{{ visita.observaciones }}</textarea>
-                            </div>
+                        <!-- Badge con cantidad de exámenes -->
+                        <div class="mb-2">
+                          <span class="badge badge-secondary">
+                            <i class="fas fa-clipboard-list mr-1"></i>
+                            {{ visita.examenes|length }} Examen{{ visita.examenes|length|pluralize:"es" }}
+                          </span>
+                        </div>
 
-                            <!-- Exámenes Asociados -->
-                            <div class="card">
-                              <div class="card-header">
-                                <h4>Gestión de Exámenes</h4>
-                              </div>
-                              <div class="card-body">
-                                <div class="row">
-                                  <div class="col-md-6">
-                                    <h5>Exámenes Asociados</h5>
-                                    {% for examen in visita.examenes.all %}
-                                    <div class="form-check">
-                                      <input class="form-check-input" type="checkbox" value="{{ examen }}"
-                                        id="examen_asociado_{{ examen.id }}" checked>
-                                      <label class="form-check-label" for="examen_asociado_{{ examen.id }}">
-                                        {{examen}}
-                                      </label>
-                                    </div>
-                                    {% empty %}
-                                    <p class="text-muted">No hay exámenes asociados</p>
-                                    {% endfor %}
-                                  </div>
-                                  <div class="col-md-6">
-                                    <h5>Exámenes Disponibles</h5>
-                                    {% for examen in examenes %}
-                                    {% if examen.nombre not in visita.examenes.all %}
-                                    <div class="form-check">
-                                      <input class="form-check-input" type="checkbox" name="examenes"
-                                        value="{{ examen.id }}" id="examen_disponible_{{ examen.id }}">
-                                      <label class="form-check-label" for="examen_disponible_{{ examen.id }}">
-                                        {{ examen.nombre }}
-                                      </label>
-                                    </div>
-                                    {% endif %}
-                                    {% empty %}
-                                    <p class="text-muted">No hay más exámenes disponibles</p>
-                                    {% endfor %}
-                                  </div>
-                                </div>
-                              </div>
+                        <!-- Lista de Exámenes (Colapsable) -->
+                        <div id="examenes-visita-{{ proyecto.id }}-{{ forloop.counter }}" class="collapse">
+                          <hr class="my-2">
+                          <h6 class="text-muted mb-2">
+                            <i class="fas fa-microscope mr-1"></i>
+                            Exámenes Configurados
+                          </h6>
+
+                          {% if visita.examenes %}
+                          <div class="row">
+                            {% for examen in visita.examenes %}
+                            <div class="col-md-6 mb-1">
+                              <small class="badge badge-light border">
+                                <i class="fas fa-check-circle text-success mr-1"></i>
+                                {{ examen }}
+                              </small>
                             </div>
+                            {% endfor %}
                           </div>
-
-                          <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                            <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                          {% else %}
+                          <div class="alert alert-warning py-2">
+                            <small>
+                              <i class="fas fa-exclamation-triangle mr-1"></i>
+                              No hay exámenes configurados para este tipo de visita
+                            </small>
                           </div>
-                        </form>
+                          {% endif %}
+                        </div>
                       </div>
                     </div>
                   </div>
                   {% endfor %}
-                </ul>
+                </div>
+
                 {% endif %}
                 {% endfor %}
 
-                <!-- Mensaje si no hay visitas -->
+                <!-- Estado Vacío para Tipos de Visita -->
                 {% if proyecto.id not in proyecto_data %}
-                <p class="text-muted">No hay visitas registradas para este proyecto.</p>
+                <div class="text-center py-4">
+                  <div class="mb-3">
+                    <i class="fas fa-calendar-plus fa-3x text-muted"></i>
+                  </div>
+                  <h6 class="text-muted">No hay tipos de visita configurados</h6>
+                  <p class="text-muted mb-3">Configura el primer tipo de visita para este proyecto</p>
+                  <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modalAgregarVisita"
+                    data-proyecto-id="{{ proyecto.id }}" data-nombre="{{ proyecto.nombre }}">
+                    <i class="fas fa-plus mr-2"></i>Crear Primer Tipo de Visita
+                  </button>
+                </div>
                 {% endif %}
               </div>
-            </li>
-            {% endfor %}
-          </ul>
+            </div>
+          </div>
+          <!-- FIN TARJETA DE PROYECTO -->
+
+          {% empty %}
+          <!-- Estado Vacío para Proyectos -->
+          <div class="text-center py-5">
+            <div class="mb-4">
+              <i class="fas fa-folder-open fa-4x text-muted"></i>
+            </div>
+            <h4 class="text-muted">No hay proyectos creados</h4>
+            <p class="text-muted mb-4">
+              Crea tu primer proyecto de investigación para comenzar.
+            </p>
+            <div class="alert alert-light border-left-info">
+              <small class="text-muted">
+                <i class="fas fa-info-circle mr-1"></i>
+                Usa el formulario de la izquierda para crear un nuevo proyecto.
+              </small>
+            </div>
+          </div>
+          {% endfor %}
         </div>
       </div>
     </div>
@@ -257,53 +294,208 @@
 </div>
 
 
-<!-- Modal para Ver Descripción del Proyecto -->
-<div class="modal fade" id="modalDescripcionProyecto" tabindex="-1" role="dialog"
-  aria-labelledby="modalDescripcionTitulo" aria-hidden="true">
+<!-- MODALES REESTRUCTURADOS AL FINAL -->
+{% for proyecto in proyectos %}
+{% for key, visitas in proyecto_data.items %}
+{% if key == proyecto.id and visitas %}
+{% for visita in visitas %}
+
+<!-- Modal Editar Tipo de Visita -->
+<div class="modal fade" id="modalEditarVisita-{{ visita.id }}" tabindex="-1" role="dialog">
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="modalDescripcionTitulo">Descripción del Proyecto</h5>
+        <h5 class="modal-title">
+          <i class="fas fa-edit mr-2"></i>
+          Editar Tipo de Visita: {{ visita.nombre }}
+        </h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      <div class="modal-body">
-        <div class="container-fluid">
-          <div class="row">
-            <div class="col-md-6">
-              <p><strong>Nombre del Proyecto:</strong> <span id="proyectoNombre"></span></p>
-              <p><strong>Fecha de Inicio:</strong> <span id="proyectoFechaInicio"></span></p>
-              <p><strong>Fecha de Financiación:</strong> <span id="proyectoFechaFinanciacion"></span></p>
+      <form method="POST" action="{% url 'editar_visita' visita.id %}">
+        {% csrf_token %}
+        <div class="modal-body">
+          <input type="hidden" name="proyecto_id" value="{{ proyecto.id }}">
+
+          <!-- Información del Proyecto -->
+          <div class="alert alert-light mb-3">
+            <small class="text-muted">
+              <i class="fas fa-flask mr-1"></i>
+              Proyecto: <strong>{{ proyecto.nombre }}</strong>
+            </small>
+          </div>
+
+          <!-- Nombre -->
+          <div class="form-group">
+            <label class="form-label">
+              <i class="fas fa-tag mr-1"></i>
+              Nombre del Tipo de Visita
+            </label>
+            <input type="text" class="form-control" name="nombre_visita" value="{{ visita.nombre }}" required>
+          </div>
+
+          <!-- Observaciones -->
+          <div class="form-group">
+            <label class="form-label">
+              <i class="fas fa-comment mr-1"></i>
+              Observaciones
+            </label>
+            <textarea class="form-control" name="observaciones" rows="3">{{ visita.observaciones }}</textarea>
+          </div>
+
+          <!-- Gestión de Exámenes -->
+          <div class="card">
+            <div class="card-header bg-light">
+              <h6 class="mb-0">
+                <i class="fas fa-microscope mr-2"></i>
+                Gestión de Exámenes
+              </h6>
             </div>
-            <div class="col-md-6">
-              <p><strong>Investigador Principal:</strong> <span id="proyectoInvestigador"></span></p>
-              <p><strong>Código SIU:</strong> <span id="proyectoCodigoSIU"></span></p>
+            <div class="card-body">
+              <div class="row">
+                <!-- Exámenes Asociados -->
+                <div class="col-md-6">
+                  <h6 class="text-success">
+                    <i class="fas fa-check-circle mr-1"></i>
+                    Exámenes Asociados
+                  </h6>
+                  <div class="border rounded p-3" style="max-height: 200px; overflow-y: auto;">
+                    {% for examen in visita.examenes.all %}
+                    <div class="form-check mb-1">
+                      <input class="form-check-input" type="checkbox" value="{{ examen.id }}"
+                        id="examen_asociado_{{ examen.id }}" checked>
+                      <label class="form-check-label" for="examen_asociado_{{ examen.id }}">
+                        <small class="badge badge-success">{{ examen }}</small>
+                      </label>
+                    </div>
+                    {% empty %}
+                    <div class="text-center py-3">
+                      <i class="fas fa-info-circle text-muted"></i>
+                      <p class="text-muted small mb-0">No hay exámenes asociados</p>
+                    </div>
+                    {% endfor %}
+                  </div>
+                </div>
+
+                <!-- Exámenes Disponibles -->
+                <div class="col-md-6">
+                  <h6 class="text-primary">
+                    <i class="fas fa-plus-circle mr-1"></i>
+                    Exámenes Disponibles
+                  </h6>
+                  <div class="border rounded p-3" style="max-height: 200px; overflow-y: auto;">
+                    {% for examen in examenes %}
+                    {% if examen.nombre not in visita.examenes.all %}
+                    <div class="form-check mb-1">
+                      <input class="form-check-input" type="checkbox" name="examenes" value="{{ examen.id }}"
+                        id="examen_disponible_{{ examen.id }}">
+                      <label class="form-check-label" for="examen_disponible_{{ examen.id }}">
+                        <small class="badge badge-light border">{{ examen.nombre }}</small>
+                      </label>
+                    </div>
+                    {% endif %}
+                    {% empty %}
+                    <div class="text-center py-3">
+                      <i class="fas fa-check-circle text-success"></i>
+                      <p class="text-muted small mb-0">Todos los exámenes están asociados</p>
+                    </div>
+                    {% endfor %}
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-          <div class="row">
-            <div class="col-md-12">
-              <p><strong>Descripción:</strong></p>
-              <p id="proyectoDescripcion"></p>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">
+            <i class="fas fa-times mr-1"></i>Cancelar
+          </button>
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save mr-1"></i>Guardar Cambios
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endfor %}
+{% endif %}
+{% endfor %}
+{% endfor %}
+
+<!-- Modal Ver Descripción del Proyecto MEJORADO -->
+<div class="modal fade" id="modalDescripcionProyecto" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title">
+          <i class="fas fa-info-circle mr-2"></i>
+          Información del Proyecto
+        </h5>
+        <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group">
+              <label class="text-muted small">Nombre del Proyecto</label>
+              <p class="font-weight-bold" id="proyectoNombre"></p>
+            </div>
+            <div class="form-group">
+              <label class="text-muted small">Fecha de Inicio</label>
+              <p id="proyectoFechaInicio"></p>
+            </div>
+            <div class="form-group">
+              <label class="text-muted small">Fecha de Financiación</label>
+              <p id="proyectoFechaFinanciacion"></p>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label class="text-muted small">Investigador Principal</label>
+              <p id="proyectoInvestigador"></p>
+            </div>
+            <div class="form-group">
+              <label class="text-muted small">Código SIU</label>
+              <p id="proyectoCodigoSIU"></p>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-12">
+            <div class="form-group">
+              <label class="text-muted small">Descripción</label>
+              <div class="border rounded p-3 bg-light">
+                <p id="proyectoDescripcion" class="mb-0"></p>
+              </div>
             </div>
           </div>
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+          <i class="fas fa-times mr-1"></i>Cerrar
+        </button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Modal para Agregar Visita -->
-<div class="modal fade" id="modalAgregarVisita" tabindex="-1" role="dialog" aria-labelledby="modalAgregarVisitas"
-  aria-hidden="true">
-  <div class="modal-dialog" role="document">
+<!-- Modal Agregar Visita MEJORADO -->
+<div class="modal fade" id="modalAgregarVisita" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Agregar tipo de visita al Proyecto</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title">
+          <i class="fas fa-plus mr-2"></i>
+          Agregar Tipo de Visita al Proyecto
+        </h5>
+        <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
@@ -311,125 +503,118 @@
         {% csrf_token %}
         <div class="modal-body">
           <input type="hidden" name="proyecto_id" id="proyecto_id">
-          <p><strong>Nombre del Proyecto:</strong> <span id="proyectoNombre"></span></p>
+
+          <!-- Información del Proyecto -->
+          <div class="alert alert-light mb-4">
+            <i class="fas fa-flask mr-2"></i>
+            <strong>Proyecto:</strong> <span id="proyectoNombreModal"></span>
+          </div>
 
           <div id="visitas-container">
             <div class="visita">
               <div class="form-group">
-                <label>Nombre del tipo de Visita</label>
+                <label>
+                  <i class="fas fa-tag mr-1"></i>
+                  Nombre del Tipo de Visita
+                </label>
                 <input type="text" class="form-control" name="nombre_visita[]" required>
               </div>
+
               <div class="form-group">
-                <label>Observaciones</label>
-                <textarea class="form-control" name="observaciones[]"></textarea>
+                <label>
+                  <i class="fas fa-comment mr-1"></i>
+                  Observaciones
+                </label>
+                <textarea class="form-control" name="observaciones[]" rows="3"></textarea>
               </div>
+
               <div class="form-group">
-                <div class="form-group">
-                  <label>Exámenes Asociados</label>
+                <label>
+                  <i class="fas fa-microscope mr-1"></i>
+                  Exámenes Asociados
+                </label>
+                <div class="border rounded p-3" style="max-height: 300px; overflow-y: auto;">
                   <div class="examenes-container">
                     {% for examen in examenes %}
-                    <div class="form-check">
+                    <div class="form-check mb-2">
                       <input class="form-check-input examen-checkbox" type="checkbox" data-id="{{ examen.id }}"
-                        data-nombre="{{ examen.nombre }}">
-                      <label class="form-check-label">{{ examen.nombre }}</label>
+                        data-nombre="{{ examen.nombre }}" id="examen_new_{{ examen.id }}">
+                      <label class="form-check-label" for="examen_new_{{ examen.id }}">
+                        <span class="badge badge-light border">{{ examen.nombre }}</span>
+                      </label>
                     </div>
                     {% endfor %}
-                    <input type="hidden" name="examenes_json" id="examenes-json" value="[]">
                   </div>
                 </div>
-
-                <hr>
+                <input type="hidden" name="examenes_json" id="examenes-json" value="[]">
               </div>
             </div>
           </div>
-          <div class="modal-footer">
-            <button type="submit" class="btn btn-primary">Guardar Visitas</button>
-          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">
+            <i class="fas fa-times mr-1"></i>Cancelar
+          </button>
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save mr-1"></i>Guardar Tipo de Visita
+          </button>
+        </div>
       </form>
     </div>
   </div>
 </div>
 
-
+<!-- JAVASCRIPT CORREGIDO -->
 <script>
   document.addEventListener('DOMContentLoaded', function () {
 
-    // Escuchar el evento de apertura del modal de descripción
+    // Modal de descripción del proyecto
     $('#modalDescripcionProyecto').on('show.bs.modal', function (event) {
+      const button = $(event.relatedTarget);
+      const modal = $(this);
 
-
-      const button = $(event.relatedTarget);  // Botón que activó el modal
-      const modal = $(this); // Modal actual
-
-      // Obtener los datos del proyecto desde los atributos data-*
-      const proyectoId = button.data('id');
       const nombre = button.data('nombre');
       const fechaInicio = button.data('fecha-inicio');
       const fechaFinanciacion = button.data('fecha-financiacion');
       const investigador = button.data('investigador');
       const codigoSIU = button.data('codigo-siu');
       const descripcion = button.data('descripcion');
-      const proyectoData = {};
 
-      // Actualizar los elementos del modal con la información del proyecto
       modal.find('#proyectoNombre').text(nombre);
-      modal.find('#proyectoFechaInicio').text(fechaInicio);
-      modal.find('#proyectoFechaFinanciacion').text(fechaFinanciacion);
-      modal.find('#proyectoInvestigador').text(investigador);
-      modal.find('#proyectoCodigoSIU').text(codigoSIU);
-      modal.find('#proyectoDescripcion').text(descripcion);
-
-      // Cargar las visitas en la lista
-      var visitasContainer = modal.find('#visitasContainer');
-      visitasContainer.empty();  // Limpiar contenido previo
-
-      // Obtener las visitas del proyecto desde el JSON
-      var visitas = proyectoData[proyectoId] || [];
-
-      if (visitas.length > 0) {
-        visitas.forEach(function (visita) {
-          visitasContainer.append(`
-                      <li class="list-group-item">
-                          <strong>Nombre:</strong> ${visita.nombre} <br>
-                          <strong>Observaciones:</strong> ${visita.observaciones} <br>
-                          <strong>Exámenes:</strong>
-                          <ul>${visita.examenes.map(ex => `<li>${ex}</li>`).join('')}</ul>
-                      </li>
-                  `);
-        });
-      } else {
-        visitasContainer.append("<li class='list-group-item text-muted'>No hay visitas registradas.</li>");
-      }
+      modal.find('#proyectoFechaInicio').text(fechaInicio || 'No definida');
+      modal.find('#proyectoFechaFinanciacion').text(fechaFinanciacion || 'No definida');
+      modal.find('#proyectoInvestigador').text(investigador || 'No asignado');
+      modal.find('#proyectoCodigoSIU').text(codigoSIU || 'No asignado');
+      modal.find('#proyectoDescripcion').text(descripcion || 'Sin descripción');
     });
 
-    // Escuchar el evento de apertura del modal de agregar visita
+    // Modal de agregar visita
     $('#modalAgregarVisita').on('show.bs.modal', function (event) {
-      var button = $(event.relatedTarget); // Botón que activó el modal
-      var proyectoId = button.data('proyecto-id'); // Extraer el ID del proyecto
-      var nombre = button.data('nombre'); // Extraer el nombre
+      var button = $(event.relatedTarget);
+      var proyectoId = button.data('proyecto-id');
+      var nombre = button.data('nombre');
 
       var modal = $(this);
-      modal.find('#proyecto_id').val(proyectoId); // Asignar el ID en el formulario
-      modal.find('#proyectoNombre').text(nombre); // Asignar el nombre del proyecto
+      modal.find('#proyecto_id').val(proyectoId);
+      modal.find('#proyectoNombreModal').text(nombre);
     });
 
+    // Gestión de exámenes
     let checkboxes = document.querySelectorAll(".examen-checkbox");
     let hiddenInput = document.getElementById("examenes-json");
 
     checkboxes.forEach(checkbox => {
       checkbox.addEventListener("change", function () {
         let examenesSeleccionados = JSON.parse(hiddenInput.value || "[]");
-
         let examenId = this.dataset.id;
         let examenNombre = this.dataset.nombre;
 
         if (this.checked) {
-          // Agregar si no existe
           if (!examenesSeleccionados.some(e => e.id === examenId)) {
             examenesSeleccionados.push({ id: examenId, nombre: examenNombre });
           }
         } else {
-          // Eliminar si se desmarca
           examenesSeleccionados = examenesSeleccionados.filter(e => e.id !== examenId);
         }
 
