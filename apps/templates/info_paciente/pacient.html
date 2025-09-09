@@ -22,6 +22,7 @@
 
 <div class="container-fluid mt--6">
   <div class="row">
+    <!-- SIDEBAR PACIENTE -->
     <div class="col-xl-3 order-xl-1">
       <div class="row justify-content-center">
         <div class="card card-profile">
@@ -39,21 +40,23 @@
                     <div class="form-group">
                       <label for="proyecto">Seleccionar Proyecto</label>
                       <select name="proyecto_id" id="proyecto" class="form-control" required>
-                        <option value="-"></option>
+                        <option value="">Seleccionar...</option>
                         {% for proyecto in proyectos_disponibles %}
                         <option value="{{ proyecto.id }}">{{ proyecto.nombre }}</option>
                         {% endfor %}
                       </select>
                       <input type="hidden" name="paciente_id" value="{{ paciente.id }}">
                     </div>
-                    <button type="submit" class="btn btn-sm btn-neutral"
-                      onclick="return confirm('¿Estás seguro de que deseas agregar el paciente al proyecto?');">Agregar
-                      al proyecto</button>
+                    <button type="submit" class="btn btn-sm btn-primary"
+                      onclick="return confirm('¿Agregar el paciente al proyecto?');">
+                      Agregar al proyecto
+                    </button>
                   </form>
                 </div>
               </div>
             </div>
 
+            <!-- Información del paciente -->
             <div class="row mt-4">
               <div class="col-md-6">
                 <strong>Tipo de Documento:</strong>
@@ -109,475 +112,488 @@
       </div>
     </div>
 
+    <!-- SECCIÓN DE PROYECTOS -->
     <div class="col-xl-9 order-xl-2">
       <div class="card">
         <div class="card-header">
           <div class="row align-items-center">
-            <div class="col-10">
-              <h3 class="mb-0">Proyectos a los que se encuentra asociado</h3>
+            <div class="col">
+              <h3 class="mb-0">
+                <i class="fas fa-folder-open mr-2 text-primary"></i>
+                Proyectos Asociados
+              </h3>
+              <p class="text-muted small mb-0">Gestiona las visitas y exámenes por proyecto</p>
             </div>
           </div>
         </div>
+
         <div class="card-body">
-          <div class="row">
-            <div class="col-12">
-              {% for proyecto in proyectos_asociados %}
-              <hr class="my-2">
-              <h5 class="card-title text-uppercase text-muted mb-3">{{ proyecto.nombre }}</h5>
-              <div class="mb-3">
-                <button class="btn btn-primary mt-3" data-bs-toggle="modal"
-                  data-bs-target="#modalAgregarVisita-{{ proyecto.id }}">
-                  Agregar Visita
-                </button>
+          {% for proyecto in proyectos_asociados %}
+
+          <!-- TARJETA DE PROYECTO -->
+          <div class="card shadow-sm mb-4 border-left-primary">
+            <!-- Header del Proyecto -->
+            <div class="card-header bg-gradient-primary text-white">
+              <div class="row align-items-center">
+                <div class="col-md-8">
+                  <h4 class="mb-1 text-white">
+                    <i class="fas fa-flask mr-2"></i>
+                    {{ proyecto.nombre }}
+                  </h4>
+                  <small class="text-white-50">
+                    <i class="fas fa-calendar mr-1"></i>
+                    Proyecto de investigación
+                  </small>
+                </div>
+                <div class="col-md-4 text-right">
+                  <!-- BOTÓN CORREGIDO -->
+                  <button class="btn btn-light btn-sm" data-toggle="modal"
+                    data-target="#modalAgregarVisita-{{ proyecto.id }}">
+                    <i class="fas fa-plus mr-2"></i>
+                    Nueva Visita
+                  </button>
+                </div>
               </div>
+            </div>
 
-
+            <!-- Contenido del Proyecto -->
+            <div class="card-body">
+              <!-- Lista de Visitas -->
               {% for visita in visitas_paciente %}
               {% if visita.Tipo_visita.proyecto == proyecto %}
-              <div class="card mb-3">
-                <div class="card-body">
-                  <!-- Información principal de la visita y botones de acción -->
-                  <div class="row align-items-center mb-3">
+
+              <!-- TARJETA DE VISITA CORREGIDA -->
+              <div class="card border mb-3">
+                <!-- Header de Visita -->
+                <div class="card-header bg-light border-bottom">
+                  <div class="row align-items-center">
                     <div class="col-md-8">
-                      <p class="mb-0">
-                        <strong>Visita:</strong> {{ visita.nombre }}<br>
-                        <strong>Fecha:</strong> {{ visita.fecha }}<br>
-                        <strong>Evaluador:</strong> {{ visita.evaluador }}<br>
-                        <strong>Tipo de Visita:</strong> {{ visita.Tipo_visita.nombre }}
-                      </p>
+                      <div class="d-flex align-items-center">
+                        <div class="avatar avatar-sm bg-primary rounded-circle mr-3">
+                          <i class="fas fa-stethoscope text-white"></i>
+                        </div>
+                        <div>
+                          <h6 class="mb-0 text-dark">{{ visita.nombre }}</h6>
+                          <small class="text-muted">
+                            <i class="fas fa-calendar mr-1"></i>{{ visita.fecha|date:"d/m/Y" }}
+                            <span class="mx-2">•</span>
+                            <i class="fas fa-user-md mr-1"></i>{{ visita.evaluador|default:"Sin asignar" }}
+                          </small>
+                        </div>
+                      </div>
                     </div>
+
                     <div class="col-md-4 text-right">
-                      <!-- Botones de acción en la misma fila -->
-                      <div class="btn-group" role="group">
-                        <button type="button" class="btn btn-info btn-sm" data-toggle="collapse"
-                          data-target="#examenes-visita-{{ visita.id }}" data-toggle="tooltip" data-placement="top"
-                          title="Ver/Ocultar Exámenes">
+                      <!-- Botones de Acción de Visita CORREGIDOS -->
+                      <div class="btn-group btn-group-sm" role="group">
+                        <button type="button" class="btn btn-outline-info" data-toggle="collapse"
+                          data-target="#examenes-visita-{{ visita.id }}" title="Ver Exámenes">
                           <i class="fas fa-list"></i>
                         </button>
 
-                        <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal"
-                          data-bs-target="#modalEditarVisita-{{ visita.id }}" data-toggle="tooltip" data-placement="top"
-                          title="Editar Visita">
+                        <button type="button" class="btn btn-outline-warning" data-toggle="modal"
+                          data-target="#modalEditarVisita-{{ visita.id }}" title="Editar Visita">
                           <i class="fas fa-edit"></i>
                         </button>
 
-                        <form action="{% url 'eliminar_v' visita.id %}" method="POST" style="display: inline;"
-                          onsubmit="return confirm('¿Estás seguro de eliminar esta visita?');">
+                        <form action="{% url 'eliminar_v' visita.id %}" method="POST" class="d-inline"
+                          onsubmit="return confirm('¿Eliminar esta visita?');">
                           {% csrf_token %}
-                          <button type="submit" class="btn btn-danger btn-sm" data-toggle="tooltip" data-placement="top"
-                            title="Eliminar Visita">
+                          <button type="submit" class="btn btn-outline-danger" title="Eliminar">
                             <i class="fas fa-trash"></i>
                           </button>
                         </form>
                       </div>
                     </div>
                   </div>
+                </div>
 
-                  <!-- Lista de exámenes (colapsable) -->
-                  <div id="examenes-visita-{{ visita.id }}" class="collapse">
-                    <hr>
-                    <h6 class="text-muted mb-3">
-                      <i class="fas fa-clipboard-list"></i> Exámenes de la Visita
-                    </h6>
+                <!-- Contenido de Exámenes (Colapsable) DENTRO DE LA TARJETA DE VISITA -->
+                <div id="examenes-visita-{{ visita.id }}" class="collapse">
+                  <div class="card-body pt-3">
+                    <div class="row mb-3">
+                      <div class="col-12">
+                        <h6 class="text-muted mb-3">
+                          <i class="fas fa-clipboard-list mr-2"></i>
+                          Exámenes de la Visita
+                        </h6>
+                      </div>
+                    </div>
 
-                    {% for visita_examen in visita.visita_examenes.all %}
-                    <div class="card mb-2 border-left-primary">
-                      <div class="card-body py-2">
-                        <div class="row align-items-center">
-                          <div class="col-md-6">
-                            <p class="mb-1">
-                              <strong>{{ visita_examen.examen.nombre }}</strong><br>
-                              <span class="badge {{ visita_examen.get_color_badge }}">
-                                <i class="{{ visita_examen.get_icono_estado }}"></i>
-                              </span>
-                            </p>
-                          </div>
-
-                          <div class="col-md-6 text-right">
-
-                            {% if visita_examen.esta_realizado %}
-                            <!-- Examen completado: Ver y Editar -->
-                            <a href="{% url 'ver_resultado_examen' visita_examen.id %}"
-                              class="btn btn-success btn-sm me-1" data-toggle="tooltip" title="Ver Resultado Completo">
-                              <i class="fas fa-eye"></i>
-                            </a>
-                            {% if visita_examen.puede_editarse %}
-                            <a href="{% url 'realizar_examen' visita_examen.visita.id visita_examen.examen.id visita_examen.visita.paciente.id %}"
-                              class="btn btn-warning btn-sm" data-toggle="tooltip" title="Editar Examen">
-                              <i class="fas fa-edit"></i>
-                            </a>
-                            {% endif %}
-
-                            {% elif visita_examen.estado == 'en_progreso' %}
-                            <!-- Examen en progreso: Continuar -->
-                            <a href="{% url 'realizar_examen' visita_examen.visita.id visita_examen.examen.id visita_examen.visita.paciente.id %}"
-                              class="btn btn-warning btn-sm" data-toggle="tooltip" title="Continuar Examen">
-                              <i class="fas fa-play-circle"></i> Continuar
-                            </a>
-
-                            {% else %}
-                            <!-- Examen pendiente: Realizar -->
-                            <a href="{% url 'realizar_examen' visita_examen.visita.id visita_examen.examen.id visita_examen.visita.paciente.id %}"
-                              class="btn btn-primary btn-sm" data-toggle="tooltip" title="Realizar Examen">
-                              <i class="fas fa-plus-circle"></i>
-                            </a>
-                            {% endif %}
-                          </div>
-                        </div>
-
-                        <!-- NUEVO: Vista previa del resultado si está completado -->
-                        {% if visita_examen.esta_realizado %}
-                        <div class="mt-2">
-                          <small class="text-muted">
-                            <strong>Vista previa del resultado:</strong>
-                            <button class="btn btn-outline-secondary btn-xs ml-2" type="button" data-toggle="collapse"
-                              data-target="#preview-{{ visita_examen.id }}" aria-expanded="false">
-                              <i class="fas fa-chevron-down"></i> Mostrar/Ocultar
-                            </button>
-                          </small>
-                          <div class="collapse mt-2" id="preview-{{ visita_examen.id }}">
-                            <div class="card card-body bg-light">
-                              {% with resultado=visita_examen.get_resultado_instance %}
-                              {% if resultado %}
-                              <div class="row">
-                                <!-- Mostrar algunos campos clave según el tipo de examen -->
-                                {% if resultado|class_name == 'SuenoFisicoResult' %}
-                                <div class="col-md-4"><strong>Peso:</strong> {{ resultado.peso|default:"N/A" }} kg</div>
-                                <div class="col-md-4"><strong>Talla:</strong> {{ resultado.talla|default:"N/A" }} cm
-                                </div>
-                                <div class="col-md-4"><strong>IMC:</strong> {{ resultado.imc|default:"N/A" }}</div>
-                                {% elif resultado|class_name == 'AtenasResult' %}
-                                <div class="col-md-6"><strong>Inducción dormir:</strong> {{
-                                  resultado.induccion_dormir|default:"N/A" }}</div>
-                                <div class="col-md-6"><strong>Puntaje total:</strong> {{
-                                  resultado.puntaje_total|default:"N/A" }}</div>
-                                {% elif resultado|class_name == 'PittsburghResult' %}
-                                <div class="col-md-6"><strong>Hora acostarse:</strong> {{
-                                  resultado.hora_acostarse|default:"N/A" }}</div>
-                                <div class="col-md-6"><strong>Puntaje total:</strong> {{
-                                  resultado.puntaje_total|default:"N/A" }}</div>
+                    <!-- Grid de Exámenes -->
+                    <div class="row">
+                      {% for visita_examen in visita.visita_examenes.all %}
+                      <div class="col-md-6 mb-3">
+                        <div class="card border-left-secondary h-100">
+                          <div class="card-body p-3">
+                            <!-- Header del Examen -->
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                              <h6 class="card-title mb-1">{{ visita_examen.examen.nombre }}</h6>
+                              <span class="badge badge-pill {{ visita_examen.get_color_badge }}">
+                                <i class="{{ visita_examen.get_icono_estado }} mr-1"></i>
+                                {% if visita_examen.esta_realizado %}
+                                Completado
+                                {% elif visita_examen.estado == 'en_progreso' %}
+                                En Progreso
                                 {% else %}
-                                <div class="col-12"><em>Resultado disponible - Ver detalles completos</em></div>
+                                Pendiente
+                                {% endif %}
+                              </span>
+                            </div>
+
+                            <!-- Metadatos del Examen -->
+                            {% if visita_examen.esta_realizado %}
+                            <div class="mb-2">
+                              <small class="text-muted">
+                                <i class="fas fa-check-circle text-success mr-1"></i>
+                                Completado {{ visita_examen.fecha_completado|date:"d/m/y" }}
+                              </small>
+                            </div>
+                            {% endif %}
+
+                            <!-- Acciones del Examen -->
+                            <div class="mt-auto">
+                              {% if visita_examen.esta_realizado %}
+                              <!-- Examen Completado -->
+                              <div class="btn-group btn-group-sm w-100" role="group">
+                                <a href="{% url 'ver_resultado_examen' visita_examen.id %}"
+                                  class="btn btn-success flex-fill">
+                                  <i class="fas fa-eye mr-1"></i>Ver
+                                </a>
+                                {% if visita_examen.puede_editarse %}
+                                <a href="{% url 'realizar_examen' visita_examen.visita.id visita_examen.examen.id visita_examen.visita.paciente.id %}"
+                                  class="btn btn-warning flex-fill">
+                                  <i class="fas fa-edit mr-1"></i>Editar
+                                </a>
                                 {% endif %}
                               </div>
+
+                              {% elif visita_examen.estado == 'en_progreso' %}
+                              <!-- Examen En Progreso -->
+                              <a href="{% url 'realizar_examen' visita_examen.visita.id visita_examen.examen.id visita_examen.visita.paciente.id %}"
+                                class="btn btn-warning btn-sm w-100">
+                                <i class="fas fa-play-circle mr-1"></i>Continuar Examen
+                              </a>
+
                               {% else %}
-                              <em class="text-muted">No se pudieron cargar los datos del resultado</em>
+                              <!-- Examen Pendiente -->
+                              <a href="{% url 'realizar_examen' visita_examen.visita.id visita_examen.examen.id visita_examen.visita.paciente.id %}"
+                                class="btn btn-primary btn-sm w-100">
+                                <i class="fas fa-plus-circle mr-1"></i>Iniciar Examen
+                              </a>
                               {% endif %}
-                              {% endwith %}
                             </div>
                           </div>
                         </div>
-                        {% endif %}
                       </div>
-                    </div>
-
-                    {% empty %}
-                    <div class="alert alert-info">
-                      <i class="fas fa-info-circle"></i> No se encontraron exámenes para esta visita.
-                    </div>
-                    {% endfor %}
-                  </div>
-
-                  <div class="modal fade" id="modalEditarVisita-{{ visita.id }}" tabindex="-1"
-                    aria-labelledby="modalLabel" aria-hidden="true">
-                    <div class="modal-dialog">
-                      <div class="modal-content">
-                        <div class="modal-header">
-                          <h5 class="modal-title">Editar Visita: {{ visita.nombre }}</h5>
-                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      {% empty %}
+                      <div class="col-12">
+                        <div class="alert alert-info">
+                          <i class="fas fa-info-circle mr-2"></i>
+                          No hay exámenes configurados para esta visita.
                         </div>
-                        <form method="POST" action="{% url 'editar_v' visita.id %}">
-                          {% csrf_token %}
-                          <div class="modal-body">
-                            <div class="mb-3">
-                              <label for="nombre" class="form-label">Nombre de la Visita</label>
-                              <input type="text" class="form-control" name="nombre" value="{{ visita.nombre }}"
-                                required>
-                            </div>
-                            <div class="mb-3">
-                              <label for="fecha" class="form-label">Fecha</label>
-                              <input type="date" class="form-control" name="fecha"
-                                value="{{ visita.fecha|date:'Y-m-d' }}" required>
-                            </div>
-                            <div class="mb-3">
-                              <label for="evaluador" class="form-label">Evaluador</label>
-                              <input type="text" class="form-control" name="evaluador" value="{{ visita.evaluador }}">
-                            </div>
-                            <h4>Acompañante</h4>
-                            <div class="mb-3">
-                              <label for="acompanante_nombre" class="form-label">Nombre</label>
-                              <input type="text" class="form-control" name="acompanante_nombre"
-                                value="{{ visita.acompanante_nombre }}">
-                            </div>
-                            <div class="mb-3">
-                              <label for="acompanante_relacion" class="form-label">Relación</label>
-                              <input type="text" class="form-control" name="acompanante_relacion"
-                                value="{{ visita.acompanante_relacion }}">
-                            </div>
-                            <div class="mb-3">
-                              <label for="acompanante_correo" class="form-label">Correo</label>
-                              <input type="email" class="form-control" name="acompanante_correo"
-                                value="{{ visita.acompanante_correo }}">
-                            </div>
-                            <div class="mb-3">
-                              <label for="acompanante_telefono" class="form-label">Teléfono</label>
-                              <input type="tel" class="form-control" name="acompanante_telefono"
-                                value="{{ visita.acompanante_telefono }}">
-                            </div>
-                            <h4>Exámenes Asociados</h4>
-                            <ul id="examenesLista">
-                              {% for visita_examen in visita.visita_examenes.all %}
-                              <strong>Examen:</strong> {{ visita_examen.examen.nombre }}<br>
-                              {% endfor %}
-                            </ul>
-                            <div class="mb-3">
-                              <label class="form-label">Agregar Examen</label>
-                              <div id="examenesCheckboxes">
-                                {% for examen in visita.Tipo_visita.examenes %}
-                                <div class="form-check">
-                                  <input class="form-check-input" type="checkbox" name="examenes_seleccionados"
-                                    value="{{ examen.id }}" id="examen_{{ examen.id }}">
-                                  <label class="form-check-label" for="examen_{{ examen.id }}">
-                                    {{ examen.nombre }}
-                                  </label>
-                                </div>
-                                {% endfor %}
-                              </div>
-                            </div>
-                            <div class="modal-footer">
-                              <button type="submit" class="btn btn-primary">Guardar Cambios</button>
-                            </div>
-                        </form>
                       </div>
+                      {% endfor %}
                     </div>
                   </div>
                 </div>
-                {% endif %}
-                {% empty %}
-                <p>No hay visitas registradas para este proyecto.</p>
-                {% endfor %}
-
-                <div class="modal fade" id="modalAgregarVisita-{{ proyecto.id }}" tabindex="-1"
-                  aria-labelledby="modalLabel" aria-hidden="true">
-                  <div class="modal-dialog">
-                    <div class="modal-content">
-                      <div class="modal-header">
-                        <h5 class="modal-title">Nueva Visita para {{ proyecto.nombre }}</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                      </div>
-                      <form method="POST" action="{% url 'crear_visita' paciente.id %}">
-                        {% csrf_token %}
-                        <div class="modal-body">
-                          <div class="mb-3">
-                            <label for="nombre_visita" class="form-label">Nombre de la Visita</label>
-                            <input type="text" class="form-control" name="nombre" required>
-                          </div>
-                          <div class="mb-3">
-                            <label for="tipo_visita" class="form-label">Tipo de Visita</label>
-                            <select class="form-control tipo-visita" name="tipo_visita" id="visitaSelect">
-                              <option value="">Seleccione un tipo de visita</option>
-                              {% for visita in proyecto.visitas.all %}
-                              <option value="{{ visita.id }}" data-examenes="{{ visita.examenes }}">
-                                {{ visita.nombre }}
-                              </option>
-                              {% endfor %}
-                            </select>
-                          </div>
-                          <div class="mb-3">
-                            <h4>Exámenes Asociados:</h4>
-                            <ul id="examenesLista" class="p-0"></ul>
-                          </div>
-                          <div class="mb-3">
-                            <label for="fecha" class="form-label">Fecha</label>
-                            <input type="date" class="form-control" name="fecha" required>
-                          </div>
-                          <div class="mb-3">
-                            <label for="evaluador" class="form-label">Evaluador</label>
-                            <input type="text" class="form-control" name="evaluador">
-                          </div>
-                          <div class="mb-3">
-                            <label for="acompanante_nombre" class="form-label">Nombre del Acompañante</label>
-                            <input type="text" class="form-control" name="acompanante_nombre">
-                          </div>
-                          <div class="mb-3">
-                            <label for="acompanante_relacion" class="form-label">Relación con el Paciente</label>
-                            <input type="text" class="form-control" name="acompanante_relacion">
-                          </div>
-                          <div class="mb-3">
-                            <label for="acompanante_correo" class="form-label">Correo del Acompañante</label>
-                            <input type="email" class="form-control" name="acompanante_correo">
-                          </div>
-                          <div class="mb-3">
-                            <label for="acompanante_telefono" class="form-label">Teléfono del Acompañante</label>
-                            <input type="tel" class="form-control" name="acompanante_telefono">
-                          </div>
-                          <div class="modal-footer">
-                            <button type="submit" class="btn btn-primary">Guardar Visita</button>
-                          </div>
-                        </div>
-                      </form>
-                    </div>
-                  </div>
-                </div>
-                {% empty %}
-                <p>No hay visitas registradas en este proyecto.</p>
-                {% endfor %}
               </div>
+              <!-- FIN TARJETA DE VISITA -->
+
+              {% endif %}
+              {% empty %}
+              <!-- Estado Vacío para Visitas -->
+              <div class="text-center py-4">
+                <div class="mb-3">
+                  <i class="fas fa-calendar-plus fa-3x text-muted"></i>
+                </div>
+                <h5 class="text-muted">No hay visitas registradas</h5>
+                <p class="text-muted mb-3">Crea la primera visita para este proyecto</p>
+                <button class="btn btn-primary" data-toggle="modal" data-target="#modalAgregarVisita-{{ proyecto.id }}">
+                  <i class="fas fa-plus mr-2"></i>Crear Primera Visita
+                </button>
+              </div>
+              {% endfor %}
             </div>
           </div>
+          <!-- FIN TARJETA DE PROYECTO -->
+
+          {% empty %}
+          <!-- Estado Vacío para Proyectos -->
+          <div class="text-center py-5">
+            <div class="mb-4">
+              <i class="fas fa-folder-open fa-4x text-muted"></i>
+            </div>
+            <h4 class="text-muted">No hay proyectos asociados</h4>
+            <p class="text-muted mb-4">
+              Agregue el paciente a un proyecto para comenzar a registrar visitas y exámenes.
+            </p>
+            <div class="alert alert-light border-left-info">
+              <small class="text-muted">
+                <i class="fas fa-info-circle mr-1"></i>
+                Use el formulario de la izquierda para asociar el paciente a un proyecto.
+              </small>
+            </div>
+          </div>
+          {% endfor %}
         </div>
       </div>
     </div>
+  </div>
+</div>
 
-    <script>
+<!-- MODALES AL FINAL DEL DOCUMENTO -->
+{% for proyecto in proyectos_asociados %}
 
-      document.addEventListener("DOMContentLoaded", function () {
-        var visitaSelect = document.querySelectorAll(".tipo-visita");
+<!-- Modal Agregar Visita - ESTRUCTURA CORREGIDA -->
+<div class="modal fade" id="modalAgregarVisita-{{ proyecto.id }}" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Nueva Visita para {{ proyecto.nombre }}</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form method="POST" action="{% url 'crear_visita' paciente.id %}">
+        {% csrf_token %}
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="nombre_visita">Nombre de la Visita</label>
+            <input type="text" class="form-control" name="nombre" required>
+          </div>
 
-        visitaSelect.forEach(function (select) {
-          select.addEventListener("change", function () {
-            var selectedOption = this.options[this.selectedIndex];
-            var examenesData = selectedOption.getAttribute("data-examenes");
+          <div class="form-group">
+            <label for="tipo_visita">Tipo de Visita</label>
+            <select class="form-control tipo-visita" name="tipo_visita">
+              <option value="">Seleccione un tipo de visita</option>
+              {% for visita in proyecto.visitas.all %}
+              <option value="{{ visita.id }}" data-examenes="{{ visita.examenes }}">
+                {{ visita.nombre }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
 
-            // Encontrar el formulario correcto - buscar el formulario padre de este select
-            var currentForm = this.closest("form");
-            var examenesLista = currentForm.querySelector("#examenesLista");
+          <div class="form-group">
+            <label>Exámenes Asociados:</label>
+            <ul id="examenesLista" class="list-unstyled"></ul>
+          </div>
 
-            if (!examenesLista) {
-              console.error("No se encontró el elemento #examenesLista en este formulario");
-              return;
+          <div class="form-group">
+            <label for="fecha">Fecha</label>
+            <input type="date" class="form-control" name="fecha" required>
+          </div>
+
+          <div class="form-group">
+            <label for="evaluador">Evaluador</label>
+            <input type="text" class="form-control" name="evaluador">
+          </div>
+
+          <hr>
+          <h6>Información del Acompañante</h6>
+
+          <div class="form-group">
+            <label for="acompanante_nombre">Nombre del Acompañante</label>
+            <input type="text" class="form-control" name="acompanante_nombre">
+          </div>
+
+          <div class="form-group">
+            <label for="acompanante_relacion">Relación con el Paciente</label>
+            <input type="text" class="form-control" name="acompanante_relacion">
+          </div>
+
+          <div class="form-group">
+            <label for="acompanante_correo">Correo del Acompañante</label>
+            <input type="email" class="form-control" name="acompanante_correo">
+          </div>
+
+          <div class="form-group">
+            <label for="acompanante_telefono">Teléfono del Acompañante</label>
+            <input type="tel" class="form-control" name="acompanante_telefono">
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Guardar Visita</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modales Editar Visita para cada visita -->
+{% for visita in visitas_paciente %}
+{% if visita.Tipo_visita.proyecto == proyecto %}
+<div class="modal fade" id="modalEditarVisita-{{ visita.id }}" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Editar Visita: {{ visita.nombre }}</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form method="POST" action="{% url 'editar_v' visita.id %}">
+        {% csrf_token %}
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="nombre">Nombre de la Visita</label>
+            <input type="text" class="form-control" name="nombre" value="{{ visita.nombre }}" required>
+          </div>
+          <div class="form-group">
+            <label for="fecha">Fecha</label>
+            <input type="date" class="form-control" name="fecha" value="{{ visita.fecha|date:'Y-m-d' }}" required>
+          </div>
+          <div class="form-group">
+            <label for="evaluador">Evaluador</label>
+            <input type="text" class="form-control" name="evaluador" value="{{ visita.evaluador }}">
+          </div>
+
+          <hr>
+          <h6>Acompañante</h6>
+
+          <div class="form-group">
+            <label for="acompanante_nombre">Nombre</label>
+            <input type="text" class="form-control" name="acompanante_nombre" value="{{ visita.acompanante_nombre }}">
+          </div>
+          <div class="form-group">
+            <label for="acompanante_relacion">Relación</label>
+            <input type="text" class="form-control" name="acompanante_relacion"
+              value="{{ visita.acompanante_relacion }}">
+          </div>
+          <div class="form-group">
+            <label for="acompanante_correo">Correo</label>
+            <input type="email" class="form-control" name="acompanante_correo" value="{{ visita.acompanante_correo }}">
+          </div>
+          <div class="form-group">
+            <label for="acompanante_telefono">Teléfono</label>
+            <input type="tel" class="form-control" name="acompanante_telefono"
+              value="{{ visita.acompanante_telefono }}">
+          </div>
+
+          <hr>
+          <h6>Exámenes Asociados</h6>
+
+          <div class="form-group">
+            <label>Exámenes actuales:</label>
+            <ul>
+              {% for visita_examen in visita.visita_examenes.all %}
+              <li>{{ visita_examen.examen.nombre }}</li>
+              {% endfor %}
+            </ul>
+          </div>
+
+          <div class="form-group">
+            <label>Agregar Exámenes:</label>
+            {% for examen in visita.Tipo_visita.examenes %}
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" name="examenes_seleccionados" value="{{ examen.id }}"
+                id="examen_edit_{{ visita.id }}_{{ examen.id }}">
+              <label class="form-check-label" for="examen_edit_{{ visita.id }}_{{ examen.id }}">
+                {{ examen.nombre }}
+              </label>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endif %}
+{% endfor %}
+
+{% endfor %}
+
+<!-- JAVASCRIPT SIMPLIFICADO Y CORREGIDO -->
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    console.log("Inicializando scripts...");
+
+    var visitaSelects = document.querySelectorAll(".tipo-visita");
+    console.log("Selectores de visita encontrados:", visitaSelects.length);
+
+    visitaSelects.forEach(function (select) {
+      select.addEventListener("change", function () {
+        var selectedOption = this.options[this.selectedIndex];
+        var examenesData = selectedOption.getAttribute("data-examenes");
+        var currentForm = this.closest("form");
+        var examenesLista = currentForm.querySelector("#examenesLista");
+
+        if (!examenesLista) {
+          console.error("No se encontró #examenesLista");
+          return;
+        }
+
+        examenesLista.innerHTML = "";
+
+        if (examenesData) {
+          try {
+            var jsonString = examenesData.replace(/'/g, '"');
+            var examenes = JSON.parse(jsonString);
+
+            var hiddenInput = currentForm.querySelector("#examenes_seleccionados");
+            if (!hiddenInput) {
+              hiddenInput = document.createElement("input");
+              hiddenInput.type = "hidden";
+              hiddenInput.name = "examenes_seleccionados";
+              hiddenInput.id = "examenes_seleccionados";
+              currentForm.appendChild(hiddenInput);
             }
 
-            examenesLista.innerHTML = ""; // Limpiar la lista antes de actualizar
+            examenes.forEach(function (examen) {
+              var li = document.createElement("li");
+              li.className = "mb-2";
 
-            if (examenesData) {
-              try {
-                // Reemplazar comillas simples por comillas dobles
-                var jsonString = examenesData.replace(/'/g, '"');
-                var examenes = JSON.parse(jsonString);
+              var checkbox = document.createElement("input");
+              checkbox.type = "checkbox";
+              checkbox.id = "examen_" + examen.id + "_" + Math.random();
+              checkbox.value = examen.id;
+              checkbox.className = "form-check-input examen-checkbox mr-2";
+              checkbox.checked = true;
 
-                // Crear un campo oculto para almacenar los IDs seleccionados
-                var hiddenInputId = "examenes_seleccionados";
-                var hiddenInput = currentForm.querySelector("#" + hiddenInputId);
+              var label = document.createElement("label");
+              label.htmlFor = checkbox.id;
+              label.textContent = examen.nombre;
+              label.className = "form-check-label";
 
-                // Si no existe el campo oculto, crearlo
-                if (!hiddenInput) {
-                  hiddenInput = document.createElement("input");
-                  hiddenInput.type = "hidden";
-                  hiddenInput.name = "examenes_seleccionados";
-                  hiddenInput.id = hiddenInputId;
-                  currentForm.appendChild(hiddenInput);
-                }
+              li.appendChild(checkbox);
+              li.appendChild(label);
+              examenesLista.appendChild(li);
 
-                examenes.forEach(function (examen) {
-                  var li = document.createElement("li");
-                  li.style.listStyleType = "none";
-                  li.style.margin = "5px 0";
-
-                  // Crear el checkbox
-                  var checkbox = document.createElement("input");
-                  checkbox.type = "checkbox";
-                  checkbox.id = "examen_" + examen.id;
-                  checkbox.value = examen.id;
-                  checkbox.className = "form-check-input examen-checkbox";
-                  checkbox.style.marginRight = "8px";
-                  checkbox.checked = true; // Marcar por defecto
-
-                  // Crear la etiqueta para el checkbox
-                  var label = document.createElement("label");
-                  label.htmlFor = "examen_" + examen.id;
-                  label.textContent = examen.nombre;
-                  label.className = "form-check-label";
-
-                  // Añadir elementos al DOM
-                  li.appendChild(checkbox);
-                  li.appendChild(label);
-                  examenesLista.appendChild(li);
-
-                  // Agregar evento al checkbox
-                  checkbox.addEventListener("change", function () {
-                    actualizarExamenesSeleccionados(currentForm);
-                  });
-                });
-
-                // Inicializar la lista de exámenes seleccionados
+              checkbox.addEventListener("change", function () {
                 actualizarExamenesSeleccionados(currentForm);
+              });
+            });
 
-              } catch (error) {
-                console.error("Error al parsear los exámenes:", error);
-              }
-            }
-          });
-        });
+            actualizarExamenesSeleccionados(currentForm);
 
-        // Función para actualizar el campo oculto con los IDs de exámenes seleccionados
-        function actualizarExamenesSeleccionados(form) {
-          var checkboxes = form.querySelectorAll('.examen-checkbox:checked');
-          var examenesSeleccionados = Array.from(checkboxes).map(function (cb) {
-            return cb.value;
-          });
-
-          var hiddenInput = form.querySelector("#examenes_seleccionados");
-          if (hiddenInput) {
-            // Actualizar el campo oculto con los IDs seleccionados como JSON
-            hiddenInput.value = JSON.stringify(examenesSeleccionados);
-            console.log("Exámenes seleccionados:", examenesSeleccionados);
-            console.log("Campo oculto:", hiddenInput);
-            console.log("Valor del campo:", hiddenInput.value);
-          } else {
-            console.error("No se encontró el campo oculto examenes_seleccionados");
+          } catch (error) {
+            console.error("Error al procesar exámenes:", error);
           }
         }
       });
+    });
 
-      document.addEventListener("DOMContentLoaded", function () {
-        var modalExamen = document.getElementById("modalExamen");
-
-        modalExamen.addEventListener("show.bs.modal", function (event) {
-          var button = event.relatedTarget;  // Botón que abrió el modal
-          var nombre = button.getAttribute("data-nombre");
-          var resultado = button.getAttribute("data-resultado");
-
-          // Si el resultado es JSON, lo convertimos a texto legible
-          try {
-            resultado = JSON.parse(resultado);
-            resultado = JSON.stringify(resultado, null, 2); // Formatear bonito
-          } catch (e) {
-            resultado = resultado || "No disponible";
-          }
-
-          // Insertar los valores en el modal
-          document.getElementById("examenNombre").textContent = nombre;
-          document.getElementById("examenResultado").textContent = resultado;
-        });
+    function actualizarExamenesSeleccionados(form) {
+      var checkboxes = form.querySelectorAll('.examen-checkbox:checked');
+      var examenesSeleccionados = Array.from(checkboxes).map(function (cb) {
+        return cb.value;
       });
 
-      document.addEventListener("DOMContentLoaded", function () {
-        document.querySelectorAll(".agregar-examen").forEach(button => {
-          button.addEventListener("click", function () {
-            let visitaId = this.getAttribute("data-visita-id");
-            let listaExamenes = document.getElementById(`examenesLista-${visitaId}`);
-            let selectVisita = document.getElementById(`visitaSelect-${visitaId}`);
-            let selectedOption = selectVisita.options[selectVisita.selectedIndex];
+      var hiddenInput = form.querySelector("#examenes_seleccionados");
+      if (hiddenInput) {
+        hiddenInput.value = JSON.stringify(examenesSeleccionados);
+      }
+    }
+  });
+</script>
 
-            if (selectedOption.dataset.examenes) {
-              let examenesDisponibles = JSON.parse(selectedOption.dataset.examenes);
-              let nuevoExamen = prompt("Ingrese el nombre del examen:");
-
-              if (nuevoExamen && !examenesDisponibles.includes(nuevoExamen)) {
-                let li = document.createElement("li");
-                li.textContent = nuevoExamen;
-                listaExamenes.appendChild(li);
-              } else {
-                alert("Examen ya incluido o no válido.");
-              }
-            } else {
-              alert("Seleccione un tipo de visita válido.");
-            }
-          });
-        });
-      });
-
-    </script>
-
-    {% endblock %}
+{% endblock %}
