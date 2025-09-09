@@ -69,12 +69,14 @@
                                                     datos_examen.ronquidos_fuertes=="Sí" %}checked{% endif %} required>
                                                 <label class="form-check-label">Sí</label>
                                             </div>
+
                                             <div class="form-check">
                                                 <input class="form-check-input" type="radio" name="ronquidos_fuertes"
-                                                    value="No" {% if not datos_examen or
+                                                    value="No" {% if datos_examen and
                                                     datos_examen.ronquidos_fuertes=="No" %}checked{% endif %}>
                                                 <label class="form-check-label">No</label>
                                             </div>
+
                                         </div>
 
                                         <div class="form-group">

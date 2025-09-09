@@ -244,6 +244,38 @@
       padding: 1rem 0.5rem !important;
       font-size: 0.9rem !important;
     }
+
+    /* Responsive para controles reorganizados */
+    .header .d-flex.justify-content-end {
+      flex-direction: column !important;
+      gap: 1rem;
+    }
+
+    .header .input-group {
+      max-width: 100% !important;
+      margin-right: 0 !important;
+      margin-bottom: 0.5rem;
+    }
+
+    .header .btn-neutral {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .header .h2 {
+      font-size: 1.5rem !important;
+      text-align: center;
+    }
+
+    .header .text-white-50 {
+      text-align: center;
+    }
+  }
+
+  @media (max-width: 992px) {
+    .header .input-group {
+      max-width: 250px;
+    }
   }
 
   /* Loading state sutil */
@@ -306,33 +338,57 @@
 <div class="header bg-primary pb-6">
   <div class="container-fluid">
     <div class="header-body">
-      <div class="row align-items-center py-4">
-        <div class="col-lg-6 col-5">
-          <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
+      <!-- Breadcrumb Row -->
+      <div class="row align-items-center py-3">
+        <div class="col-lg-12">
+          <nav aria-label="breadcrumb" class="d-none d-md-inline-block">
             <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
-              <li class="breadcrumb-item"><a href="#"><i class="fas fa-home"></i></a></li>
-              <li class="breadcrumb-item"><a href="/pacientes/">Pacientes</a></li>
+              <li class="breadcrumb-item">
+                <a href="#"><i class="fas fa-home"></i></a>
+              </li>
+              <li class="breadcrumb-item">
+                <a href="/pacientes/">Gestión de Pacientes</a>
+              </li>
             </ol>
           </nav>
         </div>
-        <div class="col-lg-6 col-7 text-right">
-          <div class="input-group">
-            <input type="text" class="form-control form-control-sm" id="searchPatient" placeholder="Buscar paciente...">
-            <div class="input-group-append">
-              <button class="btn btn-sm btn-neutral" type="button" onclick="searchTable()">
-                <i class="fas fa-search"></i>
-              </button>
+      </div>
+
+      <!-- Title and Controls Row - REORGANIZADO -->
+      <div class="row align-items-center py-4">
+        <div class="col-lg-6 col-md-6">
+
+          <p class="text-white-50 mb-0 mt-1">
+            Administra la información de los participantes
+          </p>
+        </div>
+
+        <div class="col-lg-6 col-md-6">
+          <!-- Controls Container Reorganizado -->
+          <div class="d-flex justify-content-end align-items-center">
+
+            <!-- Search Input -->
+            <div class="input-group mr-3" style="max-width: 300px;">
+              <input type="text" class="form-control" id="searchPatient" placeholder="Buscar paciente...">
+              <div class="input-group-append">
+                <button class="btn btn-outline-light" type="button" onclick="searchTable()">
+                  <i class="fas fa-search"></i>
+                </button>
+              </div>
             </div>
+
+            <!-- New Button -->
+            <button class="btn btn-neutral" id="agregar-formulario">
+              <span class="btn-inner--icon">
+                <i class="fas fa-plus"></i>
+              </span>
+              <span class="btn-inner--text">Nuevo Paciente</span>
+            </button>
+
           </div>
         </div>
       </div>
-      <div class="row align-content-center py-2">
-        <div class="col-lg-12 col-7 text-right">
-          <a class="btn btn-sm btn-neutral" id="agregar-formulario">
-            <i class="fas fa-plus me-2"></i>Nuevo
-          </a>
-        </div>
-      </div>
+
     </div>
   </div>
 </div>
@@ -409,70 +465,110 @@
 
 {% block javascripts %}
 <script>
-  // FUNCIONALIDAD ORIGINAL MEJORADA SUTILMENTE
+  // FUNCIÓN DE BÚSQUEDA CORREGIDA
   function searchTable() {
-    const searchTerm = document.getElementById("searchPatient").value.toLowerCase();
-    const table = document.querySelector("table");
-    const rows = table.getElementsByTagName("tr");
+    const searchTerm = document.getElementById("searchPatient").value.toLowerCase().trim();
+    const tableBody = document.querySelector("#patientTable tbody");
+    const rows = tableBody.getElementsByTagName("tr");
 
-    // Loading state sutil
-    table.classList.add('table-loading');
+    console.log("Buscando:", searchTerm); // Debug
 
-    setTimeout(() => {
-      for (let i = 1; i < rows.length; i++) {
-        let row = rows[i];
-        let cells = row.getElementsByTagName("td");
-        let match = false;
+    for (let i = 0; i < rows.length; i++) {
+      let row = rows[i];
+      let cells = row.getElementsByTagName("td");
+      let match = false;
+      let rowText = "";
 
-        for (let j = 0; j < cells.length; j++) {
-          let cell = cells[j];
-          if (cell.innerText.toLowerCase().includes(searchTerm)) {
-            match = true;
-            break;
-          }
-        }
-
-        if (match) {
-          row.style.display = "";
-          row.style.animation = "fadeInRow 0.2s ease-out";
-        } else {
-          row.style.display = "none";
-        }
+      // Construir texto de toda la fila
+      for (let j = 0; j < cells.length - 1; j++) { // -1 para excluir columna de acciones
+        rowText += cells[j].innerText.toLowerCase() + " ";
       }
 
-      table.classList.remove('table-loading');
-    }, 150);
-  }
+      // Verificar si hay coincidencia
+      if (searchTerm === "" || rowText.includes(searchTerm)) {
+        match = true;
+      }
 
-  // Búsqueda en tiempo real mejorada
-  document.getElementById('searchPatient').addEventListener('input', function () {
-    clearTimeout(this.searchTimeout);
-    this.searchTimeout = setTimeout(searchTable, 200);
-  });
+      // Mostrar/ocultar fila
+      if (match) {
+        row.style.display = "";
+      } else {
+        row.style.display = "none";
+      }
+    }
 
-  function calcularEdad() {
-    const fechaNacimiento = document.getElementById('fecha_nacimiento').value;
+    // Mostrar mensaje si no hay resultados
+    const visibleRows = Array.from(rows).filter(row => row.style.display !== "none");
+    const noResultsMessage = document.getElementById("no-results-message");
 
-    if (fechaNacimiento) {
-      const fechaNac = new Date(fechaNacimiento);
-      const hoy = new Date();
-      const diferencia = hoy - fechaNac;
-      const edad = Math.floor(diferencia / (1000 * 60 * 60 * 24 * 365.25));
-
-      document.getElementById('edad').value = edad;
-    } else {
-      document.getElementById('edad').value = '';
+    if (visibleRows.length === 0 && searchTerm !== "") {
+      if (!noResultsMessage) {
+        const messageRow = document.createElement("tr");
+        messageRow.id = "no-results-message";
+        messageRow.innerHTML = `
+          <td colspan="6" class="text-center py-4">
+            <i class="fas fa-search text-muted mb-2" style="font-size: 2rem;"></i>
+            <p class="text-muted mb-0">No se encontraron pacientes que coincidan con: <strong>"${searchTerm}"</strong></p>
+          </td>
+        `;
+        tableBody.appendChild(messageRow);
+      }
+    } else if (noResultsMessage) {
+      noResultsMessage.remove();
     }
   }
 
-  // Event listener mejorado
-  const fechaNacimientoField = document.getElementById('fecha_nacimiento');
-  if (fechaNacimientoField) {
-    fechaNacimientoField.addEventListener('input', calcularEdad);
+  // BÚSQUEDA EN TIEMPO REAL
+  document.addEventListener('DOMContentLoaded', function () {
+    const searchInput = document.getElementById('searchPatient');
+
+    if (searchInput) {
+      // Búsqueda mientras se escribe
+      searchInput.addEventListener('input', function () {
+        clearTimeout(this.searchTimeout);
+        this.searchTimeout = setTimeout(() => {
+          searchTable();
+        }, 200);
+      });
+
+      // Búsqueda al presionar Enter
+      searchInput.addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          searchTable();
+        }
+      });
+
+      console.log("Búsqueda inicializada correctamente"); // Debug
+    }
+
+    // Botón de búsqueda
+    const searchButton = document.querySelector('.btn-outline-light');
+    if (searchButton) {
+      searchButton.addEventListener('click', function (e) {
+        e.preventDefault();
+        searchTable();
+      });
+    }
+  });
+
+  // FUNCIÓN PARA CALCULAR EDAD (mantenida)
+  function calcularEdad() {
+    const fechaNacimiento = document.getElementById('fecha_nacimiento');
+    const edadField = document.getElementById('edad');
+
+    if (fechaNacimiento && edadField && fechaNacimiento.value) {
+      const fechaNac = new Date(fechaNacimiento.value);
+      const hoy = new Date();
+      const diferencia = hoy - fechaNac;
+      const edad = Math.floor(diferencia / (1000 * 60 * 60 * 24 * 365.25));
+      edadField.value = edad;
+    }
   }
 
-  // Mejoras sutiles
+  // MEJORAS ADICIONALES
   document.addEventListener('DOMContentLoaded', function () {
+
     // Auto-hide alerts
     const alerts = document.querySelectorAll('.alert');
     alerts.forEach(alert => {
@@ -489,24 +585,62 @@
       button.addEventListener('click', function (e) {
         e.preventDefault();
         const form = this.closest('form');
-        const confirmation = confirm('⚠️ ¿Confirmas la eliminación de este paciente?\n\nEsta acción no se puede deshacer.');
+
+        // Extraer nombre del paciente del atributo onclick
+        const onclickText = this.getAttribute('onclick');
+        let patientName = 'este paciente';
+
+        if (onclickText) {
+          const match = onclickText.match(/paciente (.+?)\?'/);
+          if (match) {
+            patientName = match[1];
+          }
+        }
+
+        const confirmation = confirm(`⚠️ ¿Confirmas la eliminación de ${patientName}?\n\nEsta acción no se puede deshacer.`);
 
         if (confirmation) {
           this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Eliminando...';
           this.disabled = true;
-          form.submit();
+          setTimeout(() => {
+            form.submit();
+          }, 500);
         }
       });
     });
 
-    // Mejorar ordenamiento
-    const sortHeaders = document.querySelectorAll('.sort');
-    sortHeaders.forEach(header => {
-      header.addEventListener('click', function () {
-        // Aquí se puede implementar ordenamiento si es necesario
-        console.log('Ordenar por:', this.dataset.sort);
+    // Evento para fecha de nacimiento si existe
+    const fechaNacimientoField = document.getElementById('fecha_nacimiento');
+    if (fechaNacimientoField) {
+      fechaNacimientoField.addEventListener('input', calcularEdad);
+    }
+
+    // Funcionalidad del botón "Nuevo Paciente"
+    const newPatientButton = document.getElementById('agregar-formulario');
+    if (newPatientButton) {
+      newPatientButton.addEventListener('click', function () {
+        // Aquí puedes agregar la lógica para mostrar el formulario o redirigir
+        console.log("Agregar nuevo paciente");
       });
-    });
+    }
+
+    // Limpiar búsqueda al cargar la página
+    const searchInput = document.getElementById('searchPatient');
+    if (searchInput) {
+      searchInput.value = '';
+    }
+
+    console.log("JavaScript inicializado correctamente"); // Debug
   });
+
+  // FUNCIÓN PARA LIMPIAR BÚSQUEDA
+  function clearSearch() {
+    const searchInput = document.getElementById('searchPatient');
+    if (searchInput) {
+      searchInput.value = '';
+      searchTable();
+      searchInput.focus();
+    }
+  }
 </script>
 {% endblock javascripts %}
