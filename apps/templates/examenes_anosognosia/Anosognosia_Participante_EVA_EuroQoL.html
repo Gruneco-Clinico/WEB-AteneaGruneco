@@ -46,11 +46,11 @@
                   name="termometro_estado_salud"
                   min="0"
                   max="100"
-                  value="50"
+                  value="{{ datos_examen.termometro_estado_salud|default:50 }}"
                   style="writing-mode: bt-lr; -webkit-appearance: slider-vertical; height: 300px; width: 30px;"
                 >
                 <span>0 (Peor estado imaginable)</span>
-                <p class="mt-2">Valor actual: <strong id="valor_termometro">50</strong></p>
+                <p class="mt-2">Valor actual: <strong id="valor_termometro">{{ datos_examen.termometro_estado_salud|default:50 }}</strong></p>
               </div>
             </div>
 

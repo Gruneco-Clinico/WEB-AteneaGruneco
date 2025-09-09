@@ -48,7 +48,13 @@
                   <div class="form-group">
                     <label for="memoria_p1">1. ¿Ha notado pérdida de memoria reciente?</label>
                     <select class="form-control" name="memoria_p1" id="memoria_p1" required>
+                      {% if datos_examen.memoria_p1 %}
+                        <option value="{{ datos_examen.memoria_p1 }}" selected>
+                          {{ datos_examen.memoria_p1 }}
+                        </option>
+                      {% else %}
                       <option value="" disabled selected>Seleccione una opción</option>
+                      {% endif %}
                       <option value="si">Sí</option>
                       <option value="no">No</option>
                     </select>
@@ -57,7 +63,13 @@
                     <div id="memoria_p1_1_container" style="display: none; margin-top: 10px; margin-left: 15px;">
                       <label for="memoria_p1_1">¿Es este un problema constante (a diferencia de esporádico)?</label>
                       <select class="form-control" name="memoria_p1_1" id="memoria_p1_1">
+                        {% if datos_examen.memoria_p1_1 %}
+                          <option value="{{ datos_examen.memoria_p1_1 }}" selected>
+                            {{ datos_examen.memoria_p1_1 }}
+                          </option>
+                        {% else %}
                         <option value="" disabled selected>Seleccione una opción</option>
+                        {% endif %}
                         <option value="si">Sí</option>
                         <option value="no">No</option>
                       </select>
@@ -67,7 +79,13 @@
                   <div class="form-group">
                     <label>2. ¿Puede él/ella recordar eventos recientes?</label>
                     <select class="form-control" name="memoria_p2" required>
+                      {% if datos_examen.memoria_p2 %}
+                        <option value="{{ datos_examen.memoria_p2 }}" selected>
+                          {{ datos_examen.memoria_p2 }}
+                        </option>
+                      {% else %}
                       <option value="" disabled selected>Seleccione</option>
+                      {% endif %}
                       <option value="generalmente">Generalmente</option>
                       <option value="a_veces">A veces</option>
                       <option value="raramente">Raramente</option>
@@ -77,7 +95,13 @@
                   <div class="form-group">
                     <label>3. ¿Puede él/ella recordar una lista breve de artículos (compras)?</label>
                     <select class="form-control" name="memoria_p3" required>
+                      {% if datos_examen.memoria_p3 %}
+                        <option value="{{ datos_examen.memoria_p3 }}" selected>
+                          {{ datos_examen.memoria_p3 }}
+                        </option>
+                      {% else %}
                       <option value="" disabled selected>Seleccione</option>
+                      {% endif %}
                       <option value="generalmente">Generalmente</option>
                       <option value="a_veces">A veces</option>
                       <option value="raramente">Raramente</option>
@@ -87,7 +111,13 @@
                   <div class="form-group">
                     <label>4. ¿Se ha registrado algún deterioro en su memoria durante el último año?</label>
                     <select class="form-control" name="memoria_p4" required>
+                      {% if datos_examen.memoria_p4 %}
+                        <option value="{{ datos_examen.memoria_p4 }}" selected>
+                          {{ datos_examen.memoria_p4 }}
+                        </option>
+                      {% else %}
                       <option value="" disabled selected>Seleccione</option>
+                      {% endif %}
                       <option value="si">Sí</option>
                       <option value="no">No</option>
                     </select>
@@ -98,7 +128,13 @@
                       actividades cotidianas habituales de años atrás (o actividades previas a la jubilación)? (opinión de 
                       fuentes colaterales).</label>
                     <select class="form-control" name="memoria_p5" required>
+                      {% if datos_examen.memoria_p5 %}
+                        <option value="{{ datos_examen.memoria_p5 }}" selected>
+                          {{ datos_examen.memoria_p5 }}
+                        </option>
+                      {% else %}
                       <option value="" disabled selected>Seleccione</option>
+                      {% endif %}
                       <option value="Si">Sí</option>
                       <option value="No">No</option>
                     </select>
@@ -108,7 +144,13 @@
                     <label>6. ¿Se olvida él/ella completamente de un evento importante (ej., viaje, fiesta, matrimonio familiar) a 
                       pocas semanas del evento? </label>
                     <select class="form-control" name="memoria_p6" required>
+                      {% if datos_examen.memoria_p6 %}
+                        <option value="{{ datos_examen.memoria_p6 }}" selected>
+                          {{ datos_examen.memoria_p6 }}
+                        </option>
+                      {% else %}
                       <option value="" disabled selected>Seleccione</option>
+                      {% endif %}
                       <option value="generalmente">Generalmente</option>
                       <option value="a_veces">A veces</option>
                       <option value="raramente">Raramente</option>
@@ -118,7 +160,13 @@
                   <div class="form-group">
                     <label>7. ¿Se olvida él/ella de detalles relevantes del evento importante?</label>
                     <select class="form-control" name="memoria_p7" required>
+                      {% if datos_examen.memoria_p7 %}
+                        <option value="{{ datos_examen.memoria_p7 }}" selected>
+                          {{ datos_examen.memoria_p7 }}
+                        </option>
+                      {% else %}
                       <option value="" disabled selected>Seleccione</option>
+                      {% endif %}
                       <option value="generalmente">Generalmente</option>
                       <option value="a_veces">A veces</option>
                       <option value="raramente">Raramente</option>
@@ -129,7 +177,13 @@
                     <label>8. ¿Se olvida él/ella completamente de información importante del pasado lejano (ej. fecha de 
                       cumpleaños, fecha de matrimonio, lugar de trabajo)?</label>
                     <select class="form-control" name="memoria_p8" required>
+                      {% if datos_examen.memoria_p8 %}
+                        <option value="{{ datos_examen.memoria_p8 }}" selected>
+                          {{ datos_examen.memoria_p8 }}
+                        </option>
+                      {% else %}
                       <option value="" disabled selected>Seleccione</option>
+                      {% endif %}
                       <option value="generalmente">Generalmente</option>
                       <option value="a_veces">A veces</option>
                       <option value="raramente">Raramente</option>
@@ -144,11 +198,11 @@
                     <!-- Subpreguntas -->
                     <div class="mt-3 ml-3">
                       <label>En el curso de una semana</label>
-                      <input type="text" class="form-control" name="evento_recuerda_semana" id="evento_recuerda_semana" rows="3" required>
+                      <input type="text" class="form-control" name="evento_recuerda_semana" id="evento_recuerda_semana" value="{{ datos_examen.evento_recuerda_semana|default_if_none:'' }}" rows="3" required>
                   
                   
                       <label>En el curso de un mes</label>
-                      <input type="text" class="form-control" name="evento_recuerda_mes" id="evento_recuerda_mes" rows="3" required>
+                      <input type="text" class="form-control" name="evento_recuerda_mes" id="evento_recuerda_mes" value="{{ datos_examen.evento_recuerda_mes|default_if_none:'' }}" rows="3" required>
                     </div>
                   </div>
                   
@@ -156,13 +210,13 @@
                   <!-- Pregunta 10 -->
                   <div class="form-group">
                     <label for="nacimiento_fecha">10. ¿Cuándo nació él/ella?</label>
-                    <input type="date" class="form-control" name="nacimiento_fecha" id="nacimiento_fecha" required>
+                    <input type="date" class="form-control" name="nacimiento_fecha" id="nacimiento_fecha" value="{{ datos_examen.nacimiento_fecha|default_if_none:'' }}" required>
                   </div>
 
                   <!-- Pregunta 11 -->
                   <div class="form-group">
                     <label for="nacimiento_lugar">11. ¿Dónde nació él/ella?</label>
-                    <input type="text" class="form-control" name="nacimiento_lugar" id="nacimiento_lugar" required>
+                    <input type="text" class="form-control" name="nacimiento_lugar" id="nacimiento_lugar" value="{{ datos_examen.nacimiento_lugar|default_if_none:'' }}" required>
                   </div>
 
                   <!-- Pregunta 12 -->
@@ -170,13 +224,13 @@
                     <label>12. ¿Cuál fue el último colegio al que él/ella asistió?</label>
                     <div class="ml-3 mt-2">
                       <label for="colegio_nombre">Nombre:</label>
-                      <input type="text" class="form-control mb-2" name="colegio_nombre" id="colegio_nombre" required>
+                      <input type="text" class="form-control mb-2" name="colegio_nombre" id="colegio_nombre" value="{{ datos_examen.colegio_nombre|default_if_none:'' }}" required>
 
                       <label for="colegio_lugar">Lugar:</label>
-                      <input type="text" class="form-control mb-2" name="colegio_lugar" id="colegio_lugar" required>
+                      <input type="text" class="form-control mb-2" name="colegio_lugar" id="colegio_lugar" value="{{ datos_examen.colegio_lugar|default_if_none:'' }}" required>
 
                       <label for="colegio_grado">Grado:</label>
-                      <input type="text" class="form-control" name="colegio_grado" id="colegio_grado" required>
+                      <input type="text" class="form-control" name="colegio_grado" id="colegio_grado" value="{{ datos_examen.colegio_grado|default_if_none:'' }}" required>
                     </div>
                   </div>
 
@@ -184,19 +238,19 @@
                   <!-- Pregunta 13 -->
                   <div class="form-group">
                     <label for="ocupacion_principal">13. ¿Cuál fue la principal ocupación de él/ella (o la ocupación del cónyuge si el sujeto no trabajaba)?</label>
-                    <input type="text" class="form-control" name="ocupacion_principal" id="ocupacion_principal" required>
+                    <input type="text" class="form-control" name="ocupacion_principal" id="ocupacion_principal" value="{{ datos_examen.ocupacion_principal|default_if_none:'' }}" required>
                   </div>
 
                   <!-- Pregunta 14 -->
                   <div class="form-group">
                     <label for="ultimo_trabajo">14. ¿Cuál fue el último trabajo de él/ella (o trabajo del cónyuge si el sujeto no trabajaba)?</label>
-                    <input type="text" class="form-control" name="ultimo_trabajo" id="ultimo_trabajo" required>
+                    <input type="text" class="form-control" name="ultimo_trabajo" id="ultimo_trabajo" value="{{ datos_examen.ultimo_trabajo|default_if_none:'' }}" required>
                   </div>
 
                   <!-- Pregunta 15 -->
                   <div class="form-group">
                     <label for="jubilacion">15. ¿Cuándo se jubiló él/ella (o cónyuge) y por qué?</label>
-                    <textarea class="form-control" name="jubilacion" id="jubilacion" rows="3" required></textarea>
+                    <textarea class="form-control" name="jubilacion" id="jubilacion" rows="3" required>{{ datos_examen.jubilacion|default_if_none:'' }}</textarea>
                   </div>
 
                   <div class="text-right mt-4">
@@ -216,7 +270,13 @@
                   <div class="form-group">
                     <label>1. ¿Con qué frecuencia sabe él/ella exactamente la fecha del día?</label>
                     <select class="form-control" name="orientacion_p1"required>
+                      {% if datos_examen.orientacion_p1 %}
+                        <option value="{{ datos_examen.orientacion_p1 }}" selected>
+                          {{ datos_examen.orientacion_p1 }}
+                        </option>
+                      {% else %}
                       <option value="" disabled selected>Seleccione una opción</option>
+                      {% endif %}
                       <option value="generalmente">Generalmente</option>
                       <option value="A veces">A veces</option>
                       <option value="Raramente">Raramente</option>
@@ -227,7 +287,13 @@
                   <div class="form-group">
                     <label>2. ¿Con qué frecuencia sabe él/ella exactamente el mes?</label>
                     <select class="form-control" name="orientacion_p2"required>
+                      {% if datos_examen.orientacion_p2 %}
+                        <option value="{{ datos_examen.orientacion_p2 }}" selected>
+                          {{ datos_examen.orientacion_p2 }}
+                        </option>
+                      {% else %}
                       <option value="" disabled selected>Seleccione una opción</option>
+                      {% endif %}
                       <option value="generalmente">Generalmente</option>
                       <option value="A veces">A veces</option>
                       <option value="Raramente">Raramente</option>
@@ -238,7 +304,13 @@
                   <div class="form-group">
                     <label>3. ¿Con qué frecuencia sabe él/ella exactamente el año?</label>
                     <select class="form-control" name="orientacion_p3" required>
+                      {% if datos_examen.orientacion_p3 %}
+                        <option value="{{ datos_examen.orientacion_p3 }}" selected>
+                          {{ datos_examen.orientacion_p3 }}
+                        </option>
+                      {% else %}
                       <option value="" disabled selected>Seleccione una opción</option>
+                      {% endif %}
                       <option value="generalmente">Generalmente</option>
                       <option value="A veces">A veces</option>
                       <option value="Raramente">Raramente</option>
@@ -249,7 +321,13 @@
                   <div class="form-group">
                     <label>4. ¿Con qué frecuencia sabe él/ella exactamente el día de la semana</label>
                     <select class="form-control" name="orientacion_p4" required>
+                      {% if datos_examen.orientacion_p4 %}
+                        <option value="{{ datos_examen.orientacion_p4 }}" selected>
+                          {{ datos_examen.orientacion_p4 }}
+                        </option>
+                      {% else %}
                       <option value="" disabled selected>Seleccione una opción</option>
+                      {% endif %}
                       <option value="generalmente">Generalmente</option>
                       <option value="A veces">A veces</option>
                       <option value="Raramente">Raramente</option>
@@ -261,7 +339,13 @@
                     <label>5. ¿Presenta él/ella dificultad para relacionar acontecimientos en el tiempo (cuándo ocurrieron unos 
                       eventos en relación con los otros)?</label>
                     <select class="form-control" name="orientacion_p5" required>
+                      {% if datos_examen.orientacion_p5 %}
+                        <option value="{{ datos_examen.orientacion_p5 }}" selected>
+                          {{ datos_examen.orientacion_p5 }}
+                        </option>
+                      {% else %}
                       <option value="" disabled selected>Seleccione una opción</option>
+                      {% endif %}
                       <option value="generalmente">Generalmente</option>
                       <option value="A veces">A veces</option>
                       <option value="Raramente">Raramente</option>
@@ -272,7 +356,13 @@
                   <div class="form-group">
                     <label>6. ¿Puede él/ella orientarse en calles que le son conocidas? </label>
                     <select class="form-control" name="orientacion_p6" required>
+                      {% if datos_examen.orientacion_p6 %}
+                        <option value="{{ datos_examen.orientacion_p6 }}" selected>
+                          {{ datos_examen.orientacion_p6 }}
+                        </option>
+                      {% else %}
                       <option value="" disabled selected>Seleccione una opción</option>
+                      {% endif %}
                       <option value="generalmente">Generalmente</option>
                       <option value="A veces">A veces</option>
                       <option value="Raramente">Raramente</option>
@@ -284,7 +374,13 @@
                     <label>7. ¿Con qué frecuencia sabe él/ella cómo llegar de un lugar a otro cuando se encuentra fuera de su 
                       vecindario? </label>
                     <select class="form-control" name="orientacion_p7" required>
+                      {% if datos_examen.orientacion_p7 %}
+                        <option value="{{ datos_examen.orientacion_p7 }}" selected>
+                          {{ datos_examen.orientacion_p7 }}
+                        </option>
+                      {% else %}
                       <option value="" disabled selected>Seleccione una opción</option>
+                      {% endif %}
                       <option value="generalmente">Generalmente</option>
                       <option value="A veces">A veces</option>
                       <option value="Raramente">Raramente</option>
@@ -295,7 +391,13 @@
                   <div class="form-group">
                     <label>8. ¿Con qué frecuencia puede él/ella orientarse dentro de su casa? </label>
                     <select class="form-control" name="orientacion_p8" required>
+                      {% if datos_examen.orientacion_p8 %}
+                        <option value="{{ datos_examen.orientacion_p8 }}" selected>
+                          {{ datos_examen.orientacion_p8 }}
+                        </option>
+                      {% else %}
                       <option value="" disabled selected>Seleccione una opción</option>
+                      {% endif %}
                       <option value="Generalmente">Generalmente</option>
                       <option value="A veces">A veces</option>
                       <option value="Raramente">Raramente</option>
@@ -321,7 +423,13 @@
                     <label>1. En general, si Ud. tuviera que evaluar la capacidad de él/ella para resolver problemas en este 
                       momento, Ud. la consideraría: </label>
                     <select class="form-control" name="juicio_p1" required>
+                      {% if datos_examen.juicio_p1 %}
+                        <option value="{{ datos_examen.juicio_p1 }}" selected>
+                          {{ datos_examen.juicio_p1 }}
+                        </option>
+                      {% else %}
                       <option value="" disabled selected>Seleccione una opción</option>
+                      {% endif %}
                       <option value="Tan buena como ha sido siempre">Tan buena como ha sido siempre</option>
                       <option value="Buena, pero no tan buena como lo era antes">Buena, pero no tan buena como lo era antes</option>
                       <option value="Regular">Regular</option>
@@ -334,7 +442,13 @@
                     <label>2. Evalúe la capacidad de él/ella para manejar pequeñas sumas de dinero (ej. dar cambio, dejar una 
                       pequeña propina): </label>
                     <select class="form-control" name="juicio_p2" required>
+                      {% if datos_examen.juicio_p2 %}
+                        <option value="{{ datos_examen.juicio_p2 }}" selected>
+                          {{ datos_examen.juicio_p2 }}
+                        </option>
+                      {% else %}
                       <option value="" disabled selected>Seleccione una opción</option>
+                      {% endif %}
                       <option value="Sin pérdida">Sin pérdida</option>
                       <option value="Algo de pérdida">Buena, pero no tan buena como lo era antes</option>
                       <option value="Pérdida severa">Pérdida severa</option>
@@ -345,7 +459,13 @@
                     <label>3. Evalúe la capacidad de él/ella para manejar transacciones financieras o de negocios complicadas (ej. 
                       balancear una chequera, pagar cuentas): </label>
                     <select class="form-control" name="juicio_p3" required>
+                      {% if datos_examen.juicio_p3 %}
+                        <option value="{{ datos_examen.juicio_p3 }}" selected>
+                          {{ datos_examen.juicio_p3 }}
+                        </option>
+                      {% else %}
                       <option value="" disabled selected>Seleccione una opción</option>
+                      {% endif %}
                       <option value="Sin pérdida">Sin pérdida</option>
                       <option value="Algo de pérdida">Buena, pero no tan buena como lo era antes</option>
                       <option value="Pérdida severa">Pérdida severa</option>
@@ -354,8 +474,14 @@
 
                   <div class="form-group">
                     <label>4. ¿Puede él/ella manejar una emergencia doméstica (ej. gotera en las cañerías, pequeño incendio)? </label>
-                    <select class="form-control" name="juicio_p3" required>
+                    <select class="form-control" name="juicio_p4" required>
+                      {% if datos_examen.juicio_p4 %}
+                        <option value="{{ datos_examen.juicio_p4 }}" selected>
+                          {{ datos_examen.juicio_p4 }}
+                        </option>
+                      {% else %}
                       <option value="" disabled selected>Seleccione una opción</option>
+                      {% endif %}
                       <option value="Tan bien como antes">Tan bien como antes</option>
                       <option value="Peor que antes debido a problemas en el pensamiento">Peor que antes debido a problemas en el pensamiento</option>
                       <option value="Peor que antes, por alguna otra razón">Peor que antes, por alguna otra razón (ADD CAMPO)</option>
@@ -365,7 +491,13 @@
                   <div class="form-group">
                     <label>5. ¿Puede él/ella comprender situaciones o explicaciones? </label>
                     <select class="form-control" name="juicio_p5" required>
+                      {% if datos_examen.juicio_p5 %}
+                        <option value="{{ datos_examen.juicio_p5 }}" selected>
+                          {{ datos_examen.juicio_p5 }}
+                        </option>
+                      {% else %}
                       <option value="" disabled selected>Seleccione una opción</option>
+                      {% endif %}
                       <option value="Generalmente">Generalmente</option>
                       <option value="A veces">A veces</option>
                       <option value="Raramente">Raramente</option>
@@ -378,7 +510,13 @@
                       su enfermedad) en situaciones sociales e interacciones con otra gente?  </label>
                       <p class="text-muted" style="margin-bottom: 8px;">* Este ítem evalúa el comportamiento, no la apariencia.</p>
                     <select class="form-control" name="juicio_p6" required>
+                      {% if datos_examen.juicio_p6 %}
+                        <option value="{{ datos_examen.juicio_p6 }}" selected>
+                          {{ datos_examen.juicio_p6 }}
+                        </option>
+                      {% else %}
                       <option value="" disabled selected>Seleccione una opción</option>
+                      {% endif %}
                       <option value="Generalmente">Generalmente</option>
                       <option value="A veces">A veces</option>
                       <option value="Raramente">Raramente</option>
@@ -406,7 +544,13 @@
                   <div class="form-group">
                     <label>1. ¿Él/Ella sigue trabajando?</label>
                     <select class="form-control" name="trabaja_actualmente" id="trabaja_actualmente" required>
+                      {% if datos_examen.trabaja_actualmente %}
+                        <option value="{{ datos_examen.trabaja_actualmente }}" selected>
+                          {{ datos_examen.trabaja_actualmente }}
+                         </option>
+                      {% else %}
                       <option value="" disabled selected>Seleccione una opción</option>
+                      {% endif %}
                       <option value="na">N/A</option>
                       <option value="si">Sí</option>
                       <option value="no">No</option>
@@ -417,7 +561,13 @@
                   <div class="form-group" id="trabajo_pregunta2" style="display: none; margin-left: 20px;">
                     <label>2. ¿Problemas con la memoria o el pensamiento de él/ella contribuyeron a su decisión de jubilarse?</label>
                     <select class="form-control" name="memoria_causa_jubilacion">
+                      {% if datos_examen.memoria_causa_jubilacion %}
+                        <option value="{{ datos_examen.memoria_causa_jubilacion }}" selected>
+                          {{ datos_examen.memoria_causa_jubilacion }}
+                         </option>
+                      {% else %}
                       <option value="" disabled selected>Seleccione una opción</option>
+                      {% endif %}
                       <option value="si">Sí</option>
                       <option value="no">No</option>
                       <option value="nose">No sé</option>
@@ -428,7 +578,13 @@
                   <div class="form-group" id="trabajo_pregunta3" style="display: none; margin-left: 20px;">
                     <label>3. ¿Él/Ella presenta dificultades significativas en el trabajo debido a problemas con su memoria o pensamiento?</label>
                     <select class="form-control" name="dificultades_trabajo_memoria">
+                      {% if datos_examen.dificultades_trabajo_memoria %}
+                        <option value="{{ datos_examen.dificultades_trabajo_memoria }}" selected>
+                          {{ datos_examen.dificultades_trabajo_memoria }}
+                         </option>
+                      {% else %}
                       <option value="" disabled selected>Seleccione una opción</option>
+                      {% endif %}
                       <option value="raramente">Raramente o nunca</option>
                       <option value="a_veces">A veces</option>
                       <option value="generalmente">Generalmente</option>
@@ -442,7 +598,13 @@
                   <div class="form-group">
                     <label>4. ¿Condujo él/ella alguna vez un carro?</label>
                     <select class="form-control" name="condujo_alguna_vez" id="condujo_alguna_vez" required>
+                      {% if datos_examen.condujo_alguna_vez %}
+                        <option value="{{ datos_examen.condujo_alguna_vez }}" selected>
+                          {{ datos_examen.condujo_alguna_vez }}
+                         </option>
+                      {% else %}
                       <option value="" disabled selected>Seleccione una opción</option>
+                      {% endif %}
                       <option value="si">Sí</option>
                       <option value="no">No</option>
                     </select>
@@ -451,7 +613,13 @@
                   <div class="form-group">
                     <label>¿Actualmente, él/ella conduce un carro?</label>
                     <select class="form-control" name="conduce_actualmente" id="conduce_actualmente">
+                      {% if datos_examen.conduce_actualmente %}
+                        <option value="{{ datos_examen.conduce_actualmente }}" selected>
+                          {{ datos_examen.conduce_actualmente }}
+                         </option>
+                      {% else %}
                       <option value="" disabled selected>Seleccione una opción</option>
+                      {% endif %}
                       <option value="si">Sí</option>
                       <option value="no">No</option>
                     </select>
@@ -461,7 +629,13 @@
                   <div class="form-group" id="conduccion_pregunta" style="display: none; margin-left: 20px;">
                     <label>¿Se debe esto a problemas con su memoria o pensamiento?</label>
                     <select class="form-control" name="dejo_de_conducir_por_memoria">
+                      {% if datos_examen.dejo_de_conducir_por_memoria %}
+                        <option value="{{ datos_examen.dejo_de_conducir_por_memoria }}" selected>
+                          {{ datos_examen.dejo_de_conducir_por_memoria }}
+                         </option>
+                      {% else %}
                       <option value="" disabled selected>Seleccione una opción</option>
+                      {% endif %}
                       <option value="si">Sí</option>
                       <option value="no">No</option>
                     </select>
@@ -471,7 +645,13 @@
                   <div class="form-group" id="conduce_riesgo" style="display: none; margin-left: 20px;">
                     <label>5. Si él/ella todavía conduce, ¿existen problemas o riesgos debido a un pensamiento pobre?</label>
                     <select class="form-control" name="riesgos_conduccion">
+                      {% if datos_examen.riesgos_conduccion %}
+                        <option value="{{ datos_examen.riesgos_conduccion }}" selected>
+                          {{ datos_examen.riesgos_conduccion }}
+                         </option>
+                      {% else %}
                       <option value="" disabled selected>Seleccione una opción</option>
+                      {% endif %}
                       <option value="si">Sí</option>
                       <option value="no">No</option>
                     </select>
@@ -481,7 +661,13 @@
                   <div class="form-group">
                     <label>6. ¿Es él/ella todavía capaz de salir a comprar lo que necesita en forma independiente?</label>
                     <select class="form-control" name="compras_independientes" required>
+                      {% if datos_examen.compras_independientes %}
+                        <option value="{{ datos_examen.compras_independientes }}" selected>
+                          {{ datos_examen.compras_independientes }}
+                         </option>
+                      {% else %}
                       <option value="" disabled selected>Seleccione una opción</option>
+                      {% endif %}
                       <option value="raramente">Raramente o nunca (Necesita ser acompañado/a siempre)</option>
                       <option value="a_veces">A veces (Compra una cantidad limitada de artículos, duplica la compra o se olvida de artículos)</option>
                       <option value="generalmente">Generalmente</option>
@@ -493,7 +679,13 @@
                   <div class="form-group">
                     <label>7. ¿Es él/ella capaz de llevar a cabo actividades fuera del hogar en forma independiente?</label>
                     <select class="form-control" name="actividades_fuera_hogar" required>
+                      {% if datos_examen.actividades_fuera_hogar %}
+                        <option value="{{ datos_examen.actividades_fuera_hogar }}" selected>
+                          {{ datos_examen.actividades_fuera_hogar }}
+                         </option>
+                      {% else %}
                       <option value="" disabled selected>Seleccione una opción</option>
+                      {% endif %}
                       <option value="raramente">Raramente o nunca (Incapaz sin ayuda)</option>
                       <option value="a_veces">A veces (Limitadas y/o rutinarias)</option>
                       <option value="generalmente">Generalmente (Participación significativa)</option>
@@ -505,7 +697,13 @@
                   <div class="form-group">
                     <label>8. ¿Asiste él/ella a funciones sociales fuera del hogar familiar?</label>
                     <select class="form-control" name="asiste_funciones_sociales" id="asiste_funciones_sociales" required>
+                      {% if datos_examen.asiste_funciones_sociales %}
+                        <option value="{{ datos_examen.asiste_funciones_sociales }}" selected>
+                          {{ datos_examen.asiste_funciones_sociales }}
+                         </option>
+                      {% else %}
                       <option value="" disabled selected>Seleccione una opción</option>
+                      {% endif %}
                       <option value="si">Sí</option>
                       <option value="no">No</option>
                     </select>
@@ -513,7 +711,7 @@
                     <!-- Subpregunta si responde "No" -->
                     <div id="funciones_sociales_motivo_container" style="display: none; margin-top: 10px;">
                       <label for="motivo_no_funciones">En caso negativo, ¿por qué no?</label>
-                      <textarea class="form-control" name="motivo_no_funciones" id="motivo_no_funciones" rows="2"></textarea>
+                      <textarea class="form-control" name="motivo_no_funciones" id="motivo_no_funciones" value="{{ datos_examen.motivo_no_funciones|default_if_none:'' }}" rows="2"></textarea>
                     </div>
                   </div>
 
@@ -521,7 +719,13 @@
                   <div class="form-group">
                     <label>9. ¿Alguien que no conozca al sujeto y observara su comportamiento pensaría que éste/a se encuentra enfermo/a?</label>
                     <select class="form-control" name="parece_enfermo" required>
+                      {% if datos_examen.parece_enfermo %}
+                        <option value="{{ datos_examen.parece_enfermo }}" selected>
+                          {{ datos_examen.parece_enfermo }}
+                         </option>
+                      {% else %}
                       <option value="" disabled selected>Seleccione una opción</option>
+                      {% endif %}
                       <option value="si">Sí</option>
                       <option value="no">No</option>
                     </select>
@@ -531,7 +735,13 @@
                   <div class="form-group">
                     <label>10. Si el sujeto se encuentra en un hogar geriátrico, ¿participa activamente él/ella en actividades sociales (con participación intelectual)?</label>
                     <select class="form-control" name="participa_hogar_geriatrico" required>
+                      {% if datos_examen.participa_hogar_geriatrico %}
+                        <option value="{{ datos_examen.participa_hogar_geriatrico }}" selected>
+                          {{ datos_examen.participa_hogar_geriatrico }}
+                         </option>
+                      {% else %}
                       <option value="" disabled selected>Seleccione una opción</option>
+                      {% endif %}
                       <option value="si">Sí</option>
                       <option value="no">No</option>
                     </select>
@@ -541,7 +751,13 @@
                   <div class="form-group">
                     <label>¿Existe suficiente información disponible para evaluar el grado de deterioro del sujeto en las actividades comunitarias?</label>
                     <select class="form-control" name="info_suficiente_comunitarias" required>
+                      {% if datos_examen.info_suficiente_comunitarias %}
+                        <option value="{{ datos_examen.info_suficiente_comunitarias }}" selected>
+                          {{ datos_examen.info_suficiente_comunitarias }}
+                         </option>
+                      {% else %}
                       <option value="" disabled selected>Seleccione una opción</option>
+                      {% endif %}
                       <option value="si">Sí</option>
                       <option value="no">No</option>
                     </select>
@@ -550,7 +766,7 @@
                   <!-- Notas -->
                   <div class="form-group">
                     <label>Notas adicionales (si desea clarificar el nivel de funcionamiento en actividades comunitarias):</label>
-                    <textarea class="form-control" name="notas_comunitarias" rows="3"></textarea>
+                    <textarea class="form-control" name="notas_comunitarias" value="{{ datos_examen.notas_comunitarias|default_if_none:'' }}" rows="3"></textarea>
                   </div>
 
                   <div class="text-right mt-4">
@@ -574,7 +790,7 @@
                     <label for="cambios_tareas_domesticas">
                       1. a) ¿Qué cambios se han registrado en las habilidades de él/ella para realizar tareas domésticas?
                     </label>
-                    <textarea class="form-control" name="cambios_tareas_domesticas" id="cambios_tareas_domesticas" rows="3" required></textarea>
+                    <textarea class="form-control" name="cambios_tareas_domesticas" id="cambios_tareas_domesticas" value="{{ datos_examen.cambios_tareas_domesticas|default_if_none:'' }}" rows="3" required></textarea>
                   </div>
 
                   <!-- Pregunta 1b -->
@@ -582,7 +798,7 @@
                     <label for="cosas_que_aun_realiza_domesticas">
                       1. b) ¿Qué cosas puede él/ella todavía realizar bien?
                     </label>
-                    <textarea class="form-control" name="cosas_que_aun_realiza_domesticas" id="cosas_que_aun_realiza_domesticas" rows="3" required></textarea>
+                    <textarea class="form-control" name="cosas_que_aun_realiza_domesticas" id="cosas_que_aun_realiza_domesticas" value="{{ datos_examen.cosas_que_aun_realiza_domesticas|default_if_none:'' }}" rows="3" required></textarea>
                   </div>
 
                   <!-- Pregunta 2a -->
@@ -590,7 +806,7 @@
                     <label for="cambios_pasatiempos">
                       2. a) ¿Qué cambios se han registrado en las habilidades de él/ella para realizar pasatiempos?
                     </label>
-                    <textarea class="form-control" name="cambios_pasatiempos" id="cambios_pasatiempos" rows="3" required></textarea>
+                    <textarea class="form-control" name="cambios_pasatiempos" id="cambios_pasatiempos" value="{{ datos_examen.cambios_pasatiempos|default_if_none:'' }}" rows="3" required></textarea>
                   </div>
 
                   <!-- Pregunta 2b -->
@@ -598,7 +814,7 @@
                     <label for="cosas_que_aun_realiza_pasatiempos">
                       2. b) ¿Qué cosas puede él/ella todavía realizar bien?
                     </label>
-                    <textarea class="form-control" name="cosas_que_aun_realiza_pasatiempos" id="cosas_que_aun_realiza_pasatiempos" rows="3" required></textarea>
+                    <textarea class="form-control" name="cosas_que_aun_realiza_pasatiempos" id="cosas_que_aun_realiza_pasatiempos" value="{{ datos_examen.cosas_que_aun_realiza_pasatiempos|default_if_none:'' }}" rows="3" required></textarea>
                   </div>
 
                   <!-- Pregunta 3 -->
@@ -606,7 +822,7 @@
                     <label for="actividades_no_realiza_en_hogar">
                       3. Si el sujeto se encuentra en un hogar geriátrico, ¿qué cosas ya no puede realizar bien (actividades domésticas y pasatiempos)?
                     </label>
-                    <textarea class="form-control" name="actividades_no_realiza_en_hogar" id="actividades_no_realiza_en_hogar" rows="3"></textarea>
+                    <textarea class="form-control" name="actividades_no_realiza_en_hogar" id="actividades_no_realiza_en_hogar" value="{{ datos_examen.actividades_no_realiza_en_hogar|default_if_none:'' }}" rows="3"></textarea>
                   </div>
 
                   <!-- Pregunta 4 -->
@@ -615,7 +831,13 @@
                       4. Habilidad para realizar tareas domésticas (Dementia Scale of Blessed)
                     </label>
                     <select class="form-control" name="habilidad_domestica_dementia_scale" required>
+                      {% if datos_examen.sentir_tension %}
+                        <option value="{{ datos_examen.sentir_tension }}" selected>
+                         {{ datos_examen.sentir_tension }}
+                        </option>
+                      {% else %}
                       <option value="" disabled selected>Seleccione una opción</option>
+                      {% endif %}
                       <option value="0">0 - Sin pérdida</option>
                       <option value="0.5">0.5 - Pérdida leve</option>
                       <option value="1">1 - Pérdida severa</option>
@@ -627,7 +849,7 @@
                     <label for="descripcion_habilidad_domestica">
                       Por favor describa:
                     </label>
-                    <textarea class="form-control" name="descripcion_habilidad_domestica" id="descripcion_habilidad_domestica" rows="4" required></textarea>
+                    <textarea class="form-control" name="descripcion_habilidad_domestica" id="descripcion_habilidad_domestica" value="{{ datos_examen.descripcion_habilidad_domestica|default_if_none:'' }}" rows="4" required></textarea>
                   </div>
 
                   <!-- Pregunta 5: Nivel actual de desempeño -->
@@ -636,7 +858,13 @@
                       5. ¿En qué nivel es él/ella capaz de realizar tareas domésticas?
                     </label>
                     <select class="form-control" name="nivel_desempeno_domestico" id="nivel_desempeno_domestico" required>
+                      {% if datos_examen.nivel_desempeno_domestico %}
+                        <option value="{{ datos_examen.nivel_desempeno_domestico }}" selected>
+                         {{ datos_examen.nivel_desempeno_domestico }}
+                        </option>
+                      {% else %}
                       <option value="" disabled selected>Seleccione una opción</option>
+                      {% endif %}
                       <option value="muy_limitado">Desempeño muy limitado (solo bajo estrecha supervisión)</option>
                       <option value="limitado">Se desempeña solo en actividades limitadas (cierta supervisión)</option>
                       <option value="independiente_algunas">Se desempeña independientemente en algunas actividades</option>
@@ -650,7 +878,7 @@
                     <label for="notas_domesticas_pasatiempos">
                       <strong>Notas adicionales</strong> (si desea aclarar nivel de funcionamiento):
                     </label>
-                    <textarea class="form-control" name="notas_domesticas_pasatiempos" id="notas_domesticas_pasatiempos" rows="4"></textarea>
+                    <textarea class="form-control" name="notas_domesticas_pasatiempos" id="notas_domesticas_pasatiempos" value="{{ datos_examen.notas_domesticas_pasatiempos|default_if_none:'' }}" rows="4"></textarea>
                   </div>
 
                   <div class="text-right mt-4">
@@ -672,7 +900,13 @@
                   <div class="form-group">
                     <label>A. Vestirse (The Dementia Scale of Blessed)</label>
                     <select class="form-control" name="cuidado_p1" required>
+                      {% if datos_examen.cuidado_p1 %}
+                        <option value="{{ datos_examen.cuidado_p1 }}" selected>
+                         {{ datos_examen.cuidado_p1 }}
+                        </option>
+                      {% else %}
                       <option value="" disabled selected>Seleccione una opción</option>
+                      {% endif %}
                       <option value="0">Sin ayuda</option>
                       <option value="1">Ocasionalmente botones mal abotonados, etc</option>
                       <option value="2">Secuencia equivocada. Cosas frecuentemente olvidadas</option>
@@ -683,7 +917,13 @@
                   <div class="form-group">
                     <label>B. Lavado, aseo</label>
                     <select class="form-control" name="cuidado_p2" required>
+                      {% if datos_examen.cuidado_p2 %}
+                        <option value="{{ datos_examen.cuidado_p2 }}" selected>
+                         {{ datos_examen.cuidado_p2 }}
+                        </option>
+                      {% else %}
                       <option value="" disabled selected>Seleccione una opción</option>
+                      {% endif %}
                       <option value="0">Sin ayuda</option>
                       <option value="1">Necesita recordatorios</option>
                       <option value="2">A veces necesita ayuda</option>
@@ -694,7 +934,13 @@
                   <div class="form-group">
                     <label>C. Hábitos de alimentación</label>
                     <select class="form-control" name="cuidado_p3" required>
+                      {% if datos_examen.cuidado_p3 %}
+                        <option value="{{ datos_examen.cuidado_p3 }}" selected>
+                         {{ datos_examen.cuidado_p3 }}
+                        </option>
+                      {% else %}
                       <option value="" disabled selected>Seleccione una opción</option>
+                      {% endif %}
                       <option value="0">Limpio; utiliza los utensilios correctos</option>
                       <option value="1">Desordenado; cuchara</option>
                       <option value="2">Sólidos simples</option>
@@ -705,7 +951,13 @@
                   <div class="form-group">
                     <label>D. Control de esfínteres (The Dementia Scale of Blessed)</label>
                     <select class="form-control" name="cuidado_p4" required>
+                      {% if datos_examen.cuidado_p4 %}
+                        <option value="{{ datos_examen.cuidado_p4 }}" selected>
+                         {{ datos_examen.cuidado_p4 }}
+                        </option>
+                      {% else %}
                       <option value="" disabled selected>Seleccione una opción</option>
+                      {% endif %}
                       <option value="0">Control completo normal</option>
                       <option value="1">Ocasionalmente moja la cama</option>
                       <option value="2">Frecuentemente moja la cama</option>

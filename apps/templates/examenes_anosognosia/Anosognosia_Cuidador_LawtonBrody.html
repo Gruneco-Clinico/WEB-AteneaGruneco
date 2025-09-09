@@ -32,128 +32,177 @@
             <div class="form-group">
               <label><strong>Género del paciente</strong></label>
               <select class="form-control" name="genero" id="genero" required>
+                {% if datos_examen.genero %}
+                  <option value="{{ datos_examen.genero }}" selected>
+                    {{ datos_examen.genero }}
+                  </option>
+                {% else %}
                 <option value="" disabled selected>Seleccione género</option>
-                <option value="mujer">Mujer</option>
-                <option value="hombre">Hombre</option>
+                {% endif %}
+                <option value="Mujer">Mujer</option>
+                <option value="Hombre">Hombre</option>
               </select>
             </div>
 
             <!-- Ítem 1 -->
             <div class="form-group">
               <label><strong>1. Capacidad para usar el teléfono</strong></label>
-              <select class="form-control lawton-item" name="item_1" required>
+              <select class="form-control lawton-item" name="usar_telefono" required>
+                {% if datos_examen.usar_telefono %}
+                  <option value="{{ datos_examen.usar_telefono }}" selected>
+                    {{ datos_examen.usar_telefono }}
+                  </option>
+                {% else %}
                 <option value="" disabled selected>Seleccione una opción</option>
-                <option value="1" data-text="Utiliza el teléfono por iniciativa propia">Utiliza el teléfono por iniciativa propia</option>
-                <option value="1" data-text="Marca algunos números familiares">Marca algunos números familiares</option>
-                <option value="1" data-text="Contesta pero no marca">Contesta pero no marca</option>
-                <option value="0" data-text="No utiliza el teléfono">No utiliza el teléfono</option>
+                {% endif %}
+                <option value="1" data-text="1. Utiliza el teléfono por iniciativa propia">Utiliza el teléfono por iniciativa propia</option>
+                <option value="1" data-text="1. Marca algunos números familiares">Marca algunos números familiares</option>
+                <option value="1" data-text="1. Contesta pero no marca">Contesta pero no marca</option>
+                <option value="0" data-text="0. No utiliza el teléfono">No utiliza el teléfono</option>
               </select>
-              <input type="hidden" name="item_1_text">
-
+              <input type="hidden" name="usar_telefono_text" value="{{ datos_examen.usar_telefono_text|default:'' }}">
             </div>
 
             <!-- Ítem 2 -->
             <div class="form-group">
               <label><strong>2. Hacer compras</strong></label>
-              <select class="form-control lawton-item" name="item_2" required>
+              <select class="form-control lawton-item" name="hacer_compras" required>
+                {% if datos_examen.hacer_compras %}
+                  <option value="{{ datos_examen.hacer_compras }}" selected>
+                    {{ datos_examen.hacer_compras }}
+                  </option>
+                {% else %}
                 <option value="" disabled selected>Seleccione una opción</option>
-                <option value="1" data-text="Realiza todas las compras independientemente">Realiza todas las compras independientemente</option>
-                <option value="0" data-text="Realiza pequeñas compras">Realiza pequeñas compras</option>
-                <option value="0" data-text="Necesita acompañamiento">Necesita acompañamiento</option>
-                <option value="0" data-text="Totalmente incapaz de comprar">Totalmente incapaz de comprar</option>
+                {% endif %}
+                <option value="1" data-text="1. Realiza todas las compras independientemente">Realiza todas las compras independientemente</option>
+                <option value="0" data-text="0. Realiza pequeñas compras">Realiza pequeñas compras</option>
+                <option value="0" data-text="0. Necesita acompañamiento">Necesita acompañamiento</option>
+                <option value="0" data-text="0. Totalmente incapaz de comprar">Totalmente incapaz de comprar</option>
               </select>
-              <input type="hidden" name="item_2_text">
-
+              <input type="hidden" name="hacer_compras_text" value="{{ datos_examen.hacer_compras_text|default:'' }}">
             </div>
 
             <!-- Ítem 3 -->
             <div class="form-group">
               <label><strong>3. Preparación de la comida</strong></label>
-              <select class="form-control lawton-item" name="item_3" required>
+              <select class="form-control lawton-item" name="preparar_comida" required>
+                {% if datos_examen.preparar_comida %}
+                  <option value="{{ datos_examen.preparar_comida }}" selected>
+                    {{ datos_examen.preparar_comida }}
+                  </option>
+                {% else %}
                 <option value="" disabled selected>Seleccione una opción</option>
-                <option value="1" data-text="Organiza, prepara y sirve solo">Organiza, prepara y sirve solo</option>
-                <option value="0" data-text="Prepara si se le dan ingredientes">Prepara si se le dan ingredientes</option>
-                <option value="0" data-text="Calienta pero no sigue dieta">Calienta pero no sigue dieta</option>
-                <option value="0" data-text="Necesita que le preparen">Necesita que le preparen</option>
+                {% endif %}
+                <option value="1" data-text="1. Organiza, prepara y sirve solo">Organiza, prepara y sirve solo</option>
+                <option value="0" data-text="0. Prepara si se le dan ingredientes">Prepara si se le dan ingredientes</option>
+                <option value="0" data-text="0. Calienta pero no sigue dieta">Calienta pero no sigue dieta</option>
+                <option value="0" data-text="0. Necesita que le preparen">Necesita que le preparen</option>
               </select>
-              <input type="hidden" name="item_3_text">
-
+              <input type="hidden" name="preparar_comida_text" value="{{ datos_examen.preparar_comida_text|default:'' }}">
             </div>
 
             <!-- Ítem 4 -->
             <div class="form-group">
               <label><strong>4. Cuidado de la casa</strong></label>
-              <select class="form-control lawton-item" name="item_4" required>
+              <select class="form-control lawton-item" name="cuidado_casa" required>
+                {% if datos_examen.cuidado_casa %}
+                  <option value="{{ datos_examen.cuidado_casa }}" selected>
+                    {{ datos_examen.cuidado_casa }}
+                  </option>
+                {% else %}
                 <option value="" disabled selected>Seleccione una opción</option>
-                <option value="1" data-text="Mantiene la casa solo o con ayuda ocasional">Mantiene la casa solo o con ayuda ocasional</option>
-                <option value="1" data-text="Realiza tareas ligeras como lavar platos">Realiza tareas ligeras como lavar platos</option>
-                <option value="1" data-text="Hace tareas pero no mantiene limpieza adecuada">Hace tareas pero no mantiene limpieza adecuada</option>
-                <option value="1" data-text="Necesita ayuda en todas las tareas">Necesita ayuda en todas las tareas</option>
-                <option value="0" data-text="No participa en las labores">No participa en las labores</option>
+                {% endif %}
+                <option value="1" data-text="1. Mantiene la casa solo o con ayuda ocasional">Mantiene la casa solo o con ayuda ocasional</option>
+                <option value="1" data-text="1. Realiza tareas ligeras como lavar platos">Realiza tareas ligeras como lavar platos</option>
+                <option value="1" data-text="1. Hace tareas pero no mantiene limpieza adecuada">Hace tareas pero no mantiene limpieza adecuada</option>
+                <option value="1" data-text="1. Necesita ayuda en todas las tareas">Necesita ayuda en todas las tareas</option>
+                <option value="0" data-text="0. No participa en las labores">No participa en las labores</option>
               </select>
-              <input type="hidden" name="item_4_text">
-
+              <input type="hidden" name="cuidado_casa_text" value="{{ datos_examen.cuidado_casa_text|default:'' }}">
             </div>
 
             <!-- Ítem 5 -->
             <div class="form-group">
               <label><strong>5. Lavado de la ropa</strong></label>
-              <select class="form-control lawton-item" name="item_5" required>
+              <select class="form-control lawton-item" name="lavar_ropa" required>
+                {% if datos_examen.lavar_ropa %}
+                  <option value="{{ datos_examen.lavar_ropa }}" selected>
+                    {{ datos_examen.lavar_ropa }}
+                  </option>
+                {% else %}
                 <option value="" disabled selected>Seleccione una opción</option>
-                <option value="1" data-text="Lava toda la ropa solo">Lava toda la ropa solo</option>
-                <option value="1" data-text="Lava solo prendas pequeñas">Lava solo prendas pequeñas</option>
-                <option value="0" data-text="Todo el lavado lo hace otra persona">Todo el lavado lo hace otra persona</option>
+                {% endif %}
+                <option value="1" data-text="1. Lava toda la ropa solo">Lava toda la ropa solo</option>
+                <option value="1" data-text="1. Lava solo prendas pequeñas">Lava solo prendas pequeñas</option>
+                <option value="0" data-text="0. Todo el lavado lo hace otra persona">Todo el lavado lo hace otra persona</option>
               </select>
-              <input type="hidden" name="item_5_text">
-
+              <input type="hidden" name="lavar_ropa_text" value="{{ datos_examen.lavar_ropa_text|default:'' }}">
             </div>
 
             <!-- Ítem 6 -->
             <div class="form-group">
               <label><strong>6. Uso de transporte</strong></label>
-              <select class="form-control lawton-item" name="item_6" required>
+              <select class="form-control lawton-item" name="uso_transporte" required>
+                {% if datos_examen.uso_transporte %}
+                  <option value="{{ datos_examen.uso_transporte }}" selected>
+                    {{ datos_examen.uso_transporte }}
+                  </option>
+                {% else %}
                 <option value="" disabled selected>Seleccione una opción</option>
-                <option value="1" data-text="Viaja solo o conduce su coche">Viaja solo o conduce su coche</option>
-                <option value="1" data-text="Puede tomar taxi pero no otros medios">Puede tomar taxi pero no otros medios</option>
-                <option value="1" data-text="Viaja solo con compañía">Viaja solo con compañía</option>
-                <option value="0" data-text="Solo viaja con ayuda">Solo viaja con ayuda</option>
-                <option value="0" data-text="No viaja">No viaja</option>
+                {% endif %}
+                <option value="1" data-text="1. Viaja solo o conduce su coche">Viaja solo o conduce su coche</option>
+                <option value="1" data-text="1. Puede tomar taxi pero no otros medios">Puede tomar taxi pero no otros medios</option>
+                <option value="1" data-text="1. Viaja solo con compañía">Viaja solo con compañía</option>
+                <option value="0" data-text="0. Solo viaja con ayuda">Solo viaja con ayuda</option>
+                <option value="0" data-text="0. No viaja">No viaja</option>
               </select>
-              <input type="hidden" name="item_6_text">
-
+              <input type="hidden" name="uso_transporte_text" value="{{ datos_examen.uso_transporte_text|default:'' }}">
             </div>
 
             <!-- Ítem 7 -->
             <div class="form-group">
               <label><strong>7. Responsabilidad con la medicación</strong></label>
-              <select class="form-control lawton-item" name="item_7" required>
+              <select class="form-control lawton-item" name="medicacion" required>
+                {% if datos_examen.medicacion %}
+                  <option value="{{ datos_examen.medicacion }}" selected>
+                    {{ datos_examen.medicacion }}
+                  </option>
+                {% else %}
                 <option value="" disabled selected>Seleccione una opción</option>
-                <option value="1" data-text="Toma medicación a dosis y hora adecuada">Toma medicación a dosis y hora adecuada</option>
-                <option value="0" data-text="Solo si está preparada">Solo si está preparada</option>
-                <option value="0" data-text="No puede administrarse">No puede administrarse</option>
+                {% endif %}
+                <option value="1" data-text="1. Toma medicación a dosis y hora adecuada">Toma medicación a dosis y hora adecuada</option>
+                <option value="0" data-text="0. Solo si está preparada">Solo si está preparada</option>
+                <option value="0" data-text="0. No puede administrarse">No puede administrarse</option>
               </select>
-              <input type="hidden" name="item_7_text">
-
+              <input type="hidden" name="medicacion_text" value="{{ datos_examen.medicacion_text|default:'' }}">
             </div>
 
             <!-- Ítem 8 -->
             <div class="form-group">
               <label><strong>8. Manejo del dinero</strong></label>
-              <select class="form-control lawton-item" name="item_8" required>
+              <select class="form-control lawton-item" name="manejo_dinero" required>
+                {% if datos_examen.manejo_dinero %}
+                  <option value="{{ datos_examen.manejo_dinero }}" selected>
+                    {{ datos_examen.manejo_dinero }}
+                  </option>
+                {% else %}
                 <option value="" disabled selected>Seleccione una opción</option>
-                <option value="1" data-text="Se encarga solo de su economía">Se encarga solo de su economía</option>
-                <option value="1" data-text="Necesita ayuda con bancos o grandes compras">Necesita ayuda con bancos o grandes compras</option>
-                <option value="0" data-text="No maneja dinero">No maneja dinero</option>
+                {% endif %}
+                <option value="1" data-text="1. Se encarga solo de su economía">Se encarga solo de su economía</option>
+                <option value="1" data-text="1. Necesita ayuda con bancos o grandes compras">Necesita ayuda con bancos o grandes compras</option>
+                <option value="0" data-text="0. No maneja dinero">No maneja dinero</option>
               </select>
-              <input type="hidden" name="item_8_text">
-
+              <input type="hidden" name="manejo_dinero_text" value="{{ datos_examen.manejo_dinero_text|default:'' }}">
             </div>
 
             <!-- Resultado -->
             <div class="alert alert-success mt-4">
               <h4 class="alert-heading">Resultado de la Escala</h4>
-              <p><strong>Puntaje Total:</strong> <span id="puntaje-lawton">0</span></p>
-              <p><strong>Diagnóstico:</strong> <span id="diagnostico-lawton">Seleccione género y opciones para ver el diagnóstico.</span></p>
+              <p><strong>Puntaje Total:</strong> <span id="puntaje-lawton">{{ datos_examen.total|default:"0" }}</span></p>
+              <p><strong>Diagnóstico:</strong> <span id="diagnostico-lawton">{{ datos_examen.diagnostico|default:"-" }}</span></p>
+              <!-- Guardar el puntaje para enviar al servidor -->
+              <input type="hidden" name="total" id="total-lawton" value="{{ datos_examen.total|default:'0' }}">
+              <input type="hidden" name="diagnostico" id="diagnostico-lawton" value="{{ datos_examen.diagnostico|default:'-' }}">
             </div>
 
             <!-- Botones -->
@@ -175,6 +224,10 @@
     const generoSelect = document.getElementById("genero");
     const puntajeSpan = document.getElementById("puntaje-lawton");
     const diagnosticoSpan = document.getElementById("diagnostico-lawton");
+
+    // Inputs ocultos para enviar
+    const totalHidden = document.getElementById("total-lawton");
+    const diagnosticoHidden = document.getElementById("diagnostico-lawton-hidden");
 
     function calcularPuntaje() {
       let total = 0;
@@ -208,21 +261,26 @@
           const val = parseInt(selects[i].value || 0);
           subtotal += isNaN(val) ? 0 : val;
         });
-        puntajeSpan.textContent = subtotal;
+        total = subtotal; //Se actualiza el total a enviar
         if (subtotal === 5) diagnostico = "Autónomo";
         else if (subtotal === 4) diagnostico = "Dependencia ligera";
         else if (subtotal >= 2) diagnostico = "Dependencia moderada";
         else if (subtotal === 1) diagnostico = "Dependencia grave";
         else diagnostico = "Dependencia total";
       }
-
+      puntajeSpan.textContent = total;
       diagnosticoSpan.textContent = diagnostico || "Seleccione género para ver diagnóstico.";
+      totalHidden.value = total;
+      diagnosticoHidden.value = diagnostico;
     }
 
     selects.forEach((s) => s.addEventListener("change", calcularPuntaje));
     generoSelect.addEventListener("change", calcularPuntaje);
+  
+    // Calcular al cargar la página
+    calcularPuntaje();
+  
   });
 </script>
-
 
 {% endblock %}

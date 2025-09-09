@@ -242,7 +242,6 @@
                 <input type="hidden" name="diferido" id="diferido_total" value="0">
               </div>
 
-
             <div class="form-group">
                 <label><strong>11. Orientación</strong></label>
                 <p>Responda correctamente a: <br>
@@ -281,7 +280,6 @@
 
                 <input type="hidden" name="orientacion" id="orientacion_total" value="0">
 
-
             <!-- Corrección por escolaridad -->
             <div class="form-group">
               <label><strong>¿Tiene 12 años o menos de escolaridad?</strong></label>
@@ -313,19 +311,7 @@
 
 <script>
   document.addEventListener("DOMContentLoaded", function () {
-    const campos = [
-      'alternancia',
-      'cubo',
-      'reloj',
-      'denominacion',
-      'memoria',
-      'atencion',
-      'repeticion',
-      'fluidez',
-      'abstraccion',
-      'diferido',
-      'orientacion'
-    ];
+    const campos = ['alternancia','cubo','reloj','denominacion','memoria','atencion','repeticion','fluidez','abstraccion','diferido','orientacion'];
 
     function actualizarCampoDesdeCheckboxes(nombreClase, campoDestino) {
       const checkboxes = document.querySelectorAll(`.${nombreClase}`);
@@ -421,13 +407,7 @@
     });
 
     document.getElementById('educacion_baja')?.addEventListener("change", calcularTotal);
-
-    // Inicial
     calcularTotal();
   });
 </script>
-
-
-
-
 {% endblock %}  

@@ -32,7 +32,11 @@
             <div class="form-group">
               <label for="movilidad"><strong>1. Movilidad</strong></label>
               <select class="form-control" name="movilidad" id="movilidad" required>
-                <option value="" disabled selected>Seleccione una opción</option>
+                {% if datos_examen.movilidad %}
+                <option value="{{ datos_examen.movilidad }}" selected>{{ datos_examen.movilidad }}</option>
+                {% else %}
+                <option value="">Seleccione una opción</option>
+                {% endif %}
                 <option value="No tengo problemas para caminar">No tengo problemas para caminar</option>
                 <option value="Tengo problemas leves para caminar">Tengo problemas leves para caminar</option>
                 <option value="Tengo problemas moderados para caminar">Tengo problemas moderados para caminar</option>
@@ -45,7 +49,11 @@
             <div class="form-group">
               <label for="cuidado_personal"><strong>2. Cuidado personal</strong></label>
               <select class="form-control" name="cuidado_personal" id="cuidado_personal" required>
-                <option value="" disabled selected>Seleccione una opción</option>
+                {% if datos_examen.cuidado_personal %}
+                <option value="{{ datos_examen.cuidado_personal }}" selected>{{ datos_examen.cuidado_personal }}</option>
+                {% else %}
+                <option value="">Seleccione una opción</option>
+                {% endif %}
                 <option value="No tengo problemas con el cuidado personal">No tengo problemas con el cuidado personal</option>
                 <option value="Tengo problemas leves para lavarme o vestirme">Tengo problemas leves para lavarme o vestirme</option>
                 <option value="Tengo problemas moderados para lavarme o vestirme">Tengo problemas moderados para lavarme o vestirme</option>
@@ -59,7 +67,11 @@
               <label for="actividades"><strong>3. Actividades cotidianas</strong></label>
               <p class="text-muted">Trabajar, estudiar, tareas domésticas, actividades familiares o tiempo libre.</p>
               <select class="form-control" name="actividades" id="actividades" required>
-                <option value="" disabled selected>Seleccione una opción</option>
+                {% if datos_examen.actividades %}
+                <option value="{{ datos_examen.actividades }}" selected>{{ datos_examen.actividades }}</option>
+                {% else %}
+                <option value="">Seleccione una opción</option>
+                {% endif %}
                 <option value="No tengo problemas para realizar mis actividades cotidianas">No tengo problemas para realizar mis actividades cotidianas</option>
                 <option value="Tengo problemas leves para realizar mis actividades cotidianas">Tengo problemas leves para realizar mis actividades cotidianas</option>
                 <option value="Tengo problemas moderados para realizar mis actividades cotidianas">Tengo problemas moderados para realizar mis actividades cotidianas</option>
@@ -72,7 +84,11 @@
             <div class="form-group">
               <label for="dolor"><strong>4. Dolor/Malestar</strong></label>
               <select class="form-control" name="dolor" id="dolor" required>
-                <option value="" disabled selected>Seleccione una opción</option>
+                {% if datos_examen.dolor %}
+                <option value="{{ datos_examen.dolor }}" selected>{{ datos_examen.dolor }}</option>
+                {% else %}
+                <option value="">Seleccione una opción</option>
+                {% endif %}
                 <option value="No tengo dolor ni malestar">No tengo dolor ni malestar</option>
                 <option value="Tengo leve dolor o malestar">Tengo leve dolor o malestar</option>
                 <option value="Tengo moderado dolor o malestar">Tengo moderado dolor o malestar</option>
@@ -85,7 +101,11 @@
             <div class="form-group">
               <label for="ansiedad"><strong>5. Ansiedad/Depresión</strong></label>
               <select class="form-control" name="ansiedad" id="ansiedad" required>
-                <option value="" disabled selected>Seleccione una opción</option>
+                {% if datos_examen.ansiedad %}
+                <option value="{{ datos_examen.ansiedad }}" selected>{{ datos_examen.ansiedad }}</option>
+                {% else %}
+                <option value="">Seleccione una opción</option>
+                {% endif %}
                 <option value="No estoy ansioso ni deprimido">No estoy ansioso ni deprimido</option>
                 <option value="Estoy levemente ansioso o deprimido">Estoy levemente ansioso o deprimido</option>
                 <option value="Estoy moderadamente ansioso o deprimido">Estoy moderadamente ansioso o deprimido</option>
@@ -107,4 +127,3 @@
 </div>
 
 {% endblock %}
-

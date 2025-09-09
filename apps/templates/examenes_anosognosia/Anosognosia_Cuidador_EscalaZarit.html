@@ -51,296 +51,429 @@
 
                         <div class="form-group">
                             <label>1. ¿Cree que su familiar le pide más ayuda de la que realmente necesita?</label>
-                            <select class="form-control adherencia-select" name="p1" required>
+                            <select class="form-control adherencia-select" name="pide_ayuda" required>
+                                {% if datos_examen.pide_ayuda %}
+                                  <option value="{{ datos_examen.pide_ayuda }}" selected>
+                                      {{ datos_examen.pide_ayuda }}
+                                  </option>
+                                {% else %}
                                 <option value="" selected disabled>Seleccione una opción</option>
+                                {% endif %}
                                 <option value="1" data-text="1. Nunca">1. Nunca</option>
                                 <option value="2" data-text="2. Rara vez">2. Rara vez</option>
                                 <option value="3" data-text="3. Algunas veces">3. Algunas veces</option>
                                 <option value="4" data-text="4. Bastantes veces">4. Bastantes veces</option>
                                 <option value="5" data-text="5. Casi siempre">5. Casi siempre</option>
                             </select>
-                            <input type="hidden" name="p1_texto">
+                            <input type="hidden" name="pide_ayuda_texto" value="{{ datos_examen.pide_ayuda_texto|default:'' }}">
                         </div>
 
                         <div class="form-group">
                             <label>2.	¿Cree que debido al tiempo que dedica a su familia no tiene suficiente tiempo para usted?</label>
-                            <select class="form-control adherencia-select" name="p2" required>
+                            <select class="form-control adherencia-select" name="falta_tiempo_propio" required>
+                                {% if datos_examen.falta_tiempo_propio %}
+                                  <option value="{{ datos_examen.falta_tiempo_propio }}" selected>
+                                      {{ datos_examen.falta_tiempo_propio }}
+                                  </option>
+                                {% else %}
                                 <option value="" selected disabled>Seleccione una opción</option>
+                                {% endif %}
                                 <option value="1" data-text="1. Nunca">1. Nunca</option>
                                 <option value="2" data-text="2. Rara vez">2. Rara vez</option>
                                 <option value="3" data-text="3. Algunas veces">3. Algunas veces</option>
                                 <option value="4" data-text="4. Bastantes veces">4. Bastantes veces</option>
                                 <option value="5" data-text="5. Casi siempre">5. Casi siempre</option>
                             </select>
-                            <input type="hidden" name="p2_texto">
+                            <input type="hidden" name="falta_tiempo_propio_texto" value="{{ datos_examen.falta_tiempo_propio_texto|default:'' }}">
                         </div>
 
                         <div class="form-group">
                             <label>3.	¿Se siente agobiado entre cuidar a su familiar y tratar de cumplir otras responsabilidades en su trabajo o familia?</label>
-                            <select class="form-control adherencia-select" name="p3" required>
+                            <select class="form-control adherencia-select" name="agobio" required>
+                                {% if datos_examen.agobio %}
+                                  <option value="{{ datos_examen.agobio }}" selected>
+                                      {{ datos_examen.agobio }}
+                                  </option>
+                                {% else %}
                                 <option value="" selected disabled>Seleccione una opción</option>
+                                {% endif %}
                                 <option value="1" data-text="1. Nunca">1. Nunca</option>
                                 <option value="2" data-text="2. Rara vez">2. Rara vez</option>
                                 <option value="3" data-text="3. Algunas veces">3. Algunas veces</option>
                                 <option value="4" data-text="4. Bastantes veces">4. Bastantes veces</option>
                                 <option value="5" data-text="5. Casi siempre">5. Casi siempre</option>
                             </select>
-                            <input type="hidden" name="p3_texto">
+                            <input type="hidden" name="agobio_texto" value="{{ datos_examen.agobio_texto|default:'' }}">
                         </div>
 
                         <div class="form-group">
                             <label>4.	¿Se siente avergonzado por la conducta de su familiar?</label>
-                            <select class="form-control adherencia-select" name="p4" required>
+                            <select class="form-control adherencia-select" name="verguenza_conducta" required>
+                                {% if datos_examen.verguenza_conducta %}
+                                  <option value="{{ datos_examen.verguenza_conducta }}" selected>
+                                      {{ datos_examen.verguenza_conducta }}
+                                  </option>
+                                {% else %}
                                 <option value="" selected disabled>Seleccione una opción</option>
+                                {% endif %}
                                 <option value="1" data-text="1. Nunca">1. Nunca</option>
                                 <option value="2" data-text="2. Rara vez">2. Rara vez</option>
                                 <option value="3" data-text="3. Algunas veces">3. Algunas veces</option>
                                 <option value="4" data-text="4. Bastantes veces">4. Bastantes veces</option>
                                 <option value="5" data-text="5. Casi siempre">5. Casi siempre</option>
                             </select>
-                            <input type="hidden" name="p4_texto">
+                            <input type="hidden" name="verguenza_conducta_texto" value="{{ datos_examen.verguenza_conducta_texto|default:'' }}">
                         </div>
 
                         <div class="form-group">
                             <label>5.	¿Se siente enfadado cuando está cerca de su familiar?</label>
-                            <select class="form-control adherencia-select" name="p5" required>
+                            <select class="form-control adherencia-select" name="sentir_enfado" required>
+                                {% if datos_examen.sentir_enfado %}
+                                  <option value="{{ datos_examen.sentir_enfado }}" selected>
+                                      {{ datos_examen.sentir_enfado }}
+                                  </option>
+                                {% else %}
                                 <option value="" selected disabled>Seleccione una opción</option>
+                                {% endif %}
                                 <option value="1" data-text="1. Nunca">1. Nunca</option>
                                 <option value="2" data-text="2. Rara vez">2. Rara vez</option>
                                 <option value="3" data-text="3. Algunas veces">3. Algunas veces</option>
                                 <option value="4" data-text="4. Bastantes veces">4. Bastantes veces</option>
                                 <option value="5" data-text="5. Casi siempre">5. Casi siempre</option>
                             </select>
-                            <input type="hidden" name="p5_texto">
+                            <input type="hidden" name="sentir_enfado_texto" value="{{ datos_examen.sentir_enfado_texto|default:'' }}">
                         </div>
 
                         <div class="form-group">
                             <label>6.	¿Piensa que su familiar afecta negativamente a su relación con otros miembros de su familia?</label>
-                            <select class="form-control adherencia-select" name="p6" required>
+                            <select class="form-control adherencia-select" name="afectar_relacion_negativamente" required>
+                                {% if datos_examen.afectar_relacion_negativamente %}
+                                  <option value="{{ datos_examen.afectar_relacion_negativamente }}" selected>
+                                      {{ datos_examen.afectar_relacion_negativamente }}
+                                  </option>
+                                {% else %}
                                 <option value="" selected disabled>Seleccione una opción</option>
+                                {% endif %}
                                 <option value="1" data-text="1. Nunca">1. Nunca</option>
                                 <option value="2" data-text="2. Rara vez">2. Rara vez</option>
                                 <option value="3" data-text="3. Algunas veces">3. Algunas veces</option>
                                 <option value="4" data-text="4. Bastantes veces">4. Bastantes veces</option>
                                 <option value="5" data-text="5. Casi siempre">5. Casi siempre</option>
                             </select>
-                            <input type="hidden" name="p6_texto">
+                            <input type="hidden" name="afectar_relacion_negativamente_texto" value="{{ datos_examen.afectar_relacion_negativamente_texto|default:'' }}">
                         </div>
 
                         <div class="form-group">
                             <label>7.	¿Tiene miedo de lo que el futuro depare a su familiar?</label>
-                            <select class="form-control adherencia-select" name="p7" required>
+                            <select class="form-control adherencia-select" name="miedo_futuro" required>
+                                {% if datos_examen.miedo_futuro %}
+                                  <option value="{{ datos_examen.miedo_futuro }}" selected>
+                                      {{ datos_examen.miedo_futuro }}
+                                  </option>
+                                {% else %}
                                 <option value="" selected disabled>Seleccione una opción</option>
+                                {% endif %}
                                 <option value="1" data-text="1. Nunca">1. Nunca</option>
                                 <option value="2" data-text="2. Rara vez">2. Rara vez</option>
                                 <option value="3" data-text="3. Algunas veces">3. Algunas veces</option>
                                 <option value="4" data-text="4. Bastantes veces">4. Bastantes veces</option>
                                 <option value="5" data-text="5. Casi siempre">5. Casi siempre</option>
                             </select>
-                            <input type="hidden" name="p7_texto">
+                            <input type="hidden" name="miedo_futuro_texto" value="{{ datos_examen.miedo_futuro_texto|default:'' }}">
                         </div>
 
                         <div class="form-group">
                             <label>8.	¿Cree que su familiar depende de usted?</label>
-                            <select class="form-control adherencia-select" name="p8" required>
+                            <select class="form-control adherencia-select" name="dependencia" required>
+                                {% if datos_examen.dependencia %}
+                                  <option value="{{ datos_examen.dependencia }}" selected>
+                                      {{ datos_examen.dependencia }}
+                                  </option>
+                                {% else %}
                                 <option value="" selected disabled>Seleccione una opción</option>
+                                {% endif %}
                                 <option value="1" data-text="1. Nunca">1. Nunca</option>
                                 <option value="2" data-text="2. Rara vez">2. Rara vez</option>
                                 <option value="3" data-text="3. Algunas veces">3. Algunas veces</option>
                                 <option value="4" data-text="4. Bastantes veces">4. Bastantes veces</option>
                                 <option value="5" data-text="5. Casi siempre">5. Casi siempre</option>
                             </select>
-                            <input type="hidden" name="p8_texto">
+                            <input type="hidden" name="dependencia_texto" value="{{ datos_examen.dependencia_texto|default:'' }}">
                         </div>
 
                         <div class="form-group">
                             <label>9.	¿Se siente tenso cuando está cerca de su familiar?</label>
-                            <select class="form-control adherencia-select" name="p9" required>
+                            <select class="form-control adherencia-select" name="sentir_tension" required>
+                                {% if datos_examen.sentir_tension %}
+                                  <option value="{{ datos_examen.sentir_tension }}" selected>
+                                      {{ datos_examen.sentir_tension }}
+                                  </option>
+                                {% else %}
                                 <option value="" selected disabled>Seleccione una opción</option>
+                                {% endif %}
                                 <option value="1" data-text="1. Nunca">1. Nunca</option>
                                 <option value="2" data-text="2. Rara vez">2. Rara vez</option>
                                 <option value="3" data-text="3. Algunas veces">3. Algunas veces</option>
                                 <option value="4" data-text="4. Bastantes veces">4. Bastantes veces</option>
                                 <option value="5" data-text="5. Casi siempre">5. Casi siempre</option>
                             </select>
-                            <input type="hidden" name="p9_texto">
+                            <input type="hidden" name="sentir_tension_texto" value="{{ datos_examen.sentir_tension_texto|default:'' }}">
                         </div>
 
                         <div class="form-group">
                             <label>10.	¿Cree que su salud se ha deteriorado por cuidar a su familiar?</label>
-                            <select class="form-control adherencia-select" name="p10" required>
+                            <select class="form-control adherencia-select" name="deterioro_salud" required>
+                                {% if datos_examen.deterioro_salud %}
+                                  <option value="{{ datos_examen.deterioro_salud }}" selected>
+                                      {{ datos_examen.deterioro_salud }}
+                                  </option>
+                                {% else %}
                                 <option value="" selected disabled>Seleccione una opción</option>
+                                {% endif %}
                                 <option value="1" data-text="1. Nunca">1. Nunca</option>
                                 <option value="2" data-text="2. Rara vez">2. Rara vez</option>
                                 <option value="3" data-text="3. Algunas veces">3. Algunas veces</option>
                                 <option value="4" data-text="4. Bastantes veces">4. Bastantes veces</option>
                                 <option value="5" data-text="5. Casi siempre">5. Casi siempre</option>
                             </select>
-                            <input type="hidden" name="p10_texto">
+                            <input type="hidden" name="deterioro_salud_texto" value="{{ datos_examen.deterioro_salud_texto|default:'' }}">
                         </div>
 
                         <div class="form-group">
                             <label>11.	¿Cree que no tiene tanta intimidad como le gustaría debido a su familiar?</label>
-                            <select class="form-control adherencia-select" name="p11" required>
+                            <select class="form-control adherencia-select" name="menos_intimidad" required>
+                                {% if datos_examen.menos_intimidad %}
+                                  <option value="{{ datos_examen.menos_intimidad }}" selected>
+                                      {{ datos_examen.menos_intimidad }}
+                                  </option>
+                                {% else %}
                                 <option value="" selected disabled>Seleccione una opción</option>
+                                {% endif %}
                                 <option value="1" data-text="1. Nunca">1. Nunca</option>
                                 <option value="2" data-text="2. Rara vez">2. Rara vez</option>
                                 <option value="3" data-text="3. Algunas veces">3. Algunas veces</option>
                                 <option value="4" data-text="4. Bastantes veces">4. Bastantes veces</option>
                                 <option value="5" data-text="5. Casi siempre">5. Casi siempre</option>
                             </select>
-                            <input type="hidden" name="p11_texto">
+                            <input type="hidden" name="menos_intimidad_texto" value="{{ datos_examen.menos_intimidad_texto|default:'' }}">
                         </div>
 
                         <div class="form-group">
                             <label>12.	¿Cree que su vida social se ha resentido por cuidar a su familiar?</label>
-                            <select class="form-control adherencia-select" name="p12" required>
+                            <select class="form-control adherencia-select" name="resentir_vida_social" required>
+                                {% if datos_examen.resentir_vida_social %}
+                                  <option value="{{ datos_examen.resentir_vida_social }}" selected>
+                                      {{ datos_examen.resentir_vida_social }}
+                                  </option>
+                                {% else %}
                                 <option value="" selected disabled>Seleccione una opción</option>
+                                {% endif %}
                                 <option value="1" data-text="1. Nunca">1. Nunca</option>
                                 <option value="2" data-text="2. Rara vez">2. Rara vez</option>
                                 <option value="3" data-text="3. Algunas veces">3. Algunas veces</option>
                                 <option value="4" data-text="4. Bastantes veces">4. Bastantes veces</option>
                                 <option value="5" data-text="5. Casi siempre">5. Casi siempre</option>
                             </select>
-                            <input type="hidden" name="p12_texto">
+                            <input type="hidden" name="resentir_vida_social_texto" value="{{ datos_examen.resentir_vida_social_texto|default:'' }}">
                         </div>
 
                         <div class="form-group">
                             <label>13.	¿Se siente incómodo por desatender a sus amistades debido a su familiar?</label>
-                            <select class="form-control adherencia-select" name="p13" required>
+                            <select class="form-control adherencia-select" name="desatender_amistades" required>
+                                {% if datos_examen.desatender_amistades %}
+                                  <option value="{{ datos_examen.desatender_amistades }}" selected>
+                                      {{ datos_examen.desatender_amistades }}
+                                  </option>
+                                {% else %}
                                 <option value="" selected disabled>Seleccione una opción</option>
+                                {% endif %}
                                 <option value="1" data-text="1. Nunca">1. Nunca</option>
                                 <option value="2" data-text="2. Rara vez">2. Rara vez</option>
                                 <option value="3" data-text="3. Algunas veces">3. Algunas veces</option>
                                 <option value="4" data-text="4. Bastantes veces">4. Bastantes veces</option>
                                 <option value="5" data-text="5. Casi siempre">5. Casi siempre</option>
                             </select>
-                            <input type="hidden" name="p13_texto">
+                            <input type="hidden" name="desatender_amistades_texto" value="{{ datos_examen.desatender_amistades_texto|default:'' }}">
                         </div>
 
                         <div class="form-group">
                             <label>14.	¿Cree que su familiar parece esperar que usted sea la persona que le cuide, como si usted fuera la única persona de quien depende?</label>
-                            <select class="form-control adherencia-select" name="p14" required>
+                            <select class="form-control adherencia-select" name="unica_dependencia" required>
+                                {% if datos_examen.unica_dependencia %}
+                                  <option value="{{ datos_examen.unica_dependencia }}" selected>
+                                      {{ datos_examen.unica_dependencia }}
+                                  </option>
+                                {% else %}
                                 <option value="" selected disabled>Seleccione una opción</option>
+                                {% endif %}
                                 <option value="1" data-text="1. Nunca">1. Nunca</option>
                                 <option value="2" data-text="2. Rara vez">2. Rara vez</option>
                                 <option value="3" data-text="3. Algunas veces">3. Algunas veces</option>
                                 <option value="4" data-text="4. Bastantes veces">4. Bastantes veces</option>
                                 <option value="5" data-text="5. Casi siempre">5. Casi siempre</option>
                             </select>
-                            <input type="hidden" name="p14_texto">
+                            <input type="hidden" name="unica_dependencia_texto" value="{{ datos_examen.unica_dependencia_texto|default:'' }}">
                         </div>
 
                         <div class="form-group">
                             <label>15.	¿Cree que no tiene suficiente dinero para cuidar a su familiar además de sus otros gastos?</label>
-                            <select class="form-control adherencia-select" name="p15" required>
+                            <select class="form-control adherencia-select" name="dinero_insuficiente" required>
+                                {% if datos_examen.dinero_insuficiente %}
+                                  <option value="{{ datos_examen.dinero_insuficiente }}" selected>
+                                      {{ datos_examen.dinero_insuficiente }}
+                                  </option>
+                                {% else %}
                                 <option value="" selected disabled>Seleccione una opción</option>
+                                {% endif %}
                                 <option value="1" data-text="1. Nunca">1. Nunca</option>
                                 <option value="2" data-text="2. Rara vez">2. Rara vez</option>
                                 <option value="3" data-text="3. Algunas veces">3. Algunas veces</option>
                                 <option value="4" data-text="4. Bastantes veces">4. Bastantes veces</option>
                                 <option value="5" data-text="5. Casi siempre">5. Casi siempre</option>
                             </select>
-                            <input type="hidden" name="p15_texto">
+                            <input type="hidden" name="dinero_insuficiente_texto" value="{{ datos_examen.dinero_insuficiente_texto|default:'' }}">
                         </div>
 
                         <div class="form-group">
                             <label>16.	¿Cree que será incapaz de cuidarle por mucho más tiempo?</label>
-                            <select class="form-control adherencia-select" name="p16" required>
+                            <select class="form-control adherencia-select" name="incapaz_mas_tiempo" required>
+                                {% if datos_examen.incapaz_mas_tiempo %}
+                                  <option value="{{ datos_examen.incapaz_mas_tiempo }}" selected>
+                                      {{ datos_examen.incapaz_mas_tiempo }}
+                                  </option>
+                                {% else %}
                                 <option value="" selected disabled>Seleccione una opción</option>
+                                {% endif %}
                                 <option value="1" data-text="1. Nunca">1. Nunca</option>
                                 <option value="2" data-text="2. Rara vez">2. Rara vez</option>
                                 <option value="3" data-text="3. Algunas veces">3. Algunas veces</option>
                                 <option value="4" data-text="4. Bastantes veces">4. Bastantes veces</option>
                                 <option value="5" data-text="5. Casi siempre">5. Casi siempre</option>
                             </select>
-                            <input type="hidden" name="p16_texto">
+                            <input type="hidden" name="incapaz_mas_tiempo_texto" value="{{ datos_examen.incapaz_mas_tiempo_texto|default:'' }}">
                         </div>
 
                         <div class="form-group">
                             <label>17.	¿Siente que ha perdido el control de su vida desde la enfermedad de su familiar?</label>
-                            <select class="form-control adherencia-select" name="p17" required>
+                            <select class="form-control adherencia-select" name="perder_control_vida" required>
+                                {% if datos_examen.perder_control_vida %}
+                                  <option value="{{ datos_examen.perder_control_vida }}" selected>
+                                      {{ datos_examen.perder_control_vida }}
+                                  </option>
+                                {% else %}
                                 <option value="" selected disabled>Seleccione una opción</option>
+                                {% endif %}
                                 <option value="1" data-text="1. Nunca">1. Nunca</option>
                                 <option value="2" data-text="2. Rara vez">2. Rara vez</option>
                                 <option value="3" data-text="3. Algunas veces">3. Algunas veces</option>
                                 <option value="4" data-text="4. Bastantes veces">4. Bastantes veces</option>
                                 <option value="5" data-text="5. Casi siempre">5. Casi siempre</option>
                             </select>
-                            <input type="hidden" name="p17_texto">
+                            <input type="hidden" name="perder_control_vida_texto" value="{{ datos_examen.perder_control_vida_texto|default:'' }}">
                         </div>
 
                         <div class="form-group">
                             <label>18.	¿Desearía dejar el cuidado de su familiar a otros?</label>
-                            <select class="form-control adherencia-select" name="p18" required>
+                            <select class="form-control adherencia-select" name="cuidado_a_otros" required>
+                                {% if datos_examen.cuidado_a_otros %}
+                                  <option value="{{ datos_examen.cuidado_a_otros }}" selected>
+                                      {{ datos_examen.cuidado_a_otros }}
+                                  </option>
+                                {% else %}
                                 <option value="" selected disabled>Seleccione una opción</option>
+                                {% endif %}
                                 <option value="1" data-text="1. Nunca">1. Nunca</option>
                                 <option value="2" data-text="2. Rara vez">2. Rara vez</option>
                                 <option value="3" data-text="3. Algunas veces">3. Algunas veces</option>
                                 <option value="4" data-text="4. Bastantes veces">4. Bastantes veces</option>
                                 <option value="5" data-text="5. Casi siempre">5. Casi siempre</option>
                             </select>
-                            <input type="hidden" name="p18_texto">
+                            <input type="hidden" name="cuidado_a_otros_texto" value="{{ datos_examen.cuidado_a_otros_texto|default:'' }}">
                         </div>
 
                         <div class="form-group">
                             <label>19.	¿Se siente indeciso sobre qué hacer con su familiar?</label>
-                            <select class="form-control adherencia-select" name="p19" required>
+                            <select class="form-control adherencia-select" name="indecision_que_hacer" required>
+                                {% if datos_examen.indecision_que_hacer %}
+                                  <option value="{{ datos_examen.indecision_que_hacer }}" selected>
+                                      {{ datos_examen.indecision_que_hacer }}
+                                  </option>
+                                {% else %}
                                 <option value="" selected disabled>Seleccione una opción</option>
+                                {% endif %}
                                 <option value="1" data-text="1. Nunca">1. Nunca</option>
                                 <option value="2" data-text="2. Rara vez">2. Rara vez</option>
                                 <option value="3" data-text="3. Algunas veces">3. Algunas veces</option>
                                 <option value="4" data-text="4. Bastantes veces">4. Bastantes veces</option>
                                 <option value="5" data-text="5. Casi siempre">5. Casi siempre</option>
                             </select>
-                            <input type="hidden" name="p19_texto">
+                            <input type="hidden" name="indecision_que_hacer_texto" value="{{ datos_examen.indecision_que_hacer_texto|default:'' }}">
                         </div>
 
                         <div class="form-group">
                             <label>20.	¿Cree que debería hacer más por su familiar?</label>
-                            <select class="form-control adherencia-select" name="p20" required>
+                            <select class="form-control adherencia-select" name="hacer_mas" required>
+                                {% if datos_examen.hacer_mas %}
+                                  <option value="{{ datos_examen.hacer_mas }}" selected>
+                                      {{ datos_examen.hacer_mas }}
+                                  </option>
+                                {% else %}
                                 <option value="" selected disabled>Seleccione una opción</option>
+                                {% endif %}
                                 <option value="1" data-text="1. Nunca">1. Nunca</option>
                                 <option value="2" data-text="2. Rara vez">2. Rara vez</option>
                                 <option value="3" data-text="3. Algunas veces">3. Algunas veces</option>
                                 <option value="4" data-text="4. Bastantes veces">4. Bastantes veces</option>
                                 <option value="5" data-text="5. Casi siempre">5. Casi siempre</option>
                             </select>
-                            <input type="hidden" name="p20_texto">
+                            <input type="hidden" name="hacer_mas_texto" value="{{ datos_examen.hacer_mas_texto|default:'' }}">
                         </div>
 
                         <div class="form-group">
                             <label>21.	¿Cree que podría cuidar mejor de su familiar?</label>
-                            <select class="form-control adherencia-select" name="p21" required>
+                            <select class="form-control adherencia-select" name="cuidar_mejor" required>
+                                {% if datos_examen.cuidar_mejor %}
+                                  <option value="{{ datos_examen.cuidar_mejor }}" selected>
+                                      {{ datos_examen.cuidar_mejor }}
+                                  </option>
+                                {% else %}
                                 <option value="" selected disabled>Seleccione una opción</option>
+                                {% endif %}
                                 <option value="1" data-text="1. Nunca">1. Nunca</option>
                                 <option value="2" data-text="2. Rara vez">2. Rara vez</option>
                                 <option value="3" data-text="3. Algunas veces">3. Algunas veces</option>
                                 <option value="4" data-text="4. Bastantes veces">4. Bastantes veces</option>
                                 <option value="5" data-text="5. Casi siempre">5. Casi siempre</option>
                             </select>
-                            <input type="hidden" name="p21_texto">
+                            <input type="hidden" name="cuidar_mejor_texto" value="{{ datos_examen.cuidar_mejor_texto|default:'' }}">
                         </div>
 
                         <div class="form-group">
                             <label>22.	Globalmente, ¿qué grado de carga experimenta por el hecho de cuidar a su familiar?</label>
-                            <select class="form-control adherencia-select" name="p22" required>
+                            <select class="form-control adherencia-select" name="grado_carga" required>
+                                {% if datos_examen.grado_carga %}
+                                  <option value="{{ datos_examen.grado_carga }}" selected>
+                                      {{ datos_examen.grado_carga }}
+                                  </option>
+                                {% else %}
                                 <option value="" selected disabled>Seleccione una opción</option>
+                                {% endif %}
                                 <option value="1" data-text="1. Nunca">1. Nunca</option>
                                 <option value="2" data-text="2. Rara vez">2. Rara vez</option>
                                 <option value="3" data-text="3. Algunas veces">3. Algunas veces</option>
                                 <option value="4" data-text="4. Bastantes veces">4. Bastantes veces</option>
                                 <option value="5" data-text="5. Casi siempre">5. Casi siempre</option>
                             </select>
-                            <input type="hidden" name="p22_texto">
+                            <input type="hidden" name="grado_carga_texto" value="{{ datos_examen.grado_carga_texto|default:'' }}">
                         </div>
 
 
                         <div class="alert alert-success mt-4" id="resultado-container" style="display: none;">
                             <h4 class="alert-heading">Resultado de la escala de Zarit</h4>
-                            <p><strong>Puntaje total:</strong> <span id="puntaje-display">0</span>/110</p>
-                            <p><strong>Interpretación:</strong> <span id="interpretacion-display">-</span></p>
+                            <p><strong>Puntaje total:</strong> <span id="puntaje-display">{{ datos_examen.puntaje_total|default:"0" }}</span>/110</p>
+                            <p><strong>Interpretación:</strong> <span id="interpretacion-display">{{ datos_examen.interpretacion|default:"-" }}</span></p>
                         </div>
+
 
                         <div class="alert alert-warning mt-4">
                             <strong>Interpretación de la escala:</strong><br>
