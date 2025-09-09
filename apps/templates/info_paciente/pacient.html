@@ -438,7 +438,6 @@
           select.addEventListener("change", function () {
             var selectedOption = this.options[this.selectedIndex];
             var examenesData = selectedOption.getAttribute("data-examenes");
-            console.log("Data-Examenes (crudo):", examenesData);
 
             // Encontrar el formulario correcto - buscar el formulario padre de este select
             var currentForm = this.closest("form");
@@ -456,7 +455,6 @@
                 // Reemplazar comillas simples por comillas dobles
                 var jsonString = examenesData.replace(/'/g, '"');
                 var examenes = JSON.parse(jsonString);
-                console.log("Exámenes parseados:", examenes);
 
                 // Crear un campo oculto para almacenar los IDs seleccionados
                 var hiddenInputId = "examenes_seleccionados";
@@ -469,7 +467,6 @@
                   hiddenInput.name = "examenes_seleccionados";
                   hiddenInput.id = hiddenInputId;
                   currentForm.appendChild(hiddenInput);
-                  console.log("Campo oculto creado:", hiddenInput);
                 }
 
                 examenes.forEach(function (examen) {

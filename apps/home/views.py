@@ -1776,15 +1776,6 @@ def guardar_examen_Pitsburg(request):
             paciente_id = request.POST.get("paciente_id")
             examen_id = request.POST.get("examen_id")
 
-            print(
-                f"DEBUG: visita_id={visita_id}, examen_id={examen_id}, paciente_id={paciente_id}"
-            )
-            print("=== DEBUG: TODOS LOS CAMPOS POST ===")
-            for key, value in request.POST.items():
-                if not key.startswith("csrf"):
-                    print(f"Campo: '{key}' = '{value}'")
-            print("=== FIN DEBUG ===")
-
             # Obtener la instancia de VisitaExamen
             visita_examen = get_object_or_404(
                 VisitaExamen, visita_id=visita_id, examen_id=examen_id
@@ -1956,16 +1947,6 @@ def guardar_examen_StopBang(request):
                 "circunferencia_cuello", ""
             )  # N - Neck
             genero_masculino = request.POST.get("genero_masculino", "")  # G - Gender
-
-            print(f"DEBUG: Campos STOP-BANG obtenidos:")
-            print(f"  S - Ronquidos fuertes: '{ronquidos_fuertes}'")
-            print(f"  T - Cansancio diurno: '{cansancio_diurno}'")
-            print(f"  O - Apneas observadas: '{apneas_observadas}'")
-            print(f"  P - Presión arterial: '{presion_arterial}'")
-            print(f"  B - IMC alto: '{imc_alto}'")
-            print(f"  A - Edad mayor 50: '{edad_mayor_50}'")
-            print(f"  N - Circunferencia cuello: '{circunferencia_cuello}'")
-            print(f"  G - Género masculino: '{genero_masculino}'")
 
             # Función para calcular puntuación STOP-BANG
             def calcular_puntuacion_stopbang(campos):
