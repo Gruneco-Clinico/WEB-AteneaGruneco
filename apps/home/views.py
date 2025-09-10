@@ -39,7 +39,6 @@ from .models import (
     ISIResult,
     LawtonBrodyResult,
     CuidadorNPIResult,
-    AdherenciaTerapeuticaResult,
     EuroQol5D5LResult,
     EuroQolEVASaludResult,
     MoCAResult,
@@ -49,8 +48,8 @@ from .models import (
     AQDParticipanteResult,
     CDRCuidadorResult,
     CDRParticipanteResult,
-    RedLatSpanishResult
-
+    RedLatSpanishResult,
+    AdherenciaTerapeuticaResult,
 )
 from .forms import ProyectoForm, RegistroDemograficoForm
 import json
@@ -695,7 +694,21 @@ def realizar_examen(request, visita_id, examen_id, paciente_id):
         16: {"template": "examenes_sueno/sueno_MEW.html", "model": MEWResult},
         17: {"template": "examenes_sueno/sueno_Berlín.html", "model": BerlinResult},
         18: {"template": "examenes_sueno/sueno_atenas.html", "model": AtenasResult},
-        19: {"template": "examenes_sueno/sueno_ISI.html", "model": ISIResult},
+        19: {"template": "examenes_anosognosia/sueno_ISI.html", "model": ISIResult},
+        21: {"template": "examenes_anosognosia/Anosognosia_Participante_EuroQoL.html", "model": EuroQol5D5LResult},
+        22: {"template": "examenes_anosognosia/Anosognosia_Participante_EVA_EuroQoL.html", "model": EuroQolEVASaludResult},
+        23: {"template": "examenes_anosognosia/Anosognosia_Participante_Yesavage.html", "model": ParticipanteYesavageResult},
+        24: {"template": "examenes_anosognosia/Anosognosia_Cuidador_NPI.html", "model": CuidadorNPIResult},
+        25: {"template": "examenes_anosognosia/Anosognosia_Cuidador_LawtonBrody.html", "model": LawtonBrodyResult},
+        #26: {"template": "examenes_anosognosia/Anosognosia_Cuidador_BettyFerrel.html", "model": ISIResult},
+        27: {"template": "examenes_anosognosia/Anosognosia_Participante_MoCA.html", "model": MoCAResult},
+        28: {"template": "examenes_anosognosia/Anosognosia_Participante_AdherenciaTerapeutica.html", "model": AdherenciaTerapeuticaResult},
+        29: {"template": "examenes_anosognosia/Anosognosia_Cuidador_EscalaZarit.html", "model": ZaritResult},
+        30: {"template": "examenes_anosognosia/Anosognosia_Cuidador_AQD.html", "model": AQDCuidadorResult},
+        31: {"template": "examenes_anosognosia/Anosognosia_Participante_AQD.html", "model": AQDParticipanteResult},
+        32: {"template": "examenes_anosognosia/Anosognosia_Cuidador_RedLatSpanish.html", "model": RedLatSpanishResult},
+        33: {"template": "examenes_anosognosia/Anosognosia_Cuidador_CDR.html", "model": CDRCuidadorResult},
+        34: {"template": "examenes_anosognosia/Anosognosia_Participante_CDR.html", "model": CDRParticipanteResult},
     }
 
     config = exam_config.get(int(examen_id))  # CAMBIO: Asegurar que sea entero

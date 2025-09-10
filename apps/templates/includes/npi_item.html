@@ -1,10 +1,10 @@
 <div class="form-group">
   <label><strong>{{ numero }}. {{ label }}</strong></label>
   <select class="form-control toggle-subitems" name="{{ nombre }}" data-target="grupo{{ numero }}" required>
-    {% if datos_examen %}
-      <option value="{{ datos_examen|attr: nombre }}" selected>{{ datos_examen|attr: nombre }}</option>
+    {% if datos_examen and datos_examen.nombre %}
+      <option value="{{ datos_examen.nombre }}" selected>{{ datos_examen.nombre|capfirst }}</option>
     {% else %}
-    <option value="" disabled selected>Seleccione una opción</option>
+      <option value="" disabled selected>Seleccione una opción</option>
     {% endif %}
     <option value="si">Sí</option>
     <option value="no">No</option>
@@ -17,10 +17,8 @@
   <div class="form-group">
     <label>Frecuencia</label>
     <select class="form-control frecuencia-select" name="{{ nombre }}_frecuencia" data-item="{{ nombre }}">
-      {% if datos_examen and datos_examen|attr: nombre ~ "_frecuencia" %}
-        <option value="{{ datos_examen|attr: nombre ~ "_frecuencia" }}" selected>
-          {{ datos_examen|attr: nombre ~ "_frecuencia_texto" }}
-        </option>
+      {% if datos_examen and datos_examen.nombre_frecuencia %}
+        <option value="{{ datos_examen.nombre_frecuencia }}" selected>{{ datos_examen.nombre_frecuencia_texto }}</option>
       {% else %}
         <option value="" disabled selected>Seleccione una opción</option>
       {% endif %}
@@ -36,10 +34,8 @@
   <div class="form-group">
     <label>Gravedad</label>
     <select class="form-control gravedad-select" name="{{ nombre }}_gravedad" data-item="{{ nombre }}">
-      {% if datos_examen and datos_examen|attr: nombre ~ "_gravedad" %}
-        <option value="{{ datos_examen|attr: nombre ~ "_gravedad" }}" selected>
-          {{ datos_examen|attr: nombre ~ "_gravedad_texto" }}
-        </option>
+      {% if datos_examen and datos_examen.nombre_gravedad %}
+        <option value="{{ datos_examen.nombre_gravedad }}" selected>{{ datos_examen.nombre_gravedad_texto }}</option>
       {% else %}
         <option value="" disabled selected>Seleccione una opción</option>
       {% endif %}
@@ -53,19 +49,17 @@
   <!-- Resultado FG -->
   <div class="form-group">
     <label>Frecuencia × Gravedad</label>
-    <input type="text" class="form-control resultado-fg" name="{{ nombre }}_resultado" id="{{ nombre }}_resultado" readonly value="0">
+    <input type="text" class="form-control resultado-fg" name="{{ nombre }}_resultado" id="{{ nombre }}_resultado" readonly value="{{ datos_examen.nombre_resultado|default:'0' }}">
   </div>
 
   <!-- Distrés -->
   <div class="form-group">
     <label>Distrés</label>
     <select class="form-control distres-select" name="{{ nombre }}_distres" data-item="{{ nombre }}">
-      {% if datos_examen and datos_examen|attr: nombre ~ "_distres" %}
-        <option value="{{ datos_examen|attr: nombre ~ "_distres" }}" selected>
-          {{ datos_examen|attr: nombre ~ "_distres_texto" }}
-        </option>
+      {% if datos_examen and datos_examen.nombre_distres %}
+        <option value="{{ datos_examen.nombre_distres }}" selected>{{ datos_examen.nombre_distres_texto }}</option>
       {% else %}
-      <option value="" disabled selected>Seleccione una opción</option>
+        <option value="" disabled selected>Seleccione una opción</option>
       {% endif %}
       <option value="1" data-text="1. Nada">1. Nada</option>
       <option value="2" data-text="2. Leve">2. Leve</option>
