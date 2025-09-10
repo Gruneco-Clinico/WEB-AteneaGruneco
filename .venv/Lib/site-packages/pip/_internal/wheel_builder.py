@@ -1,12 +1,11 @@
-"""Orchestrator for building wheels from InstallRequirements."""
-
-from __future__ import annotations
+"""Orchestrator for building wheels from InstallRequirements.
+"""
 
 import logging
 import os.path
 import re
 import shutil
-from collections.abc import Iterable
+from typing import Iterable, List, Optional, Tuple
 
 from pip._vendor.packaging.utils import canonicalize_name, canonicalize_version
 from pip._vendor.packaging.version import InvalidVersion, Version
@@ -32,7 +31,7 @@ logger = logging.getLogger(__name__)
 
 _egg_info_re = re.compile(r"([a-z0-9_.]+)-([a-z0-9_.!+-]+)", re.IGNORECASE)
 
-BuildResult = tuple[list[InstallRequirement], list[InstallRequirement]]
+BuildResult = Tuple[List[InstallRequirement], List[InstallRequirement]]
 
 
 def _contains_egg_info(s: str) -> bool:
@@ -45,14 +44,29 @@ def _contains_egg_info(s: str) -> bool:
 
 def _should_build(
     req: InstallRequirement,
+    need_wheel: bool,
 ) -> bool:
     """Return whether an InstallRequirement should be built into a wheel."""
-    assert not req.constraint
-
+    if req.constraint:
+        # never build requirements that are merely constraints
+        return False
     if req.is_wheel:
+        if need_wheel:
+            logger.info(
+                "Skipping %s, due to already being wheel.",
+                req.name,
+            )
         return False
 
-    assert req.source_dir
+    if need_wheel:
+        # i.e. pip wheel, not pip install
+        return True
+
+    # From this point, this concerns the pip install command only
+    # (need_wheel=False).
+
+    if not req.source_dir:
+        return False
 
     if req.editable:
         # we only build PEP 660 editable requirements
@@ -61,15 +75,21 @@ def _should_build(
     return True
 
 
+def should_build_for_wheel_command(
+    req: InstallRequirement,
+) -> bool:
+    return _should_build(req, need_wheel=True)
+
+
 def should_build_for_install_command(
     req: InstallRequirement,
 ) -> bool:
-    return _should_build(req)
+    return _should_build(req, need_wheel=False)
 
 
 def _should_cache(
     req: InstallRequirement,
-) -> bool | None:
+) -> Optional[bool]:
     """
     Return whether a built InstallRequirement can be stored in the persistent
     wheel cache, assuming the wheel cache is available, and _should_build()
@@ -148,10 +168,10 @@ def _build_one(
     req: InstallRequirement,
     output_dir: str,
     verify: bool,
-    build_options: list[str],
-    global_options: list[str],
+    build_options: List[str],
+    global_options: List[str],
     editable: bool,
-) -> str | None:
+) -> Optional[str]:
     """Build one wheel.
 
     :return: The filename of the built wheel, or None if the build failed.
@@ -185,10 +205,10 @@ def _build_one(
 def _build_one_inside_env(
     req: InstallRequirement,
     output_dir: str,
-    build_options: list[str],
-    global_options: list[str],
+    build_options: List[str],
+    global_options: List[str],
     editable: bool,
-) -> str | None:
+) -> Optional[str]:
     with TempDirectory(kind="wheel") as temp_dir:
         assert req.name
         if req.use_pep517:
@@ -253,7 +273,7 @@ def _build_one_inside_env(
         return None
 
 
-def _clean_one_legacy(req: InstallRequirement, global_options: list[str]) -> bool:
+def _clean_one_legacy(req: InstallRequirement, global_options: List[str]) -> bool:
     clean_args = make_setuptools_clean_args(
         req.setup_py_path,
         global_options=global_options,
@@ -274,8 +294,8 @@ def build(
     requirements: Iterable[InstallRequirement],
     wheel_cache: WheelCache,
     verify: bool,
-    build_options: list[str],
-    global_options: list[str],
+    build_options: List[str],
+    global_options: List[str],
 ) -> BuildResult:
     """Build wheels.
 
