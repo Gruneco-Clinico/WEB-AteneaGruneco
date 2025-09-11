@@ -195,7 +195,7 @@
                               <label class="form-check-label" for="trastorno_sueno">Trastorno de conducta del
                                 sueño</label>
                             </div>
-                            <!-- Resto de checkboxes... -->
+
                           </div>
                         </div>
 
@@ -1011,42 +1011,637 @@
 
 
 {% block javascripts %}
+
 <script>
+  let contador = 0;
   document.addEventListener("DOMContentLoaded", function () {
-    console.log("Inicializando formulario de anamnesis...");
-
     ///////////////////////////////////////////////////////////////
-    // SECCIÓN: QUEJA DE SUEÑO - CORREGIDA
+    // SECCIÓN: ACTIVIDAD FÍSICA
     ///////////////////////////////////////////////////////////////
 
+    let contadorActividadesFisicas = 0;
+    const actividadFisicaSi = document.getElementById("actividad_fisica_si");
+    const actividadFisicaNo = document.getElementById("actividad_fisica_no");
+    const agregarActividadFisicaBtn = document.getElementById("agregar-actividad-fisica");
+    const contenedorActividadesFisicas = document.getElementById("contenedor-actividades-fisicas");
+
+    function toggleAgregarActividadFisica() {
+      const mostrar = actividadFisicaSi.checked;
+      contenedorActividadesFisicas.style.display = mostrar ? "block" : "none";
+      agregarActividadFisicaBtn.style.display = mostrar ? "block" : "none";
+
+      if (!mostrar) {
+        // Limpiar contenedor pero mantener el botón
+        while (contenedorActividadesFisicas.children.length > 1) {
+          contenedorActividadesFisicas.removeChild(contenedorActividadesFisicas.lastChild);
+        }
+        contadorActividadesFisicas = 0;
+      }
+    }
+
+    function agregarActividadFisica() {
+      contadorActividadesFisicas++;
+
+      const nuevaActividad = document.createElement("div");
+      nuevaActividad.classList.add("border", "p-3", "mb-3");
+      nuevaActividad.innerHTML = `
+    <div class="form-group">
+      <h5>Actividad Física ${contadorActividadesFisicas}</h5>
+      <div class="form-row">
+        <div class="col-md-6">
+          <label>Tipo de actividad</label>
+          <select class="form-control" name="tipo_actividad_fisica[]" required>
+            <option value="" disabled selected>Seleccione una actividad</option>
+            <option value="pesas">Levantamiento de pesas</option>
+            <option value="deportes">Deportes colectivos</option>
+            <option value="natacion">Natación</option>
+            <option value="correr">Correr/trotar</option>
+            <option value="ciclismo">Ciclismo</option>
+            <option value="yoga">Estiramiento/yoga</option>
+            <option value="otro">Otro (Especificar)</option>
+          </select>
+          <input type="text" class="form-control mt-2" name="tipo_actividad_otro_texto[]" 
+                 placeholder="Especificar" style="display: none;">
+        </div>
+        <div class="col-md-3">
+          <label>Intensidad (1-10)</label>
+          <input type="number" class="form-control" name="intensidad_fisica[]" min="1" max="10" required>
+        </div>
+        <div class="col-md-3">
+          <label>Frecuencia</label>
+          <select class="form-control" name="frecuencia_fisica[]" required>
+            <option value="" disabled selected>Seleccione</option>
+            <option value="1">1 vez a la semana</option>
+            <option value="1-3">1-3 veces a la semana</option>
+            <option value="3-5">3-5 veces a la semana</option>
+            <option value="mas_5">Más de 5 veces a la semana</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group mt-3">
+        <label>Observaciones</label>
+        <textarea class="form-control" name="observaciones_actividad_fisica[]" rows="2"></textarea>
+      </div>
+      <button type="button" class="btn btn-danger btn-sm eliminar-actividad-fisica">Eliminar</button>
+    </div>
+  `;
+
+      // Manejar campo "Otro"
+      const selectTipo = nuevaActividad.querySelector('select[name="tipo_actividad_fisica[]"]');
+      const inputOtro = nuevaActividad.querySelector('input[name="tipo_actividad_otro_texto[]"]');
+
+      selectTipo.addEventListener('change', function () {
+        inputOtro.style.display = this.value === 'otro' ? 'block' : 'none';
+        if (this.value !== 'otro') inputOtro.value = '';
+      });
+
+      contenedorActividadesFisicas.appendChild(nuevaActividad);
+    }
+
+    function eliminarActividadFisica(event) {
+      if (event.target.classList.contains("eliminar-actividad-fisica")) {
+        event.target.closest("div.border").remove();
+      }
+    }
+
+    // Event listeners
+    actividadFisicaSi.addEventListener("change", toggleAgregarActividadFisica);
+    actividadFisicaNo.addEventListener("change", toggleAgregarActividadFisica);
+    agregarActividadFisicaBtn.addEventListener("click", agregarActividadFisica);
+    contenedorActividadesFisicas.addEventListener("click", eliminarActividadFisica);
+
+    // Inicializar
+    toggleAgregarActividadFisica();
+
+    ///////////////////////////////////////////////////////////////
+    // SECCIÓN: MEDICAMENTOS
+    ///////////////////////////////////////////////////////////////
+
+    let contadorMedicamentos = 0;
+    const consumeMedSi = document.getElementById("consume_si");
+    const consumeMedNo = document.getElementById("consume_no");
+    const agregarMedicamentoBtn = document.getElementById("agregar-medicamento");
+    const contenedorMedicamentos = document.getElementById("contenedor-medicamentos");
+
+    function toggleAgregarMedicamento() {
+      const mostrar = consumeMedSi.checked;
+      contenedorMedicamentos.style.display = mostrar ? "block" : "none";
+      agregarMedicamentoBtn.style.display = mostrar ? "block" : "none";
+
+      if (!mostrar) {
+        // Limpiar contenedor pero mantener el botón
+        while (contenedorMedicamentos.children.length > 1) {
+          contenedorMedicamentos.removeChild(contenedorMedicamentos.lastChild);
+        }
+        contadorMedicamentos = 0;
+      }
+    }
+
+    function agregarMedicamento() {
+      contadorMedicamentos++;
+
+      const nuevoMedicamento = document.createElement("div");
+      nuevoMedicamento.classList.add("border", "p-3", "mb-3");
+      nuevoMedicamento.innerHTML = `
+    <h5>Medicamento ${contadorMedicamentos}</h5>
+    <div class="form-group">
+      <label>Nombre del medicamento</label>
+      <input type="text" class="form-control" name="nombre_medicamento[]" placeholder="Ej. Paracetamol" required>
+    </div>
+    <div class="form-group">
+      <label>Dosis / Concentración</label>
+      <input type="text" class="form-control" name="dosis_medicamento[]" placeholder="Ej. 500mg" required>
+    </div>
+    <div class="form-group">
+      <label>Presentación</label>
+      <select class="form-control" name="presentacion[]" required>
+        <option value="" disabled selected>Seleccione una opción</option>
+        <option value="Tabletas">Tabletas</option>
+        <option value="Cápsulas">Cápsulas</option>
+        <option value="Solución">Solución</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Número de veces al día</label>
+      <input type="number" class="form-control" name="veces_dia[]" min="1" required>
+    </div>
+    <div class="form-group">
+      <label>Frecuencia</label>
+      <select class="form-control" name="frecuencia_medicamentos[]" required>
+        <option value="" disabled selected>Seleccione una opción</option>
+        <option value="1 vez a la semana">1 vez a la semana</option>
+        <option value="1-3 veces a la semana">1-3 veces a la semana</option>
+        <option value="3-5 veces a la semana">3-5 veces a la semana</option>
+        <option value="Más de 5 veces a la semana">Más de 5 veces a la semana</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Tiempo antes de dormir</label>
+      <select class="form-control" name="tiempo_antes_dormir[]" required>
+        <option value="" disabled selected>Seleccione una opción</option>
+        <option value="Antes de dormir">Antes de dormir</option>
+        <option value="15 minutos antes">15 minutos antes</option>
+        <option value="Entre 15 - 30 minutos antes">Entre 15 - 30 minutos antes</option>
+        <option value="Entre 30 y 60 minutos antes">Entre 30 y 60 minutos antes</option>
+        <option value="Entre 1 a 2 horas antes">Entre 1 a 2 horas antes</option>
+        <option value="Más de 2 horas antes">Más de 2 horas antes</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Observaciones</label>
+      <textarea class="form-control" name="observaciones_medicamento[]" rows="2"></textarea>
+    </div>
+    <button type="button" class="btn btn-danger btn-sm eliminar-medicamento">Eliminar</button>
+  `;
+
+      contenedorMedicamentos.appendChild(nuevoMedicamento);
+    }
+
+    function eliminarMedicamento(event) {
+      if (event.target.classList.contains("eliminar-medicamento")) {
+        event.target.closest("div.border").remove();
+      }
+    }
+
+    // Event listeners
+    consumeMedSi.addEventListener("change", toggleAgregarMedicamento);
+    consumeMedNo.addEventListener("change", toggleAgregarMedicamento);
+    agregarMedicamentoBtn.addEventListener("click", agregarMedicamento);
+    contenedorMedicamentos.addEventListener("click", eliminarMedicamento);
+
+    // Inicializar
+    toggleAgregarMedicamento();
+
+    ///////////////////////////////////////////////////////////////
+
+    // Referencias a los elementos del formulario
+    const consumeSi = document.getElementById("consume-si");
+    const consumeNo = document.getElementById("consume-no");
+    const camposComidaContainer = document.getElementById("campos-comida-container");
+    const agregarSustanciaBtn = document.getElementById("agregar-sustancia");
+    const contenedorSustancias = document.getElementById("contenedor-sustancias");
+
+    // Función para mostrar u ocultar los campos adicionales
+    function toggleCamposComida() {
+      if (consumeSi.checked) {
+        camposComidaContainer.style.display = "block";
+      } else {
+        camposComidaContainer.style.display = "none";
+        // Limpiar el contenedor de sustancias si se selecciona "No"
+        contenedorSustancias.innerHTML = "";
+      }
+    }
+
+    // Función para agregar un nuevo conjunto de campos de sustancia
+    let contadorSustancias = 0; // Contador global para generar índices únicos
+
+    function agregarSustancia() {
+      const sustanciaHTML = `
+    <div class="sustancia-item mb-4 border p-3">\
+    <h5>Sustancia ${contadorSustancias}</h5>
+      <div class="form-group">
+        <label for="tipo-sustancia">Tipo de sustancia</label>
+        <input type="text" class="form-control" name="tipo_sustancia_${contadorSustancias}" required>
+      </div>
+      <div class="form-group">
+        <label for="cantidad-sustancia">Cantidad</label>
+        <input type="text" class="form-control" name="cantidad_sustancia_${contadorSustancias}" required>
+      </div>
+      <div class="form-group"> 
+        <label for="frecuencia-sustancia">Frecuencia a la semana</label>
+        <select class="form-control" name="frecuencia_sustancia_${contadorSustancias}" required>
+          <option value="1 vez a la semana">1 vez a la semana</option>
+          <option value="1-3 veces a la semana">1-3 veces a la semana</option>
+          <option value="3-5 veces a la semana">3-5 veces a la semana</option>
+          <option value="> 5 veces a la semana">> 5 veces a la semana</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="tiempo-sustancia">¿Cuánto tiempo antes de dormir?</label>
+        <select class="form-control" name="tiempo_sustancia_${contadorSustancias}" required>
+          <option value="Antes de dormir">Antes de dormir</option>
+          <option value="< 15 minutos antes">< 15 minutos antes</option>
+          <option value="15-30 minutos antes">15-30 minutos antes</option>
+          <option value="30-60 minutos antes">30-60 minutos antes</option>
+          <option value="1-2 horas antes">1-2 horas antes</option>
+          <option value="Más de 2 horas antes">Más de 2 horas antes</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="observaciones-sustancia">Observaciones</label>
+        <textarea class="form-control" name="observaciones_sustancia_${contadorSustancias}" rows="2"></textarea>
+      </div>
+      <button type="button" class="btn btn-danger btn-sm eliminar-sustancia">Eliminar</button>
+    </div>
+  `;
+      contenedorSustancias.insertAdjacentHTML("beforeend", sustanciaHTML);
+      contadorSustancias++; // Incrementar el contador para la próxima sustancia
+    }
+    // Función para eliminar un conjunto de campos de sustancia
+    function eliminarSustancia(event) {
+      if (event.target.classList.contains("eliminar-sustancia")) {
+        event.target.closest(".sustancia-item").remove();
+      }
+    }
+
+    // Escuchar cambios en los radio buttons
+    consumeSi.addEventListener("change", toggleCamposComida);
+    consumeNo.addEventListener("change", toggleCamposComida);
+
+    // Escuchar clic en el botón "Agregar sustancia"
+    agregarSustanciaBtn.addEventListener("click", agregarSustancia);
+
+    // Escuchar clic en el contenedor de sustancias para eliminar
+    contenedorSustancias.addEventListener("click", eliminarSustancia);
+
+    // Inicializar el estado al cargar la página
+    toggleCamposComida();
+
+
+    ///////////////////////////////////////////////////////////////
+    let contadorPantallas = 0; // Contador para identificar cada pantalla
+
+    // Referencias a los elementos del formulario
+    const pantallasSi = document.getElementById("pantallas_si");
+    const pantallasNo = document.getElementById("pantallas_no");
+    const agregarPantallaBtn = document.getElementById("agregar-pantalla");
+    const contenedorPantallas = document.getElementById("contenedor-pantallas");
+
+    // Función para mostrar u ocultar el botón "Agregar Pantalla"
+    function toggleAgregarPantalla() {
+      if (pantallasSi.checked) {
+        contenedorPantallas.style.display = "block"; // Mostrar el contenedor
+        agregarPantallaBtn.style.display = "block"; // Mostrar el botón
+      } else {
+        contenedorPantallas.style.display = "none"; // Ocultar el contenedor
+        agregarPantallaBtn.style.display = "none"; // Ocultar el botón
+        // Limpiar el contenedor de pantallas
+        while (contenedorPantallas.children.length > 1) {
+          contenedorPantallas.removeChild(contenedorPantallas.lastChild);
+        }
+        contadorPantallas = 0; // Reiniciar el contador
+      }
+    }
+
+    // Función para agregar una nueva pantalla
+    function agregarPantalla() {
+      contadorPantallas++; // Incrementar el contador
+
+      // Crear un nuevo div para la pantalla
+      const nuevaPantalla = document.createElement("div");
+      nuevaPantalla.classList.add("border", "p-3", "mb-3");
+      nuevaPantalla.innerHTML = `
+    <h5>Pantalla ${contadorPantallas}</h5>
+    <div class="form-group">
+      <label>Tipo de pantalla</label>
+      <select class="form-control tipo-pantalla" name="tipo_pantalla[]" required>
+        <option value="">Selecciona una opción</option>
+        <option value="celular">Celular</option>
+        <option value="televisor">Televisor</option>
+        <option value="computador">Computador</option>
+        <option value="videojuegos">Videojuegos</option>
+        <option value="tablet">Ipad / Tablet</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Frecuencia a la semana</label>
+      <select class="form-control frecuencia" name="pantalla_frecuencia[]" required>
+        <option value="">Selecciona una opción</option>
+        <option value="1 vez a la semana">1 vez a la semana</option>
+        <option value="1-3 veces a la semana">1-3 veces a la semana</option>
+        <option value="3-5 veces a la semana">3-5 veces a la semana</option>
+        <option value="Más de 5 veces a la semana">Más de 5 veces a la semana</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>¿Cuánto tiempo antes de dormir?</label>
+      <select class="form-control tiempo-dormir" name="pantalla_tiempo_dormir[]" required>
+        <option value="">Selecciona una opción</option>
+        <option value="Antes de dormir">Antes de dormir</option>
+        <option value="< 15 minutos antes">&lt; 15 minutos antes</option>
+        <option value="Entre 15 - 30 minutos antes">Entre 15 - 30 minutos antes</option>
+        <option value="Entre 30 y 60 minutos antes">Entre 30 y 60 minutos antes</option>
+        <option value="Entre 1 a 2 horas antes">Entre 1 a 2 horas antes</option>
+        <option value="Más de 2 horas antes">Más de 2 horas antes</option>
+      </select>
+    </div>
+    <button type="button" class="btn btn-danger btn-sm eliminar-pantalla">Eliminar</button>
+  `;
+
+      // Agregar la nueva pantalla al contenedor (después del botón)
+      contenedorPantallas.appendChild(nuevaPantalla);
+    }
+
+    // Función para eliminar una pantalla
+    function eliminarPantalla(event) {
+      if (event.target.classList.contains("eliminar-pantalla")) {
+        event.target.closest("div.border").remove(); // Elimina el div que contiene la pantalla
+      }
+    }
+
+    // Escuchar cambios en los radio buttons
+    pantallasSi.addEventListener("change", toggleAgregarPantalla);
+    pantallasNo.addEventListener("change", toggleAgregarPantalla);
+
+    // Escuchar clic en el botón "Agregar Pantalla"
+    agregarPantallaBtn.addEventListener("click", agregarPantalla);
+
+    // Escuchar clic en el contenedor de pantallas para eliminar
+    contenedorPantallas.addEventListener("click", eliminarPantalla);
+
+    // Inicializar el estado al cargar la página
+    toggleAgregarPantalla();
+
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////?/
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////?/
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////?/
+    let contadorSintomas = 0; // Contador para identificar cada síntoma
+
+    // Referencias a los elementos del formulario
+    const sintomasSuenoSi = document.getElementById("sintomas_sueno_si");
+    const sintomasSuenoNo = document.getElementById("sintomas_sueno_no");
+    const agregarSintomaBtn = document.getElementById("agregar-sintoma");
+    const contenedorSintomas = document.getElementById("contenedor-sintomas");
+
+    // Función para mostrar u ocultar el botón "Agregar Síntoma"
+    function toggleAgregarSintoma() {
+      if (sintomasSuenoSi.checked) {
+        agregarSintomaBtn.style.display = "block"; // Mostrar el botón
+      } else {
+        agregarSintomaBtn.style.display = "none"; // Ocultar el botón
+        contenedorSintomas.innerHTML = ""; // Limpiar el contenedor de síntomas
+        contadorSintomas = 0; // Reiniciar el contador
+      }
+    }
+
+    // Función para agregar un nuevo síntoma
+    function agregarSintoma() {
+      contadorSintomas++; // Incrementar el contador
+
+      // Crear un nuevo div para el síntoma
+      const nuevoSintoma = document.createElement("div");
+      nuevoSintoma.classList.add("border", "p-3", "mb-3");
+      nuevoSintoma.innerHTML = `
+      <h5>Síntoma ${contadorSintomas}</h5>
+      <div class="form-group">
+        <label>Tipo de síntoma</label>
+        <select class="form-control" name="tipo_sintoma[]" required>
+          <option value="">Seleccione un síntoma</option>
+          <option value="Cefalea">Cefalea</option>
+          <option value="Nicturia">Nicturia</option>
+          <option value="Movimiento de extremidades">Movimiento de extremidades</option>
+          <option value="Disnea nocturna">Disnea nocturna</option>
+          <option value="Parálisis del sueño">Parálisis del sueño</option>
+          <option value="Pesadillas">Pesadillas</option>
+          <option value="Molestias en las piernas">Molestias en las piernas</option>
+          <option value="Ingesta nocturna">Ingesta nocturna</option>
+          <option value="Sonambulismo">Sonambulismo</option>
+          <option value="Bruxismo">Bruxismo</option>
+          <option value="Somniloquia">Somniloquia</option>
+          <option value="Micro despertares">Micro despertares</option>
+          <option value="Recreación de sueño">Recreación de sueño</option>
+          <option value="Congestión nasal">Congestión nasal</option>
+          <option value="Respiración oral">Respiración oral</option>
+          <option value="Estridor y catatrenia">Estridor y catatrenia</option>
+          <option value="Otro">Otro</option>
+        </select>
+      </div>
+   <div class="form-group">
+    <label>¿Cuándo inició?</label>
+    <input type="text" class="form-control" name="cuando_inicio[]" placeholder="Ej. Hace 3 meses" required>
+</div>
+
+<div class="form-group">
+    <label>¿Cómo ha evolucionado?</label>
+    <input type="text" class="form-control" name="evolucion[]" placeholder="Ej. Ha empeorado con el tiempo" required>
+</div>
+
+<div class="form-group">
+    <label>Frecuencia a la semana</label>
+    <select class="form-control" name="frecuencia[]">
+        <option value="" disabled selected>Seleccione una opción</option>
+        <option value="1">Una vez</option>
+        <option value="2-3">2-3 veces</option>
+        <option value="4-5">4-5 veces</option>
+        <option value="más de 5">Más de 5 veces</option>
+    </select>
+</div>
+
+<div class="form-group">
+    <label>Gravedad</label>
+    <select class="form-control" name="gravedad[]">
+        <option value="" disabled selected>Seleccione una opción</option>
+        <option value="leve">Leve</option>
+        <option value="moderado">Moderado</option>
+        <option value="grave">Grave</option>
+    </select>
+</div>
+
+<div class="form-group">
+    <label>Observaciones</label>
+    <textarea class="form-control" name="observaciones_sintoma[]" rows="2"></textarea>
+</div>
+
+<button type="button" class="btn btn-danger btn-sm eliminar-sintoma">Eliminar</button>
+
+    `;
+
+      // Agregar el nuevo síntoma al contenedor
+      contenedorSintomas.appendChild(nuevoSintoma);
+    }
+
+    // Función para eliminar un síntoma
+    function eliminarSintoma(event) {
+      if (event.target.classList.contains("eliminar-sintoma")) {
+        event.target.closest("div.border").remove(); // Elimina el div que contiene el síntoma
+      }
+    }
+
+    // Escuchar cambios en los radio buttons
+    sintomasSuenoSi.addEventListener("change", toggleAgregarSintoma);
+    sintomasSuenoNo.addEventListener("change", toggleAgregarSintoma);
+
+    // Escuchar clic en el botón "Agregar Síntoma"
+    agregarSintomaBtn.addEventListener("click", agregarSintoma);
+
+    // Escuchar clic en el contenedor de síntomas para eliminar
+    contenedorSintomas.addEventListener("click", eliminarSintoma);
+
+    // Inicializar el estado al cargar la página
+    toggleAgregarSintoma();
+
+    let contadorSintomasDiurnos = 0; // Contador para identificar cada síntoma diurno
+
+    // Referencias a los elementos del formulario
+    const sintomasDiurnosSi = document.getElementById("sintomas_diurnos_si");
+    const sintomasDiurnosNo = document.getElementById("sintomas_diurnos_no");
+    const agregarSintomaDiurnoBtn = document.getElementById("agregar-sintoma-diurno");
+    const contenedorSintomasDiurnos = document.getElementById("contenedor-sintomas-diurnos");
+
+    // Función para mostrar u ocultar el botón "Agregar Síntoma Diurno"
+    function toggleAgregarSintomaDiurno() {
+      if (sintomasDiurnosSi.checked) {
+        agregarSintomaDiurnoBtn.style.display = "block"; // Mostrar el botón
+      } else {
+        agregarSintomaDiurnoBtn.style.display = "none"; // Ocultar el botón
+        contenedorSintomasDiurnos.innerHTML = ""; // Limpiar el contenedor de síntomas diurnos
+        contadorSintomasDiurnos = 0; // Reiniciar el contador
+      }
+    }
+
+    // Función para agregar un nuevo síntoma diurno
+    function agregarSintomaDiurno() {
+      contadorSintomasDiurnos++; // Incrementar el contador
+
+      // Crear un nuevo div para el síntoma diurno
+      const nuevoSintomaDiurno = document.createElement("div");
+      nuevoSintomaDiurno.classList.add("border", "p-3", "mb-3");
+      nuevoSintomaDiurno.innerHTML = `
+      <h5>Síntoma Diurno ${contadorSintomasDiurnos}</h5>
+      <div class="form-group">
+        <label>Tipo de síntoma</label>
+        <select class="form-control" name="tipo_sintoma_diurno[]" required>
+          <option value="">Seleccione un síntoma</option>
+          <option value="Somnolencia diurna">Somnolencia diurna</option>
+          <option value="Trastorno del humor">Trastorno del humor</option>
+          <option value="Disminución de la productividad">Disminución de la productividad</option>
+          <option value="Alteración de las relaciones personales">Alteración de las relaciones personales</option>
+          <option value="Trastorno de la memoria">Trastorno de la memoria</option>
+          <option value="Trastorno de la atención">Trastorno de la atención</option>
+        </select>
+      </div>
+    <div class="form-group">
+  <label>¿Cuándo inició?</label>
+  <input type="text" class="form-control" name="cuando_inicio_diurno[]" placeholder="Ej. Hace 3 meses" required>
+</div>
+
+<div class="form-group">
+  <label>¿Cómo ha evolucionado?</label>
+  <input type="text" class="form-control" name="evolucion_diurno[]" placeholder="Ej. Ha empeorado con el tiempo" required>
+</div>
+
+<div class="form-group">
+  <label>Frecuencia a la semana</label>
+  <select class="form-control" name="frecuencia_diurno[]">
+    <option value="">Seleccione una opción</option>
+    <option value="1">Una vez</option>
+    <option value="2-3">2-3 veces</option>
+    <option value="4-5">4-5 veces</option>
+    <option value="más de 5">Más de 5 veces</option>
+  </select>
+</div>
+
+<div class="form-group">
+  <label>Gravedad</label>
+  <select class="form-control" name="gravedad_diurno[]">
+    <option value="">Seleccione una opción</option>
+    <option value="leve">Leve</option>
+    <option value="moderado">Moderado</option>
+    <option value="grave">Grave</option>
+  </select>
+</div>
+
+<div class="form-group">
+  <label>Observaciones</label>
+  <textarea class="form-control" name="observaciones_sintoma_diurno[]" rows="2"></textarea>
+</div>
+
+<button type="button" class="btn btn-danger btn-sm eliminar-sintoma">Eliminar</button>
+    `;
+
+      // Agregar el nuevo síntoma diurno al contenedor
+      contenedorSintomasDiurnos.appendChild(nuevoSintomaDiurno);
+    }
+
+    // Función para eliminar un síntoma diurno
+    function eliminarSintomaDiurno(event) {
+      if (event.target.classList.contains("eliminar-sintoma-diurno")) {
+        event.target.closest("div.border").remove(); // Elimina el div que contiene el síntoma diurno
+      }
+    }
+
+    // Escuchar cambios en los radio buttons
+    sintomasDiurnosSi.addEventListener("change", toggleAgregarSintomaDiurno);
+    sintomasDiurnosNo.addEventListener("change", toggleAgregarSintomaDiurno);
+
+    // Escuchar clic en el botón "Agregar Síntoma Diurno"
+    agregarSintomaDiurnoBtn.addEventListener("click", agregarSintomaDiurno);
+
+    // Escuchar clic en el contenedor de síntomas diurnos para eliminar
+    contenedorSintomasDiurnos.addEventListener("click", eliminarSintomaDiurno);
+
+    // Inicializar el estado al cargar la página
+    toggleAgregarSintomaDiurno();
+  });
+
+  document.addEventListener("DOMContentLoaded", function () {
+    // Elementos principales
     const quejaSi = document.getElementById("queja_sueno-si");
     const quejaNo = document.getElementById("queja_sueno-no");
     const camposQueja = document.getElementById("campos-queja-container");
     const seccionCausas = document.getElementById("seccion-causas");
 
+    // Mostrar/ocultar sección completa de quejas
     function toggleQuejaSection() {
       const mostrar = quejaSi.checked;
       camposQueja.style.display = mostrar ? "block" : "none";
       seccionCausas.style.display = mostrar ? "block" : "none";
 
       if (!mostrar) {
-        // Limpiar checkboxes de tipos de queja
-        document.querySelectorAll('.queja-checkbox').forEach(cb => {
-          cb.checked = false;
-        });
-
-        // Limpiar campos de causas
+        // Limpiar todo si se selecciona "No"
+        document.querySelectorAll('.queja-checkbox').forEach(cb => cb.checked = false);
+        document.getElementById("quejas-container").innerHTML = "";
         document.getElementById("causa_conocida_no").checked = true;
-        document.getElementById("causas-container").style.display = "none";
         document.getElementById("especifique_causas").value = "";
         document.getElementById("observaciones_queja").value = "";
       }
     }
 
-    if (quejaSi && quejaNo) {
-      quejaSi.addEventListener("change", toggleQuejaSection);
-      quejaNo.addEventListener("change", toggleQuejaSection);
-    }
+    quejaSi.addEventListener("change", toggleQuejaSection);
+    quejaNo.addEventListener("change", toggleQuejaSection);
 
     // Control para causas conocidas
     const causaSi = document.getElementById("causa_conocida_si");
@@ -1054,259 +1649,214 @@
     const causasContainer = document.getElementById("causas-container");
 
     function toggleCausas() {
-      if (causasContainer) {
-        causasContainer.style.display = causaSi.checked ? "block" : "none";
-        if (causaNo.checked) {
-          const especifiqueCausas = document.getElementById("especifique_causas");
-          if (especifiqueCausas) especifiqueCausas.value = "";
+      causasContainer.style.display = causaSi.checked ? "block" : "none";
+      if (causaNo.checked) {
+        document.getElementById("especifique_causas").value = "";
+      }
+    }
+
+    causaSi.addEventListener("change", toggleCausas);
+    causaNo.addEventListener("change", toggleCausas);
+
+    // Generar campos dinámicos para cada queja
+    const checkboxes = document.querySelectorAll(".queja-checkbox");
+    const container = document.getElementById("quejas-container");
+    const quejaFields = {};
+
+    checkboxes.forEach(checkbox => {
+      checkbox.addEventListener("change", function () {
+        const quejaValue = this.value;
+        const quejaId = quejaValue.replace(/\s+/g, '_').toLowerCase();
+        const sectionId = `queja-${quejaId}`;
+
+        if (this.checked) {
+          // Solo crear si no existe
+          if (!quejaFields[quejaId]) {
+            const section = document.createElement("div");
+            section.id = sectionId;
+            section.className = "queja-section mb-4 p-3 border rounded";
+
+            section.innerHTML = `
+                        <h5>${quejaValue}</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>¿Cuándo inició?</label>
+                                    <input type="text" class="form-control" name="${quejaId}_inicio">
+                                </div>
+                            </div>
+                                  <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-control-label">Cómo ha evolucionado</label>
+                                    <textarea class="form-control" name="${quejaId}_evolucion" rows="2"></textarea>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-control-label">Frecuencia Semana</label>
+                                    <select class="form-control" name="${quejaId}_frecuencia">
+                                        <option value="Una vez">Una vez</option>
+                                        <option value="2-3 veces">2-3 veces</option>
+                                        <option value="4-5 veces">4-5 veces</option>
+                                        <option value="> 5 veces">> 5 veces</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-control-label">Gravedad</label>
+                                    <select class="form-control" name="${quejaId}_gravedad">
+                                        <option value="Leve">Leve</option>
+                                        <option value="Moderado">Moderado</option>
+                                        <option value="Grave">Grave</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <!-- Resto de campos... -->
+                        </div>
+                    `;
+
+            container.appendChild(section);
+            quejaFields[quejaId] = true;
+          }
+        } else {
+          // Eliminar sección si existe
+          const section = document.getElementById(sectionId);
+          if (section) {
+            section.remove();
+            delete quejaFields[quejaId];
+          }
         }
-      }
-    }
+      });
+    });
+  });
 
-    if (causaSi && causaNo) {
-      causaSi.addEventListener("change", toggleCausas);
-      causaNo.addEventListener("change", toggleCausas);
-    }
+  // Mostrar/ocultar descripción de rutina
+  document.getElementById('rutina_si').addEventListener('change', function () {
+    document.getElementById('describa-rutina').style.display = this.checked ? 'block' : 'none';
+  });
+  document.getElementById('rutina_no').addEventListener('change', function () {
+    document.getElementById('describa-rutina').style.display = this.checked ? 'none' : 'block';
+    if (this.checked) document.getElementById('describa_rutina').value = '';
+  });
+  document.addEventListener('DOMContentLoaded', function () {
 
-    ///////////////////////////////////////////////////////////////
-    // SECCIÓN: RUTINA ANTES DE DORMIR
-    ///////////////////////////////////////////////////////////////
+    // Mostrar/ocultar sección de siestas
+    document.querySelectorAll('input[name="realiza_siestas"]').forEach(radio => {
+      radio.addEventListener('change', function () {
+        document.getElementById('siestas-container').style.display =
+          this.value === 'Si' ? 'block' : 'none';
+      });
+    });
 
-    const rutinaSi = document.getElementById('rutina_si');
-    const rutinaNo = document.getElementById('rutina_no');
-    const describaDormir = document.getElementById('describa-rutina');
+    // Mostrar/ocultar sección de consumo de comidas
+    document.querySelectorAll('input[name="consume"]').forEach(radio => {
+      radio.addEventListener('change', function () {
+        document.getElementById('campos-comida-container').style.display =
+          this.value === 'si' ? 'block' : 'none';
+      });
+    });
 
-    function toggleRutina() {
-      if (describaDormir) {
-        describaDormir.style.display = rutinaSi && rutinaSi.checked ? 'block' : 'none';
-        if (rutinaNo && rutinaNo.checked) {
-          const describaRutinaInput = document.getElementById('describa_rutina');
-          if (describaRutinaInput) describaRutinaInput.value = '';
-        }
-      }
-    }
+    // Mostrar/ocultar sección de pantallas
+    document.querySelectorAll('input[name="usa_pantallas"]').forEach(radio => {
+      radio.addEventListener('change', function () {
+        document.getElementById('contenedor-pantallas').style.display =
+          this.value === 'Si' ? 'block' : 'none';
+      });
+    });
 
-    if (rutinaSi && rutinaNo) {
-      rutinaSi.addEventListener('change', toggleRutina);
-      rutinaNo.addEventListener('change', toggleRutina);
-    }
 
-    ///////////////////////////////////////////////////////////////
-    // SECCIÓN: SIESTAS - SIMPLIFICADA
-    ///////////////////////////////////////////////////////////////
+    radio.addEventListener('change', function () {
+      document.getElementById('contenedor-medicamentos').style.display =
+        this.value === 'Si' ? 'block' : 'none';
+    });
+  });
+  document.addEventListener("DOMContentLoaded", function () {
+    // Contador para actividades
+    let contadorActividades = 0;
 
-    const siestasSi = document.getElementById("siestas_si");
-    const siestasNo = document.getElementById("siestas_no");
-    const siestasContainer = document.getElementById("siestas-container");
-
-    function toggleSiestas() {
-      if (siestasContainer) {
-        siestasContainer.style.display = siestasSi && siestasSi.checked ? "block" : "none";
-      }
-    }
-
-    if (siestasSi && siestasNo) {
-      siestasSi.addEventListener("change", toggleSiestas);
-      siestasNo.addEventListener("change", toggleSiestas);
-    }
-
-    ///////////////////////////////////////////////////////////////
-    // SECCIÓN: CONSUMO DE SUSTANCIAS - SIMPLIFICADA
-    ///////////////////////////////////////////////////////////////
-
-    const consumeSi = document.getElementById("consume-si");
-    const consumeNo = document.getElementById("consume-no");
-    const camposComidaContainer = document.getElementById("campos-comida-container");
-
-    function toggleConsumo() {
-      if (camposComidaContainer) {
-        camposComidaContainer.style.display = consumeSi && consumeSi.checked ? "block" : "none";
-      }
-    }
-
-    if (consumeSi && consumeNo) {
-      consumeSi.addEventListener("change", toggleConsumo);
-      consumeNo.addEventListener("change", toggleConsumo);
-    }
-
-    ///////////////////////////////////////////////////////////////
-    // SECCIÓN: PANTALLAS - SIMPLIFICADA
-    ///////////////////////////////////////////////////////////////
-
-    const pantallasSi = document.getElementById("pantallas_si");
-    const pantallasNo = document.getElementById("pantallas_no");
-    const contenedorPantallas = document.getElementById("contenedor-pantallas");
-
-    function togglePantallas() {
-      if (contenedorPantallas) {
-        contenedorPantallas.style.display = pantallasSi && pantallasSi.checked ? "block" : "none";
-      }
-    }
-
-    if (pantallasSi && pantallasNo) {
-      pantallasSi.addEventListener("change", togglePantallas);
-      pantallasNo.addEventListener("change", togglePantallas);
-    }
-
-    ///////////////////////////////////////////////////////////////
-    // SECCIÓN: ACTIVIDADES EN CAMA - SIMPLIFICADA
-    ///////////////////////////////////////////////////////////////
-
+    // Referencias a los elementos
     const camaActividadesSi = document.getElementById("cama_actividades_si");
     const camaActividadesNo = document.getElementById("cama_actividades_no");
+    const agregarActividadBtn = document.getElementById("agregar-actividad");
     const contenedorActividades = document.getElementById("contenedor-actividades");
 
-    function toggleActividades() {
-      if (contenedorActividades) {
-        contenedorActividades.style.display = camaActividadesSi && camaActividadesSi.checked ? "block" : "none";
-      }
-    }
-
-    if (camaActividadesSi && camaActividadesNo) {
-      camaActividadesSi.addEventListener("change", toggleActividades);
-      camaActividadesNo.addEventListener("change", toggleActividades);
-    }
-
-    ///////////////////////////////////////////////////////////////
-    // SECCIÓN: ACTIVIDAD FÍSICA - SIMPLIFICADA
-    ///////////////////////////////////////////////////////////////
-
-    const actividadFisicaSi = document.getElementById("actividad_fisica_si");
-    const actividadFisicaNo = document.getElementById("actividad_fisica_no");
-    const contenedorActividadesFisicas = document.getElementById("contenedor-actividades-fisicas");
-
-    function toggleActividadFisica() {
-      if (contenedorActividadesFisicas) {
-        contenedorActividadesFisicas.style.display = actividadFisicaSi && actividadFisicaSi.checked ? "block" : "none";
-      }
-    }
-
-    if (actividadFisicaSi && actividadFisicaNo) {
-      actividadFisicaSi.addEventListener("change", toggleActividadFisica);
-      actividadFisicaNo.addEventListener("change", toggleActividadFisica);
-    }
-
-    ///////////////////////////////////////////////////////////////
-    // SECCIÓN: MEDICAMENTOS - SIMPLIFICADA
-    ///////////////////////////////////////////////////////////////
-
-    const consumeMedSi = document.getElementById("consume_si");
-    const consumeMedNo = document.getElementById("consume_no");
-    const contenedorMedicamentos = document.getElementById("contenedor-medicamentos");
-
-    function toggleMedicamentos() {
-      if (contenedorMedicamentos) {
-        contenedorMedicamentos.style.display = consumeMedSi && consumeMedSi.checked ? "block" : "none";
-      }
-    }
-
-    if (consumeMedSi && consumeMedNo) {
-      consumeMedSi.addEventListener("change", toggleMedicamentos);
-      consumeMedNo.addEventListener("change", toggleMedicamentos);
-    }
-
-    ///////////////////////////////////////////////////////////////
-    // SECCIÓN: SÍNTOMAS - SIMPLIFICADA
-    ///////////////////////////////////////////////////////////////
-
-    const sintomasSuenoSi = document.getElementById("sintomas_sueno_si");
-    const sintomasSuenoNo = document.getElementById("sintomas_sueno_no");
-    const agregarSintomaBtn = document.getElementById("agregar-sintoma");
-
-    function toggleSintomas() {
-      if (agregarSintomaBtn) {
-        agregarSintomaBtn.style.display = sintomasSuenoSi && sintomasSuenoSi.checked ? "block" : "none";
-      }
-    }
-
-    if (sintomasSuenoSi && sintomasSuenoNo) {
-      sintomasSuenoSi.addEventListener("change", toggleSintomas);
-      sintomasSuenoNo.addEventListener("change", toggleSintomas);
-    }
-
-    ///////////////////////////////////////////////////////////////
-    // SECCIÓN: SÍNTOMAS DIURNOS - SIMPLIFICADA
-    ///////////////////////////////////////////////////////////////
-
-    const sintomasDiurnosSi = document.getElementById("sintomas_diurnos_si");
-    const sintomasDiurnosNo = document.getElementById("sintomas_diurnos_no");
-    const agregarSintomaDiurnoBtn = document.getElementById("agregar-sintoma-diurno");
-
-    function toggleSintomasDiurnos() {
-      if (agregarSintomaDiurnoBtn) {
-        agregarSintomaDiurnoBtn.style.display = sintomasDiurnosSi && sintomasDiurnosSi.checked ? "block" : "none";
-      }
-    }
-
-    if (sintomasDiurnosSi && sintomasDiurnosNo) {
-      sintomasDiurnosSi.addEventListener("change", toggleSintomasDiurnos);
-      sintomasDiurnosNo.addEventListener("change", toggleSintomasDiurnos);
-    }
-
-    ///////////////////////////////////////////////////////////////
-    // VALIDACIÓN Y ENVÍO DEL FORMULARIO
-    ///////////////////////////////////////////////////////////////
-
-    const form = document.querySelector('form');
-    if (form) {
-      form.addEventListener('submit', function (e) {
-        console.log("Enviando formulario de anamnesis...");
-
-        // Validar campos requeridos básicos
-        const visitaId = document.getElementById('visita_id');
-        const pacienteId = document.getElementById('paciente_id');
-        const examenId = document.getElementById('examen_id');
-
-        if (!visitaId || !visitaId.value) {
-          e.preventDefault();
-          alert('Error: Falta información de la visita');
-          return false;
+    // Función para mostrar/ocultar sección
+    function toggleAgregarActividad() {
+      if (camaActividadesSi.checked) {
+        contenedorActividades.style.display = "block";
+        agregarActividadBtn.style.display = "block";
+      } else {
+        contenedorActividades.style.display = "none";
+        agregarActividadBtn.style.display = "none";
+        // Limpiar contenedor pero mantener el botón
+        while (contenedorActividades.children.length > 1) {
+          contenedorActividades.removeChild(contenedorActividades.lastChild);
         }
-
-        if (!pacienteId || !pacienteId.value) {
-          e.preventDefault();
-          alert('Error: Falta información del paciente');
-          return false;
-        }
-
-        if (!examenId || !examenId.value) {
-          e.preventDefault();
-          alert('Error: Falta información del examen');
-          return false;
-        }
-
-        console.log("Datos del formulario válidos, enviando...");
-        console.log("Visita ID:", visitaId.value);
-        console.log("Paciente ID:", pacienteId.value);
-        console.log("Examen ID:", examenId.value);
-
-        // Mostrar indicador de carga
-        const submitBtn = form.querySelector('button[type="submit"]');
-        if (submitBtn) {
-          submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Guardando...';
-          submitBtn.disabled = true;
-        }
-
-        // El formulario se enviará normalmente
-        return true;
-      });
+        contadorActividades = 0;
+      }
     }
 
-    // Inicializar todos los estados
-    toggleQuejaSection();
-    toggleCausas();
-    toggleRutina();
-    toggleSiestas();
-    toggleConsumo();
-    togglePantallas();
-    toggleActividades();
-    toggleActividadFisica();
-    toggleMedicamentos();
-    toggleSintomas();
-    toggleSintomasDiurnos();
+    // Función para agregar actividad
+    function agregarActividad() {
+      contadorActividades++;
 
-    console.log("Formulario de anamnesis inicializado correctamente");
+      const nuevaActividad = document.createElement("div");
+      nuevaActividad.classList.add("border", "p-3", "mb-3");
+      nuevaActividad.innerHTML = `
+      <h5>Actividad ${contadorActividades}</h5>
+      <div class="form-group">
+        <label>Tipo de actividad</label>
+        <select class="form-control" name="tipo_actividad[]" multiple required>
+          <option value="comer">Comer</option>
+          <option value="videojuegos">Jugar videojuegos</option>
+          <option value="peliculas">Ver películas/series</option>
+          <option value="internet">Navegar en internet</option>
+          <option value="redes">Revisar redes sociales</option>
+          <option value="leer">Leer</option>
+          <option value="estudiar">Estudiar</option>
+          <option value="yoga">Estiramientos/Yoga</option>
+          <option value="teletrabajo">Teletrabajo</option>
+          <option value="otros">Otros</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Frecuencia a la semana</label>
+        <select class="form-control" name="frecuencia_actividad[]" required>
+          <option value="1 vez">1 vez a la semana</option>
+          <option value="1-3 veces">1-3 veces a la semana</option>
+          <option value="3-5 veces">3-5 veces a la semana</option>
+          <option value="más de 5">Más de 5 veces a la semana</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Observaciones</label>
+        <textarea class="form-control" name="observaciones_actividades[]" rows="2"></textarea>
+      </div>
+      <button type="button" class="btn btn-danger btn-sm eliminar-actividad">Eliminar</button>
+    `;
+
+      contenedorActividades.appendChild(nuevaActividad);
+    }
+
+    // Función para eliminar actividad
+    function eliminarActividad(event) {
+      if (event.target.classList.contains("eliminar-actividad")) {
+        event.target.closest("div.border").remove();
+      }
+    }
+
+    // Event listeners
+    camaActividadesSi.addEventListener("change", toggleAgregarActividad);
+    camaActividadesNo.addEventListener("change", toggleAgregarActividad);
+    agregarActividadBtn.addEventListener("click", agregarActividad);
+    contenedorActividades.addEventListener("click", eliminarActividad);
+
+    // Inicializar estado
+    toggleAgregarActividad();
   });
+
+
 </script>
 {% endblock javascripts %}
 {% endblock content %}

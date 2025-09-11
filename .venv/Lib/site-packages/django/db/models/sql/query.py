@@ -1696,6 +1696,7 @@ class Query(BaseExpression):
         return target_clause, needed_inner
 
     def add_filtered_relation(self, filtered_relation, alias):
+        self.check_alias(alias)
         filtered_relation.alias = alias
         relation_lookup_parts, relation_field_parts, _ = self.solve_lookup_type(
             filtered_relation.relation_name
@@ -2242,8 +2243,21 @@ class Query(BaseExpression):
                     join_info.joins,
                     join_info.path,
                 )
-                for target in targets:
-                    cols.append(join_info.transform_function(target, final_alias))
+                if len(targets) > 1:
+                    transformed_targets = [
+                        join_info.transform_function(target, final_alias)
+                        for target in targets
+                    ]
+                    cols.append(
+                        ColPairs(
+                            final_alias if self.alias_cols else None,
+                            [col.target for col in transformed_targets],
+                            [col.output_field for col in transformed_targets],
+                            join_info.final_field,
+                        )
+                    )
+                else:
+                    cols.append(join_info.transform_function(targets[0], final_alias))
             if cols:
                 self.set_select(cols)
         except MultiJoin:
