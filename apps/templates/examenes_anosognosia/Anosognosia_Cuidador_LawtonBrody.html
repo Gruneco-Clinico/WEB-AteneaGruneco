@@ -202,7 +202,7 @@
               <p><strong>Diagnóstico:</strong> <span id="diagnostico-lawton">{{ datos_examen.diagnostico|default:"-" }}</span></p>
               <!-- Guardar el puntaje para enviar al servidor -->
               <input type="hidden" name="total" id="total-lawton" value="{{ datos_examen.total|default:'0' }}">
-              <input type="hidden" name="diagnostico" id="diagnostico-lawton" value="{{ datos_examen.diagnostico|default:'-' }}">
+              <input type="hidden" name="diagnostico" id="diagnostico-lawton-hidden" value="{{ datos_examen.diagnostico|default:'-' }}">
             </div>
 
             <!-- Botones -->
@@ -247,14 +247,14 @@
       const genero = generoSelect.value;
       let diagnostico = "";
 
-      if (genero === "mujer") {
+      if (genero === "Mujer") {
         puntajeSpan.textContent = total;
         if (total === 8) diagnostico = "Autónoma";
         else if (total >= 6) diagnostico = "Dependencia ligera";
         else if (total >= 4) diagnostico = "Dependencia moderada";
         else if (total >= 2) diagnostico = "Dependencia grave";
         else diagnostico = "Dependencia total";
-      } else if (genero === "hombre") {
+      } else if (genero === "Hombre") {
         const indicesHombre = [0, 1, 5, 6, 7]; // item_1, item_2, item_6, item_7, item_8
         let subtotal = 0;
         indicesHombre.forEach((i) => {

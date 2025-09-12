@@ -1,0 +1,249 @@
+{% extends 'layouts/base.html' %}
+{% block content %}
+
+<div class="header bg-primary pb-6">
+  <div class="container-fluid">
+    <div class="header-body">
+      <div class="row align-items-center py-4">
+        <div class="col-lg-6 col-5">
+          <h6 class="h2 text-white d-inline-block mb-0">Evaluación CDR - Participante</h6>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid mt--6">
+  <div class="row">
+    <div class="col">
+      <div class="card shadow">
+        <form method="post" action="{% url 'guardar_evaluacion_clinica_CDR' %}">
+          {% csrf_token %}
+          <input type="hidden" name="visita_id" value="{{ visita_examen }}">
+          <input type="hidden" name="paciente_id" value="{{ paciente_id }}">
+          <input type="hidden" name="examen_id" value="{{ examen_id }}">
+          
+          <div class="card-body">
+                  <!-- Memoria -->
+                  <div class="form-group">
+                    <label for="cdr_memoria">1. Memoria</label>
+                    <select class="form-control" name="cdr_memoria" id="cdr_memoria" required>
+                      {% if datos_examen.cdr_memoria %}
+                      <option value="{{ datos_examen.cdr_memoria }}" selected>{{ datos_examen.cdr_memoria }}</option>
+                      {% else %}
+                      <option value="">Seleccione una opción</option>
+                      {% endif %}
+                      <option value="0" data-description="No hay pérdida de memoria o hay un leve olvido esporádico ">0: Ausencia de demencia</option>
+                      <option value="0.5" data-description="Leve olvido persistente; recuerdo parcial de eventos, olvido “benigno” ">0.5: Diagnóstico incierto o pospuesto</option>
+                      <option value="1" data-description="Pérdida moderada de la memoria; más marcada para eventos recientes; el defecto interfiere con las actividades cotidianas ">1:Demencia leve</option>
+                      <option value="2" data-description="Severa pérdida de la memoria; solo retiene material muy aprendido; rápida pérdida de nuevo material ">2: Demencia moderada</option>
+                      <option value="3" data-description="Severa pérdida de memoria; sólo quedan fragmentos">3: Demencia severa</option>
+                    </select>
+                    <div class="descripcion-campo text-muted mt-2" id="desc_cdr_memoria"></div>
+                  </div>
+
+                  <!-- Orientación -->
+                  <div class="form-group">
+                    <label for="cdr_orientacion">2. Orientación</label>
+                    <select class="form-control" name="cdr_orientacion" id="cdr_orientacion" required>
+                      {% if datos_examen.cdr_orientacion %}
+                      <option value="{{ datos_examen.cdr_orientacion }}" selected>{{ datos_examen.cdr_orientacion }}</option>
+                      {% else %}
+                      <option value="">Seleccione una opción</option>
+                      {% endif %}
+                      <option value="0" data-description="Completamente orientado/a">0: Ausencia de demencia</option>
+                      <option value="0.5" data-description="Completamente orientado/a salvo una leve dificultad con las relaciones temporales ">0.5: Diagnóstico incierto o pospuesto</option>
+                      <option value="1" data-description="Moderada dificultad con relaciones temporales; orientado/a en cuanto al lugar al momento del test; puede sufrir desorientación geográfica en algún otro lugar ">1:Demencia leve</option>
+                      <option value="2" data-description="Severa dificultad con relaciones temporales; generalmente desorientado/a en cuanto al tiempo, frecuentemente en cuanto al lugar  ">2: Demencia moderada</option>
+                      <option value="3" data-description="Orientado/a solamente a la persona">3: Demencia severa</option>
+                    </select>
+                    <div class="descripcion-campo text-muted mt-2" id="desc_cdr_orientacion"></div>
+                  </div>
+
+                  <!-- Juicio y resolución de problemas -->
+                  <div class="form-group">
+                    <label for="cdr_juicio">3. Juicio y resolución de problemas</label>
+                    <select class="form-control" name="cdr_juicio" id="cdr_juicio" required>
+                      {% if datos_examen.cdr_juicio %}
+                      <option value="{{ datos_examen.cdr_juicio }}" selected>{{ datos_examen.cdr_juicio }}</option>
+                      {% else %}
+                      <option value="">Seleccione una opción</option>
+                      {% endif %}
+                      <option value="0" data-description="Soluciona bien los problemas cotidianos; buen juicio en relación con desempeño pasado ">0: Ausencia de demencia</option>
+                      <option value="0.5" data-description="Leve deterioro en la solución de problemas, semejanzas y diferencias ">0.5: Diagnóstico incierto o pospuesto</option>
+                      <option value="1" data-description="Moderada dificultad en el manejo de problemas, semejanzas y diferencias; juicio social generalmente conservado">1:Demencia leve</option>
+                      <option value="2" data-description="Severamente deteriorado/a en el manejo de problemas, semejanzas y diferencias; juicio social generalmente deteriorado">2: Demencia moderada</option>
+                      <option value="3" data-description="Incapaz de realizar juicios o de solucionar problemas ">3: Demencia severa</option>
+                    </select>
+                    <div class="descripcion-campo text-muted mt-2" id="desc_cdr_juicio"></div>
+                  </div>
+
+                  <!-- Actividades Comunitarias -->
+                  <div class="form-group">
+                    <label for="cdr_comunitarias">4. Juicio y resolución de problemas</label>
+                    <select class="form-control" name="cdr_comunitarias" id="cdr_comunitarias" required>
+                      {% if datos_examen.cdr_comunitarias %}
+                      <option value="{{ datos_examen.cdr_comunitarias }}" selected>{{ datos_examen.cdr_comunitarias }}</option>
+                      {% else %}
+                      <option value="">Seleccione una opción</option>
+                      {% endif %}
+                      <option value="0" data-description="Funcionamiento independiente y en el nivel usual en el trabajo, compras, asuntos de negocios y financieros, voluntariado y grupos sociales ">0: Ausencia de demencia</option>
+                      <option value="0.5" data-description="Leve deterioro en estas actividades ">0.5: Diagnóstico incierto o pospuesto</option>
+                      <option value="1" data-description="Incapaz de funcionar independientemente en estas actividades, aunque todavía puede estar involucrado/a en alguna de ellas; a simple vista, da la impresión de normalidad ">1:Demencia leve</option>
+                      <option value="2" data-description="Aparenta estar lo suficientemente bien como para tener actividad social fuera del hogar ">2: Demencia moderada</option>
+                      <option value="3" data-description="Aparenta estar demasiado enfermo/a como para tener actividad social fuera del ámbito hogareño ">3: Demencia severa</option>
+                    </select>
+                    <div class="descripcion-campo text-muted mt-2" id="desc_cdr_comunitarias"></div>
+                  </div>
+
+                  <!-- Hogar y Pasatiempos -->
+                  <div class="form-group">
+                    <label for="cdr_pasatiempos">5. Juicio y resolución de problemas</label>
+                    <select class="form-control" name="cdr_pasatiempos" id="cdr_pasatiempos" required>
+                      {% if datos_examen.cdr_pasatiempos %}
+                      <option value="{{ datos_examen.cdr_pasatiempos }}" selected>{{ datos_examen.cdr_pasatiempos }}</option>
+                      {% else %}
+                      <option value="">Seleccione una opción</option>
+                      {% endif %}
+                      <option value="0" data-description="Vida hogareña, pasatiempos e intereses intelectuales bien conservados ">0: Ausencia de demencia</option>
+                      <option value="0.5" data-description="Vida hogareña, pasatiempos e intereses intelectuales levemente deteriorados ">0.5: Diagnóstico incierto o pospuesto</option>
+                      <option value="1" data-description="Deterioro leve pero definitivo de su funcionamiento dentro del hogar; las tareas domésticas más difíciles son abandonadas; los intereses y los pasatiempos más complicados son abandonados ">1:Demencia leve</option>
+                      <option value="2" data-description="Sólo se encuentran conservados los quehaceres simples; intereses muy restringidos, pobremente conservados ">2: Demencia moderada</option>
+                      <option value="3" data-description="No cumple función significativa dentro del hogar ">3: Demencia severa</option>
+                    </select>
+                    <div class="descripcion-campo text-muted mt-2" id="desc_cdr_pasatiempos"></div>
+                  </div>
+
+                  <!-- Cuidado Personal -->
+                  <div class="form-group">
+                    <label for="cdr_cuidado">6. Cuidado personal</label>
+                    <select class="form-control" name="cdr_cuidado" id="cdr_cuidado" required>
+                      {% if datos_examen.cdr_cuidado %}
+                      <option value="{{ datos_examen.cdr_cuidado }}" selected>{{ datos_examen.cdr_cuidado }}</option>
+                      {% else %}
+                      <option value="">Seleccione una opción</option>
+                      {% endif %}
+                      <option value="0" data-description="Completamente capaz de cuidar de sí mismo/a ">0: Ausencia de demencia</option>
+                      <option value="1" data-description="Necesita recordatorios ">1:Demencia leve</option>
+                      <option value="2" data-description="Requiere asistencia para vestirse, asearse, y para el cuidado de sus efectos personales ">2: Demencia moderada</option>
+                      <option value="3" data-description="Requiere mucha ayuda con el cuidado personal; frecuentemente incontinente ">3: Demencia severa</option>
+                    </select>
+                    <div class="descripcion-campo text-muted mt-2" id="desc_cdr_cuidado"></div>
+                  </div>
+
+                  <!-- Resultado Global -->
+                  <div class="form-group mt-4">
+                    <label for="cdr_global"><strong>CDR Global (calculado automáticamente)</strong></label>
+                    <input type="text" class="form-control" id="cdr_global" name="cdr_global" readonly placeholder="Será calculado automáticamente">
+                  </div>
+
+                  <div class="text-right mt-4">
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    
+    // --- CÁLCULO DEL CDR GLOBAL ---
+    const memoria = document.querySelector('[name="cdr_memoria"]');
+    const orientacion = document.querySelector('[name="cdr_orientacion"]');
+    const juicio = document.querySelector('[name="cdr_juicio"]');
+    const comunitarias = document.querySelector('[name="cdr_comunitarias"]');
+    const pasatiempos = document.querySelector('[name="cdr_pasatiempos"]');
+    const cuidado = document.querySelector('[name="cdr_cuidado"]');
+    const globalInput = document.getElementById("cdr_global");
+
+    function calcularCDRGlobal() {
+      const m = parseFloat(memoria.value || -1);
+      const o = parseFloat(orientacion.value || -1);
+      const j = parseFloat(juicio.value || -1);
+      const c = parseFloat(comunitarias.value || -1);
+      const h = parseFloat(pasatiempos.value || -1);
+      const p = parseFloat(cuidado.value || -1);
+
+      if ([m, o, j, c, h, p].includes(-1)) {
+        globalInput.value = "";
+        return;
+      }
+
+      let iguales = 0, mayores = 0, menores = 0;
+
+      if (o === m) iguales++;
+      if (j === m) iguales++;
+      if (c === m) iguales++;
+      if (h === m) iguales++;
+      if (p === m) iguales++;
+
+      if (o > m) mayores++; else if (o < m) menores++;
+      if (j > m) mayores++; else if (j < m) menores++;
+      if (c > m) mayores++; else if (c < m) menores++;
+      if (h > m) mayores++; else if (h < m) menores++;
+      if (p > m) mayores++; else if (p < m) menores++;
+
+      if (m === 0) {
+        const count05oMas = (o >= 0.5 ? 1 : 0) + (j >= 0.5 ? 1 : 0) + (c >= 0.5 ? 1 : 0) + (h >= 0.5 ? 1 : 0) + (p >= 0.5 ? 1 : 0);
+        globalInput.value = count05oMas >= 2 ? "0.5" : "0";
+        return;
+      }
+
+      if (m === 0.5) {
+        const count1oMas = (o >= 1 ? 1 : 0) + (j >= 1 ? 1 : 0) + (c >= 1 ? 1 : 0) + (h >= 1 ? 1 : 0) + (p >= 1 ? 1 : 0);
+        globalInput.value = count1oMas >= 3 ? "1" : "0.5";
+        return;
+      }
+
+      if (iguales >= 3) {
+        globalInput.value = m.toString();
+        return;
+      }
+
+      if (mayores > menores) {
+        const mayoresArr = [o, j, c, h, p].filter(x => x > m);
+        globalInput.value = moda(mayoresArr).toString();
+        return;
+      } else if (menores > mayores) {
+        const menoresArr = [o, j, c, h, p].filter(x => x < m);
+        globalInput.value = moda(menoresArr).toString();
+        return;
+      }
+
+      globalInput.value = m.toString();
+    }
+
+    function moda(arr) {
+      let counts = {};
+      arr.forEach(n => counts[n] = (counts[n] || 0) + 1);
+      let max = Math.max(...Object.values(counts));
+      return parseFloat(Object.keys(counts).find(k => counts[k] === max));
+    }
+
+    // Escuchar cambios en cada campo del CDR y mostrar descripción textual
+    [memoria, orientacion, juicio, comunitarias, pasatiempos, cuidado].forEach(select => {
+      select.addEventListener("change", function () {
+        calcularCDRGlobal();
+
+        const selectedOption = this.options[this.selectedIndex];
+        const description = selectedOption.getAttribute('data-description');
+        const descDiv = document.getElementById("desc_" + this.name); // debe existir en el HTML
+
+        if (descDiv && description) {
+          descDiv.textContent = description;
+        } else if (descDiv) {
+          descDiv.textContent = "";
+        }
+      });
+    });
+  });
+</script>
+
+{% endblock %}

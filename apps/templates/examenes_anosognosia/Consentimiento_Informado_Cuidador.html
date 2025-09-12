@@ -1,0 +1,137 @@
+{% extends 'layouts/base.html' %}
+{% block content %}
+
+<div class="header bg-primary pb-6">
+  <div class="container-fluid">
+    <div class="header-body">
+      <div class="row align-items-center py-4">
+        <div class="col-lg-6 col-5">
+          <h6 class="h2 text-white d-inline-block mb-0">Consentimiento Informado - Cuidador</h6>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid mt--6">
+  <div class="row">
+    <div class="col">
+      <div class="card shadow">
+        <form method="post" action="{% url 'guardar_consentimiento_cuidador' %}">
+          {% csrf_token %}
+          <input type="hidden" name="visita_id" value="{{ visita_examen }}">
+          <input type="hidden" name="paciente_id" value="{{ paciente_id }}">
+          <input type="hidden" name="examen_id" value="{{ examen_id }}">
+
+          <div class="card-body">
+
+            <!-- Fecha -->
+            <div class="form-group">
+              <label for="fecha">Fecha</label>
+              <input type="date" class="form-control" name="fecha" id="fecha" value="{{ datos_examen.fecha|date:'Y-m-d' }}" required>
+            </div>
+
+            <!-- Hora inicio -->
+            <div class="form-group">
+              <label for="hora_inicio">Hora inicio</label>
+              <input type="time" class="form-control" name="hora_inicio" id="hora_inicio" value="{{ datos_examen.hora_inicio|default:'' }}" required>
+            </div>
+
+            <!-- Investigador -->
+            <div class="form-group">
+              <label for="investigador">Investigador</label>
+              <input type="text" class="form-control" name="investigador" id="investigador" value="{{ datos_examen.investigador|default:'' }}" required>
+            </div>
+
+            <!-- Acompañante -->
+            <div class="form-group">
+              <label for="nombre_acompanante">Nombre del acompañante</label>
+              <input type="text" class="form-control" name="nombre_acompanante" id="nombre_acompanante" value="{{ datos_examen.nombre_acompanante|default:'' }}" required>
+            </div>
+
+            <!-- Investigador -->
+            <div class="form-group">
+              <label for="nombre_participante">Nombre del participante</label>
+              <input type="text" class="form-control" name="nombre_participante" id="nombre_participante" value="{{ datos_examen.nombre_participante|default:'' }}" required>
+            </div>
+
+            <!-- Versión del consentimiento -->
+            <div class="form-group">
+              <label for="version_consentimiento">Versión de consentimiento informado</label>
+              <input type="text" class="form-control" name="version_consentimiento" id="version_consentimiento" rows="1"  value="{{ datos_examen.version_consentimiento|default:'' }}" required>
+            </div>
+
+            <!-- Descripción del proceso -->
+            <div class="form-group">
+              <label for="descripcion_proceso">Descripción del proceso de consentimiento</label>
+              <textarea class="form-control" name="descripcion_proceso" id="descripcion_proceso" rows="10" required>{{ datos_examen.descripcion_proceso|default:'' }}</textarea>
+            </div>
+
+            <!-- Preguntas planteadas -->
+            <div class="form-group">
+              <label for="preguntas">Preguntas planteadas</label>
+              <textarea class="form-control" name="preguntas" id="preguntas" rows="3">{{ datos_examen.preguntas|default:'' }}</textarea>
+            </div>
+
+            <!-- Acepta voluntariamente -->
+            <div class="form-group">
+              <label for="acepta">El participante acepta voluntariamente participar en el estudio</label>
+              <select class="form-control" name="acepta" id="acepta" required>
+                <option value="">Seleccione una opción</option>
+                <option value="si" {% if datos_examen.acepta == "si" %}selected{% endif %}>Sí</option>
+                <option value="no" {% if datos_examen.acepta == "no" %}selected{% endif %}>No</option>
+              </select>
+            </div>
+
+            <!-- Hora de firma -->
+            <div class="form-group">
+              <label for="hora_firma">Hora de firma</label>
+              <input type="time" class="form-control" name="hora_firma" id="hora_firma" value="{{ datos_examen.hora_firma|default:'' }}">
+            </div>
+
+            <!-- Fecha de firma -->
+            <div class="form-group">
+              <label for="fecha_firma">Fecha de firma</label>
+              <input type="date" class="form-control" name="fecha_firma" id="fecha_firma" value="{{ datos_examen.fecha_firma|date:'Y-m-d' }}">
+            </div>
+
+            <!-- Nombre Testigo 1 -->
+            <div class="form-group">
+              <label for="testigo1">Nombre Testigo 1</label>
+              <input type="text" class="form-control" name="testigo1" id="testigo1" value="{{ datos_examen.testigo1|default:'' }}">
+            </div>
+
+            <!-- Nombre Testigo 2 -->
+            <div class="form-group">
+              <label for="testigo2">Nombre Testigo 2</label>
+              <input type="text" class="form-control" name="testigo2" id="testigo2" value="{{ datos_examen.testigo2|default:'' }}">
+            </div>
+
+            <!-- Copia entregada -->
+            <div class="form-group">
+              <label for="copia_entregada">Se entrega copia firmada del documento</label>
+              <select class="form-control" name="copia_entregada" id="copia_entregada" required>
+                <option value="">Seleccione una opción</option>
+                <option value="si" {% if datos_examen.copia_entregada == "si" %}selected{% endif %}>Sí</option>
+                <option value="no" {% if datos_examen.copia_entregada == "no" %}selected{% endif %}>No</option>
+              </select>
+            </div>
+
+            <!-- Hora de finalización -->
+            <div class="form-group">
+              <label for="hora_finalizacion">Hora de finalización</label>
+              <input type="time" class="form-control" name="hora_finalizacion" id="hora_finalizacion" value="{{ datos_examen.hora_finalizacion|default:'' }}">
+            </div>
+
+            <div class="text-right mt-4">
+              <button type="submit" class="btn btn-primary">Guardar</button>
+            </div>
+
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

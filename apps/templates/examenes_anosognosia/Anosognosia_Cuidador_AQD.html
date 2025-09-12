@@ -51,543 +51,483 @@
 
                         <!-- Preguntas -->
                         <div class="form-group">
-                            <label>1.	¿Tiene el paciente dificultades para recordar la fecha?</label>
+                          <label>1.	¿Tiene el paciente dificultades para recordar la fecha?</label>
                             <select class="form-control adherencia-select" name="recordar_fecha" required>
-                              {% if datos_examen.recordar_fecha %}
-                                  <option value="{{ datos_examen.recordar_fecha }}" selected>
-                                      {{ datos_examen.recordar_fecha }}
-                                  </option>
-                              {% else %}
-                                <option value="" selected disabled>Seleccione una opción</option>
-                              {% endif %}
-                                <option value="1" data-text="1. Nunca">1. Nunca</option>
-                                <option value="2" data-text="2. A veces">2. A veces</option>
-                                <option value="3" data-text="3. Casi siempre">3. Casi siempre</option>
-                                <option value="4" data-text="4. Siempre">4. Siempre</option>
-                            </select>
-                            <input type="hidden" name="recordar_fecha_texto" value="{{ datos_examen.recordar_fecha_texto|default:'' }}">
+                            {% if datos_examen.recordar_fecha %}
+                            <option value="{{ datos_examen.recordar_fecha }}" selected>{{ datos_examen.recordar_fecha }}</option>
+                            {% else %}
+                            <option value="" disabled {% if not datos_examen.recordar_fecha %}selected{% endif %}>Seleccione una opción</option>
+                            {% endif %}
+                            <option value="1" data-text="1. Nunca">1. Nunca</option>
+                            <option value="2" data-text="2. A veces">2. A veces</option>
+                            <option value="3" data-text="3. Casi siempre">3. Casi siempre</option>
+                            <option value="4" data-text="4. Siempre">4. Siempre</option>
+                          </select>
+                          <input type="hidden" name="recordar_fecha_texto" value="{{ datos_examen.recordar_fecha_texto|default:'' }}">
                         </div>
 
                         <div class="form-group">
                           <label>2.	¿Tiene el paciente dificultades para orientarse en lugares nuevos?</label>
                           <select class="form-control adherencia-select" name="orientacion_lugares_nuevos" required>
-                              {% if datos_examen.orientacion_lugares_nuevos %}
-                                  <option value="{{ datos_examen.orientacion_lugares_nuevos }}" selected>
-                                      {{ datos_examen.orientacion_lugares_nuevos }}
-                                  </option>
-                              {% else %}
-                              <option value="" selected disabled>Seleccione una opción</option>
-                              {% endif %}
-                                <option value="1" data-text="1. Nunca">1. Nunca</option>
-                                <option value="2" data-text="2. A veces">2. A veces</option>
-                                <option value="3" data-text="3. Casi siempre">3. Casi siempre</option>
-                                <option value="4" data-text="4. Siempre">4. Siempre</option>
-                            </select>
-                            <input type="hidden" name="orientacion_lugares_nuevos_texto" value="{{ datos_examen.orientacion_lugares_nuevos_texto|default:'' }}">
+                            {% if datos_examen.orientacion_lugares_nuevos %}
+                            <option value="{{ datos_examen.orientacion_lugares_nuevos }}" selected>{{ datos_examen.orientacion_lugares_nuevos }}</option>
+                            {% else %}
+                            <option value="" disabled {% if not datos_examen.orientacion_lugares_nuevos %}selected{% endif %}>Seleccione una opción</option>
+                            {% endif %}
+                            <option value="1" data-text="1. Nunca">1. Nunca</option>
+                            <option value="2" data-text="2. A veces">2. A veces</option>
+                            <option value="3" data-text="3. Casi siempre">3. Casi siempre</option>
+                            <option value="4" data-text="4. Siempre">4. Siempre</option>
+                          </select>
+                          <input type="hidden" name="orientacion_lugares_nuevos_texto" value="{{ datos_examen.orientacion_lugares_nuevos_texto|default:'' }}">
                         </div>
 
                         <div class="form-group">
                           <label>3.	¿Tiene el paciente dificultades para recordar llamadas telefónicas?</label>
                           <select class="form-control adherencia-select" name="recordar_llamadas" required>
-                              {% if datos_examen.recordar_llamadas %}
-                                  <option value="{{ datos_examen.recordar_llamadas }}" selected>
-                                      {{ datos_examen.recordar_llamadas }}
-                                  </option>
-                              {% else %}
-                              <option value="" selected disabled>Seleccione una opción</option>
-                              {% endif %}
-                                <option value="1" data-text="1. Nunca">1. Nunca</option>
-                                <option value="2" data-text="2. A veces">2. A veces</option>
-                                <option value="3" data-text="3. Casi siempre">3. Casi siempre</option>
-                                <option value="4" data-text="4. Siempre">4. Siempre</option>
-                            </select>
-                            <input type="hidden" name="recordar_llamadas_texto" value="{{ datos_examen.recordar_llamadas_texto|default:'' }}">
+                            {% if datos_examen.recordar_llamadas %}
+                            <option value="{{ datos_examen.recordar_llamadas }}" selected>{{ datos_examen.recordar_llamadas }}</option>
+                            {% else %}
+                            <option value="" disabled {% if not datos_examen.recordar_llamadas %}selected{% endif %}>Seleccione una opción</option>
+                            {% endif %}
+                            <option value="1" data-text="1. Nunca">1. Nunca</option>
+                            <option value="2" data-text="2. A veces">2. A veces</option>
+                            <option value="3" data-text="3. Casi siempre">3. Casi siempre</option>
+                            <option value="4" data-text="4. Siempre">4. Siempre</option>
+                          </select>
+                          <input type="hidden" name="recordar_llamadas_texto" value="{{ datos_examen.recordar_llamadas_texto|default:'' }}">
                         </div>
 
                         <div class="form-group">
                           <label>4.	¿Tiene el paciente dificultades para entender conversaciones?</label>
                           <select class="form-control adherencia-select" name="entender_conversacion" required>
-                              {% if datos_examen.entender_conversacion %}
-                                  <option value="{{ datos_examen.entender_conversacion }}" selected>
-                                      {{ datos_examen.entender_conversacion }}
-                                  </option>
-                              {% else %}
-                              <option value="" selected disabled>Seleccione una opción</option>
-                              {% endif %}
-                                <option value="1" data-text="1. Nunca">1. Nunca</option>
-                                <option value="2" data-text="2. A veces">2. A veces</option>
-                                <option value="3" data-text="3. Casi siempre">3. Casi siempre</option>
-                                <option value="4" data-text="4. Siempre">4. Siempre</option>
-                            </select>
-                            <input type="hidden" name="entender_conversacion_texto" value="{{ datos_examen.entender_conversacion_texto|default:'' }}">
+                            {% if datos_examen.entender_conversacion %}
+                            <option value="{{ datos_examen.entender_conversacion }}" selected>{{ datos_examen.entender_conversacion }}</option>
+                            {% else %}
+                            <option value="" disabled {% if not datos_examen.entender_conversacion %}selected{% endif %}>Seleccione una opción</option>
+                            {% endif %}
+                            <option value="1" data-text="1. Nunca">1. Nunca</option>
+                            <option value="2" data-text="2. A veces">2. A veces</option>
+                            <option value="3" data-text="3. Casi siempre">3. Casi siempre</option>
+                            <option value="4" data-text="4. Siempre">4. Siempre</option>
+                          </select>
+                          <input type="hidden" name="entender_conversacion_texto" value="{{ datos_examen.entender_conversacion_texto|default:'' }}">
                         </div>
 
                         <div class="form-group">
                           <label>5.	¿Tiene el paciente dificultades para firmar?</label>
                           <select class="form-control adherencia-select" name="firmar" required>
                             {% if datos_examen.firmar %}
-                                  <option value="{{ datos_examen.firmar }}" selected>
-                                      {{ datos_examen.firmar }}
-                                  </option>
-                              {% else %}
-                              <option value="" selected disabled>Seleccione una opción</option>
-                              {% endif %}
-                                <option value="1" data-text="1. Nunca">1. Nunca</option>
-                                <option value="2" data-text="2. A veces">2. A veces</option>
-                                <option value="3" data-text="3. Casi siempre">3. Casi siempre</option>
-                                <option value="4" data-text="4. Siempre">4. Siempre</option>
-                            </select>
-                            <input type="hidden" name="firmar_texto" value="{{ datos_examen.firmar_texto|default:'' }}">
+                            <option value="{{ datos_examen.firmar }}" selected>{{ datos_examen.firmar }}</option>
+                            {% else %}
+                            <option value="" disabled {% if not datos_examen.firmar %}selected{% endif %}>Seleccione una opción</option>
+                            {% endif %}
+                            <option value="1" data-text="1. Nunca">1. Nunca</option>
+                            <option value="2" data-text="2. A veces">2. A veces</option>
+                            <option value="3" data-text="3. Casi siempre">3. Casi siempre</option>
+                            <option value="4" data-text="4. Siempre">4. Siempre</option>
+                          </select>
+                          <input type="hidden" name="firmar_texto" value="{{ datos_examen.firmar_texto|default:'' }}">
                         </div>
 
                         <div class="form-group">
                           <label>6.	¿Tiene el paciente dificultades para entender lo que lee?</label>
                           <select class="form-control adherencia-select" name="entender_lectura" required>
                             {% if datos_examen.entender_lectura %}
-                                  <option value="{{ datos_examen.entender_lectura }}" selected>
-                                      {{ datos_examen.entender_lectura }}
-                                  </option>
-                              {% else %}
-                              <option value="" selected disabled>Seleccione una opción</option>
-                              {% endif %}
-                                <option value="1" data-text="1. Nunca">1. Nunca</option>
-                                <option value="2" data-text="2. A veces">2. A veces</option>
-                                <option value="3" data-text="3. Casi siempre">3. Casi siempre</option>
-                                <option value="4" data-text="4. Siempre">4. Siempre</option>
-                            </select>
-                            <input type="hidden" name="entender_lectura_texto" value="{{ datos_examen.entender_lectura_texto|default:'' }}">
+                            <option value="{{ datos_examen.entender_lectura }}" selected>{{ datos_examen.entender_lectura }}</option>
+                            {% else %}
+                            <option value="" disabled {% if not datos_examen.entender_lectura %}selected{% endif %}>Seleccione una opción</option>
+                            {% endif %}
+                            <option value="1" data-text="1. Nunca">1. Nunca</option>
+                            <option value="2" data-text="2. A veces">2. A veces</option>
+                            <option value="3" data-text="3. Casi siempre">3. Casi siempre</option>
+                            <option value="4" data-text="4. Siempre">4. Siempre</option>
+                          </select>
+                          <input type="hidden" name="entender_lectura_texto" value="{{ datos_examen.entender_lectura_texto|default:'' }}">
                         </div>
 
                         <div class="form-group">
                           <label>7.	¿Tiene el paciente dificultades para mantener en orden sus cosas?</label>
                           <select class="form-control adherencia-select" name="mantener_orden" required>
                             {% if datos_examen.mantener_orden %}
-                                  <option value="{{ datos_examen.mantener_orden }}" selected>
-                                      {{ datos_examen.mantener_orden }}
-                                  </option>
-                              {% else %}
-                              <option value="" selected disabled>Seleccione una opción</option>
-                              {% endif %}
-                                <option value="1" data-text="1. Nunca">1. Nunca</option>
-                                <option value="2" data-text="2. A veces">2. A veces</option>
-                                <option value="3" data-text="3. Casi siempre">3. Casi siempre</option>
-                                <option value="4" data-text="4. Siempre">4. Siempre</option>
-                            </select>
-                            <input type="hidden" name="mantener_orden_texto" value="{{ datos_examen.mantener_orden_texto|default:'' }}">
+                            <option value="{{ datos_examen.mantener_orden }}" selected>{{ datos_examen.mantener_orden }}</option>
+                            {% else %}
+                            <option value="" disabled {% if not datos_examen.mantener_orden %}selected{% endif %}>Seleccione una opción</option>
+                            {% endif %}
+                            <option value="1" data-text="1. Nunca">1. Nunca</option>
+                            <option value="2" data-text="2. A veces">2. A veces</option>
+                            <option value="3" data-text="3. Casi siempre">3. Casi siempre</option>
+                            <option value="4" data-text="4. Siempre">4. Siempre</option>
+                          </select>
+                          <input type="hidden" name="mantener_orden_texto" value="{{ datos_examen.mantener_orden_texto|default:'' }}">
                         </div>
 
                         <div class="form-group">
                           <label>8.	¿Tiene el paciente dificultades para recordar dónde deja los objetos en su casa?</label>
                           <select class="form-control adherencia-select" name="recordar_lugar_objetos" required>
                             {% if datos_examen.recordar_lugar_objetos %}
-                                  <option value="{{ datos_examen.recordar_lugar_objetos }}" selected>
-                                      {{ datos_examen.recordar_lugar_objetos }}
-                                  </option>
-                              {% else %}
-                              <option value="" selected disabled>Seleccione una opción</option>
-                              {% endif %}
-                                <option value="1" data-text="1. Nunca">1. Nunca</option>
-                                <option value="2" data-text="2. A veces">2. A veces</option>
-                                <option value="3" data-text="3. Casi siempre">3. Casi siempre</option>
-                                <option value="4" data-text="4. Siempre">4. Siempre</option>
-                            </select>
-                            <input type="hidden" name="recordar_lugar_objetos_texto" value="{{ datos_examen.recordar_lugar_objetos_texto|default:'' }}">
+                            <option value="{{ datos_examen.recordar_lugar_objetos }}" selected>{{ datos_examen.recordar_lugar_objetos }}</option>
+                            {% else %}
+                            <option value="" disabled {% if not datos_examen.recordar_lugar_objetos %}selected{% endif %}>Seleccione una opción</option>
+                            {% endif %}
+                            <option value="1" data-text="1. Nunca">1. Nunca</option>
+                            <option value="2" data-text="2. A veces">2. A veces</option>
+                            <option value="3" data-text="3. Casi siempre">3. Casi siempre</option>
+                            <option value="4" data-text="4. Siempre">4. Siempre</option>
+                          </select>
+                          <input type="hidden" name="recordar_lugar_objetos_texto" value="{{ datos_examen.recordar_lugar_objetos_texto|default:'' }}">
                         </div>
 
                         <div class="form-group">
                           <label>9.	¿Tiene el paciente dificultades para escribir?</label>
                           <select class="form-control adherencia-select" name="escribir" required>
                             {% if datos_examen.escribir %}
-                                  <option value="{{ datos_examen.escribir }}" selected>
-                                      {{ datos_examen.escribir }}
-                                  </option>
-                              {% else %}
-                              <option value="" selected disabled>Seleccione una opción</option>
-                              {% endif %}
-                                <option value="1" data-text="1. Nunca">1. Nunca</option>
-                                <option value="2" data-text="2. A veces">2. A veces</option>
-                                <option value="3" data-text="3. Casi siempre">3. Casi siempre</option>
-                                <option value="4" data-text="4. Siempre">4. Siempre</option>
-                            </select>
-                            <input type="hidden" name="escribir_texto" value="{{ datos_examen.escribir_texto|default:'' }}">
+                            <option value="{{ datos_examen.escribir }}" selected>{{ datos_examen.escribir }}</option>
+                            {% else %}
+                            <option value="" disabled {% if not datos_examen.escribir %}selected{% endif %}>Seleccione una opción</option>
+                            {% endif %}
+                            <option value="1" data-text="1. Nunca">1. Nunca</option>
+                            <option value="2" data-text="2. A veces">2. A veces</option>
+                            <option value="3" data-text="3. Casi siempre">3. Casi siempre</option>
+                            <option value="4" data-text="4. Siempre">4. Siempre</option>
+                          </select>
+                          <input type="hidden" name="escribir_texto" value="{{ datos_examen.escribir_texto|default:'' }}">
                         </div>
 
                         <div class="form-group">
                           <label>10.	¿Tiene el paciente dificultades para manejar dinero?</label>
                           <select class="form-control adherencia-select" name="manejar_dinero" required>
                             {% if datos_examen.manejar_dinero %}
-                                  <option value="{{ datos_examen.manejar_dinero }}" selected>
-                                      {{ datos_examen.manejar_dinero }}
-                                  </option>
-                              {% else %}
-                              <option value="" selected disabled>Seleccione una opción</option>
-                              {% endif %}
-                                <option value="1" data-text="1. Nunca">1. Nunca</option>
-                                <option value="2" data-text="2. A veces">2. A veces</option>
-                                <option value="3" data-text="3. Casi siempre">3. Casi siempre</option>
-                                <option value="4" data-text="4. Siempre">4. Siempre</option>
-                            </select>
-                            <input type="hidden" name="manejar_dinero_texto" value="{{ datos_examen.manejar_dinero_texto|default:'' }}">
+                            <option value="{{ datos_examen.manejar_dinero }}" selected>{{ datos_examen.manejar_dinero }}</option>
+                            {% else %}
+                            <option value="" disabled {% if not datos_examen.manejar_dinero %}selected{% endif %}>Seleccione una opción</option>
+                            {% endif %}
+                            <option value="1" data-text="1. Nunca">1. Nunca</option>
+                            <option value="2" data-text="2. A veces">2. A veces</option>
+                            <option value="3" data-text="3. Casi siempre">3. Casi siempre</option>
+                            <option value="4" data-text="4. Siempre">4. Siempre</option>
+                          </select>
+                          <input type="hidden" name="manejar_dinero_texto" value="{{ datos_examen.manejar_dinero_texto|default:'' }}">
                         </div>
 
                         <div class="form-group">
                           <label>11.	¿Tiene el paciente dificultades para orientarse en la zona donde vive?</label>
                           <select class="form-control adherencia-select" name="orientacion_zona_donde_vive" required>
                             {% if datos_examen.orientacion_zona_donde_vive %}
-                                  <option value="{{ datos_examen.orientacion_zona_donde_vive }}" selected>
-                                      {{ datos_examen.orientacion_zona_donde_vive }}
-                                  </option>
-                              {% else %}
-                              <option value="" selected disabled>Seleccione una opción</option>
-                              {% endif %}
-                                <option value="1" data-text="1. Nunca">1. Nunca</option>
-                                <option value="2" data-text="2. A veces">2. A veces</option>
-                                <option value="3" data-text="3. Casi siempre">3. Casi siempre</option>
-                                <option value="4" data-text="4. Siempre">4. Siempre</option>
-                            </select>
-                            <input type="hidden" name="orientacion_zona_donde_vive_texto" value="{{ datos_examen.orientacion_zona_donde_vive_texto|default:'' }}">
+                            <option value="{{ datos_examen.orientacion_zona_donde_vive }}" selected>{{ datos_examen.orientacion_zona_donde_vive }}</option>
+                            {% else %}
+                            <option value="" disabled {% if not datos_examen.orientacion_zona_donde_vive %}selected{% endif %}>Seleccione una opción</option>
+                            {% endif %}
+                            <option value="1" data-text="1. Nunca">1. Nunca</option>
+                            <option value="2" data-text="2. A veces">2. A veces</option>
+                            <option value="3" data-text="3. Casi siempre">3. Casi siempre</option>
+                            <option value="4" data-text="4. Siempre">4. Siempre</option>
+                          </select>
+                          <input type="hidden" name="orientacion_zona_donde_vive_texto" value="{{ datos_examen.orientacion_zona_donde_vive_texto|default:'' }}">
                         </div>
 
                         <div class="form-group">
                           <label>12.	¿Tiene el paciente dificultades para recordar citas (ejemplo: cuándo ir al médico)?</label>
                           <select class="form-control adherencia-select" name="recordar_citas" required>
                             {% if datos_examen.recordar_citas %}
-                                  <option value="{{ datos_examen.recordar_citas }}" selected>
-                                      {{ datos_examen.recordar_citas }}
-                                  </option>
-                              {% else %}
-                             <option value="" selected disabled>Seleccione una opción</option>
-                             {% endif %}
-                                <option value="1" data-text="1. Nunca">1. Nunca</option>
-                                <option value="2" data-text="2. A veces">2. A veces</option>
-                                <option value="3" data-text="3. Casi siempre">3. Casi siempre</option>
-                                <option value="4" data-text="4. Siempre">4. Siempre</option>
-                            </select>
-                            <input type="hidden" name="recordar_citas_texto" value="{{ datos_examen.recordar_citas_texto|default:'' }}">
+                            <option value="{{ datos_examen.recordar_citas }}" selected>{{ datos_examen.recordar_citas }}</option>
+                            {% else %}
+                            <option value="" disabled {% if not datos_examen.recordar_citas %}selected{% endif %}>Seleccione una opción</option>
+                            {% endif %}
+                            <option value="1" data-text="1. Nunca">1. Nunca</option>
+                            <option value="2" data-text="2. A veces">2. A veces</option>
+                            <option value="3" data-text="3. Casi siempre">3. Casi siempre</option>
+                            <option value="4" data-text="4. Siempre">4. Siempre</option>
+                          </select>
+                          <input type="hidden" name="recordar_citas_texto" value="{{ datos_examen.recordar_citas_texto|default:'' }}">
                         </div>
 
                         <div class="form-group">
                           <label>13.	¿Tiene el paciente dificultades para practicar sus pasatiempos?</label>
                           <select class="form-control adherencia-select" name="pasatiempos" required>
                             {% if datos_examen.pasatiempos %}
-                                  <option value="{{ datos_examen.pasatiempos }}" selected>
-                                      {{ datos_examen.pasatiempos }}
-                                  </option>
-                              {% else %}
-                              <option value="" selected disabled>Seleccione una opción</option>
-                              {% endif %}
-                                <option value="1" data-text="1. Nunca">1. Nunca</option>
-                                <option value="2" data-text="2. A veces">2. A veces</option>
-                                <option value="3" data-text="3. Casi siempre">3. Casi siempre</option>
-                                <option value="4" data-text="4. Siempre">4. Siempre</option>
-                            </select>
-                            <input type="hidden" name="pasatiempos_texto" value="{{ datos_examen.pasatiempos_texto|default:'' }}">
+                            <option value="{{ datos_examen.pasatiempos }}" selected>{{ datos_examen.pasatiempos }}</option>
+                            {% else %}
+                            <option value="" disabled {% if not datos_examen.pasatiempos %}selected{% endif %}>Seleccione una opción</option>
+                            {% endif %}
+                            <option value="1" data-text="1. Nunca">1. Nunca</option>
+                            <option value="2" data-text="2. A veces">2. A veces</option>
+                            <option value="3" data-text="3. Casi siempre">3. Casi siempre</option>
+                            <option value="4" data-text="4. Siempre">4. Siempre</option>
+                          </select>
+                          <input type="hidden" name="pasatiempos_texto" value="{{ datos_examen.pasatiempos_texto|default:'' }}">
                         </div>
 
                         <div class="form-group">
                           <label>14.	¿Tiene el paciente dificultades para comunicarse con la gente?</label>
                           <select class="form-control adherencia-select" name="comunicarse_con_gente" required>
                             {% if datos_examen.comunicarse_con_gente %}
-                                  <option value="{{ datos_examen.comunicarse_con_gente }}" selected>
-                                      {{ datos_examen.comunicarse_con_gente }}
-                                  </option>
-                              {% else %}
-                              <option value="" selected disabled>Seleccione una opción</option>
-                              {% endif %}
-                                <option value="1" data-text="1. Nunca">1. Nunca</option>
-                                <option value="2" data-text="2. A veces">2. A veces</option>
-                                <option value="3" data-text="3. Casi siempre">3. Casi siempre</option>
-                                <option value="4" data-text="4. Siempre">4. Siempre</option>
-                            </select>
-                            <input type="hidden" name="comunicarse_con_gente_texto" value="{{ datos_examen.comunicarse_con_gente_texto|default:'' }}">
+                            <option value="{{ datos_examen.comunicarse_con_gente }}" selected>{{ datos_examen.comunicarse_con_gente }}</option>
+                            {% else %}
+                            <option value="" disabled {% if not datos_examen.comunicarse_con_gente %}selected{% endif %}>Seleccione una opción</option>
+                            {% endif %}
+                            <option value="1" data-text="1. Nunca">1. Nunca</option>
+                            <option value="2" data-text="2. A veces">2. A veces</option>
+                            <option value="3" data-text="3. Casi siempre">3. Casi siempre</option>
+                            <option value="4" data-text="4. Siempre">4. Siempre</option>
+                          </select>
+                          <input type="hidden" name="comunicarse_con_gente_texto" value="{{ datos_examen.comunicarse_con_gente_texto|default:'' }}">
                         </div>
 
                         <div class="form-group">
                           <label>15.	¿Tiene el paciente dificultades para hacer cálculos mentales? (por ejemplo: sumar, restar, multiplicar, dividir).</label>
                           <select class="form-control adherencia-select" name="calculos_mentales" required>
                             {% if datos_examen.calculos_mentales %}
-                                  <option value="{{ datos_examen.calculos_mentales }}" selected>
-                                      {{ datos_examen.calculos_mentales }}
-                                  </option>
-                              {% else %}
-                              <option value="" selected disabled>Seleccione una opción</option>
-                              {% endif %}
-                                <option value="1" data-text="1. Nunca">1. Nunca</option>
-                                <option value="2" data-text="2. A veces">2. A veces</option>
-                                <option value="3" data-text="3. Casi siempre">3. Casi siempre</option>
-                                <option value="4" data-text="4. Siempre">4. Siempre</option>
-                            </select>
-                            <input type="hidden" name="calculos_mentales_texto" value="{{ datos_examen.calculos_mentales_texto|default:'' }}">
+                            <option value="{{ datos_examen.calculos_mentales }}" selected>{{ datos_examen.calculos_mentales }}</option>
+                            {% else %}
+                            <option value="" disabled {% if not datos_examen.calculos_mentales %}selected{% endif %}>Seleccione una opción</option>
+                            {% endif %}
+                            <option value="1" data-text="1. Nunca">1. Nunca</option>
+                            <option value="2" data-text="2. A veces">2. A veces</option>
+                            <option value="3" data-text="3. Casi siempre">3. Casi siempre</option>
+                            <option value="4" data-text="4. Siempre">4. Siempre</option>
+                          </select>
+                          <input type="hidden" name="calculos_mentales_texto" value="{{ datos_examen.calculos_mentales_texto|default:'' }}">
                         </div>
 
                         <div class="form-group">
                           <label>16.	¿Tiene el paciente dificultades para recordar las cosas que va a comprar?</label>
                           <select class="form-control adherencia-select" name="recordar_compras" required>
                             {% if datos_examen.recordar_compras %}
-                                  <option value="{{ datos_examen.recordar_compras }}" selected>
-                                      {{ datos_examen.recordar_compras }}
-                                  </option>
-                              {% else %}
-                              <option value="" selected disabled>Seleccione una opción</option>
-                              {% endif %}
-                                <option value="1" data-text="1. Nunca">1. Nunca</option>
-                                <option value="2" data-text="2. A veces">2. A veces</option>
-                                <option value="3" data-text="3. Casi siempre">3. Casi siempre</option>
-                                <option value="4" data-text="4. Siempre">4. Siempre</option>
-                            </select>
-                            <input type="hidden" name="recordar_compras_texto" value="{{ datos_examen.recordar_compras_texto|default:'' }}">
+                            <option value="{{ datos_examen.recordar_compras }}" selected>{{ datos_examen.recordar_compras }}</option>
+                            {% else %}
+                            <option value="" disabled {% if not datos_examen.recordar_compras %}selected{% endif %}>Seleccione una opción</option>
+                            {% endif %}
+                            <option value="1" data-text="1. Nunca">1. Nunca</option>
+                            <option value="2" data-text="2. A veces">2. A veces</option>
+                            <option value="3" data-text="3. Casi siempre">3. Casi siempre</option>
+                            <option value="4" data-text="4. Siempre">4. Siempre</option>
+                          </select>
+                          <input type="hidden" name="recordar_compras_texto" value="{{ datos_examen.recordar_compras_texto|default:'' }}">
                         </div>
 
                         <div class="form-group">
                           <label>17.	¿Tiene el paciente dificultades para contener la orina?</label>
                           <select class="form-control adherencia-select" name="contener_orina" required>
                             {% if datos_examen.contener_orina %}
-                                  <option value="{{ datos_examen.contener_orina }}" selected>
-                                      {{ datos_examen.contener_orina }}
-                                  </option>
-                              {% else %}
-                              <option value="" selected disabled>Seleccione una opción</option>
-                              {% endif %}
-                                <option value="1" data-text="1. Nunca">1. Nunca</option>
-                                <option value="2" data-text="2. A veces">2. A veces</option>
-                                <option value="3" data-text="3. Casi siempre">3. Casi siempre</option>
-                                <option value="4" data-text="4. Siempre">4. Siempre</option>
-                            </select>
-                            <input type="hidden" name="contener_orina_texto" value="{{ datos_examen.contener_orina_texto|default:'' }}">
+                            <option value="{{ datos_examen.contener_orina }}" selected>{{ datos_examen.contener_orina }}</option>
+                            {% else %}
+                            <option value="" disabled {% if not datos_examen.contener_orina %}selected{% endif %}>Seleccione una opción</option>
+                            {% endif %}
+                            <option value="1" data-text="1. Nunca">1. Nunca</option>
+                            <option value="2" data-text="2. A veces">2. A veces</option>
+                            <option value="3" data-text="3. Casi siempre">3. Casi siempre</option>
+                            <option value="4" data-text="4. Siempre">4. Siempre</option>
+                          </select>
+                          <input type="hidden" name="contener_orina_texto" value="{{ datos_examen.contener_orina_texto|default:'' }}">
                         </div>
 
                         <div class="form-group">
                           <label>18.	¿Tiene el paciente dificultades para entender una película?</label>
                           <select class="form-control adherencia-select" name="entender_pelicula" required>
                             {% if datos_examen.entender_pelicula %}
-                                  <option value="{{ datos_examen.entender_pelicula }}" selected>
-                                      {{ datos_examen.entender_pelicula }}
-                                  </option>
-                              {% else %}
-                              <option value="" selected disabled>Seleccione una opción</option>
-                              {% endif %}
-                                <option value="1" data-text="1. Nunca">1. Nunca</option>
-                                <option value="2" data-text="2. A veces">2. A veces</option>
-                                <option value="3" data-text="3. Casi siempre">3. Casi siempre</option>
-                                <option value="4" data-text="4. Siempre">4. Siempre</option>
-                            </select>
-                            <input type="hidden" name="entender_pelicula_texto" value="{{ datos_examen.entender_pelicula_texto|default:'' }}">
+                            <option value="{{ datos_examen.entender_pelicula }}" selected>{{ datos_examen.entender_pelicula }}</option>
+                            {% else %}
+                            <option value="" disabled {% if not datos_examen.entender_pelicula %}selected{% endif %}>Seleccione una opción</option>
+                            {% endif %}
+                            <option value="1" data-text="1. Nunca">1. Nunca</option>
+                            <option value="2" data-text="2. A veces">2. A veces</option>
+                            <option value="3" data-text="3. Casi siempre">3. Casi siempre</option>
+                            <option value="4" data-text="4. Siempre">4. Siempre</option>
+                          </select>
+                          <input type="hidden" name="entender_pelicula_texto" value="{{ datos_examen.entender_pelicula_texto|default:'' }}">
                         </div>
 
                         <div class="form-group">
                           <label>19.	¿Tiene el paciente dificultades para orientarse dentro de su casa?</label>
                           <select class="form-control adherencia-select" name="orientacion_en_casa" required>
                             {% if datos_examen.orientacion_en_casa %}
-                                  <option value="{{ datos_examen.orientacion_en_casa }}" selected>
-                                      {{ datos_examen.orientacion_en_casa }}
-                                  </option>
-                              {% else %}
-                              <option value="" selected disabled>Seleccione una opción</option>
-                              {% endif %}
-                                <option value="1" data-text="1. Nunca">1. Nunca</option>
-                                <option value="2" data-text="2. A veces">2. A veces</option>
-                                <option value="3" data-text="3. Casi siempre">3. Casi siempre</option>
-                                <option value="4" data-text="4. Siempre">4. Siempre</option>
-                            </select>
-                            <input type="hidden" name="orientacion_en_casa_texto" value="{{ datos_examen.orientacion_en_casa_texto|default:'' }}">
+                            <option value="{{ datos_examen.orientacion_en_casa }}" selected>{{ datos_examen.orientacion_en_casa }}</option>
+                            {% else %}
+                            <option value="" disabled {% if not datos_examen.orientacion_en_casa %}selected{% endif %}>Seleccione una opción</option>
+                            {% endif %}
+                            <option value="1" data-text="1. Nunca">1. Nunca</option>
+                            <option value="2" data-text="2. A veces">2. A veces</option>
+                            <option value="3" data-text="3. Casi siempre">3. Casi siempre</option>
+                            <option value="4" data-text="4. Siempre">4. Siempre</option>
+                          </select>
+                          <input type="hidden" name="orientacion_en_casa_texto" value="{{ datos_examen.orientacion_en_casa_texto|default:'' }}">
                         </div>
 
                         <div class="form-group">
                           <label>20.	¿Tiene el paciente dificultades para realizar tareas del hogar como cocinar, limpiar, etc.?</label>
                           <select class="form-control adherencia-select" name="hacer_tareas_hogar" required>
                             {% if datos_examen.hacer_tareas_hogar %}
-                                  <option value="{{ datos_examen.hacer_tareas_hogar }}" selected>
-                                      {{ datos_examen.hacer_tareas_hogar }}
-                                  </option>
-                              {% else %}
-                              <option value="" selected disabled>Seleccione una opción</option>
-                              {% endif %}
-                                <option value="1" data-text="1. Nunca">1. Nunca</option>
-                                <option value="2" data-text="2. A veces">2. A veces</option>
-                                <option value="3" data-text="3. Casi siempre">3. Casi siempre</option>
-                                <option value="4" data-text="4. Siempre">4. Siempre</option>
-                            </select>
-                            <input type="hidden" name="hacer_tareas_hogar_texto" value="{{ datos_examen.hacer_tareas_hogar_texto|default:'' }}">
+                            <option value="{{ datos_examen.hacer_tareas_hogar }}" selected>{{ datos_examen.hacer_tareas_hogar }}</option>
+                            {% else %}
+                            <option value="" disabled {% if not datos_examen.hacer_tareas_hogar %}selected{% endif %}>Seleccione una opción</option>
+                            {% endif %}
+                            <option value="1" data-text="1. Nunca">1. Nunca</option>
+                            <option value="2" data-text="2. A veces">2. A veces</option>
+                            <option value="3" data-text="3. Casi siempre">3. Casi siempre</option>
+                            <option value="4" data-text="4. Siempre">4. Siempre</option>
+                          </select>
+                          <input type="hidden" name="hacer_tareas_hogar_texto" value="{{ datos_examen.hacer_tareas_hogar_texto|default:'' }}">
                         </div>
 
                         <div class="form-group">
                           <label>21.	¿Tiene el paciente dificultades para comer solo?</label>
                           <select class="form-control adherencia-select" name="comer_solo" required>
                             {% if datos_examen.comer_solo %}
-                                  <option value="{{ datos_examen.comer_solo }}" selected>
-                                      {{ datos_examen.comer_solo }}
-                                  </option>
-                              {% else %}
-                              <option value="" selected disabled>Seleccione una opción</option>
-                              {% endif %}
-                                <option value="1" data-text="1. Nunca">1. Nunca</option>
-                                <option value="2" data-text="2. A veces">2. A veces</option>
-                                <option value="3" data-text="3. Casi siempre">3. Casi siempre</option>
-                                <option value="4" data-text="4. Siempre">4. Siempre</option>
-                            </select>
-                            <input type="hidden" name="comer_solo_texto" value="{{ datos_examen.comer_solo_texto|default:'' }}">
+                            <option value="{{ datos_examen.comer_solo }}" selected>{{ datos_examen.comer_solo }}</option>
+                            {% else %}
+                            <option value="" disabled {% if not datos_examen.comer_solo %}selected{% endif %}>Seleccione una opción</option>
+                            {% endif %}
+                            <option value="1" data-text="1. Nunca">1. Nunca</option>
+                            <option value="2" data-text="2. A veces">2. A veces</option>
+                            <option value="3" data-text="3. Casi siempre">3. Casi siempre</option>
+                            <option value="4" data-text="4. Siempre">4. Siempre</option>
+                          </select>
+                          <input type="hidden" name="comer_solo_texto" value="{{ datos_examen.comer_solo_texto|default:'' }}">
                         </div>
 
                         <div class="form-group">
                           <label>22.	¿Tiene el paciente dificultades para realizar trámites? (por ejemplo: ir al banco, a la EPS, etc.).</label>
                           <select class="form-control adherencia-select" name="realizar_tramites" required>
                             {% if datos_examen.realizar_tramites %}
-                                  <option value="{{ datos_examen.realizar_tramites }}" selected>
-                                      {{ datos_examen.realizar_tramites }}
-                                  </option>
-                              {% else %}
-                              <option value="" selected disabled>Seleccione una opción</option>
-                              {% endif %}
-                                <option value="1" data-text="1. Nunca">1. Nunca</option>
-                                <option value="2" data-text="2. A veces">2. A veces</option>
-                                <option value="3" data-text="3. Casi siempre">3. Casi siempre</option>
-                                <option value="4" data-text="4. Siempre">4. Siempre</option>
-                            </select>
-                            <input type="hidden" name="realizar_tramites_texto" value="{{ datos_examen.realizar_tramites_texto|default:'' }}">
+                            <option value="{{ datos_examen.realizar_tramites }}" selected>{{ datos_examen.realizar_tramites }}</option>
+                            {% else %}
+                            <option value="" disabled {% if not datos_examen.realizar_tramites %}selected{% endif %}>Seleccione una opción</option>
+                            {% endif %}
+                            <option value="1" data-text="1. Nunca">1. Nunca</option>
+                            <option value="2" data-text="2. A veces">2. A veces</option>
+                            <option value="3" data-text="3. Casi siempre">3. Casi siempre</option>
+                            <option value="4" data-text="4. Siempre">4. Siempre</option>
+                          </select>
+                          <input type="hidden" name="realizar_tramites_texto" value="{{ datos_examen.realizar_tramites_texto|default:'' }}">
                         </div>
 
                         <div class="form-group">
                           <label>23.	¿Ha notado al paciente menos flexible para tomar decisiones y sin poder adaptarse a cosas nuevas?</label>
                           <select class="form-control adherencia-select" name="decisiones_y_adaptacion" required>
                             {% if datos_examen.decisiones_y_adaptacion %}
-                                  <option value="{{ datos_examen.decisiones_y_adaptacion }}" selected>
-                                      {{ datos_examen.decisiones_y_adaptacion }}
-                                  </option>
-                              {% else %}
-                              <option value="" selected disabled>Seleccione una opción</option>
-                              {% endif %}
-                                <option value="1" data-text="1. Nunca">1. Nunca</option>
-                                <option value="2" data-text="2. A veces">2. A veces</option>
-                                <option value="3" data-text="3. Casi siempre">3. Casi siempre</option>
-                                <option value="4" data-text="4. Siempre">4. Siempre</option>
-                            </select>
-                            <input type="hidden" name="decisiones_y_adaptacion_texto" value="{{ datos_examen.decisiones_y_adaptacion_texto|default:'' }}">
+                            <option value="{{ datos_examen.decisiones_y_adaptacion }}" selected>{{ datos_examen.decisiones_y_adaptacion }}</option>
+                            {% else %}
+                            <option value="" disabled {% if not datos_examen.decisiones_y_adaptacion %}selected{% endif %}>Seleccione una opción</option>
+                            {% endif %}
+                            <option value="1" data-text="1. Nunca">1. Nunca</option>
+                            <option value="2" data-text="2. A veces">2. A veces</option>
+                            <option value="3" data-text="3. Casi siempre">3. Casi siempre</option>
+                            <option value="4" data-text="4. Siempre">4. Siempre</option>
+                          </select>
+                          <input type="hidden" name="decisiones_y_adaptacion_texto" value="{{ datos_examen.decisiones_y_adaptacion_texto|default:'' }}">
                         </div>
 
                         <div class="form-group">
                           <label>24.	¿Ha notado al paciente más egoísta y que no presta atención a las necesidades de los demás?</label>
                           <select class="form-control adherencia-select" name="egoismo" required>
                             {% if datos_examen.egoismo %}
-                                  <option value="{{ datos_examen.egoismo }}" selected>
-                                      {{ datos_examen.egoismo }}
-                                  </option>
-                              {% else %}
-                              <option value="" selected disabled>Seleccione una opción</option>
-                              {% endif %}
-                                <option value="1" data-text="1. Nunca">1. Nunca</option>
-                                <option value="2" data-text="2. A veces">2. A veces</option>
-                                <option value="3" data-text="3. Casi siempre">3. Casi siempre</option>
-                                <option value="4" data-text="4. Siempre">4. Siempre</option>
-                            </select>
-                            <input type="hidden" name="egoismo_texto" value="{{ datos_examen.egoismo_texto|default:'' }}">
+                            <option value="{{ datos_examen.egoismo }}" selected>{{ datos_examen.egoismo }}</option>
+                            {% else %}
+                            <option value="" disabled {% if not datos_examen.egoismo %}selected{% endif %}>Seleccione una opción</option>
+                            {% endif %}
+                            <option value="1" data-text="1. Nunca">1. Nunca</option>
+                            <option value="2" data-text="2. A veces">2. A veces</option>
+                            <option value="3" data-text="3. Casi siempre">3. Casi siempre</option>
+                            <option value="4" data-text="4. Siempre">4. Siempre</option>
+                          </select>
+                          <input type="hidden" name="egoismo_texto" value="{{ datos_examen.egoismo_texto|default:'' }}">
                         </div>
 
                         <div class="form-group">
                           <label>25.	¿Ha notado que el paciente se enoja por pequeñeces y pierde la paciencia con más facilidad?</label>
                           <select class="form-control adherencia-select" name="enojo_menos_paciencia" required>
                             {% if datos_examen.enojo_menos_paciencia %}
-                                  <option value="{{ datos_examen.enojo_menos_paciencia }}" selected>
-                                      {{ datos_examen.enojo_menos_paciencia }}
-                                  </option>
-                              {% else %}
-                              <option value="" selected disabled>Seleccione una opción</option>
-                              {% endif %}
-                                <option value="1" data-text="1. Nunca">1. Nunca</option>
-                                <option value="2" data-text="2. A veces">2. A veces</option>
-                                <option value="3" data-text="3. Casi siempre">3. Casi siempre</option>
-                                <option value="4" data-text="4. Siempre">4. Siempre</option>
-                            </select>
-                            <input type="hidden" name="enojo_menos_paciencia_texto" value="{{ datos_examen.enojo_menos_paciencia_texto|default:'' }}">
+                            <option value="{{ datos_examen.enojo_menos_paciencia }}" selected>{{ datos_examen.enojo_menos_paciencia }}</option>
+                            {% else %}
+                            <option value="" disabled {% if not datos_examen.enojo_menos_paciencia %}selected{% endif %}>Seleccione una opción</option>
+                            {% endif %}
+                            <option value="1" data-text="1. Nunca">1. Nunca</option>
+                            <option value="2" data-text="2. A veces">2. A veces</option>
+                            <option value="3" data-text="3. Casi siempre">3. Casi siempre</option>
+                            <option value="4" data-text="4. Siempre">4. Siempre</option>
+                          </select>
+                          <input type="hidden" name="enojo_menos_paciencia_texto" value="{{ datos_examen.enojo_menos_paciencia_texto|default:'' }}">
                         </div>
 
                         <div class="form-group">
                           <label>26.	¿Ha notado que el paciente llora con excesiva facilidad?</label>
                           <select class="form-control adherencia-select" name="llorar_con_facilidad" required>
                             {% if datos_examen.llorar_con_facilidad %}
-                                  <option value="{{ datos_examen.llorar_con_facilidad }}" selected>
-                                      {{ datos_examen.llorar_con_facilidad }}
-                                  </option>
-                              {% else %}
-                              <option value="" selected disabled>Seleccione una opción</option>
-                              {% endif %}
-                                <option value="1" data-text="1. Nunca">1. Nunca</option>
-                                <option value="2" data-text="2. A veces">2. A veces</option>
-                                <option value="3" data-text="3. Casi siempre">3. Casi siempre</option>
-                                <option value="4" data-text="4. Siempre">4. Siempre</option>
-                            </select>
-                            <input type="hidden" name="llorar_con_facilidad_texto" value="{{ datos_examen.llorar_con_facilidad_texto|default:'' }}">
+                            <option value="{{ datos_examen.llorar_con_facilidad }}" selected>{{ datos_examen.llorar_con_facilidad }}</option>
+                            {% else %}
+                            <option value="" disabled {% if not datos_examen.llorar_con_facilidad %}selected{% endif %}>Seleccione una opción</option>
+                            {% endif %}
+                            <option value="1" data-text="1. Nunca">1. Nunca</option>
+                            <option value="2" data-text="2. A veces">2. A veces</option>
+                            <option value="3" data-text="3. Casi siempre">3. Casi siempre</option>
+                            <option value="4" data-text="4. Siempre">4. Siempre</option>
+                          </select>
+                          <input type="hidden" name="llorar_con_facilidad_texto" value="{{ datos_examen.llorar_con_facilidad_texto|default:'' }}">
                         </div>
 
                         <div class="form-group">
                           <label>27.	¿Ha notado que el paciente se ríe en situaciones inapropiadas?</label>
                           <select class="form-control adherencia-select" name="reir_situaciones_inapropiadas" required>
                             {% if datos_examen.reir_situaciones_inapropiadas %}
-                                  <option value="{{ datos_examen.reir_situaciones_inapropiadas }}" selected>
-                                      {{ datos_examen.reir_situaciones_inapropiadas }}
-                                  </option>
-                              {% else %}
-                              <option value="" selected disabled>Seleccione una opción</option>
-                              {% endif %}
-                                <option value="1" data-text="1. Nunca">1. Nunca</option>
-                                <option value="2" data-text="2. A veces">2. A veces</option>
-                                <option value="3" data-text="3. Casi siempre">3. Casi siempre</option>
-                                <option value="4" data-text="4. Siempre">4. Siempre</option>
-                            </select>
-                            <input type="hidden" name="reir_situaciones_inapropiadas_texto" value="{{ datos_examen.reir_situaciones_inapropiadas_texto|default:'' }}">
+                            <option value="{{ datos_examen.reir_situaciones_inapropiadas }}" selected>{{ datos_examen.reir_situaciones_inapropiadas }}</option>
+                            {% else %}
+                            <option value="" disabled {% if not datos_examen.reir_situaciones_inapropiadas %}selected{% endif %}>Seleccione una opción</option>
+                            {% endif %}
+                            <option value="1" data-text="1. Nunca">1. Nunca</option>
+                            <option value="2" data-text="2. A veces">2. A veces</option>
+                            <option value="3" data-text="3. Casi siempre">3. Casi siempre</option>
+                            <option value="4" data-text="4. Siempre">4. Siempre</option>
+                          </select>
+                          <input type="hidden" name="reir_situaciones_inapropiadas_texto" value="{{ datos_examen.reir_situaciones_inapropiadas_texto|default:'' }}">
                         </div>
 
                         <div class="form-group">
                           <label>28.	¿Ha notado al paciente más interesado en temas sexuales, y habla permanentemente de esos temas?</label>
                           <select class="form-control adherencia-select" name="temas_sexuales" required>
-                              {% if datos_examen.temas_sexuales %}
-                                  <option value="{{ datos_examen.temas_sexuales }}" selected>
-                                      {{ datos_examen.temas_sexuales }}
-                                  </option>
-                              {% else %}
-                              <option value="" selected disabled>Seleccione una opción</option>
-                              {% endif %}
-                                <option value="1" data-text="1. Nunca">1. Nunca</option>
-                                <option value="2" data-text="2. A veces">2. A veces</option>
-                                <option value="3" data-text="3. Casi siempre">3. Casi siempre</option>
-                                <option value="4" data-text="4. Siempre">4. Siempre</option>
-                            </select>
-                            <input type="hidden" name="temas_sexuales_texto" value="{{ datos_examen.temas_sexuales_texto|default:'' }}">
+                            {% if datos_examen.temas_sexuales %}
+                            <option value="{{ datos_examen.temas_sexuales }}" selected>{{ datos_examen.temas_sexuales }}</option>
+                            {% else %}
+                            <option value="" disabled {% if not datos_examen.temas_sexuales %}selected{% endif %}>Seleccione una opción</option>
+                            {% endif %}
+                            <option value="1" data-text="1. Nunca">1. Nunca</option>
+                            <option value="2" data-text="2. A veces">2. A veces</option>
+                            <option value="3" data-text="3. Casi siempre">3. Casi siempre</option>
+                            <option value="4" data-text="4. Siempre">4. Siempre</option>
+                          </select>
+                          <input type="hidden" name="temas_sexuales_texto" value="{{ datos_examen.temas_sexuales_texto|default:'' }}">
                         </div>
 
                         <div class="form-group">
                           <label>29.	¿Ha notado al paciente con falta de interés en cosas que antes le interesaban?</label>
                           <select class="form-control adherencia-select" name="falta_de_interes" required>
                             {% if datos_examen.falta_de_interes %}
-                                  <option value="{{ datos_examen.falta_de_interes }}" selected>
-                                      {{ datos_examen.falta_de_interes }}
-                                  </option>
-                              {% else %}
-                              <option value="" selected disabled>Seleccione una opción</option>
-                              {% endif %}
-                                <option value="1" data-text="1. Nunca">1. Nunca</option>
-                                <option value="2" data-text="2. A veces">2. A veces</option>
-                                <option value="3" data-text="3. Casi siempre">3. Casi siempre</option>
-                                <option value="4" data-text="4. Siempre">4. Siempre</option>
-                            </select>
-                            <input type="hidden" name="falta_de_interes_texto" value="{{ datos_examen.falta_de_interes_texto|default:'' }}">
+                            <option value="{{ datos_examen.falta_de_interes }}" selected>{{ datos_examen.falta_de_interes }}</option>
+                            {% else %}
+                            <option value="" disabled {% if not datos_examen.falta_de_interes %}selected{% endif %}>Seleccione una opción</option>
+                            {% endif %}
+                            <option value="1" data-text="1. Nunca">1. Nunca</option>
+                            <option value="2" data-text="2. A veces">2. A veces</option>
+                            <option value="3" data-text="3. Casi siempre">3. Casi siempre</option>
+                            <option value="4" data-text="4. Siempre">4. Siempre</option>
+                          </select>
+                          <input type="hidden" name="falta_de_interes_texto" value="{{ datos_examen.falta_de_interes_texto|default:'' }}">
                         </div>
 
                         <div class="form-group">
                           <label>30.	¿Ha notado al paciente más deprimido?</label>
                           <select class="form-control adherencia-select" name="deprimido" required>
                             {% if datos_examen.deprimido %}
-                                  <option value="{{ datos_examen.deprimido }}" selected>
-                                      {{ datos_examen.deprimido }}
-                                  </option>
-                              {% else %}
-                              <option value="" selected disabled>Seleccione una opción</option>
-                              {% endif %}
-                                <option value="1" data-text="1. Nunca">1. Nunca</option>
-                                <option value="2" data-text="2. A veces">2. A veces</option>
-                                <option value="3" data-text="3. Casi siempre">3. Casi siempre</option>
-                                <option value="4" data-text="4. Siempre">4. Siempre</option>
-                            </select>
-                            <input type="hidden" name="deprimido_texto" value="{{ datos_examen.deprimido_texto|default:'' }}">
+                            <option value="{{ datos_examen.deprimido }}" selected>{{ datos_examen.deprimido }}</option>
+                            {% else %}
+                            <option value="" disabled {% if not datos_examen.deprimido %}selected{% endif %}>Seleccione una opción</option>
+                            {% endif %}
+                            <option value="1" data-text="1. Nunca">1. Nunca</option>
+                            <option value="2" data-text="2. A veces">2. A veces</option>
+                            <option value="3" data-text="3. Casi siempre">3. Casi siempre</option>
+                            <option value="4" data-text="4. Siempre">4. Siempre</option>
+                          </select>
+                          <input type="hidden" name="deprimido_texto" value="{{ datos_examen.deprimido_texto|default:'' }}">
                         </div>
 
                         <div class="text-right mt-4">

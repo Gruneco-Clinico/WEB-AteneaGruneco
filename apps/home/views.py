@@ -50,6 +50,12 @@ from .models import (
     CDRParticipanteResult,
     RedLatSpanishResult,
     AdherenciaTerapeuticaResult,
+    BettyFerrelResult,
+    PuntajeCDRResult,
+    ConsentimientoInformadoParticipanteResult,
+    ConsentimientoInformadoCuidadorResult,
+    AnamnesisCuidadorResult,
+    AnamnesisParticipanteResult,
 )
 from .forms import ProyectoForm, RegistroDemograficoForm
 import json
@@ -662,35 +668,17 @@ def realizar_examen(request, visita_id, examen_id, paciente_id):
     # Diccionario de configuración de exámenes
     exam_config = {
         3: {"template": "examenes_general/General_ExamenFísico.html", "model": None},
-        4: {
-            "template": "examenes_general/General_RevisiónSistemas.html",
-            "model": None,
-        },
+        4: {"template": "examenes_general/General_RevisiónSistemas.html","model": None,},
         5: {"template": "examenes_general/General_Antecedentes.html", "model": None},
         7: {"template": "examenes_general/General_Análisis.html", "model": None},
         8: {"template": "examenes_general/General_Medicamentos.html", "model": None},
-        9: {
-            "template": "examenes_general/General_ExamenNeurológico.html",
-            "model": None,
-        },
-        10: {
-            "template": "examenes_sueno/Sueno_anamnesis.html",
-            "model": SuenoAnamnesisResult,
-        },
+        9: {"template": "examenes_general/General_ExamenNeurológico.html","model": None,},
+        10: {"template": "examenes_sueno/Sueno_anamnesis.html","model": SuenoAnamnesisResult,},
         11: {"template": "examenes_sueno/Sueño_Cuestionarios.html", "model": None},
-        12: {
-            "template": "examenes_sueno/Sueño_ExamenFisico.html",
-            "model": SuenoFisicoResult,
-        },  # CORREGIDO: Era el examen físico, no Pittsburgh
-        13: {
-            "template": "examenes_sueno/sueno_Pitsburg.html",
-            "model": PittsburghResult,
-        },  # CORREGIDO: Este es Pittsburgh
+        12: {"template": "examenes_sueno/Sueño_ExamenFisico.html","model": SuenoFisicoResult,},  # CORREGIDO: Era el examen físico, no Pittsburgh
+        13: {"template": "examenes_sueno/sueno_Pitsburg.html","model": PittsburghResult,},  # CORREGIDO: Este es Pittsburgh
         14: {"template": "examenes_sueno/sueno_Epworth.html", "model": EpworthResult},
-        15: {
-            "template": "examenes_sueno/sueno_Stop_Bang.html",
-            "model": StopBangResult,
-        },
+        15: {"template": "examenes_sueno/sueno_Stop_Bang.html","model": StopBangResult,},
         16: {"template": "examenes_sueno/sueno_MEW.html", "model": MEWResult},
         17: {"template": "examenes_sueno/sueno_Berlín.html", "model": BerlinResult},
         18: {"template": "examenes_sueno/sueno_atenas.html", "model": AtenasResult},
@@ -700,7 +688,7 @@ def realizar_examen(request, visita_id, examen_id, paciente_id):
         23: {"template": "examenes_anosognosia/Anosognosia_Participante_Yesavage.html", "model": ParticipanteYesavageResult},
         24: {"template": "examenes_anosognosia/Anosognosia_Cuidador_NPI.html", "model": CuidadorNPIResult},
         25: {"template": "examenes_anosognosia/Anosognosia_Cuidador_LawtonBrody.html", "model": LawtonBrodyResult},
-        #26: {"template": "examenes_anosognosia/Anosognosia_Cuidador_BettyFerrel.html", "model": ISIResult},
+        26: {"template": "examenes_anosognosia/Anosognosia_Cuidador_CalidadVida_BettyFerrel.html", "model": BettyFerrelResult},
         27: {"template": "examenes_anosognosia/Anosognosia_Participante_MoCA.html", "model": MoCAResult},
         28: {"template": "examenes_anosognosia/Anosognosia_Participante_AdherenciaTerapeutica.html", "model": AdherenciaTerapeuticaResult},
         29: {"template": "examenes_anosognosia/Anosognosia_Cuidador_EscalaZarit.html", "model": ZaritResult},
@@ -709,6 +697,12 @@ def realizar_examen(request, visita_id, examen_id, paciente_id):
         32: {"template": "examenes_anosognosia/Anosognosia_Cuidador_RedLatSpanish.html", "model": RedLatSpanishResult},
         33: {"template": "examenes_anosognosia/Anosognosia_Cuidador_CDR.html", "model": CDRCuidadorResult},
         34: {"template": "examenes_anosognosia/Anosognosia_Participante_CDR.html", "model": CDRParticipanteResult},
+        35: {"template": "examenes_anosognosia/CDR_Evaluacion_Clinica.html", "model": PuntajeCDRResult},
+        36: {"template": "examenes_anosognosia/Consentimiento_Informado_Participante.html", "model": ConsentimientoInformadoParticipanteResult},
+        37: {"template": "examenes_anosognosia/Consentimiento_Informado_Cuidador.html", "model": ConsentimientoInformadoCuidadorResult},
+        38: {"template": "examenes_anosognosia/Anamnesis_Cuidador_ANG.html", "model": AnamnesisCuidadorResult},
+        39: {"template": "examenes_anosognosia/Anamnesis_Participante_ANG.html", "model": AnamnesisParticipanteResult},
+
     }
 
     config = exam_config.get(int(examen_id))  # CAMBIO: Asegurar que sea entero
@@ -788,6 +782,26 @@ def ver_resultado_examen(request, visita_examen_id):
         "AtenasResult": "examenes_resultados/resultado_atenas.html",
         "PittsburghResult": "examenes_resultados/resultado_pittsburgh.html",
         "EpworthResult": "examenes_resultados/resultado_epworth.html",
+        "LawtonBrodyResult":"examenes_resultados/resultado_lawtonbrody.html",
+        "CuidadorNPIResult":"examenes_resultados/resultado_cuidadornpi.html",
+        "EuroQol5D5LResult":"examenes_resultados/resultado_euroqol.html",
+        "EuroQolEVASaludResult":"examenes_resultados/resultado_evasaludeuroqol.html",
+        "MoCAResult":"examenes_resultados/resultado_moca.html",
+        "ParticipanteYesavageResult":"examenes_resultados/resultado_yesavage.html",
+        "ZaritResult":"examenes_resultados/resultado_zarit.html",
+        "AQDCuidadorResult":"examenes_resultados/resultado_aqdcuidador.html",
+        "AQDParticipanteResult":"examenes_resultados/resultado_aqdparticipante.html",
+        "CDRCuidadorResult":"examenes_resultados/resultado_cdrcuidador.html",
+        "CDRParticipanteResult":"examenes_resultados/resultado_cdrparticipante.html",
+        "RedLatSpanishResult":"examenes_resultados/resultado_redlatspanish.html",
+        "AdherenciaTerapeuticaResult":"examenes_resultados/resultado_adherenciaterapeutica.html",
+        "BettyFerrelResult":"examenes_resultados/resultado_bettyferrel.html",
+        "PuntajeCDRResult":"examenes_resultados/resultado_puntajeCDR.html",
+        "ConsentimientoInformadoParticipanteResult":"examenes_resultados/resultado_consentimientoinformadoparticipante.html",
+        "ConsentimientoInformadoCuidadorResult":"examenes_resultados/resultado_consentimientoinformadocuidador.html",
+        "AnamnesisCuidadorResult":"examenes_resultados/resultado_anamnesiscuidador.html",
+        "AnamnesisParticipanteResult":"examenes_resultados/resultado_anamnesisparticipante.html",
+
         # Agregar más según tus exámenes
     }
 
@@ -2339,28 +2353,17 @@ def guardar_examen_Cuidador_Zarit(request):
 
             # Obtener respuestas de las preguntas
 
-            pide_ayuda= request.POST.get("pide_ayuda_texto")
-            falta_tiempo_propio= request.POST.get("falta_tiempo_propio_texto")
-            agobio= request.POST.get("agobio_texto")
-            verguenza_conducta= request.POST.get("verguenza_conducta_texto")
-            sentir_enfado= request.POST.get("sentir_enfado_texto")
-            afectar_relacion_negativamente= request.POST.get("afectar_relacion_negativamente_texto")
-            miedo_futuro= request.POST.get("miedo_futuro_texto")
-            dependencia= request.POST.get("dependencia_texto")
-            sentir_tension= request.POST.get("sentir_tension_texto")
-            deterioro_salud= request.POST.get("deterioro_salud_texto")
-            menos_intimidad= request.POST.get("menos_intimidad_texto")
-            resentir_vida_social= request.POST.get("resentir_vida_social_texto")
-            desatender_amistades= request.POST.get("desatender_amistades_texto")
-            unica_dependencia= request.POST.get("unica_dependencia_texto")
-            dinero_insuficiente= request.POST.get("dinero_insuficiente_texto")
-            incapaz_mas_tiempo= request.POST.get("incapaz_mas_tiempo_texto")
-            perder_control_vida= request.POST.get("perder_control_vida_texto")
-            cuidado_a_otros= request.POST.get("cuidado_a_otros_texto")
-            indecision_que_hacer= request.POST.get("indecision_que_hacer_texto")
-            hacer_mas= request.POST.get("hacer_mas_texto")
-            cuidar_mejor= request.POST.get("cuidar_mejor_texto")
-            grado_carga= request.POST.get("grado_carga_texto")
+            campos = [
+                "pide_ayuda", "falta_tiempo_propio", "agobio", "verguenza_conducta",
+                "sentir_enfado", "afectar_relacion_negativamente", "miedo_futuro", "dependencia",
+                "sentir_tension", "deterioro_salud", "menos_intimidad", "resentir_vida_social",
+                "desatender_amistades", "unica_dependencia", "dinero_insuficiente",
+                "incapaz_mas_tiempo", "perder_control_vida", "cuidado_a_otros", "indecision_que_hacer",
+                "hacer_mas", "cuidar_mejor", "grado_carga"
+            ]
+            #respuestas = {campo+"_value": request.POST.get(campo) for campo in campos}
+
+            respuestas_texto = {campo: request.POST.get(campo+"_texto") for campo in campos}
 
             puntaje_total = request.POST.get("puntaje_total")
             interpretacion = request.POST.get("interpretacion")
@@ -2368,28 +2371,8 @@ def guardar_examen_Cuidador_Zarit(request):
             zarit, created = ZaritResult.objects.update_or_create(
                 visita_examen=visita_examen,
                 defaults={
-                    "pide_ayuda":pide_ayuda,
-                    "falta_tiempo_propio":falta_tiempo_propio,
-                    "agobio":agobio,
-                    "verguenza_conducta":verguenza_conducta,
-                    "sentir_enfado":sentir_enfado,
-                    "afectar_relacion_negativamente":afectar_relacion_negativamente,
-                    "miedo_futuro":miedo_futuro,
-                    "dependencia":dependencia,
-                    "sentir_tension":sentir_tension,
-                    "deterioro_salud":deterioro_salud,
-                    "menos_intimidad":menos_intimidad,
-                    "resentir_vida_social":resentir_vida_social,
-                    "desatender_amistades":desatender_amistades,
-                    "unica_dependencia":unica_dependencia,
-                    "dinero_insuficiente":dinero_insuficiente,
-                    "incapaz_mas_tiempo":incapaz_mas_tiempo,
-                    "perder_control_vida":perder_control_vida,
-                    "cuidado_a_otros":cuidado_a_otros,
-                    "indecision_que_hacer":indecision_que_hacer,
-                    "hacer_mas":hacer_mas,
-                    "cuidar_mejor":cuidar_mejor,
-                    "grado_carga":grado_carga,
+                    #**respuestas,
+                    **respuestas_texto,
                     "puntaje_total": puntaje_total,
                     "interpretacion": interpretacion,
                 },
@@ -3131,6 +3114,436 @@ def guardar_examen_Cuidador_RedLatSpanish(request):
 
             messages.error(
                 request, f"❌ Error al guardar la Evaluación RedLat Spanish: {str(e)}"
+            )
+            return redirect("detalle_paciente", paciente_id=paciente_id or 1)
+
+    else:
+        messages.error(request, "❌ Método no permitido.")
+        return redirect("index")
+    
+
+@login_required
+def guardar_examen_BettyFerrel(request):
+    if request.method == "POST":
+        try:
+            visita_id = request.POST.get("visita_id")
+            paciente_id = request.POST.get("paciente_id")
+            examen_id = request.POST.get("examen_id")
+
+            # Obtener visita_examen
+            visita_examen = get_object_or_404(
+                VisitaExamen, visita_id=visita_id, examen_id=examen_id
+            )
+
+            # Marcar como en progreso si está pendiente
+            if visita_examen.estado == "pendiente":
+                visita_examen.estado = "en_progreso"
+                visita_examen.fecha_inicio = timezone.now()
+                visita_examen.save()
+
+            campos = {k: request.POST.get(k+"_texto", "") for k in ["agotamiento","cambios_alimenticios","dolor","cambios_sueno","salud_fisica_general","facilidad_enfrentar",
+                "felicidad","control_vida","satisfaccion_vida","concentracion","utilidad_personal","angustia_diagnostico",
+                "ansiedad","depresion","miedo_otra_enfermedad","miedo_retroceso", "miedo_avance","estado_psicologico",
+                "angustia_familiar","nivel_ayuda","relaciones_personales","vida_sexual","trabajo","actividades_hogar",
+                "aislamiento","carga_economica","estado_social","actividades_religiosas","actividades_espirituales_personales",
+                "incertidumbre_futuro","cambios_positivos","proposito_vida","esperanza","estado_espiritual" ]}
+
+            # Guardar o actualizar
+            bettyferrel, created = BettyFerrelResult.objects.update_or_create(
+                visita_examen=visita_examen, defaults=campos
+            )
+
+            print(f"DEBUG: Betty Ferrel {'creado' if created else 'actualizado'} con ID {bettyferrel.id}")
+
+            # Marcar examen como completado
+            visita_examen.estado = "completado"
+            visita_examen.fecha_completado = timezone.now()
+            visita_examen.save()
+
+            messages.success(
+                request,
+                "✅ Examen Calidad de Vida Betty Ferrel guardado exitosamente."
+            )
+            return redirect("detalle_paciente", paciente_id=paciente_id)
+
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            try:
+                if "visita_examen" in locals():
+                    visita_examen.estado = "pendiente"
+                    visita_examen.save()
+            except:
+                pass
+            messages.error(
+                request,
+                f"❌ Error al guardar el cuestionario Betty Ferrel: {str(e)}"
+            )
+            return redirect("detalle_paciente", paciente_id=paciente_id or 1)
+
+    else:
+        messages.error(request, "❌ Método no permitido.")
+        return redirect("index")
+    
+
+@login_required
+def guardar_evaluacion_clinica_CDR(request):
+    if request.method == "POST":
+        try:
+            visita_id = request.POST.get("visita_id")
+            paciente_id = request.POST.get("paciente_id")
+            examen_id = request.POST.get("examen_id")
+
+            # Obtener visita_examen
+            visita_examen = get_object_or_404(
+                VisitaExamen, visita_id=visita_id, examen_id=examen_id
+            )
+
+            # Marcar como en progreso si está pendiente
+            if visita_examen.estado == "pendiente":
+                visita_examen.estado = "en_progreso"
+                visita_examen.fecha_inicio = timezone.now()
+                visita_examen.save()
+
+            # Campos del formulario
+            campos = {
+                "cdr_memoria": request.POST.get("cdr_memoria", ""),
+                "cdr_orientacion": request.POST.get("cdr_orientacion", ""),
+                "cdr_juicio": request.POST.get("cdr_juicio", ""),
+                "cdr_comunitarias": request.POST.get("cdr_comunitarias", ""),
+                "cdr_pasatiempos": request.POST.get("cdr_pasatiempos", ""),
+                "cdr_cuidado": request.POST.get("cdr_cuidado", ""),
+                "cdr_global": request.POST.get("cdr_global", ""),
+            }
+
+            # Guardar o actualizar
+            cdr_result, created = PuntajeCDRResult.objects.update_or_create(
+                visita_examen=visita_examen, defaults=campos
+            )
+
+            print(f"DEBUG: CDR {'creado' if created else 'actualizado'} con ID {cdr_result.id}")
+
+            # Marcar examen como completado
+            visita_examen.estado = "completado"
+            visita_examen.fecha_completado = timezone.now()
+            visita_examen.save()
+
+            messages.success(
+                request,
+                "✅ Evaluación clínica CDR guardada exitosamente."
+            )
+            return redirect("detalle_paciente", paciente_id=paciente_id)
+
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            try:
+                if "visita_examen" in locals():
+                    visita_examen.estado = "pendiente"
+                    visita_examen.save()
+            except:
+                pass
+            messages.error(
+                request,
+                f"❌ Error al guardar la evaluación clínica CDR: {str(e)}"
+            )
+            return redirect("detalle_paciente", paciente_id=paciente_id or 1)
+
+    else:
+        messages.error(request, "❌ Método no permitido.")
+        return redirect("index")
+    
+@login_required
+def guardar_consentimiento_participante(request):
+    if request.method == "POST":
+        try:
+            visita_id = request.POST.get("visita_id")
+            paciente_id = request.POST.get("paciente_id")
+            examen_id = request.POST.get("examen_id")
+
+            # Obtener visita_examen
+            visita_examen = get_object_or_404(
+                VisitaExamen, visita_id=visita_id, examen_id=examen_id
+            )
+
+            # Marcar como en progreso si está pendiente
+            if visita_examen.estado == "pendiente":
+                visita_examen.estado = "en_progreso"
+                visita_examen.fecha_inicio = timezone.now()
+                visita_examen.save()
+
+            # Campos del formulario
+            campos = {
+                "fecha": request.POST.get("fecha"),
+                "hora_inicio": request.POST.get("hora_inicio"),
+                "investigador": request.POST.get("investigador"),
+                "version_consentimiento": request.POST.get("version_consentimiento"),
+                "descripcion_proceso": request.POST.get("descripcion_proceso", ""),
+                "preguntas": request.POST.get("preguntas", ""),
+                "acepta": request.POST.get("acepta"),
+                "hora_firma": request.POST.get("hora_firma"),
+                "fecha_firma": request.POST.get("fecha_firma"),
+                "testigo1": request.POST.get("testigo1", ""),
+                "testigo2": request.POST.get("testigo2", ""),
+                "copia_entregada": request.POST.get("copia_entregada"),
+                "hora_finalizacion": request.POST.get("hora_finalizacion"),
+            }
+
+            # Guardar o actualizar
+            consentimientoparticipante, created = ConsentimientoInformadoParticipanteResult.objects.update_or_create(
+                visita_examen=visita_examen, defaults=campos
+            )
+
+            print(f"DEBUG: Consentimiento Informado {'creado' if created else 'actualizado'} con ID {consentimientoparticipante.id}")
+
+            # Marcar examen como completado
+            visita_examen.estado = "completado"
+            visita_examen.fecha_completado = timezone.now()
+            visita_examen.save()
+
+            messages.success(
+                request,
+                "✅ Consentimiento Informado Participante guardado exitosamente."
+            )
+            return redirect("detalle_paciente", paciente_id=paciente_id)
+
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            try:
+                if "visita_examen" in locals():
+                    visita_examen.estado = "pendiente"
+                    visita_examen.save()
+            except:
+                pass
+            messages.error(
+                request,
+                f"❌ Error al guardar el Consentimiento Informado Participante: {str(e)}"
+            )
+            return redirect("detalle_paciente", paciente_id=paciente_id or 1)
+
+    else:
+        messages.error(request, "❌ Método no permitido.")
+        return redirect("index")
+    
+@login_required
+def guardar_consentimiento_cuidador(request):
+    if request.method == "POST":
+        try:
+            visita_id = request.POST.get("visita_id")
+            paciente_id = request.POST.get("paciente_id")
+            examen_id = request.POST.get("examen_id")
+
+            # Obtener visita_examen
+            visita_examen = get_object_or_404(
+                VisitaExamen, visita_id=visita_id, examen_id=examen_id
+            )
+
+            # Marcar como en progreso si está pendiente
+            if visita_examen.estado == "pendiente":
+                visita_examen.estado = "en_progreso"
+                visita_examen.fecha_inicio = timezone.now()
+                visita_examen.save()
+
+            # Campos del formulario
+            campos = {
+                "fecha": request.POST.get("fecha"),
+                "hora_inicio": request.POST.get("hora_inicio"),
+                "investigador": request.POST.get("investigador"),
+                "nombre_acompanante": request.POST.get("nombre_acompanante"),
+                "nombre_participante": request.POST.get("nombre_participante"),
+                "version_consentimiento": request.POST.get("version_consentimiento"),
+                "descripcion_proceso": request.POST.get("descripcion_proceso", ""),
+                "preguntas": request.POST.get("preguntas", ""),
+                "acepta": request.POST.get("acepta"),
+                "hora_firma": request.POST.get("hora_firma"),
+                "fecha_firma": request.POST.get("fecha_firma"),
+                "testigo1": request.POST.get("testigo1", ""),
+                "testigo2": request.POST.get("testigo2", ""),
+                "copia_entregada": request.POST.get("copia_entregada"),
+                "hora_finalizacion": request.POST.get("hora_finalizacion"),
+            }
+
+            # Guardar o actualizar
+            consentimientocuidador, created = ConsentimientoInformadoCuidadorResult.objects.update_or_create(
+                visita_examen=visita_examen, defaults=campos
+            )
+
+            print(f"DEBUG: Consentimiento Informado {'creado' if created else 'actualizado'} con ID {consentimientocuidador.id}")
+
+            # Marcar examen como completado
+            visita_examen.estado = "completado"
+            visita_examen.fecha_completado = timezone.now()
+            visita_examen.save()
+
+            messages.success(
+                request,
+                "✅ Consentimiento Informado Cuidador guardado exitosamente."
+            )
+            return redirect("detalle_paciente", paciente_id=paciente_id)
+
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            try:
+                if "visita_examen" in locals():
+                    visita_examen.estado = "pendiente"
+                    visita_examen.save()
+            except:
+                pass
+            messages.error(
+                request,
+                f"❌ Error al guardar el Consentimiento Informado Cuidador: {str(e)}"
+            )
+            return redirect("detalle_paciente", paciente_id=paciente_id or 1)
+
+    else:
+        messages.error(request, "❌ Método no permitido.")
+        return redirect("index")
+    
+@login_required
+def guardar_anamnesis_cuidador(request):
+    if request.method == "POST":
+        try:
+            visita_id = request.POST.get("visita_id")
+            paciente_id = request.POST.get("paciente_id")
+            examen_id = request.POST.get("examen_id")
+
+            # Obtener visita_examen
+            visita_examen = get_object_or_404(
+                VisitaExamen, visita_id=visita_id, examen_id=examen_id
+            )
+
+            # Marcar como en progreso si está pendiente
+            if visita_examen.estado == "pendiente":
+                visita_examen.estado = "en_progreso"
+                visita_examen.fecha_inicio = timezone.now()
+                visita_examen.save()
+
+            # Campos del formulario
+            campos = {
+                "nombres_apellidos": request.POST.get("nombres_apellidos"),
+                "documento": request.POST.get("documento"),
+                "lugar_nacimiento": request.POST.get("lugar_nacimiento"),
+                "lugar_procedencia": request.POST.get("lugar_procedencia"),
+                "edad": request.POST.get("edad"),
+                "sexo": request.POST.get("sexo"),
+                "estado_civil": request.POST.get("estado_civil"),
+                "relacion": request.POST.get("relacion"),
+                "tiempo_acompanando": request.POST.get("tiempo_acompanando"),
+                "ocupacion": request.POST.get("ocupacion", ""),
+                "escolaridad": request.POST.get("escolaridad", ""),
+                "ingresos_hogar": request.POST.get("ingresos_hogar"),
+                "estrato": request.POST.get("estrato"),
+                "religion": request.POST.get("religion", ""),
+                "lateralidad": request.POST.get("lateralidad", ""),
+                "convivencia": request.POST.get("convivencia", ""),
+                "eps": request.POST.get("eps", ""),
+            }
+
+            # Guardar o actualizar
+            anamnesis_cuidador, created = AnamnesisCuidadorResult.objects.update_or_create(
+                visita_examen=visita_examen, defaults=campos
+            )
+
+            print(f"DEBUG: Anamnesis Cuidador {'creada' if created else 'actualizada'} con ID {anamnesis_cuidador.id}")
+
+            # Marcar examen como completado
+            visita_examen.estado = "completado"
+            visita_examen.fecha_completado = timezone.now()
+            visita_examen.save()
+
+            messages.success(
+                request,
+                "✅ Anamnesis Cuidador guardada exitosamente."
+            )
+            return redirect("detalle_paciente", paciente_id=paciente_id)
+
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            try:
+                if "visita_examen" in locals():
+                    visita_examen.estado = "pendiente"
+                    visita_examen.save()
+            except:
+                pass
+            messages.error(
+                request,
+                f"❌ Error al guardar Anamnesis Cuidador: {str(e)}"
+            )
+            return redirect("detalle_paciente", paciente_id=paciente_id or 1)
+
+    else:
+        messages.error(request, "❌ Método no permitido.")
+        return redirect("index")
+
+
+@login_required
+def guardar_anamnesis_participante(request):
+    if request.method == "POST":
+        try:
+            visita_id = request.POST.get("visita_id")
+            paciente_id = request.POST.get("paciente_id")
+            examen_id = request.POST.get("examen_id")
+
+            # Obtener visita_examen
+            visita_examen = get_object_or_404(
+                VisitaExamen, visita_id=visita_id, examen_id=examen_id
+            )
+
+            # Marcar como en progreso si está pendiente
+            if visita_examen.estado == "pendiente":
+                visita_examen.estado = "en_progreso"
+                visita_examen.fecha_inicio = timezone.now()
+                visita_examen.save()
+
+            # Campos del formulario
+            campos = {
+                "nombres_apellidos": request.POST.get("nombres_apellidos"),
+                "documento": request.POST.get("documento"),
+                "lugar_nacimiento": request.POST.get("lugar_nacimiento"),
+                "edad": request.POST.get("edad"),
+                "sexo": request.POST.get("sexo"),
+                "tiempo_acompanando": request.POST.get("tiempo_acompanando"),
+                "ingresos_hogar": request.POST.get("ingresos_hogar"),
+                "estrato": request.POST.get("estrato"),
+                "religion": request.POST.get("religion", ""),
+                "lateralidad": request.POST.get("lateralidad", ""),
+                "convivencia": request.POST.get("convivencia", ""),
+                "eps": request.POST.get("eps", ""),
+            }
+
+            # Guardar o actualizar
+            anamnesis_participante, created = AnamnesisParticipanteResult.objects.update_or_create(
+                visita_examen=visita_examen, defaults=campos
+            )
+
+            print(f"DEBUG: Anamnesis Participante {'creada' if created else 'actualizada'} con ID {anamnesis_participante.id}")
+
+            # Marcar examen como completado
+            visita_examen.estado = "completado"
+            visita_examen.fecha_completado = timezone.now()
+            visita_examen.save()
+
+            messages.success(
+                request,
+                "✅ Anamnesis Participante guardada exitosamente."
+            )
+            return redirect("detalle_paciente", paciente_id=paciente_id)
+
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            try:
+                if "visita_examen" in locals():
+                    visita_examen.estado = "pendiente"
+                    visita_examen.save()
+            except:
+                pass
+            messages.error(
+                request,
+                f"❌ Error al guardar la Anamnesis Participante: {str(e)}"
             )
             return redirect("detalle_paciente", paciente_id=paciente_id or 1)
 

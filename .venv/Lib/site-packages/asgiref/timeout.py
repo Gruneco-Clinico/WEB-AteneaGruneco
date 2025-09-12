@@ -7,10 +7,9 @@
 
 
 import asyncio
-import warnings
+import sys
 from types import TracebackType
-from typing import Any  # noqa
-from typing import Optional, Type
+from typing import Any, Optional, Type
 
 
 class timeout:
@@ -36,11 +35,7 @@ class timeout:
     ) -> None:
         self._timeout = timeout
         if loop is None:
-            loop = asyncio.get_running_loop()
-        else:
-            warnings.warn(
-                """The loop argument to timeout() is deprecated.""", DeprecationWarning
-            )
+            loop = asyncio.get_event_loop()
         self._loop = loop
         self._task = None  # type: Optional[asyncio.Task[Any]]
         self._cancelled = False
@@ -87,7 +82,7 @@ class timeout:
         if self._timeout is None:
             return self
 
-        self._task = asyncio.current_task(self._loop)
+        self._task = current_task(self._loop)
         if self._task is None:
             raise RuntimeError(
                 "Timeout context manager should be used " "inside a task"
@@ -116,3 +111,17 @@ class timeout:
         if self._task is not None:
             self._task.cancel()
             self._cancelled = True
+
+
+def current_task(loop: asyncio.AbstractEventLoop) -> "Optional[asyncio.Task[Any]]":
+    if sys.version_info >= (3, 7):
+        task = asyncio.current_task(loop=loop)
+    else:
+        task = asyncio.Task.current_task(loop=loop)
+    if task is None:
+        # this should be removed, tokio must use register_task and family API
+        fn = getattr(loop, "current_task", None)
+        if fn is not None:
+            task = fn()
+
+    return task

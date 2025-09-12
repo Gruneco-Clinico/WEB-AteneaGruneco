@@ -53,11 +53,9 @@
                     <label>A) Comer</label>
                     <select class="form-control autocuidado" name="comer" required>
                       {% if datos_examen.comer %}
-                        <option value="{{ datos_examen.comer }}" selected>
-                          {{ datos_examen.comer }}
-                        </option>
+                      <option value="{{ datos_examen.comer }}" selected>{{ datos_examen.comer }}</option>
                       {% else %}
-                      <option value="" selected disabled>Seleccione una opción</option>
+                      <option value="" disabled selected> Seleccione una opción</option>
                       {% endif %}
                       <option value="3" data-text="3. No tiene problemas">No tiene problemas</option>
                       <option value="2" data-text="2. Es independiente, pero come despacio o derrama un poco">Es independiente, pero come despacio o derrama un poco</option>
@@ -72,11 +70,9 @@
                     <label>B) Vestirse</label>
                     <select class="form-control autocuidado" name="vestirse" required>
                       {% if datos_examen.vestirse %}
-                        <option value="{{ datos_examen.vestirse }}" selected>
-                          {{ datos_examen.vestirse }}
-                        </option>
+                      <option value="{{ datos_examen.vestirse }}" selected>{{ datos_examen.vestirse }}</option>
                       {% else %}
-                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="" disabled selected> Seleccione una opción</option>
                       {% endif %}
                       <option value="3" data-text="3. No tiene problemas">No tiene problemas.</option>
                       <option value="2" data-text="2. Es independiente, pero se viste de manera lenta o torpe.">Es independiente, pero se viste de manera lenta o torpe.</option>
@@ -91,11 +87,9 @@
                     <label>C) Bañarse o Ducharse</label>
                     <select class="form-control autocuidado" name="banarse" required>
                       {% if datos_examen.banarse %}
-                        <option value="{{ datos_examen.banarse }}" selected>
-                          {{ datos_examen.banarse }}
-                        </option>
+                      <option value="{{ datos_examen.banarse }}" selected>{{ datos_examen.banarse }}</option>
                       {% else %}
-                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="" disabled selected> Seleccione una opción</option>
                       {% endif %}
                       <option value="3" data-text="3. No tiene problemas">No tiene problemas</option>
                       <option value="2" data-text="2. Se baña solo, pero necesita que se lo recuerden.">Se baña solo, pero necesita que se lo recuerden.</option>
@@ -110,11 +104,9 @@
                     <label>D) Ir al baño (orinar y defecar)</label>
                     <select class="form-control autocuidado" name="bano" required>
                       {% if datos_examen.bano %}
-                        <option value="{{ datos_examen.bano }}" selected>
-                          {{ datos_examen.bano }}
-                        </option>
+                      <option value="{{ datos_examen.bano }}" selected>{{ datos_examen.bano }}</option>
                       {% else %}
-                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="" disabled selected> Seleccione una opción</option>
                       {% endif %}
                       <option value="3" data-text="3. Va al baño de manera independiente">Va al baño de manera independiente</option>
                       <option value="2" data-text="2. Va al baño cuando se lo recuerdan; tiene algunos accidentes, ensucia.">Va al baño cuando se lo recuerdan; tiene algunos accidentes, ensucia.</option>
@@ -129,11 +121,9 @@
                     <label>E) Ingesta de medicamentos</label>
                     <select class="form-control autocuidado" name="medicamentos" required>
                       {% if datos_examen.medicamentos %}
-                        <option value="{{ datos_examen.medicamentos }}" selected>
-                          {{ datos_examen.medicamentos }}
-                        </option>
+                      <option value="{{ datos_examen.medicamentos }}" selected>{{ datos_examen.medicamentos }}</option>
                       {% else %}
-                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="" disabled selected> Seleccione una opción</option>
                       {% endif %}
                       <option value="4" data-text="4. No toma usualmente medicamentos">No toma usualmente medicamentos</option>
                       <option value="3" data-text="3. Se acuerda sin ayuda.">Se acuerda sin ayuda.</option>
@@ -149,11 +139,9 @@
                     <label>F) Interés en apariencia personal</label>
                     <select class="form-control autocuidado" name="apariencia" required>
                       {% if datos_examen.apariencia %}
-                        <option value="{{ datos_examen.apariencia }}" selected>
-                          {{ datos_examen.apariencia }}
-                        </option>
+                      <option value="{{ datos_examen.apariencia }}" selected>{{ datos_examen.apariencia }}</option>
                       {% else %}
-                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="" disabled selected> Seleccione una opción</option>
                       {% endif %}
                       <option value="3" data-text="3. Igual que siempre.">Igual que siempre.</option>
                       <option value="2" data-text="2. Se interesa sólo cuando va a salir, pero no cuando está en su casa">Se interesa sólo cuando va a salir, pero no cuando está en su casa.</option>
@@ -191,11 +179,9 @@
                     <label>A) Preparar alimentos, cocinar</label>
                     <select class="form-control cuidado_hogar" name="cocinar" required>
                       {% if datos_examen.cocinar %}
-                        <option value="{{ datos_examen.cocinar }}" selected>
-                          {{ datos_examen.cocinar }}
-                        </option>
+                      <option value="{{ datos_examen.cocinar }}" selected>{{ datos_examen.cocinar }}</option>
                       {% else %}
-                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="" disabled selected> Seleccione una opción</option>
                       {% endif %}
                       <option value="3" data-text="3. Nunca hizo esta actividad">Nunca hizo esta actividad</option>
                       <option value="2" data-text="2. Planifica y prepara comida sin dificultad">Planifica y prepara comida sin dificultad</option>
@@ -211,11 +197,9 @@
                     <label>B) Poner la mesa</label>
                     <select class="form-control cuidado_hogar" name="poner_mesa" required>
                       {% if datos_examen.poner_mesa %}
-                        <option value="{{ datos_examen.poner_mesa }}" selected>
-                          {{ datos_examen.poner_mesa }}
-                        </option>
+                      <option value="{{ datos_examen.poner_mesa }}" selected>{{ datos_examen.poner_mesa }}</option>
                       {% else %}
-                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="" disabled selected> Seleccione una opción</option>
                       {% endif %}
                       <option value="3" data-text="3. Nunca hizo esta actividad">Nunca hizo esta actividad</option>
                       <option value="2" data-text="2. Sin problemas">Sin problemas</option>
@@ -231,11 +215,9 @@
                     <label>C) Aseo del hogar</label>
                     <select class="form-control cuidado_hogar" name="aseo_hogar" required>
                       {% if datos_examen.aseo_hogar %}
-                        <option value="{{ datos_examen.aseo_hogar }}" selected>
-                          {{ datos_examen.aseo_hogar }}
-                        </option>
+                      <option value="{{ datos_examen.aseo_hogar }}" selected>{{ datos_examen.aseo_hogar }}</option>
                       {% else %}
-                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="" disabled selected> Seleccione una opción</option>
                       {% endif %}
                       <option value="3" data-text="3. Nunca hizo esta actividad">Nunca hizo esta actividad</option>
                       <option value="2" data-text="2. Mantiene la casa como siempre">Mantiene la casa como siempre</option>
@@ -251,11 +233,9 @@
                     <label>D) Mantención de la casa</label>
                     <select class="form-control cuidado_hogar" name="mantener_casa" required>
                       {% if datos_examen.mantener_casa %}
-                        <option value="{{ datos_examen.mantener_casa }}" selected>
-                          {{ datos_examen.mantener_casa }}
-                        </option>
+                      <option value="{{ datos_examen.mantener_casa }}" selected>{{ datos_examen.mantener_casa }}</option>
                       {% else %}
-                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="" disabled selected> Seleccione una opción</option>
                       {% endif %}
                       <option value="3" data-text="3. Nunca hizo esta actividad">Nunca hizo esta actividad</option>
                       <option value="2" data-text="2. Realiza todas las tareas habituales">Realiza todas las tareas habituales</option>
@@ -271,11 +251,9 @@
                     <label>E) Reparaciones del hogar</label>
                     <select class="form-control cuidado_hogar" name="reparar_hogar" required>
                       {% if datos_examen.reparar_hogar %}
-                        <option value="{{ datos_examen.reparar_hogar }}" selected>
-                          {{ datos_examen.reparar_hogar }}
-                        </option>
+                      <option value="{{ datos_examen.reparar_hogar }}" selected>{{ datos_examen.reparar_hogar }}</option>
                       {% else %}
-                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="" disabled selected> Seleccione una opción</option>
                       {% endif %}
                       <option value="3" data-text="3. Nunca hizo esta actividad">Nunca hizo esta actividad</option>
                       <option value="2" data-text="2. Realiza todas las reparaciones usuales">Realiza todas las reparaciones usuales</option>
@@ -291,11 +269,9 @@
                     <label>F) Lavado de ropa</label>
                     <select class="form-control cuidado_hogar" name="lavado_ropa" required>
                       {% if datos_examen.lavado_ropa %}
-                        <option value="{{ datos_examen.lavado_ropa }}" selected>
-                          {{ datos_examen.lavado_ropa }}
-                        </option>
+                      <option value="{{ datos_examen.lavado_ropa }}" selected>{{ datos_examen.lavado_ropa }}</option>
                       {% else %}
-                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="" disabled selected> Seleccione una opción</option>
                       {% endif %}
                       <option value="3" data-text="3. Nunca hizo esta actividad">Nunca hizo esta actividad</option>
                       <option value="2"  data-text="2. Realiza el lavado de ropa como siempre (mismo horario, misma rutina)">Realiza el lavado de ropa como siempre (mismo horario, misma rutina)</option>
@@ -334,11 +310,9 @@
                     <label>A) Trabajo</label>
                     <select class="form-control trabajo_recreacion" name="trabajo" required>
                       {% if datos_examen.trabajo %}
-                        <option value="{{ datos_examen.trabajo }}" selected>
-                          {{ datos_examen.trabajo }}
-                        </option>
+                      <option value="{{ datos_examen.trabajo }}" selected>{{ datos_examen.trabajo }}</option>
                       {% else %}
-                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="" disabled selected> Seleccione una opción</option>
                       {% endif %}
                       <option value="3" data-text="3. Nunca ha trabajado o se retiró antes de la enfermedad">Nunca ha trabajado o se retiró antes de la enfermedad</option>
                       <option value="2" data-text="2. Continúa trabajando como habitualmente">Continúa trabajando como habitualmente</option>
@@ -354,11 +328,9 @@
                     <label>B) Recreación</label>
                     <select class="form-control trabajo_recreacion" name="recreacion" required>
                       {% if datos_examen.recreacion %}
-                        <option value="{{ datos_examen.recreacion }}" selected>
-                          {{ datos_examen.recreacion }}
-                        </option>
+                      <option value="{{ datos_examen.recreacion }}" selected>{{ datos_examen.recreacion }}</option>
                       {% else %}
-                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="" disabled selected> Seleccione una opción</option>
                       {% endif %}
                       <option value="3" data-text="3. Nunca ha participado de actividades de recreación o dejó de hacerlo antes de la enfermedad">Nunca ha participado de actividades de recreación o dejó de hacerlo antes de la enfermedad</option>
                       <option value="2" data-text="2. Igual que siempre">Igual que siempre</option>
@@ -374,11 +346,9 @@
                     <label>C) Organizaciones</label>
                     <select class="form-control trabajo_recreacion" name="organizaciones" required>
                       {% if datos_examen.organizaciones %}
-                        <option value="{{ datos_examen.organizaciones }}" selected>
-                          {{ datos_examen.organizaciones }}
-                        </option>
+                      <option value="{{ datos_examen.organizaciones }}" selected>{{ datos_examen.organizaciones }}</option>
                       {% else %}
-                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="" disabled selected> Seleccione una opción</option>
                       {% endif %}
                       <option value="3" data-text="3. Nunca ha participado en organizaciones o dejó de hacerlo antes de la enfermedad">Nunca ha participado en organizaciones o dejó de hacerlo antes de la enfermedad</option>
                       <option value="2" data-text="2. Asiste a reuniones y toma responsabilidades como habitualmente">Asiste a reuniones y toma responsabilidades como habitualmente</option>
@@ -394,11 +364,9 @@
                     <label>D) Desplazamiento</label>
                     <select class="form-control trabajo_recreacion" name="desplazamiento" required>
                       {% if datos_examen.desplazamiento %}
-                        <option value="{{ datos_examen.desplazamiento }}" selected>
-                          {{ datos_examen.desplazamiento }}
-                        </option>
+                      <option value="{{ datos_examen.desplazamiento }}" selected>{{ datos_examen.desplazamiento }}</option>
                       {% else %}
-                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="" disabled selected> Seleccione una opción</option>
                       {% endif %}
                       <option value="3" data-text="3. Igual que siempre">Igual que siempre</option>
                       <option value="2" data-text="2. Sale si otro maneja">Sale si otro maneja</option>
@@ -436,11 +404,9 @@
                     <label>A) Compra de alimentos</label>
                     <select class="form-control compras_dinero" name="alimentos" required>
                       {% if datos_examen.alimentos %}
-                        <option value="{{ datos_examen.alimentos }}" selected>
-                          {{ datos_examen.alimentos }}
-                        </option>
+                      <option value="{{ datos_examen.alimentos }}" selected>{{ datos_examen.alimentos }}</option>
                       {% else %}
-                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="" disabled selected> Seleccione una opción</option>
                       {% endif %}
                       <option value="3" data-text="3. Nunca ha tenido esta responsabilidad">Nunca ha tenido esta responsabilidad</option>
                       <option value="2" data-text="2. Sin problemas">Sin problemas</option>
@@ -456,11 +422,9 @@
                     <label>B) Manejar dinero en efectivo</label>
                     <select class="form-control compras_dinero" name="dinero_efectivo" required>
                       {% if datos_examen.dinero_efectivo %}
-                        <option value="{{ datos_examen.dinero_efectivo }}" selected>
-                          {{ datos_examen.dinero_efectivo }}
-                        </option>
+                      <option value="{{ datos_examen.dinero_efectivo }}" selected>{{ datos_examen.dinero_efectivo }}</option>
                       {% else %}
-                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="" disabled selected> Seleccione una opción</option>
                       {% endif %}
                       <option value="3" data-text="3. Nunca ha tenido esta responsabilidad">Nunca ha tenido esta responsabilidad</option>
                       <option value="2" data-text="2. No tiene problemas">No tiene problemas</option>
@@ -476,11 +440,9 @@
                     <label>C) Manejar de las finanzas</label>
                     <select class="form-control compras_dinero" name="finanzas" required>
                       {% if datos_examen.finanzas %}
-                        <option value="{{ datos_examen.finanzas }}" selected>
-                          {{ datos_examen.finanzas }}
-                        </option>
+                      <option value="{{ datos_examen.finanzas }}" selected>{{ datos_examen.finanzas }}</option>
                       {% else %}
-                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="" disabled selected> Seleccione una opción</option>
                       {% endif %}
                       <option value="3" data-text="3. Nunca ha tenido esta responsabilidad">Nunca ha tenido esta responsabilidad</option>
                       <option value="2" data-text="2. No tiene problemas para pagar cuentas e ir al banco">No tiene problemas para pagar cuentas e ir al banco</option>
@@ -519,11 +481,9 @@
                     <label>A) Transporte público</label>
                     <select class="form-control viajes" name="transporte_publico" required>
                       {% if datos_examen.transporte_publico %}
-                        <option value="{{ datos_examen.transporte_publico }}" selected>
-                          {{ datos_examen.transporte_publico }}
-                        </option>
+                      <option value="{{ datos_examen.transporte_publico }}" selected>{{ datos_examen.transporte_publico }}</option>
                       {% else %}
-                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="" disabled selected> Seleccione una opción</option>
                       {% endif %}
                       <option value="3" data-text="3. Nunca ha usado el transporte público con regularidad">Nunca ha usado el transporte público con regularidad</option>
                       <option value="2" data-text="2. Utiliza el transporte público como habitualmente">Utiliza el transporte público como habitualmente</option>
@@ -539,11 +499,9 @@
                     <label>B) Manejo de vehículos</label>
                     <select class="form-control viajes" name="manejo_vehiculos" required>
                       {% if datos_examen.manejo_vehiculos %}
-                        <option value="{{ datos_examen.manejo_vehiculos }}" selected>
-                          {{ datos_examen.manejo_vehiculos }}
-                        </option>
+                      <option value="{{ datos_examen.manejo_vehiculos }}" selected>{{ datos_examen.manejo_vehiculos }}</option>
                       {% else %}
-                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="" disabled selected> Seleccione una opción</option>
                       {% endif %}
                       <option value="3" data-text="3. Nunca ha manejado">Nunca ha manejado</option>
                       <option value="2" data-text="2. Maneja como siempre">Maneja como siempre</option>
@@ -559,11 +517,9 @@
                     <label>C) Movilidad en su barrio</label>
                     <select class="form-control viajes" name="movilidad_barrio" required>
                       {% if datos_examen.movilidad_barrio %}
-                        <option value="{{ datos_examen.movilidad_barrio }}" selected>
-                          {{ datos_examen.movilidad_barrio }}
-                        </option>
+                      <option value="{{ datos_examen.movilidad_barrio }}" selected>{{ datos_examen.movilidad_barrio }}</option>
                       {% else %}
-                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="" disabled selected> Seleccione una opción</option>
                       {% endif %}
                       <option value="3" data-text="3. Esta actividad la tenía restringida desde antes de la enfermedad">Esta actividad la tenía restringida desde antes de la enfermedad</option>
                       <option value="2" data-text="2. Igual que siempre">Igual que siempre</option>
@@ -579,11 +535,9 @@
                     <label>D) Viajes fuera del ambiente familiar</label>
                     <select class="form-control viajes" name="viajes_fuera" required>
                       {% if datos_examen.viajes_fuera %}
-                        <option value="{{ datos_examen.viajes_fuera }}" selected>
-                          {{ datos_examen.viajes_fuera }}
-                        </option>
+                      <option value="{{ datos_examen.viajes_fuera }}" selected>{{ datos_examen.viajes_fuera }}</option>
                       {% else %}
-                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="" disabled selected> Seleccione una opción</option>
                       {% endif %}
                       <option value="3" data-text="3. Nunca realizó esta actividad">Nunca realizó esta actividad</option>
                       <option value="2" data-text="2. Igual que siempre">Igual que siempre</option>
@@ -623,11 +577,9 @@
                     <label>A) Uso del teléfono</label>
                     <select class="form-control comunicacion" name="telefono" required>
                       {% if datos_examen.telefono %}
-                        <option value="{{ datos_examen.telefono }}" selected>
-                          {{ datos_examen.telefono }}
-                        </option>
+                      <option value="{{ datos_examen.telefono }}" selected>{{ datos_examen.telefono }}</option>
                       {% else %}
-                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="" disabled selected> Seleccione una opción</option>
                       {% endif %}
                       <option value="3" data-text="3. Nunca ha usado el teléfono">Nunca ha usado el teléfono</option>
                       <option value="2" data-text="2. Igual que siempre">Igual que siempre</option>
@@ -643,11 +595,9 @@
                     <label>B) Conversación</label>
                     <select class="form-control comunicacion" name="conversacion" required>
                       {% if datos_examen.conversacion %}
-                        <option value="{{ datos_examen.conversacion }}" selected>
-                          {{ datos_examen.conversacion }}
-                        </option>
+                      <option value="{{ datos_examen.conversacion }}" selected>{{ datos_examen.conversacion }}</option>
                       {% else %}
-                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="" disabled selected> Seleccione una opción</option>
                       {% endif %}
                       <option value="3" data-text="3. Igual que siempre">Igual que siempre</option>
                       <option value="2" data-text="2. Menos conversador; tiene dificultades para recordar palabras o nombres">Menos conversador; tiene dificultades para recordar palabras o nombres</option>
@@ -662,11 +612,9 @@
                     <label>C) Comprensión</label>
                     <select class="form-control comunicacion" name="comprension" required>
                       {% if datos_examen.comprension %}
-                        <option value="{{ datos_examen.comprension }}" selected>
-                          {{ datos_examen.comprension }}
-                        </option>
+                      <option value="{{ datos_examen.comprension }}" selected>{{ datos_examen.comprension }}</option>
                       {% else %}
-                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="" disabled selected> Seleccione una opción</option>
                       {% endif %}
                       <option value="3" data-text="3. Comprende todo lo que se le dice usualmente">Comprende todo lo que se le dice usualmente</option>
                       <option value="2" data-text="2. Pide que le repitan lo que se le dijo">Pide que le repitan lo que se le dijo</option>
@@ -681,11 +629,9 @@
                     <label>D) Lectura</label>
                     <select class="form-control comunicacion" name="lectura" required>
                       {% if datos_examen.lectura %}
-                        <option value="{{ datos_examen.lectura }}" selected>
-                          {{ datos_examen.lectura }}
-                        </option>
+                      <option value="{{ datos_examen.lectura }}" selected>{{ datos_examen.lectura }}</option>
                       {% else %}
-                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="" disabled selected> Seleccione una opción</option>
                       {% endif %}
                       <option value="3" data-text="3. Nunca leyó mucho">Nunca leyó mucho</option>
                       <option value="2" data-text="2. Lee igual que siempre">Lee igual que siempre</option>
@@ -701,11 +647,9 @@
                     <label>E) Escritura</label>
                     <select class="form-control comunicacion" name="escritura" required>
                       {% if datos_examen.escritura %}
-                        <option value="{{ datos_examen.escritura }}" selected>
-                          {{ datos_examen.escritura }}
-                        </option>
+                      <option value="{{ datos_examen.escritura }}" selected>{{ datos_examen.escritura }}</option>
                       {% else %}
-                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="" disabled selected> Seleccione una opción</option>
                       {% endif %}
                       <option value="3" data-text="3. Nunca escribió mucho">Nunca escribió mucho</option>
                       <option value="2" data-text="2. Igual que siempre">Igual que siempre</option>
@@ -744,11 +688,9 @@
                     <label>A) Uso del computador</label>
                     <select class="form-control tecnologia" name="computador" required>
                       {% if datos_examen.computador %}
-                        <option value="{{ datos_examen.computador }}" selected>
-                          {{ datos_examen.computador }}
-                        </option>
+                      <option value="{{ datos_examen.computador }}" selected>{{ datos_examen.computador }}</option>
                       {% else %}
-                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="" disabled selected> Seleccione una opción</option>
                       {% endif %}
                       <option value="3" data-text="3. Nunca lo ha ocupado antes">Nunca lo ha ocupado antes</option>
                       <option value="2" data-text="2. Utiliza el computador regularmente. Realiza tareas en diferentes programas">Utiliza el computador regularmente. Realiza tareas en diferentes programas</option>
@@ -764,11 +706,9 @@
                     <label>B) Uso del teléfono celular</label>
                     <select class="form-control tecnologia" name="telefono_celular" required>
                       {% if datos_examen.telefono_celular %}
-                        <option value="{{ datos_examen.telefono_celular }}" selected>
-                          {{ datos_examen.telefono_celular }}
-                        </option>
+                      <option value="{{ datos_examen.telefono_celular }}" selected>{{ datos_examen.telefono_celular }}</option>
                       {% else %}
-                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="" disabled selected> Seleccione una opción</option>
                       {% endif %}
                       <option value="3" data-text="3. Nunca ha usado celular">Nunca ha usado celular</option>
                       <option value="2" data-text="2. Utiliza el teléfono celular de manera regular, maneja sin dificultades sus diferentes funciones">Utiliza el teléfono celular de manera regular, maneja sin dificultades sus diferentes funciones</option>
@@ -784,11 +724,9 @@
                     <label>C) Uso del cajero automático</label>
                     <select class="form-control tecnologia" name="cajero" required>
                       {% if datos_examen.cajero %}
-                        <option value="{{ datos_examen.cajero }}" selected>
-                          {{ datos_examen.cajero }}
-                        </option>
+                      <option value="{{ datos_examen.cajero }}" selected>{{ datos_examen.cajero }}</option>
                       {% else %}
-                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="" disabled selected> Seleccione una opción</option>
                       {% endif %}
                       <option value="3" data-text="3. Nunca ha ocupado cajero automático">Nunca ha ocupado cajero automático</option>
                       <option value="2" data-text="2. Utiliza el cajero automático, saca dinero y/o realiza diversas transacciones">Utiliza el cajero automático, saca dinero y/o realiza diversas transacciones</option>
@@ -804,11 +742,9 @@
                     <label>D) Acceso a internet</label>
                     <select class="form-control tecnologia" name="internet" required>
                       {% if datos_examen.internet %}
-                        <option value="{{ datos_examen.internet }}" selected>
-                          {{ datos_examen.internet }}
-                        </option>
+                      <option value="{{ datos_examen.internet }}" selected>{{ datos_examen.internet }}</option>
                       {% else %}
-                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="" disabled selected> Seleccione una opción</option>
                       {% endif %}
                       <option value="3" data-text="3. Nunca ha ocupado internet">Nunca ha ocupado internet</option>
                       <option value="2" data-text="2. Busca fluidamente información en Internet, utiliza sitios de su interés">Busca fluidamente información en Internet, utiliza sitios de su interés</option>
@@ -824,11 +760,9 @@
                     <label>E) Uso del correo electrónico</label>
                     <select class="form-control tecnologia" name="email" required>
                       {% if datos_examen.email %}
-                        <option value="{{ datos_examen.email }}" selected>
-                          {{ datos_examen.email }}
-                        </option>
+                      <option value="{{ datos_examen.email }}" selected>{{ datos_examen.email }}</option>
                       {% else %}
-                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="" disabled selected> Seleccione una opción</option>
                       {% endif %}
                       <option value="3" data-text="3. Nunca ha usado correo electrónico">Nunca ha usado correo electrónico</option>
                       <option value="2" data-text="2. Ocupa regularmente el email para comunicarse con sus contactos, recibe y envía archivos adjuntos">Ocupa regularmente el email para comunicarse con sus contactos, recibe y envía archivos adjuntos</option>
@@ -844,14 +778,12 @@
                     <label>F) Uso de redes sociales</label>
                     <select class="form-control tecnologia" name="redes_sociales" required>
                       {% if datos_examen.redes_sociales %}
-                        <option value="{{ datos_examen.redes_sociales }}" selected>
-                          {{ datos_examen.redes_sociales }}
-                        </option>
+                      <option value="{{ datos_examen.redes_sociales }}" selected>{{ datos_examen.redes_sociales }}</option>
                       {% else %}
-                      <option value="" disabled selected>Seleccione una opción</option>
+                      <option value="" disabled selected> Seleccione una opción</option>
                       {% endif %}
                       <option value="3" data-text="3. Nunca ha utilizado redes">Nunca ha utilizado redes</option>
-                      <option value="2" data-text="2. Ocupa regularmente las redes socailes, tales como Facebook, Twitter, WhatsApp, entre otros.">Ocupa regularmente las redes socailes, tales como Facebook, Twitter, WhatsApp, entre otros.</option>
+                      <option value="2" data-text="2. Ocupa regularmente las redes sociales, tales como Facebook, Twitter, WhatsApp, entre otros.">Ocupa regularmente las redes socailes, tales como Facebook, Twitter, WhatsApp, entre otros.</option>
                       <option value="1" data-text="1. Puede ocupar las funciones básicas de las redes sociales, pero tiene dificultades para usar opciones avanzadas sin ayuda (ejemplo: subir una foto, publicar un comentario, jugar un juego)">Puede ocupar las funciones básicas de las redes sociales, pero tiene dificultades para usar opciones avanzadas sin ayuda (ejemplo: subir una foto, publicar un comentario, jugar un juego)</option>
                       <option value="0" data-text="0. Solo puede ocupar las redes sociales con ayuda">Solo puede ocupar las redes sociales con ayuda</option>
                       <option value="-1" data-text="-1. Ya no sabe cómo usar las redes sociales">Ya no sabe cómo usar las redes sociales</option>
@@ -884,7 +816,20 @@
 <script>
 document.addEventListener("DOMContentLoaded", function () {
 
-  // Función para calcular el puntaje
+  // ---- Función para sincronizar selects con su input hidden ----
+  function syncSelectWithHidden(select) {
+  const selectedOption = select.options[select.selectedIndex];
+  let texto = "";
+
+  if (selectedOption) {
+    texto = selectedOption.getAttribute("data-text") || selectedOption.textContent || "";
+  }
+
+  const hiddenTextInput = document.querySelector(`input[name="${select.name}_texto"]`);
+  if (hiddenTextInput) hiddenTextInput.value = texto.trim();
+}
+
+  // ---- Función para calcular el puntaje ----
   function calcularPuntaje(clase, outputId) {
     const selects = document.querySelectorAll(`.${clase}`);
     let suma = 0;
@@ -896,27 +841,20 @@ document.addEventListener("DOMContentLoaded", function () {
         suma += valor;
         respuestasValidas += 1;
       }
-
-      // Guardar texto en el input hidden correspondiente
-      const selectedOption = select.options[select.selectedIndex];
-      const texto = selectedOption?.getAttribute("data-text") || "";
-      const hiddenTextInput = document.querySelector(`input[name="${select.name}_texto"]`);
-      if (hiddenTextInput) hiddenTextInput.value = texto.trim();
+      // Mantener sincronizado el texto
+      syncSelectWithHidden(select);
     });
 
-    // Calcular puntaje en porcentaje
     const puntaje = respuestasValidas > 0 ? Math.round((suma / (respuestasValidas * 3)) * 100) : 0;
 
-    // Mostrar en input visible
     const resultadoVisible = document.getElementById(outputId);
     if (resultadoVisible) resultadoVisible.value = puntaje + "%";
 
-    // Guardar en input hidden real para Django
     const resultadoHidden = document.getElementById(outputId + "_hidden");
     if (resultadoHidden) resultadoHidden.value = puntaje;
   }
 
-  // Lista de secciones con clase e ID de campo de puntaje
+  // ---- Secciones ----
   const secciones = [
     { clase: 'autocuidado', id: 'puntaje_autocuidado' },
     { clase: 'cuidado_hogar', id: 'puntaje_cuidado_hogar' },
@@ -927,30 +865,36 @@ document.addEventListener("DOMContentLoaded", function () {
     { clase: 'tecnologia', id: 'puntaje_tecnologia' },
   ];
 
-  // Listeners para calcular puntaje y guardar textos
+  // ---- Listeners para selects ----
   secciones.forEach(seccion => {
     const selects = document.querySelectorAll(`.${seccion.clase}`);
     selects.forEach(select => {
+      // Al cambiar, recalcular y guardar texto
       select.addEventListener('change', () => {
         calcularPuntaje(seccion.clase, seccion.id);
       });
+      // ⚡ Al cargar la página, sincronizar hidden con valor actual
+      syncSelectWithHidden(select);
     });
   });
 
-  // Botones "Siguiente sección"
+  // ---- Inicializar puntajes al cargar ----
+  secciones.forEach(seccion => {
+    calcularPuntaje(seccion.clase, seccion.id);
+  });
+
+  // ---- Botones siguiente sección ----
   const nextButtons = document.querySelectorAll('.btn-next');
   nextButtons.forEach(button => {
     button.addEventListener('click', function () {
       const nextTabId = this.getAttribute('data-next');
       if (!nextTabId) return;
 
-      // Desactivar pestaña actual
       const activePane = document.querySelector('.tab-pane.active');
       const activeNav = document.querySelector('.nav-link.active');
       if (activePane) activePane.classList.remove('show', 'active');
       if (activeNav) activeNav.classList.remove('active');
 
-      // Activar la siguiente
       const nextPane = document.querySelector(nextTabId);
       const nextNavLink = document.querySelector(`.nav-link[href="${nextTabId}"]`);
       if (nextPane && nextNavLink) {
@@ -960,6 +904,16 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     });
   });
+
+  // ---- Antes de enviar el formulario, forzar sincronización completa ----
+  const form = document.querySelector("form");
+  if (form) {
+    form.addEventListener("submit", function () {
+      secciones.forEach(seccion => {
+        calcularPuntaje(seccion.clase, seccion.id);
+      });
+    });
+  }
 
 });
 </script>

@@ -1,0 +1,150 @@
+{% extends 'layouts/base.html' %}
+{% block content %}
+
+<div class="header bg-primary pb-6">
+  <div class="container-fluid">
+    <div class="header-body">
+      <div class="row align-items-center py-4">
+        <div class="col-lg-6 col-5">
+          <h6 class="h2 text-white d-inline-block mb-0">Evaluación Médica Acompañante</h6>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid mt--6">
+  <div class="row">
+    <div class="col">
+      <div class="card shadow">
+        <form method="post" action="{% url 'guardar_anamnesis_participante' %}">
+          {% csrf_token %}
+          <input type="hidden" name="visita_id" value="{{ visita_examen }}">
+          <input type="hidden" name="paciente_id" value="{{ paciente_id }}">
+          <input type="hidden" name="examen_id" value="{{ examen_id }}">
+
+          <div class="card-body">
+
+            <!-- NOMBRES Y APELLIDOS -->
+            <div class="form-group">
+              <label for="nombres_apellidos"><strong>Nombres y apellidos</strong></label>
+              <input type="text" class="form-control" name="nombres_apellidos" id="nombres_apellidos"
+                     value="{{ datos_examen.nombres_apellidos|default:'' }}" required>
+            </div>
+
+            <!-- DOCUMENTO -->
+            <div class="form-group">
+              <label for="documento"><strong>Tipo de documento y número de identificación</strong></label>
+              <input type="text" class="form-control" name="documento" id="documento"
+                     value="{{ datos_examen.documento|default:'' }}" required>
+            </div>
+
+            <!-- LUGAR DE NACIMIENTO -->
+            <div class="form-group">
+              <label for="lugar_nacimiento"><strong>Lugar de nacimiento</strong></label>
+              <input type="text" class="form-control" name="lugar_nacimiento" id="lugar_nacimiento"
+                     value="{{ datos_examen.lugar_nacimiento|default:'' }}">
+            </div>
+
+            <!-- EDAD -->
+            <div class="form-group">
+              <label for="edad"><strong>Edad</strong></label>
+              <input type="number" class="form-control" name="edad" id="edad"
+                     value="{{ datos_examen.edad|default:'' }}">
+            </div>
+
+            <!-- SEXO -->
+            <div class="form-group">
+              <label for="sexo"><strong>Sexo</strong></label>
+              <select class="form-control" name="sexo" id="sexo">
+                {% if datos_examen.sexo %}
+                <option value="{{ datos_examen.sexo }}" selected>{{ datos_examen.sexo }}</option>
+                {% else %}
+                <option value="">Seleccione una opción</option>
+                {% endif %}
+                <option value="Masculino">Masculino</option>
+                <option value="Femenino">Femenino</option>
+                <option value="Otro">Otro</option>
+              </select>
+            </div>
+
+            <!-- TIEMPO DE ACOMPAÑAMIENTO -->
+            <div class="form-group">
+              <label for="tiempo_acompanando"><strong>Desde hace cuánto acompaña al participante</strong></label>
+              <input type="text" class="form-control" name="tiempo_acompanando" id="tiempo_acompanando"
+                     value="{{ datos_examen.tiempo_acompanando|default:'' }}">
+            </div>
+
+            <!-- SALARIOS -->
+            <div class="form-group">
+              <label for="ingresos_hogar"><strong>No. de salarios mínimos que entran al hogar</strong></label>
+              <select class="form-control" name="ingresos_hogar" id="ingresos_hogar">
+                {% if datos_examen.ingresos_hogar %}
+                <option value="{{ datos_examen.ingresos_hogar }}" selected>{{ datos_examen.ingresos_hogar }}</option>
+                {% else %}
+                <option value="">Seleccione una opción</option>
+                {% endif %}
+                <option value="0">0</option>
+                <option value="1">1</option>
+                <option value="2 a 3">2 a 3</option>
+                <option value="Más de 3">Más de 3</option>
+              </select>
+            </div>
+
+            <!-- ESTRATO -->
+            <div class="form-group">
+              <label for="estrato"><strong>Estrato socioeconómico en el que reside</strong></label>
+              <input type="number" class="form-control" name="estrato" id="estrato"
+                     value="{{ datos_examen.estrato|default:'' }}">
+            </div>
+
+            <!-- RELIGIÓN -->
+            <div class="form-group">
+              <label for="religion"><strong>Religión</strong></label>
+              <input type="text" class="form-control" name="religion" id="religion"
+                     value="{{ datos_examen.religion|default:'' }}">
+            </div>
+
+            <!-- LATERALIDAD -->
+            <div class="form-group">
+              <label for="lateralidad"><strong>Lateralidad</strong></label>
+              <select class="form-control" name="lateralidad" id="lateralidad">
+                {% if datos_examen.lateralidad %}
+                <option value="{{ datos_examen.lateralidad }}" selected>{{ datos_examen.lateralidad }}</option>
+                {% else %}
+                <option value="">Seleccione una opción</option>
+                {% endif %}
+                <option value="Diestro">Diestro</option>
+                <option value="Zurdo">Zurdo</option>
+                <option value="Ambidiestro">Ambidiestro</option>
+              </select>
+            </div>
+
+            <!-- CON QUIÉN VIVE -->
+            <div class="form-group">
+              <label for="convivencia"><strong>Con quién vive</strong></label>
+              <textarea class="form-control" name="convivencia" id="convivencia" rows="2">{{ datos_examen.convivencia|default:'' }}</textarea>
+              <small class="text-muted">Incluir mascotas</small>
+            </div>
+
+            <!-- EPS -->
+            <div class="form-group">
+              <label for="eps"><strong>EPS</strong></label>
+              <input type="text" class="form-control" name="eps" id="eps"
+                     value="{{ datos_examen.eps|default:'' }}">
+            </div>
+
+            <!-- BOTONES -->
+            <div class="text-right mt-4">
+              <button type="submit" class="btn btn-primary">Guardar</button>
+              <a href="{% url 'detalle_paciente' paciente_id %}" class="btn btn-secondary">Ver Paciente</a>
+            </div>
+
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

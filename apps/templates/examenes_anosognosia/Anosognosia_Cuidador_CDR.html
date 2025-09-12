@@ -70,8 +70,8 @@
                         {% else %}
                         <option value="" disabled selected>Seleccione una opción</option>
                         {% endif %}
-                        <option value="si">Sí</option>
-                        <option value="no">No</option>
+                        <option value="Sí">Sí</option>
+                        <option value="No">No</option>
                       </select>
                     </div>
                   </div>
@@ -86,9 +86,9 @@
                       {% else %}
                       <option value="" disabled selected>Seleccione</option>
                       {% endif %}
-                      <option value="generalmente">Generalmente</option>
-                      <option value="a_veces">A veces</option>
-                      <option value="raramente">Raramente</option>
+                      <option value="Generalmente">Generalmente</option>
+                      <option value="A veces">A veces</option>
+                      <option value="Raramente">Raramente</option>
                     </select>
                   </div>
 
@@ -102,9 +102,9 @@
                       {% else %}
                       <option value="" disabled selected>Seleccione</option>
                       {% endif %}
-                      <option value="generalmente">Generalmente</option>
-                      <option value="a_veces">A veces</option>
-                      <option value="raramente">Raramente</option>
+                      <option value="Generalmente">Generalmente</option>
+                      <option value="A veces">A veces</option>
+                      <option value="Raramente">Raramente</option>
                     </select>
                   </div>
 
@@ -118,8 +118,8 @@
                       {% else %}
                       <option value="" disabled selected>Seleccione</option>
                       {% endif %}
-                      <option value="si">Sí</option>
-                      <option value="no">No</option>
+                      <option value="Sí">Sí</option>
+                      <option value="No">No</option>
                     </select>
                   </div>
 
@@ -135,7 +135,7 @@
                       {% else %}
                       <option value="" disabled selected>Seleccione</option>
                       {% endif %}
-                      <option value="Si">Sí</option>
+                      <option value="Sí">Sí</option>
                       <option value="No">No</option>
                     </select>
                   </div>
@@ -151,9 +151,9 @@
                       {% else %}
                       <option value="" disabled selected>Seleccione</option>
                       {% endif %}
-                      <option value="generalmente">Generalmente</option>
-                      <option value="a_veces">A veces</option>
-                      <option value="raramente">Raramente</option>
+                      <option value="Generalmente">Generalmente</option>
+                      <option value="A veces">A veces</option>
+                      <option value="Raramente">Raramente</option>
                     </select>
                   </div>
 
@@ -167,9 +167,9 @@
                       {% else %}
                       <option value="" disabled selected>Seleccione</option>
                       {% endif %}
-                      <option value="generalmente">Generalmente</option>
-                      <option value="a_veces">A veces</option>
-                      <option value="raramente">Raramente</option>
+                      <option value="Generalmente">Generalmente</option>
+                      <option value="A veces">A veces</option>
+                      <option value="Raramente">Raramente</option>
                     </select>
                   </div>
 
@@ -184,9 +184,9 @@
                       {% else %}
                       <option value="" disabled selected>Seleccione</option>
                       {% endif %}
-                      <option value="generalmente">Generalmente</option>
-                      <option value="a_veces">A veces</option>
-                      <option value="raramente">Raramente</option>
+                      <option value="Generalmente">Generalmente</option>
+                      <option value="A veces">A veces</option>
+                      <option value="Raramente">Raramente</option>
                     </select>
                   </div>
 
@@ -210,7 +210,7 @@
                   <!-- Pregunta 10 -->
                   <div class="form-group">
                     <label for="nacimiento_fecha">10. ¿Cuándo nació él/ella?</label>
-                    <input type="date" class="form-control" name="nacimiento_fecha" id="nacimiento_fecha" value="{{ datos_examen.nacimiento_fecha|default_if_none:'' }}" required>
+                    <input type="date" class="form-control" name="nacimiento_fecha" id="nacimiento_fecha" value="{{ datos_examen.nacimiento_fecha|date:'Y-m-d' }}"  required>
                   </div>
 
                   <!-- Pregunta 11 -->
@@ -277,7 +277,7 @@
                       {% else %}
                       <option value="" disabled selected>Seleccione una opción</option>
                       {% endif %}
-                      <option value="generalmente">Generalmente</option>
+                      <option value="Generalmente">Generalmente</option>
                       <option value="A veces">A veces</option>
                       <option value="Raramente">Raramente</option>
                       <option value="No sé">No sé</option>
@@ -294,7 +294,7 @@
                       {% else %}
                       <option value="" disabled selected>Seleccione una opción</option>
                       {% endif %}
-                      <option value="generalmente">Generalmente</option>
+                      <option value="Generalmente">Generalmente</option>
                       <option value="A veces">A veces</option>
                       <option value="Raramente">Raramente</option>
                       <option value="No sé">No sé</option>
@@ -311,7 +311,7 @@
                       {% else %}
                       <option value="" disabled selected>Seleccione una opción</option>
                       {% endif %}
-                      <option value="generalmente">Generalmente</option>
+                      <option value="Generalmente">Generalmente</option>
                       <option value="A veces">A veces</option>
                       <option value="Raramente">Raramente</option>
                       <option value="No sé">No sé</option>
@@ -328,7 +328,7 @@
                       {% else %}
                       <option value="" disabled selected>Seleccione una opción</option>
                       {% endif %}
-                      <option value="generalmente">Generalmente</option>
+                      <option value="Generalmente">Generalmente</option>
                       <option value="A veces">A veces</option>
                       <option value="Raramente">Raramente</option>
                       <option value="No sé">No sé</option>
@@ -346,7 +346,7 @@
                       {% else %}
                       <option value="" disabled selected>Seleccione una opción</option>
                       {% endif %}
-                      <option value="generalmente">Generalmente</option>
+                      <option value="Generalmente">Generalmente</option>
                       <option value="A veces">A veces</option>
                       <option value="Raramente">Raramente</option>
                       <option value="No sé">No sé</option>
@@ -363,7 +363,7 @@
                       {% else %}
                       <option value="" disabled selected>Seleccione una opción</option>
                       {% endif %}
-                      <option value="generalmente">Generalmente</option>
+                      <option value="Generalmente">Generalmente</option>
                       <option value="A veces">A veces</option>
                       <option value="Raramente">Raramente</option>
                       <option value="No sé">No sé</option>
@@ -381,7 +381,7 @@
                       {% else %}
                       <option value="" disabled selected>Seleccione una opción</option>
                       {% endif %}
-                      <option value="generalmente">Generalmente</option>
+                      <option value="Generalmente">Generalmente</option>
                       <option value="A veces">A veces</option>
                       <option value="Raramente">Raramente</option>
                       <option value="No sé">No sé</option>
@@ -450,7 +450,7 @@
                       <option value="" disabled selected>Seleccione una opción</option>
                       {% endif %}
                       <option value="Sin pérdida">Sin pérdida</option>
-                      <option value="Algo de pérdida">Buena, pero no tan buena como lo era antes</option>
+                      <option value="Buena, pero no tan buena como lo era antes">Buena, pero no tan buena como lo era antes</option>
                       <option value="Pérdida severa">Pérdida severa</option>
                     </select>
                   </div>
@@ -467,7 +467,7 @@
                       <option value="" disabled selected>Seleccione una opción</option>
                       {% endif %}
                       <option value="Sin pérdida">Sin pérdida</option>
-                      <option value="Algo de pérdida">Buena, pero no tan buena como lo era antes</option>
+                      <option value="Buena, pero no tan buena como lo era antes">Buena, pero no tan buena como lo era antes</option>
                       <option value="Pérdida severa">Pérdida severa</option>
                     </select>
                   </div>
@@ -551,9 +551,9 @@
                       {% else %}
                       <option value="" disabled selected>Seleccione una opción</option>
                       {% endif %}
-                      <option value="na">N/A</option>
-                      <option value="si">Sí</option>
-                      <option value="no">No</option>
+                      <option value="N/A">N/A</option>
+                      <option value="Sí">Sí</option>
+                      <option value="No">No</option>
                     </select>
                   </div>
 
@@ -568,9 +568,9 @@
                       {% else %}
                       <option value="" disabled selected>Seleccione una opción</option>
                       {% endif %}
-                      <option value="si">Sí</option>
-                      <option value="no">No</option>
-                      <option value="nose">No sé</option>
+                      <option value="Sí">Sí</option>
+                      <option value="No">No</option>
+                      <option value="No sé">No sé</option>
                     </select>
                   </div>
 
@@ -585,10 +585,10 @@
                       {% else %}
                       <option value="" disabled selected>Seleccione una opción</option>
                       {% endif %}
-                      <option value="raramente">Raramente o nunca</option>
-                      <option value="a_veces">A veces</option>
-                      <option value="generalmente">Generalmente</option>
-                      <option value="nose">No sé</option>
+                      <option value="Raramente">Raramente o nunca</option>
+                      <option value="A veces">A veces</option>
+                      <option value="Generalmente">Generalmente</option>
+                      <option value="No sé">No sé</option>
                     </select>
                   </div>
 
@@ -605,8 +605,8 @@
                       {% else %}
                       <option value="" disabled selected>Seleccione una opción</option>
                       {% endif %}
-                      <option value="si">Sí</option>
-                      <option value="no">No</option>
+                      <option value="Sí">Sí</option>
+                      <option value="No">No</option>
                     </select>
                   </div>
 
@@ -620,8 +620,8 @@
                       {% else %}
                       <option value="" disabled selected>Seleccione una opción</option>
                       {% endif %}
-                      <option value="si">Sí</option>
-                      <option value="no">No</option>
+                      <option value="Sí">Sí</option>
+                      <option value="No">No</option>
                     </select>
                   </div>
 
@@ -636,8 +636,8 @@
                       {% else %}
                       <option value="" disabled selected>Seleccione una opción</option>
                       {% endif %}
-                      <option value="si">Sí</option>
-                      <option value="no">No</option>
+                      <option value="Sí">Sí</option>
+                      <option value="No">No</option>
                     </select>
                   </div>
 
@@ -652,8 +652,8 @@
                       {% else %}
                       <option value="" disabled selected>Seleccione una opción</option>
                       {% endif %}
-                      <option value="si">Sí</option>
-                      <option value="no">No</option>
+                      <option value="Sí">Sí</option>
+                      <option value="No">No</option>
                     </select>
                   </div>
 
@@ -668,10 +668,10 @@
                       {% else %}
                       <option value="" disabled selected>Seleccione una opción</option>
                       {% endif %}
-                      <option value="raramente">Raramente o nunca (Necesita ser acompañado/a siempre)</option>
-                      <option value="a_veces">A veces (Compra una cantidad limitada de artículos, duplica la compra o se olvida de artículos)</option>
-                      <option value="generalmente">Generalmente</option>
-                      <option value="no_sabe">No sé</option>
+                      <option value="Raramente">Raramente o nunca (Necesita ser acompañado/a siempre)</option>
+                      <option value="A veces">A veces (Compra una cantidad limitada de artículos, duplica la compra o se olvida de artículos)</option>
+                      <option value="Generalmente">Generalmente</option>
+                      <option value="No sé">No sé</option>
                     </select>
                   </div>
 
@@ -680,16 +680,16 @@
                     <label>7. ¿Es él/ella capaz de llevar a cabo actividades fuera del hogar en forma independiente?</label>
                     <select class="form-control" name="actividades_fuera_hogar" required>
                       {% if datos_examen.actividades_fuera_hogar %}
-                        <option value="{{ datos_examen.actividades_fuera_hogar }}" selected>
-                          {{ datos_examen.actividades_fuera_hogar }}
-                         </option>
+                      <option value="{{ datos_examen.actividades_fuera_hogar }}" selected>
+                      {{ datos_examen.actividades_fuera_hogar }}
+                      </option>
                       {% else %}
                       <option value="" disabled selected>Seleccione una opción</option>
                       {% endif %}
-                      <option value="raramente">Raramente o nunca (Incapaz sin ayuda)</option>
-                      <option value="a_veces">A veces (Limitadas y/o rutinarias)</option>
-                      <option value="generalmente">Generalmente (Participación significativa)</option>
-                      <option value="no_sabe">No sé</option>
+                      <option value="Raramente">Raramente o nunca (Incapaz sin ayuda)</option>
+                      <option value="A veces">A veces (Limitadas y/o rutinarias)</option>
+                      <option value="Generalmente">Generalmente (Participación significativa)</option>
+                      <option value="No sé">No sé</option>
                     </select>
                   </div>
 
@@ -704,14 +704,14 @@
                       {% else %}
                       <option value="" disabled selected>Seleccione una opción</option>
                       {% endif %}
-                      <option value="si">Sí</option>
-                      <option value="no">No</option>
+                      <option value="Sí">Sí</option>
+                      <option value="No">No</option>
                     </select>
 
                     <!-- Subpregunta si responde "No" -->
                     <div id="funciones_sociales_motivo_container" style="display: none; margin-top: 10px;">
                       <label for="motivo_no_funciones">En caso negativo, ¿por qué no?</label>
-                      <textarea class="form-control" name="motivo_no_funciones" id="motivo_no_funciones" value="{{ datos_examen.motivo_no_funciones|default_if_none:'' }}" rows="2"></textarea>
+                      <textarea class="form-control" name="motivo_no_funciones" id="motivo_no_funciones" rows="2">{{ datos_examen.motivo_no_funciones|default_if_none:'' }}</textarea>
                     </div>
                   </div>
 
@@ -726,8 +726,8 @@
                       {% else %}
                       <option value="" disabled selected>Seleccione una opción</option>
                       {% endif %}
-                      <option value="si">Sí</option>
-                      <option value="no">No</option>
+                      <option value="Sí">Sí</option>
+                      <option value="No">No</option>
                     </select>
                   </div>
 
@@ -742,8 +742,8 @@
                       {% else %}
                       <option value="" disabled selected>Seleccione una opción</option>
                       {% endif %}
-                      <option value="si">Sí</option>
-                      <option value="no">No</option>
+                      <option value="Sí">Sí</option>
+                      <option value="No">No</option>
                     </select>
                   </div>
 
@@ -758,15 +758,15 @@
                       {% else %}
                       <option value="" disabled selected>Seleccione una opción</option>
                       {% endif %}
-                      <option value="si">Sí</option>
-                      <option value="no">No</option>
+                      <option value="Sí">Sí</option>
+                      <option value="No">No</option>
                     </select>
                   </div>
 
                   <!-- Notas -->
                   <div class="form-group">
                     <label>Notas adicionales (si desea clarificar el nivel de funcionamiento en actividades comunitarias):</label>
-                    <textarea class="form-control" name="notas_comunitarias" value="{{ datos_examen.notas_comunitarias|default_if_none:'' }}" rows="3"></textarea>
+                    <textarea class="form-control" name="notas_comunitarias"  rows="3">{{ datos_examen.notas_comunitarias|default_if_none:'' }}</textarea>
                   </div>
 
                   <div class="text-right mt-4">
@@ -790,7 +790,7 @@
                     <label for="cambios_tareas_domesticas">
                       1. a) ¿Qué cambios se han registrado en las habilidades de él/ella para realizar tareas domésticas?
                     </label>
-                    <textarea class="form-control" name="cambios_tareas_domesticas" id="cambios_tareas_domesticas" value="{{ datos_examen.cambios_tareas_domesticas|default_if_none:'' }}" rows="3" required></textarea>
+                    <textarea class="form-control" name="cambios_tareas_domesticas" id="cambios_tareas_domesticas" rows="3" required>{{ datos_examen.cambios_tareas_domesticas|default_if_none:'' }}</textarea>
                   </div>
 
                   <!-- Pregunta 1b -->
@@ -798,7 +798,7 @@
                     <label for="cosas_que_aun_realiza_domesticas">
                       1. b) ¿Qué cosas puede él/ella todavía realizar bien?
                     </label>
-                    <textarea class="form-control" name="cosas_que_aun_realiza_domesticas" id="cosas_que_aun_realiza_domesticas" value="{{ datos_examen.cosas_que_aun_realiza_domesticas|default_if_none:'' }}" rows="3" required></textarea>
+                    <textarea class="form-control" name="cosas_que_aun_realiza_domesticas" id="cosas_que_aun_realiza_domesticas"  rows="3" required>{{ datos_examen.cosas_que_aun_realiza_domesticas|default_if_none:'' }}</textarea>
                   </div>
 
                   <!-- Pregunta 2a -->
@@ -806,7 +806,7 @@
                     <label for="cambios_pasatiempos">
                       2. a) ¿Qué cambios se han registrado en las habilidades de él/ella para realizar pasatiempos?
                     </label>
-                    <textarea class="form-control" name="cambios_pasatiempos" id="cambios_pasatiempos" value="{{ datos_examen.cambios_pasatiempos|default_if_none:'' }}" rows="3" required></textarea>
+                    <textarea class="form-control" name="cambios_pasatiempos" id="cambios_pasatiempos" rows="3" required>{{ datos_examen.cambios_pasatiempos|default_if_none:'' }}</textarea>
                   </div>
 
                   <!-- Pregunta 2b -->
@@ -814,7 +814,7 @@
                     <label for="cosas_que_aun_realiza_pasatiempos">
                       2. b) ¿Qué cosas puede él/ella todavía realizar bien?
                     </label>
-                    <textarea class="form-control" name="cosas_que_aun_realiza_pasatiempos" id="cosas_que_aun_realiza_pasatiempos" value="{{ datos_examen.cosas_que_aun_realiza_pasatiempos|default_if_none:'' }}" rows="3" required></textarea>
+                    <textarea class="form-control" name="cosas_que_aun_realiza_pasatiempos" id="cosas_que_aun_realiza_pasatiempos" rows="3" required>{{ datos_examen.cosas_que_aun_realiza_pasatiempos|default_if_none:'' }}</textarea>
                   </div>
 
                   <!-- Pregunta 3 -->
@@ -822,7 +822,7 @@
                     <label for="actividades_no_realiza_en_hogar">
                       3. Si el sujeto se encuentra en un hogar geriátrico, ¿qué cosas ya no puede realizar bien (actividades domésticas y pasatiempos)?
                     </label>
-                    <textarea class="form-control" name="actividades_no_realiza_en_hogar" id="actividades_no_realiza_en_hogar" value="{{ datos_examen.actividades_no_realiza_en_hogar|default_if_none:'' }}" rows="3"></textarea>
+                    <textarea class="form-control" name="actividades_no_realiza_en_hogar" id="actividades_no_realiza_en_hogar" rows="3">{{ datos_examen.actividades_no_realiza_en_hogar|default_if_none:'' }}</textarea>
                   </div>
 
                   <!-- Pregunta 4 -->
@@ -831,16 +831,16 @@
                       4. Habilidad para realizar tareas domésticas (Dementia Scale of Blessed)
                     </label>
                     <select class="form-control" name="habilidad_domestica_dementia_scale" required>
-                      {% if datos_examen.sentir_tension %}
-                        <option value="{{ datos_examen.sentir_tension }}" selected>
-                         {{ datos_examen.sentir_tension }}
+                      {% if datos_examen.habilidad_domestica_dementia_scale %}
+                        <option value="{{ datos_examen.habilidad_domestica_dementia_scale }}" selected>
+                         {{ datos_examen.habilidad_domestica_dementia_scale }}
                         </option>
                       {% else %}
                       <option value="" disabled selected>Seleccione una opción</option>
                       {% endif %}
-                      <option value="0">0 - Sin pérdida</option>
-                      <option value="0.5">0.5 - Pérdida leve</option>
-                      <option value="1">1 - Pérdida severa</option>
+                      <option value="0 - Sin pérdida">0 - Sin pérdida</option>
+                      <option value="0.5 - Pérdida leve">0.5 - Pérdida leve</option>
+                      <option value="1 - Pérdida severa">1 - Pérdida severa</option>
                     </select>
                   </div>
 
@@ -849,7 +849,7 @@
                     <label for="descripcion_habilidad_domestica">
                       Por favor describa:
                     </label>
-                    <textarea class="form-control" name="descripcion_habilidad_domestica" id="descripcion_habilidad_domestica" value="{{ datos_examen.descripcion_habilidad_domestica|default_if_none:'' }}" rows="4" required></textarea>
+                    <textarea class="form-control" name="descripcion_habilidad_domestica" id="descripcion_habilidad_domestica" rows="4" required>{{ datos_examen.descripcion_habilidad_domestica|default_if_none:'' }}</textarea>
                   </div>
 
                   <!-- Pregunta 5: Nivel actual de desempeño -->
@@ -865,11 +865,11 @@
                       {% else %}
                       <option value="" disabled selected>Seleccione una opción</option>
                       {% endif %}
-                      <option value="muy_limitado">Desempeño muy limitado (solo bajo estrecha supervisión)</option>
-                      <option value="limitado">Se desempeña solo en actividades limitadas (cierta supervisión)</option>
-                      <option value="independiente_algunas">Se desempeña independientemente en algunas actividades</option>
-                      <option value="no_al_nivel_usual">Se desempeña en actividades habituales, pero no con el nivel usual</option>
-                      <option value="normal">Se desempeña normalmente en actividades habituales</option>
+                      <option value="Desempeño muy limitado (solo bajo estrecha supervisión)">Desempeño muy limitado (solo bajo estrecha supervisión)</option>
+                      <option value="Se desempeña solo en actividades limitadas (cierta supervisión)">Se desempeña solo en actividades limitadas (cierta supervisión)</option>
+                      <option value="Se desempeña independientemente en algunas actividades">Se desempeña independientemente en algunas actividades</option>
+                      <option value="Se desempeña en actividades habituales, pero no con el nivel usual">Se desempeña en actividades habituales, pero no con el nivel usual</option>
+                      <option value="Se desempeña normalmente en actividades habituales">Se desempeña normalmente en actividades habituales</option>
                     </select>
                   </div>
 
@@ -878,7 +878,7 @@
                     <label for="notas_domesticas_pasatiempos">
                       <strong>Notas adicionales</strong> (si desea aclarar nivel de funcionamiento):
                     </label>
-                    <textarea class="form-control" name="notas_domesticas_pasatiempos" id="notas_domesticas_pasatiempos" value="{{ datos_examen.notas_domesticas_pasatiempos|default_if_none:'' }}" rows="4"></textarea>
+                    <textarea class="form-control" name="notas_domesticas_pasatiempos" id="notas_domesticas_pasatiempos" rows="4">{{ datos_examen.notas_domesticas_pasatiempos|default_if_none:'' }}</textarea>
                   </div>
 
                   <div class="text-right mt-4">
@@ -907,10 +907,10 @@
                       {% else %}
                       <option value="" disabled selected>Seleccione una opción</option>
                       {% endif %}
-                      <option value="0">Sin ayuda</option>
-                      <option value="1">Ocasionalmente botones mal abotonados, etc</option>
-                      <option value="2">Secuencia equivocada. Cosas frecuentemente olvidadas</option>
-                      <option value="3">Incapaz de vestirse solo/a</option>
+                      <option value="0: Sin ayuda">Sin ayuda</option>
+                      <option value="1: Ocasionalmente botones mal abotonados, etc">Ocasionalmente botones mal abotonados, etc</option>
+                      <option value="2: Secuencia equivocada. Cosas frecuentemente olvidadas">Secuencia equivocada. Cosas frecuentemente olvidadas</option>
+                      <option value="3: Incapaz de vestirse solo/a">Incapaz de vestirse solo/a</option>
                     </select>
                   </div>
 
@@ -924,10 +924,10 @@
                       {% else %}
                       <option value="" disabled selected>Seleccione una opción</option>
                       {% endif %}
-                      <option value="0">Sin ayuda</option>
-                      <option value="1">Necesita recordatorios</option>
-                      <option value="2">A veces necesita ayuda</option>
-                      <option value="3">Siempre o casi siempre necesita ayuda</option>
+                      <option value="0: Sin ayuda">Sin ayuda</option>
+                      <option value="1: Necesita recordatorios">Necesita recordatorios</option>
+                      <option value="2: A veces necesita ayuda">A veces necesita ayuda</option>
+                      <option value="3: Siempre o casi siempre necesita ayuda">Siempre o casi siempre necesita ayuda</option>
                     </select>
                   </div>
 
@@ -941,10 +941,10 @@
                       {% else %}
                       <option value="" disabled selected>Seleccione una opción</option>
                       {% endif %}
-                      <option value="0">Limpio; utiliza los utensilios correctos</option>
-                      <option value="1">Desordenado; cuchara</option>
-                      <option value="2">Sólidos simples</option>
-                      <option value="3">Se le debe dar de comer en todo momento</option>
+                      <option value="0: Limpio; utiliza los utensilios correctos">Limpio; utiliza los utensilios correctos</option>
+                      <option value="1: Desordenado; cuchara">Desordenado; cuchara</option>
+                      <option value="2: Sólidos simples">Sólidos simples</option>
+                      <option value="3: Se le debe dar de comer en todo momento">Se le debe dar de comer en todo momento</option>
                     </select>
                   </div>
 
@@ -958,10 +958,10 @@
                       {% else %}
                       <option value="" disabled selected>Seleccione una opción</option>
                       {% endif %}
-                      <option value="0">Control completo normal</option>
-                      <option value="1">Ocasionalmente moja la cama</option>
-                      <option value="2">Frecuentemente moja la cama</option>
-                      <option value="3">Incontinencia doble</option>
+                      <option value="0: Control completo normal">Control completo normal</option>
+                      <option value="1: Ocasionalmente moja la cama">Ocasionalmente moja la cama</option>
+                      <option value="2: Frecuentemente moja la cama">Frecuentemente moja la cama</option>
+                      <option value="3: Incontinencia doble">Incontinencia doble</option>
                     </select>
                   </div>
 
@@ -1011,7 +1011,7 @@
 
     if (memoriaSelect && memoriaConstanteContainer) {
       memoriaSelect.addEventListener("change", function () {
-        if (this.value === "si") {
+        if (this.value === "Sí") {
           memoriaConstanteContainer.style.display = "block";
         } else {
           memoriaConstanteContainer.style.display = "none";
@@ -1029,15 +1029,15 @@
     if (trabajoSelect) {
       trabajoSelect.addEventListener("change", function () {
         const val = this.value;
-        if (trabajoP2) trabajoP2.style.display = (val === "no") ? "block" : "none";
-        if (trabajoP3) trabajoP3.style.display = (val === "si") ? "block" : "none";
+        if (trabajoP2) trabajoP2.style.display = (val === "No") ? "block" : "none";
+        if (trabajoP3) trabajoP3.style.display = (val === "Sí") ? "block" : "none";
 
         // Reset campos si se ocultan
-        if (val !== "no" && trabajoP2) {
+        if (val !== "No" && trabajoP2) {
           const select = trabajoP2.querySelector("select");
           if (select) select.value = "";
         }
-        if (val !== "si" && trabajoP3) {
+        if (val !== "Sí" && trabajoP3) {
           const select = trabajoP3.querySelector("select");
           if (select) select.value = "";
         }
@@ -1052,15 +1052,15 @@
     if (conduceSelect) {
       conduceSelect.addEventListener("change", function () {
         const val = this.value;
-        if (dejaConducir) dejaConducir.style.display = (val === "no") ? "block" : "none";
-        if (riesgoConduce) riesgoConduce.style.display = (val === "si") ? "block" : "none";
+        if (dejaConducir) dejaConducir.style.display = (val === "No") ? "block" : "none";
+        if (riesgoConduce) riesgoConduce.style.display = (val === "Sí") ? "block" : "none";
 
         // Reset si se ocultan
-        if (val !== "no" && dejaConducir) {
+        if (val !== "No" && dejaConducir) {
           const select = dejaConducir.querySelector("select");
           if (select) select.value = "";
         }
-        if (val !== "si" && riesgoConduce) {
+        if (val !== "Sí" && riesgoConduce) {
           const select = riesgoConduce.querySelector("select");
           if (select) select.value = "";
         }
@@ -1073,7 +1073,7 @@
 
     if (funcionesSelect && motivoContainer) {
       funcionesSelect.addEventListener("change", function () {
-        if (this.value === "no") {
+        if (this.value === "No") {
           motivoContainer.style.display = "block";
         } else {
           motivoContainer.style.display = "none";

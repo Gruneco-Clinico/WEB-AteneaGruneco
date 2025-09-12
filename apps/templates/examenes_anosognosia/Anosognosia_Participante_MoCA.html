@@ -22,6 +22,9 @@
           <input type="hidden" name="visita_id" value="{{ visita_examen }}">
           <input type="hidden" name="paciente_id" value="{{ paciente_id }}">
           <input type="hidden" name="examen_id" value="{{ examen_id }}">
+          <input type="hidden" name="atencion" id="atencion_total" value="{{ datos_examen.atencion|default:'0' }}">
+          <input type="hidden" name="repeticion" id="repeticion_total" value="{{ datos_examen.repeticion|default:'0' }}">
+
 
           <div class="card-body">
             <div class="alert alert-info">
@@ -34,7 +37,11 @@
               <p>El paciente debe seguir la secuencia: 1-A-2-B-3-C-4-D-5-E.</p>
               <p><strong>Puntaje:</strong> 1 si completa correctamente; 0 si no corrige inmediatamente un error cualquiera que este sea.</p>
               <select class="form-control" name="alternancia" required>
-                <option value="" disabled selected>Seleccione puntuación</option>
+                {% if datos_examen.alternancia %}
+                <option value="{{ datos_examen.alternancia }}" selected>{{ datos_examen.alternancia }}</option>
+                {% else %}
+                <option value="">Seleccione una opción</option>
+                {% endif %}
                 <option value="0">0 puntos</option>
                 <option value="1">1 punto</option>
               </select>
@@ -46,7 +53,11 @@
               <p><strong>Criterios:</strong> El cubo debe ser tridimensional, todas las líneas presentes, no se añaden líneas y todas son relativamente paralelas y aproximadamente de la misma longitud (los prismas rectangulares son aceptables).</p>
               <p><strong>Puntaje:</strong> 1 si cumple todos los criterios; 0 si no se han respetado TODOS los criterios anteriores.</p>
               <select class="form-control" name="cubo" required>
-                <option value="" disabled selected>Seleccione puntuación</option>
+                {% if datos_examen.cubo %}
+                <option value="{{ datos_examen.cubo }}" selected>{{ datos_examen.cubo }}</option>
+                {% else %}
+                <option value="">Seleccione una opción</option>
+                {% endif %}
                 <option value="0">0 puntos</option>
                 <option value="1">1 punto</option>
               </select>
@@ -67,7 +78,11 @@
                 cerca del centro del reloj.</li>
                 <li><strong>No se asignan puntos si no se han respetado todos los criterios anteriores.</strong></li>
               <select class="form-control" name="reloj" required>
-                <option value="" disabled selected>Seleccione puntuación</option>
+                {% if datos_examen.reloj %}
+                <option value="{{ datos_examen.reloj }}" selected>{{ datos_examen.reloj }}</option>
+                {% else %}
+                <option value="">Seleccione una opción</option>
+                {% endif %}
                 <option value="0">0 puntos</option>
                 <option value="1">1 punto</option>
                 <option value="2">2 puntos</option>
@@ -81,7 +96,11 @@
               <p><strong>Puntaje: </strong>Se asigna un punto por la identificación correcta de cada uno de los dibujos: (1) camello o 
                 dromedario (2) león (3) rinoceronte. </p>
               <select class="form-control" name="denominacion" required>
-                <option value="" disabled selected>Seleccione puntuación</option>
+                {% if datos_examen.denominacion %}
+                <option value="{{ datos_examen.denominacion }}" selected>{{ datos_examen.denominacion }}</option>
+                {% else %}
+                <option value="">Seleccione una opción</option>
+                {% endif %}
                 <option value="0">0 puntos</option>
                 <option value="1">1 punto</option>
                 <option value="2">2 puntos</option>
@@ -102,7 +121,11 @@
                 <p><strong>Secuencia numérica: 2 1 8 5 4</strong></p>
                 <p><em>Instrucciones:</em> Lea la secuencia de números a un ritmo de uno por segundo, luego de haber dado las siguientes instrucciones: “Le voy a leer una serie de números, y cuando haya terminado, me gustaría que repita estos números en el mismo orden en el que yo los he dicho”.</p>
                 <select class="form-control mb-3" name="atencion_secuencia" required>
-                  <option value="" disabled selected>Seleccione puntuación</option>
+                  {% if datos_examen.atencion_secuencia %}
+                  <option value="{{ datos_examen.atencion_secuencia }}" selected>{{ datos_examen.atencion_secuencia }}</option>
+                  {% else %}
+                  <option value="">Seleccione una opción</option>
+                  {% endif %}
                   <option value="0">0 puntos</option>
                   <option value="1">1 punto</option>
                 </select>
@@ -111,7 +134,11 @@
                 <p><strong>Secuencia numérica inversa: 7 4 2</strong></p>
                 <p><em>Instrucciones:</em> El examinador lee una secuencia de 3 cifras a un ritmo de una por segundo, luego de haber dado las instrucciones: “Le voy a leer una serie de números, y cuando haya terminado, me gustaría que repita los números en el orden inverso al que yo los he dado”.</p>
                 <select class="form-control mb-3" name="atencion_inversa" required>
-                  <option value="" disabled selected>Seleccione puntuación</option>
+                  {% if datos_examen.atencion_inversa %}
+                  <option value="{{ datos_examen.atencion_inversa }}" selected>{{ datos_examen.atencion_inversa }}</option>
+                  {% else %}
+                  <option value="">Seleccione una opción</option>
+                  {% endif %}
                   <option value="0">0 puntos</option>
                   <option value="1">1 punto</option>
                 </select>
@@ -185,7 +212,11 @@
               <label><strong>8. Fluidez verbal</strong></label>
               <p>Decir la mayor cantidad de palabras que comiencen con "F" en un minuto. Se otorga 1 punto si dice 11 palabras o más en un minuto.</p>
               <select class="form-control" name="fluidez" required>
-                <option value="" disabled selected>Seleccione puntuación</option>
+                {% if datos_examen.fluidez %}
+                <option value="{{ datos_examen.fluidez }}" selected>{{ datos_examen.fluidez }}</option>
+                {% else %}
+                <option value="">Seleccione una opción</option>
+                {% endif %}
                 <option value="0">0 puntos</option>
                 <option value="1">1 punto</option>
               </select>
@@ -196,7 +227,11 @@
               <label><strong>9. Abstracción</strong></label>
               <p>Identificar similitudes entre pares de palabras. Puntaje máximo: 2 puntos.</p>
               <select class="form-control" name="abstraccion" required>
-                <option value="" disabled selected>Seleccione puntuación</option>
+                {% if datos_examen.abstraccion %}
+                <option value="{{ datos_examen.abstraccion }}" selected>{{ datos_examen.abstraccion }}</option>
+                {% else %}
+                <option value="">Seleccione una opción</option>
+                {% endif %}
                 <option value="0">0 puntos</option>
                 <option value="1">1 punto</option>
                 <option value="2">2 puntos</option>

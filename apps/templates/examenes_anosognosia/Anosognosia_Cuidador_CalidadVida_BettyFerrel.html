@@ -17,7 +17,7 @@
   <div class="row">
     <div class="col">
       <div class="card shadow">
-        <form method="post" action="{% url 'guardar_examen_Cuidador_BettyFerrel' %}">
+        <form method="post" action="{% url 'guardar_examen_BettyFerrel' %}">
           {% csrf_token %}
           <input type="hidden" name="visita_id" value="{{ visita_examen }}">
           <input type="hidden" name="paciente_id" value="{{ paciente_id }}">
@@ -43,25 +43,50 @@
                 <div class="card-body bg-white">
                   {% comment %} Selecciones de 0 a 3: Ausencia / Algo / Problema / Muchísimo {% endcomment %}
                   <div class="form-group"><label>Agotamiento</label><select class="form-control" name="agotamiento" required>
-                    <option value="" disabled selected>Seleccione una opción</option><option value="0" data-text="0. Ausencia de problema">0. Ausencia de problema</option>
+                    {% if datos_examen.agotamiento %}
+                    <option value="{{ datos_examen.agotamiento }}" selected>{{ datos_examen.agotamiento }}</option>
+                    {% else %}
+                    <option value="" disabled {% if not datos_examen.agotamiento %}selected{% endif %}>Seleccione una opción</option>
+                    {% endif %}
+                    <option value="0" data-text="0. Ausencia de problema">0. Ausencia de problema</option>
                     <option value="1" data-text="1. Algo de problema">1. Algo de problema</option><option value="2" data-text="2. Problema">2. Problema</option><option value="3" data-text="Muchísimo problema">3. Muchísimo problema</option>
-                  </select><input type="hidden" name="agotamiento_texto"></div>
-                  <div class="form-group"><label>Cambios en los hábitos alimentarios</label><select class="form-control" name="cambios_alimentarios" required>
-                    <option value="" disabled selected>Seleccione una opción</option><option value="0" data-text="0. Ausencia de problema">0. Ausencia de problema</option>
-                    <option value="1" data-text="1. Algo de problema">1. Algo de problema</option><option value="2" data-text="2. Problema">2. Problema</option><option value="3" data-text="Muchísimo problema">3. Muchísimo problema</option>
-                  </select><input type="hidden" name="cambios_alimenticios_texto"></div>
+                  </select><input type="hidden" name="agotamiento_texto"  value="{{ datos_examen.agotamiento_texto|default:'' }}"></div>
+
+                  <div class="form-group"><label>Cambios en los hábitos alimentarios</label><select class="form-control" name="cambios_alimenticios" required>
+                    {% if datos_examen.cambios_alimenticios %}
+                    <option value="{{ datos_examen.cambios_alimenticios }}" selected>{{ datos_examen.cambios_alimenticios }}</option>
+                    {% else %}
+                    <option value="" disabled {% if not datos_examen.cambios_alimenticios %}selected{% endif %}>Seleccione una opción</option>
+                    {% endif %}
+                    <option value="0" data-text="0. Ausencia de problema">0. Ausencia de problema</option><option value="1" data-text="1. Algo de problema">1. Algo de problema</option><option value="2" data-text="2. Problema">2. Problema</option><option value="3" data-text="Muchísimo problema">3. Muchísimo problema</option>
+                  </select><input type="hidden" name="cambios_alimenticios_texto" value="{{ datos_examen.cambios_alimenticios_texto|default:'' }}"></div>
+
                   <div class="form-group"><label>Dolor</label><select class="form-control" name="dolor" required>
-                    <option value="" disabled selected>Seleccione una opción</option><option value="0" data-text="0. Ausencia de problema">0. Ausencia de problema</option>
-                    <option value="1" data-text="1. Algo de problema">1. Algo de problema</option><option value="2" data-text="2. Problema">2. Problema</option><option value="3" data-text="Muchísimo problema">3. Muchísimo problema</option>
-                  </select><input type="hidden" name="dolor_texto"></div>
+                    {% if datos_examen.dolor %}
+                    <option value="{{ datos_examen.dolor }}" selected>{{ datos_examen.dolor }}</option>
+                    {% else %}
+                    <option value="" disabled {% if not datos_examen.dolor %}selected{% endif %}>Seleccione una opción</option>
+                    {% endif %}
+                    <option value="0" data-text="0. Ausencia de problema">0. Ausencia de problema</option><option value="1" data-text="1. Algo de problema">1. Algo de problema</option><option value="2" data-text="2. Problema">2. Problema</option><option value="3" data-text="Muchísimo problema">3. Muchísimo problema</option>
+                  </select><input type="hidden" name="dolor_texto" value="{{ datos_examen.dolor_texto|default:'' }}"></div>
+
                   <div class="form-group"><label>Cambios en el sueño</label><select class="form-control" name="cambios_sueno" required>
-                    <option value="" disabled selected>Seleccione una opción</option><option value="0" data-text="0. Ausencia de problema">0. Ausencia de problema</option>
-                    <option value="1" data-text="1. Algo de problema">1. Algo de problema</option><option value="2" data-text="2. Problema">2. Problema</option><option value="3" data-text="Muchísimo problema">3. Muchísimo problema</option>
-                  </select><input type="hidden" name="cambios_sueno_texto"></div>
+                    {% if datos_examen.cambios_sueno %}
+                    <option value="{{ datos_examen.cambios_sueno }}" selected>{{ datos_examen.cambios_sueno }}</option>
+                    {% else %}
+                    <option value="" disabled {% if not datos_examen.cambios_sueno %}selected{% endif %}>Seleccione una opción</option>
+                    {% endif %}
+                    <option value="0" data-text="0. Ausencia de problema">0. Ausencia de problema</option><option value="1" data-text="1. Algo de problema">1. Algo de problema</option><option value="2" data-text="2. Problema">2. Problema</option><option value="3" data-text="Muchísimo problema">3. Muchísimo problema</option>
+                  </select><input type="hidden" name="cambios_sueno_texto" value="{{ datos_examen.cambios_sueno_texto|default:'' }}"></div>
+
                   <div class="form-group"><label>Clasifique su salud física en general</label><select class="form-control" name="salud_fisica_general" required>
-                    <option value="" disabled selected>Seleccione una opción</option><option value="0" data-text="0. Sumamente mala">0. Sumamente mala</option>
-                    <option value="1" data-text="1. Regular">1. Regular</option><option value="2. Buena" data-text="">2. Buena</option><option value="3" data-text="3. Excelente">3. Excelente</option>
-                  </select><input type="hidden" name="salud_fisica_general_texto"></div>
+                    {% if datos_examen.salud_fisica_general %}
+                    <option value="{{ datos_examen.salud_fisica_general }}" selected>{{ datos_examen.salud_fisica_general }}</option>
+                    {% else %}
+                    <option value="" disabled {% if not datos_examen.salud_fisica_general %}selected{% endif %}>Seleccione una opción</option>
+                    {% endif %}
+                    <option value="0" data-text="0. Ausencia de problema">0. Ausencia de problema</option><option value="1" data-text="1. Regular">1. Regular</option><option value="2. Buena" data-text="">2. Buena</option><option value="3" data-text="3. Excelente">3. Excelente</option>
+                  </select><input type="hidden" name="salud_fisica_general_texto" value="{{ datos_examen.salud_fisica_general_texto|default:'' }}"></div>
 
                   <div class="text-right mt-4">
                     <button type="button" class="btn btn-outline-primary btn-next" data-next="#psicologico">Siguiente sección</button>
@@ -79,74 +104,130 @@
                 <div class="card-body bg-white">
 
                   <div class="form-group"><label>¿Qué tan fácil es enfrentar su vida con un pariente enfermo?</label><select class="form-control" name="facilidad_enfrentar" required>
-                    <option value="" disabled selected>Seleccione una opción</option><option value="0" data-text="0. Muy fácil">0. Muy fácil</option>
-                    <option value="1" data-text="1. Fácil">1. Fácil</option><option value="2" data-text="2. Difícil">2. Difícil</option><option value="3" data-text="3. Muy difícil">3. Muy difícil</option>
-                  </select><input type="hidden" name="facilidad_enfrentar_texto"></div>
+                    {% if datos_examen.facilidad_enfrentar %}
+                    <option value="{{ datos_examen.facilidad_enfrentar }}" selected>{{ datos_examen.facilidad_enfrentar }}</option>
+                    {% else %}
+                    <option value="" disabled {% if not datos_examen.facilidad_enfrentar %}selected{% endif %}>Seleccione una opción</option>
+                    {% endif %}
+                    <option value="0" data-text="0. Ausencia de problema">0. Ausencia de problema</option><option value="1" data-text="1. Fácil">1. Fácil</option><option value="2" data-text="2. Difícil">2. Difícil</option><option value="3" data-text="3. Muy difícil">3. Muy difícil</option>
+                  </select><input type="hidden" name="facilidad_enfrentar_texto" value="{{ datos_examen.facilidad_enfrentar_texto|default:'' }}"></div>
 
                   <div class="form-group"><label>¿Cuánta felicidad siente?</label><select class="form-control" name="felicidad" required>
-                    <option value="" disabled selected>Seleccione una opción</option><option value="0" data-text="0. Nada">0. Nada</option>
-                    <option value="1" data-text="1. Algo">1. Algo</option><option value="2" data-text="2. Moderado">2. Moderado</option><option value="3" data-text="3. Muchísimo">3. Muchísimo</option>
-                  </select><input type="hidden" name="felicidad_texto"></div>
+                    {% if datos_examen.felicidad %}
+                    <option value="{{ datos_examen.felicidad }}" selected>{{ datos_examen.felicidad }}</option>
+                    {% else %}
+                    <option value="" disabled {% if not datos_examen.felicidad %}selected{% endif %}>Seleccione una opción</option>
+                    {% endif %}
+                    <option value="0" data-text="0. Ausencia de problema">0. Ausencia de problema</option><option value="1" data-text="1. Algo">1. Algo</option><option value="2" data-text="2. Moderado">2. Moderado</option><option value="3" data-text="3. Muchísimo">3. Muchísimo</option>
+                  </select><input type="hidden" name="felicidad_texto" value="{{ datos_examen.felicidad_texto|default:'' }}"></div>
 
                   <div class="form-group"><label>¿Siente que tiene el control de su vida?</label><select class="form-control" name="control_vida" required>
-                    <option value="" disabled selected>Seleccione una opción</option><option value="0" data-text="0. Nada">0. Nada</option>
-                    <option value="1" data-text="1. Algo">1. Algo</option><option value="2" data-text="2. Moderado">2. Moderado</option><option value="3" data-text="3. Muchísimo">3. Muchísimo</option>
-                  </select><input type="hidden" name="control_vida_texto"></div>
+                    {% if datos_examen.control_vida %}
+                    <option value="{{ datos_examen.control_vida }}" selected>{{ datos_examen.control_vida }}</option>
+                    {% else %}
+                    <option value="" disabled {% if not datos_examen.control_vida %}selected{% endif %}>Seleccione una opción</option>
+                    {% endif %}
+                    <option value="0" data-text="0. Ausencia de problema">0. Ausencia de problema</option><option value="1" data-text="1. Algo">1. Algo</option><option value="2" data-text="2. Moderado">2. Moderado</option><option value="3" data-text="3. Muchísimo">3. Muchísimo</option>
+                  </select><input type="hidden" name="control_vida_texto" value="{{ datos_examen.control_vida_texto|default:'' }}"></div>
 
                   <div class="form-group"><label>¿Qué tan satisfecho está con su vida?</label><select class="form-control" name="satisfaccion_vida" required>
-                    <option value="" disabled selected>Seleccione una opción</option><option value="0" data-text="0. Nada">0. Nada</option>
-                    <option value="1" data-text="1. Algo">1. Algo</option><option value="2" data-text="2. Moderado">2. Moderado</option><option value="3" data-text="3. Muchísimo">3. Muchísimo</option>
-                  </select><input type="hidden" name="satisfaccion_vida_texto"></div>
+                    {% if datos_examen.satisfaccion_vida %}
+                    <option value="{{ datos_examen.satisfaccion_vida }}" selected>{{ datos_examen.satisfaccion_vida }}</option>
+                    {% else %}
+                    <option value="" disabled {% if not datos_examen.satisfaccion_vida %}selected{% endif %}>Seleccione una opción</option>
+                    {% endif %}
+                    <option value="0" data-text="0. Ausencia de problema">0. Ausencia de problema</option><option value="1" data-text="1. Algo">1. Algo</option><option value="2" data-text="2. Moderado">2. Moderado</option><option value="3" data-text="3. Muchísimo">3. Muchísimo</option>
+                  </select><input type="hidden" name="satisfaccion_vida_texto" value="{{ datos_examen.satisfaccion_vida_texto|default:'' }}"></div>
 
                   <div class="form-group"><label>Capacidad para concentrarse o recordar</label><select class="form-control" name="concentracion" required>
-                    <option value="" disabled selected>Seleccione una opción</option><option value="0">Sumamente mala</option>
-                    <option value="1">Regular</option><option value="2">Buena</option><option value="3">Excelente</option>
-                  </select><input type="hidden" name="concentracion_texto"></div>
+                    {% if datos_examen.concentracion %}
+                    <option value="{{ datos_examen.concentracion }}" selected>{{ datos_examen.concentracion }}</option>
+                    {% else %}
+                    <option value="" disabled {% if not datos_examen.concentracion %}selected{% endif %}>Seleccione una opción</option>
+                    {% endif %}
+                    <option value="0" data-text="0. Ausencia de problema">0. Ausencia de problema</option><option value="1">Regular</option><option value="2">Buena</option><option value="3">Excelente</option>
+                  </select><input type="hidden" name="concentracion_texto" value="{{ datos_examen.concentracion_texto|default:'' }}"></div>
 
                   <div class="form-group"><label>¿Qué tan útil se siente?</label><select class="form-control" name="utilidad_personal" required>
-                    <option value="" disabled selected>Seleccione una opción</option><option value="0" data-text="0. Nada">0. Nada</option>
-                    <option value="1" data-text="1. Algo">1. Algo</option><option value="2" data-text="2. Moderado">2. Moderado</option><option value="3" data-text="3. Muchísimo">3. Muchísimo</option>
-                  </select><input type="hidden" name="utilidad_personal_texto"></div>
+                    {% if datos_examen.utilidad_personal %}
+                    <option value="{{ datos_examen.utilidad_personal }}" selected>{{ datos_examen.utilidad_personal }}</option>
+                    {% else %}
+                    <option value="" disabled {% if not datos_examen.utilidad_personal %}selected{% endif %}>Seleccione una opción</option>
+                    {% endif %}
+                    <option value="0" data-text="0. Ausencia de problema">0. Ausencia de problema</option><option value="1" data-text="1. Algo">1. Algo</option><option value="2" data-text="2. Moderado">2. Moderado</option><option value="3" data-text="3. Muchísimo">3. Muchísimo</option>
+                  </select><input type="hidden" name="utilidad_personal_texto" value="{{ datos_examen.utilidad_personal_texto|default:'' }}"></div>
 
                   <div class="form-group"><label>¿Cuánta angustia le causó el diagnóstico?</label><select class="form-control" name="angustia_diagnostico" required>
-                    <option value="" disabled selected>Seleccione una opción</option><option value="0" data-text="0. Nada">0. Nada</option>
-                    <option value="1" data-text="1. Algo">1. Algo</option><option value="2" data-text="2. Moderado">2. Moderado</option><option value="3" data-text="3. Muchísimo">3. Muchísimo</option>
-                  </select><input type="hidden" name="angustia_diagnostico_texto"></div>
+                    {% if datos_examen.angustia_diagnostico %}
+                    <option value="{{ datos_examen.angustia_diagnostico }}" selected>{{ datos_examen.angustia_diagnostico }}</option>
+                    {% else %}
+                    <option value="" disabled {% if not datos_examen.angustia_diagnostico %}selected{% endif %}>Seleccione una opción</option>
+                    {% endif %}
+                    <option value="0" data-text="0. Ausencia de problema">0. Ausencia de problema</option><option value="1" data-text="1. Algo">1. Algo</option><option value="2" data-text="2. Moderado">2. Moderado</option><option value="3" data-text="3. Muchísimo">3. Muchísimo</option>
+                  </select><input type="hidden" name="angustia_diagnostico_texto" value="{{ datos_examen.angustia_diagnostico_texto|default:'' }}"></div>
 
                   <div class="form-group"><label>¿Cuánta angustia le causó el tratamiento?</label><select class="form-control" name="angustia_tratamiento" required>
-                    <option value="" disabled selected>Seleccione una opción</option><option value="0" data-text="0. Nada">0. Nada</option>
-                    <option value="1" data-text="1. Algo">1. Algo</option><option value="2" data-text="2. Moderado">2. Moderado</option><option value="3" data-text="3. Muchísimo">3. Muchísimo</option>
-                  </select><input type="hidden" name="angustia_tratamiento_texto"></div>
+                    {% if datos_examen.angustia_tratamiento %}
+                    <option value="{{ datos_examen.angustia_tratamiento }}" selected>{{ datos_examen.angustia_tratamiento }}</option>
+                    {% else %}
+                    <option value="" disabled {% if not datos_examen.angustia_tratamiento %}selected{% endif %}>Seleccione una opción</option>
+                    {% endif %}
+                    <option value="0" data-text="0. Ausencia de problema">0. Ausencia de problema</option><option value="1" data-text="1. Algo">1. Algo</option><option value="2" data-text="2. Moderado">2. Moderado</option><option value="3" data-text="3. Muchísimo">3. Muchísimo</option>
+                  </select><input type="hidden" name="angustia_tratamiento_texto" value="{{ datos_examen.angustia_tratamiento_texto|default:'' }}"></div>
 
                   <div class="form-group"><label>¿Cuánta ansiedad siente?</label><select class="form-control" name="ansiedad" required>
-                    <option value="" disabled selected>Seleccione una opción</option><option value="0" data-text="0. Nada">0. Nada</option>
-                    <option value="1" data-text="1. Algo">1. Algo</option><option value="2" data-text="2. Moderado">2. Moderado</option><option value="3" data-text="3. Muchísimo">3. Muchísimo</option>
-                  </select><input type="hidden" name="ansiedad_texto"></div>
+                    {% if datos_examen.ansiedad %}
+                    <option value="{{ datos_examen.ansiedad }}" selected>{{ datos_examen.ansiedad }}</option>
+                    {% else %}
+                    <option value="" disabled {% if not datos_examen.ansiedad %}selected{% endif %}>Seleccione una opción</option>
+                    {% endif %}
+                    <option value="0" data-text="0. Ausencia de problema">0. Ausencia de problema</option> <option value="1" data-text="1. Algo">1. Algo</option><option value="2" data-text="2. Moderado">2. Moderado</option><option value="3" data-text="3. Muchísimo">3. Muchísimo</option>
+                  </select><input type="hidden" name="ansiedad_texto" value="{{ datos_examen.ansiedad_texto|default:'' }}"></div>
 
                   <div class="form-group"><label>¿Cuánta depresión siente?</label><select class="form-control" name="depresion" required>
-                    <option value="" disabled selected>Seleccione una opción</option><option value="0" data-text="0. Nada">0. Nada</option>
-                    <option value="1" data-text="1. Algo">1. Algo</option><option value="2" data-text="2. Moderado">2. Moderado</option><option value="3" data-text="3. Muchísimo">3. Muchísimo</option>
-                  </select><input type="hidden" name="depresion_texto"></div>
+                    {% if datos_examen.depresion %}
+                    <option value="{{ datos_examen.depresion }}" selected>{{ datos_examen.depresion }}</option>
+                    {% else %}
+                    <option value="" disabled {% if not datos_examen.depresion %}selected{% endif %}>Seleccione una opción</option>
+                    {% endif %}
+                    <option value="0" data-text="0. Ausencia de problema">0. Ausencia de problema</option><option value="1" data-text="1. Algo">1. Algo</option><option value="2" data-text="2. Moderado">2. Moderado</option><option value="3" data-text="3. Muchísimo">3. Muchísimo</option>
+                  </select><input type="hidden" name="depresion_texto" value="{{ datos_examen.depresion_texto|default:'' }}"></div>
 
                   <div class="form-group"><label>¿Tiene miedo de otra enfermedad crónica?</label><select class="form-control" name="miedo_otra_enfermedad" required>
-                    <option value="" disabled selected>Seleccione una opción</option><option value="0" data-text="0. Nada">0. Nada</option>
-                    <option value="1" data-text="1. Algo">1. Algo</option><option value="2" data-text="2. Moderado">2. Moderado</option><option value="3" data-text="3. Muchísimo">3. Muchísimo</option>
-                  </select><input type="hidden" name="miedo_otra_enfermedad_texto"></div>
+                    {% if datos_examen.miedo_otra_enfermedad %}
+                    <option value="{{ datos_examen.miedo_otra_enfermedad }}" selected>{{ datos_examen.miedo_otra_enfermedad }}</option>
+                    {% else %}
+                    <option value="" disabled {% if not datos_examen.miedo_otra_enfermedad %}selected{% endif %}>Seleccione una opción</option>
+                    {% endif %}
+                    <option value="0" data-text="0. Ausencia de problema">0. Ausencia de problema</option><option value="1" data-text="1. Algo">1. Algo</option><option value="2" data-text="2. Moderado">2. Moderado</option><option value="3" data-text="3. Muchísimo">3. Muchísimo</option>
+                  </select><input type="hidden" name="miedo_otra_enfermedad_texto" value="{{ datos_examen.miedo_otra_enfermedad_texto|default:'' }}"></div>
 
                   <div class="form-group"><label>¿Tiene miedo de retroceso en su pariente?</label><select class="form-control" name="miedo_retroceso" required>
-                    <option value="" disabled selected>Seleccione una opción</option><option value="0" data-text="0. Nada">0. Nada</option>
-                    <option value="1" data-text="1. Algo">1. Algo</option><option value="2" data-text="2. Moderado">2. Moderado</option><option value="3" data-text="3. Muchísimo">3. Muchísimo</option>
-                  </select><input type="hidden" name="miedo_retroceso_texto"></div>
+                    {% if datos_examen.miedo_retroceso %}
+                    <option value="{{ datos_examen.miedo_retroceso }}" selected>{{ datos_examen.miedo_retroceso }}</option>
+                    {% else %}
+                    <option value="" disabled {% if not datos_examen.miedo_retroceso %}selected{% endif %}>Seleccione una opción</option>
+                    {% endif %}
+                    <option value="0" data-text="0. Ausencia de problema">0. Ausencia de problema</option><option value="1" data-text="1. Algo">1. Algo</option><option value="2" data-text="2. Moderado">2. Moderado</option><option value="3" data-text="3. Muchísimo">3. Muchísimo</option>
+                  </select><input type="hidden" name="miedo_retroceso_texto" value="{{ datos_examen.miedo_retroceso_texto|default:'' }}"></div>
 
                   <div class="form-group"><label>¿Tiene miedo del avance de la enfermedad?</label><select class="form-control" name="miedo_avance" required>
-                    <option value="" disabled selected>Seleccione una opción</option><option value="0" data-text="0. Nada">0. Nada</option>
-                    <option value="1" data-text="1. Algo">1. Algo</option><option value="2" data-text="2. Moderado">2. Moderado</option><option value="3" data-text="3. Muchísimo">3. Muchísimo</option>
-                  </select><input type="hidden" name="miedo_avance_texto"></div>
+                    {% if datos_examen.miedo_avance %}
+                    <option value="{{ datos_examen.miedo_avance }}" selected>{{ datos_examen.miedo_avance }}</option>
+                    {% else %}
+                    <option value="" disabled {% if not datos_examen.miedo_avance %}selected{% endif %}>Seleccione una opción</option>
+                    {% endif %}
+                    <option value="0" data-text="0. Ausencia de problema">0. Ausencia de problema</option><option value="1" data-text="1. Algo">1. Algo</option><option value="2" data-text="2. Moderado">2. Moderado</option><option value="3" data-text="3. Muchísimo">3. Muchísimo</option>
+                  </select><input type="hidden" name="miedo_avance_texto" value="{{ datos_examen.miedo_avance_texto|default:'' }}"></div>
 
                   <div class="form-group"><label>Clasifique su estado psicológico en general</label><select class="form-control" name="estado_psicologico" required>
-                    <option value="" disabled selected>Seleccione una opción</option><option value="0" data-text="0. Sumamente malo">0. Sumamente malo</option>
-                        <option value="1" data-text="1. Regular">1. Regular</option><option value="2" data-text="2. Bueno">2. Bueno</option><option value="3" data-text="3. Excelente">3. Excelente</option>
-                  </select><input type="hidden" name="estado_psicologico_texto"></div>
+                    {% if datos_examen.estado_psicologico %}
+                    <option value="{{ datos_examen.estado_psicologico }}" selected>{{ datos_examen.estado_psicologico }}</option>
+                    {% else %}
+                    <option value="" disabled {% if not datos_examen.estado_psicologico %}selected{% endif %}>Seleccione una opción</option>
+                    {% endif %}
+                    <option value="0" data-text="0. Ausencia de problema">0. Ausencia de problema</option><option value="1" data-text="1. Regular">1. Regular</option><option value="2" data-text="2. Bueno">2. Bueno</option><option value="3" data-text="3. Excelente">3. Excelente</option>
+                  </select><input type="hidden" name="estado_psicologico_texto" value="{{ datos_examen.estado_psicologico_texto|default:'' }}"></div>
 
                   <div class="text-right mt-4">
                     <button type="button" class="btn btn-outline-primary btn-next" data-next="#social">Siguiente sección</button>
@@ -164,49 +245,85 @@
                 <div class="card-body bg-white">
                   
                     <div class="form-group"><label>¿Cuánta angustia le ha ocasionado la enfermedad de su familiar?</label><select class="form-control" name="angustia_familiar" required>
-                      <option value="" disabled selected>Seleccione una opción</option><option value="0" data-text="0. Nada">0. Nada</option>
-                      <option value="1" data-text="1. Algo">1. Algo</option><option value="2" data-text="2. Moderado">2. Moderado</option><option value="3" data-text="3. Muchísimo">3. Muchísimo</option>
-                    </select><input type="hidden" name="angustia_familiar_texto"></div>
+                      {% if datos_examen.angustia_familiar %}
+                    <option value="{{ datos_examen.angustia_familiar }}" selected>{{ datos_examen.angustia_familiar }}</option>
+                    {% else %}
+                    <option value="" disabled {% if not datos_examen.angustia_familiar %}selected{% endif %}>Seleccione una opción</option>
+                    {% endif %}
+                    <option value="0" data-text="0. Ausencia de problema">0. Ausencia de problema</option><option value="1" data-text="1. Algo">1. Algo</option><option value="2" data-text="2. Moderado">2. Moderado</option><option value="3" data-text="3. Muchísimo">3. Muchísimo</option>
+                    </select><input type="hidden" name="angustia_familiar_texto" value="{{ datos_examen.angustia_familiar_texto|default:'' }}"></div>
 
                     <div class="form-group"><label>¿El nivel de ayuda que recibe de otras personas es suficiente para satisfacer sus necesidades?</label><select class="form-control" name="nivel_ayuda" required>
-                      <option value="" disabled selected>Seleccione una opción</option><option value="0" data-text="0. Nada">0. Nada</option>
-                      <option value="1" data-text="1. Algo">1. Algo</option><option value="2" data-text="2. Moderado">2. Moderado</option><option value="3" data-text="3. Muchísimo">3. Muchísimo</option>
-                    </select><input type="hidden" name="nivel_ayuda_texto"></div>
+                      {% if datos_examen.nivel_ayuda %}
+                    <option value="{{ datos_examen.nivel_ayuda }}" selected>{{ datos_examen.nivel_ayuda }}</option>
+                    {% else %}
+                    <option value="" disabled {% if not datos_examen.nivel_ayuda %}selected{% endif %}>Seleccione una opción</option>
+                    {% endif %}
+                    <option value="0" data-text="0. Ausencia de problema">0. Ausencia de problema</option><option value="1" data-text="1. Algo">1. Algo</option><option value="2" data-text="2. Moderado">2. Moderado</option><option value="3" data-text="3. Muchísimo">3. Muchísimo</option>
+                    </select><input type="hidden" name="nivel_ayuda_texto" value="{{ datos_examen.nivel_ayuda_texto|default:'' }}"></div>
 
                     <div class="form-group"><label>¿Hasta qué punto la enfermedad y tratamiento de su pariente han obstaculizado sus relaciones personales?</label><select class="form-control" name="relaciones_personales" required>
-                      <option value="" disabled selected>Seleccione una opción</option><option value="0" data-text="0. Nada">0. Nada</option>
-                      <option value="1" data-text="1. Algo">1. Algo</option><option value="2" data-text="2. Moderado">2. Moderado</option><option value="3" data-text="3. Muchísimo">3. Muchísimo</option>
-                    </select><input type="hidden" name="relaciones_personales_texto"></div>
+                      {% if datos_examen.relaciones_personales %}
+                    <option value="{{ datos_examen.relaciones_personales }}" selected>{{ datos_examen.relaciones_personales }}</option>
+                    {% else %}
+                    <option value="" disabled {% if not datos_examen.relaciones_personales %}selected{% endif %}>Seleccione una opción</option>
+                    {% endif %}
+                    <option value="0" data-text="0. Ausencia de problema">0. Ausencia de problema</option><option value="1" data-text="1. Algo">1. Algo</option><option value="2" data-text="2. Moderado">2. Moderado</option><option value="3" data-text="3. Muchísimo">3. Muchísimo</option>
+                    </select><input type="hidden" name="relaciones_personales_texto" value="{{ datos_examen.relaciones_personales_texto|default:'' }}"></div>
 
                     <div class="form-group"><label>¿Hasta qué punto la enfermedad y tratamiento de su pariente han afectado su vida sexual?</label><select class="form-control" name="vida_sexual" required>
-                      <option value="" disabled selected>Seleccione una opción</option><option value="0" data-text="0. Nada">0. Nada</option>
-                      <option value="1" data-text="1. Algo">1. Algo</option><option value="2" data-text="2. Moderado">2. Moderado</option><option value="3" data-text="3. Muchísimo">3. Muchísimo</option>
-                    </select><input type="hidden" name="vida_sexual_texto"></div>
+                      {% if datos_examen.vida_sexual %}
+                    <option value="{{ datos_examen.vida_sexual }}" selected>{{ datos_examen.vida_sexual }}</option>
+                    {% else %}
+                    <option value="" disabled {% if not datos_examen.vida_sexual %}selected{% endif %}>Seleccione una opción</option>
+                    {% endif %}
+                    <option value="0" data-text="0. Ausencia de problema">0. Ausencia de problema</option><option value="1" data-text="1. Algo">1. Algo</option><option value="2" data-text="2. Moderado">2. Moderado</option><option value="3" data-text="3. Muchísimo">3. Muchísimo</option>
+                    </select><input type="hidden" name="vida_sexual_texto" value="{{ datos_examen.vida_sexual_texto|default:'' }}"></div>
 
                     <div class="form-group"><label>¿Hasta qué punto la enfermedad y tratamiento de su pariente han afectado su trabajo?</label><select class="form-control" name="trabajo" required>
-                      <option value="" disabled selected>Seleccione una opción</option><option value="0" data-text="0. Nada">0. Nada</option>
-                      <option value="1" data-text="1. Algo">1. Algo</option><option value="2" data-text="2. Moderado">2. Moderado</option><option value="3" data-text="3. Muchísimo">3. Muchísimo</option>
-                    </select><input type="hidden" name="trabajo_texto"></div>
+                      {% if datos_examen.trabajo %}
+                    <option value="{{ datos_examen.trabajo }}" selected>{{ datos_examen.trabajo }}</option>
+                    {% else %}
+                    <option value="" disabled {% if not datos_examen.trabajo %}selected{% endif %}>Seleccione una opción</option>
+                    {% endif %}
+                    <option value="0" data-text="0. Ausencia de problema">0. Ausencia de problema</option><option value="1" data-text="1. Algo">1. Algo</option><option value="2" data-text="2. Moderado">2. Moderado</option><option value="3" data-text="3. Muchísimo">3. Muchísimo</option>
+                    </select><input type="hidden" name="trabajo_texto" value="{{ datos_examen.trabajo_texto|default:'' }}"></div>
 
                     <div class="form-group"><label>¿Hasta qué punto la enfermedad y tratamiento de su pariente, han afectado las actividades que usted realiza en el hogar?</label><select class="form-control" name="actividades_hogar" required>
-                      <option value="" disabled selected>Seleccione una opción</option><option value="0" data-text="0. Nada">0. Nada</option>
-                      <option value="1" data-text="1. Algo">1. Algo</option><option value="2" data-text="2. Moderado">2. Moderado</option><option value="3" data-text="3. Muchísimo">3. Muchísimo</option>
-                    </select><input type="hidden" name="actividades_hogar_texto"></div>
+                      {% if datos_examen.actividades_hogar %}
+                    <option value="{{ datos_examen.actividades_hogar }}" selected>{{ datos_examen.actividades_hogar }}</option>
+                    {% else %}
+                    <option value="" disabled {% if not datos_examen.actividades_hogar %}selected{% endif %}>Seleccione una opción</option>
+                    {% endif %}
+                    <option value="0" data-text="0. Ausencia de problema">0. Ausencia de problema</option><option value="1" data-text="1. Algo">1. Algo</option><option value="2" data-text="2. Moderado">2. Moderado</option><option value="3" data-text="3. Muchísimo">3. Muchísimo</option>
+                    </select><input type="hidden" name="actividades_hogar_texto" value="{{ datos_examen.actividades_hogar_texto|default:'' }}"></div>
 
                     <div class="form-group"><label>¿Qué tan aislado se siente usted a causa de la enfermedad y el tratamiento de su pariente?</label><select class="form-control" name="aislamiento" required>
-                      <option value="" disabled selected>Seleccione una opción</option><option value="0" data-text="0. Nada">0. Nada</option>
-                      <option value="1" data-text="1. Algo">1. Algo</option><option value="2" data-text="2. Moderado">2. Moderado</option><option value="3" data-text="3. Muchísimo">3. Muchísimo</option>
-                    </select><input type="hidden" name="aislamiento_texto"></div>
+                      {% if datos_examen.aislamiento %}
+                    <option value="{{ datos_examen.aislamiento }}" selected>{{ datos_examen.aislamiento }}</option>
+                    {% else %}
+                    <option value="" disabled {% if not datos_examen.aislamiento %}selected{% endif %}>Seleccione una opción</option>
+                    {% endif %}
+                    <option value="0" data-text="0. Ausencia de problema">0. Ausencia de problema</option><option value="1" data-text="1. Algo">1. Algo</option><option value="2" data-text="2. Moderado">2. Moderado</option><option value="3" data-text="3. Muchísimo">3. Muchísimo</option>
+                    </select><input type="hidden" name="aislamiento_texto" value="{{ datos_examen.aislamiento_texto|default:'' }}"></div>
 
                     <div class="form-group"><label>¿Cuánta carga económica le ha ocasionado la enfermedad y tratamiento de su pariente?</label><select class="form-control" name="carga_economica" required>
-                      <option value="" disabled selected>Seleccione una opción</option><option value="0" data-text="0. Nada">0. Nada</option>
-                      <option value="1" data-text="1. Algo">1. Algo</option><option value="2" data-text="2. Moderado">2. Moderado</option><option value="3" data-text="3. Muchísimo">3. Muchísimo</option>
-                    </select><input type="hidden" name="carga_economica_texto"></div>
+                      {% if datos_examen.carga_economica %}
+                    <option value="{{ datos_examen.carga_economica }}" selected>{{ datos_examen.carga_economica }}</option>
+                    {% else %}
+                    <option value="" disabled {% if not datos_examen.carga_economica %}selected{% endif %}>Seleccione una opción</option>
+                    {% endif %}
+                    <option value="0" data-text="0. Ausencia de problema">0. Ausencia de problema</option><option value="1" data-text="1. Algo">1. Algo</option><option value="2" data-text="2. Moderado">2. Moderado</option><option value="3" data-text="3. Muchísimo">3. Muchísimo</option>
+                    </select><input type="hidden" name="carga_economica_texto" value="{{ datos_examen.carga_economica_texto|default:'' }}"></div>
 
                     <div class="form-group"><label>Clasifique su estado social general</label><select class="form-control" name="estado_social" required>
-                      <option value="" disabled selected>Seleccione una opción</option><option value="0" data-text="0. Sumamente malo">0. Sumamente malo</option>
-                      <option value="1" data-text="1. Regular">1. Regular</option><option value="2" data-text="2. Bueno">2. Bueno</option><option value="3" data-text="3. Excelente">3. Excelente</option>
-                      </select><input type="hidden" name="estado_social_texto"></div>
+                      {% if datos_examen.estado_social %}
+                    <option value="{{ datos_examen.estado_social }}" selected>{{ datos_examen.estado_social }}</option>
+                    {% else %}
+                    <option value="" disabled {% if not datos_examen.estado_social %}selected{% endif %}>Seleccione una opción</option>
+                    {% endif %}
+                    <option value="0" data-text="0. Ausencia de problema">0. Ausencia de problema</option><option value="1" data-text="1. Regular">1. Regular</option><option value="2" data-text="2. Bueno">2. Bueno</option><option value="3" data-text="3. Excelente">3. Excelente</option>
+                      </select><input type="hidden" name="estado_social_texto" value="{{ datos_examen.estado_social_texto|default:'' }}"></div>
 
                     <div class="text-right mt-4">
                       <button type="button" class="btn btn-outline-primary btn-next" data-next="#espiritual">Siguiente sección</button>
@@ -224,43 +341,71 @@
                 <div class="card-body bg-white">
                   
                     <div class="form-group"><label>¿El nivel de ayuda que recibe de sus actividades religiosas, tales como ir a la iglesia o al templo, satisfacen sus necesidades?</label><select class="form-control" name="actividades_religiosas" required>
-                      <option value="" disabled selected>Seleccione una opción</option><option value="0" data-text="0. Nada">0. Nada</option>
-                      <option value="1" data-text="1. Algo">1. Algo</option><option value="2" data-text="2. Moderado">2. Moderado</option><option value="3" data-text="3. Muchísimo">3. Muchísimo</option>
-                    </select><input type="hidden" name="actividades_religiosas_texto"></div>
+                      {% if datos_examen.actividades_religiosas %}
+                    <option value="{{ datos_examen.actividades_religiosas }}" selected>{{ datos_examen.actividades_religiosas }}</option>
+                    {% else %}
+                    <option value="" disabled {% if not datos_examen.actividades_religiosas %}selected{% endif %}>Seleccione una opción</option>
+                    {% endif %}
+                    <option value="0" data-text="0. Ausencia de problema">0. Ausencia de problema</option><option value="1" data-text="1. Algo">1. Algo</option><option value="2" data-text="2. Moderado">2. Moderado</option><option value="3" data-text="3. Muchísimo">3. Muchísimo</option>
+                    </select><input type="hidden" name="actividades_religiosas_texto" value="{{ datos_examen.actividades_religiosas_texto|default:'' }}"></div>
 
                     <div class="form-group"><label>¿El nivel de ayuda que recibe de sus actividades espirituales personales, tales como meditar u orar, es suficiente para satisfacer sus necesidades?</label><select class="form-control" name="actividades_espirituales_personales" required>
-                      <option value="" disabled selected>Seleccione una opción</option><option value="0" data-text="0. Nada">0. Nada</option>
-                      <option value="1" data-text="1. Algo">1. Algo</option><option value="2" data-text="2. Moderado">2. Moderado</option><option value="3" data-text="3. Muchísimo">3. Muchísimo</option>
-                    </select><input type="hidden" name="actividades_espirituales_personales_texto"></div>
+                      {% if datos_examen.actividades_espirituales_personales %}
+                    <option value="{{ datos_examen.actividades_espirituales_personales }}" selected>{{ datos_examen.actividades_espirituales_personales }}</option>
+                    {% else %}
+                    <option value="" disabled {% if not datos_examen.actividades_espirituales_personales %}selected{% endif %}>Seleccione una opción</option>
+                    {% endif %}
+                    <option value="0" data-text="0. Ausencia de problema">0. Ausencia de problema</option><option value="1" data-text="1. Algo">1. Algo</option><option value="2" data-text="2. Moderado">2. Moderado</option><option value="3" data-text="3. Muchísimo">3. Muchísimo</option>
+                    </select><input type="hidden" name="actividades_espirituales_personales_texto" value="{{ datos_examen.actividades_espirituales_personales_texto|default:'' }}"></div>
 
                     <div class="form-group"><label>¿Cuánta incertidumbre siente usted respecto al futuro de su pariente?</label><select class="form-control" name="incertidumbre_futuro" required>
-                      <option value="" disabled selected>Seleccione una opción</option><option value="0" data-text="0. Nada">0. Nada</option>
-                      <option value="1" data-text="1. Algo">1. Algo</option><option value="2" data-text="2. Moderado">2. Moderado</option><option value="3" data-text="3. Muchísimo">3. Muchísimo</option>
-                    </select><input type="hidden" name="incertidumbre_futuro_texto"></div>
+                      {% if datos_examen.incertidumbre_futuro %}
+                    <option value="{{ datos_examen.incertidumbre_futuro }}" selected>{{ datos_examen.incertidumbre_futuro }}</option>
+                    {% else %}
+                    <option value="" disabled {% if not datos_examen.incertidumbre_futuro %}selected{% endif %}>Seleccione una opción</option>
+                    {% endif %}
+                    <option value="0" data-text="0. Ausencia de problema">0. Ausencia de problema</option><option value="1" data-text="1. Algo">1. Algo</option><option value="2" data-text="2. Moderado">2. Moderado</option><option value="3" data-text="3. Muchísimo">3. Muchísimo</option>
+                    </select><input type="hidden" name="incertidumbre_futuro_texto" value="{{ datos_examen.incertidumbre_futuro_texto|default:'' }}"></div>
 
                     <div class="form-group"><label>¿Hasta qué punto la enfermedad de su pariente ha causado cambios positivos en su vida?</label><select class="form-control" name="cambios_positivos" required>
-                      <option value="" disabled selected>Seleccione una opción</option><option value="0" data-text="0. Nada">0. Nada</option>
-                      <option value="1" data-text="1. Algo">1. Algo</option><option value="2" data-text="2. Moderado">2. Moderado</option><option value="3" data-text="3. Muchísimo">3. Muchísimo</option>
-                    </select><input type="hidden" name="cambios_positivos_texto"></div>
+                      {% if datos_examen.cambios_positivos %}
+                    <option value="{{ datos_examen.cambios_positivos }}" selected>{{ datos_examen.cambios_positivos }}</option>
+                    {% else %}
+                    <option value="" disabled {% if not datos_examen.cambios_positivos %}selected{% endif %}>Seleccione una opción</option>
+                    {% endif %}
+                    <option value="0" data-text="0. Ausencia de problema">0. Ausencia de problema</option><option value="1" data-text="1. Algo">1. Algo</option><option value="2" data-text="2. Moderado">2. Moderado</option><option value="3" data-text="3. Muchísimo">3. Muchísimo</option>
+                    </select><input type="hidden" name="cambios_positivos_texto" value="{{ datos_examen.cambios_positivos_texto|default:'' }}"></div>
 
                     <div class="form-group"><label>¿Usted siente que tiene un propósito en su vida o una razón para vivir?</label><select class="form-control" name="proposito_vida" required>
-                      <option value="" disabled selected>Seleccione una opción</option><option value="0" data-text="0. Nada">0. Nada</option>
-                      <option value="1" data-text="1. Algo">1. Algo</option><option value="2" data-text="2. Moderado">2. Moderado</option><option value="3" data-text="3. Muchísimo">3. Muchísimo</option>
-                    </select><input type="hidden" name="proposito_vida_texto"></div>
+                      {% if datos_examen.proposito_vida %}
+                    <option value="{{ datos_examen.proposito_vida }}" selected>{{ datos_examen.proposito_vida }}</option>
+                    {% else %}
+                    <option value="" disabled {% if not datos_examen.proposito_vida %}selected{% endif %}>Seleccione una opción</option>
+                    {% endif %}
+                    <option value="0" data-text="0. Ausencia de problema">0. Ausencia de problema</option><option value="1" data-text="1. Algo">1. Algo</option><option value="2" data-text="2. Moderado">2. Moderado</option><option value="3" data-text="3. Muchísimo">3. Muchísimo</option>
+                    </select><input type="hidden" name="proposito_vida_texto" value="{{ datos_examen.proposito_vida_texto|default:'' }}"></div>
 
                     <div class="form-group"><label>¿Cuánta esperanza siente usted?</label><select class="form-control" name="esperanza" required>
-                      <option value="" disabled selected>Seleccione una opción</option><option value="0" data-text="0. Nada">0. Nada</option>
-                      <option value="1" data-text="1. Algo">1. Algo</option><option value="2" data-text="2. Moderado">2. Moderado</option><option value="3" data-text="3. Muchísimo">3. Muchísimo</option>
-                    </select><input type="hidden" name="esperanza_texto"></div>
+                      {% if datos_examen.esperanza %}
+                    <option value="{{ datos_examen.esperanza }}" selected>{{ datos_examen.esperanza }}</option>
+                    {% else %}
+                    <option value="" disabled {% if not datos_examen.esperanza %}selected{% endif %}>Seleccione una opción</option>
+                    {% endif %}
+                    <option value="0" data-text="0. Ausencia de problema">0. Ausencia de problema</option><option value="1" data-text="1. Algo">1. Algo</option><option value="2" data-text="2. Moderado">2. Moderado</option><option value="3" data-text="3. Muchísimo">3. Muchísimo</option>
+                    </select><input type="hidden" name="esperanza_texto" value="{{ datos_examen.esperanza_texto|default:'' }}"></div>
 
                     <div class="form-group"><label>Clasifique su estado espiritual de manera general</label><select class="form-control" name="estado_espiritual" required>
-                        <option value="" disabled selected>Seleccione una opción</option><option value="0" data-text="0. Sumamente malo">0. Sumamente malo</option>
-                        <option value="1" data-text="1. Regular">1. Regular</option><option value="2" data-text="2. Bueno">2. Bueno</option><option value="3" data-text="3. Excelente">3. Excelente</option>
-                    </select><input type="hidden" name="estado_espiritual_texto"></div>
+                      {% if datos_examen.estado_espiritual %}
+                    <option value="{{ datos_examen.estado_espiritual }}" selected>{{ datos_examen.estado_espiritual }}</option>
+                    {% else %}
+                    <option value="" disabled {% if not datos_examen.estado_espiritual %}selected{% endif %}>Seleccione una opción</option>
+                    {% endif %}
+                    <option value="0" data-text="0. Ausencia de problema">0. Ausencia de problema</option><option value="1" data-text="1. Regular">1. Regular</option><option value="2" data-text="2. Bueno">2. Bueno</option><option value="3" data-text="3. Excelente">3. Excelente</option>
+                    </select><input type="hidden" name="estado_espiritual_texto" value="{{ datos_examen.estado_espiritual_texto|default:'' }}"></div>
 
                     <!-- Botón de envío -->
                     <div class="text-right mt-4">
-                      <button type="submit" class="btn btn-primary">Guardar Evaluación</button>
+                      <button type="submit" class="btn btn-primary">Guardar</button>
                       <a href="{% url 'detalle_paciente' paciente_id %}" class="btn btn-secondary">Ver Paciente</a>
                     </div>
 

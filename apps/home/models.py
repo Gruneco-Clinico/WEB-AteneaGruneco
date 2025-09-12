@@ -342,6 +342,12 @@ class VisitaExamen(models.Model):
                 "aqdparticipanteresult_resultado",
                 "cdrcuidadorresult_resultado",
                 "cdrparticipanteresult_resultado",
+                "bettyferrelresult_resultado",
+                "puntajecdrresult_resultado",
+                "consentimientoinformadoparticipanteresult_resultado",
+                "consentimientoinformadocuidadorresult_resultado",
+                "anamnesiscuidadorresult_resultado",
+                "anamnesisparticipanteresult_resultado",
             ]
 
             for related_name in possible_related_names:
@@ -432,7 +438,13 @@ class VisitaExamen(models.Model):
             "aqdparticipante": "realizar_aqdparticipante",
             "redlatspanish":"realizar_redlatspanish",
             "cdrcuidador": "realizar_cdrcuidador",
-            "cdrparticipante":"realizar_cdrparticipante"
+            "cdrparticipante":"realizar_cdrparticipante",
+            "bettyferrel":"realizar_bettyferrel",
+            "puntajecdr":"realizar_puntajecdr",
+            "consentimientoinformadoparticipante":"realizar_consentimientoinformadoparticipante",
+            "consentimientoinformadocuidador":"realizar_consentimientoinformadocuidador",
+            "anamnesiscuidador":"realizar_anamnesiscuidador",
+            "anamnesisparticipante":"realizar_anamnesisparticipante",
         }
 
         url_name = url_mapping.get(examen_nombre)
@@ -477,7 +489,13 @@ class VisitaExamen(models.Model):
             "aqdparticipante": "ver_aqdparticipante",
             "redlatspanish":"ver_redlatspanish",
             "cdrcuidador": "ver_cdrcuidador",
-            "cdrparticipante":"ver_cdrparticipante"
+            "cdrparticipante":"ver_cdrparticipante",
+            "bettyferrel":"ver_bettyferrel",
+            "puntajecdr":"ver_puntajecdr",
+            "consentimientoinformadoparticipante":"ver_consentimientoinformadoparticipante",
+            "consentimientoinformadocuidador":"ver_consentimientoinformadocuidador",
+            "anamnesiscuidador":"ver_anamnesiscuidador",
+            "anamnesisparticipante":"ver_anamnesisparticipante",
         }
 
         url_name = url_mapping.get(examen_nombre)
@@ -518,7 +536,14 @@ class VisitaExamen(models.Model):
             "aqdparticipante": "editar_aqdparticipante",
             "redlatspanish":"editar_redlatspanish",
             "cdrcuidador": "editar_cdrcuidador",
-            "cdrparticipante":"editar_cdrparticipante"
+            "cdrparticipante":"editar_cdrparticipante",
+            "bettyferrel":"editar_bettyferrel",
+            "puntajecdr":"editar_puntajecdr",
+            "consentimientoinformadoparticipante":"editar_consentimientoinformadoparticipante",
+            "consentimientoinformadocuidador":"editar_consentimientoinformadocuidador",
+            "anamnesiscuidador":"editar_anamnesiscuidador",
+            "anamnesisparticipante":"editar_anamnesisparticipante",
+
         }
 
         url_name = url_mapping.get(examen_nombre)
@@ -1445,8 +1470,6 @@ class RedLatSpanishResult(ResultadoExamenBase):
     medicamentos = models.CharField(max_length=255, blank=True, null=True)
     apariencia = models.CharField(max_length=255, blank=True, null=True)
 
-    puntaje_autocuidado = models.CharField(max_length=20, blank=True, null=True)
-
     # ---------- Cuidado del hogar ----------
     cocinar = models.CharField(max_length=255, blank=True, null=True)
     poner_mesa = models.CharField(max_length=255, blank=True, null=True)
@@ -1455,30 +1478,22 @@ class RedLatSpanishResult(ResultadoExamenBase):
     reparar_hogar = models.CharField(max_length=255, blank=True, null=True)
     lavado_ropa = models.CharField(max_length=255, blank=True, null=True)
 
-    puntaje_cuidado_hogar = models.CharField(max_length=20, blank=True, null=True)
-
     # ---------- Trabajo y recreación ----------
     trabajo = models.CharField(max_length=255, blank=True, null=True)
     recreacion = models.CharField(max_length=255, blank=True, null=True)
     organizaciones = models.CharField(max_length=255, blank=True, null=True)
     desplazamiento = models.CharField(max_length=255, blank=True, null=True)
 
-    puntaje_trabajo_recreacion = models.CharField(max_length=20, blank=True, null=True)
-
     # ---------- Compras y dinero ----------
     alimentos = models.CharField(max_length=255, blank=True, null=True)
     dinero_efectivo = models.CharField(max_length=255, blank=True, null=True)
     finanzas = models.CharField(max_length=255, blank=True, null=True)
-
-    puntaje_compras_dinero = models.CharField(max_length=20, blank=True, null=True)
 
     # ---------- Viajes ----------
     transporte_publico = models.CharField(max_length=255, blank=True, null=True)
     manejo_vehiculos = models.CharField(max_length=255, blank=True, null=True)
     movilidad_barrio = models.CharField(max_length=255, blank=True, null=True)
     viajes_fuera = models.CharField(max_length=255, blank=True, null=True)
-
-    puntaje_viajes = models.CharField(max_length=20, blank=True, null=True)
 
     # ---------- Comunicación ----------
     telefono = models.CharField(max_length=255, blank=True, null=True)
@@ -1487,8 +1502,6 @@ class RedLatSpanishResult(ResultadoExamenBase):
     lectura = models.CharField(max_length=255, blank=True, null=True)
     escritura = models.CharField(max_length=255, blank=True, null=True)
 
-    puntaje_comunicacion = models.CharField(max_length=20, blank=True, null=True)
-
     # ---------- Tecnología ----------
     computador = models.CharField(max_length=255, blank=True, null=True)
     telefono_celular = models.CharField(max_length=255, blank=True, null=True)
@@ -1496,8 +1509,153 @@ class RedLatSpanishResult(ResultadoExamenBase):
     internet = models.CharField(max_length=255, blank=True, null=True)
     email = models.CharField(max_length=255, blank=True, null=True)
     redes_sociales = models.CharField(max_length=255, blank=True, null=True)
-
+        
+    puntaje_autocuidado = models.CharField(max_length=20, blank=True, null=True)
+    puntaje_cuidado_hogar = models.CharField(max_length=20, blank=True, null=True)
+    puntaje_trabajo_recreacion = models.CharField(max_length=20, blank=True, null=True)
+    puntaje_compras_dinero = models.CharField(max_length=20, blank=True, null=True)
+    puntaje_viajes = models.CharField(max_length=20, blank=True, null=True)
+    puntaje_comunicacion = models.CharField(max_length=20, blank=True, null=True)
     puntaje_tecnologia = models.CharField(max_length=20, blank=True, null=True)
 
     def __str__(self):
         return f"RedLat Spanish - {self.visita_examen}"
+
+
+class BettyFerrelResult(ResultadoExamenBase):
+    # ---------- Bienestar físico ----------
+    agotamiento = models.CharField(max_length=255, blank=True, null=True)
+    cambios_alimenticios = models.CharField(max_length=255, blank=True, null=True)
+    dolor = models.CharField(max_length=255, blank=True, null=True)
+    cambios_sueno = models.CharField(max_length=255, blank=True, null=True)
+    salud_fisica_general = models.CharField(max_length=255, blank=True, null=True)
+
+    # ---------- bienestar psicológico ----------
+    facilidad_enfrentar = models.CharField(max_length=255, blank=True, null=True)
+    felicidad = models.CharField(max_length=255, blank=True, null=True)
+    control_vida = models.CharField(max_length=255, blank=True, null=True)
+    satisfaccion_vida = models.CharField(max_length=255, blank=True, null=True)
+    concentracion = models.CharField(max_length=255, blank=True, null=True)
+    utilidad_personal = models.CharField(max_length=255, blank=True, null=True)
+    angustia_diagnostico = models.CharField(max_length=255, blank=True, null=True)
+    angustia_tratamiento = models.CharField(max_length=255, blank=True, null=True)
+    ansiedad = models.CharField(max_length=255, blank=True, null=True)
+    depresion = models.CharField(max_length=255, blank=True, null=True)
+    miedo_otra_enfermedad = models.CharField(max_length=255, blank=True, null=True)
+    miedo_retroceso = models.CharField(max_length=255, blank=True, null=True)
+    miedo_avance = models.CharField(max_length=255, blank=True, null=True)
+    estado_psicologico = models.CharField(max_length=255, blank=True, null=True)
+
+    # ---------- Bienestar social ----------
+    angustia_familiar = models.CharField(max_length=255, blank=True, null=True)
+    nivel_ayuda = models.CharField(max_length=255, blank=True, null=True)
+    relaciones_personales = models.CharField(max_length=255, blank=True, null=True)
+    vida_sexual = models.CharField(max_length=255, blank=True, null=True)
+    trabajo = models.CharField(max_length=255, blank=True, null=True)
+    actividades_hogar = models.CharField(max_length=255, blank=True, null=True)
+    aislamiento = models.CharField(max_length=255, blank=True, null=True)
+    carga_economica = models.CharField(max_length=255, blank=True, null=True)
+    estado_social = models.CharField(max_length=255, blank=True, null=True)
+
+    # ---------- Bienestar espiritual ----------
+    actividades_religiosas = models.CharField(max_length=255, blank=True, null=True)
+    actividades_espirituales_personales = models.CharField(max_length=255, blank=True, null=True)
+    incertidumbre_futuro = models.CharField(max_length=255, blank=True, null=True)
+    cambios_positivos = models.CharField(max_length=255, blank=True, null=True)
+    proposito_vida = models.CharField(max_length=255, blank=True, null=True)
+    esperanza = models.CharField(max_length=255, blank=True, null=True)
+    estado_espiritual = models.CharField(max_length=255, blank=True, null=True)
+
+    def __str__(self):
+        return f"Betty Ferrel - {self.visita_examen}"
+    
+class PuntajeCDRResult(ResultadoExamenBase):
+    cdr_memoria = models.CharField(max_length=10)
+    cdr_orientacion = models.CharField(max_length=10)
+    cdr_juicio = models.CharField(max_length=10)
+    cdr_comunitarias = models.CharField(max_length=10)
+    cdr_pasatiempos = models.CharField(max_length=10)
+    cdr_cuidado = models.CharField(max_length=10)
+    cdr_global = models.CharField(max_length=10)
+
+    def __str__(self):
+        return f"CDR - {self.visita_examen_id}"
+
+class ConsentimientoInformadoParticipanteResult(ResultadoExamenBase):
+    fecha = models.DateField()
+    hora_inicio = models.TimeField()
+    investigador = models.CharField(max_length=255)
+    version_consentimiento = models.CharField(max_length=50)
+    descripcion_proceso = models.TextField(blank=True, null=True)
+    preguntas = models.TextField(blank=True, null=True)
+    acepta = models.CharField(max_length=10)  # "Si" o "No"
+    hora_firma = models.TimeField()
+    fecha_firma = models.DateField()
+    testigo1 = models.CharField(max_length=255, blank=True, null=True)
+    testigo2 = models.CharField(max_length=255, blank=True, null=True)
+    copia_entregada = models.CharField(max_length=10)  # "Si" o "No"
+    hora_finalizacion = models.TimeField()
+
+    def __str__(self):
+        return f"Consentimiento Informado - {self.visita_examen_id}"
+    
+class ConsentimientoInformadoCuidadorResult(ResultadoExamenBase):
+    fecha = models.DateField()
+    hora_inicio = models.TimeField()
+    investigador = models.CharField(max_length=255)
+    nombre_acompanante = models.CharField(max_length=255)
+    nombre_participante = models.CharField(max_length=255)
+    version_consentimiento = models.CharField(max_length=50)
+    descripcion_proceso = models.TextField(blank=True, null=True)
+    preguntas = models.TextField(blank=True, null=True)
+    acepta = models.CharField(max_length=10)  # "Si" o "No"
+    hora_firma = models.TimeField()
+    fecha_firma = models.DateField()
+    testigo1 = models.CharField(max_length=255, blank=True, null=True)
+    testigo2 = models.CharField(max_length=255, blank=True, null=True)
+    copia_entregada = models.CharField(max_length=10)  # "Si" o "No"
+    hora_finalizacion = models.TimeField()
+
+    def __str__(self):
+        return f"Consentimiento Informado - {self.visita_examen_id}"
+
+class AnamnesisCuidadorResult(ResultadoExamenBase):
+    nombres_apellidos = models.CharField(max_length=255)
+    documento = models.CharField(max_length=100)  # Tipo y número
+    lugar_nacimiento = models.CharField(max_length=255)
+    lugar_procedencia = models.CharField(max_length=255)
+    edad = models.IntegerField()
+    sexo = models.CharField(max_length=20)
+    estado_civil = models.CharField(max_length=50)
+    relacion = models.CharField(max_length=100)
+    tiempo_acompanando = models.CharField(max_length=100)
+    ocupacion = models.CharField(max_length=255, blank=True, null=True)
+    escolaridad = models.CharField(max_length=100, blank=True, null=True)
+    ingresos_hogar = models.CharField(max_length=50)
+    estrato = models.CharField(max_length=20)
+    religion = models.CharField(max_length=100, blank=True, null=True)
+    lateralidad = models.CharField(max_length=50, blank=True, null=True)
+    convivencia = models.TextField(blank=True, null=True)
+    eps = models.CharField(max_length=100, blank=True, null=True)
+
+    def __str__(self):
+        return f"Anamnesis Cuidador - {self.visita_examen_id}"
+    
+class AnamnesisParticipanteResult(ResultadoExamenBase):
+    nombres_apellidos = models.CharField(max_length=255)
+    documento = models.CharField(max_length=100)  # Tipo y número
+    lugar_nacimiento = models.CharField(max_length=255)
+    edad = models.IntegerField()
+    sexo = models.CharField(max_length=20)
+    tiempo_acompanando = models.CharField(max_length=100)
+    ingresos_hogar = models.CharField(max_length=50)
+    estrato = models.CharField(max_length=20)
+    religion = models.CharField(max_length=100, blank=True, null=True)
+    lateralidad = models.CharField(max_length=50, blank=True, null=True)
+    convivencia = models.TextField(blank=True, null=True)
+    eps = models.CharField(max_length=100, blank=True, null=True)
+
+    def __str__(self):
+        return f"Anamnesis Participante - {self.visita_examen_id}"
+
+

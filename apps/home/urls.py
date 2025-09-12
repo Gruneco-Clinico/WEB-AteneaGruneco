@@ -49,6 +49,8 @@ urlpatterns = [
     path("guardar_examen_MEW/", views.guardar_examen_MEW, name="guardar_examen_MEW"),
     path("guardar_examen_Pitsburg/",views.guardar_examen_Pitsburg,name="guardar_examen_Pitsburg",),
     path("guardar_examen_StopBang/",views.guardar_examen_StopBang,name="guardar_examen_StopBang",),
+
+    #Anosognosia
     path("guardar_examen_Participante_EuroQoL/",views.guardar_examen_Participante_EuroQoL,name="guardar_examen_Participante_EuroQoL",),
     path("guardar_examen_Participante_EVA_EuroQoL/",views.guardar_examen_Participante_EVA_EuroQoL,name="guardar_examen_Participante_EVA_EuroQoL",),
     path("guardar_examen_Cuidador_NPI/",views.guardar_examen_Cuidador_NPI,name="guardar_examen_Cuidador_NPI",),
@@ -61,5 +63,11 @@ urlpatterns = [
     path("guardar_examen_Cuidador_CDR/",views.guardar_examen_Cuidador_CDR,name="guardar_examen_Cuidador_CDR",),
     path("guardar_examen_Cuidador_RedLatSpanish/",views.guardar_examen_Cuidador_RedLatSpanish,name="guardar_examen_Cuidador_RedLatSpanish",),
     path("guardar_examen_Participante_CDR/",views.guardar_examen_Participante_CDR,name="guardar_examen_Participante_CDR",),
+    path("guardar_examen_BettyFerrel/",views.guardar_examen_BettyFerrel,name="guardar_examen_BettyFerrel",),
+    path("guardar_evaluacion_clinica_CDR/",views.guardar_evaluacion_clinica_CDR,name="guardar_evaluacion_clinica_CDR",),
+    path("guardar_consentimiento_participante/",views.guardar_consentimiento_participante,name="guardar_consentimiento_participante",),
+    path("guardar_consentimiento_cuidador/",views.guardar_consentimiento_cuidador,name="guardar_consentimiento_cuidador",),
+    path("guardar_anamnesis_cuidador/",views.guardar_anamnesis_cuidador,name="guardar_anamnesis_cuidador",),
+    path("guardar_anamnesis_participante/",views.guardar_anamnesis_participante,name="guardar_anamnesis_participante",),
 
 ]
