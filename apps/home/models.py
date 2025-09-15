@@ -6,7 +6,6 @@ Copyright (c) 2019 - present AppSeed.us
 from django.db import models
 from django.contrib.auth.models import AbstractUser, Group, Permission
 from django.urls import reverse, NoReverseMatch
-from django.utils import timezone
 
 
 class CustomUser(AbstractUser):
@@ -439,12 +438,6 @@ class VisitaExamen(models.Model):
             "redlatspanish": "realizar_redlatspanish",
             "cdrcuidador": "realizar_cdrcuidador",
             "cdrparticipante": "realizar_cdrparticipante",
-            "bettyferrel": "realizar_bettyferrel",
-            "puntajecdr": "realizar_puntajecdr",
-            "consentimientoinformadoparticipante": "realizar_consentimientoinformadoparticipante",
-            "consentimientoinformadocuidador": "realizar_consentimientoinformadocuidador",
-            "anamnesiscuidador": "realizar_anamnesiscuidador",
-            "anamnesisparticipante": "realizar_anamnesisparticipante",
         }
 
         url_name = url_mapping.get(examen_nombre)
@@ -490,12 +483,6 @@ class VisitaExamen(models.Model):
             "redlatspanish": "ver_redlatspanish",
             "cdrcuidador": "ver_cdrcuidador",
             "cdrparticipante": "ver_cdrparticipante",
-            "bettyferrel": "ver_bettyferrel",
-            "puntajecdr": "ver_puntajecdr",
-            "consentimientoinformadoparticipante": "ver_consentimientoinformadoparticipante",
-            "consentimientoinformadocuidador": "ver_consentimientoinformadocuidador",
-            "anamnesiscuidador": "ver_anamnesiscuidador",
-            "anamnesisparticipante": "ver_anamnesisparticipante",
         }
 
         url_name = url_mapping.get(examen_nombre)
@@ -537,12 +524,6 @@ class VisitaExamen(models.Model):
             "redlatspanish": "editar_redlatspanish",
             "cdrcuidador": "editar_cdrcuidador",
             "cdrparticipante": "editar_cdrparticipante",
-            "bettyferrel": "editar_bettyferrel",
-            "puntajecdr": "editar_puntajecdr",
-            "consentimientoinformadoparticipante": "editar_consentimientoinformadoparticipante",
-            "consentimientoinformadocuidador": "editar_consentimientoinformadocuidador",
-            "anamnesiscuidador": "editar_anamnesiscuidador",
-            "anamnesisparticipante": "editar_anamnesisparticipante",
         }
 
         url_name = url_mapping.get(examen_nombre)

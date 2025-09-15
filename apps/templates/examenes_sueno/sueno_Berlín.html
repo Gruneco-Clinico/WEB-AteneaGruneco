@@ -176,13 +176,13 @@
                     <label class="form-control-label">¿Alguna vez se ha quedado dormido mientras maneja o va de
                         pasajero?</label>
                     <div class="custom-control custom-radio mt-2">
-                        <input type="radio" id="somnolencia_si" name="somnolencia_conducir" value="Sí"
-                            class="custom-control-input">
+                        <input type="radio" id="somnolencia_si" name="somnolencia_conducir" value="True"
+                            class="custom-control-input" {{ datos_examen.somnolencia_conducir|yesno:"checked," }}>
                         <label class="custom-control-label" for="somnolencia_si">Sí</label>
                     </div>
                     <div class="custom-control custom-radio">
-                        <input type="radio" id="somnolencia_no" name="somnolencia_conducir" value="No"
-                            class="custom-control-input">
+                        <input type="radio" id="somnolencia_no" name="somnolencia_conducir" value="False"
+                            class="custom-control-input" {{ datos_examen.somnolencia_conducir|yesno:",checked" }}>
                         <label class="custom-control-label" for="somnolencia_no">No</label>
                     </div>
                 </div>
@@ -191,11 +191,13 @@
                 <div class="mb-3">
                     <label class="form-control-label">¿Usted tiene la presión alta?</label>
                     <div class="custom-control custom-radio mt-2">
-                        <input type="radio" id="presion_si" name="presion_alta" value="Sí" class="custom-control-input">
+                        <input type="radio" id="presion_si" name="presion_alta" value="True" class="custom-control-input"
+                            {{ datos_examen.presion_alta|yesno:"checked," }}>
                         <label class="custom-control-label" for="presion_si">Sí</label>
                     </div>
                     <div class="custom-control custom-radio">
-                        <input type="radio" id="presion_no" name="presion_alta" value="No" class="custom-control-input">
+                        <input type="radio" id="presion_no" name="presion_alta" value="False" class="custom-control-input"
+                            {{ datos_examen.presion_alta|yesno:",checked" }}>
                         <label class="custom-control-label" for="presion_no">No</label>
                     </div>
                 </div>

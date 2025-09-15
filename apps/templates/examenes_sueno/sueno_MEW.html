@@ -274,7 +274,7 @@
                                                 <option value="A la hora habitual y ya no dormiría más">A la hora
                                                     habitual y ya no dormiría más
                                                 </option>
-                                                <option value="A la hora habitual y dormiría un poco má">A la hora
+                                                <option value="A la hora habitual y dormiría un poco más">A la hora
                                                     habitual y dormiría un poco más
                                                 </option>
                                                 <option value="Me despertaría más tarde de lo habitual">Me despertaría
@@ -305,7 +305,7 @@
                                                 <option value="Echar un buen sueño antes y una siesta después">Echar un
                                                     buen sueño antes y una siesta después
                                                 </option>
-                                                <option value="Sólo dormirías antes de la guardia">Sólo dormir antes de
+                                                <option value="Sólo dormir antes de la guardia">Sólo dormir antes de
                                                     la guardia
                                                 </option>
                                             </select>
@@ -442,38 +442,169 @@
     document.addEventListener("DOMContentLoaded", function () {
         const form = document.querySelector('form');
         const puntuacionInput = document.querySelector('input[name="puntuacion"]');
-        const selects = document.querySelectorAll('select');
+        const selects = document.querySelectorAll('select[required]');
 
-        // Mapeo de puntuaciones para cada pregunta (ejemplo simplificado)
+        // Mapeo completo de puntuaciones para cada pregunta del MEQ
         const puntuaciones = {
             'hora_levantarse_meq': {
-                'Entre las 05:00 (5 AM) y 06:30 (6:30 AM) de la mañana': 5,
-                'Entre las 06:30 (6:30 AM) y las 07:45 (7:45 AM) de la mañana': 4,
-                'Entre las 07:45 (7:45 AM) y las 09:45 (9:45 AM) de la mañana': 3,
-                'Entre las 09:45 (9:45 AM) y las 11:00 (11 AM) de la mañana': 2,
-                'Entre las 11 (11 AM) de la mañana y las 12 de la tarde (12 noon)': 1
+                '(5 AM) y (6:30 AM) ': 5,
+                '(6:30 AM) y (7:45 AM) ': 4,
+                '(7:45 AM) y (9:45 AM) ': 3,
+                '(9:45 AM) y (11 AM) ': 2,
+                '(11 AM) y (12 pm)': 1
+            },
+            'hora_acostarse_meq': {
+                'A las 20:00 (8 PM) – 21:00 (9 PM)': 5,
+                'A las 21:00 (9 PM) – 22:15 (10:15 PM)': 4,
+                'A las 22:15 (10:15 PM) – 00:30 (12:30 AM)': 3,
+                'A las 00:30 (12:30 AM) – 01:45 (1:45 AM)': 2,
+                'A las 01:45 (1:45 AM) – 03:00 (3 AM)': 1
+            },
+            'uso_despertador_meq': {
+                'No lo necesito': 4,
+                'Lo necesito poco': 3,
+                'Lo necesito bastante': 2,
+                'Lo necesito mucho': 1
+            },
+            'facilidad_levantarse_meq': {
+                'Nada fácil': 1,
+                'No muy fácil': 2,
+                'Bastante fácil': 3,
+                'Muy fácil': 4
+            },
+            'alerta_manana_meq': {
+                'Nada alerta': 1,
+                'Poco alerta': 2,
+                'Bastante alerta': 3,
+                'Muy alerta': 4
+            },
+            'apetito_manana_meq': {
+                'Muy escaso': 1,
+                'Bastante escaso': 2,
+                'Bastante bueno': 3,
+                'Muy bueno': 4
+            },
+            'descanso_manana_meq': {
+                'Muy cansado': 1,
+                'Bastante cansado': 2,
+                'Bastante descansado': 3,
+                'Muy descansado': 4
+            },
+            'hora_acostarse_libre_meq': {
+                'Nunca o raramente o más tarde': 4,
+                'Menos de 1 hora más tarde': 3,
+                'De 1 a 2 horas más tarde': 2,
+                'Más de 2 horas más tarde': 1
+            },
+            'hora_cansancio_noche_meq': {
+                '20:00 - 21:00': 5,
+                '21:00 - 22:15': 4,
+                '22:15 - 00:45': 3,
+                '00:45 - 02:00': 2,
+                '02:00 - 03:00': 1
+            },
+            'nivel_cansancia_11': {
+                'Ningún cansancio': 0,
+                'Algún cansancio': 2,
+                'Bastante cansancio': 3,
+                'Mucho cansancio': 5
+            },
+            'ejercicio_fisico_meq': {
+                'Estaría en buena forma': 4,
+                'Estaría en una forma aceptable': 3,
+                'Me resultaría difícil': 2,
+                'Me resultaría muy difícil': 1
+            },
+            'hora_despertarse_si_tarde': {
+                'A la hora habitual y ya no dormiría más': 4,
+                'A la hora habitual y dormiría un poco más': 3,
+                'Me despertaría más tarde de lo habitual': 2,
+                'Dormiría mucho más de lo habitual': 1
+            },
+            'guardia_nocturna': {
+                'No acostarme hasta pasada la guardia': 1,
+                'Echar una siesta antes y dormir después': 2,
+                'Echar un buen sueño antes y una siesta después': 3,
+                'Sólo dormir antes de la guardia': 4
+            },
+            'horario_trabajo_fisico': {
+                'De 08:00 (8 AM) a 10:00 (10 AM)': 4,
+                'De 11:00 (11 AM) a 13:00 (1 PM)': 3,
+                'De 13:00 (1 PM) a 17:00 (5 PM)': 2,
+                'De 19:00 (7 PM) a 21:00 (9 PM)': 1
+            },
+            'ejercicio_nocturno': {
+                'Estaría en buena forma': 1,
+                'Estaría en una forma aceptable': 2,
+                'Me resultaría difícil': 3,
+                'Me resultaría muy difícil': 4
+            },
+            'horario_trabajo': {
+                'Entre las 04:00 (4 AM) y las 08:00 (8 AM)': 5,
+                'Entre las 08:00 (8 AM) y las 09:00 (9 AM)': 4,
+                'Entre las 09:00 (9 AM) y las 14:00 (2 PM)': 3,
+                'Entre las 14:00 (2 PM) y las 17:00 (5 PM)': 2,
+                'Entre las 17:00 (5 PM) y las 04:00 (4 AM)': 1
+            },
+            'maximo_bienestar': {
+                'Entre las 05:00 (5 AM) y las 08:00 (8 AM)': 5,
+                'Entre las 08:00 (8 AM) y las 10:00 (10 AM)': 4,
+                'Entre las 10:00 (10 AM) y las 17:00 (5 PM)': 3,
+                'Entre las 17:00 (5 PM) y las 22:00 (10 PM)': 2,
+                'Entre las 22:00 (10 PM) y las 05:00 (5 AM)': 1
+            },
+            'tipo_persona': {
+                'Un tipo claramente matutino': 6,
+                'Un tipo más matutino que vespertino': 4,
+                'Un tipo más vespertino que matutino': 2,
+                'Un tipo claramente vespertino': 0
             }
-            // Agrega los mapeos para todas las preguntas aquí
         };
 
         function calcularPuntuacion() {
             let puntuacionTotal = 0;
+            let preguntasRespondidas = 0;
+
             selects.forEach(select => {
-                const selectedOption = select.options[select.selectedIndex];
-                if (selectedOption.value && puntuaciones[select.name]) {
-                    puntuacionTotal += puntuaciones[select.name][selectedOption.value] || 0;
+                if (select.name !== 'puntuacion' && select.value && select.value !== '') {
+                    const valor = select.value;
+                    if (puntuaciones[select.name] && puntuaciones[select.name].hasOwnProperty(valor)) {
+                        puntuacionTotal += puntuaciones[select.name][valor];
+                        preguntasRespondidas++;
+                    }
                 }
             });
+
+            // Mostrar la puntuación actual siempre
             puntuacionInput.value = puntuacionTotal;
+
+            // Cambiar el placeholder según el progreso
+            if (preguntasRespondidas < 18) {
+                puntuacionInput.placeholder = `Puntuación parcial (${preguntasRespondidas}/18 preguntas)`;
+            } else {
+                puntuacionInput.placeholder = 'Puntuación final';
+            }
         }
 
         // Calcula la puntuación cada vez que cambie una pregunta
         selects.forEach(select => {
-            select.addEventListener('change', calcularPuntuacion);
+            if (select.name !== 'puntuacion') {
+                select.addEventListener('change', calcularPuntuacion);
+            }
         });
 
+        // Calcular puntuación inicial si hay datos precargados
+        calcularPuntuacion();
+
         // También calcula antes de enviar por seguridad
-        form.addEventListener('submit', calcularPuntuacion);
+        form.addEventListener('submit', function (e) {
+            calcularPuntuacion();
+            if (!puntuacionInput.value) {
+                alert('Por favor, responda todas las preguntas antes de enviar el formulario.');
+                e.preventDefault();
+                return false;
+            }
+        });
     });
 </script>
 

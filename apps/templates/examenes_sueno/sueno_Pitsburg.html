@@ -516,11 +516,11 @@
                                     <div class="form-group">
                                         <label>Otros inconvenientes mientras duerme</label>
                                         <textarea name="descripcion_inconvenientes" class="form-control"
-                                            placeholder="Describa otros inconvenientes"></textarea>
+                                            placeholder="Describa otros inconvenientes">{{ datos_examen.descripcion_inconvenientes }}</textarea>
                                         <select name="otros_inconvenientes" class="form-control mt-2">
-                                            {% if datos_examen and datos_examen.descripcion_inconvenientes %}
-                                            <option value="{{ datos_examen.descripcion_inconvenientes }}" selected>
-                                                {{datos_examen.descripcion_inconvenientes }}</option>
+                                            {% if datos_examen and datos_examen.otros_inconvenientes %}
+                                            <option value="{{ datos_examen.otros_inconvenientes }}" selected>
+                                                {{datos_examen.otros_inconvenientes }}</option>
                                             {% else %}
                                             <option value="" selected disabled>Seleccione frecuencia</option>
                                             {% endif %}

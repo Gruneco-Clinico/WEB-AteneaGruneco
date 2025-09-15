@@ -63,20 +63,19 @@
                                                 <strong>R</strong>onca - Ronca fuerte (lo suficientemente fuerte como
                                                 para ser escuchado a través de puertas cerradas)
                                             </label>
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="radio" name="ronquidos_fuertes"
-                                                    value="Sí" {% if datos_examen and
-                                                    datos_examen.ronquidos_fuertes=="Sí" %}checked{% endif %} required>
-                                                <label class="form-check-label">Sí</label>
+                                            <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                                                <label class="btn btn-outline-secondary active">
+                                                    <!-- prettier-ignore -->
+                                                    <input type="radio" name="ronca_fuerte" value="False"
+                                                        autocomplete="off" {{ datos_examen.ronca_fuerte|yesno:"checked,"
+                                                        }}> No
+                                                </label>
+                                                <label class="btn btn-outline-primary">
+                                                    <input type="radio" name="ronca_fuerte" value="True"
+                                                        autocomplete="off" {{ datos_examen.ronca_fuerte|yesno:",checked"
+                                                        }}> Sí
+                                                </label>
                                             </div>
-
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="radio" name="ronquidos_fuertes"
-                                                    value="No" {% if datos_examen and
-                                                    datos_examen.ronquidos_fuertes=="No" %}checked{% endif %}>
-                                                <label class="form-check-label">No</label>
-                                            </div>
-
                                         </div>
 
                                         <div class="form-group">
@@ -84,17 +83,17 @@
                                                 <strong>C</strong>ansancio - Se siente cansado, fatigado o somnoliento
                                                 durante el día
                                             </label>
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="radio" name="cansancio_diurno"
-                                                    value="Sí" {% if datos_examen and
-                                                    datos_examen.cansancio_diurno=="Sí" %}checked{% endif %} required>
-                                                <label class="form-check-label">Sí</label>
-                                            </div>
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="radio" name="cansancio_diurno"
-                                                    value="No" {% if not datos_examen or
-                                                    datos_examen.cansancio_diurno=="No" %}checked{% endif %}>
-                                                <label class="form-check-label">No</label>
+                                            <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                                                <label class="btn btn-outline-secondary active">
+                                                    <input type="radio" name="cansado_frecuencia" value="False"
+                                                        autocomplete="off" {{
+                                                        datos_examen.cansado_frecuencia|yesno:"checked," }}> No
+                                                </label>
+                                                <label class="btn btn-outline-primary">
+                                                    <input type="radio" name="cansado_frecuencia" value="True"
+                                                        autocomplete="off" {{
+                                                        datos_examen.cansado_frecuencia|yesno:",checked" }}> Sí
+                                                </label>
                                             </div>
                                         </div>
 
@@ -103,17 +102,17 @@
                                                 <strong>O</strong>bservar - Lo han observado dejar de respirar o
                                                 ahogarse mientras dormía
                                             </label>
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="radio" name="apneas_observadas"
-                                                    value="Sí" {% if datos_examen and
-                                                    datos_examen.apneas_observadas=="Sí" %}checked{% endif %} required>
-                                                <label class="form-check-label">Sí</label>
-                                            </div>
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="radio" name="apneas_observadas"
-                                                    value="No" {% if not datos_examen or
-                                                    datos_examen.apneas_observadas=="No" %}checked{% endif %}>
-                                                <label class="form-check-label">No</label>
+                                            <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                                                <label class="btn btn-outline-secondary active">
+                                                    <input type="radio" name="deja_respirar" value="False"
+                                                        autocomplete="off" {{
+                                                        datos_examen.deja_respirar|yesno:"checked," }}> No
+                                                </label>
+                                                <label class="btn btn-outline-primary">
+                                                    <input type="radio" name="deja_respirar" value="True"
+                                                        autocomplete="off" {{
+                                                        datos_examen.deja_respirar|yesno:",checked" }}> Sí
+                                                </label>
                                             </div>
                                         </div>
 
@@ -122,40 +121,18 @@
                                                 <strong>P</strong>resión - Tiene o está recibiendo tratamiento para la
                                                 presión arterial alta
                                             </label>
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="radio" name="presion_arterial"
-                                                    value="Sí" {% if datos_examen and
-                                                    datos_examen.presion_arterial=="Sí" %}checked{% endif %} required>
-                                                <label class="form-check-label">Sí</label>
+                                            <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                                                <label class="btn btn-outline-secondary active">
+                                                    <input type="radio" name="presion_arterial" value="False"
+                                                        autocomplete="off" {{
+                                                        datos_examen.presion_arterial|yesno:"checked," }}> No
+                                                </label>
+                                                <label class="btn btn-outline-primary">
+                                                    <input type="radio" name="presion_arterial" value="True"
+                                                        autocomplete="off" {{
+                                                        datos_examen.presion_arterial|yesno:"checked," }}> Sí
+                                                </label>
                                             </div>
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="radio" name="presion_arterial"
-                                                    value="No" {% if not datos_examen or
-                                                    datos_examen.presion_arterial=="No" %}checked{% endif %}>
-                                                <label class="form-check-label">No</label>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label class="form-control-label">
-                                                <strong>A</strong>pneas observadas - ¿Se han observado apneas durante el
-                                                sueño?
-                                            </label>
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="radio" name="apneas_observadas"
-                                                    value="Sí" {% if datos_examen and
-                                                    datos_examen.apneas_observadas=="Sí" %}checked{% endif %} required>
-                                                <label class="form-check-label">Sí</label>
-                                            </div>
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="radio" name="apneas_observadas"
-                                                    value="No" {% if not datos_examen or
-                                                    datos_examen.apneas_observadas=="No" %}checked{% endif %}>
-                                                <label class="form-check-label">No</label>
-                                            </div>
-
                                         </div>
                                     </div>
 
@@ -164,17 +141,15 @@
                                             <label class="form-control-label">
                                                 <strong>I</strong>MC - IMC > 35 kg/m²
                                             </label>
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="radio" name="imc_alto" value="Sí"
-                                                    {% if datos_examen and datos_examen.imc_alto=="Sí" %}checked{% endif
-                                                    %} required>
-                                                <label class="form-check-label">Sí</label>
-                                            </div>
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="radio" name="imc_alto" value="No"
-                                                    {% if not datos_examen or datos_examen.imc_alto=="No" %}checked{%
-                                                    endif %}>
-                                                <label class="form-check-label">No</label>
+                                            <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                                                <label class="btn btn-outline-secondary active">
+                                                    <input type="radio" name="imc_alto" value="False" autocomplete="off"
+                                                        {{ datos_examen.imc_alto|yesno:"checked," }}> No
+                                                </label>
+                                                <label class="btn btn-outline-primary">
+                                                    <input type="radio" name="imc_alto" value="True" autocomplete="off"
+                                                        {{ datos_examen.imc_alto|yesno:",checked" }}> Sí
+                                                </label>
                                             </div>
                                         </div>
 
@@ -182,36 +157,15 @@
                                             <label class="form-control-label">
                                                 <strong>E</strong>dad - Edad > 50 años
                                             </label>
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="radio" name="edad_mayor_50"
-                                                    value="Sí" {% if datos_examen and datos_examen.edad_mayor_50=="Sí"
-                                                    %}checked{% endif %} required>
-                                                <label class="form-check-label">Sí</label>
-                                            </div>
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="radio" name="edad_mayor_50"
-                                                    value="No" {% if not datos_examen or
-                                                    datos_examen.edad_mayor_50=="No" %}checked{% endif %}>
-                                                <label class="form-check-label">No</label>
-                                            </div>
-                                        </div>
-
-                                        <div class="form-group">
-                                            <label class="form-control-label">
-                                                <strong>C</strong>uello - Circunferencia del cuello grande (Hombres > 40
-                                                cm, Mujeres > 35 cm)
-                                            </label>
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="radio" name="cuello_grande"
-                                                    value="Sí" {% if datos_examen and datos_examen.cuello_grande=="Sí"
-                                                    %}checked{% endif %} required>
-                                                <label class="form-check-label">Sí</label>
-                                            </div>
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="radio" name="cuello_grande"
-                                                    value="No" {% if not datos_examen or
-                                                    datos_examen.cuello_grande=="No" %}checked{% endif %}>
-                                                <label class="form-check-label">No</label>
+                                            <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                                                <label class="btn btn-outline-secondary active">
+                                                    <input type="radio" name="mayor_50" value="False" autocomplete="off"
+                                                        {{ datos_examen.mayor_50|yesno:"checked," }}> No
+                                                </label>
+                                                <label class="btn btn-outline-primary">
+                                                    <input type="radio" name="mayor_50" value="True" autocomplete="off"
+                                                        {{ datos_examen.mayor_50|yesno:",checked" }}> Sí
+                                                </label>
                                             </div>
                                         </div>
 
@@ -222,12 +176,14 @@
                                             </label>
                                             <div class="btn-group btn-group-toggle" data-toggle="buttons">
                                                 <label class="btn btn-outline-secondary active">
-                                                    <input type="radio" name="cuello_grande" value="0"
-                                                        autocomplete="off" checked> No
+                                                    <input type="radio" name="cuello_grande" value="False"
+                                                        autocomplete="off" {{datos_examen.cuello_grande|yesno:"checked,"
+                                                        }}> No
                                                 </label>
                                                 <label class="btn btn-outline-primary">
-                                                    <input type="radio" name="cuello_grande" value="1"
-                                                        autocomplete="off"> Sí
+                                                    <input type="radio" name="cuello_grande" value="True"
+                                                        autocomplete="off" {{datos_examen.cuello_grande|yesno:",checked"
+                                                        }}> Sí
                                                 </label>
                                             </div>
                                         </div>
@@ -236,17 +192,17 @@
                                             <label class="form-control-label">
                                                 <strong>G</strong>enero - Género masculino
                                             </label>
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="radio" name="masculino" value="Sí"
-                                                    {% if datos_examen and datos_examen.masculino=="Sí" %}checked{%
-                                                    endif %} required>
-                                                <label class="form-check-label">Sí</label>
-                                            </div>
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="radio" name="masculino" value="No"
-                                                    {% if not datos_examen or datos_examen.masculino=="No" %}checked{%
-                                                    endif %}>
-                                                <label class="form-check-label">No</label>
+                                            <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                                                <label class="btn btn-outline-secondary active">
+                                                    <input type="radio" name="masculino" value="False"
+                                                        autocomplete="off" {{ datos_examen.masculino|yesno:"checked,"
+                                                        }}> No
+                                                </label>
+                                                <label class="btn btn-outline-primary">
+                                                    <input type="radio" name="masculino" value="True" autocomplete="off"
+                                                        {{ datos_examen.masculino|yesno:",checked" }}>
+                                                    Sí
+                                                </label>
                                             </div>
                                         </div>
                                     </div>
