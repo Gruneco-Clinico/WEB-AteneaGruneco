@@ -1157,15 +1157,15 @@ def guardar_sueno_anamnesis(request):
 
             # Quejas de sueño
             anamnesis.tipos_queja_detalle.all().delete()
-            nombres_quejas = request.POST.getlist("tipos_queja[]")
+            nombres_quejas = request.POST.getlist("tipo_queja[]")
             for nombre in nombres_quejas:
                 TipoQuejaSueno.objects.create(
                     anamnesis=anamnesis,
                     nombre=nombre,
-                    inicio=request.POST.get(f"inicio_{nombre}", ""),
-                    evolucion=request.POST.get(f"evolucion_{nombre}", ""),
-                    frecuencia=request.POST.get(f"frecuencia_{nombre}", ""),
-                    gravedad=request.POST.get(f"gravedad_{nombre}", ""),
+                    inicio=request.POST.get(f"{nombre}_inicio", ""),
+                    evolucion=request.POST.get(f"{nombre}_evolucion", ""),
+                    frecuencia=request.POST.get(f"{nombre}_frecuencia", ""),
+                    gravedad=request.POST.get(f"{nombre}_gravedad", ""),
                 )
 
             # Sustancias

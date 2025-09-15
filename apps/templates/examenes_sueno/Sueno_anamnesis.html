@@ -1,4 +1,4 @@
-{% extends 'layouts/base.html' %} {% block content %}
+{# prettier-ignore #} {% extends 'layouts/base.html' %} {% block content %}
 <style>
   .custom-control-label {
     margin-left: 2rem;
@@ -41,59 +41,109 @@
     <div class="col">
       <div class="card shadow">
         <form method="post" action="{% url 'guardar_examen_anamnesis' %}">
-
           <!-- Card header -->
           <div class="card-header border-0">
             <div class="row align-items-center">
               <div class="col">
                 <h3 class="mb-0">
-                  {% if resultado %}
-                  Editar Anamnesis de Sueño
-                  {% else %}
-                  Examen Sueño Anamnesis
-                  {% endif %}
+                  {% if resultado %} Editar Anamnesis de Sueño {% else %} Examen
+                  Sueño Anamnesis {% endif %}
                 </h3>
               </div>
               <div class="col text-right">
                 <span class="text-muted">Fecha: {% now "d/m/Y" %}</span>
                 {% if resultado %}
-                <br><span class="badge badge-success">Completado</span>
+                <br /><span class="badge badge-success">Completado</span>
                 {% endif %}
               </div>
             </div>
           </div>
           <!-- Card body -->
           <div class="card-body">
-
             {% csrf_token %}
-            <input type="hidden" name="visita_id" id="visita_id" value="{{ visita_examen }}" />
-            <input type="hidden" name="paciente_id" id="paciente_id" value="{{ paciente_id }}" />
-            <input type="hidden" name="examen_id" id="examen_id" value="{{ examen_id }}" />
+            <input
+              type="hidden"
+              name="visita_id"
+              id="visita_id"
+              value="{{ visita_examen }}"
+            />
+            <input
+              type="hidden"
+              name="paciente_id"
+              id="paciente_id"
+              value="{{ paciente_id }}"
+            />
+            <input
+              type="hidden"
+              name="examen_id"
+              id="examen_id"
+              value="{{ examen_id }}"
+            />
 
             <!-- Navegación de secciones -->
-            <ul class="nav nav-pills nav-fill mb-4" id="examTabs" role="tablist">
+            <ul
+              class="nav nav-pills nav-fill mb-4"
+              id="examTabs"
+              role="tablist"
+            >
               <li class="nav-item">
-                <a class="nav-link active" id="anamnesis-tab" data-toggle="tab" href="#anamnesis"
-                  role="tab">Anamnesis</a>
+                <a
+                  class="nav-link active"
+                  id="anamnesis-tab"
+                  data-toggle="tab"
+                  href="#anamnesis"
+                  role="tab"
+                  >Anamnesis</a
+                >
               </li>
               <li class="nav-item">
-                <a class="nav-link" id="evaluacion_queja-tab" data-toggle="tab" href="#evaluacion_queja"
-                  role="tab">Queja de sueño</a>
+                <a
+                  class="nav-link"
+                  id="evaluacion_queja-tab"
+                  data-toggle="tab"
+                  href="#evaluacion_queja"
+                  role="tab"
+                  >Queja de sueño</a
+                >
               </li>
               <li class="nav-item">
-                <a class="nav-link" id="horario-tab" data-toggle="tab" href="#horario" role="tab">Horario de sueño</a>
+                <a
+                  class="nav-link"
+                  id="horario-tab"
+                  data-toggle="tab"
+                  href="#horario"
+                  role="tab"
+                  >Horario de sueño</a
+                >
               </li>
               <li class="nav-item">
-                <a class="nav-link" id="Higiene-tab" data-toggle="tab" href="#Higiene" role="tab">Higiene de sueño</a>
+                <a
+                  class="nav-link"
+                  id="Higiene-tab"
+                  data-toggle="tab"
+                  href="#Higiene"
+                  role="tab"
+                  >Higiene de sueño</a
+                >
               </li>
               <li class="nav-item">
-                <a class="nav-link" id="pensamiento-tab" data-toggle="tab" href="#pensamiento" role="tab">Síntomas
-                  asociados</a>
+                <a
+                  class="nav-link"
+                  id="pensamiento-tab"
+                  data-toggle="tab"
+                  href="#pensamiento"
+                  role="tab"
+                  >Síntomas asociados</a
+                >
               </li>
             </ul>
             <div class="tab-content" id="examTabContent">
               <!-- Anamnesis -->
-              <div class="tab-pane fade show active" id="anamnesis" role="tabpanel">
+              <div
+                class="tab-pane fade show active"
+                id="anamnesis"
+                role="tabpanel"
+              >
                 <div class="card bg-gradient-default shadow-sm mb-4">
                   <div class="card-header bg-transparent">
                     <h4 class="text-white mb-0">Anamnesis</h4>
@@ -102,13 +152,25 @@
                     <!-- Sección: Motivo de consulta y Enfermedad actual -->
                     <div class="form-group">
                       <label for="motivo_consulta">Motivo de consulta</label>
-                      <textarea class="form-control" id="motivo_consulta" name="motivo_consulta"
-                        rows="3">{{ resultado.motivo_consulta|default:"" }}</textarea>
+                      <textarea
+                        class="form-control"
+                        id="motivo_consulta"
+                        name="motivo_consulta"
+                        rows="3"
+                      >
+{{ datos_examen.motivo_consulta|default:"" }}</textarea
+                      >
                     </div>
                     <div class="form-group">
                       <label for="enfermedad_actual">Enfermedad actual</label>
-                      <textarea class="form-control" id="enfermedad_actual" name="enfermedad_actual"
-                        rows="3">{{ resultado.enfermedad_actual|default:"" }}</textarea>
+                      <textarea
+                        class="form-control"
+                        id="enfermedad_actual"
+                        name="enfermedad_actual"
+                        rows="3"
+                      >
+{{ datos_examen.enfermedad_actual|default:"" }}</textarea
+                      >
                     </div>
                   </div>
                 </div>
@@ -122,80 +184,185 @@
                   <div class="card-body bg-white">
                     <div class="row">
                       <!-- Sección: Queja de sueño -->
+
                       <div class="form-group">
-                        <label class="form-label" for="queja_sueno">Queja de sueño</label>
+                        <label class="form-label" for="presenta_queja"
+                          >Queja de sueño</label
+                        >
+
                         <div class="custom-control custom-radio">
-                          <input type="radio" class="custom-control-input" id="queja_sueno-si" name="queja_sueno"
-                            value="si">
-                          <label class="custom-control-label" for="queja_sueno-si">Sí</label>
+                          <input
+                            type="radio"
+                            class="custom-control-input"
+                            id="presenta_queja-si"
+                            name="presenta_queja"
+                            value="si"
+                          />
+
+                          <label
+                            class="custom-control-label"
+                            for="presenta_queja-si"
+                            >Sí</label
+                          >
                         </div>
+
                         <div class="custom-control custom-radio">
-                          <input type="radio" class="custom-control-input" id="queja_sueno-no" name="queja_sueno"
-                            value="no" checked>
-                          <label class="custom-control-label" for="queja_sueno-no">No</label>
+                          <input
+                            type="radio"
+                            class="custom-control-input"
+                            id="presenta_queja-no"
+                            name="presenta_queja"
+                            value="no"
+                          />
+                          <label
+                            class="custom-control-label"
+                            for="presenta_queja-no"
+                            >No</label
+                          >
                         </div>
                       </div>
 
-                      <div id="campos-queja-container" style="display: none;">
+                      <div id="campos-queja-container" style="display: none">
                         <div class="form-group">
-                          <label class="form-control-label">Tipo de queja de sueño</label>
+                          <label class="form-control-label"
+                            >Tipo de queja de sueño</label
+                          >
                           <div class="d-flex flex-wrap">
                             <!-- Lista de checkboxes para tipos de quejas -->
                             <div class="form-check mr-3 mb-2">
-                              <input class="form-check-input queja-checkbox" type="checkbox" name="tipo_queja[]"
-                                value="Dificultad de conciliación" id="dificultad_conciliacion">
-                              <label class="form-check-label" for="dificultad_conciliacion">Dificultad de
-                                conciliación</label>
+                              <input
+                                class="form-check-input queja-checkbox"
+                                type="checkbox"
+                                name="tipo_queja[]"
+                                value="Dificultad de conciliación"
+                                id="dificultad_conciliacion"
+                              />
+                              <label
+                                class="form-check-label"
+                                for="dificultad_conciliacion"
+                                >Dificultad de conciliación</label
+                              >
                             </div>
                             <div class="form-check mr-3 mb-2">
-                              <input class="form-check-input queja-checkbox" type="checkbox" name="tipo_queja[]"
-                                value="Dificultad de mantenimiento" id="dificultad_mantenimiento">
-                              <label class="form-check-label" for="dificultad_mantenimiento">Dificultad de
-                                mantenimiento</label>
+                              <input
+                                class="form-check-input queja-checkbox"
+                                type="checkbox"
+                                name="tipo_queja[]"
+                                value="Dificultad de mantenimiento"
+                                id="dificultad_mantenimiento"
+                              />
+                              <label
+                                class="form-check-label"
+                                for="dificultad_mantenimiento"
+                                >Dificultad de mantenimiento</label
+                              >
                             </div>
                             <div class="form-check mr-3 mb-2">
-                              <input class="form-check-input queja-checkbox" type="checkbox" name="tipo_queja[]"
-                                value="Trastornos de conducta del sueño" id="trastornos_conducta">
-                              <label class="form-check-label" for="trastornos_conducta">Trastornos de conducta del
-                                sueño</label>
+                              <input
+                                class="form-check-input queja-checkbox"
+                                type="checkbox"
+                                name="tipo_queja[]"
+                                value="Trastornos de conducta del sueño"
+                                id="trastornos_conducta"
+                              />
+                              <label
+                                class="form-check-label"
+                                for="trastornos_conducta"
+                                >Trastornos de conducta del sueño</label
+                              >
                             </div>
                             <div class="form-check mr-3 mb-2">
-                              <input class="form-check-input queja-checkbox" type="checkbox" name="tipo_queja[]"
-                                value="Apnea" id="apnea">
-                              <label class="form-check-label" for="apnea">Apnea</label>
+                              <input
+                                class="form-check-input queja-checkbox"
+                                type="checkbox"
+                                name="tipo_queja[]"
+                                value="Apnea"
+                                id="apnea"
+                              />
+                              <label class="form-check-label" for="apnea"
+                                >Apnea</label
+                              >
                             </div>
                             <div class="form-check mr-3 mb-2">
-                              <input class="form-check-input queja-checkbox" type="checkbox" name="tipo_queja[]"
-                                value="Ronquido" id="ronquido">
-                              <label class="form-check-label" for="ronquido">Ronquido</label>
+                              <input
+                                class="form-check-input queja-checkbox"
+                                type="checkbox"
+                                name="tipo_queja[]"
+                                value="Ronquido"
+                                id="ronquido"
+                              />
+                              <label class="form-check-label" for="ronquido"
+                                >Ronquido</label
+                              >
                             </div>
                             <div class="form-check mr-3 mb-2">
-                              <input class="form-check-input queja-checkbox" type="checkbox" name="tipo_queja[]"
-                                value="Somnolencia diurna" id="somnolencia_diurna">
-                              <label class="form-check-label" for="somnolencia_diurna">Somnolencia diurna</label>
+                              <input
+                                class="form-check-input queja-checkbox"
+                                type="checkbox"
+                                name="tipo_queja[]"
+                                value="Somnolencia diurna"
+                                id="somnolencia_diurna"
+                              />
+                              <label
+                                class="form-check-label"
+                                for="somnolencia_diurna"
+                                >Somnolencia diurna</label
+                              >
                             </div>
                             <div class="form-check mr-3 mb-2">
-                              <input class="form-check-input queja-checkbox" type="checkbox" name="tipo_queja[]"
-                                value="Narcolepsia" id="narcolepsia">
-                              <label class="form-check-label" for="narcolepsia">Narcolepsia</label>
+                              <input
+                                class="form-check-input queja-checkbox"
+                                type="checkbox"
+                                name="tipo_queja[]"
+                                value="Narcolepsia"
+                                id="narcolepsia"
+                              />
+                              <label class="form-check-label" for="narcolepsia"
+                                >Narcolepsia</label
+                              >
                             </div>
                             <div class="form-check mr-3 mb-2">
-                              <input class="form-check-input queja-checkbox" type="checkbox" name="tipo_queja[]"
-                                value="Hipersomnolencia" id="hipersomnolencia">
-                              <label class="form-check-label" for="hipersomnolencia">Hipersomnolencia</label>
+                              <input
+                                class="form-check-input queja-checkbox"
+                                type="checkbox"
+                                name="tipo_queja[]"
+                                value="Hipersomnolencia"
+                                id="hipersomnolencia"
+                              />
+                              <label
+                                class="form-check-label"
+                                for="hipersomnolencia"
+                                >Hipersomnolencia</label
+                              >
                             </div>
                             <div class="form-check mr-3 mb-2">
-                              <input class="form-check-input queja-checkbox" type="checkbox" name="tipo_queja[]"
-                                value="Despertares nocturnos" id="despertares_nocturnos">
-                              <label class="form-check-label" for="despertares_nocturnos">Despertares nocturnos</label>
+                              <input
+                                class="form-check-input queja-checkbox"
+                                type="checkbox"
+                                name="tipo_queja[]"
+                                value="Despertares nocturnos"
+                                id="despertares_nocturnos"
+                              />
+                              <label
+                                class="form-check-label"
+                                for="despertares_nocturnos"
+                                >Despertares nocturnos</label
+                              >
                             </div>
                             <div class="form-check mr-3 mb-2">
-                              <input class="form-check-input queja-checkbox" type="checkbox" name="tipo_queja[]"
-                                value="Trastorno de conducta del sueño" id="trastorno_sueno">
-                              <label class="form-check-label" for="trastorno_sueno">Trastorno de conducta del
-                                sueño</label>
+                              <input
+                                class="form-check-input queja-checkbox"
+                                type="checkbox"
+                                name="tipo_queja[]"
+                                value="Trastorno de conducta del sueño"
+                                id="trastorno_sueno"
+                              />
+                              <label
+                                class="form-check-label"
+                                for="trastorno_sueno"
+                                >Trastorno de conducta del sueño</label
+                              >
                             </div>
-
                           </div>
                         </div>
 
@@ -203,33 +370,72 @@
                         <div id="quejas-container" class="col-12"></div>
 
                         <!-- Sección de causas (solo visible si queja_sueno es "Sí") -->
-                        <div id="seccion-causas" style="display: none;">
+                        <div id="seccion-causas" style="display: none">
                           <div class="form-group">
-                            <label class="form-control-label">Existe alguna causa conocida o a la que le atribuya el
-                              problema</label>
+                            <label class="form-control-label"
+                              >Existe alguna causa conocida o a la que le
+                              atribuya el problema</label
+                            >
                             <div class="form-check form-check-inline">
-                              <input class="form-check-input" type="radio" name="causa_conocida" id="causa_conocida_si"
-                                value="Si">
-                              <label class="form-check-label" for="causa_conocida_si">Sí</label>
+                              <input
+                                class="form-check-input"
+                                type="radio"
+                                name="causa_conocida"
+                                id="causa_conocida_si"
+                                value="Si"
+                              />
+                              <label
+                                class="form-check-label"
+                                for="causa_conocida_si"
+                                >Sí</label
+                              >
                             </div>
                             <div class="form-check form-check-inline">
-                              <input class="form-check-input" type="radio" name="causa_conocida" id="causa_conocida_no"
-                                value="No" checked>
-                              <label class="form-check-label" for="causa_conocida_no">No</label>
+                              <input
+                                class="form-check-input"
+                                type="radio"
+                                name="causa_conocida"
+                                id="causa_conocida_no"
+                                value="No"
+                                checked
+                              />
+                              <label
+                                class="form-check-label"
+                                for="causa_conocida_no"
+                                >No</label
+                              >
                             </div>
                           </div>
 
-                          <div id="causas-container" class="col-md-12" style="display: none;">
+                          <div
+                            id="causas-container"
+                            class="col-md-12"
+                            style="display: none"
+                          >
                             <div class="form-group">
-                              <label class="form-control-label">Especifique cuál o cuáles causas</label>
-                              <textarea class="form-control" name="especifique_causas"
-                                id="especifique_causas"></textarea>
+                              <label class="form-control-label"
+                                >Especifique cuál o cuáles causas</label
+                              >
+                              <textarea
+                                class="form-control"
+                                name="especificacion_causa"
+                                id="especifique_causas"
+                              >
+{{ datos_examen.especificacion_causa|default:"" }}</textarea
+                              >
                             </div>
                             <div class="col-md-12">
                               <div class="form-group">
-                                <label class="form-control-label">Observaciones</label>
-                                <textarea class="form-control" name="observaciones_queja"
-                                  id="observaciones_queja"></textarea>
+                                <label class="form-control-label"
+                                  >Observaciones</label
+                                >
+                                <textarea
+                                  class="form-control"
+                                  name="observaciones_queja"
+                                  id="observaciones_queja"
+                                >
+{{ datos_examen.observaciones_queja|default:"" }}</textarea
+                                >
                               </div>
                             </div>
                           </div>
@@ -255,23 +461,52 @@
                           </div>
                           <div class="card-body">
                             <div class="form-group">
-                              <label class="form-control-label">¿Tiene alguna rutina antes de dormir?</label>
+                              <label class="form-control-label"
+                                >¿Tiene alguna rutina antes de dormir?</label
+                              >
                               <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="rutina_dormir" id="rutina_si"
-                                  value="si">
-                                <label class="form-check-label" for="rutina_si">Sí</label>
+                                <input
+                                  class="form-check-input"
+                                  type="radio"
+                                  name="rutina_dormir"
+                                  id="rutina_si"
+                                  value="si"
+                                />
+                                <label class="form-check-label" for="rutina_si"
+                                  >Sí</label
+                                >
                               </div>
                               <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="rutina_dormir" id="rutina_no"
-                                  value="no" checked>
-                                <label class="form-check-label" for="rutina_no">No</label>
+                                <input
+                                  class="form-check-input"
+                                  type="radio"
+                                  name="rutina_dormir"
+                                  id="rutina_no"
+                                  value="no"
+                                  checked
+                                />
+                                <label class="form-check-label" for="rutina_no"
+                                  >No</label
+                                >
                               </div>
                             </div>
 
-                            <div class="form-group" id="describa-rutina" style="display: none;">
-                              <label class="form-control-label">Describa su rutina</label>
-                              <textarea class="form-control" id="describa_rutina" name="describa_rutina"
-                                rows="3"></textarea>
+                            <div
+                              class="form-group"
+                              id="describa-rutina"
+                              style="display: none"
+                            >
+                              <label class="form-control-label"
+                                >Describa su rutina</label
+                              >
+                              <textarea
+                                class="form-control"
+                                id="describa_rutina"
+                                name="describa_rutina"
+                                rows="3"
+                              >
+{{ datos_examen.describa_rutina|default:"" }}</textarea
+                              >
                             </div>
                           </div>
                         </div>
@@ -285,22 +520,51 @@
                           </div>
                           <div class="card-body">
                             <div class="form-group">
-                              <label class="form-control-label">Tipo de jornada (Lunes a Viernes)</label>
+                              <label class="form-control-label"
+                                >Tipo de jornada (Lunes a Viernes)</label
+                              >
                               <div class="d-flex flex-wrap">
                                 <div class="form-check mr-3 mb-2">
-                                  <input class="form-check-input" type="checkbox" name="jornada_laboral[]"
-                                    id="jornada_diurna" value="Diurna">
-                                  <label class="form-check-label" for="jornada_diurna">Diurna</label>
+                                  <input
+                                    class="form-check-input"
+                                    type="checkbox"
+                                    name="jornada_laboral"
+                                    id="jornada_laboral"
+                                    value="Diurna"
+                                  />
+                                  <label
+                                    class="form-check-label"
+                                    for="jornada_laboral"
+                                    >Diurna</label
+                                  >
                                 </div>
                                 <div class="form-check mr-3 mb-2">
-                                  <input class="form-check-input" type="checkbox" name="jornada_laboral[]"
-                                    id="jornada_nocturna" value="Nocturna">
-                                  <label class="form-check-label" for="jornada_nocturna">Nocturna</label>
+                                  <input
+                                    class="form-check-input"
+                                    type="checkbox"
+                                    name="jornada_laboral"
+                                    id="jornada_laboral"
+                                    value="Nocturna"
+                                  />
+                                  <label
+                                    class="form-check-label"
+                                    for="jornada_laboral_nocturna"
+                                    >Nocturna</label
+                                  >
                                 </div>
                                 <div class="form-check mr-3 mb-2">
-                                  <input class="form-check-input" type="checkbox" name="jornada_laboral[]"
-                                    id="jornada_mixta" value="Mixta">
-                                  <label class="form-check-label" for="jornada_mixta">Mixta</label>
+                                  <input
+                                    class="form-check-input"
+                                    type="checkbox"
+                                    name="jornada_laboral"
+                                    id="jornada_laboral"
+                                    value="Mixta"
+                                  />
+                                  <label
+                                    class="form-check-label"
+                                    for="jornada_laboral"
+                                    >Mixta</label
+                                  >
                                 </div>
                               </div>
                             </div>
@@ -314,29 +578,57 @@
                           </div>
                           <div class="card-body">
                             <div class="form-group">
-                              <label class="form-control-label">Tipo de jornada (fines de semana)</label>
+                              <label class="form-control-label"
+                                >Tipo de jornada (fines de semana)</label
+                              >
                               <div class="d-flex flex-wrap">
                                 <div class="form-check mr-3 mb-2">
-                                  <input class="form-check-input" type="checkbox" name="jornada_fds[]"
-                                    id="jornada_diurna" value="Diurna">
-                                  <label class="form-check-label" for="jornada_diurna">Diurna</label>
+                                  <input
+                                    class="form-check-input"
+                                    type="checkbox"
+                                    name="jornada_fds[]"
+                                    id="jornada_diurna"
+                                    value="Diurna"
+                                  />
+                                  <label
+                                    class="form-check-label"
+                                    for="jornada_diurna"
+                                    >Diurna</label
+                                  >
                                 </div>
                                 <div class="form-check mr-3 mb-2">
-                                  <input class="form-check-input" type="checkbox" name="jornada_fds[]"
-                                    id="jornada_nocturna" value="Nocturna">
-                                  <label class="form-check-label" for="jornada_nocturna">Nocturna</label>
+                                  <input
+                                    class="form-check-input"
+                                    type="checkbox"
+                                    name="jornada_fds[]"
+                                    id="jornada_nocturna"
+                                    value="Nocturna"
+                                  />
+                                  <label
+                                    class="form-check-label"
+                                    for="jornada_nocturna"
+                                    >Nocturna</label
+                                  >
                                 </div>
                                 <div class="form-check mr-3 mb-2">
-                                  <input class="form-check-input" type="checkbox" name="jornada_fds[]"
-                                    id="jornada_mixta" value="Mixta">
-                                  <label class="form-check-label" for="jornada_mixta">Mixta</label>
+                                  <input
+                                    class="form-check-input"
+                                    type="checkbox"
+                                    name="jornada_fds[]"
+                                    id="jornada_mixta"
+                                    value="Mixta"
+                                  />
+                                  <label
+                                    class="form-check-label"
+                                    for="jornada_mixta"
+                                    >Mixta</label
+                                  >
                                 </div>
                               </div>
                             </div>
                           </div>
                         </div>
                       </div>
-
 
                       <!-- Sección: Hábitos de sueño (organizada por periodos) -->
                       <div class="col-md-12">
@@ -346,35 +638,74 @@
                           </div>
                           <div class="card-body">
                             <!-- Pestañas para diferentes periodos -->
-                            <ul class="nav nav-tabs" id="sueñoTabs" role="tablist">
+                            <ul
+                              class="nav nav-tabs"
+                              id="sueñoTabs"
+                              role="tablist"
+                            >
                               <li class="nav-item">
-                                <a class="nav-link active" id="laboral-tab" data-toggle="tab" href="#laboral"
-                                  role="tab">Días laborales</a>
+                                <a
+                                  class="nav-link active"
+                                  id="laboral-tab"
+                                  data-toggle="tab"
+                                  href="#laboral"
+                                  role="tab"
+                                  >Días laborales</a
+                                >
                               </li>
                               <li class="nav-item">
-                                <a class="nav-link" id="fines-tab" data-toggle="tab" href="#fines" role="tab">Fines de
-                                  semana</a>
+                                <a
+                                  class="nav-link"
+                                  id="fines-tab"
+                                  data-toggle="tab"
+                                  href="#fines"
+                                  role="tab"
+                                  >Fines de semana</a
+                                >
                               </li>
                               <li class="nav-item">
-                                <a class="nav-link" id="vacaciones-tab" data-toggle="tab" href="#vacaciones"
-                                  role="tab">Vacaciones</a>
+                                <a
+                                  class="nav-link"
+                                  id="vacaciones-tab"
+                                  data-toggle="tab"
+                                  href="#vacaciones"
+                                  role="tab"
+                                  >Vacaciones</a
+                                >
                               </li>
                             </ul>
 
                             <div class="tab-content" id="sueñoTabsContent">
                               <!-- Días laborales -->
-                              <div class="tab-pane fade show active" id="laboral" role="tabpanel">
+                              <div
+                                class="tab-pane fade show active"
+                                id="laboral"
+                                role="tabpanel"
+                              >
                                 <div class="row mt-3">
                                   <div class="col-md-6">
                                     <div class="form-group">
-                                      <label class="form-control-label">Hora aproximada de acostarse</label>
-                                      <input type="time" class="form-control" name="hora_acostarse_laboral">
+                                      <label class="form-control-label"
+                                        >Hora aproximada de acostarse</label
+                                      >
+                                      <input
+                                        type="time"
+                                        class="form-control"
+                                        name="hora_acostarse_laboral"
+                                      />
                                     </div>
                                   </div>
                                   <div class="col-md-6">
                                     <div class="form-group">
-                                      <label class="form-control-label">Tiempo para quedarse dormido (minutos)</label>
-                                      <input type="number" class="form-control" name="tiempo_dormirse_laboral">
+                                      <label class="form-control-label"
+                                        >Tiempo para quedarse dormido
+                                        (minutos)</label
+                                      >
+                                      <input
+                                        type="number"
+                                        class="form-control"
+                                        name="tiempo_dormirse_laboral"
+                                      />
                                     </div>
                                   </div>
                                 </div>
@@ -382,28 +713,52 @@
                                 <div class="row">
                                   <div class="col-md-6">
                                     <div class="form-group">
-                                      <label class="form-control-label">Hora de intención de dormir</label>
-                                      <input type="time" class="form-control" name="hora_intencion_dormir_laboral">
+                                      <label class="form-control-label"
+                                        >Hora de intención de dormir</label
+                                      >
+                                      <input
+                                        type="time"
+                                        class="form-control"
+                                        name="hora_intencion_dormir_laboral"
+                                      />
                                     </div>
                                   </div>
                                   <div class="col-md-6">
                                     <div class="form-group">
-                                      <label class="form-control-label">Hora aproximada de despertarse</label>
-                                      <input type="time" class="form-control" name="hora_despertar_laboral">
+                                      <label class="form-control-label"
+                                        >Hora aproximada de despertarse</label
+                                      >
+                                      <input
+                                        type="time"
+                                        class="form-control"
+                                        name="hora_despertar_laboral"
+                                      />
                                     </div>
                                   </div>
                                 </div>
 
                                 <div class="form-group">
-                                  <label class="form-control-label">Tiempo para salir de la cama (minutos)</label>
-                                  <input type="number" class="form-control" name="tiempo_salir_cama_laboral">
+                                  <label class="form-control-label"
+                                    >Tiempo para salir de la cama
+                                    (minutos)</label
+                                  >
+                                  <input
+                                    type="number"
+                                    class="form-control"
+                                    name="tiempo_salir_cama_laboral"
+                                  />
                                 </div>
 
                                 <div class="row">
                                   <div class="col-md-4">
                                     <div class="form-group">
-                                      <label class="form-control-label">¿El sueño es reparador?</label>
-                                      <select class="form-control" name="sueno_reparador_laboral">
+                                      <label class="form-control-label"
+                                        >¿El sueño es reparador?</label
+                                      >
+                                      <select
+                                        class="form-control"
+                                        name="sueno_reparador_laboral"
+                                      >
                                         <option value="">Seleccione...</option>
                                         <option value="Si">Sí</option>
                                         <option value="No">No</option>
@@ -412,8 +767,13 @@
                                   </div>
                                   <div class="col-md-4">
                                     <div class="form-group">
-                                      <label class="form-control-label">¿Tiene compañero(a) de cama?</label>
-                                      <select class="form-control" name="companero_cama_laboral">
+                                      <label class="form-control-label"
+                                        >¿Tiene compañero(a) de cama?</label
+                                      >
+                                      <select
+                                        class="form-control"
+                                        name="companero_cama_laboral"
+                                      >
                                         <option value="">Seleccione...</option>
                                         <option value="Si">Sí</option>
                                         <option value="No">No</option>
@@ -422,8 +782,13 @@
                                   </div>
                                   <div class="col-md-4">
                                     <div class="form-group">
-                                      <label class="form-control-label">¿Necesita despertador?</label>
-                                      <select class="form-control" name="despertador_laboral">
+                                      <label class="form-control-label"
+                                        >¿Necesita despertador?</label
+                                      >
+                                      <select
+                                        class="form-control"
+                                        name="despertador_laboral"
+                                      >
                                         <option value="">Seleccione...</option>
                                         <option value="Si">Sí</option>
                                         <option value="No">No</option>
@@ -434,18 +799,35 @@
                               </div>
 
                               <!-- Fines de semana (estructura similar) -->
-                              <div class="tab-pane fade" id="fines" role="tabpanel">
+                              <div
+                                class="tab-pane fade"
+                                id="fines"
+                                role="tabpanel"
+                              >
                                 <div class="row mt-3">
                                   <div class="col-md-6">
                                     <div class="form-group">
-                                      <label class="form-control-label">Hora aproximada de acostarse</label>
-                                      <input type="time" class="form-control" name="hora_acostarse_fds">
+                                      <label class="form-control-label"
+                                        >Hora aproximada de acostarse</label
+                                      >
+                                      <input
+                                        type="time"
+                                        class="form-control"
+                                        name="hora_acostarse_fds"
+                                      />
                                     </div>
                                   </div>
                                   <div class="col-md-6">
                                     <div class="form-group">
-                                      <label class="form-control-label">Tiempo para quedarse dormido (minutos)</label>
-                                      <input type="number" class="form-control" name="tiempo_dormirse_fds">
+                                      <label class="form-control-label"
+                                        >Tiempo para quedarse dormido
+                                        (minutos)</label
+                                      >
+                                      <input
+                                        type="number"
+                                        class="form-control"
+                                        name="tiempo_dormirse_fds"
+                                      />
                                     </div>
                                   </div>
                                 </div>
@@ -453,28 +835,52 @@
                                 <div class="row">
                                   <div class="col-md-6">
                                     <div class="form-group">
-                                      <label class="form-control-label">Hora de intención de dormir</label>
-                                      <input type="time" class="form-control" name="hora_intencion_dormir_fds">
+                                      <label class="form-control-label"
+                                        >Hora de intención de dormir</label
+                                      >
+                                      <input
+                                        type="time"
+                                        class="form-control"
+                                        name="hora_intencion_dormir_fds"
+                                      />
                                     </div>
                                   </div>
                                   <div class="col-md-6">
                                     <div class="form-group">
-                                      <label class="form-control-label">Hora aproximada de despertarse</label>
-                                      <input type="time" class="form-control" name="hora_despertar_fds">
+                                      <label class="form-control-label"
+                                        >Hora aproximada de despertarse</label
+                                      >
+                                      <input
+                                        type="time"
+                                        class="form-control"
+                                        name="hora_despertar_fds"
+                                      />
                                     </div>
                                   </div>
                                 </div>
 
                                 <div class="form-group">
-                                  <label class="form-control-label">Tiempo para salir de la cama (minutos)</label>
-                                  <input type="number" class="form-control" name="tiempo_salir_cama_fds">
+                                  <label class="form-control-label"
+                                    >Tiempo para salir de la cama
+                                    (minutos)</label
+                                  >
+                                  <input
+                                    type="number"
+                                    class="form-control"
+                                    name="tiempo_salir_cama_fds"
+                                  />
                                 </div>
 
                                 <div class="row">
                                   <div class="col-md-4">
                                     <div class="form-group">
-                                      <label class="form-control-label">¿El sueño es reparador?</label>
-                                      <select class="form-control" name="sueno_reparador_fds">
+                                      <label class="form-control-label"
+                                        >¿El sueño es reparador?</label
+                                      >
+                                      <select
+                                        class="form-control"
+                                        name="sueno_reparador_fds"
+                                      >
                                         <option value="">Seleccione...</option>
                                         <option value="Si">Sí</option>
                                         <option value="No">No</option>
@@ -483,8 +889,13 @@
                                   </div>
                                   <div class="col-md-4">
                                     <div class="form-group">
-                                      <label class="form-control-label">¿Tiene compañero(a) de cama?</label>
-                                      <select class="form-control" name="companero_cama_fds">
+                                      <label class="form-control-label"
+                                        >¿Tiene compañero(a) de cama?</label
+                                      >
+                                      <select
+                                        class="form-control"
+                                        name="companero_cama_fds"
+                                      >
                                         <option value="">Seleccione...</option>
                                         <option value="Si">Sí</option>
                                         <option value="No">No</option>
@@ -493,8 +904,13 @@
                                   </div>
                                   <div class="col-md-4">
                                     <div class="form-group">
-                                      <label class="form-control-label">¿Necesita despertador?</label>
-                                      <select class="form-control" name="despertador_fds">
+                                      <label class="form-control-label"
+                                        >¿Necesita despertador?</label
+                                      >
+                                      <select
+                                        class="form-control"
+                                        name="despertador_fds"
+                                      >
                                         <option value="">Seleccione...</option>
                                         <option value="Si">Sí</option>
                                         <option value="No">No</option>
@@ -506,18 +922,35 @@
                               </div>
 
                               <!-- Vacaciones (estructura similar) -->
-                              <div class="tab-pane fade" id="vacaciones" role="tabpanel">
+                              <div
+                                class="tab-pane fade"
+                                id="vacaciones"
+                                role="tabpanel"
+                              >
                                 <div class="row mt-3">
                                   <div class="col-md-6">
                                     <div class="form-group">
-                                      <label class="form-control-label">Hora aproximada de acostarse</label>
-                                      <input type="time" class="form-control" name="hora_acostarse_vacaciones">
+                                      <label class="form-control-label"
+                                        >Hora aproximada de acostarse</label
+                                      >
+                                      <input
+                                        type="time"
+                                        class="form-control"
+                                        name="hora_acostarse_vacaciones"
+                                      />
                                     </div>
                                   </div>
                                   <div class="col-md-6">
                                     <div class="form-group">
-                                      <label class="form-control-label">Tiempo para quedarse dormido (minutos)</label>
-                                      <input type="number" class="form-control" name="tiempo_dormirse_vacaciones">
+                                      <label class="form-control-label"
+                                        >Tiempo para quedarse dormido
+                                        (minutos)</label
+                                      >
+                                      <input
+                                        type="number"
+                                        class="form-control"
+                                        name="tiempo_dormirse_vacaciones"
+                                      />
                                     </div>
                                   </div>
                                 </div>
@@ -525,28 +958,52 @@
                                 <div class="row">
                                   <div class="col-md-6">
                                     <div class="form-group">
-                                      <label class="form-control-label">Hora de intención de dormir</label>
-                                      <input type="time" class="form-control" name="hora_intencion_dormir_vacaciones">
+                                      <label class="form-control-label"
+                                        >Hora de intención de dormir</label
+                                      >
+                                      <input
+                                        type="time"
+                                        class="form-control"
+                                        name="hora_intencion_dormir_vacaciones"
+                                      />
                                     </div>
                                   </div>
                                   <div class="col-md-6">
                                     <div class="form-group">
-                                      <label class="form-control-label">Hora aproximada de despertarse</label>
-                                      <input type="time" class="form-control" name="hora_despertar_vacaciones">
+                                      <label class="form-control-label"
+                                        >Hora aproximada de despertarse</label
+                                      >
+                                      <input
+                                        type="time"
+                                        class="form-control"
+                                        name="hora_despertar_vacaciones"
+                                      />
                                     </div>
                                   </div>
                                 </div>
 
                                 <div class="form-group">
-                                  <label class="form-control-label">Tiempo para salir de la cama (minutos)</label>
-                                  <input type="number" class="form-control" name="tiempo_salir_cama_vacaciones">
+                                  <label class="form-control-label"
+                                    >Tiempo para salir de la cama
+                                    (minutos)</label
+                                  >
+                                  <input
+                                    type="number"
+                                    class="form-control"
+                                    name="tiempo_salir_cama_vacaciones"
+                                  />
                                 </div>
 
                                 <div class="row">
                                   <div class="col-md-4">
                                     <div class="form-group">
-                                      <label class="form-control-label">¿El sueño es reparador?</label>
-                                      <select class="form-control" name="sueno_reparador_vacaciones">
+                                      <label class="form-control-label"
+                                        >¿El sueño es reparador?</label
+                                      >
+                                      <select
+                                        class="form-control"
+                                        name="sueno_reparador_vacaciones"
+                                      >
                                         <option value="">Seleccione...</option>
                                         <option value="Si">Sí</option>
                                         <option value="No">No</option>
@@ -555,8 +1012,13 @@
                                   </div>
                                   <div class="col-md-4">
                                     <div class="form-group">
-                                      <label class="form-control-label">¿Tiene compañero(a) de cama?</label>
-                                      <select class="form-control" name="companero_cama_vacaciones">
+                                      <label class="form-control-label"
+                                        >¿Tiene compañero(a) de cama?</label
+                                      >
+                                      <select
+                                        class="form-control"
+                                        name="companero_cama_vacaciones"
+                                      >
                                         <option value="">Seleccione...</option>
                                         <option value="Si">Sí</option>
                                         <option value="No">No</option>
@@ -565,8 +1027,13 @@
                                   </div>
                                   <div class="col-md-4">
                                     <div class="form-group">
-                                      <label class="form-control-label">¿Necesita despertador?</label>
-                                      <select class="form-control" name="despertador_vacaciones">
+                                      <label class="form-control-label"
+                                        >¿Necesita despertador?</label
+                                      >
+                                      <select
+                                        class="form-control"
+                                        name="despertador_vacaciones"
+                                      >
                                         <option value="">Seleccione...</option>
                                         <option value="Si">Sí</option>
                                         <option value="No">No</option>
@@ -586,7 +1053,6 @@
               </div>
               <!-- higiene del sueno -->
               <div class="tab-pane fade" id="Higiene" role="tabpanel">
-
                 <div class="card bg-gradient-default shadow-sm mb-4">
                   <div class="card-header bg-transparent">
                     <h4 class="text-white mb-0">Higiene de sueño</h4>
@@ -599,7 +1065,6 @@
                             <h3 class="mb-0">Higiene de sueño</h3>
                           </div>
                           <div class="card-body">
-
                             <!-- SECCIÓN 1: HÁBITOS DE SIESTA -->
                             <div class="mb-4 border-bottom pb-3">
                               <h4 class="mb-3">Hábitos de siesta</h4>
@@ -607,32 +1072,66 @@
                               <div class="form-group">
                                 <label>¿Realiza siestas durante el día?</label>
                                 <div class="custom-control custom-radio">
-                                  <input type="radio" class="custom-control-input" id="siestas_si"
-                                    name="realiza_siestas" value="Si">
-                                  <label class="custom-control-label" for="siestas_si">Sí</label>
+                                  <input
+                                    type="radio"
+                                    class="custom-control-input"
+                                    id="siestas_si"
+                                    name="realiza_siestas"
+                                    value="Si"
+                                  />
+                                  <label
+                                    class="custom-control-label"
+                                    for="siestas_si"
+                                    >Sí</label
+                                  >
                                 </div>
                                 <div class="custom-control custom-radio">
-                                  <input type="radio" class="custom-control-input" id="siestas_no"
-                                    name="realiza_siestas" value="No">
-                                  <label class="custom-control-label" for="siestas_no">No</label>
+                                  <input
+                                    type="radio"
+                                    class="custom-control-input"
+                                    id="siestas_no"
+                                    name="realiza_siestas"
+                                    value="No"
+                                  />
+                                  <label
+                                    class="custom-control-label"
+                                    for="siestas_no"
+                                    >No</label
+                                  >
                                 </div>
                               </div>
 
                               <!-- Detalles de siestas (mostrar solo si selecciona "Sí") -->
-                              <div id="siestas-container" class="pl-4 mt-3" style="display: none;">
+                              <div
+                                id="siestas-container"
+                                class="pl-4 mt-3"
+                                style="display: none"
+                              >
                                 <div class="row">
                                   <div class="col-md-6">
                                     <div class="form-group">
-                                      <label for="numero_siestas">Número de siestas al día</label>
-                                      <input type="number" class="form-control" id="numero_siestas"
-                                        name="numero_siestas">
+                                      <label for="numero_siestas"
+                                        >Número de siestas al día</label
+                                      >
+                                      <input
+                                        type="number"
+                                        class="form-control"
+                                        id="numero_siestas"
+                                        name="numero_siestas"
+                                      />
                                     </div>
                                   </div>
                                   <div class="col-md-6">
                                     <div class="form-group">
-                                      <label for="duracion_siestas">Duración aproximada (minutos)</label>
-                                      <input type="number" class="form-control" id="duracion_siestas"
-                                        name="duracion_siestas">
+                                      <label for="duracion_siestas"
+                                        >Duración aproximada (minutos)</label
+                                      >
+                                      <input
+                                        type="number"
+                                        class="form-control"
+                                        id="duracion_siestas"
+                                        name="duracion_siestas"
+                                      />
                                     </div>
                                   </div>
                                 </div>
@@ -641,75 +1140,177 @@
                                   <label>Frecuencia a la semana</label>
                                   <div class="ml-3">
                                     <div class="custom-control custom-radio">
-                                      <input type="radio" class="custom-control-input" id="siesta_frecuencia_una"
-                                        name="siesta_frecuencia" value="Una vez">
-                                      <label class="custom-control-label" for="siesta_frecuencia_una">Una vez</label>
+                                      <input
+                                        type="radio"
+                                        class="custom-control-input"
+                                        id="siesta_frecuencia_una"
+                                        name="siesta_frecuencia"
+                                        value="Una vez"
+                                      />
+                                      <label
+                                        class="custom-control-label"
+                                        for="siesta_frecuencia_una"
+                                        >Una vez</label
+                                      >
                                     </div>
                                     <div class="custom-control custom-radio">
-                                      <input type="radio" class="custom-control-input" id="siesta_frecuencia_dos_tres"
-                                        name="siesta_frecuencia" value="2-3 veces">
-                                      <label class="custom-control-label" for="siesta_frecuencia_dos_tres">2-3
-                                        veces</label>
+                                      <input
+                                        type="radio"
+                                        class="custom-control-input"
+                                        id="siesta_frecuencia_dos_tres"
+                                        name="siesta_frecuencia"
+                                        value="2-3 veces"
+                                      />
+                                      <label
+                                        class="custom-control-label"
+                                        for="siesta_frecuencia_dos_tres"
+                                        >2-3 veces</label
+                                      >
                                     </div>
                                     <div class="custom-control custom-radio">
-                                      <input type="radio" class="custom-control-input"
-                                        id="siesta_frecuencia_cuatro_cinco" name="siesta_frecuencia" value="4-5 veces">
-                                      <label class="custom-control-label" for="siesta_frecuencia_cuatro_cinco">4-5
-                                        veces</label>
+                                      <input
+                                        type="radio"
+                                        class="custom-control-input"
+                                        id="siesta_frecuencia_cuatro_cinco"
+                                        name="siesta_frecuencia"
+                                        value="4-5 veces"
+                                      />
+                                      <label
+                                        class="custom-control-label"
+                                        for="siesta_frecuencia_cuatro_cinco"
+                                        >4-5 veces</label
+                                      >
                                     </div>
                                     <div class="custom-control custom-radio">
-                                      <input type="radio" class="custom-control-input" id="siesta_frecuencia_mas_cinco"
-                                        name="siesta_frecuencia" value="> 5 veces">
-                                      <label class="custom-control-label" for="siesta_frecuencia_mas_cinco">Más de 5
-                                        veces</label>
+                                      <input
+                                        type="radio"
+                                        class="custom-control-input"
+                                        id="siesta_frecuencia_mas_cinco"
+                                        name="siesta_frecuencia"
+                                        value="> 5 veces"
+                                      />
+                                      <label
+                                        class="custom-control-label"
+                                        for="siesta_frecuencia_mas_cinco"
+                                        >Más de 5 veces</label
+                                      >
                                     </div>
                                   </div>
                                 </div>
 
                                 <div class="form-group">
-                                  <label>Momento del día en que realiza siestas</label>
+                                  <label
+                                    >Momento del día en que realiza
+                                    siestas</label
+                                  >
                                   <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" id="manana" name="momento_dia"
-                                      value="Mañana">
-                                    <label class="custom-control-label" for="manana">Mañana</label>
+                                    <input
+                                      type="checkbox"
+                                      class="custom-control-input"
+                                      id="manana"
+                                      name="momento_dia"
+                                      value="Mañana"
+                                    />
+                                    <label
+                                      class="custom-control-label"
+                                      for="manana"
+                                      >Mañana</label
+                                    >
                                   </div>
                                   <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" id="tarde" name="momento_dia"
-                                      value="Tarde">
-                                    <label class="custom-control-label" for="tarde">Tarde</label>
+                                    <input
+                                      type="checkbox"
+                                      class="custom-control-input"
+                                      id="tarde"
+                                      name="momento_dia"
+                                      value="Tarde"
+                                    />
+                                    <label
+                                      class="custom-control-label"
+                                      for="tarde"
+                                      >Tarde</label
+                                    >
                                   </div>
                                   <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" id="noche" name="momento_dia"
-                                      value="Noche">
-                                    <label class="custom-control-label" for="noche">Noche</label>
+                                    <input
+                                      type="checkbox"
+                                      class="custom-control-input"
+                                      id="noche"
+                                      name="momento_dia"
+                                      value="Noche"
+                                    />
+                                    <label
+                                      class="custom-control-label"
+                                      for="noche"
+                                      >Noche</label
+                                    >
                                   </div>
                                   <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" id="variable" name="momento_dia"
-                                      value="Variable">
-                                    <label class="custom-control-label" for="variable">Variable</label>
+                                    <input
+                                      type="checkbox"
+                                      class="custom-control-input"
+                                      id="variable"
+                                      name="momento_dia"
+                                      value="Variable"
+                                    />
+                                    <label
+                                      class="custom-control-label"
+                                      for="variable"
+                                      >Variable</label
+                                    >
                                   </div>
                                 </div>
 
                                 <div class="form-group">
                                   <label>¿La siesta es reparadora?</label>
                                   <div class="custom-control custom-radio">
-                                    <input type="radio" class="custom-control-input" id="siesta_reparadora_si"
-                                      name="siesta_reparadora" value="Si">
-                                    <label class="custom-control-label" for="siesta_reparadora_si">Sí</label>
+                                    <input
+                                      type="radio"
+                                      class="custom-control-input"
+                                      id="siesta_reparadora_si"
+                                      name="siesta_reparadora"
+                                      value="Si"
+                                    />
+                                    <label
+                                      class="custom-control-label"
+                                      for="siesta_reparadora_si"
+                                      >Sí</label
+                                    >
                                   </div>
                                   <div class="custom-control custom-radio">
-                                    <input type="radio" class="custom-control-input" id="siesta_reparadora_no"
-                                      name="siesta_reparadora" value="No">
-                                    <label class="custom-control-label" for="siesta_reparadora_no">No</label>
+                                    <input
+                                      type="radio"
+                                      class="custom-control-input"
+                                      id="siesta_reparadora_no"
+                                      name="siesta_reparadora"
+                                      value="No"
+                                    />
+                                    <label
+                                      class="custom-control-label"
+                                      for="siesta_reparadora_no"
+                                      >No</label
+                                    >
                                   </div>
                                 </div>
 
                                 <div class="form-group">
-                                  <label>Periodo en el que realiza las siestas</label>
-                                  <select class="form-control" name="periodo_siestas">
-                                    <option value="Jornada laboral / académica">Jornada laboral / académica</option>
-                                    <option value="Fines de Semana">Fines de Semana</option>
-                                    <option value="Vacaciones">Vacaciones</option>
+                                  <label
+                                    >Periodo en el que realiza las
+                                    siestas</label
+                                  >
+                                  <select
+                                    class="form-control"
+                                    name="periodo_siestas"
+                                  >
+                                    <option value="Jornada laboral / académica">
+                                      Jornada laboral / académica
+                                    </option>
+                                    <option value="Fines de Semana">
+                                      Fines de Semana
+                                    </option>
+                                    <option value="Vacaciones">
+                                      Vacaciones
+                                    </option>
                                   </select>
                                 </div>
                               </div>
@@ -722,80 +1323,183 @@
                                 <div class="form-group">
                                   <label>Condiciones de iluminación</label>
                                   <div class="custom-control custom-radio">
-                                    <input type="radio" class="custom-control-input" id="muy_iluminado"
-                                      name="iluminacion" value="Muy iluminado">
-                                    <label class="custom-control-label" for="muy_iluminado">Muy iluminado</label>
+                                    <input
+                                      type="radio"
+                                      class="custom-control-input"
+                                      id="muy_iluminado"
+                                      name="iluminacion"
+                                      value="Muy iluminado"
+                                    />
+                                    <label
+                                      class="custom-control-label"
+                                      for="muy_iluminado"
+                                      >Muy iluminado</label
+                                    >
                                   </div>
                                   <div class="custom-control custom-radio">
-                                    <input type="radio" class="custom-control-input" id="levemente_iluminado"
-                                      name="iluminacion" value="Levemente iluminado">
-                                    <label class="custom-control-label" for="levemente_iluminado">Levemente
-                                      iluminado</label>
+                                    <input
+                                      type="radio"
+                                      class="custom-control-input"
+                                      id="levemente_iluminado"
+                                      name="iluminacion"
+                                      value="Levemente iluminado"
+                                    />
+                                    <label
+                                      class="custom-control-label"
+                                      for="levemente_iluminado"
+                                      >Levemente iluminado</label
+                                    >
                                   </div>
                                   <div class="custom-control custom-radio">
-                                    <input type="radio" class="custom-control-input" id="levemente_oscuro"
-                                      name="iluminacion" value="Levemente oscuro">
-                                    <label class="custom-control-label" for="levemente_oscuro">Levemente oscuro</label>
+                                    <input
+                                      type="radio"
+                                      class="custom-control-input"
+                                      id="levemente_oscuro"
+                                      name="iluminacion"
+                                      value="Levemente oscuro"
+                                    />
+                                    <label
+                                      class="custom-control-label"
+                                      for="levemente_oscuro"
+                                      >Levemente oscuro</label
+                                    >
                                   </div>
                                   <div class="custom-control custom-radio">
-                                    <input type="radio" class="custom-control-input" id="muy_oscuro" name="iluminacion"
-                                      value="Muy oscuro">
-                                    <label class="custom-control-label" for="muy_oscuro">Muy oscuro</label>
+                                    <input
+                                      type="radio"
+                                      class="custom-control-input"
+                                      id="muy_oscuro"
+                                      name="iluminacion"
+                                      value="Muy oscuro"
+                                    />
+                                    <label
+                                      class="custom-control-label"
+                                      for="muy_oscuro"
+                                      >Muy oscuro</label
+                                    >
                                   </div>
                                 </div>
 
                                 <div class="form-group">
                                   <label>Comodidad del espacio</label>
                                   <div class="custom-control custom-radio">
-                                    <input type="radio" class="custom-control-input" id="muy_incomodo" name="comodidad"
-                                      value="Muy incómodo">
-                                    <label class="custom-control-label" for="muy_incomodo">Muy incómodo</label>
+                                    <input
+                                      type="radio"
+                                      class="custom-control-input"
+                                      id="muy_incomodo"
+                                      name="comodidad"
+                                      value="Muy incómodo"
+                                    />
+                                    <label
+                                      class="custom-control-label"
+                                      for="muy_incomodo"
+                                      >Muy incómodo</label
+                                    >
                                   </div>
                                   <div class="custom-control custom-radio">
-                                    <input type="radio" class="custom-control-input" id="levemente_incomodo"
-                                      name="comodidad" value="Levemente incómodo">
-                                    <label class="custom-control-label" for="levemente_incomodo">Levemente
-                                      incómodo</label>
+                                    <input
+                                      type="radio"
+                                      class="custom-control-input"
+                                      id="levemente_incomodo"
+                                      name="comodidad"
+                                      value="Levemente incómodo"
+                                    />
+                                    <label
+                                      class="custom-control-label"
+                                      for="levemente_incomodo"
+                                      >Levemente incómodo</label
+                                    >
                                   </div>
                                   <div class="custom-control custom-radio">
-                                    <input type="radio" class="custom-control-input" id="levemente_comodo"
-                                      name="comodidad" value="Levemente cómodo">
-                                    <label class="custom-control-label" for="levemente_comodo">Levemente cómodo</label>
+                                    <input
+                                      type="radio"
+                                      class="custom-control-input"
+                                      id="levemente_comodo"
+                                      name="comodidad"
+                                      value="Levemente cómodo"
+                                    />
+                                    <label
+                                      class="custom-control-label"
+                                      for="levemente_comodo"
+                                      >Levemente cómodo</label
+                                    >
                                   </div>
                                   <div class="custom-control custom-radio">
-                                    <input type="radio" class="custom-control-input" id="muy_comodo" name="comodidad"
-                                      value="Muy cómodo">
-                                    <label class="custom-control-label" for="muy_comodo">Muy cómodo</label>
+                                    <input
+                                      type="radio"
+                                      class="custom-control-input"
+                                      id="muy_comodo"
+                                      name="comodidad"
+                                      value="Muy cómodo"
+                                    />
+                                    <label
+                                      class="custom-control-label"
+                                      for="muy_comodo"
+                                      >Muy cómodo</label
+                                    >
                                   </div>
                                 </div>
 
                                 <div class="form-group">
                                   <label>Condiciones de ruido</label>
                                   <div class="custom-control custom-radio">
-                                    <input type="radio" class="custom-control-input" id="muy_ruidoso" name="ruido"
-                                      value="Muy ruidoso">
-                                    <label class="custom-control-label" for="muy_ruidoso">Muy ruidoso</label>
+                                    <input
+                                      type="radio"
+                                      class="custom-control-input"
+                                      id="muy_ruidoso"
+                                      name="ruido"
+                                      value="Muy ruidoso"
+                                    />
+                                    <label
+                                      class="custom-control-label"
+                                      for="muy_ruidoso"
+                                      >Muy ruidoso</label
+                                    >
                                   </div>
                                   <div class="custom-control custom-radio">
-                                    <input type="radio" class="custom-control-input" id="levemente_ruidoso" name="ruido"
-                                      value="Levemente ruidoso">
-                                    <label class="custom-control-label" for="levemente_ruidoso">Levemente
-                                      ruidoso</label>
+                                    <input
+                                      type="radio"
+                                      class="custom-control-input"
+                                      id="levemente_ruidoso"
+                                      name="ruido"
+                                      value="Levemente ruidoso"
+                                    />
+                                    <label
+                                      class="custom-control-label"
+                                      for="levemente_ruidoso"
+                                      >Levemente ruidoso</label
+                                    >
                                   </div>
                                   <div class="custom-control custom-radio">
-                                    <input type="radio" class="custom-control-input" id="levemente_silencioso"
-                                      name="ruido" value="Levemente silencioso">
-                                    <label class="custom-control-label" for="levemente_silencioso">Levemente
-                                      silencioso</label>
+                                    <input
+                                      type="radio"
+                                      class="custom-control-input"
+                                      id="levemente_silencioso"
+                                      name="ruido"
+                                      value="Levemente silencioso"
+                                    />
+                                    <label
+                                      class="custom-control-label"
+                                      for="levemente_silencioso"
+                                      >Levemente silencioso</label
+                                    >
                                   </div>
                                   <div class="custom-control custom-radio">
-                                    <input type="radio" class="custom-control-input" id="muy_silencioso" name="ruido"
-                                      value="Muy silencioso">
-                                    <label class="custom-control-label" for="muy_silencioso">Muy silencioso</label>
+                                    <input
+                                      type="radio"
+                                      class="custom-control-input"
+                                      id="muy_silencioso"
+                                      name="ruido"
+                                      value="Muy silencioso"
+                                    />
+                                    <label
+                                      class="custom-control-label"
+                                      for="muy_silencioso"
+                                      >Muy silencioso</label
+                                    >
                                   </div>
                                 </div>
                               </div>
-
                             </div>
 
                             <!-- SECCIÓN 3: HÁBITOS PREVIOS AL SUEÑO -->
@@ -803,43 +1507,101 @@
                               <h4 class="mb-3">Hábitos previos al sueño</h4>
 
                               <div class="form-group">
-                                <label class="form-label">¿Consume comidas o bebidas antes de dormir?</label>
+                                <label class="form-label"
+                                  >¿Consume comidas o bebidas antes de
+                                  dormir?</label
+                                >
                                 <div class="custom-control custom-radio">
-                                  <input type="radio" class="custom-control-input" id="consume-si" name="consume"
-                                    value="si">
-                                  <label class="custom-control-label" for="consume-si">Sí</label>
+                                  <input
+                                    type="radio"
+                                    class="custom-control-input"
+                                    id="consume-si"
+                                    name="consume"
+                                    value="si"
+                                  />
+                                  <label
+                                    class="custom-control-label"
+                                    for="consume-si"
+                                    >Sí</label
+                                  >
                                 </div>
                                 <div class="custom-control custom-radio">
-                                  <input type="radio" class="custom-control-input" id="consume-no" name="consume"
-                                    value="no">
-                                  <label class="custom-control-label" for="consume-no">No</label>
+                                  <input
+                                    type="radio"
+                                    class="custom-control-input"
+                                    id="consume-no"
+                                    name="consume"
+                                    value="no"
+                                  />
+                                  <label
+                                    class="custom-control-label"
+                                    for="consume-no"
+                                    >No</label
+                                  >
                                 </div>
                               </div>
 
-                              <div id="campos-comida-container" style="display: none;">
+                              <div
+                                id="campos-comida-container"
+                                style="display: none"
+                              >
                                 <div id="contenedor-sustancias"></div>
-                                <button type="button" id="agregar-sustancia" class="btn btn-primary mb-3">Agregar
-                                  sustancia</button>
-
+                                <button
+                                  type="button"
+                                  id="agregar-sustancia"
+                                  class="btn btn-primary mb-3"
+                                >
+                                  Agregar sustancia
+                                </button>
                               </div>
 
                               <div class="form-group mt-3">
-                                <label>¿Utiliza pantallas cerca al horario de dormir?</label>
+                                <label
+                                  >¿Utiliza pantallas cerca al horario de
+                                  dormir?</label
+                                >
                                 <div class="custom-control custom-radio">
-                                  <input type="radio" class="custom-control-input" id="pantallas_si"
-                                    name="usa_pantallas" value="Si">
-                                  <label class="custom-control-label" for="pantallas_si">Sí</label>
+                                  <input
+                                    type="radio"
+                                    class="custom-control-input"
+                                    id="pantallas_si"
+                                    name="usa_pantallas"
+                                    value="Si"
+                                  />
+                                  <label
+                                    class="custom-control-label"
+                                    for="pantallas_si"
+                                    >Sí</label
+                                  >
                                 </div>
                                 <div class="custom-control custom-radio">
-                                  <input type="radio" class="custom-control-input" id="pantallas_no"
-                                    name="usa_pantallas" value="No">
-                                  <label class="custom-control-label" for="pantallas_no">No</label>
+                                  <input
+                                    type="radio"
+                                    class="custom-control-input"
+                                    id="pantallas_no"
+                                    name="usa_pantallas"
+                                    value="No"
+                                  />
+                                  <label
+                                    class="custom-control-label"
+                                    for="pantallas_no"
+                                    >No</label
+                                  >
                                 </div>
                               </div>
 
-                              <div id="contenedor-pantallas" class="mt-3" style="display: none;">
-                                <button id="agregar-pantalla" type="button" class="btn btn-primary">Agregar
-                                  Pantalla</button>
+                              <div
+                                id="contenedor-pantallas"
+                                class="mt-3"
+                                style="display: none"
+                              >
+                                <button
+                                  id="agregar-pantalla"
+                                  type="button"
+                                  class="btn btn-primary"
+                                >
+                                  Agregar Pantalla
+                                </button>
                               </div>
                             </div>
 
@@ -848,65 +1610,156 @@
                               <h4 class="mb-3">Uso de la cama</h4>
 
                               <div class="form-group">
-                                <label>¿Utiliza la cama para actividades diferentes a dormir y relaciones
-                                  sexuales?</label>
+                                <label
+                                  >¿Utiliza la cama para actividades diferentes
+                                  a dormir y relaciones sexuales?</label
+                                >
                                 <div class="custom-control custom-radio">
-                                  <input type="radio" class="custom-control-input" id="cama_actividades_si"
-                                    name="cama_actividades" value="Si">
-                                  <label class="custom-control-label" for="cama_actividades_si">Sí</label>
+                                  <input
+                                    type="radio"
+                                    class="custom-control-input"
+                                    id="cama_actividades_si"
+                                    name="cama_actividades"
+                                    value="Si"
+                                  />
+                                  <label
+                                    class="custom-control-label"
+                                    for="cama_actividades_si"
+                                    >Sí</label
+                                  >
                                 </div>
                                 <div class="custom-control custom-radio">
-                                  <input type="radio" class="custom-control-input" id="cama_actividades_no"
-                                    name="cama_actividades" value="No">
-                                  <label class="custom-control-label" for="cama_actividades_no">No</label>
+                                  <input
+                                    type="radio"
+                                    class="custom-control-input"
+                                    id="cama_actividades_no"
+                                    name="cama_actividades"
+                                    value="No"
+                                  />
+                                  <label
+                                    class="custom-control-label"
+                                    for="cama_actividades_no"
+                                    >No</label
+                                  >
                                 </div>
                               </div>
 
-                              <div id="contenedor-actividades" class="mt-3" style="display: none;">
-                                <button id="agregar-actividad" type="button" class="btn btn-primary">Agregar
-                                  Actividad</button>
+                              <div
+                                id="contenedor-actividades"
+                                class="mt-3"
+                                style="display: none"
+                              >
+                                <button
+                                  id="agregar-actividad"
+                                  type="button"
+                                  class="btn btn-primary"
+                                >
+                                  Agregar Actividad
+                                </button>
                               </div>
                             </div>
 
                             <!-- SECCIÓN 5: ACTIVIDAD FÍSICA Y MEDICAMENTOS -->
                             <div class="mb-4">
-                              <h4 class="mb-3">Actividad física y medicamentos</h4>
+                              <h4 class="mb-3">
+                                Actividad física y medicamentos
+                              </h4>
 
                               <div class="form-group">
-                                <label>¿Realiza actividad física durante el día?</label>
+                                <label
+                                  >¿Realiza actividad física durante el
+                                  día?</label
+                                >
                                 <div class="custom-control custom-radio">
-                                  <input type="radio" class="custom-control-input" id="actividad_fisica_si"
-                                    name="actividad_fisica" value="Si">
-                                  <label class="custom-control-label" for="actividad_fisica_si">Sí</label>
+                                  <input
+                                    type="radio"
+                                    class="custom-control-input"
+                                    id="actividad_fisica_si"
+                                    name="actividad_fisica"
+                                    value="Si"
+                                  />
+                                  <label
+                                    class="custom-control-label"
+                                    for="actividad_fisica_si"
+                                    >Sí</label
+                                  >
                                 </div>
                                 <div class="custom-control custom-radio">
-                                  <input type="radio" class="custom-control-input" id="actividad_fisica_no"
-                                    name="actividad_fisica" value="No">
-                                  <label class="custom-control-label" for="actividad_fisica_no">No</label>
+                                  <input
+                                    type="radio"
+                                    class="custom-control-input"
+                                    id="actividad_fisica_no"
+                                    name="actividad_fisica"
+                                    value="No"
+                                  />
+                                  <label
+                                    class="custom-control-label"
+                                    for="actividad_fisica_no"
+                                    >No</label
+                                  >
                                 </div>
                               </div>
 
-                              <div id="contenedor-actividades-fisicas" class="mt-3" style="display: none;">
-                                <button id="agregar-actividad-fisica" type="button" class="btn btn-primary">Agregar
-                                  Actividad Física</button>
+                              <div
+                                id="contenedor-actividades-fisicas"
+                                class="mt-3"
+                                style="display: none"
+                              >
+                                <button
+                                  id="agregar-actividad-fisica"
+                                  type="button"
+                                  class="btn btn-primary"
+                                >
+                                  Agregar Actividad Física
+                                </button>
                               </div>
 
                               <div class="form-group mt-3">
-                                <label>¿Consume algún medicamento u otro tipo de sustancias?</label>
+                                <label
+                                  >¿Consume algún medicamento u otro tipo de
+                                  sustancias?</label
+                                >
                                 <div class="custom-control custom-radio">
-                                  <input type="radio" class="custom-control-input" id="consume_si"
-                                    name="consume_medicamento" value="Si">
-                                  <label class="custom-control-label" for="consume_si">Sí</label>
+                                  <input
+                                    type="radio"
+                                    class="custom-control-input"
+                                    id="consume_si"
+                                    name="consume_medicamento"
+                                    value="Si"
+                                  />
+                                  <label
+                                    class="custom-control-label"
+                                    for="consume_si"
+                                    >Sí</label
+                                  >
                                 </div>
                                 <div class="custom-control custom-radio">
-                                  <input type="radio" class="custom-control-input" id="consume_no"
-                                    name="consume_medicamento" value="No">
-                                  <label class="custom-control-label" for="consume_no">No</label>
+                                  <input
+                                    type="radio"
+                                    class="custom-control-input"
+                                    id="consume_no"
+                                    name="consume_medicamento"
+                                    value="No"
+                                  />
+                                  <label
+                                    class="custom-control-label"
+                                    for="consume_no"
+                                    >No</label
+                                  >
                                 </div>
                               </div>
 
-                              <div id="contenedor-medicamentos" class="mt-3" style="display: none;">
-                                <button id="agregar-medicamento" class="btn btn-primary">Agregar Medicamento</button>
+                              <div
+                                id="contenedor-medicamentos"
+                                class="mt-3"
+                                style="display: none"
+                              >
+                                <button
+                                  id="agregar-medicamento"
+                                  class="btn btn-primary"
+                                >
+                                  Agregar Medicamento
+                                </button>
                               </div>
                             </div>
                           </div>
@@ -915,7 +1768,6 @@
                     </div>
                   </div>
                 </div>
-
               </div>
               <!-- pensamiento -->
               <div class="tab-pane fade" id="pensamiento" role="tabpanel">
@@ -930,57 +1782,113 @@
                           <div class="card-header border-0">
                             <div class="row align-items-center">
                               <div class="col">
-                                <h3 class="mb-0">Síntomas asociados al sueño</h3>
+                                <h3 class="mb-0">
+                                  Síntomas asociados al sueño
+                                </h3>
                               </div>
                             </div>
                           </div>
                           <div class="card-body">
                             <!-- Pregunta sobre síntomas asociados al sueño -->
                             <div class="form-group">
-                              <label>¿Presenta algún síntoma diferente asociado al sueño?</label>
+                              <label
+                                >¿Presenta algún síntoma diferente asociado al
+                                sueño?</label
+                              >
                               <div class="custom-control custom-radio">
-                                <input type="radio" class="custom-control-input" id="sintomas_sueno_si"
-                                  name="sintomas_sueno" value="Si">
-                                <label class="custom-control-label" for="sintomas_sueno_si">Sí</label>
+                                <input
+                                  type="radio"
+                                  class="custom-control-input"
+                                  id="sintomas_sueno_si"
+                                  name="sintomas_sueno"
+                                  value="Si"
+                                />
+                                <label
+                                  class="custom-control-label"
+                                  for="sintomas_sueno_si"
+                                  >Sí</label
+                                >
                               </div>
                               <div class="custom-control custom-radio">
-                                <input type="radio" class="custom-control-input" id="sintomas_sueno_no"
-                                  name="sintomas_sueno" value="No">
-                                <label class="custom-control-label" for="sintomas_sueno_no">No</label>
+                                <input
+                                  type="radio"
+                                  class="custom-control-input"
+                                  id="sintomas_sueno_no"
+                                  name="sintomas_sueno"
+                                  value="No"
+                                />
+                                <label
+                                  class="custom-control-label"
+                                  for="sintomas_sueno_no"
+                                  >No</label
+                                >
                               </div>
                             </div>
 
                             <!-- Botón para agregar información sobre síntomas -->
-                            <button id="agregar-sintoma" type="button" class="btn btn-primary"
-                              style="display: none;">Agregar
-                              Síntoma</button>
+                            <button
+                              id="agregar-sintoma"
+                              type="button"
+                              class="btn btn-primary"
+                              style="display: none"
+                            >
+                              Agregar Síntoma
+                            </button>
 
                             <!-- Contenedor dinámico para los síntomas -->
                             <div id="contenedor-sintomas" class="mt-3"></div>
 
                             <!-- Pregunta sobre síntomas durante el funcionamiento diurno -->
                             <div class="form-group">
-                              <label>¿Presenta algún síntoma durante el funcionamiento diurno?</label>
+                              <label
+                                >¿Presenta algún síntoma durante el
+                                funcionamiento diurno?</label
+                              >
                               <div class="custom-control custom-radio">
-                                <input type="radio" class="custom-control-input" id="sintomas_diurnos_si"
-                                  name="sintomas_diurnos" value="Si">
-                                <label class="custom-control-label" for="sintomas_diurnos_si">Sí</label>
+                                <input
+                                  type="radio"
+                                  class="custom-control-input"
+                                  id="sintomas_diurnos_si"
+                                  name="sintomas_diurnos"
+                                  value="Si"
+                                />
+                                <label
+                                  class="custom-control-label"
+                                  for="sintomas_diurnos_si"
+                                  >Sí</label
+                                >
                               </div>
                               <div class="custom-control custom-radio">
-                                <input type="radio" class="custom-control-input" id="sintomas_diurnos_no"
-                                  name="sintomas_diurnos" value="No">
-                                <label class="custom-control-label" for="sintomas_diurnos_no">No</label>
+                                <input
+                                  type="radio"
+                                  class="custom-control-input"
+                                  id="sintomas_diurnos_no"
+                                  name="sintomas_diurnos"
+                                  value="No"
+                                />
+                                <label
+                                  class="custom-control-label"
+                                  for="sintomas_diurnos_no"
+                                  >No</label
+                                >
                               </div>
                             </div>
 
                             <!-- Botón para agregar información sobre síntomas diurnos -->
-                            <button id="agregar-sintoma-diurno" type="button" class="btn btn-primary"
-                              style="display: none;">Agregar
-                              Síntoma Diurno</button>
+                            <button
+                              id="agregar-sintoma-diurno"
+                              type="button"
+                              class="btn btn-primary"
+                              style="display: none"
+                            >
+                              Agregar Síntoma Diurno
+                            </button>
 
                             <!-- Contenedor dinámico para los síntomas diurnos -->
-                            <div id="contenedor-sintomas-diurnos" class="mt-3"></div>
-
+                            <div
+                              id="contenedor-sintomas-diurnos"
+                              class="mt-3"
+                            ></div>
                           </div>
                         </div>
                       </div>
@@ -990,25 +1898,24 @@
                 <!-- Botones de acción -->
                 <div class="row">
                   <div class="col-12 text-right">
-                    <button type="submit" class="btn btn-primary">Guardar Examen</button>
-                    <a href="{% url 'detalle_paciente' paciente_id %}" class="btn btn-primary">Ver Paciente</a>
+                    <button type="submit" class="btn btn-primary">
+                      Guardar Examen
+                    </button>
+                    <a
+                      href="{% url 'detalle_paciente' paciente_id %}"
+                      class="btn btn-primary"
+                      >Ver Paciente</a
+                    >
                   </div>
                 </div>
               </div>
-
             </div>
           </div>
-
         </form>
       </div>
     </div>
   </div>
 </div>
-
-
-
-
-
 
 {% block javascripts %}
 
@@ -1022,8 +1929,12 @@
     let contadorActividadesFisicas = 0;
     const actividadFisicaSi = document.getElementById("actividad_fisica_si");
     const actividadFisicaNo = document.getElementById("actividad_fisica_no");
-    const agregarActividadFisicaBtn = document.getElementById("agregar-actividad-fisica");
-    const contenedorActividadesFisicas = document.getElementById("contenedor-actividades-fisicas");
+    const agregarActividadFisicaBtn = document.getElementById(
+      "agregar-actividad-fisica"
+    );
+    const contenedorActividadesFisicas = document.getElementById(
+      "contenedor-actividades-fisicas"
+    );
 
     function toggleAgregarActividadFisica() {
       const mostrar = actividadFisicaSi.checked;
@@ -1033,7 +1944,9 @@
       if (!mostrar) {
         // Limpiar contenedor pero mantener el botón
         while (contenedorActividadesFisicas.children.length > 1) {
-          contenedorActividadesFisicas.removeChild(contenedorActividadesFisicas.lastChild);
+          contenedorActividadesFisicas.removeChild(
+            contenedorActividadesFisicas.lastChild
+          );
         }
         contadorActividadesFisicas = 0;
       }
@@ -1087,12 +2000,16 @@
   `;
 
       // Manejar campo "Otro"
-      const selectTipo = nuevaActividad.querySelector('select[name="tipo_actividad_fisica[]"]');
-      const inputOtro = nuevaActividad.querySelector('input[name="tipo_actividad_otro_texto[]"]');
+      const selectTipo = nuevaActividad.querySelector(
+        'select[name="tipo_actividad_fisica[]"]'
+      );
+      const inputOtro = nuevaActividad.querySelector(
+        'input[name="tipo_actividad_otro_texto[]"]'
+      );
 
-      selectTipo.addEventListener('change', function () {
-        inputOtro.style.display = this.value === 'otro' ? 'block' : 'none';
-        if (this.value !== 'otro') inputOtro.value = '';
+      selectTipo.addEventListener("change", function () {
+        inputOtro.style.display = this.value === "otro" ? "block" : "none";
+        if (this.value !== "otro") inputOtro.value = "";
       });
 
       contenedorActividadesFisicas.appendChild(nuevaActividad);
@@ -1108,7 +2025,10 @@
     actividadFisicaSi.addEventListener("change", toggleAgregarActividadFisica);
     actividadFisicaNo.addEventListener("change", toggleAgregarActividadFisica);
     agregarActividadFisicaBtn.addEventListener("click", agregarActividadFisica);
-    contenedorActividadesFisicas.addEventListener("click", eliminarActividadFisica);
+    contenedorActividadesFisicas.addEventListener(
+      "click",
+      eliminarActividadFisica
+    );
 
     // Inicializar
     toggleAgregarActividadFisica();
@@ -1120,8 +2040,12 @@
     let contadorMedicamentos = 0;
     const consumeMedSi = document.getElementById("consume_si");
     const consumeMedNo = document.getElementById("consume_no");
-    const agregarMedicamentoBtn = document.getElementById("agregar-medicamento");
-    const contenedorMedicamentos = document.getElementById("contenedor-medicamentos");
+    const agregarMedicamentoBtn = document.getElementById(
+      "agregar-medicamento"
+    );
+    const contenedorMedicamentos = document.getElementById(
+      "contenedor-medicamentos"
+    );
 
     function toggleAgregarMedicamento() {
       const mostrar = consumeMedSi.checked;
@@ -1217,9 +2141,13 @@
     // Referencias a los elementos del formulario
     const consumeSi = document.getElementById("consume-si");
     const consumeNo = document.getElementById("consume-no");
-    const camposComidaContainer = document.getElementById("campos-comida-container");
+    const camposComidaContainer = document.getElementById(
+      "campos-comida-container"
+    );
     const agregarSustanciaBtn = document.getElementById("agregar-sustancia");
-    const contenedorSustancias = document.getElementById("contenedor-sustancias");
+    const contenedorSustancias = document.getElementById(
+      "contenedor-sustancias"
+    );
 
     // Función para mostrar u ocultar los campos adicionales
     function toggleCamposComida() {
@@ -1296,7 +2224,6 @@
 
     // Inicializar el estado al cargar la página
     toggleCamposComida();
-
 
     ///////////////////////////////////////////////////////////////
     let contadorPantallas = 0; // Contador para identificar cada pantalla
@@ -1518,8 +2445,12 @@
     // Referencias a los elementos del formulario
     const sintomasDiurnosSi = document.getElementById("sintomas_diurnos_si");
     const sintomasDiurnosNo = document.getElementById("sintomas_diurnos_no");
-    const agregarSintomaDiurnoBtn = document.getElementById("agregar-sintoma-diurno");
-    const contenedorSintomasDiurnos = document.getElementById("contenedor-sintomas-diurnos");
+    const agregarSintomaDiurnoBtn = document.getElementById(
+      "agregar-sintoma-diurno"
+    );
+    const contenedorSintomasDiurnos = document.getElementById(
+      "contenedor-sintomas-diurnos"
+    );
 
     // Función para mostrar u ocultar el botón "Agregar Síntoma Diurno"
     function toggleAgregarSintomaDiurno() {
@@ -1619,8 +2550,8 @@
 
   document.addEventListener("DOMContentLoaded", function () {
     // Elementos principales
-    const quejaSi = document.getElementById("queja_sueno-si");
-    const quejaNo = document.getElementById("queja_sueno-no");
+    const quejaSi = document.getElementById("presenta_queja-si");
+    const quejaNo = document.getElementById("presenta_queja-no");
     const camposQueja = document.getElementById("campos-queja-container");
     const seccionCausas = document.getElementById("seccion-causas");
 
@@ -1632,7 +2563,9 @@
 
       if (!mostrar) {
         // Limpiar todo si se selecciona "No"
-        document.querySelectorAll('.queja-checkbox').forEach(cb => cb.checked = false);
+        document
+          .querySelectorAll(".queja-checkbox")
+          .forEach((cb) => (cb.checked = false));
         document.getElementById("quejas-container").innerHTML = "";
         document.getElementById("causa_conocida_no").checked = true;
         document.getElementById("especifique_causas").value = "";
@@ -1663,10 +2596,10 @@
     const container = document.getElementById("quejas-container");
     const quejaFields = {};
 
-    checkboxes.forEach(checkbox => {
+    checkboxes.forEach((checkbox) => {
       checkbox.addEventListener("change", function () {
         const quejaValue = this.value;
-        const quejaId = quejaValue.replace(/\s+/g, '_').toLowerCase();
+        const quejaId = quejaValue.replace(/\s+/g, "_").toLowerCase();
         const sectionId = `queja-${quejaId}`;
 
         if (this.checked) {
@@ -1732,43 +2665,49 @@
   });
 
   // Mostrar/ocultar descripción de rutina
-  document.getElementById('rutina_si').addEventListener('change', function () {
-    document.getElementById('describa-rutina').style.display = this.checked ? 'block' : 'none';
+  document.getElementById("rutina_si").addEventListener("change", function () {
+    document.getElementById("describa-rutina").style.display = this.checked
+      ? "block"
+      : "none";
   });
-  document.getElementById('rutina_no').addEventListener('change', function () {
-    document.getElementById('describa-rutina').style.display = this.checked ? 'none' : 'block';
-    if (this.checked) document.getElementById('describa_rutina').value = '';
+  document.getElementById("rutina_no").addEventListener("change", function () {
+    document.getElementById("describa-rutina").style.display = this.checked
+      ? "none"
+      : "block";
+    if (this.checked) document.getElementById("describa_rutina").value = "";
   });
-  document.addEventListener('DOMContentLoaded', function () {
-
+  document.addEventListener("DOMContentLoaded", function () {
     // Mostrar/ocultar sección de siestas
-    document.querySelectorAll('input[name="realiza_siestas"]').forEach(radio => {
-      radio.addEventListener('change', function () {
-        document.getElementById('siestas-container').style.display =
-          this.value === 'Si' ? 'block' : 'none';
+    document
+      .querySelectorAll('input[name="realiza_siestas"]')
+      .forEach((radio) => {
+        radio.addEventListener("change", function () {
+          document.getElementById("siestas-container").style.display =
+            this.value === "Si" ? "block" : "none";
+        });
       });
-    });
 
     // Mostrar/ocultar sección de consumo de comidas
-    document.querySelectorAll('input[name="consume"]').forEach(radio => {
-      radio.addEventListener('change', function () {
-        document.getElementById('campos-comida-container').style.display =
-          this.value === 'si' ? 'block' : 'none';
+    document.querySelectorAll('input[name="consume"]').forEach((radio) => {
+      radio.addEventListener("change", function () {
+        document.getElementById("campos-comida-container").style.display =
+          this.value === "si" ? "block" : "none";
       });
     });
 
     // Mostrar/ocultar sección de pantallas
-    document.querySelectorAll('input[name="usa_pantallas"]').forEach(radio => {
-      radio.addEventListener('change', function () {
-        document.getElementById('contenedor-pantallas').style.display =
-          this.value === 'Si' ? 'block' : 'none';
+    document
+      .querySelectorAll('input[name="usa_pantallas"]')
+      .forEach((radio) => {
+        radio.addEventListener("change", function () {
+          document.getElementById("contenedor-pantallas").style.display =
+            this.value === "Si" ? "block" : "none";
+        });
       });
-    });
 
-
-    radio.addEventListener('change', function () {
-      document.getElementById('contenedor-medicamentos').style.display =
-        this.value === 'Si' ? 'block' : 'none';
+    radio.addEventListener("change", function () {
+      document.getElementById("contenedor-medicamentos").style.display =
+        this.value === "Si" ? "block" : "none";
     });
   });
   document.addEventListener("DOMContentLoaded", function () {
@@ -1779,7 +2718,9 @@
     const camaActividadesSi = document.getElementById("cama_actividades_si");
     const camaActividadesNo = document.getElementById("cama_actividades_no");
     const agregarActividadBtn = document.getElementById("agregar-actividad");
-    const contenedorActividades = document.getElementById("contenedor-actividades");
+    const contenedorActividades = document.getElementById(
+      "contenedor-actividades"
+    );
 
     // Función para mostrar/ocultar sección
     function toggleAgregarActividad() {
@@ -1855,8 +2796,5 @@
     // Inicializar estado
     toggleAgregarActividad();
   });
-
-
 </script>
-{% endblock javascripts %}
-{% endblock content %}
+{% endblock javascripts %} {% endblock content %}
