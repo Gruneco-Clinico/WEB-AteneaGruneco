@@ -436,15 +436,15 @@ class VisitaExamen(models.Model):
             "zarit": "realizar_zarit",
             "aqdcuidador": "realizar_aqdcuidador",
             "aqdparticipante": "realizar_aqdparticipante",
-            "redlatspanish":"realizar_redlatspanish",
+            "redlatspanish": "realizar_redlatspanish",
             "cdrcuidador": "realizar_cdrcuidador",
-            "cdrparticipante":"realizar_cdrparticipante",
-            "bettyferrel":"realizar_bettyferrel",
-            "puntajecdr":"realizar_puntajecdr",
-            "consentimientoinformadoparticipante":"realizar_consentimientoinformadoparticipante",
-            "consentimientoinformadocuidador":"realizar_consentimientoinformadocuidador",
-            "anamnesiscuidador":"realizar_anamnesiscuidador",
-            "anamnesisparticipante":"realizar_anamnesisparticipante",
+            "cdrparticipante": "realizar_cdrparticipante",
+            "bettyferrel": "realizar_bettyferrel",
+            "puntajecdr": "realizar_puntajecdr",
+            "consentimientoinformadoparticipante": "realizar_consentimientoinformadoparticipante",
+            "consentimientoinformadocuidador": "realizar_consentimientoinformadocuidador",
+            "anamnesiscuidador": "realizar_anamnesiscuidador",
+            "anamnesisparticipante": "realizar_anamnesisparticipante",
         }
 
         url_name = url_mapping.get(examen_nombre)
@@ -487,15 +487,15 @@ class VisitaExamen(models.Model):
             "zarit": "ver_zarit",
             "aqdcuidador": "ver_aqdcuidador",
             "aqdparticipante": "ver_aqdparticipante",
-            "redlatspanish":"ver_redlatspanish",
+            "redlatspanish": "ver_redlatspanish",
             "cdrcuidador": "ver_cdrcuidador",
-            "cdrparticipante":"ver_cdrparticipante",
-            "bettyferrel":"ver_bettyferrel",
-            "puntajecdr":"ver_puntajecdr",
-            "consentimientoinformadoparticipante":"ver_consentimientoinformadoparticipante",
-            "consentimientoinformadocuidador":"ver_consentimientoinformadocuidador",
-            "anamnesiscuidador":"ver_anamnesiscuidador",
-            "anamnesisparticipante":"ver_anamnesisparticipante",
+            "cdrparticipante": "ver_cdrparticipante",
+            "bettyferrel": "ver_bettyferrel",
+            "puntajecdr": "ver_puntajecdr",
+            "consentimientoinformadoparticipante": "ver_consentimientoinformadoparticipante",
+            "consentimientoinformadocuidador": "ver_consentimientoinformadocuidador",
+            "anamnesiscuidador": "ver_anamnesiscuidador",
+            "anamnesisparticipante": "ver_anamnesisparticipante",
         }
 
         url_name = url_mapping.get(examen_nombre)
@@ -534,16 +534,15 @@ class VisitaExamen(models.Model):
             "zarit": "editar_zarit",
             "aqdcuidador": "editar_aqdcuidador",
             "aqdparticipante": "editar_aqdparticipante",
-            "redlatspanish":"editar_redlatspanish",
+            "redlatspanish": "editar_redlatspanish",
             "cdrcuidador": "editar_cdrcuidador",
-            "cdrparticipante":"editar_cdrparticipante",
-            "bettyferrel":"editar_bettyferrel",
-            "puntajecdr":"editar_puntajecdr",
-            "consentimientoinformadoparticipante":"editar_consentimientoinformadoparticipante",
-            "consentimientoinformadocuidador":"editar_consentimientoinformadocuidador",
-            "anamnesiscuidador":"editar_anamnesiscuidador",
-            "anamnesisparticipante":"editar_anamnesisparticipante",
-
+            "cdrparticipante": "editar_cdrparticipante",
+            "bettyferrel": "editar_bettyferrel",
+            "puntajecdr": "editar_puntajecdr",
+            "consentimientoinformadoparticipante": "editar_consentimientoinformadoparticipante",
+            "consentimientoinformadocuidador": "editar_consentimientoinformadocuidador",
+            "anamnesiscuidador": "editar_anamnesiscuidador",
+            "anamnesisparticipante": "editar_anamnesisparticipante",
         }
 
         url_name = url_mapping.get(examen_nombre)
@@ -679,8 +678,8 @@ class BerlinResult(ResultadoExamenBase):
     apnea_observada = models.CharField(max_length=50)
     fatiga_matutina = models.CharField(max_length=50)
     fatiga_dia = models.CharField(max_length=50)
-    somnolencia_conducir = models.CharField(max_length=50)
-    presion_alta = models.CharField(max_length=50)
+    somnolencia_conducir = models.BooleanField(null=True, blank=True)
+    presion_alta = models.BooleanField(null=True, blank=True)
 
 
 class SuenoAnamnesisResult(ResultadoExamenBase):
@@ -940,8 +939,10 @@ class StopBangResult(ResultadoExamenBase):
 
     def __str__(self):
         return f"STOP-BANG - {self.visita_examen_id}"
-    
+
+
 ### Anosognosia
+
 
 class LawtonBrodyResult(ResultadoExamenBase):
     genero = models.CharField(max_length=10)
@@ -960,82 +961,140 @@ class LawtonBrodyResult(ResultadoExamenBase):
 
     def __str__(self):
         return f"Lawton & Brody - {self.visita_examen_id}"
-    
+
 
 class CuidadorNPIResult(ResultadoExamenBase):
-
-    ideas_delirantes = models.CharField(max_length=5, choices=[("si", "Sí"), ("no", "No"), ("ns", "No Sabe")], blank=True, null=True)
+    ideas_delirantes = models.CharField(
+        max_length=5,
+        choices=[("si", "Sí"), ("no", "No"), ("ns", "No Sabe")],
+        blank=True,
+        null=True,
+    )
     ideas_delirantes_frecuencia = models.CharField(max_length=50, blank=True, null=True)
     ideas_delirantes_gravedad = models.CharField(max_length=50, blank=True, null=True)
     ideas_delirantes_F_G = models.IntegerField(blank=True, null=True)
     ideas_delirantes_distres = models.CharField(max_length=50, blank=True, null=True)
 
-    alucinaciones = models.CharField(max_length=5, choices=[("si", "Sí"), ("no", "No"), ("ns", "No Sabe")], blank=True, null=True)
+    alucinaciones = models.CharField(
+        max_length=5,
+        choices=[("si", "Sí"), ("no", "No"), ("ns", "No Sabe")],
+        blank=True,
+        null=True,
+    )
     alucinaciones_frecuencia = models.CharField(max_length=50, blank=True, null=True)
     alucinaciones_gravedad = models.CharField(max_length=50, blank=True, null=True)
     alucinaciones_F_G = models.IntegerField(blank=True, null=True)
     alucinaciones_distres = models.CharField(max_length=50, blank=True, null=True)
 
-    agitacion = models.CharField(max_length=5, choices=[("si", "Sí"), ("no", "No"), ("ns", "No Sabe")], blank=True, null=True)
+    agitacion = models.CharField(
+        max_length=5,
+        choices=[("si", "Sí"), ("no", "No"), ("ns", "No Sabe")],
+        blank=True,
+        null=True,
+    )
     agitacion_frecuencia = models.CharField(max_length=50, blank=True, null=True)
     agitacion_gravedad = models.CharField(max_length=50, blank=True, null=True)
     agitacion_F_G = models.IntegerField(blank=True, null=True)
     agitacion_distres = models.CharField(max_length=50, blank=True, null=True)
 
-    depresion = models.CharField(max_length=5, choices=[("si", "Sí"), ("no", "No"), ("ns", "No Sabe")], blank=True, null=True)
+    depresion = models.CharField(
+        max_length=5,
+        choices=[("si", "Sí"), ("no", "No"), ("ns", "No Sabe")],
+        blank=True,
+        null=True,
+    )
     depresion_frecuencia = models.CharField(max_length=50, blank=True, null=True)
     depresion_gravedad = models.CharField(max_length=50, blank=True, null=True)
     depresion_F_G = models.IntegerField(blank=True, null=True)
     depresion_distres = models.CharField(max_length=50, blank=True, null=True)
 
-    ansiedad = models.CharField(max_length=5, choices=[("si", "Sí"), ("no", "No"), ("ns", "No Sabe")], blank=True, null=True)
+    ansiedad = models.CharField(
+        max_length=5,
+        choices=[("si", "Sí"), ("no", "No"), ("ns", "No Sabe")],
+        blank=True,
+        null=True,
+    )
     ansiedad_frecuencia = models.CharField(max_length=50, blank=True, null=True)
     ansiedad_gravedad = models.CharField(max_length=50, blank=True, null=True)
     ansiedad_F_G = models.IntegerField(blank=True, null=True)
     ansiedad_distres = models.CharField(max_length=50, blank=True, null=True)
 
-    euforia = models.CharField(max_length=5, choices=[("si", "Sí"), ("no", "No"), ("ns", "No Sabe")], blank=True, null=True)
+    euforia = models.CharField(
+        max_length=5,
+        choices=[("si", "Sí"), ("no", "No"), ("ns", "No Sabe")],
+        blank=True,
+        null=True,
+    )
     euforia_frecuencia = models.CharField(max_length=50, blank=True, null=True)
     euforia_gravedad = models.CharField(max_length=50, blank=True, null=True)
     euforia_F_G = models.IntegerField(blank=True, null=True)
     euforia_distres = models.CharField(max_length=50, blank=True, null=True)
 
-    apatia = models.CharField(max_length=5, choices=[("si", "Sí"), ("no", "No"), ("ns", "No Sabe")], blank=True, null=True)
+    apatia = models.CharField(
+        max_length=5,
+        choices=[("si", "Sí"), ("no", "No"), ("ns", "No Sabe")],
+        blank=True,
+        null=True,
+    )
     apatia_frecuencia = models.CharField(max_length=50, blank=True, null=True)
     apatia_gravedad = models.CharField(max_length=50, blank=True, null=True)
     apatia_F_G = models.IntegerField(blank=True, null=True)
     apatia_distres = models.CharField(max_length=50, blank=True, null=True)
 
-    desinhibicion = models.CharField(max_length=5, choices=[("si", "Sí"), ("no", "No"), ("ns", "No Sabe")], blank=True, null=True)
+    desinhibicion = models.CharField(
+        max_length=5,
+        choices=[("si", "Sí"), ("no", "No"), ("ns", "No Sabe")],
+        blank=True,
+        null=True,
+    )
     desinhibicion_frecuencia = models.CharField(max_length=50, blank=True, null=True)
     desinhibicion_gravedad = models.CharField(max_length=50, blank=True, null=True)
     desinhibicion_F_G = models.IntegerField(blank=True, null=True)
     desinhibicion_distres = models.CharField(max_length=50, blank=True, null=True)
 
-    irritabilidad = models.CharField(max_length=5, choices=[("si", "Sí"), ("no", "No"), ("ns", "No Sabe")], blank=True, null=True)
+    irritabilidad = models.CharField(
+        max_length=5,
+        choices=[("si", "Sí"), ("no", "No"), ("ns", "No Sabe")],
+        blank=True,
+        null=True,
+    )
     irritabilidad_frecuencia = models.CharField(max_length=50, blank=True, null=True)
     irritabilidad_gravedad = models.CharField(max_length=50, blank=True, null=True)
     irritabilidad_F_G = models.IntegerField(blank=True, null=True)
     irritabilidad_distres = models.CharField(max_length=50, blank=True, null=True)
 
-    conducta_motor = models.CharField(max_length=5, choices=[("si", "Sí"), ("no", "No"), ("ns", "No Sabe")], blank=True, null=True)
+    conducta_motor = models.CharField(
+        max_length=5,
+        choices=[("si", "Sí"), ("no", "No"), ("ns", "No Sabe")],
+        blank=True,
+        null=True,
+    )
     conducta_motor_frecuencia = models.CharField(max_length=50, blank=True, null=True)
     conducta_motor_gravedad = models.CharField(max_length=50, blank=True, null=True)
     conducta_motor_F_G = models.IntegerField(blank=True, null=True)
     conducta_motor_distres = models.CharField(max_length=50, blank=True, null=True)
 
-    sueno = models.CharField(max_length=5, choices=[("si", "Sí"), ("no", "No"), ("ns", "No Sabe")], blank=True, null=True)
+    sueno = models.CharField(
+        max_length=5,
+        choices=[("si", "Sí"), ("no", "No"), ("ns", "No Sabe")],
+        blank=True,
+        null=True,
+    )
     sueno_frecuencia = models.CharField(max_length=50, blank=True, null=True)
     sueno_gravedad = models.CharField(max_length=50, blank=True, null=True)
     sueno_F_G = models.IntegerField(blank=True, null=True)
     sueno_distres = models.CharField(max_length=50, blank=True, null=True)
 
-    apetito = models.CharField(max_length=5, choices=[("si", "Sí"), ("no", "No"), ("ns", "No Sabe")], blank=True, null=True)
+    apetito = models.CharField(
+        max_length=5,
+        choices=[("si", "Sí"), ("no", "No"), ("ns", "No Sabe")],
+        blank=True,
+        null=True,
+    )
     apetito_frecuencia = models.CharField(max_length=50, blank=True, null=True)
     apetito_gravedad = models.CharField(max_length=50, blank=True, null=True)
     apetito_F_G = models.IntegerField(blank=True, null=True)
     apetito_distres = models.CharField(max_length=50, blank=True, null=True)
-
 
     def __str__(self):
         return f"NPI - Paciente {self.visita_examen_id}"
@@ -1089,10 +1148,8 @@ class AdherenciaTerapeuticaResult(ResultadoExamenBase):
     factor2_interpretacion = models.CharField(max_length=50, blank=True, null=True)
     factor3_interpretacion = models.CharField(max_length=50, blank=True, null=True)
 
-
     def __str__(self):
         return f"Adherencia Terapéutica - {self.visita_examen_id}"
-
 
 
 class EuroQol5D5LResult(ResultadoExamenBase):
@@ -1104,7 +1161,7 @@ class EuroQol5D5LResult(ResultadoExamenBase):
 
     def __str__(self):
         return f"EuroQol-5D-5L - {self.visita_examen}"
-    
+
 
 class EuroQolEVASaludResult(ResultadoExamenBase):
     # Valor reportado en el "termómetro" de 0 a 100
@@ -1115,20 +1172,23 @@ class EuroQolEVASaludResult(ResultadoExamenBase):
     def __str__(self):
         return f"EuroQol EVA Salud - {self.visita_examen}"
 
+
 class MoCAResult(ResultadoExamenBase):
     # Ítems del MoCA
-    alternancia = models.PositiveSmallIntegerField()   # 0–1
-    cubo = models.PositiveSmallIntegerField()          # 0–1
-    reloj = models.PositiveSmallIntegerField()         # 0–3
+    alternancia = models.PositiveSmallIntegerField()  # 0–1
+    cubo = models.PositiveSmallIntegerField()  # 0–1
+    reloj = models.PositiveSmallIntegerField()  # 0–3
     denominacion = models.PositiveSmallIntegerField()  # 0–3
-    
+
     # Atención y memoria
-    atencion = models.PositiveSmallIntegerField()      # 0–6 (suma de secuencia, inversa, concentración, sustracción)
-    repeticion = models.PositiveSmallIntegerField()    # 0–2
-    fluidez = models.PositiveSmallIntegerField()       # 0–1
-    abstraccion = models.PositiveSmallIntegerField()   # 0–2
-    diferido = models.PositiveSmallIntegerField()      # 0–5
-    orientacion = models.PositiveSmallIntegerField()   # 0–6
+    atencion = (
+        models.PositiveSmallIntegerField()
+    )  # 0–6 (suma de secuencia, inversa, concentración, sustracción)
+    repeticion = models.PositiveSmallIntegerField()  # 0–2
+    fluidez = models.PositiveSmallIntegerField()  # 0–1
+    abstraccion = models.PositiveSmallIntegerField()  # 0–2
+    diferido = models.PositiveSmallIntegerField()  # 0–5
+    orientacion = models.PositiveSmallIntegerField()  # 0–6
 
     # Corrección por escolaridad baja (checkbox)
     educacion_baja = models.BooleanField(default=False)
@@ -1142,23 +1202,52 @@ class MoCAResult(ResultadoExamenBase):
 
 
 class ParticipanteYesavageResult(ResultadoExamenBase):
-
     # Preguntas (sí/no)
-    satisfaccion_vida = models.CharField(max_length=2, choices=[("si", "Sí"), ("no", "No")], blank=True, null=True)
-    disminuir_actividades = models.CharField(max_length=2, choices=[("si", "Sí"), ("no", "No")], blank=True, null=True)
-    vida_vacia = models.CharField(max_length=2, choices=[("si", "Sí"), ("no", "No")], blank=True, null=True)
-    aburrido_frecuente = models.CharField(max_length=2, choices=[("si", "Sí"), ("no", "No")], blank=True, null=True)
-    buen_animo = models.CharField(max_length=2, choices=[("si", "Sí"), ("no", "No")], blank=True, null=True)
-    preocupacion = models.CharField(max_length=2, choices=[("si", "Sí"), ("no", "No")], blank=True, null=True)
-    felicidad = models.CharField(max_length=2, choices=[("si", "Sí"), ("no", "No")], blank=True, null=True)
-    frecuencia_desamparado = models.CharField(max_length=2, choices=[("si", "Sí"), ("no", "No")], blank=True, null=True)
-    quedarse_casa = models.CharField(max_length=2, choices=[("si", "Sí"), ("no", "No")], blank=True, null=True)
-    problemas_memoria = models.CharField(max_length=2, choices=[("si", "Sí"), ("no", "No")], blank=True, null=True)
-    maravilla_vivir = models.CharField(max_length=2, choices=[("si", "Sí"), ("no", "No")], blank=True, null=True)
-    inutil = models.CharField(max_length=2, choices=[("si", "Sí"), ("no", "No")], blank=True, null=True)
-    lleno_energia = models.CharField(max_length=2, choices=[("si", "Sí"), ("no", "No")], blank=True, null=True)
-    sin_esperanza = models.CharField(max_length=2, choices=[("si", "Sí"), ("no", "No")], blank=True, null=True)
-    otras_personas_mejor = models.CharField(max_length=2, choices=[("si", "Sí"), ("no", "No")], blank=True, null=True)
+    satisfaccion_vida = models.CharField(
+        max_length=2, choices=[("si", "Sí"), ("no", "No")], blank=True, null=True
+    )
+    disminuir_actividades = models.CharField(
+        max_length=2, choices=[("si", "Sí"), ("no", "No")], blank=True, null=True
+    )
+    vida_vacia = models.CharField(
+        max_length=2, choices=[("si", "Sí"), ("no", "No")], blank=True, null=True
+    )
+    aburrido_frecuente = models.CharField(
+        max_length=2, choices=[("si", "Sí"), ("no", "No")], blank=True, null=True
+    )
+    buen_animo = models.CharField(
+        max_length=2, choices=[("si", "Sí"), ("no", "No")], blank=True, null=True
+    )
+    preocupacion = models.CharField(
+        max_length=2, choices=[("si", "Sí"), ("no", "No")], blank=True, null=True
+    )
+    felicidad = models.CharField(
+        max_length=2, choices=[("si", "Sí"), ("no", "No")], blank=True, null=True
+    )
+    frecuencia_desamparado = models.CharField(
+        max_length=2, choices=[("si", "Sí"), ("no", "No")], blank=True, null=True
+    )
+    quedarse_casa = models.CharField(
+        max_length=2, choices=[("si", "Sí"), ("no", "No")], blank=True, null=True
+    )
+    problemas_memoria = models.CharField(
+        max_length=2, choices=[("si", "Sí"), ("no", "No")], blank=True, null=True
+    )
+    maravilla_vivir = models.CharField(
+        max_length=2, choices=[("si", "Sí"), ("no", "No")], blank=True, null=True
+    )
+    inutil = models.CharField(
+        max_length=2, choices=[("si", "Sí"), ("no", "No")], blank=True, null=True
+    )
+    lleno_energia = models.CharField(
+        max_length=2, choices=[("si", "Sí"), ("no", "No")], blank=True, null=True
+    )
+    sin_esperanza = models.CharField(
+        max_length=2, choices=[("si", "Sí"), ("no", "No")], blank=True, null=True
+    )
+    otras_personas_mejor = models.CharField(
+        max_length=2, choices=[("si", "Sí"), ("no", "No")], blank=True, null=True
+    )
 
     # Puntaje total (0–15)
     puntaje_total = models.IntegerField(default=0)
@@ -1166,7 +1255,7 @@ class ParticipanteYesavageResult(ResultadoExamenBase):
 
     def __str__(self):
         return f"Yesavage - {self.visita_examen_id}"
-    
+
 
 class ZaritResult(ResultadoExamenBase):
     pide_ayuda = models.CharField(max_length=50, blank=True, null=True)
@@ -1174,7 +1263,9 @@ class ZaritResult(ResultadoExamenBase):
     agobio = models.CharField(max_length=50, blank=True, null=True)
     verguenza_conducta = models.CharField(max_length=50, blank=True, null=True)
     sentir_enfado = models.CharField(max_length=50, blank=True, null=True)
-    afectar_relacion_negativamente = models.CharField(max_length=50, blank=True, null=True)
+    afectar_relacion_negativamente = models.CharField(
+        max_length=50, blank=True, null=True
+    )
     miedo_futuro = models.CharField(max_length=50, blank=True, null=True)
     dependencia = models.CharField(max_length=50, blank=True, null=True)
     sentir_tension = models.CharField(max_length=50, blank=True, null=True)
@@ -1227,14 +1318,16 @@ class AQDCuidadorResult(ResultadoExamenBase):
     egoismo = models.CharField(max_length=50, blank=True, null=True)
     enojo_menos_paciencia = models.CharField(max_length=50, blank=True, null=True)
     llorar_con_facilidad = models.CharField(max_length=50, blank=True, null=True)
-    reir_situaciones_inapropiadas = models.CharField(max_length=50, blank=True, null=True)
+    reir_situaciones_inapropiadas = models.CharField(
+        max_length=50, blank=True, null=True
+    )
     temas_sexuales = models.CharField(max_length=50, blank=True, null=True)
     falta_de_interes = models.CharField(max_length=50, blank=True, null=True)
     deprimido = models.CharField(max_length=50, blank=True, null=True)
 
     def __str__(self):
         return f"AQ-D Cuidador - {self.visita_examen_id}"
-    
+
 
 class AQDParticipanteResult(ResultadoExamenBase):
     recordar_fecha = models.CharField(max_length=50, blank=True, null=True)
@@ -1263,25 +1356,31 @@ class AQDParticipanteResult(ResultadoExamenBase):
     egoismo = models.CharField(max_length=50, blank=True, null=True)
     enojo_menos_paciencia = models.CharField(max_length=50, blank=True, null=True)
     llorar_con_facilidad = models.CharField(max_length=50, blank=True, null=True)
-    reir_situaciones_inapropiadas = models.CharField(max_length=50, blank=True, null=True)
+    reir_situaciones_inapropiadas = models.CharField(
+        max_length=50, blank=True, null=True
+    )
     temas_sexuales = models.CharField(max_length=50, blank=True, null=True)
     falta_de_interes = models.CharField(max_length=50, blank=True, null=True)
     deprimido = models.CharField(max_length=50, blank=True, null=True)
 
     # Puntaje total
-    #puntaje_total = models.IntegerField(blank=True, null=True)
+    # puntaje_total = models.IntegerField(blank=True, null=True)
 
     def __str__(self):
         return f"AQ-D Participante - {self.visita_examen_id}"
-    
+
 
 class CDRCuidadorResult(ResultadoExamenBase):
     # ====================
     # Dominio: Memoria
     # ====================
     memoria_p1 = models.CharField(max_length=10, blank=True, null=True)  # sí/no
-    memoria_p1_1 = models.CharField(max_length=10, blank=True, null=True)  # sí/no, subpregunta
-    memoria_p2 = models.CharField(max_length=20, blank=True, null=True)  # generalmente/a_veces/raramente
+    memoria_p1_1 = models.CharField(
+        max_length=10, blank=True, null=True
+    )  # sí/no, subpregunta
+    memoria_p2 = models.CharField(
+        max_length=20, blank=True, null=True
+    )  # generalmente/a_veces/raramente
     memoria_p3 = models.CharField(max_length=20, blank=True, null=True)
     memoria_p4 = models.CharField(max_length=10, blank=True, null=True)  # sí/no
     memoria_p5 = models.CharField(max_length=10, blank=True, null=True)  # sí/no
@@ -1328,23 +1427,37 @@ class CDRCuidadorResult(ResultadoExamenBase):
     # ====================
     # Actividades comunitarias
     # ====================
-    trabaja_actualmente = models.CharField(max_length=10, blank=True, null=True)  # na/si/no
-    memoria_causa_jubilacion = models.CharField(max_length=10, blank=True, null=True)  # si/no/nose
-    dificultades_trabajo_memoria = models.CharField(max_length=20, blank=True, null=True)
+    trabaja_actualmente = models.CharField(
+        max_length=10, blank=True, null=True
+    )  # na/si/no
+    memoria_causa_jubilacion = models.CharField(
+        max_length=10, blank=True, null=True
+    )  # si/no/nose
+    dificultades_trabajo_memoria = models.CharField(
+        max_length=20, blank=True, null=True
+    )
 
     condujo_alguna_vez = models.CharField(max_length=5, blank=True, null=True)  # si/no
     conduce_actualmente = models.CharField(max_length=5, blank=True, null=True)  # si/no
-    dejo_de_conducir_por_memoria = models.CharField(max_length=5, blank=True, null=True)  # si/no
+    dejo_de_conducir_por_memoria = models.CharField(
+        max_length=5, blank=True, null=True
+    )  # si/no
     riesgos_conduccion = models.CharField(max_length=5, blank=True, null=True)  # si/no
 
     compras_independientes = models.CharField(max_length=50, blank=True, null=True)
     actividades_fuera_hogar = models.CharField(max_length=50, blank=True, null=True)
-    asiste_funciones_sociales = models.CharField(max_length=5, blank=True, null=True)  # si/no
+    asiste_funciones_sociales = models.CharField(
+        max_length=5, blank=True, null=True
+    )  # si/no
     motivo_no_funciones = models.TextField(blank=True, null=True)
 
     parece_enfermo = models.CharField(max_length=5, blank=True, null=True)  # si/no
-    participa_hogar_geriatrico = models.CharField(max_length=5, blank=True, null=True)  # si/no
-    info_suficiente_comunitarias = models.CharField(max_length=5, blank=True, null=True)  # si/no
+    participa_hogar_geriatrico = models.CharField(
+        max_length=5, blank=True, null=True
+    )  # si/no
+    info_suficiente_comunitarias = models.CharField(
+        max_length=5, blank=True, null=True
+    )  # si/no
     notas_comunitarias = models.TextField(blank=True, null=True)
 
     # ====================
@@ -1356,7 +1469,9 @@ class CDRCuidadorResult(ResultadoExamenBase):
     cosas_que_aun_realiza_pasatiempos = models.TextField(blank=True, null=True)
     actividades_no_realiza_en_hogar = models.TextField(blank=True, null=True)
 
-    habilidad_domestica_dementia_scale = models.DecimalField(max_digits=2, decimal_places=1, blank=True, null=True)
+    habilidad_domestica_dementia_scale = models.DecimalField(
+        max_digits=2, decimal_places=1, blank=True, null=True
+    )
     descripcion_habilidad_domestica = models.TextField(blank=True, null=True)
     nivel_desempeno_domestico = models.CharField(max_length=50, blank=True, null=True)
     notas_domesticas_pasatiempos = models.TextField(blank=True, null=True)
@@ -1380,10 +1495,14 @@ class CDRParticipanteResult(ResultadoExamenBase):
     memoria_p1 = models.CharField(max_length=5, blank=True, null=True)  # si/no
 
     evento_recuerda_semana = models.TextField(blank=True, null=True)
-    memoria_semana_calificacion = models.DecimalField(max_digits=2, decimal_places=1, blank=True, null=True)
+    memoria_semana_calificacion = models.DecimalField(
+        max_digits=2, decimal_places=1, blank=True, null=True
+    )
 
     evento_recuerda_mes = models.TextField(blank=True, null=True)
-    memoria_mes_calificacion = models.DecimalField(max_digits=2, decimal_places=1, blank=True, null=True)
+    memoria_mes_calificacion = models.DecimalField(
+        max_digits=2, decimal_places=1, blank=True, null=True
+    )
 
     # Ensayos (checkboxes del nombre/dirección)
     ensayo1_juan = models.BooleanField(default=False)
@@ -1425,7 +1544,9 @@ class CDRParticipanteResult(ResultadoExamenBase):
     # ====================
     # Dominio: Orientación
     # ====================
-    orientacion_p1 = models.CharField(max_length=15, blank=True, null=True)  # correcto/incorrecto
+    orientacion_p1 = models.CharField(
+        max_length=15, blank=True, null=True
+    )  # correcto/incorrecto
     orientacion_p2 = models.CharField(max_length=15, blank=True, null=True)
     orientacion_p3 = models.CharField(max_length=15, blank=True, null=True)
     orientacion_p4 = models.CharField(max_length=15, blank=True, null=True)
@@ -1455,7 +1576,9 @@ class CDRParticipanteResult(ResultadoExamenBase):
 
     juicio_p8_puntaje = models.IntegerField(blank=True, null=True)
 
-    juicio_p9 = models.CharField(max_length=50, blank=True, null=True)  # Buena, parcial, poca percepción
+    juicio_p9 = models.CharField(
+        max_length=50, blank=True, null=True
+    )  # Buena, parcial, poca percepción
 
     def __str__(self):
         return f"CDR Participante - {self.visita_examen_id}"
@@ -1509,7 +1632,7 @@ class RedLatSpanishResult(ResultadoExamenBase):
     internet = models.CharField(max_length=255, blank=True, null=True)
     email = models.CharField(max_length=255, blank=True, null=True)
     redes_sociales = models.CharField(max_length=255, blank=True, null=True)
-        
+
     puntaje_autocuidado = models.CharField(max_length=20, blank=True, null=True)
     puntaje_cuidado_hogar = models.CharField(max_length=20, blank=True, null=True)
     puntaje_trabajo_recreacion = models.CharField(max_length=20, blank=True, null=True)
@@ -1559,7 +1682,9 @@ class BettyFerrelResult(ResultadoExamenBase):
 
     # ---------- Bienestar espiritual ----------
     actividades_religiosas = models.CharField(max_length=255, blank=True, null=True)
-    actividades_espirituales_personales = models.CharField(max_length=255, blank=True, null=True)
+    actividades_espirituales_personales = models.CharField(
+        max_length=255, blank=True, null=True
+    )
     incertidumbre_futuro = models.CharField(max_length=255, blank=True, null=True)
     cambios_positivos = models.CharField(max_length=255, blank=True, null=True)
     proposito_vida = models.CharField(max_length=255, blank=True, null=True)
@@ -1568,7 +1693,8 @@ class BettyFerrelResult(ResultadoExamenBase):
 
     def __str__(self):
         return f"Betty Ferrel - {self.visita_examen}"
-    
+
+
 class PuntajeCDRResult(ResultadoExamenBase):
     cdr_memoria = models.CharField(max_length=10)
     cdr_orientacion = models.CharField(max_length=10)
@@ -1580,6 +1706,7 @@ class PuntajeCDRResult(ResultadoExamenBase):
 
     def __str__(self):
         return f"CDR - {self.visita_examen_id}"
+
 
 class ConsentimientoInformadoParticipanteResult(ResultadoExamenBase):
     fecha = models.DateField()
@@ -1598,7 +1725,8 @@ class ConsentimientoInformadoParticipanteResult(ResultadoExamenBase):
 
     def __str__(self):
         return f"Consentimiento Informado - {self.visita_examen_id}"
-    
+
+
 class ConsentimientoInformadoCuidadorResult(ResultadoExamenBase):
     fecha = models.DateField()
     hora_inicio = models.TimeField()
@@ -1618,6 +1746,7 @@ class ConsentimientoInformadoCuidadorResult(ResultadoExamenBase):
 
     def __str__(self):
         return f"Consentimiento Informado - {self.visita_examen_id}"
+
 
 class AnamnesisCuidadorResult(ResultadoExamenBase):
     nombres_apellidos = models.CharField(max_length=255)
@@ -1640,7 +1769,8 @@ class AnamnesisCuidadorResult(ResultadoExamenBase):
 
     def __str__(self):
         return f"Anamnesis Cuidador - {self.visita_examen_id}"
-    
+
+
 class AnamnesisParticipanteResult(ResultadoExamenBase):
     nombres_apellidos = models.CharField(max_length=255)
     documento = models.CharField(max_length=100)  # Tipo y número
@@ -1657,5 +1787,3 @@ class AnamnesisParticipanteResult(ResultadoExamenBase):
 
     def __str__(self):
         return f"Anamnesis Participante - {self.visita_examen_id}"
-
-
