@@ -2165,43 +2165,44 @@
 
     function agregarSustancia() {
       const sustanciaHTML = `
-    <div class="sustancia-item mb-4 border p-3">\
+  <div class="sustancia-item mb-4 border p-3">
     <h5>Sustancia ${contadorSustancias}</h5>
-      <div class="form-group">
-        <label for="tipo-sustancia">Tipo de sustancia</label>
-        <input type="text" class="form-control" name="tipo_sustancia_${contadorSustancias}" required>
-      </div>
-      <div class="form-group">
-        <label for="cantidad-sustancia">Cantidad</label>
-        <input type="text" class="form-control" name="cantidad_sustancia_${contadorSustancias}" required>
-      </div>
-      <div class="form-group"> 
-        <label for="frecuencia-sustancia">Frecuencia a la semana</label>
-        <select class="form-control" name="frecuencia_sustancia_${contadorSustancias}" required>
-          <option value="1 vez a la semana">1 vez a la semana</option>
-          <option value="1-3 veces a la semana">1-3 veces a la semana</option>
-          <option value="3-5 veces a la semana">3-5 veces a la semana</option>
-          <option value="> 5 veces a la semana">> 5 veces a la semana</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label for="tiempo-sustancia">¿Cuánto tiempo antes de dormir?</label>
-        <select class="form-control" name="tiempo_sustancia_${contadorSustancias}" required>
-          <option value="Antes de dormir">Antes de dormir</option>
-          <option value="< 15 minutos antes">< 15 minutos antes</option>
-          <option value="15-30 minutos antes">15-30 minutos antes</option>
-          <option value="30-60 minutos antes">30-60 minutos antes</option>
-          <option value="1-2 horas antes">1-2 horas antes</option>
-          <option value="Más de 2 horas antes">Más de 2 horas antes</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label for="observaciones-sustancia">Observaciones</label>
-        <textarea class="form-control" name="observaciones_sustancia_${contadorSustancias}" rows="2"></textarea>
-      </div>
-      <button type="button" class="btn btn-danger btn-sm eliminar-sustancia">Eliminar</button>
+    <div class="form-group">
+      <label>Tipo de sustancia</label>
+      <input type="text" class="form-control" name="sustancias_tipo[]" required>
     </div>
-  `;
+    <div class="form-group">
+      <label>Cantidad</label>
+      <input type="text" class="form-control" name="sustancias_cantidad[]" required>
+    </div>
+    <div class="form-group"> 
+      <label>Frecuencia a la semana</label>
+      <select class="form-control" name="sustancias_frecuencia[]" required>
+        <option value="1 vez a la semana">1 vez a la semana</option>
+        <option value="1-3 veces a la semana">1-3 veces a la semana</option>
+        <option value="3-5 veces a la semana">3-5 veces a la semana</option>
+        <option value="> 5 veces a la semana">> 5 veces a la semana</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>¿Cuánto tiempo antes de dormir?</label>
+      <select class="form-control" name="sustancias_tiempo[]" required>
+        <option value="Antes de dormir">Antes de dormir</option>
+        <option value="< 15 minutos antes">< 15 minutos antes</option>
+        <option value="15-30 minutos antes">15-30 minutos antes</option>
+        <option value="30-60 minutos antes">30-60 minutos antes</option>
+        <option value="1-2 horas antes">1-2 horas antes</option>
+        <option value="Más de 2 horas antes">Más de 2 horas antes</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Observaciones</label>
+      <textarea class="form-control" name="sustancias_observaciones[]" rows="2"></textarea>
+    </div>
+    <button type="button" class="btn btn-danger btn-sm eliminar-sustancia">Eliminar</button>
+  </div>
+`;
+
       contenedorSustancias.insertAdjacentHTML("beforeend", sustanciaHTML);
       contadorSustancias++; // Incrementar el contador para la próxima sustancia
     }

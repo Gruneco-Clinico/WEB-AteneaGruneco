@@ -1159,13 +1159,14 @@ def guardar_sueno_anamnesis(request):
             anamnesis.tipos_queja_detalle.all().delete()
             nombres_quejas = request.POST.getlist("tipo_queja[]")
             for nombre in nombres_quejas:
+                quejaId = nombre.replace(" ", "_").lower()
                 TipoQuejaSueno.objects.create(
                     anamnesis=anamnesis,
                     nombre=nombre,
-                    inicio=request.POST.get(f"{nombre}_inicio", ""),
-                    evolucion=request.POST.get(f"{nombre}_evolucion", ""),
-                    frecuencia=request.POST.get(f"{nombre}_frecuencia", ""),
-                    gravedad=request.POST.get(f"{nombre}_gravedad", ""),
+                    inicio=request.POST.get(f"{quejaId}_inicio", ""),
+                    evolucion=request.POST.get(f"{quejaId}_evolucion", ""),
+                    frecuencia=request.POST.get(f"{quejaId}_frecuencia", ""),
+                    gravedad=request.POST.get(f"{quejaId}_gravedad", ""),
                 )
 
             # Sustancias
@@ -1196,13 +1197,13 @@ def guardar_sueno_anamnesis(request):
 
             # Medicamentos
             anamnesis.medicamentos.all().delete()
-            nombres = request.POST.getlist("medicamento_nombre[]")
-            dosis = request.POST.getlist("medicamento_dosis[]")
-            observaciones = request.POST.getlist("medicamento_observaciones[]")
-            presentacion = request.POST.getlist("medicamento_presentacion[]")
-            veces_dia = request.POST.getlist("medicamento_veces_dia[]")
-            frecuencias = request.POST.getlist("medicamento_frecuencia[]")
-            tiempos = request.POST.getlist("medicamento_tiempo[]")
+            nombres = request.POST.getlist("nombre_medicamento[]")
+            dosis = request.POST.getlist("dosis_medicamento[]")
+            observaciones = request.POST.getlist("observaciones_medicamento[]")
+            presentacion = request.POST.getlist("presentacion[]")
+            veces_dia = request.POST.getlist("veces_dia[]")
+            frecuencias = request.POST.getlist("frecuencia_medicamentos[]")
+            tiempos = request.POST.getlist("tiempo_antes_dormir[]")
 
             for i, nombre in enumerate(nombres):
                 MedicamentoSueno.objects.create(
@@ -1218,9 +1219,9 @@ def guardar_sueno_anamnesis(request):
 
             # Pantallas
             anamnesis.pantallas.all().delete()
-            pantallas_tipos = request.POST.getlist("pantalla_tipo[]")
+            pantallas_tipos = request.POST.getlist("tipo_pantalla[]")
             pantallas_frecuencias = request.POST.getlist("pantalla_frecuencia[]")
-            pantallas_tiempos = request.POST.getlist("pantalla_tiempo[]")
+            pantallas_tiempos = request.POST.getlist("pantalla_tiempo_dormir[]")
 
             for i, tipo in enumerate(pantallas_tipos):
                 PantallaSueno.objects.create(
@@ -1236,9 +1237,9 @@ def guardar_sueno_anamnesis(request):
 
             # Actividades en cama
             anamnesis.actividades_en_cama.all().delete()
-            actividades_cama = request.POST.getlist("actividad_cama_tipo[]")
-            actividades_frec = request.POST.getlist("actividad_cama_frecuencia[]")
-            actividades_obs = request.POST.getlist("actividad_cama_observaciones[]")
+            actividades_cama = request.POST.getlist("tipo_actividad[]")
+            actividades_frec = request.POST.getlist("frecuencia_actividad[]")
+            actividades_obs = request.POST.getlist("observaciones_actividades[]")
 
             for i, tipo in enumerate(actividades_cama):
                 ActividadEnCamaSueno.objects.create(
@@ -1252,11 +1253,11 @@ def guardar_sueno_anamnesis(request):
 
             # Actividades físicas
             anamnesis.actividades_fisicas.all().delete()
-            actfis_tipo = request.POST.getlist("actividad_fisica_tipo[]")
-            actfis_otro = request.POST.getlist("actividad_fisica_otro[]")
-            actfis_intensidad = request.POST.getlist("actividad_fisica_intensidad[]")
-            actfis_frec = request.POST.getlist("actividad_fisica_frecuencia[]")
-            actfis_obs = request.POST.getlist("actividad_fisica_observaciones[]")
+            actfis_tipo = request.POST.getlist("tipo_actividad_fisica[]")
+            actfis_otro = request.POST.getlist("tipo_actividad_otro_texto[]")
+            actfis_intensidad = request.POST.getlist("intensidad_fisica[]")
+            actfis_frec = request.POST.getlist("frecuencia_fisica[]")
+            actfis_obs = request.POST.getlist("observaciones_actividad_fisica[]")
 
             for i, tipo in enumerate(actfis_tipo):
                 ActividadFisicaSueno.objects.create(
@@ -1272,12 +1273,12 @@ def guardar_sueno_anamnesis(request):
 
             # Síntomas de sueño
             anamnesis.sintomas_suenos.all().delete()
-            sintomas_tipo = request.POST.getlist("sintoma_sueno_tipo[]")
-            sintomas_inicio = request.POST.getlist("sintoma_sueno_inicio[]")
-            sintomas_evo = request.POST.getlist("sintoma_sueno_evolucion[]")
-            sintomas_frec = request.POST.getlist("sintoma_sueno_frecuencia[]")
-            sintomas_grav = request.POST.getlist("sintoma_sueno_gravedad[]")
-            sintomas_obs = request.POST.getlist("sintoma_sueno_observaciones[]")
+            sintomas_tipo = request.POST.getlist("tipo_sintoma[]")
+            sintomas_inicio = request.POST.getlist("cuando_inicio[]")
+            sintomas_evo = request.POST.getlist("evolucion[]")
+            sintomas_frec = request.POST.getlist("frecuencia[]")
+            sintomas_grav = request.POST.getlist("gravedad[]")
+            sintomas_obs = request.POST.getlist("observaciones_sintoma[]")
 
             for i, tipo in enumerate(sintomas_tipo):
                 SintomaSueno.objects.create(
@@ -1294,12 +1295,12 @@ def guardar_sueno_anamnesis(request):
 
             # Síntomas diurnos
             anamnesis.sintomas_diurno.all().delete()
-            sintomasd_tipo = request.POST.getlist("sintoma_diurno_tipo[]")
-            sintomasd_inicio = request.POST.getlist("sintoma_diurno_inicio[]")
-            sintomasd_evo = request.POST.getlist("sintoma_diurno_evolucion[]")
-            sintomasd_frec = request.POST.getlist("sintoma_diurno_frecuencia[]")
-            sintomasd_grav = request.POST.getlist("sintoma_diurno_gravedad[]")
-            sintomasd_obs = request.POST.getlist("sintoma_diurno_observaciones[]")
+            sintomasd_tipo = request.POST.getlist("tipo_sintoma_diurno[]")
+            sintomasd_inicio = request.POST.getlist("cuando_inicio_diurno[]")
+            sintomasd_evo = request.POST.getlist("evolucion_diurno[]")
+            sintomasd_frec = request.POST.getlist("frecuencia_diurno[]")
+            sintomasd_grav = request.POST.getlist("gravedad_diurno[]")
+            sintomasd_obs = request.POST.getlist("observaciones_sintoma_diurno[]")
 
             for i, tipo in enumerate(sintomasd_tipo):
                 SintomaDiurnoSueno.objects.create(
