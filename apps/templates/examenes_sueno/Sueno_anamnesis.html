@@ -176,275 +176,239 @@
                 </div>
               </div>
               <!-- Queja de sueño -->
-              <div class="tab-pane fade" id="evaluacion_queja" role="tabpanel">
-                <div class="card bg-gradient-default shadow-sm mb-4">
-                  <div class="card-header bg-transparent">
-                    <h4 class="text-white mb-0">Queja de sueño</h4>
-                  </div>
-                  <div class="card-body bg-white">
-                    <div class="row">
-                      <!-- Sección: Queja de sueño -->
+<div class="tab-pane fade" id="evaluacion_queja" role="tabpanel">
+  <div class="card bg-gradient-default shadow-sm mb-4">
+    <div class="card-header bg-transparent">
+      <h4 class="text-white mb-0">Queja de sueño</h4>
+    </div>
+    <div class="card-body bg-white">
+      <div class="row">
+        <!-- Sección: Queja de sueño -->
+        <div class="form-group">
+          <label class="form-label" for="presenta_queja">Queja de sueño</label>
 
-                      <div class="form-group">
-                        <label class="form-label" for="presenta_queja"
-                          >Queja de sueño</label
-                        >
+          <div class="custom-control custom-radio">
+            <input
+              type="radio"
+              class="custom-control-input"
+              id="presenta_queja-si"
+              name="presenta_queja"
+              value="si"
+              {% if datos_examen.presenta_queja == "si" %}checked{% endif %}
+            />
+            <label class="custom-control-label" for="presenta_queja-si">Sí</label>
+          </div>
 
-                        <div class="custom-control custom-radio">
-                          <input
-                            type="radio"
-                            class="custom-control-input"
-                            id="presenta_queja-si"
-                            name="presenta_queja"
-                            value="si"
-                          />
+          <div class="custom-control custom-radio">
+            <input
+              type="radio"
+              class="custom-control-input"
+              id="presenta_queja-no"
+              name="presenta_queja"
+              value="no"
+              {% if datos_examen.presenta_queja == "no" %}checked{% endif %}
+            />
+            <label class="custom-control-label" for="presenta_queja-no">No</label>
+          </div>
+        </div>
 
-                          <label
-                            class="custom-control-label"
-                            for="presenta_queja-si"
-                            >Sí</label
-                          >
-                        </div>
+        <div id="campos-queja-container" {% if datos_examen.presenta_queja != "si" %}style="display: none"{% endif %}>
+          <div class="form-group">
+            <label class="form-control-label">Tipo de queja de sueño</label>
+            <div class="d-flex flex-wrap">
+              <!-- Lista de checkboxes para tipos de quejas -->
+              <div class="form-check mr-3 mb-2">
+                <input
+                  class="form-check-input queja-checkbox"
+                  type="checkbox"
+                  name="tipo_queja[]"
+                  value="Dificultad de conciliación"
+                  id="dificultad_conciliacion"
+                  {% if 'Dificultad de conciliación' in datos_examen.tipo_queja %}checked{% endif %}
+                />
+                <label class="form-check-label" for="dificultad_conciliacion">
+                  Dificultad de conciliación
+                </label>
+              </div>
+              <div class="form-check mr-3 mb-2">
+                <input
+                  class="form-check-input queja-checkbox"
+                  type="checkbox"
+                  name="tipo_queja[]"
+                  value="Dificultad de mantenimiento"
+                  id="dificultad_mantenimiento"
+                  {% if 'Dificultad de mantenimiento' in datos_examen.tipo_queja %}checked{% endif %}
+                />
+                <label class="form-check-label" for="dificultad_mantenimiento">
+                  Dificultad de mantenimiento
+                </label>
+              </div>
+              <div class="form-check mr-3 mb-2">
+                <input
+                  class="form-check-input queja-checkbox"
+                  type="checkbox"
+                  name="tipo_queja[]"
+                  value="Trastornos de conducta del sueño"
+                  id="trastornos_conducta"
+                  {% if 'Trastornos de conducta del sueño' in datos_examen.tipo_queja %}checked{% endif %}
+                />
+                <label class="form-check-label" for="trastornos_conducta">
+                  Trastornos de conducta del sueño
+                </label>
+              </div>
+              <div class="form-check mr-3 mb-2">
+                <input
+                  class="form-check-input queja-checkbox"
+                  type="checkbox"
+                  name="tipo_queja[]"
+                  value="Apnea"
+                  id="apnea"
+                  {% if 'Apnea' in datos_examen.tipo_queja %}checked{% endif %}
+                />
+                <label class="form-check-label" for="apnea">Apnea</label>
+              </div>
+              <div class="form-check mr-3 mb-2">
+                <input
+                  class="form-check-input queja-checkbox"
+                  type="checkbox"
+                  name="tipo_queja[]"
+                  value="Ronquido"
+                  id="ronquido"
+                  {% if 'Ronquido' in datos_examen.tipo_queja %}checked{% endif %}
+                />
+                <label class="form-check-label" for="ronquido">Ronquido</label>
+              </div>
+              <div class="form-check mr-3 mb-2">
+                <input
+                  class="form-check-input queja-checkbox"
+                  type="checkbox"
+                  name="tipo_queja[]"
+                  value="Somnolencia diurna"
+                  id="somnolencia_diurna"
+                  {% if 'Somnolencia diurna' in datos_examen.tipo_queja %}checked{% endif %}
+                />
+                <label class="form-check-label" for="somnolencia_diurna">
+                  Somnolencia diurna
+                </label>
+              </div>
+              <div class="form-check mr-3 mb-2">
+                <input
+                  class="form-check-input queja-checkbox"
+                  type="checkbox"
+                  name="tipo_queja[]"
+                  value="Narcolepsia"
+                  id="narcolepsia"
+                  {% if 'Narcolepsia' in datos_examen.tipo_queja %}checked{% endif %}
+                />
+                <label class="form-check-label" for="narcolepsia">Narcolepsia</label>
+              </div>
+              <div class="form-check mr-3 mb-2">
+                <input
+                  class="form-check-input queja-checkbox"
+                  type="checkbox"
+                  name="tipo_queja[]"
+                  value="Hipersomnolencia"
+                  id="hipersomnolencia"
+                  {% if 'Hipersomnolencia' in datos_examen.tipo_queja %}checked{% endif %}
+                />
+                <label class="form-check-label" for="hipersomnolencia">
+                  Hipersomnolencia
+                </label>
+              </div>
+              <div class="form-check mr-3 mb-2">
+                <input
+                  class="form-check-input queja-checkbox"
+                  type="checkbox"
+                  name="tipo_queja[]"
+                  value="Despertares nocturnos"
+                  id="despertares_nocturnos"
+                  {% if 'Despertares nocturnos' in datos_examen.tipo_queja %}checked{% endif %}
+                />
+                <label class="form-check-label" for="despertares_nocturnos">
+                  Despertares nocturnos
+                </label>
+              </div>
+              <div class="form-check mr-3 mb-2">
+                <input
+                  class="form-check-input queja-checkbox"
+                  type="checkbox"
+                  name="tipo_queja[]"
+                  value="Trastorno de conducta del sueño"
+                  id="trastorno_sueno"
+                  {% if 'Trastorno de conducta del sueño' in datos_examen.tipo_queja %}checked{% endif %}
+                />
+                <label class="form-check-label" for="trastorno_sueno">
+                  Trastorno de conducta del sueño
+                </label>
+              </div>
+            </div>
+          </div>
 
-                        <div class="custom-control custom-radio">
-                          <input
-                            type="radio"
-                            class="custom-control-input"
-                            id="presenta_queja-no"
-                            name="presenta_queja"
-                            value="no"
-                          />
-                          <label
-                            class="custom-control-label"
-                            for="presenta_queja-no"
-                            >No</label
-                          >
-                        </div>
-                      </div>
+          <!-- Contenedor para campos dinámicos de cada queja -->
+          <div id="quejas-container" class="col-12">
+            <!-- Los campos dinámicos se cargarán aquí via JavaScript -->
+          </div>
 
-                      <div id="campos-queja-container" style="display: none">
-                        <div class="form-group">
-                          <label class="form-control-label"
-                            >Tipo de queja de sueño</label
-                          >
-                          <div class="d-flex flex-wrap">
-                            <!-- Lista de checkboxes para tipos de quejas -->
-                            <div class="form-check mr-3 mb-2">
-                              <input
-                                class="form-check-input queja-checkbox"
-                                type="checkbox"
-                                name="tipo_queja[]"
-                                value="Dificultad de conciliación"
-                                id="dificultad_conciliacion"
-                              />
-                              <label
-                                class="form-check-label"
-                                for="dificultad_conciliacion"
-                                >Dificultad de conciliación</label
-                              >
-                            </div>
-                            <div class="form-check mr-3 mb-2">
-                              <input
-                                class="form-check-input queja-checkbox"
-                                type="checkbox"
-                                name="tipo_queja[]"
-                                value="Dificultad de mantenimiento"
-                                id="dificultad_mantenimiento"
-                              />
-                              <label
-                                class="form-check-label"
-                                for="dificultad_mantenimiento"
-                                >Dificultad de mantenimiento</label
-                              >
-                            </div>
-                            <div class="form-check mr-3 mb-2">
-                              <input
-                                class="form-check-input queja-checkbox"
-                                type="checkbox"
-                                name="tipo_queja[]"
-                                value="Trastornos de conducta del sueño"
-                                id="trastornos_conducta"
-                              />
-                              <label
-                                class="form-check-label"
-                                for="trastornos_conducta"
-                                >Trastornos de conducta del sueño</label
-                              >
-                            </div>
-                            <div class="form-check mr-3 mb-2">
-                              <input
-                                class="form-check-input queja-checkbox"
-                                type="checkbox"
-                                name="tipo_queja[]"
-                                value="Apnea"
-                                id="apnea"
-                              />
-                              <label class="form-check-label" for="apnea"
-                                >Apnea</label
-                              >
-                            </div>
-                            <div class="form-check mr-3 mb-2">
-                              <input
-                                class="form-check-input queja-checkbox"
-                                type="checkbox"
-                                name="tipo_queja[]"
-                                value="Ronquido"
-                                id="ronquido"
-                              />
-                              <label class="form-check-label" for="ronquido"
-                                >Ronquido</label
-                              >
-                            </div>
-                            <div class="form-check mr-3 mb-2">
-                              <input
-                                class="form-check-input queja-checkbox"
-                                type="checkbox"
-                                name="tipo_queja[]"
-                                value="Somnolencia diurna"
-                                id="somnolencia_diurna"
-                              />
-                              <label
-                                class="form-check-label"
-                                for="somnolencia_diurna"
-                                >Somnolencia diurna</label
-                              >
-                            </div>
-                            <div class="form-check mr-3 mb-2">
-                              <input
-                                class="form-check-input queja-checkbox"
-                                type="checkbox"
-                                name="tipo_queja[]"
-                                value="Narcolepsia"
-                                id="narcolepsia"
-                              />
-                              <label class="form-check-label" for="narcolepsia"
-                                >Narcolepsia</label
-                              >
-                            </div>
-                            <div class="form-check mr-3 mb-2">
-                              <input
-                                class="form-check-input queja-checkbox"
-                                type="checkbox"
-                                name="tipo_queja[]"
-                                value="Hipersomnolencia"
-                                id="hipersomnolencia"
-                              />
-                              <label
-                                class="form-check-label"
-                                for="hipersomnolencia"
-                                >Hipersomnolencia</label
-                              >
-                            </div>
-                            <div class="form-check mr-3 mb-2">
-                              <input
-                                class="form-check-input queja-checkbox"
-                                type="checkbox"
-                                name="tipo_queja[]"
-                                value="Despertares nocturnos"
-                                id="despertares_nocturnos"
-                              />
-                              <label
-                                class="form-check-label"
-                                for="despertares_nocturnos"
-                                >Despertares nocturnos</label
-                              >
-                            </div>
-                            <div class="form-check mr-3 mb-2">
-                              <input
-                                class="form-check-input queja-checkbox"
-                                type="checkbox"
-                                name="tipo_queja[]"
-                                value="Trastorno de conducta del sueño"
-                                id="trastorno_sueno"
-                              />
-                              <label
-                                class="form-check-label"
-                                for="trastorno_sueno"
-                                >Trastorno de conducta del sueño</label
-                              >
-                            </div>
-                          </div>
-                        </div>
+          <!-- Sección de causas (solo visible si queja_sueno es "Sí") -->
+          <div id="seccion-causas" {% if datos_examen.presenta_queja != "si" %}style="display: none"{% endif %}>
+            <div class="form-group">
+              <label class="form-control-label">
+                Existe alguna causa conocida o a la que le atribuya el problema
+              </label>
+              <div class="form-check form-check-inline">
+                <input
+                  class="form-check-input"
+                  type="radio"
+                  name="causa_conocida"
+                  id="causa_conocida_si"
+                  value="Si"
+                  {% if datos_examen.causa_conocida == "Si" %}checked{% endif %}
+                />
+                <label class="form-check-label" for="causa_conocida_si">Sí</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input
+                  class="form-check-input"
+                  type="radio"
+                  name="causa_conocida"
+                  id="causa_conocida_no"
+                  value="No"
+                  {% if datos_examen.causa_conocida == "No" or not datos_examen.causa_conocida %}checked{% endif %}
+                />
+                <label class="form-check-label" for="causa_conocida_no">No</label>
+              </div>
+            </div>
 
-                        <!-- Contenedor para campos dinámicos de cada queja -->
-                        <div id="quejas-container" class="col-12"></div>
-
-                        <!-- Sección de causas (solo visible si queja_sueno es "Sí") -->
-                        <div id="seccion-causas" style="display: none">
-                          <div class="form-group">
-                            <label class="form-control-label"
-                              >Existe alguna causa conocida o a la que le
-                              atribuya el problema</label
-                            >
-                            <div class="form-check form-check-inline">
-                              <input
-                                class="form-check-input"
-                                type="radio"
-                                name="causa_conocida"
-                                id="causa_conocida_si"
-                                value="Si"
-                              />
-                              <label
-                                class="form-check-label"
-                                for="causa_conocida_si"
-                                >Sí</label
-                              >
-                            </div>
-                            <div class="form-check form-check-inline">
-                              <input
-                                class="form-check-input"
-                                type="radio"
-                                name="causa_conocida"
-                                id="causa_conocida_no"
-                                value="No"
-                                checked
-                              />
-                              <label
-                                class="form-check-label"
-                                for="causa_conocida_no"
-                                >No</label
-                              >
-                            </div>
-                          </div>
-
-                          <div
-                            id="causas-container"
-                            class="col-md-12"
-                            style="display: none"
-                          >
-                            <div class="form-group">
-                              <label class="form-control-label"
-                                >Especifique cuál o cuáles causas</label
-                              >
-                              <textarea
-                                class="form-control"
-                                name="especificacion_causa"
-                                id="especifique_causas"
-                              >
-{{ datos_examen.especificacion_causa|default:"" }}</textarea
-                              >
-                            </div>
-                            <div class="col-md-12">
-                              <div class="form-group">
-                                <label class="form-control-label"
-                                  >Observaciones</label
-                                >
-                                <textarea
-                                  class="form-control"
-                                  name="observaciones_queja"
-                                  id="observaciones_queja"
-                                >
-{{ datos_examen.observaciones_queja|default:"" }}</textarea
-                                >
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+            <div
+              id="causas-container"
+              class="col-md-12"
+              {% if datos_examen.causa_conocida != "Si" %}style="display: none"{% endif %}
+            >
+              <div class="form-group">
+                <label class="form-control-label">Especifique cuál o cuáles causas</label>
+                <textarea
+                  class="form-control"
+                  name="especificacion_causa"
+                  id="especifique_causas"
+                >{{ datos_examen.especificacion_causa|default:"" }}</textarea>
+              </div>
+              <div class="col-md-12">
+                <div class="form-group">
+                  <label class="form-control-label">Observaciones</label>
+                  <textarea
+                    class="form-control"
+                    name="observaciones_queja"
+                    id="observaciones_queja"
+                  >{{ datos_examen.observaciones_queja|default:"" }}</textarea>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
               <!-- horaior-->
               <div class="tab-pane fade" id="horario" role="tabpanel">
                 <div class="card bg-gradient-default shadow-sm mb-4">
@@ -464,28 +428,24 @@
                               <label class="form-control-label"
                                 >¿Tiene alguna rutina antes de dormir?</label
                               >
-                              <div class="form-check form-check-inline">
-                                <input
-                                  class="form-check-input"
-                                  type="radio"
-                                  name="rutina_dormir"
-                                  id="rutina_si"
-                                  value="si"
-                                />
-                                <label class="form-check-label" for="rutina_si"
+                              <div class="custom-control custom-radio">
+                                <input type="radio" class="custom-control-input"
+                                id="rutina_si" name="rutina_dormir" value="si"
+                                {% if datos_examen.rutina_dormir == "si" %}checked{% endif %} />
+                                <label
+                                  class="custom-control-label"
+                                  for="rutina_si"
                                   >Sí</label
                                 >
                               </div>
-                              <div class="form-check form-check-inline">
-                                <input
-                                  class="form-check-input"
-                                  type="radio"
-                                  name="rutina_dormir"
-                                  id="rutina_no"
-                                  value="no"
-                                  checked
-                                />
-                                <label class="form-check-label" for="rutina_no"
+
+                              <div class="custom-control custom-radio">
+                                <input type="radio" class="custom-control-input"
+                                id="rutina_no" name="rutina_dormir" value="no"
+                                {% if datos_examen.rutina_dormir == "no" %}checked{% endif %} />
+                                <label
+                                  class="custom-control-label"
+                                  for="rutina_no"
                                   >No</label
                                 >
                               </div>
@@ -513,1402 +473,1095 @@
                       </div>
 
                       <!-- Sección: Horario laboral/académico -->
-                      <div class="col-md-12 mb-4">
-                        <div class="card">
-                          <div class="card-header">
-                            <h5 class="mb-0">Horario laboral/académico</h5>
-                          </div>
-                          <div class="card-body">
-                            <div class="form-group">
-                              <label class="form-control-label"
-                                >Tipo de jornada (Lunes a Viernes)</label
-                              >
-                              <div class="d-flex flex-wrap">
-                                <div class="form-check mr-3 mb-2">
-                                  <input
-                                    class="form-check-input"
-                                    type="checkbox"
-                                    name="jornada_laboral"
-                                    id="jornada_laboral"
-                                    value="Diurna"
-                                  />
-                                  <label
-                                    class="form-check-label"
-                                    for="jornada_laboral"
-                                    >Diurna</label
-                                  >
-                                </div>
-                                <div class="form-check mr-3 mb-2">
-                                  <input
-                                    class="form-check-input"
-                                    type="checkbox"
-                                    name="jornada_laboral"
-                                    id="jornada_laboral"
-                                    value="Nocturna"
-                                  />
-                                  <label
-                                    class="form-check-label"
-                                    for="jornada_laboral_nocturna"
-                                    >Nocturna</label
-                                  >
-                                </div>
-                                <div class="form-check mr-3 mb-2">
-                                  <input
-                                    class="form-check-input"
-                                    type="checkbox"
-                                    name="jornada_laboral"
-                                    id="jornada_laboral"
-                                    value="Mixta"
-                                  />
-                                  <label
-                                    class="form-check-label"
-                                    for="jornada_laboral"
-                                    >Mixta</label
-                                  >
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      <div class="col-md-12 mb-4">
-                        <div class="card">
-                          <div class="card-header">
-                            <h5 class="mb-0">Horario laboral/académico</h5>
-                          </div>
-                          <div class="card-body">
-                            <div class="form-group">
-                              <label class="form-control-label"
-                                >Tipo de jornada (fines de semana)</label
-                              >
-                              <div class="d-flex flex-wrap">
-                                <div class="form-check mr-3 mb-2">
-                                  <input
-                                    class="form-check-input"
-                                    type="checkbox"
-                                    name="jornada_fds[]"
-                                    id="jornada_diurna"
-                                    value="Diurna"
-                                  />
-                                  <label
-                                    class="form-check-label"
-                                    for="jornada_diurna"
-                                    >Diurna</label
-                                  >
-                                </div>
-                                <div class="form-check mr-3 mb-2">
-                                  <input
-                                    class="form-check-input"
-                                    type="checkbox"
-                                    name="jornada_fds[]"
-                                    id="jornada_nocturna"
-                                    value="Nocturna"
-                                  />
-                                  <label
-                                    class="form-check-label"
-                                    for="jornada_nocturna"
-                                    >Nocturna</label
-                                  >
-                                </div>
-                                <div class="form-check mr-3 mb-2">
-                                  <input
-                                    class="form-check-input"
-                                    type="checkbox"
-                                    name="jornada_fds[]"
-                                    id="jornada_mixta"
-                                    value="Mixta"
-                                  />
-                                  <label
-                                    class="form-check-label"
-                                    for="jornada_mixta"
-                                    >Mixta</label
-                                  >
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
+                      <!-- Sección: Horario laboral/académico -->
+                     <!-- Sección: Horario laboral/académico -->
+<div class="col-md-12 mb-4">
+  <div class="card">
+    <div class="card-header">
+      <h5 class="mb-0">Horario laboral/académico</h5>
+    </div>
+    <div class="card-body">
+      <div class="form-group">
+        <label class="form-control-label">Tipo de jornada (Lunes a Viernes)</label>
+        <div class="d-flex flex-wrap">
+          <div class="form-check mr-3 mb-2">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              name="jornada_laboral[]"
+              id="jornada_laboral_diurna"
+              value="Diurna"
+              {% if 'Diurna' in datos_examen.jornada_laboral %}checked{% endif %}
+            />
+            <label class="form-check-label" for="jornada_laboral_diurna">Diurna</label>
+          </div>
+          <div class="form-check mr-3 mb-2">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              name="jornada_laboral[]"
+              id="jornada_laboral_nocturna"
+              value="Nocturna"
+              {% if 'Nocturna' in datos_examen.jornada_laboral %}checked{% endif %}
+            />
+            <label class="form-check-label" for="jornada_laboral_nocturna">Nocturna</label>
+          </div>
+          <div class="form-check mr-3 mb-2">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              name="jornada_laboral[]"
+              id="jornada_laboral_mixta"
+              value="Mixta"
+              {% if 'Mixta' in datos_examen.jornada_laboral %}checked{% endif %}
+            />
+            <label class="form-check-label" for="jornada_laboral_mixta">Mixta</label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="col-md-12 mb-4">
+  <div class="card">
+    <div class="card-header">
+      <h5 class="mb-0">Horario fines de semana</h5>
+    </div>
+    <div class="card-body">
+      <div class="form-group">
+        <label class="form-control-label">Tipo de jornada (fines de semana)</label>
+        <div class="d-flex flex-wrap">
+          <div class="form-check mr-3 mb-2">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              name="jornada_fds[]"
+              id="jornada_fds_diurna"
+              value="Diurna"
+              {% if 'Diurna' in datos_examen.jornada_fds %}checked{% endif %}
+            />
+            <label class="form-check-label" for="jornada_fds_diurna">Diurna</label>
+          </div>
+          <div class="form-check mr-3 mb-2">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              name="jornada_fds[]"
+              id="jornada_fds_nocturna"
+              value="Nocturna"
+              {% if 'Nocturna' in datos_examen.jornada_fds %}checked{% endif %}
+            />
+            <label class="form-check-label" for="jornada_fds_nocturna">Nocturna</label>
+          </div>
+          <div class="form-check mr-3 mb-2">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              name="jornada_fds[]"
+              id="jornada_fds_mixta"
+              value="Mixta"
+              {% if 'Mixta' in datos_examen.jornada_fds %}checked{% endif %}
+            />
+            <label class="form-check-label" for="jornada_fds_mixta">Mixta</label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
                       <!-- Sección: Hábitos de sueño (organizada por periodos) -->
-                      <div class="col-md-12">
-                        <div class="card">
-                          <div class="card-header">
-                            <h5 class="mb-0">Hábitos de sueño</h5>
-                          </div>
-                          <div class="card-body">
-                            <!-- Pestañas para diferentes periodos -->
-                            <ul
-                              class="nav nav-tabs"
-                              id="sueñoTabs"
-                              role="tablist"
-                            >
-                              <li class="nav-item">
-                                <a
-                                  class="nav-link active"
-                                  id="laboral-tab"
-                                  data-toggle="tab"
-                                  href="#laboral"
-                                  role="tab"
-                                  >Días laborales</a
-                                >
-                              </li>
-                              <li class="nav-item">
-                                <a
-                                  class="nav-link"
-                                  id="fines-tab"
-                                  data-toggle="tab"
-                                  href="#fines"
-                                  role="tab"
-                                  >Fines de semana</a
-                                >
-                              </li>
-                              <li class="nav-item">
-                                <a
-                                  class="nav-link"
-                                  id="vacaciones-tab"
-                                  data-toggle="tab"
-                                  href="#vacaciones"
-                                  role="tab"
-                                  >Vacaciones</a
-                                >
-                              </li>
-                            </ul>
+                      <!-- Sección: Hábitos de sueño (organizada por periodos) -->
+<div class="col-md-12">
+  <div class="card">
+    <div class="card-header">
+      <h5 class="mb-0">Hábitos de sueño</h5>
+    </div>
+    <div class="card-body">
+      <!-- Pestañas para diferentes periodos -->
+      <ul class="nav nav-tabs" id="sueñoTabs" role="tablist">
+        <li class="nav-item">
+          <a class="nav-link active" id="laboral-tab" data-toggle="tab" href="#laboral" role="tab">Días laborales</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" id="fines-tab" data-toggle="tab" href="#fines" role="tab">Fines de semana</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" id="vacaciones-tab" data-toggle="tab" href="#vacaciones" role="tab">Vacaciones</a>
+        </li>
+      </ul>
 
-                            <div class="tab-content" id="sueñoTabsContent">
-                              <!-- Días laborales -->
-                              <div
-                                class="tab-pane fade show active"
-                                id="laboral"
-                                role="tabpanel"
-                              >
-                                <div class="row mt-3">
-                                  <div class="col-md-6">
-                                    <div class="form-group">
-                                      <label class="form-control-label"
-                                        >Hora aproximada de acostarse</label
-                                      >
-                                      <input
-                                        type="time"
-                                        class="form-control"
-                                        name="hora_acostarse_laboral"
-                                      />
-                                    </div>
-                                  </div>
-                                  <div class="col-md-6">
-                                    <div class="form-group">
-                                      <label class="form-control-label"
-                                        >Tiempo para quedarse dormido
-                                        (minutos)</label
-                                      >
-                                      <input
-                                        type="number"
-                                        class="form-control"
-                                        name="tiempo_dormirse_laboral"
-                                      />
-                                    </div>
-                                  </div>
-                                </div>
+      <div class="tab-content" id="sueñoTabsContent">
+        <!-- Días laborales -->
+        <div class="tab-pane fade show active" id="laboral" role="tabpanel">
+          <div class="row mt-3">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="form-control-label">Hora aproximada de acostarse</label>
+                <input
+                  type="time"
+                  class="form-control"
+                  name="hora_acostarse_laboral"
+                  value="{{ datos_examen.hora_acostarse_laboral|default:'' }}"
+                />
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="form-control-label">Tiempo para quedarse dormido (minutos)</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  name="tiempo_dormirse_laboral"
+                  value="{{ datos_examen.tiempo_dormirse_laboral|default:'' }}"
+                />
+              </div>
+            </div>
+          </div>
 
-                                <div class="row">
-                                  <div class="col-md-6">
-                                    <div class="form-group">
-                                      <label class="form-control-label"
-                                        >Hora de intención de dormir</label
-                                      >
-                                      <input
-                                        type="time"
-                                        class="form-control"
-                                        name="hora_intencion_dormir_laboral"
-                                      />
-                                    </div>
-                                  </div>
-                                  <div class="col-md-6">
-                                    <div class="form-group">
-                                      <label class="form-control-label"
-                                        >Hora aproximada de despertarse</label
-                                      >
-                                      <input
-                                        type="time"
-                                        class="form-control"
-                                        name="hora_despertar_laboral"
-                                      />
-                                    </div>
-                                  </div>
-                                </div>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="form-control-label">Hora de intención de dormir</label>
+                <input
+                  type="time"
+                  class="form-control"
+                  name="hora_intencion_dormir_laboral"
+                  value="{{ datos_examen.hora_intencion_dormir_laboral|default:'' }}"
+                />
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="form-control-label">Hora aproximada de despertarse</label>
+                <input
+                  type="time"
+                  class="form-control"
+                  name="hora_despertar_laboral"
+                  value="{{ datos_examen.hora_despertar_laboral|default:'' }}"
+                />
+              </div>
+            </div>
+          </div>
 
-                                <div class="form-group">
-                                  <label class="form-control-label"
-                                    >Tiempo para salir de la cama
-                                    (minutos)</label
-                                  >
-                                  <input
-                                    type="number"
-                                    class="form-control"
-                                    name="tiempo_salir_cama_laboral"
-                                  />
-                                </div>
+          <div class="form-group">
+            <label class="form-control-label">Tiempo para salir de la cama (minutos)</label>
+            <input
+              type="number"
+              class="form-control"
+              name="tiempo_salir_cama_laboral"
+              value="{{ datos_examen.tiempo_salir_cama_laboral|default:'' }}"
+            />
+          </div>
 
-                                <div class="row">
-                                  <div class="col-md-4">
-                                    <div class="form-group">
-                                      <label class="form-control-label"
-                                        >¿El sueño es reparador?</label
-                                      >
-                                      <select
-                                        class="form-control"
-                                        name="sueno_reparador_laboral"
-                                      >
-                                        <option value="">Seleccione...</option>
-                                        <option value="Si">Sí</option>
-                                        <option value="No">No</option>
-                                      </select>
-                                    </div>
-                                  </div>
-                                  <div class="col-md-4">
-                                    <div class="form-group">
-                                      <label class="form-control-label"
-                                        >¿Tiene compañero(a) de cama?</label
-                                      >
-                                      <select
-                                        class="form-control"
-                                        name="companero_cama_laboral"
-                                      >
-                                        <option value="">Seleccione...</option>
-                                        <option value="Si">Sí</option>
-                                        <option value="No">No</option>
-                                      </select>
-                                    </div>
-                                  </div>
-                                  <div class="col-md-4">
-                                    <div class="form-group">
-                                      <label class="form-control-label"
-                                        >¿Necesita despertador?</label
-                                      >
-                                      <select
-                                        class="form-control"
-                                        name="despertador_laboral"
-                                      >
-                                        <option value="">Seleccione...</option>
-                                        <option value="Si">Sí</option>
-                                        <option value="No">No</option>
-                                      </select>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
+          <div class="row">
+            <div class="col-md-4">
+              <div class="form-group">
+                <label class="form-control-label">¿El sueño es reparador?</label>
+                <select class="form-control" name="sueno_reparador_laboral">
+                  <option value="">Seleccione...</option>
+                  <option value="Si" {% if datos_examen.sueno_reparador_laboral == "Si" %}selected{% endif %}>Sí</option>
+                  <option value="No" {% if datos_examen.sueno_reparador_laboral == "No" %}selected{% endif %}>No</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="form-group">
+                <label class="form-control-label">¿Tiene compañero(a) de cama?</label>
+                <select class="form-control" name="companero_cama_laboral">
+                  <option value="">Seleccione...</option>
+                  <option value="Si" {% if datos_examen.companero_cama_laboral == "Si" %}selected{% endif %}>Sí</option>
+                  <option value="No" {% if datos_examen.companero_cama_laboral == "No" %}selected{% endif %}>No</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="form-group">
+                <label class="form-control-label">¿Necesita despertador?</label>
+                <select class="form-control" name="despertador_laboral">
+                  <option value="">Seleccione...</option>
+                  <option value="Si" {% if datos_examen.despertador_laboral == "Si" %}selected{% endif %}>Sí</option>
+                  <option value="No" {% if datos_examen.despertador_laboral == "No" %}selected{% endif %}>No</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
 
-                              <!-- Fines de semana (estructura similar) -->
-                              <div
-                                class="tab-pane fade"
-                                id="fines"
-                                role="tabpanel"
-                              >
-                                <div class="row mt-3">
-                                  <div class="col-md-6">
-                                    <div class="form-group">
-                                      <label class="form-control-label"
-                                        >Hora aproximada de acostarse</label
-                                      >
-                                      <input
-                                        type="time"
-                                        class="form-control"
-                                        name="hora_acostarse_fds"
-                                      />
-                                    </div>
-                                  </div>
-                                  <div class="col-md-6">
-                                    <div class="form-group">
-                                      <label class="form-control-label"
-                                        >Tiempo para quedarse dormido
-                                        (minutos)</label
-                                      >
-                                      <input
-                                        type="number"
-                                        class="form-control"
-                                        name="tiempo_dormirse_fds"
-                                      />
-                                    </div>
-                                  </div>
-                                </div>
+        <!-- Fines de semana -->
+        <div class="tab-pane fade" id="fines" role="tabpanel">
+          <div class="row mt-3">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="form-control-label">Hora aproximada de acostarse</label>
+                <input
+                  type="time"
+                  class="form-control"
+                  name="hora_acostarse_fds"
+                  value="{{ datos_examen.hora_acostarse_fds|default:'' }}"
+                />
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="form-control-label">Tiempo para quedarse dormido (minutos)</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  name="tiempo_dormirse_fds"
+                  value="{{ datos_examen.tiempo_dormirse_fds|default:'' }}"
+                />
+              </div>
+            </div>
+          </div>
 
-                                <div class="row">
-                                  <div class="col-md-6">
-                                    <div class="form-group">
-                                      <label class="form-control-label"
-                                        >Hora de intención de dormir</label
-                                      >
-                                      <input
-                                        type="time"
-                                        class="form-control"
-                                        name="hora_intencion_dormir_fds"
-                                      />
-                                    </div>
-                                  </div>
-                                  <div class="col-md-6">
-                                    <div class="form-group">
-                                      <label class="form-control-label"
-                                        >Hora aproximada de despertarse</label
-                                      >
-                                      <input
-                                        type="time"
-                                        class="form-control"
-                                        name="hora_despertar_fds"
-                                      />
-                                    </div>
-                                  </div>
-                                </div>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="form-control-label">Hora de intención de dormir</label>
+                <input
+                  type="time"
+                  class="form-control"
+                  name="hora_intencion_dormir_fds"
+                  value="{{ datos_examen.hora_intencion_dormir_fds|default:'' }}"
+                />
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="form-control-label">Hora aproximada de despertarse</label>
+                <input
+                  type="time"
+                  class="form-control"
+                  name="hora_despertar_fds"
+                  value="{{ datos_examen.hora_despertar_fds|default:'' }}"
+                />
+              </div>
+            </div>
+          </div>
 
-                                <div class="form-group">
-                                  <label class="form-control-label"
-                                    >Tiempo para salir de la cama
-                                    (minutos)</label
-                                  >
-                                  <input
-                                    type="number"
-                                    class="form-control"
-                                    name="tiempo_salir_cama_fds"
-                                  />
-                                </div>
+          <div class="form-group">
+            <label class="form-control-label">Tiempo para salir de la cama (minutos)</label>
+            <input
+              type="number"
+              class="form-control"
+              name="tiempo_salir_cama_fds"
+              value="{{ datos_examen.tiempo_salir_cama_fds|default:'' }}"
+            />
+          </div>
 
-                                <div class="row">
-                                  <div class="col-md-4">
-                                    <div class="form-group">
-                                      <label class="form-control-label"
-                                        >¿El sueño es reparador?</label
-                                      >
-                                      <select
-                                        class="form-control"
-                                        name="sueno_reparador_fds"
-                                      >
-                                        <option value="">Seleccione...</option>
-                                        <option value="Si">Sí</option>
-                                        <option value="No">No</option>
-                                      </select>
-                                    </div>
-                                  </div>
-                                  <div class="col-md-4">
-                                    <div class="form-group">
-                                      <label class="form-control-label"
-                                        >¿Tiene compañero(a) de cama?</label
-                                      >
-                                      <select
-                                        class="form-control"
-                                        name="companero_cama_fds"
-                                      >
-                                        <option value="">Seleccione...</option>
-                                        <option value="Si">Sí</option>
-                                        <option value="No">No</option>
-                                      </select>
-                                    </div>
-                                  </div>
-                                  <div class="col-md-4">
-                                    <div class="form-group">
-                                      <label class="form-control-label"
-                                        >¿Necesita despertador?</label
-                                      >
-                                      <select
-                                        class="form-control"
-                                        name="despertador_fds"
-                                      >
-                                        <option value="">Seleccione...</option>
-                                        <option value="Si">Sí</option>
-                                        <option value="No">No</option>
-                                      </select>
-                                    </div>
-                                  </div>
-                                </div>
-                                <!-- Misma estructura que días laborales pero con nombres _fds -->
-                              </div>
+          <div class="row">
+            <div class="col-md-4">
+              <div class="form-group">
+                <label class="form-control-label">¿El sueño es reparador?</label>
+                <select class="form-control" name="sueno_reparador_fds">
+                  <option value="">Seleccione...</option>
+                  <option value="Si" {% if datos_examen.sueno_reparador_fds == "Si" %}selected{% endif %}>Sí</option>
+                  <option value="No" {% if datos_examen.sueno_reparador_fds == "No" %}selected{% endif %}>No</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="form-group">
+                <label class="form-control-label">¿Tiene compañero(a) de cama?</label>
+                <select class="form-control" name="companero_cama_fds">
+                  <option value="">Seleccione...</option>
+                  <option value="Si" {% if datos_examen.companero_cama_fds == "Si" %}selected{% endif %}>Sí</option>
+                  <option value="No" {% if datos_examen.companero_cama_fds == "No" %}selected{% endif %}>No</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="form-group">
+                <label class="form-control-label">¿Necesita despertador?</label>
+                <select class="form-control" name="despertador_fds">
+                  <option value="">Seleccione...</option>
+                  <option value="Si" {% if datos_examen.despertador_fds == "Si" %}selected{% endif %}>Sí</option>
+                  <option value="No" {% if datos_examen.despertador_fds == "No" %}selected{% endif %}>No</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
 
-                              <!-- Vacaciones (estructura similar) -->
-                              <div
-                                class="tab-pane fade"
-                                id="vacaciones"
-                                role="tabpanel"
-                              >
-                                <div class="row mt-3">
-                                  <div class="col-md-6">
-                                    <div class="form-group">
-                                      <label class="form-control-label"
-                                        >Hora aproximada de acostarse</label
-                                      >
-                                      <input
-                                        type="time"
-                                        class="form-control"
-                                        name="hora_acostarse_vacaciones"
-                                      />
-                                    </div>
-                                  </div>
-                                  <div class="col-md-6">
-                                    <div class="form-group">
-                                      <label class="form-control-label"
-                                        >Tiempo para quedarse dormido
-                                        (minutos)</label
-                                      >
-                                      <input
-                                        type="number"
-                                        class="form-control"
-                                        name="tiempo_dormirse_vacaciones"
-                                      />
-                                    </div>
-                                  </div>
-                                </div>
+        <!-- Vacaciones -->
+        <div class="tab-pane fade" id="vacaciones" role="tabpanel">
+          <div class="row mt-3">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="form-control-label">Hora aproximada de acostarse</label>
+                <input
+                  type="time"
+                  class="form-control"
+                  name="hora_acostarse_vacaciones"
+                  value="{{ datos_examen.hora_acostarse_vacaciones|default:'' }}"
+                />
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="form-control-label">Tiempo para quedarse dormido (minutos)</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  name="tiempo_dormirse_vacaciones"
+                  value="{{ datos_examen.tiempo_dormirse_vacaciones|default:'' }}"
+                />
+              </div>
+            </div>
+          </div>
 
-                                <div class="row">
-                                  <div class="col-md-6">
-                                    <div class="form-group">
-                                      <label class="form-control-label"
-                                        >Hora de intención de dormir</label
-                                      >
-                                      <input
-                                        type="time"
-                                        class="form-control"
-                                        name="hora_intencion_dormir_vacaciones"
-                                      />
-                                    </div>
-                                  </div>
-                                  <div class="col-md-6">
-                                    <div class="form-group">
-                                      <label class="form-control-label"
-                                        >Hora aproximada de despertarse</label
-                                      >
-                                      <input
-                                        type="time"
-                                        class="form-control"
-                                        name="hora_despertar_vacaciones"
-                                      />
-                                    </div>
-                                  </div>
-                                </div>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="form-control-label">Hora de intención de dormir</label>
+                <input
+                  type="time"
+                  class="form-control"
+                  name="hora_intencion_dormir_vacaciones"
+                  value="{{ datos_examen.hora_intencion_dormir_vacaciones|default:'' }}"
+                />
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="form-control-label">Hora aproximada de despertarse</label>
+                <input
+                  type="time"
+                  class="form-control"
+                  name="hora_despertar_vacaciones"
+                  value="{{ datos_examen.hora_despertar_vacaciones|default:'' }}"
+                />
+              </div>
+            </div>
+          </div>
 
-                                <div class="form-group">
-                                  <label class="form-control-label"
-                                    >Tiempo para salir de la cama
-                                    (minutos)</label
-                                  >
-                                  <input
-                                    type="number"
-                                    class="form-control"
-                                    name="tiempo_salir_cama_vacaciones"
-                                  />
-                                </div>
+          <div class="form-group">
+            <label class="form-control-label">Tiempo para salir de la cama (minutos)</label>
+            <input
+              type="number"
+              class="form-control"
+              name="tiempo_salir_cama_vacaciones"
+              value="{{ datos_examen.tiempo_salir_cama_vacaciones|default:'' }}"
+            />
+          </div>
 
-                                <div class="row">
-                                  <div class="col-md-4">
-                                    <div class="form-group">
-                                      <label class="form-control-label"
-                                        >¿El sueño es reparador?</label
-                                      >
-                                      <select
-                                        class="form-control"
-                                        name="sueno_reparador_vacaciones"
-                                      >
-                                        <option value="">Seleccione...</option>
-                                        <option value="Si">Sí</option>
-                                        <option value="No">No</option>
-                                      </select>
-                                    </div>
-                                  </div>
-                                  <div class="col-md-4">
-                                    <div class="form-group">
-                                      <label class="form-control-label"
-                                        >¿Tiene compañero(a) de cama?</label
-                                      >
-                                      <select
-                                        class="form-control"
-                                        name="companero_cama_vacaciones"
-                                      >
-                                        <option value="">Seleccione...</option>
-                                        <option value="Si">Sí</option>
-                                        <option value="No">No</option>
-                                      </select>
-                                    </div>
-                                  </div>
-                                  <div class="col-md-4">
-                                    <div class="form-group">
-                                      <label class="form-control-label"
-                                        >¿Necesita despertador?</label
-                                      >
-                                      <select
-                                        class="form-control"
-                                        name="despertador_vacaciones"
-                                      >
-                                        <option value="">Seleccione...</option>
-                                        <option value="Si">Sí</option>
-                                        <option value="No">No</option>
-                                      </select>
-                                    </div>
-                                  </div>
-                                </div>
-                                <!-- Misma estructura que días laborales pero con nombres _vacaciones -->
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
+          <div class="row">
+            <div class="col-md-4">
+              <div class="form-group">
+                <label class="form-control-label">¿El sueño es reparador?</label>
+                <select class="form-control" name="sueno_reparador_vacaciones">
+                  <option value="">Seleccione...</option>
+                  <option value="Si" {% if datos_examen.sueno_reparador_vacaciones == "Si" %}selected{% endif %}>Sí</option>
+                  <option value="No" {% if datos_examen.sueno_reparador_vacaciones == "No" %}selected{% endif %}>No</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="form-group">
+                <label class="form-control-label">¿Tiene compañero(a) de cama?</label>
+                <select class="form-control" name="companero_cama_vacaciones">
+                  <option value="">Seleccione...</option>
+                  <option value="Si" {% if datos_examen.companero_cama_vacaciones == "Si" %}selected{% endif %}>Sí</option>
+                  <option value="No" {% if datos_examen.companero_cama_vacaciones == "No" %}selected{% endif %}>No</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="form-group">
+                <label class="form-control-label">¿Necesita despertador?</label>
+                <select class="form-control" name="despertador_vacaciones">
+                  <option value="">Seleccione...</option>
+                  <option value="Si" {% if datos_examen.despertador_vacaciones == "Si" %}selected{% endif %}>Sí</option>
+                  <option value="No" {% if datos_examen.despertador_vacaciones == "No" %}selected{% endif %}>No</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
                     </div>
                   </div>
                 </div>
               </div>
               <!-- higiene del sueno -->
               <div class="tab-pane fade" id="Higiene" role="tabpanel">
-                <div class="card bg-gradient-default shadow-sm mb-4">
-                  <div class="card-header bg-transparent">
-                    <h4 class="text-white mb-0">Higiene de sueño</h4>
+  <div class="card bg-gradient-default shadow-sm mb-4">
+    <div class="card-header bg-transparent">
+      <h4 class="text-white mb-0">Higiene de sueño</h4>
+    </div>
+    <div class="card-body bg-white">
+      <div class="row">
+        <div class="col">
+          <div class="card">
+            <div class="card-header border-0">
+              <h3 class="mb-0">Higiene de sueño</h3>
+            </div>
+            <div class="card-body">
+              <!-- SECCIÓN 1: HÁBITOS DE SIESTA -->
+              <div class="mb-4 border-bottom pb-3">
+                <h4 class="mb-3">Hábitos de siesta</h4>
+
+                <div class="form-group">
+                  <label>¿Realiza siestas durante el día?</label>
+                  <div class="custom-control custom-radio">
+                    <input
+                      type="radio"
+                      class="custom-control-input"
+                      id="siestas_si"
+                      name="realiza_siestas"
+                      value="Si"
+                      {% if datos_examen.realiza_siestas == "Si" %}checked{% endif %}
+                    />
+                    <label class="custom-control-label" for="siestas_si">Sí</label>
                   </div>
-                  <div class="card-body bg-white">
-                    <div class="row">
-                      <div class="col">
-                        <div class="card">
-                          <div class="card-header border-0">
-                            <h3 class="mb-0">Higiene de sueño</h3>
-                          </div>
-                          <div class="card-body">
-                            <!-- SECCIÓN 1: HÁBITOS DE SIESTA -->
-                            <div class="mb-4 border-bottom pb-3">
-                              <h4 class="mb-3">Hábitos de siesta</h4>
+                  <div class="custom-control custom-radio">
+                    <input
+                      type="radio"
+                      class="custom-control-input"
+                      id="siestas_no"
+                      name="realiza_siestas"
+                      value="No"
+                      {% if datos_examen.realiza_siestas == "No" %}checked{% endif %}
+                    />
+                    <label class="custom-control-label" for="siestas_no">No</label>
+                  </div>
+                </div>
 
-                              <div class="form-group">
-                                <label>¿Realiza siestas durante el día?</label>
-                                <div class="custom-control custom-radio">
-                                  <input
-                                    type="radio"
-                                    class="custom-control-input"
-                                    id="siestas_si"
-                                    name="realiza_siestas"
-                                    value="Si"
-                                  />
-                                  <label
-                                    class="custom-control-label"
-                                    for="siestas_si"
-                                    >Sí</label
-                                  >
-                                </div>
-                                <div class="custom-control custom-radio">
-                                  <input
-                                    type="radio"
-                                    class="custom-control-input"
-                                    id="siestas_no"
-                                    name="realiza_siestas"
-                                    value="No"
-                                  />
-                                  <label
-                                    class="custom-control-label"
-                                    for="siestas_no"
-                                    >No</label
-                                  >
-                                </div>
-                              </div>
+                <!-- Detalles de siestas -->
+                <div id="siestas-container" class="pl-4 mt-3" {% if datos_examen.realiza_siestas != "Si" %}style="display: none"{% endif %}>
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label for="numero_siestas">Número de siestas al día</label>
+                        <input
+                          type="number"
+                          class="form-control"
+                          id="numero_siestas"
+                          name="numero_siestas"
+                          value="{{ datos_examen.numero_siestas|default:'' }}"
+                        />
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label for="duracion_siestas">Duración aproximada (minutos)</label>
+                        <input
+                          type="number"
+                          class="form-control"
+                          id="duracion_siestas"
+                          name="duracion_siestas"
+                          value="{{ datos_examen.duracion_siestas|default:'' }}"
+                        />
+                      </div>
+                    </div>
+                  </div>
 
-                              <!-- Detalles de siestas (mostrar solo si selecciona "Sí") -->
-                              <div
-                                id="siestas-container"
-                                class="pl-4 mt-3"
-                                style="display: none"
-                              >
-                                <div class="row">
-                                  <div class="col-md-6">
-                                    <div class="form-group">
-                                      <label for="numero_siestas"
-                                        >Número de siestas al día</label
-                                      >
-                                      <input
-                                        type="number"
-                                        class="form-control"
-                                        id="numero_siestas"
-                                        name="numero_siestas"
-                                      />
-                                    </div>
-                                  </div>
-                                  <div class="col-md-6">
-                                    <div class="form-group">
-                                      <label for="duracion_siestas"
-                                        >Duración aproximada (minutos)</label
-                                      >
-                                      <input
-                                        type="number"
-                                        class="form-control"
-                                        id="duracion_siestas"
-                                        name="duracion_siestas"
-                                      />
-                                    </div>
-                                  </div>
-                                </div>
+                  <div class="form-group">
+                    <label>Frecuencia a la semana</label>
+                    <div class="ml-3">
+                      <div class="custom-control custom-radio">
+                        <input
+                          type="radio"
+                          class="custom-control-input"
+                          id="siesta_frecuencia_una"
+                          name="siesta_frecuencia"
+                          value="Una vez"
+                          {% if datos_examen.siesta_frecuencia == "Una vez" %}checked{% endif %}
+                        />
+                        <label class="custom-control-label" for="siesta_frecuencia_una">Una vez</label>
+                      </div>
+                      <div class="custom-control custom-radio">
+                        <input
+                          type="radio"
+                          class="custom-control-input"
+                          id="siesta_frecuencia_dos_tres"
+                          name="siesta_frecuencia"
+                          value="2-3 veces"
+                          {% if datos_examen.siesta_frecuencia == "2-3 veces" %}checked{% endif %}
+                        />
+                        <label class="custom-control-label" for="siesta_frecuencia_dos_tres">2-3 veces</label>
+                      </div>
+                      <div class="custom-control custom-radio">
+                        <input
+                          type="radio"
+                          class="custom-control-input"
+                          id="siesta_frecuencia_cuatro_cinco"
+                          name="siesta_frecuencia"
+                          value="4-5 veces"
+                          {% if datos_examen.siesta_frecuencia == "4-5 veces" %}checked{% endif %}
+                        />
+                        <label class="custom-control-label" for="siesta_frecuencia_cuatro_cinco">4-5 veces</label>
+                      </div>
+                      <div class="custom-control custom-radio">
+                        <input
+                          type="radio"
+                          class="custom-control-input"
+                          id="siesta_frecuencia_mas_cinco"
+                          name="siesta_frecuencia"
+                          value="> 5 veces"
+                          {% if datos_examen.siesta_frecuencia == "> 5 veces" %}checked{% endif %}
+                        />
+                        <label class="custom-control-label" for="siesta_frecuencia_mas_cinco">Más de 5 veces</label>
+                      </div>
+                    </div>
+                  </div>
 
-                                <div class="form-group">
-                                  <label>Frecuencia a la semana</label>
-                                  <div class="ml-3">
-                                    <div class="custom-control custom-radio">
-                                      <input
-                                        type="radio"
-                                        class="custom-control-input"
-                                        id="siesta_frecuencia_una"
-                                        name="siesta_frecuencia"
-                                        value="Una vez"
-                                      />
-                                      <label
-                                        class="custom-control-label"
-                                        for="siesta_frecuencia_una"
-                                        >Una vez</label
-                                      >
-                                    </div>
-                                    <div class="custom-control custom-radio">
-                                      <input
-                                        type="radio"
-                                        class="custom-control-input"
-                                        id="siesta_frecuencia_dos_tres"
-                                        name="siesta_frecuencia"
-                                        value="2-3 veces"
-                                      />
-                                      <label
-                                        class="custom-control-label"
-                                        for="siesta_frecuencia_dos_tres"
-                                        >2-3 veces</label
-                                      >
-                                    </div>
-                                    <div class="custom-control custom-radio">
-                                      <input
-                                        type="radio"
-                                        class="custom-control-input"
-                                        id="siesta_frecuencia_cuatro_cinco"
-                                        name="siesta_frecuencia"
-                                        value="4-5 veces"
-                                      />
-                                      <label
-                                        class="custom-control-label"
-                                        for="siesta_frecuencia_cuatro_cinco"
-                                        >4-5 veces</label
-                                      >
-                                    </div>
-                                    <div class="custom-control custom-radio">
-                                      <input
-                                        type="radio"
-                                        class="custom-control-input"
-                                        id="siesta_frecuencia_mas_cinco"
-                                        name="siesta_frecuencia"
-                                        value="> 5 veces"
-                                      />
-                                      <label
-                                        class="custom-control-label"
-                                        for="siesta_frecuencia_mas_cinco"
-                                        >Más de 5 veces</label
-                                      >
-                                    </div>
-                                  </div>
-                                </div>
+                  <div class="form-group">
+                    <label>Momento del día en que realiza siestas</label>
+                    <div class="custom-control custom-checkbox">
+                      <input
+                        type="checkbox"
+                        class="custom-control-input"
+                        id="manana"
+                        name="momento_dia[]"
+                        value="Mañana"
+                        {% if 'Mañana' in datos_examen.periodo_siestas %}checked{% endif %}
+                      />
+                      <label class="custom-control-label" for="manana">Mañana</label>
+                    </div>
+                    <div class="custom-control custom-checkbox">
+                      <input
+                        type="checkbox"
+                        class="custom-control-input"
+                        id="tarde"
+                        name="momento_dia[]"
+                        value="Tarde"
+                        {% if 'Tarde' in datos_examen.periodo_siestas %}checked{% endif %}
+                      />
+                      <label class="custom-control-label" for="tarde">Tarde</label>
+                    </div>
+                    <div class="custom-control custom-checkbox">
+                      <input
+                        type="checkbox"
+                        class="custom-control-input"
+                        id="noche"
+                        name="momento_dia[]"
+                        value="Noche"
+                        {% if 'Noche' in datos_examen.periodo_siestas %}checked{% endif %}
+                      />
+                      <label class="custom-control-label" for="noche">Noche</label>
+                    </div>
+                    <div class="custom-control custom-checkbox">
+                      <input
+                        type="checkbox"
+                        class="custom-control-input"
+                        id="variable"
+                        name="momento_dia[]"
+                        value="Variable"
+                        {% if 'Variable' in datos_examen.periodo_siestas %}checked{% endif %}
+                      />
+                      <label class="custom-control-label" for="variable">Variable</label>
+                    </div>
+                  </div>
 
-                                <div class="form-group">
-                                  <label
-                                    >Momento del día en que realiza
-                                    siestas</label
-                                  >
-                                  <div class="custom-control custom-checkbox">
-                                    <input
-                                      type="checkbox"
-                                      class="custom-control-input"
-                                      id="manana"
-                                      name="momento_dia"
-                                      value="Mañana"
-                                    />
-                                    <label
-                                      class="custom-control-label"
-                                      for="manana"
-                                      >Mañana</label
-                                    >
-                                  </div>
-                                  <div class="custom-control custom-checkbox">
-                                    <input
-                                      type="checkbox"
-                                      class="custom-control-input"
-                                      id="tarde"
-                                      name="momento_dia"
-                                      value="Tarde"
-                                    />
-                                    <label
-                                      class="custom-control-label"
-                                      for="tarde"
-                                      >Tarde</label
-                                    >
-                                  </div>
-                                  <div class="custom-control custom-checkbox">
-                                    <input
-                                      type="checkbox"
-                                      class="custom-control-input"
-                                      id="noche"
-                                      name="momento_dia"
-                                      value="Noche"
-                                    />
-                                    <label
-                                      class="custom-control-label"
-                                      for="noche"
-                                      >Noche</label
-                                    >
-                                  </div>
-                                  <div class="custom-control custom-checkbox">
-                                    <input
-                                      type="checkbox"
-                                      class="custom-control-input"
-                                      id="variable"
-                                      name="momento_dia"
-                                      value="Variable"
-                                    />
-                                    <label
-                                      class="custom-control-label"
-                                      for="variable"
-                                      >Variable</label
-                                    >
-                                  </div>
-                                </div>
+                  <div class="form-group">
+                    <label>¿La siesta es reparadora?</label>
+                    <div class="custom-control custom-radio">
+                      <input
+                        type="radio"
+                        class="custom-control-input"
+                        id="siesta_reparadora_si"
+                        name="siesta_reparadora"
+                        value="Si"
+                        {% if datos_examen.siesta_reparadora == "Si" %}checked{% endif %}
+                      />
+                      <label class="custom-control-label" for="siesta_reparadora_si">Sí</label>
+                    </div>
+                    <div class="custom-control custom-radio">
+                      <input
+                        type="radio"
+                        class="custom-control-input"
+                        id="siesta_reparadora_no"
+                        name="siesta_reparadora"
+                        value="No"
+                        {% if datos_examen.siesta_reparadora == "No" %}checked{% endif %}
+                      />
+                      <label class="custom-control-label" for="siesta_reparadora_no">No</label>
+                    </div>
+                  </div>
 
-                                <div class="form-group">
-                                  <label>¿La siesta es reparadora?</label>
-                                  <div class="custom-control custom-radio">
-                                    <input
-                                      type="radio"
-                                      class="custom-control-input"
-                                      id="siesta_reparadora_si"
-                                      name="siesta_reparadora"
-                                      value="Si"
-                                    />
-                                    <label
-                                      class="custom-control-label"
-                                      for="siesta_reparadora_si"
-                                      >Sí</label
-                                    >
-                                  </div>
-                                  <div class="custom-control custom-radio">
-                                    <input
-                                      type="radio"
-                                      class="custom-control-input"
-                                      id="siesta_reparadora_no"
-                                      name="siesta_reparadora"
-                                      value="No"
-                                    />
-                                    <label
-                                      class="custom-control-label"
-                                      for="siesta_reparadora_no"
-                                      >No</label
-                                    >
-                                  </div>
-                                </div>
+                  <div class="form-group">
+                    <label>Periodo en el que realiza las siestas</label>
+                    <select class="form-control" name="periodo_siestas">
+                      <option value="">Seleccione...</option>
+                      <option value="Jornada laboral / académica" {% if datos_examen.periodo_siestas == "Jornada laboral / académica" %}selected{% endif %}>
+                        Jornada laboral / académica
+                      </option>
+                      <option value="Fines de Semana" {% if datos_examen.periodo_siestas == "Fines de Semana" %}selected{% endif %}>
+                        Fines de Semana
+                      </option>
+                      <option value="Vacaciones" {% if datos_examen.periodo_siestas == "Vacaciones" %}selected{% endif %}>
+                        Vacaciones
+                      </option>
+                    </select>
+                  </div>
+                </div>
+              </div>
 
-                                <div class="form-group">
-                                  <label
-                                    >Periodo en el que realiza las
-                                    siestas</label
-                                  >
-                                  <select
-                                    class="form-control"
-                                    name="periodo_siestas"
-                                  >
-                                    <option value="Jornada laboral / académica">
-                                      Jornada laboral / académica
-                                    </option>
-                                    <option value="Fines de Semana">
-                                      Fines de Semana
-                                    </option>
-                                    <option value="Vacaciones">
-                                      Vacaciones
-                                    </option>
-                                  </select>
-                                </div>
-                              </div>
-                            </div>
+              <!-- SECCIÓN 2: ENTORNO DE DESCANSO -->
+              <div class="mb-4 border-bottom pb-3">
+                <h4 class="mb-3">Entorno de descanso</h4>
+                <div class="row">
+                  <div class="col-md-4">
+                    <div class="form-group">
+                      <label>Condiciones de iluminación</label>
+                      <div class="custom-control custom-radio">
+                        <input
+                          type="radio"
+                          class="custom-control-input"
+                          id="muy_iluminado"
+                          name="iluminacion"
+                          value="Muy iluminado"
+                          {% if datos_examen.iluminacion == "Muy iluminado" %}checked{% endif %}
+                        />
+                        <label class="custom-control-label" for="muy_iluminado">Muy iluminado</label>
+                      </div>
+                      <div class="custom-control custom-radio">
+                        <input
+                          type="radio"
+                          class="custom-control-input"
+                          id="levemente_iluminado"
+                          name="iluminacion"
+                          value="Levemente iluminado"
+                          {% if datos_examen.iluminacion == "Levemente iluminado" %}checked{% endif %}
+                        />
+                        <label class="custom-control-label" for="levemente_iluminado">Levemente iluminado</label>
+                      </div>
+                      <div class="custom-control custom-radio">
+                        <input
+                          type="radio"
+                          class="custom-control-input"
+                          id="levemente_oscuro"
+                          name="iluminacion"
+                          value="Levemente oscuro"
+                          {% if datos_examen.iluminacion == "Levemente oscuro" %}checked{% endif %}
+                        />
+                        <label class="custom-control-label" for="levemente_oscuro">Levemente oscuro</label>
+                      </div>
+                      <div class="custom-control custom-radio">
+                        <input
+                          type="radio"
+                          class="custom-control-input"
+                          id="muy_oscuro"
+                          name="iluminacion"
+                          value="Muy oscuro"
+                          {% if datos_examen.iluminacion == "Muy oscuro" %}checked{% endif %}
+                        />
+                        <label class="custom-control-label" for="muy_oscuro">Muy oscuro</label>
+                      </div>
+                    </div>
+                  </div>
 
-                            <!-- SECCIÓN 2: ENTORNO DE DESCANSO -->
-                            <div class="mb-4 border-bottom pb-3">
-                              <h4 class="mb-3">Entorno de descanso</h4>
-                              <div class="row">
-                                <div class="form-group">
-                                  <label>Condiciones de iluminación</label>
-                                  <div class="custom-control custom-radio">
-                                    <input
-                                      type="radio"
-                                      class="custom-control-input"
-                                      id="muy_iluminado"
-                                      name="iluminacion"
-                                      value="Muy iluminado"
-                                    />
-                                    <label
-                                      class="custom-control-label"
-                                      for="muy_iluminado"
-                                      >Muy iluminado</label
-                                    >
-                                  </div>
-                                  <div class="custom-control custom-radio">
-                                    <input
-                                      type="radio"
-                                      class="custom-control-input"
-                                      id="levemente_iluminado"
-                                      name="iluminacion"
-                                      value="Levemente iluminado"
-                                    />
-                                    <label
-                                      class="custom-control-label"
-                                      for="levemente_iluminado"
-                                      >Levemente iluminado</label
-                                    >
-                                  </div>
-                                  <div class="custom-control custom-radio">
-                                    <input
-                                      type="radio"
-                                      class="custom-control-input"
-                                      id="levemente_oscuro"
-                                      name="iluminacion"
-                                      value="Levemente oscuro"
-                                    />
-                                    <label
-                                      class="custom-control-label"
-                                      for="levemente_oscuro"
-                                      >Levemente oscuro</label
-                                    >
-                                  </div>
-                                  <div class="custom-control custom-radio">
-                                    <input
-                                      type="radio"
-                                      class="custom-control-input"
-                                      id="muy_oscuro"
-                                      name="iluminacion"
-                                      value="Muy oscuro"
-                                    />
-                                    <label
-                                      class="custom-control-label"
-                                      for="muy_oscuro"
-                                      >Muy oscuro</label
-                                    >
-                                  </div>
-                                </div>
+                  <div class="col-md-4">
+                    <div class="form-group">
+                      <label>Comodidad del espacio</label>
+                      <div class="custom-control custom-radio">
+                        <input
+                          type="radio"
+                          class="custom-control-input"
+                          id="muy_incomodo"
+                          name="comodidad"
+                          value="Muy incómodo"
+                          {% if datos_examen.comodidad == "Muy incómodo" %}checked{% endif %}
+                        />
+                        <label class="custom-control-label" for="muy_incomodo">Muy incómodo</label>
+                      </div>
+                      <div class="custom-control custom-radio">
+                        <input
+                          type="radio"
+                          class="custom-control-input"
+                          id="levemente_incomodo"
+                          name="comodidad"
+                          value="Levemente incómodo"
+                          {% if datos_examen.comodidad == "Levemente incómodo" %}checked{% endif %}
+                        />
+                        <label class="custom-control-label" for="levemente_incomodo">Levemente incómodo</label>
+                      </div>
+                      <div class="custom-control custom-radio">
+                        <input
+                          type="radio"
+                          class="custom-control-input"
+                          id="levemente_comodo"
+                          name="comodidad"
+                          value="Levemente cómodo"
+                          {% if datos_examen.comodidad == "Levemente cómodo" %}checked{% endif %}
+                        />
+                        <label class="custom-control-label" for="levemente_comodo">Levemente cómodo</label>
+                      </div>
+                      <div class="custom-control custom-radio">
+                        <input
+                          type="radio"
+                          class="custom-control-input"
+                          id="muy_comodo"
+                          name="comodidad"
+                          value="Muy cómodo"
+                          {% if datos_examen.comodidad == "Muy cómodo" %}checked{% endif %}
+                        />
+                        <label class="custom-control-label" for="muy_comodo">Muy cómodo</label>
+                      </div>
+                    </div>
+                  </div>
 
-                                <div class="form-group">
-                                  <label>Comodidad del espacio</label>
-                                  <div class="custom-control custom-radio">
-                                    <input
-                                      type="radio"
-                                      class="custom-control-input"
-                                      id="muy_incomodo"
-                                      name="comodidad"
-                                      value="Muy incómodo"
-                                    />
-                                    <label
-                                      class="custom-control-label"
-                                      for="muy_incomodo"
-                                      >Muy incómodo</label
-                                    >
-                                  </div>
-                                  <div class="custom-control custom-radio">
-                                    <input
-                                      type="radio"
-                                      class="custom-control-input"
-                                      id="levemente_incomodo"
-                                      name="comodidad"
-                                      value="Levemente incómodo"
-                                    />
-                                    <label
-                                      class="custom-control-label"
-                                      for="levemente_incomodo"
-                                      >Levemente incómodo</label
-                                    >
-                                  </div>
-                                  <div class="custom-control custom-radio">
-                                    <input
-                                      type="radio"
-                                      class="custom-control-input"
-                                      id="levemente_comodo"
-                                      name="comodidad"
-                                      value="Levemente cómodo"
-                                    />
-                                    <label
-                                      class="custom-control-label"
-                                      for="levemente_comodo"
-                                      >Levemente cómodo</label
-                                    >
-                                  </div>
-                                  <div class="custom-control custom-radio">
-                                    <input
-                                      type="radio"
-                                      class="custom-control-input"
-                                      id="muy_comodo"
-                                      name="comodidad"
-                                      value="Muy cómodo"
-                                    />
-                                    <label
-                                      class="custom-control-label"
-                                      for="muy_comodo"
-                                      >Muy cómodo</label
-                                    >
-                                  </div>
-                                </div>
-
-                                <div class="form-group">
-                                  <label>Condiciones de ruido</label>
-                                  <div class="custom-control custom-radio">
-                                    <input
-                                      type="radio"
-                                      class="custom-control-input"
-                                      id="muy_ruidoso"
-                                      name="ruido"
-                                      value="Muy ruidoso"
-                                    />
-                                    <label
-                                      class="custom-control-label"
-                                      for="muy_ruidoso"
-                                      >Muy ruidoso</label
-                                    >
-                                  </div>
-                                  <div class="custom-control custom-radio">
-                                    <input
-                                      type="radio"
-                                      class="custom-control-input"
-                                      id="levemente_ruidoso"
-                                      name="ruido"
-                                      value="Levemente ruidoso"
-                                    />
-                                    <label
-                                      class="custom-control-label"
-                                      for="levemente_ruidoso"
-                                      >Levemente ruidoso</label
-                                    >
-                                  </div>
-                                  <div class="custom-control custom-radio">
-                                    <input
-                                      type="radio"
-                                      class="custom-control-input"
-                                      id="levemente_silencioso"
-                                      name="ruido"
-                                      value="Levemente silencioso"
-                                    />
-                                    <label
-                                      class="custom-control-label"
-                                      for="levemente_silencioso"
-                                      >Levemente silencioso</label
-                                    >
-                                  </div>
-                                  <div class="custom-control custom-radio">
-                                    <input
-                                      type="radio"
-                                      class="custom-control-input"
-                                      id="muy_silencioso"
-                                      name="ruido"
-                                      value="Muy silencioso"
-                                    />
-                                    <label
-                                      class="custom-control-label"
-                                      for="muy_silencioso"
-                                      >Muy silencioso</label
-                                    >
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-
-                            <!-- SECCIÓN 3: HÁBITOS PREVIOS AL SUEÑO -->
-                            <div class="mb-4 border-bottom pb-3">
-                              <h4 class="mb-3">Hábitos previos al sueño</h4>
-
-                              <div class="form-group">
-                                <label class="form-label"
-                                  >¿Consume comidas o bebidas antes de
-                                  dormir?</label
-                                >
-                                <div class="custom-control custom-radio">
-                                  <input
-                                    type="radio"
-                                    class="custom-control-input"
-                                    id="consume-si"
-                                    name="consume"
-                                    value="si"
-                                  />
-                                  <label
-                                    class="custom-control-label"
-                                    for="consume-si"
-                                    >Sí</label
-                                  >
-                                </div>
-                                <div class="custom-control custom-radio">
-                                  <input
-                                    type="radio"
-                                    class="custom-control-input"
-                                    id="consume-no"
-                                    name="consume"
-                                    value="no"
-                                  />
-                                  <label
-                                    class="custom-control-label"
-                                    for="consume-no"
-                                    >No</label
-                                  >
-                                </div>
-                              </div>
-
-                              <div
-                                id="campos-comida-container"
-                                style="display: none"
-                              >
-                                <div id="contenedor-sustancias"></div>
-                                <button
-                                  type="button"
-                                  id="agregar-sustancia"
-                                  class="btn btn-primary mb-3"
-                                >
-                                  Agregar sustancia
-                                </button>
-                              </div>
-
-                              <div class="form-group mt-3">
-                                <label
-                                  >¿Utiliza pantallas cerca al horario de
-                                  dormir?</label
-                                >
-                                <div class="custom-control custom-radio">
-                                  <input
-                                    type="radio"
-                                    class="custom-control-input"
-                                    id="pantallas_si"
-                                    name="usa_pantallas"
-                                    value="Si"
-                                  />
-                                  <label
-                                    class="custom-control-label"
-                                    for="pantallas_si"
-                                    >Sí</label
-                                  >
-                                </div>
-                                <div class="custom-control custom-radio">
-                                  <input
-                                    type="radio"
-                                    class="custom-control-input"
-                                    id="pantallas_no"
-                                    name="usa_pantallas"
-                                    value="No"
-                                  />
-                                  <label
-                                    class="custom-control-label"
-                                    for="pantallas_no"
-                                    >No</label
-                                  >
-                                </div>
-                              </div>
-
-                              <div
-                                id="contenedor-pantallas"
-                                class="mt-3"
-                                style="display: none"
-                              >
-                                <button
-                                  id="agregar-pantalla"
-                                  type="button"
-                                  class="btn btn-primary"
-                                >
-                                  Agregar Pantalla
-                                </button>
-                              </div>
-                            </div>
-
-                            <!-- SECCIÓN 4: USO DE LA CAMA -->
-                            <div class="mb-4 border-bottom pb-3">
-                              <h4 class="mb-3">Uso de la cama</h4>
-
-                              <div class="form-group">
-                                <label
-                                  >¿Utiliza la cama para actividades diferentes
-                                  a dormir y relaciones sexuales?</label
-                                >
-                                <div class="custom-control custom-radio">
-                                  <input
-                                    type="radio"
-                                    class="custom-control-input"
-                                    id="cama_actividades_si"
-                                    name="cama_actividades"
-                                    value="Si"
-                                  />
-                                  <label
-                                    class="custom-control-label"
-                                    for="cama_actividades_si"
-                                    >Sí</label
-                                  >
-                                </div>
-                                <div class="custom-control custom-radio">
-                                  <input
-                                    type="radio"
-                                    class="custom-control-input"
-                                    id="cama_actividades_no"
-                                    name="cama_actividades"
-                                    value="No"
-                                  />
-                                  <label
-                                    class="custom-control-label"
-                                    for="cama_actividades_no"
-                                    >No</label
-                                  >
-                                </div>
-                              </div>
-
-                              <div
-                                id="contenedor-actividades"
-                                class="mt-3"
-                                style="display: none"
-                              >
-                                <button
-                                  id="agregar-actividad"
-                                  type="button"
-                                  class="btn btn-primary"
-                                >
-                                  Agregar Actividad
-                                </button>
-                              </div>
-                            </div>
-
-                            <!-- SECCIÓN 5: ACTIVIDAD FÍSICA Y MEDICAMENTOS -->
-                            <div class="mb-4">
-                              <h4 class="mb-3">
-                                Actividad física y medicamentos
-                              </h4>
-
-                              <div class="form-group">
-                                <label
-                                  >¿Realiza actividad física durante el
-                                  día?</label
-                                >
-                                <div class="custom-control custom-radio">
-                                  <input
-                                    type="radio"
-                                    class="custom-control-input"
-                                    id="actividad_fisica_si"
-                                    name="actividad_fisica"
-                                    value="Si"
-                                  />
-                                  <label
-                                    class="custom-control-label"
-                                    for="actividad_fisica_si"
-                                    >Sí</label
-                                  >
-                                </div>
-                                <div class="custom-control custom-radio">
-                                  <input
-                                    type="radio"
-                                    class="custom-control-input"
-                                    id="actividad_fisica_no"
-                                    name="actividad_fisica"
-                                    value="No"
-                                  />
-                                  <label
-                                    class="custom-control-label"
-                                    for="actividad_fisica_no"
-                                    >No</label
-                                  >
-                                </div>
-                              </div>
-
-                              <div
-                                id="contenedor-actividades-fisicas"
-                                class="mt-3"
-                                style="display: none"
-                              >
-                                <button
-                                  id="agregar-actividad-fisica"
-                                  type="button"
-                                  class="btn btn-primary"
-                                >
-                                  Agregar Actividad Física
-                                </button>
-                              </div>
-
-                              <div class="form-group mt-3">
-                                <label
-                                  >¿Consume algún medicamento u otro tipo de
-                                  sustancias?</label
-                                >
-                                <div class="custom-control custom-radio">
-                                  <input
-                                    type="radio"
-                                    class="custom-control-input"
-                                    id="consume_si"
-                                    name="consume_medicamento"
-                                    value="Si"
-                                  />
-                                  <label
-                                    class="custom-control-label"
-                                    for="consume_si"
-                                    >Sí</label
-                                  >
-                                </div>
-                                <div class="custom-control custom-radio">
-                                  <input
-                                    type="radio"
-                                    class="custom-control-input"
-                                    id="consume_no"
-                                    name="consume_medicamento"
-                                    value="No"
-                                  />
-                                  <label
-                                    class="custom-control-label"
-                                    for="consume_no"
-                                    >No</label
-                                  >
-                                </div>
-                              </div>
-
-                              <div
-                                id="contenedor-medicamentos"
-                                class="mt-3"
-                                style="display: none"
-                              >
-                                <button
-                                  id="agregar-medicamento"
-                                  class="btn btn-primary"
-                                >
-                                  Agregar Medicamento
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
+                  <div class="col-md-4">
+                    <div class="form-group">
+                      <label>Condiciones de ruido</label>
+                      <div class="custom-control custom-radio">
+                        <input
+                          type="radio"
+                          class="custom-control-input"
+                          id="muy_ruidoso"
+                          name="ruido"
+                          value="Muy ruidoso"
+                          {% if datos_examen.ruido == "Muy ruidoso" %}checked{% endif %}
+                        />
+                        <label class="custom-control-label" for="muy_ruidoso">Muy ruidoso</label>
+                      </div>
+                      <div class="custom-control custom-radio">
+                        <input
+                          type="radio"
+                          class="custom-control-input"
+                          id="levemente_ruidoso"
+                          name="ruido"
+                          value="Levemente ruidoso"
+                          {% if datos_examen.ruido == "Levemente ruidoso" %}checked{% endif %}
+                        />
+                        <label class="custom-control-label" for="levemente_ruidoso">Levemente ruidoso</label>
+                      </div>
+                      <div class="custom-control custom-radio">
+                        <input
+                          type="radio"
+                          class="custom-control-input"
+                          id="levemente_silencioso"
+                          name="ruido"
+                          value="Levemente silencioso"
+                          {% if datos_examen.ruido == "Levemente silencioso" %}checked{% endif %}
+                        />
+                        <label class="custom-control-label" for="levemente_silencioso">Levemente silencioso</label>
+                      </div>
+                      <div class="custom-control custom-radio">
+                        <input
+                          type="radio"
+                          class="custom-control-input"
+                          id="muy_silencioso"
+                          name="ruido"
+                          value="Muy silencioso"
+                          {% if datos_examen.ruido == "Muy silencioso" %}checked{% endif %}
+                        />
+                        <label class="custom-control-label" for="muy_silencioso">Muy silencioso</label>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
+
+              <!-- SECCIÓN 3: HÁBITOS PREVIOS AL SUEÑO -->
+              <div class="mb-4 border-bottom pb-3">
+                <h4 class="mb-3">Hábitos previos al sueño</h4>
+
+                <div class="form-group">
+                  <label class="form-label">¿Consume comidas o bebidas antes de dormir?</label>
+                  <div class="custom-control custom-radio">
+                    <input
+                      type="radio"
+                      class="custom-control-input"
+                      id="consume-si"
+                      name="consume"
+                      value="si"
+                      {% if datos_examen.consume == "si" %}checked{% endif %}
+                    />
+                    <label class="custom-control-label" for="consume-si">Sí</label>
+                  </div>
+                  <div class="custom-control custom-radio">
+                    <input
+                      type="radio"
+                      class="custom-control-input"
+                      id="consume-no"
+                      name="consume"
+                      value="no"
+                      {% if datos_examen.consume == "no" %}checked{% endif %}
+                    />
+                    <label class="custom-control-label" for="consume-no">No</label>
+                  </div>
+                </div>
+
+                <div id="campos-comida-container" {% if datos_examen.consume != "si" %}style="display: none"{% endif %}>
+                  <div id="contenedor-sustancias">
+                    <!-- Sustancias existentes se cargarán aquí via JavaScript -->
+                  </div>
+                  <button type="button" id="agregar-sustancia" class="btn btn-primary mb-3">
+                    Agregar sustancia
+                  </button>
+                </div>
+
+                <div class="form-group mt-3">
+                  <label>¿Utiliza pantallas cerca al horario de dormir?</label>
+                  <div class="custom-control custom-radio">
+                    <input
+                      type="radio"
+                      class="custom-control-input"
+                      id="pantallas_si"
+                      name="usa_pantallas"
+                      value="Si"
+                      {% if datos_examen.usa_pantallas == "Si" %}checked{% endif %}
+                    />
+                    <label class="custom-control-label" for="pantallas_si">Sí</label>
+                  </div>
+                  <div class="custom-control custom-radio">
+                    <input
+                      type="radio"
+                      class="custom-control-input"
+                      id="pantallas_no"
+                      name="usa_pantallas"
+                      value="No"
+                      {% if datos_examen.usa_pantallas == "No" %}checked{% endif %}
+                    />
+                    <label class="custom-control-label" for="pantallas_no">No</label>
+                  </div>
+                </div>
+
+                <div id="contenedor-pantallas" class="mt-3" {% if datos_examen.usa_pantallas != "Si" %}style="display: none"{% endif %}>
+                  <!-- Pantallas existentes se cargarán aquí via JavaScript -->
+                  <button id="agregar-pantalla" type="button" class="btn btn-primary">
+                    Agregar Pantalla
+                  </button>
+                </div>
+              </div>
+
+              <!-- SECCIÓN 4: USO DE LA CAMA -->
+              <div class="mb-4 border-bottom pb-3">
+                <h4 class="mb-3">Uso de la cama</h4>
+
+                <div class="form-group">
+                  <label>¿Utiliza la cama para actividades diferentes a dormir y relaciones sexuales?</label>
+                  <div class="custom-control custom-radio">
+                    <input
+                      type="radio"
+                      class="custom-control-input"
+                      id="cama_actividades_si"
+                      name="cama_actividades"
+                      value="Si"
+                      {% if datos_examen.cama_actividades == "Si" %}checked{% endif %}
+                    />
+                    <label class="custom-control-label" for="cama_actividades_si">Sí</label>
+                  </div>
+                  <div class="custom-control custom-radio">
+                    <input
+                      type="radio"
+                      class="custom-control-input"
+                      id="cama_actividades_no"
+                      name="cama_actividades"
+                      value="No"
+                      {% if datos_examen.cama_actividades == "No" %}checked{% endif %}
+                    />
+                    <label class="custom-control-label" for="cama_actividades_no">No</label>
+                  </div>
+                </div>
+
+                <div id="contenedor-actividades" class="mt-3" {% if datos_examen.cama_actividades != "Si" %}style="display: none"{% endif %}>
+                  <!-- Actividades existentes se cargarán aquí via JavaScript -->
+                  <button id="agregar-actividad" type="button" class="btn btn-primary">
+                    Agregar Actividad
+                  </button>
+                </div>
+              </div>
+
+              <!-- SECCIÓN 5: ACTIVIDAD FÍSICA Y MEDICAMENTOS -->
+              <div class="mb-4">
+                <h4 class="mb-3">Actividad física y medicamentos</h4>
+
+                <div class="form-group">
+                  <label>¿Realiza actividad física durante el día?</label>
+                  <div class="custom-control custom-radio">
+                    <input
+                      type="radio"
+                      class="custom-control-input"
+                      id="actividad_fisica_si"
+                      name="actividad_fisica"
+                      value="Si"
+                      {% if datos_examen.actividad_fisica == "Si" %}checked{% endif %}
+                    />
+                    <label class="custom-control-label" for="actividad_fisica_si">Sí</label>
+                  </div>
+                  <div class="custom-control custom-radio">
+                    <input
+                      type="radio"
+                      class="custom-control-input"
+                      id="actividad_fisica_no"
+                      name="actividad_fisica"
+                      value="No"
+                      {% if datos_examen.actividad_fisica == "No" %}checked{% endif %}
+                    />
+                    <label class="custom-control-label" for="actividad_fisica_no">No</label>
+                  </div>
+                </div>
+
+                <div id="contenedor-actividades-fisicas" class="mt-3" {% if datos_examen.actividad_fisica != "Si" %}style="display: none"{% endif %}>
+                  <!-- Actividades físicas existentes se cargarán aquí via JavaScript -->
+                  <button id="agregar-actividad-fisica" type="button" class="btn btn-primary">
+                    Agregar Actividad Física
+                  </button>
+                </div>
+
+                <div class="form-group mt-3">
+                  <label>¿Consume algún medicamento u otro tipo de sustancias?</label>
+                  <div class="custom-control custom-radio">
+                    <input
+                      type="radio"
+                      class="custom-control-input"
+                      id="consume_si"
+                      name="consume_medicamento"
+                      value="Si"
+                      {% if datos_examen.consume_medicamento == "Si" %}checked{% endif %}
+                    />
+                    <label class="custom-control-label" for="consume_si">Sí</label>
+                  </div>
+                  <div class="custom-control custom-radio">
+                    <input
+                      type="radio"
+                      class="custom-control-input"
+                      id="consume_no"
+                      name="consume_medicamento"
+                      value="No"
+                      {% if datos_examen.consume_medicamento == "No" %}checked{% endif %}
+                    />
+                    <label class="custom-control-label" for="consume_no">No</label>
+                  </div>
+                </div>
+
+                <div id="contenedor-medicamentos" class="mt-3" {% if datos_examen.consume_medicamento != "Si" %}style="display: none"{% endif %}>
+                  <!-- Medicamentos existentes se cargarán aquí via JavaScript -->
+                  <button id="agregar-medicamento" class="btn btn-primary">
+                    Agregar Medicamento
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
               <!-- pensamiento -->
               <div class="tab-pane fade" id="pensamiento" role="tabpanel">
-                <div class="card bg-gradient-default shadow-sm mb-4">
-                  <div class="card-header bg-transparent">
-                    <h4 class="text-white mb-0">Síntomas asociados al sueño</h4>
-                  </div>
-                  <div class="card-body bg-white">
-                    <div class="row">
-                      <div class="col">
-                        <div class="card">
-                          <div class="card-header border-0">
-                            <div class="row align-items-center">
-                              <div class="col">
-                                <h3 class="mb-0">
-                                  Síntomas asociados al sueño
-                                </h3>
-                              </div>
-                            </div>
-                          </div>
-                          <div class="card-body">
-                            <!-- Pregunta sobre síntomas asociados al sueño -->
-                            <div class="form-group">
-                              <label
-                                >¿Presenta algún síntoma diferente asociado al
-                                sueño?</label
-                              >
-                              <div class="custom-control custom-radio">
-                                <input
-                                  type="radio"
-                                  class="custom-control-input"
-                                  id="sintomas_sueno_si"
-                                  name="sintomas_sueno"
-                                  value="Si"
-                                />
-                                <label
-                                  class="custom-control-label"
-                                  for="sintomas_sueno_si"
-                                  >Sí</label
-                                >
-                              </div>
-                              <div class="custom-control custom-radio">
-                                <input
-                                  type="radio"
-                                  class="custom-control-input"
-                                  id="sintomas_sueno_no"
-                                  name="sintomas_sueno"
-                                  value="No"
-                                />
-                                <label
-                                  class="custom-control-label"
-                                  for="sintomas_sueno_no"
-                                  >No</label
-                                >
-                              </div>
-                            </div>
-
-                            <!-- Botón para agregar información sobre síntomas -->
-                            <button
-                              id="agregar-sintoma"
-                              type="button"
-                              class="btn btn-primary"
-                              style="display: none"
-                            >
-                              Agregar Síntoma
-                            </button>
-
-                            <!-- Contenedor dinámico para los síntomas -->
-                            <div id="contenedor-sintomas" class="mt-3"></div>
-
-                            <!-- Pregunta sobre síntomas durante el funcionamiento diurno -->
-                            <div class="form-group">
-                              <label
-                                >¿Presenta algún síntoma durante el
-                                funcionamiento diurno?</label
-                              >
-                              <div class="custom-control custom-radio">
-                                <input
-                                  type="radio"
-                                  class="custom-control-input"
-                                  id="sintomas_diurnos_si"
-                                  name="sintomas_diurnos"
-                                  value="Si"
-                                />
-                                <label
-                                  class="custom-control-label"
-                                  for="sintomas_diurnos_si"
-                                  >Sí</label
-                                >
-                              </div>
-                              <div class="custom-control custom-radio">
-                                <input
-                                  type="radio"
-                                  class="custom-control-input"
-                                  id="sintomas_diurnos_no"
-                                  name="sintomas_diurnos"
-                                  value="No"
-                                />
-                                <label
-                                  class="custom-control-label"
-                                  for="sintomas_diurnos_no"
-                                  >No</label
-                                >
-                              </div>
-                            </div>
-
-                            <!-- Botón para agregar información sobre síntomas diurnos -->
-                            <button
-                              id="agregar-sintoma-diurno"
-                              type="button"
-                              class="btn btn-primary"
-                              style="display: none"
-                            >
-                              Agregar Síntoma Diurno
-                            </button>
-
-                            <!-- Contenedor dinámico para los síntomas diurnos -->
-                            <div
-                              id="contenedor-sintomas-diurnos"
-                              class="mt-3"
-                            ></div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <!-- Botones de acción -->
-                <div class="row">
-                  <div class="col-12 text-right">
-                    <button type="submit" class="btn btn-primary">
-                      Guardar Examen
-                    </button>
-                    <a
-                      href="{% url 'detalle_paciente' paciente_id %}"
-                      class="btn btn-primary"
-                      >Ver Paciente</a
-                    >
-                  </div>
+  <div class="card bg-gradient-default shadow-sm mb-4">
+    <div class="card-header bg-transparent">
+      <h4 class="text-white mb-0">Síntomas asociados al sueño</h4>
+    </div>
+    <div class="card-body bg-white">
+      <div class="row">
+        <div class="col">
+          <div class="card">
+            <div class="card-header border-0">
+              <div class="row align-items-center">
+                <div class="col">
+                  <h3 class="mb-0">Síntomas asociados al sueño</h3>
                 </div>
               </div>
+            </div>
+            <div class="card-body">
+              <!-- Pregunta sobre síntomas asociados al sueño -->
+              <div class="form-group">
+                <label>¿Presenta algún síntoma diferente asociado al sueño?</label>
+                <div class="custom-control custom-radio">
+                  <input
+                    type="radio"
+                    class="custom-control-input"
+                    id="sintomas_sueno_si"
+                    name="sintomas_sueno"
+                    value="Si"
+                    {% if datos_examen.sintomas_sueno == "Si" %}checked{% endif %}
+                  />
+                  <label class="custom-control-label" for="sintomas_sueno_si">Sí</label>
+                </div>
+                <div class="custom-control custom-radio">
+                  <input
+                    type="radio"
+                    class="custom-control-input"
+                    id="sintomas_sueno_no"
+                    name="sintomas_sueno"
+                    value="No"
+                    {% if datos_examen.sintomas_sueno == "No" %}checked{% endif %}
+                  />
+                  <label class="custom-control-label" for="sintomas_sueno_no">No</label>
+                </div>
+              </div>
+
+              <!-- Botón para agregar información sobre síntomas -->
+              <button
+                id="agregar-sintoma"
+                type="button"
+                class="btn btn-primary"
+                {% if datos_examen.sintomas_sueno != "Si" %}style="display: none"{% endif %}
+              >
+                Agregar Síntoma
+              </button>
+
+              <!-- Contenedor dinámico para los síntomas -->
+              <div id="contenedor-sintomas" class="mt-3">
+                <!-- Los síntomas existentes se cargarán aquí via JavaScript -->
+              </div>
+
+              <!-- Pregunta sobre síntomas durante el funcionamiento diurno -->
+              <div class="form-group">
+                <label>¿Presenta algún síntoma durante el funcionamiento diurno?</label>
+                <div class="custom-control custom-radio">
+                  <input
+                    type="radio"
+                    class="custom-control-input"
+                    id="sintomas_diurnos_si"
+                    name="sintomas_diurnos"
+                    value="Si"
+                    {% if datos_examen.sintomas_diurnos == "Si" %}checked{% endif %}
+                  />
+                  <label class="custom-control-label" for="sintomas_diurnos_si">Sí</label>
+                </div>
+                <div class="custom-control custom-radio">
+                  <input
+                    type="radio"
+                    class="custom-control-input"
+                    id="sintomas_diurnos_no"
+                    name="sintomas_diurnos"
+                    value="No"
+                    {% if datos_examen.sintomas_diurnos == "No" %}checked{% endif %}
+                  />
+                  <label class="custom-control-label" for="sintomas_diurnos_no">No</label>
+                </div>
+              </div>
+
+              <!-- Botón para agregar información sobre síntomas diurnos -->
+              <button
+                id="agregar-sintoma-diurno"
+                type="button"
+                class="btn btn-primary"
+                {% if datos_examen.sintomas_diurnos != "Si" %}style="display: none"{% endif %}
+              >
+                Agregar Síntoma Diurno
+              </button>
+
+              <!-- Contenedor dinámico para los síntomas diurnos -->
+              <div id="contenedor-sintomas-diurnos" class="mt-3">
+                <!-- Los síntomas diurnos existentes se cargarán aquí via JavaScript -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Botones de acción -->
+  <div class="row">
+    <div class="col-12 text-right">
+      <button type="submit" class="btn btn-primary">Guardar Examen</button>
+      <a href="{% url 'detalle_paciente' paciente_id %}" class="btn btn-primary">Ver Paciente</a>
+    </div>
+  </div>
+</div>
             </div>
           </div>
         </form>
@@ -2797,5 +2450,60 @@
     // Inicializar estado
     toggleAgregarActividad();
   });
+
+  // Al final del JavaScript existente, agregar:
+document.addEventListener("DOMContentLoaded", function () {
+  // Inicializar datos existentes para sustancias
+  {% if datos_examen.sustancias %}
+    {% for sustancia in datos_examen.sustancias %}
+      agregarSustancia();
+      const ultimaSustancia = document.querySelector('.sustancia-item:last-child');
+      ultimaSustancia.querySelector('input[name="sustancias_tipo[]"]').value = "{{ sustancia.tipo }}";
+      ultimaSustancia.querySelector('input[name="sustancias_cantidad[]"]').value = "{{ sustancia.cantidad }}";
+      ultimaSustancia.querySelector('select[name="sustancias_frecuencia[]"]').value = "{{ sustancia.frecuencia }}";
+      ultimaSustancia.querySelector('select[name="sustancias_tiempo[]"]').value = "{{ sustancia.tiempo }}";
+      ultimaSustancia.querySelector('textarea[name="sustancias_observaciones[]"]').value = "{{ sustancia.observaciones }}";
+    {% endfor %}
+  {% endif %}
+
+  // Inicializar datos existentes para pantallas
+  {% if datos_examen.pantallas %}
+    {% for pantalla in datos_examen.pantallas %}
+      agregarPantalla();
+      const ultimaPantalla = document.querySelector('#contenedor-pantallas .border:last-child');
+      ultimaPantalla.querySelector('select[name="tipo_pantalla[]"]').value = "{{ pantalla.tipo }}";
+      ultimaPantalla.querySelector('select[name="pantalla_frecuencia[]"]').value = "{{ pantalla.frecuencia }}";
+      ultimaPantalla.querySelector('select[name="pantalla_tiempo_dormir[]"]').value = "{{ pantalla.tiempo_antes_dormir }}";
+    {% endfor %}
+  {% endif %}
+
+  // Inicializar datos existentes para actividades físicas
+  {% if datos_examen.actividades_fisicas %}
+    {% for actividad in datos_examen.actividades_fisicas %}
+      agregarActividadFisica();
+      const ultimaActividad = document.querySelector('#contenedor-actividades-fisicas .border:last-child');
+      ultimaActividad.querySelector('select[name="tipo_actividad_fisica[]"]').value = "{{ actividad.tipo }}";
+      ultimaActividad.querySelector('input[name="intensidad_fisica[]"]').value = "{{ actividad.intensidad }}";
+      ultimaActividad.querySelector('select[name="frecuencia_fisica[]"]').value = "{{ actividad.frecuencia }}";
+      ultimaActividad.querySelector('textarea[name="observaciones_actividad_fisica[]"]').value = "{{ actividad.observaciones }}";
+    {% endfor %}
+  {% endif %}
+
+  // Inicializar datos existentes para medicamentos
+  {% if datos_examen.medicamentos %}
+    {% for medicamento in datos_examen.medicamentos %}
+      agregarMedicamento();
+      const ultimoMedicamento = document.querySelector('#contenedor-medicamentos .border:last-child');
+      ultimoMedicamento.querySelector('input[name="nombre_medicamento[]"]').value = "{{ medicamento.nombre }}";
+      ultimoMedicamento.querySelector('input[name="dosis_medicamento[]"]').value = "{{ medicamento.dosis }}";
+      ultimoMedicamento.querySelector('select[name="presentacion[]"]').value = "{{ medicamento.presentacion }}";
+      ultimoMedicamento.querySelector('input[name="veces_dia[]"]').value = "{{ medicamento.veces_dia }}";
+      ultimoMedicamento.querySelector('select[name="frecuencia_medicamentos[]"]').value = "{{ medicamento.frecuencia }}";
+      ultimoMedicamento.querySelector('textarea[name="observaciones_medicamento[]"]').value = "{{ medicamento.observaciones }}";
+    {% endfor %}
+  {% endif %}
+});
+
+
 </script>
 {% endblock javascripts %} {% endblock content %}
