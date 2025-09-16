@@ -11,6 +11,7 @@ from django.contrib.auth import login, authenticate, logout
 from django.shortcuts import redirect
 from django.contrib import messages
 from django.utils import timezone
+from datetime import datetime, date
 from .models import (
     DatosDemograficos,
     Proyecto,
@@ -59,6 +60,19 @@ from .models import (
     DiagnosticoDSMV,
     DiagnosticoICSD3,
     DiagnosticoNoClasificado,
+    AntecedentesResult,
+    AntecedentePatologico,
+    AntecedenteQuirurgico,
+    AntecedenteFarmacologico,
+    AntecedenteToxico,
+    AntecedenteFamiliar,
+    AntecedenteAlergico,
+    AntecedenteTraumatico,
+    AntecedenteGinecoObstetrico,
+    ExamenNeurologicoResult,
+    ExamenFisicoResult,
+    RevisionSistemasResult,
+    MedicamentosResult,
 )
 from .forms import ProyectoForm, RegistroDemograficoForm
 import json
@@ -670,20 +684,29 @@ def editar_visita(request, visita_id):
 def realizar_examen(request, visita_id, examen_id, paciente_id):
     # Diccionario de configuración de exámenes
     exam_config = {
-        3: {"template": "examenes_general/General_ExamenFísico.html", "model": None},
+        3: {
+            "template": "examenes_general/General_ExamenFísico.html",
+            "model": ExamenFisicoResult,
+        },
         4: {
             "template": "examenes_general/General_RevisiónSistemas.html",
-            "model": None,
+            "model": RevisionSistemasResult,
         },
-        5: {"template": "examenes_general/General_Antecedentes.html", "model": None},
+        5: {
+            "template": "examenes_general/General_Antecedentes.html",
+            "model": AntecedentesResult,
+        },
         7: {
             "template": "examenes_general/General_Análisis.html",
             "model": AnalisisGeneralResult,
         },
-        8: {"template": "examenes_general/General_Medicamentos.html", "model": None},
+        8: {
+            "template": "examenes_general/General_Medicamentos.html",
+            "model": MedicamentosResult,
+        },
         9: {
             "template": "examenes_general/General_ExamenNeurológico.html",
-            "model": None,
+            "model": ExamenNeurologicoResult,
         },
         10: {
             "template": "examenes_sueno/Sueno_anamnesis.html",
@@ -3939,6 +3962,427 @@ def guardar_examen_analisis(request):
         except Exception as e:
             print(f"Error guardando análisis general: {e}")
             messages.error(request, f"❌ Error al guardar el análisis: {str(e)}")
+            return redirect("detalle_paciente", paciente_id=paciente_id or 1)
+
+    else:
+        messages.error(request, "❌ Método no permitido.")
+        return redirect("index")
+
+
+# ...existing code...
+
+
+@login_required
+def guardar_examen_antecedentes(request):
+    if request.method == "POST":
+        try:
+            visita_id = request.POST.get("visita_id")
+            paciente_id = request.POST.get("paciente_id")
+            examen_id = request.POST.get("examen_id")
+
+            # Obtener la instancia de VisitaExamen
+            visita_examen = get_object_or_404(
+                VisitaExamen, visita_id=visita_id, examen_id=examen_id
+            )
+
+            # Marcar como iniciado si está pendiente
+            if visita_examen.estado == "pendiente":
+                visita_examen.estado = "en_progreso"
+                visita_examen.fecha_inicio = timezone.now()
+                visita_examen.save()
+
+            # Crear o actualizar el resultado principal de antecedentes
+            antecedentes_result, created = AntecedentesResult.objects.update_or_create(
+                visita_examen=visita_examen,
+                defaults={
+                    "tiene_antecedentes": False,
+                    "observaciones_generales": request.POST.get(
+                        "observaciones_generales", ""
+                    ),
+                },
+            )
+
+            # Variable para controlar si hay algún antecedente
+            tiene_antecedentes = False
+            antecedentes_guardados = []
+
+            # ===== ANTECEDENTES PATOLÓGICOS =====
+            if request.POST.get("antecedente_patologico") == "Si":
+                tiene_antecedentes = True
+
+                # Limpiar antecedentes patológicos existentes
+                antecedentes_result.antecedentes_patologicos.all().delete()
+
+                tipo_patologia = request.POST.get("tipo_patologia")
+                if tipo_patologia:
+                    fecha_inicio_str = request.POST.get("fecha_inicio_patologia")
+                    fecha_inicio = (
+                        datetime.strptime(fecha_inicio_str, "%Y-%m-%d").date()
+                        if fecha_inicio_str
+                        else None
+                    )
+
+                    fecha_finalizacion_str = request.POST.get(
+                        "fecha_finalizacion_patologico"
+                    )
+                    fecha_finalizacion = (
+                        datetime.strptime(fecha_finalizacion_str, "%Y-%m-%d").date()
+                        if fecha_finalizacion_str
+                        else None
+                    )
+
+                    AntecedentePatologico.objects.create(
+                        antecedente_result=antecedentes_result,
+                        tipo_patologia=tipo_patologia.lower().replace(" ", "_"),
+                        descripcion_otros=request.POST.get(
+                            "descripcion_otros_patologico"
+                        )
+                        if tipo_patologia == "Otros"
+                        else None,
+                        fecha_inicio=fecha_inicio,
+                        ha_recibido_tratamiento=request.POST.get(
+                            "tratamiento_patologico"
+                        )
+                        == "Si",
+                        detalle_tratamiento=request.POST.get(
+                            "detalle_tratamiento_patologico", ""
+                        ),
+                        tiene_complicaciones=request.POST.get(
+                            "complicaciones_patologico"
+                        )
+                        == "Si",
+                        detalle_complicaciones=request.POST.get(
+                            "detalle_complicaciones_patologico", ""
+                        ),
+                        activo=request.POST.get("activo_patologico") == "Si",
+                        fecha_finalizacion=fecha_finalizacion,
+                        observaciones=request.POST.get("observaciones_patologico", ""),
+                    )
+                    antecedentes_guardados.append("Patológicos")
+
+            # ===== ANTECEDENTES QUIRÚRGICOS =====
+            if request.POST.get("antecedente_quirurgico") == "Si":
+                tiene_antecedentes = True
+
+                # Limpiar antecedentes quirúrgicos existentes
+                antecedentes_result.antecedentes_quirurgicos.all().delete()
+
+                descripcion = request.POST.get("descripcion_quirurgico")
+                if descripcion:
+                    fecha_inicio_str = request.POST.get("fecha_inicio_quirurgico")
+                    fecha_inicio = (
+                        datetime.strptime(fecha_inicio_str, "%Y-%m-%d").date()
+                        if fecha_inicio_str
+                        else None
+                    )
+
+                    fecha_finalizacion_str = request.POST.get(
+                        "fecha_finalizacion_quirurgico"
+                    )
+                    fecha_finalizacion = (
+                        datetime.strptime(fecha_finalizacion_str, "%Y-%m-%d").date()
+                        if fecha_finalizacion_str
+                        else None
+                    )
+
+                    AntecedenteQuirurgico.objects.create(
+                        antecedente_result=antecedentes_result,
+                        descripcion=descripcion,
+                        fecha_intervencion=fecha_inicio,
+                        ha_recibido_tratamiento=request.POST.get(
+                            "tratamiento_quirurgico"
+                        )
+                        == "Si",
+                        detalle_tratamiento=request.POST.get(
+                            "detalle_tratamiento_quirurgico", ""
+                        ),
+                        tiene_complicaciones=request.POST.get(
+                            "complicaciones_quirurgico"
+                        )
+                        == "Si",
+                        detalle_complicaciones=request.POST.get(
+                            "detalle_complicaciones_quirurgico", ""
+                        ),
+                        activo=request.POST.get("activo_quirurgico") == "Si",
+                        fecha_finalizacion=fecha_finalizacion,
+                        observaciones=request.POST.get("observaciones_quirurgico", ""),
+                    )
+                    antecedentes_guardados.append("Quirúrgicos")
+
+            # ===== ANTECEDENTES FARMACOLÓGICOS =====
+            if request.POST.get("antecedente_farmacologico") == "Si":
+                tiene_antecedentes = True
+
+                # Limpiar antecedentes farmacológicos existentes
+                antecedentes_result.antecedentes_farmacologicos.all().delete()
+
+                descripcion = request.POST.get("descripcion_farmacologico")
+                if descripcion:
+                    fecha_inicio_str = request.POST.get("fecha_inicio_farmacologico")
+                    fecha_inicio = (
+                        datetime.strptime(fecha_inicio_str, "%Y-%m-%d").date()
+                        if fecha_inicio_str
+                        else None
+                    )
+
+                    fecha_finalizacion_str = request.POST.get(
+                        "fecha_finalizacion_farmacologico"
+                    )
+                    fecha_finalizacion = (
+                        datetime.strptime(fecha_finalizacion_str, "%Y-%m-%d").date()
+                        if fecha_finalizacion_str
+                        else None
+                    )
+
+                    AntecedenteFarmacologico.objects.create(
+                        antecedente_result=antecedentes_result,
+                        descripcion=descripcion,
+                        fecha_inicio=fecha_inicio,
+                        recibio_tratamiento=request.POST.get(
+                            "tratamiento_farmacologico"
+                        )
+                        == "Si",
+                        detalle_tratamiento=request.POST.get(
+                            "detalle_tratamiento_farmacologico", ""
+                        ),
+                        tuvo_complicaciones=request.POST.get(
+                            "complicaciones_farmacologico"
+                        )
+                        == "Si",
+                        detalle_complicaciones=request.POST.get(
+                            "detalle_complicaciones_farmacologico", ""
+                        ),
+                        activo=request.POST.get("activo_farmacologico") == "Si",
+                        fecha_finalizacion=fecha_finalizacion,
+                        observaciones=request.POST.get(
+                            "observaciones_farmacologico", ""
+                        ),
+                    )
+                    antecedentes_guardados.append("Farmacológicos")
+
+            # ===== ANTECEDENTES TÓXICOS =====
+            if request.POST.get("antecedente_toxico") == "Si":
+                tiene_antecedentes = True
+
+                # Limpiar antecedentes tóxicos existentes
+                antecedentes_result.antecedentes_toxicos.all().delete()
+
+                tipos_toxico = request.POST.getlist("tipo_toxico[]")
+                if tipos_toxico:
+                    fecha_inicio_str = request.POST.get("fecha_inicio_toxico")
+                    fecha_inicio = (
+                        datetime.strptime(fecha_inicio_str, "%Y-%m-%d").date()
+                        if fecha_inicio_str
+                        else None
+                    )
+
+                    fecha_finalizacion_str = request.POST.get(
+                        "fecha_finalizacion_toxico"
+                    )
+                    fecha_finalizacion = (
+                        datetime.strptime(fecha_finalizacion_str, "%Y-%m-%d").date()
+                        if fecha_finalizacion_str
+                        else None
+                    )
+
+                    # Convertir tipos a valores de la base de datos
+                    tipos_bd = []
+                    for tipo in tipos_toxico:
+                        if tipo == "Tabaquismo":
+                            tipos_bd.append("tabaquismo")
+                        elif tipo == "Consumo de Alcohol":
+                            tipos_bd.append("alcohol")
+                        elif tipo == "Sustancias Psicoactivas":
+                            tipos_bd.append("sustancias_psicoactivas")
+                        elif tipo == "Intoxicaciones":
+                            tipos_bd.append("intoxicaciones")
+                        elif tipo == "Alergias a Medicamentos":
+                            tipos_bd.append("alergias_medicamentos")
+                        else:
+                            tipos_bd.append("otros")
+
+                    AntecedenteToxico.objects.create(
+                        antecedente_result=antecedentes_result,
+                        tipos_toxico=tipos_bd,
+                        descripcion_otros=request.POST.get("descripcion_otros_toxico")
+                        if "otros" in tipos_bd
+                        else None,
+                        fecha_inicio=fecha_inicio,
+                        ha_recibido_tratamiento=request.POST.get("tratamiento_toxico")
+                        == "Si",
+                        detalle_tratamiento=request.POST.get(
+                            "detalle_tratamiento_toxico", ""
+                        ),
+                        tiene_complicaciones=request.POST.get("complicaciones_toxico")
+                        == "Si",
+                        detalle_complicaciones=request.POST.get(
+                            "detalle_complicaciones_toxico", ""
+                        ),
+                        activo=request.POST.get("activo_toxico") == "Si",
+                        fecha_finalizacion=fecha_finalizacion,
+                        observaciones=request.POST.get("observaciones_toxico", ""),
+                    )
+                    antecedentes_guardados.append("Tóxicos")
+
+            # ===== ANTECEDENTES FAMILIARES =====
+            if request.POST.get("antecedente_familiar") == "Si":
+                tiene_antecedentes = True
+
+                # Limpiar antecedentes familiares existentes
+                antecedentes_result.antecedentes_familiares.all().delete()
+
+                tipo_antecedente = request.POST.get("tipo_antecedente_familiar")
+                parentesco = request.POST.get("parentesco")
+
+                if tipo_antecedente and parentesco:
+                    AntecedenteFamiliar.objects.create(
+                        antecedente_result=antecedentes_result,
+                        tipo_antecedente=tipo_antecedente,
+                        parentesco=parentesco,
+                        observaciones=request.POST.get("observaciones_familiar", ""),
+                    )
+                    antecedentes_guardados.append("Familiares")
+
+            # ===== ANTECEDENTES OTROS (Alérgicos, Traumáticos, Gineco-Obstétricos) =====
+            if request.POST.get("antecedente_otros") == "Si":
+                tiene_antecedentes = True
+
+                # Procesar sub-tipos de "otros"
+                # Alérgicos
+                if request.POST.get("subtipo_alergico") == "Si":
+                    antecedentes_result.antecedentes_alergicos.all().delete()
+                    descripcion = request.POST.get("descripcion_alergico")
+                    if descripcion:
+                        fecha_inicio_str = request.POST.get("fecha_inicio_alergico")
+                        fecha_inicio = (
+                            datetime.strptime(fecha_inicio_str, "%Y-%m-%d").date()
+                            if fecha_inicio_str
+                            else None
+                        )
+
+                        AntecedenteAlergico.objects.create(
+                            antecedente_result=antecedentes_result,
+                            descripcion=descripcion,
+                            fecha_inicio=fecha_inicio,
+                            tratamiento_recibido=request.POST.get(
+                                "tratamiento_alergico", ""
+                            ),
+                            detalle_tratamiento=request.POST.get(
+                                "detalle_tratamiento_alergico", ""
+                            ),
+                            complicaciones=request.POST.get(
+                                "complicaciones_alergico", ""
+                            ),
+                            activo=request.POST.get("activo_alergico") == "Si",
+                            observaciones=request.POST.get(
+                                "observaciones_alergico", ""
+                            ),
+                        )
+                        antecedentes_guardados.append("Alérgicos")
+
+                # Traumáticos
+                if request.POST.get("subtipo_traumatico") == "Si":
+                    antecedentes_result.antecedentes_traumaticos.all().delete()
+                    descripcion = request.POST.get("descripcion_traumatico")
+                    if descripcion:
+                        fecha_inicio_str = request.POST.get("fecha_inicio_traumatico")
+                        fecha_inicio = (
+                            datetime.strptime(fecha_inicio_str, "%Y-%m-%d").date()
+                            if fecha_inicio_str
+                            else None
+                        )
+
+                        AntecedenteTraumatico.objects.create(
+                            antecedente_result=antecedentes_result,
+                            descripcion=descripcion,
+                            fecha_inicio=fecha_inicio,
+                            tratamiento_recibido=request.POST.get(
+                                "tratamiento_traumatico", ""
+                            ),
+                            detalle_tratamiento=request.POST.get(
+                                "detalle_tratamiento_traumatico", ""
+                            ),
+                            complicaciones=request.POST.get(
+                                "complicaciones_traumatico", ""
+                            ),
+                            activo=request.POST.get("activo_traumatico") == "Si",
+                            observaciones=request.POST.get(
+                                "observaciones_traumatico", ""
+                            ),
+                        )
+                        antecedentes_guardados.append("Traumáticos")
+
+                # Gineco-Obstétricos
+                if request.POST.get("subtipo_gineco") == "Si":
+                    # Eliminar antecedente gineco-obstétrico existente (OneToOne)
+                    if hasattr(antecedentes_result, "antecedentes_gineco"):
+                        antecedentes_result.antecedentes_gineco.delete()
+
+                    AntecedenteGinecoObstetrico.objects.create(
+                        antecedente_result=antecedentes_result,
+                        tiene_menarquia=request.POST.get("menarquia") == "Si",
+                        edad_menarquia=int(request.POST.get("edad_menarquia", 0))
+                        or None,
+                        tiene_menopausia=request.POST.get("menopausia") == "Si",
+                        edad_menopausia=int(request.POST.get("edad_menopausia", 0))
+                        or None,
+                        gravidez=int(request.POST.get("gravidez", 0)),
+                        abortos=int(request.POST.get("abortos", 0)),
+                        hijos_vivos=int(request.POST.get("hijos_vivos", 0)),
+                        usa_metodo_planificacion=request.POST.get(
+                            "metodo_planificacion"
+                        )
+                        == "Si",
+                        metodo_detalle=request.POST.get("metodo_detalle", ""),
+                        dosis_planificacion=request.POST.get("dosis_planificacion", ""),
+                        adherencia_planificacion=request.POST.get(
+                            "adherencia_planificacion", ""
+                        ),
+                        tolerancia_planificacion=request.POST.get(
+                            "tolerancia_planificacion", ""
+                        ),
+                        observaciones=request.POST.get("observaciones_gineco", ""),
+                    )
+                    antecedentes_guardados.append("Gineco-Obstétricos")
+
+            # Actualizar el campo principal
+            antecedentes_result.tiene_antecedentes = tiene_antecedentes
+            antecedentes_result.save()
+
+            # Marcar el examen como completado
+            visita_examen.estado = "completado"
+            visita_examen.fecha_completado = timezone.now()
+            visita_examen.save()
+
+            # Mensaje de éxito personalizado
+            if antecedentes_guardados:
+                tipos_guardados = ", ".join(antecedentes_guardados)
+                messages.success(
+                    request,
+                    f"✅ Antecedentes médicos guardados exitosamente.\n"
+                    f"📋 Tipos registrados: {tipos_guardados}",
+                )
+            else:
+                messages.success(
+                    request,
+                    "✅ Antecedentes médicos guardados exitosamente.\n"
+                    "📋 Sin antecedentes registrados.",
+                )
+
+            return redirect("detalle_paciente", paciente_id=paciente_id)
+
+        except Exception as e:
+            # Revertir estado si hubo error
+            try:
+                if "visita_examen" in locals():
+                    visita_examen.estado = "pendiente"
+                    visita_examen.save()
+            except:
+                pass
+
+            messages.error(
+                request, f"❌ Error al guardar los antecedentes médicos: {str(e)}"
+            )
             return redirect("detalle_paciente", paciente_id=paciente_id or 1)
 
     else:

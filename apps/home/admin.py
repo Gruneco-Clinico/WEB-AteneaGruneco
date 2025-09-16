@@ -13,10 +13,6 @@ from .models import (
     PittsburghResult,
     EpworthResult,
     MEWResult,
-    BerlinResult,
-    SuenoAnamnesisResult,
-    TipoQuejaSueno,
-    SintomaSueno,
     SintomaDiurnoSueno,
     SustanciaSueno,
     MedicamentoSueno,
@@ -27,6 +23,10 @@ from .models import (
     AtenasResult,
     SuenoFisicoResult,
     StopBangResult,
+    BerlinResult,
+    SuenoAnamnesisResult,
+    TipoQuejaSueno,
+    SintomaSueno,
 )
 
 admin.site.register(Proyecto)

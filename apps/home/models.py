@@ -348,6 +348,11 @@ class VisitaExamen(models.Model):
                 "anamnesiscuidadorresult_resultado",
                 "anamnesisparticipanteresult_resultado",
                 "analisisgeneralresult_resultado",
+                "ExamenFisicoResult_resultado",
+                "AntecedentesResult_resultado",
+                "ExamenNeurologicoResult_resultado",
+                "MedicamentosResult_resultado",
+                "RevisionSistemasResult_resultado",
             ]
 
             for related_name in possible_related_names:
@@ -440,6 +445,11 @@ class VisitaExamen(models.Model):
             "cdrcuidador": "realizar_cdrcuidador",
             "cdrparticipante": "realizar_cdrparticipante",
             "analisisgeneral": "realizar_analisisgeneral",
+            "examenfisico": "realizar_examen_fisico",
+            "antecedentes": "realizar_antecedentes",
+            "examenneurologico": "realizar_examen_neurologico",
+            "medicamentos": "realizar_medicamentos",
+            "revisionsistemas": "realizar_revision_sistemas",
         }
 
         url_name = url_mapping.get(examen_nombre)
@@ -486,6 +496,11 @@ class VisitaExamen(models.Model):
             "cdrcuidador": "ver_cdrcuidador",
             "cdrparticipante": "ver_cdrparticipante",
             "analisisgeneral": "ver_analisis_general",
+            "examenfisico": "ver_examen_fisico",
+            "antecedentes": "ver_antecedentes",
+            "examenneurologico": "ver_examen_neurologico",
+            "medicamentos": "ver_medicamentos",
+            "revisionsistemas": "ver_revision_sistemas",
         }
 
         url_name = url_mapping.get(examen_nombre)
@@ -528,6 +543,11 @@ class VisitaExamen(models.Model):
             "cdrcuidador": "editar_cdrcuidador",
             "cdrparticipante": "editar_cdrparticipante",
             "analisisgeneral": "editar_analisis_general",
+            "examenfisico": "editar_examen_fisico",
+            "antecedentes": "editar_antecedentes",
+            "examenneurologico": "editar_examen_neurologico",
+            "medicamentos": "editar_medicamentos",
+            "revisionsistemas": "editar_revision_sistemas",
         }
 
         url_name = url_mapping.get(examen_nombre)

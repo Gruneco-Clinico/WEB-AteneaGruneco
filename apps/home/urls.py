@@ -187,4 +187,9 @@ urlpatterns = [
         views.guardar_examen_analisis,
         name="guardar_examen_analisis",
     ),
+    path(
+        "guardar_examen_antecedentes/",
+        views.guardar_examen_antecedentes,
+        name="guardar_examen_antecedentes",
+    ),
 ]
