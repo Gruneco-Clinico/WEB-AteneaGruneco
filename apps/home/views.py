@@ -685,11 +685,11 @@ def realizar_examen(request, visita_id, examen_id, paciente_id):
         12: {
             "template": "examenes_sueno/Sueño_ExamenFisico.html",
             "model": SuenoFisicoResult,
-        },  # CORREGIDO: Era el examen físico, no Pittsburgh
+        },
         13: {
             "template": "examenes_sueno/sueno_Pitsburg.html",
             "model": PittsburghResult,
-        },  # CORREGIDO: Este es Pittsburgh
+        },
         14: {"template": "examenes_sueno/sueno_Epworth.html", "model": EpworthResult},
         15: {
             "template": "examenes_sueno/sueno_Stop_Bang.html",
@@ -777,12 +777,12 @@ def realizar_examen(request, visita_id, examen_id, paciente_id):
         },
     }
 
-    config = exam_config.get(int(examen_id))  # CAMBIO: Asegurar que sea entero
+    config = exam_config.get(int(examen_id))
     if not config:
         messages.error(request, "Examen no encontrado")
         return redirect("detalle_paciente", paciente_id=paciente_id)
 
-    # Obtener datos existentes usando los nuevos métodos
+    # Obtener datos existentes
     datos_examen = None
     visita_examen_obj = None
     modo_edicion = False
@@ -792,15 +792,109 @@ def realizar_examen(request, visita_id, examen_id, paciente_id):
             visita_id=visita_id, examen_id=examen_id
         )
 
-        # CAMBIO: Usar el nuevo método get_resultado_instance()
         if config["model"] and visita_examen_obj.esta_realizado:
             resultado = visita_examen_obj.get_resultado_instance()
             if resultado and isinstance(resultado, config["model"]):
-                datos_examen = model_to_dict(resultado)
-                # Limpiar campos que no necesitas en el template
-                datos_examen.pop("id", None)
-                datos_examen.pop("visita_examen", None)
-                modo_edicion = True
+                # ===================================================
+                # CASO ESPECIAL: ANAMNESIS DE SUEÑO (ID 10)
+                # ===================================================
+                if int(examen_id) == 10 and isinstance(resultado, SuenoAnamnesisResult):
+                    # Obtener datos básicos del modelo principal
+                    datos_examen = model_to_dict(resultado)
+                    datos_examen.pop("id", None)
+                    datos_examen.pop("visita_examen", None)
+
+                    # Obtener relaciones hijas con prefetch para optimización
+                    anamnesis = SuenoAnamnesisResult.objects.prefetch_related(
+                        "sustancias",
+                        "medicamentos",
+                        "pantallas",
+                        "actividades_en_cama",
+                        "actividades_fisicas",
+                        "sintomas_suenos",
+                        "sintomas_diurno",
+                        "tipos_queja_detalle",
+                    ).get(id=resultado.id)
+
+                    # Agregar las relaciones al diccionario de datos
+                    datos_examen["sustancias"] = list(
+                        anamnesis.sustancias.values(
+                            "tipo", "cantidad", "frecuencia", "tiempo", "observaciones"
+                        )
+                    )
+
+                    datos_examen["medicamentos"] = list(
+                        anamnesis.medicamentos.values(
+                            "nombre",
+                            "dosis",
+                            "presentacion",
+                            "veces_dia",
+                            "frecuencia",
+                            "tiempo",
+                            "observaciones",
+                        )
+                    )
+
+                    datos_examen["pantallas"] = list(
+                        anamnesis.pantallas.values(
+                            "tipo", "frecuencia", "tiempo_antes_dormir"
+                        )
+                    )
+
+                    datos_examen["actividades_en_cama"] = list(
+                        anamnesis.actividades_en_cama.values(
+                            "tipo", "frecuencia", "observaciones"
+                        )
+                    )
+
+                    datos_examen["actividades_fisicas"] = list(
+                        anamnesis.actividades_fisicas.values(
+                            "tipo",
+                            "otro_texto",
+                            "intensidad",
+                            "frecuencia",
+                            "observaciones",
+                        )
+                    )
+
+                    datos_examen["sintomas_suenos"] = list(
+                        anamnesis.sintomas_suenos.values(
+                            "tipo",
+                            "cuando_inicio",
+                            "evolucion",
+                            "frecuencia",
+                            "gravedad",
+                            "observaciones",
+                        )
+                    )
+
+                    datos_examen["sintomas_diurnos"] = list(
+                        anamnesis.sintomas_diurno.values(
+                            "tipo",
+                            "cuando_inicio",
+                            "evolucion",
+                            "frecuencia",
+                            "gravedad",
+                            "observaciones",
+                        )
+                    )
+
+                    datos_examen["tipos_queja"] = list(
+                        anamnesis.tipos_queja_detalle.values(
+                            "nombre", "inicio", "evolucion", "frecuencia", "gravedad"
+                        )
+                    )
+
+                    modo_edicion = True
+
+                else:
+                    # ===================================================
+                    # CASO GENERAL: OTROS EXÁMENES
+                    # ===================================================
+                    datos_examen = model_to_dict(resultado)
+                    datos_examen.pop("id", None)
+                    datos_examen.pop("visita_examen", None)
+                    modo_edicion = True
 
     except VisitaExamen.DoesNotExist:
         messages.error(request, "Visita-examen no encontrada")
