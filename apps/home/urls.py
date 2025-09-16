@@ -11,7 +11,10 @@ urlpatterns = [
     # Páginas principales
     path("", views.home, name="home"),  # Página de inicio gruneco.com.co
     # path('ads/', views.ads, name='ads'),
-    path("index/", views.index, name="index"),  # Página de inicio de Atenea
+    path("index/", views.index, name="index"),
+    path(
+        "estadisticas/", views.estadisticas, name="estadisticas"
+    ),  # Página de estadísticas
     path("login/", login_view, name="login"),
     path("logout/", views.logout_view, name="logout"),
     path("profile/", profile_view, name="profile"),  # Perfil de usuario

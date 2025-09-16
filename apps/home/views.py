@@ -153,10 +153,10 @@ def index(request):
 
 
 @login_required(login_url="/login/")
+@user_passes_test(is_superuser, login_url="/login/")
 def estadisticas(request):
     context = {"segment": "estadisticas"}
-    html_template = loader.get_template("home/stadistic.html")
-    return HttpResponse(html_template.render(context, request))
+    return render(request, "home/stadistic.html", context)
 
 
 # pacientes
