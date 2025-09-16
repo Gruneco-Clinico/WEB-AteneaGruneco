@@ -54,6 +54,11 @@ from .models import (
     ConsentimientoInformadoCuidadorResult,
     AnamnesisCuidadorResult,
     AnamnesisParticipanteResult,
+    AnalisisGeneralResult,
+    DiagnosticoCIE10,
+    DiagnosticoDSMV,
+    DiagnosticoICSD3,
+    DiagnosticoNoClasificado,
 )
 from .forms import ProyectoForm, RegistroDemograficoForm
 import json
@@ -671,7 +676,10 @@ def realizar_examen(request, visita_id, examen_id, paciente_id):
             "model": None,
         },
         5: {"template": "examenes_general/General_Antecedentes.html", "model": None},
-        7: {"template": "examenes_general/General_Análisis.html", "model": None},
+        7: {
+            "template": "examenes_general/General_Análisis.html",
+            "model": AnalisisGeneralResult,
+        },
         8: {"template": "examenes_general/General_Medicamentos.html", "model": None},
         9: {
             "template": "examenes_general/General_ExamenNeurológico.html",
@@ -3762,6 +3770,175 @@ def guardar_examen_Cuidador_Zarit(request):
                 pass
 
             messages.error(request, f"❌ Error al guardar la escala de Zarit: {str(e)}")
+            return redirect("detalle_paciente", paciente_id=paciente_id or 1)
+
+    else:
+        messages.error(request, "❌ Método no permitido.")
+        return redirect("index")
+
+
+#######################################################################################
+
+
+@login_required
+def guardar_examen_analisis(request):
+    if request.method == "POST":
+        try:
+            visita_id = request.POST.get("visita_id")
+            paciente_id = request.POST.get("paciente_id")
+            examen_id = request.POST.get("examen_id")
+
+            # Obtener la instancia de VisitaExamen
+            visita_examen = get_object_or_404(
+                VisitaExamen, visita_id=visita_id, examen_id=examen_id
+            )
+
+            # Marcar como iniciado si está pendiente
+            if visita_examen.estado == "pendiente":
+                visita_examen.estado = "en_progreso"
+                visita_examen.fecha_inicio = timezone.now()
+                visita_examen.save()
+
+            # Obtener datos principales
+            analisis_historia = request.POST.get("analisis_historia", "")
+            plan_tratamiento = request.POST.get("plan_tratamiento", "")
+
+            # Crear o actualizar resultado principal
+            analisis_result, created = AnalisisGeneralResult.objects.update_or_create(
+                visita_examen=visita_examen,
+                defaults={
+                    "analisis_historia": analisis_historia,
+                    "plan_tratamiento": plan_tratamiento,
+                },
+            )
+
+            # Limpiar diagnósticos existentes
+            analisis_result.diagnosticos_cie10.all().delete()
+            analisis_result.diagnosticos_dsmv.all().delete()
+            analisis_result.diagnosticos_icsd3.all().delete()
+            analisis_result.diagnosticos_no_clasificados.all().delete()
+
+            # Procesar diagnósticos CIE-10
+            cie10_codigos = request.POST.getlist("cie10_codigo[]")
+            cie10_diagnosticos = request.POST.getlist("cie10_diagnostico[]")
+            cie10_estados = request.POST.getlist("cie10_estado[]")
+
+            for i, (codigo, diagnostico) in enumerate(
+                zip(cie10_codigos, cie10_diagnosticos)
+            ):
+                if codigo.strip() and diagnostico.strip():
+                    # Crear el diagnóstico
+                    diag_cie10 = DiagnosticoCIE10.objects.create(
+                        analisis_result=analisis_result,
+                        codigo=codigo.strip(),
+                        diagnostico=diagnostico.strip(),
+                        orden=i + 1,
+                    )
+
+                    # Marcar estados correspondientes basados en los checkboxes
+                    if "confirmado_nuevo" in cie10_estados:
+                        diag_cie10.confirmado_nuevo = True
+                    if "confirmado_antiguo" in cie10_estados:
+                        diag_cie10.confirmado_antiguo = True
+                    if "en_estudio" in cie10_estados:
+                        diag_cie10.en_estudio = True
+
+                    diag_cie10.save()
+
+            # Procesar diagnósticos DSM-V (similar estructura)
+            dsmv_codigos = request.POST.getlist("dsmv_codigo[]")
+            dsmv_diagnosticos = request.POST.getlist("dsmv_diagnostico[]")
+            dsmv_estados = request.POST.getlist("dsmv_estado[]")
+
+            for i, (codigo, diagnostico) in enumerate(
+                zip(dsmv_codigos, dsmv_diagnosticos)
+            ):
+                if codigo.strip() and diagnostico.strip():
+                    diag_dsmv = DiagnosticoDSMV.objects.create(
+                        analisis_result=analisis_result,
+                        codigo=codigo.strip(),
+                        diagnostico=diagnostico.strip(),
+                        orden=i + 1,
+                    )
+
+                    if "confirmado_nuevo" in dsmv_estados:
+                        diag_dsmv.confirmado_nuevo = True
+                    if "confirmado_antiguo" in dsmv_estados:
+                        diag_dsmv.confirmado_antiguo = True
+                    if "en_estudio" in dsmv_estados:
+                        diag_dsmv.en_estudio = True
+
+                    diag_dsmv.save()
+
+            # Procesar diagnósticos ICSD-3 (similar estructura)
+            icsd3_codigos = request.POST.getlist("icsd3_codigo[]")
+            icsd3_diagnosticos = request.POST.getlist("icsd3_diagnostico[]")
+            icsd3_estados = request.POST.getlist("icsd3_estado[]")
+
+            for i, (codigo, diagnostico) in enumerate(
+                zip(icsd3_codigos, icsd3_diagnosticos)
+            ):
+                if codigo.strip() and diagnostico.strip():
+                    diag_icsd3 = DiagnosticoICSD3.objects.create(
+                        analisis_result=analisis_result,
+                        codigo=codigo.strip(),
+                        diagnostico=diagnostico.strip(),
+                        orden=i + 1,
+                    )
+
+                    if "confirmado_nuevo" in icsd3_estados:
+                        diag_icsd3.confirmado_nuevo = True
+                    if "confirmado_antiguo" in icsd3_estados:
+                        diag_icsd3.confirmado_antiguo = True
+                    if "en_estudio" in icsd3_estados:
+                        diag_icsd3.en_estudio = True
+
+                    diag_icsd3.save()
+
+            # Procesar diagnósticos no clasificados
+            noclasi_diagnosticos = request.POST.getlist("noclasi_diagnostico[]")
+            noclasi_estados = request.POST.getlist("noclasi_estado[]")
+
+            for i, diagnostico in enumerate(noclasi_diagnosticos):
+                if diagnostico.strip():
+                    diag_noclasi = DiagnosticoNoClasificado.objects.create(
+                        analisis_result=analisis_result,
+                        diagnostico=diagnostico.strip(),
+                        orden=i + 1,
+                    )
+
+                    if "confirmado_nuevo" in noclasi_estados:
+                        diag_noclasi.confirmado_nuevo = True
+                    if "confirmado_antiguo" in noclasi_estados:
+                        diag_noclasi.confirmado_antiguo = True
+                    if "en_estudio" in noclasi_estados:
+                        diag_noclasi.en_estudio = True
+
+                    diag_noclasi.save()
+
+            # Marcar el examen como completado
+            visita_examen.estado = "completado"
+            visita_examen.fecha_completado = timezone.now()
+            visita_examen.save()
+
+            # Contar diagnósticos guardados
+            total_diagnosticos = (
+                analisis_result.diagnosticos_cie10.count()
+                + analisis_result.diagnosticos_dsmv.count()
+                + analisis_result.diagnosticos_icsd3.count()
+                + analisis_result.diagnosticos_no_clasificados.count()
+            )
+
+            messages.success(
+                request,
+                f"✅ Análisis y diagnósticos guardados exitosamente.\n"
+                f"📋 Total de diagnósticos: {total_diagnosticos}",
+            )
+            return redirect("detalle_paciente", paciente_id=paciente_id)
+
+        except Exception as e:
+            print(f"Error guardando análisis general: {e}")
+            messages.error(request, f"❌ Error al guardar el análisis: {str(e)}")
             return redirect("detalle_paciente", paciente_id=paciente_id or 1)
 
     else:

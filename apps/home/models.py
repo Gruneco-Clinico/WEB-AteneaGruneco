@@ -347,6 +347,7 @@ class VisitaExamen(models.Model):
                 "consentimientoinformadocuidadorresult_resultado",
                 "anamnesiscuidadorresult_resultado",
                 "anamnesisparticipanteresult_resultado",
+                "analisisgeneralresult_resultado",
             ]
 
             for related_name in possible_related_names:
@@ -438,6 +439,7 @@ class VisitaExamen(models.Model):
             "redlatspanish": "realizar_redlatspanish",
             "cdrcuidador": "realizar_cdrcuidador",
             "cdrparticipante": "realizar_cdrparticipante",
+            "analisisgeneral": "realizar_analisisgeneral",
         }
 
         url_name = url_mapping.get(examen_nombre)
@@ -483,6 +485,7 @@ class VisitaExamen(models.Model):
             "redlatspanish": "ver_redlatspanish",
             "cdrcuidador": "ver_cdrcuidador",
             "cdrparticipante": "ver_cdrparticipante",
+            "analisisgeneral": "ver_analisis_general",
         }
 
         url_name = url_mapping.get(examen_nombre)
@@ -524,6 +527,7 @@ class VisitaExamen(models.Model):
             "redlatspanish": "editar_redlatspanish",
             "cdrcuidador": "editar_cdrcuidador",
             "cdrparticipante": "editar_cdrparticipante",
+            "analisisgeneral": "editar_analisis_general",
         }
 
         url_name = url_mapping.get(examen_nombre)
@@ -1768,3 +1772,168 @@ class AnamnesisParticipanteResult(ResultadoExamenBase):
 
     def __str__(self):
         return f"Anamnesis Participante - {self.visita_examen_id}"
+
+
+# examenes generales
+
+
+class AnalisisGeneralResult(ResultadoExamenBase):
+    """
+    Modelo para almacenar los resultados del examen general de análisis y diagnóstico
+    """
+
+    # ========================================
+    # ANÁLISIS PRINCIPAL
+    # ========================================
+    analisis_historia = models.TextField(
+        blank=True, null=True, verbose_name="Análisis de Historia Clínica"
+    )
+
+    plan_tratamiento = models.TextField(
+        blank=True, null=True, verbose_name="Plan de Tratamiento"
+    )
+
+    def __str__(self):
+        return f"Análisis General - {self.visita_examen_id}"
+
+
+class DiagnosticoCIE10(models.Model):
+    """
+    Modelo para diagnósticos CIE-10 relacionados con el análisis general
+    """
+
+    analisis_result = models.ForeignKey(
+        AnalisisGeneralResult,
+        on_delete=models.CASCADE,
+        related_name="diagnosticos_cie10",
+    )
+
+    codigo = models.CharField(
+        max_length=20,
+        verbose_name="Código CIE-10",
+        help_text="Código CIE-10 (ej. F32.9)",
+    )
+
+    diagnostico = models.CharField(
+        max_length=500, verbose_name="Descripción del Diagnóstico"
+    )
+
+    # Los checkboxes pueden tener múltiples valores seleccionados
+    confirmado_nuevo = models.BooleanField(default=False)
+    confirmado_antiguo = models.BooleanField(default=False)
+    en_estudio = models.BooleanField(default=False)
+
+    orden = models.PositiveIntegerField(default=1, verbose_name="Orden de aparición")
+
+    class Meta:
+        verbose_name = "Diagnóstico CIE-10"
+        verbose_name_plural = "Diagnósticos CIE-10"
+        ordering = ["orden"]
+
+    def __str__(self):
+        return f"{self.codigo} - {self.diagnostico[:50]}"
+
+
+class DiagnosticoDSMV(models.Model):
+    """
+    Modelo para diagnósticos DSM-V relacionados con el análisis general
+    """
+
+    analisis_result = models.ForeignKey(
+        AnalisisGeneralResult,
+        on_delete=models.CASCADE,
+        related_name="diagnosticos_dsmv",
+    )
+
+    codigo = models.CharField(
+        max_length=20,
+        verbose_name="Código DSM-V",
+        help_text="Código DSM-V (ej. 296.2x)",
+    )
+
+    diagnostico = models.CharField(
+        max_length=500, verbose_name="Descripción del Diagnóstico"
+    )
+
+    # Estados como campos booleanos separados
+    confirmado_nuevo = models.BooleanField(default=False)
+    confirmado_antiguo = models.BooleanField(default=False)
+    en_estudio = models.BooleanField(default=False)
+
+    orden = models.PositiveIntegerField(default=1, verbose_name="Orden de aparición")
+
+    class Meta:
+        verbose_name = "Diagnóstico DSM-V"
+        verbose_name_plural = "Diagnósticos DSM-V"
+        ordering = ["orden"]
+
+    def __str__(self):
+        return f"{self.codigo} - {self.diagnostico[:50]}"
+
+
+class DiagnosticoICSD3(models.Model):
+    """
+    Modelo para diagnósticos ICSD-3 relacionados con el análisis general
+    """
+
+    analisis_result = models.ForeignKey(
+        AnalisisGeneralResult,
+        on_delete=models.CASCADE,
+        related_name="diagnosticos_icsd3",
+    )
+
+    codigo = models.CharField(
+        max_length=20,
+        verbose_name="Código ICSD-3",
+        help_text="Código ICSD-3 (ej. G47.00)",
+    )
+
+    diagnostico = models.CharField(
+        max_length=500, verbose_name="Descripción del Diagnóstico"
+    )
+
+    # Estados como campos booleanos separados
+    confirmado_nuevo = models.BooleanField(default=False)
+    confirmado_antiguo = models.BooleanField(default=False)
+    en_estudio = models.BooleanField(default=False)
+
+    orden = models.PositiveIntegerField(default=1, verbose_name="Orden de aparición")
+
+    class Meta:
+        verbose_name = "Diagnóstico ICSD-3"
+        verbose_name_plural = "Diagnósticos ICSD-3"
+        ordering = ["orden"]
+
+    def __str__(self):
+        return f"{self.codigo} - {self.diagnostico[:50]}"
+
+
+class DiagnosticoNoClasificado(models.Model):
+    """
+    Modelo para diagnósticos no clasificados relacionados con el análisis general
+    """
+
+    analisis_result = models.ForeignKey(
+        AnalisisGeneralResult,
+        on_delete=models.CASCADE,
+        related_name="diagnosticos_no_clasificados",
+    )
+
+    diagnostico = models.CharField(
+        max_length=500, verbose_name="Descripción del Diagnóstico No Clasificado"
+    )
+
+    # Estados como campos booleanos separados
+    confirmado_nuevo = models.BooleanField(default=False)
+    confirmado_antiguo = models.BooleanField(default=False)
+    en_estudio = models.BooleanField(default=False)
+
+    orden = models.PositiveIntegerField(default=1, verbose_name="Orden de aparición")
+
+    class Meta:
+        verbose_name = "Diagnóstico No Clasificado"
+        verbose_name_plural = "Diagnósticos No Clasificados"
+        ordering = ["orden"]
+
+    def __str__(self):
+        return f"{self.diagnostico[:50]}"
