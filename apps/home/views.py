@@ -2097,15 +2097,42 @@ def guardar_examen_StopBang(request):
                 visita_examen.fecha_inicio = timezone.now()
                 visita_examen.save()
 
-            # Convertir valores (los radios envían "True" o "False")
-            ronca_fuerte = request.POST.get("ronca_fuerte") == "True"
-            cansado_frecuencia = request.POST.get("cansado_frecuencia") == "True"
-            deja_respirar = request.POST.get("deja_respirar") == "True"
-            presion_arterial = request.POST.get("presion_arterial") == "True"
-            imc_alto = request.POST.get("imc_alto") == "True"
-            mayor_50 = request.POST.get("mayor_50") == "True"
-            cuello_grande = request.POST.get("cuello_grande") == "True"
-            masculino = request.POST.get("masculino") == "True"
+            # CAMBIO: Convertir valores correctamente (ahora recibimos "0" y "1")
+            def convert_to_bool(value):
+                """Convierte valor del formulario a booleano"""
+                if value is None:
+                    return False
+                # Si viene como string "1" o "0"
+                if isinstance(value, str):
+                    return value == "1" or value.lower() == "true"
+                # Si viene como entero
+                return bool(int(value)) if str(value).isdigit() else False
+
+            # Aplicar conversión a todos los campos
+            ronca_fuerte = convert_to_bool(request.POST.get("ronca_fuerte"))
+            cansado_frecuencia = convert_to_bool(request.POST.get("cansado_frecuencia"))
+            deja_respirar = convert_to_bool(request.POST.get("deja_respirar"))
+            presion_arterial = convert_to_bool(request.POST.get("presion_arterial"))
+            imc_alto = convert_to_bool(request.POST.get("imc_alto"))
+            mayor_50 = convert_to_bool(request.POST.get("mayor_50"))
+            cuello_grande = convert_to_bool(request.POST.get("cuello_grande"))
+            masculino = convert_to_bool(request.POST.get("masculino"))
+
+            # DEBUG: Imprimir valores recibidos y convertidos
+            print("=== DEBUG STOP-BANG ===")
+            print(
+                f"ronca_fuerte: '{request.POST.get('ronca_fuerte')}' -> {ronca_fuerte}"
+            )
+            print(
+                f"cansado_frecuencia: '{request.POST.get('cansado_frecuencia')}' -> {cansado_frecuencia}"
+            )
+            print(
+                f"deja_respirar: '{request.POST.get('deja_respirar')}' -> {deja_respirar}"
+            )
+            print(
+                f"presion_arterial: '{request.POST.get('presion_arterial')}' -> {presion_arterial}"
+            )
+            print("=======================")
 
             # Calcular puntuación
             campos = [
