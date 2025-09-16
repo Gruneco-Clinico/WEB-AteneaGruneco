@@ -1937,3 +1937,1635 @@ class DiagnosticoNoClasificado(models.Model):
 
     def __str__(self):
         return f"{self.diagnostico[:50]}"
+
+
+class ExamenFisicoResult(ResultadoExamenBase):
+    """Modelo para el Examen Físico General"""
+
+    # Signos Vitales
+    talla = models.FloatField(
+        verbose_name="Talla (cm)", help_text="Rango normal adultos: 150-190 cm"
+    )
+    peso = models.FloatField(
+        verbose_name="Peso (kg)", help_text="Rango normal adultos: 45-100 kg"
+    )
+    imc = models.FloatField(
+        verbose_name="Índice de Masa Corporal", null=True, blank=True
+    )
+    temperatura = models.FloatField(
+        verbose_name="Temperatura (°C)", help_text="Normal: 36.1-37.2°C"
+    )
+    frecuencia_cardiaca = models.IntegerField(
+        verbose_name="Frecuencia Cardíaca (lpm)", help_text="Normal adultos: 60-100 lpm"
+    )
+    frecuencia_respiratoria = models.IntegerField(
+        verbose_name="Frecuencia Respiratoria (rpm)",
+        help_text="Normal adultos: 12-20 rpm",
+    )
+    presion_arterial_sistolica = models.IntegerField(
+        verbose_name="Presión Arterial Sistólica (mmHg)", help_text="Normal: <140 mmHg"
+    )
+    presion_arterial_diastolica = models.IntegerField(
+        verbose_name="Presión Arterial Diastólica (mmHg)", help_text="Normal: <90 mmHg"
+    )
+    perimetro_cefalico = models.FloatField(
+        verbose_name="Perímetro Cefálico (cm)",
+        null=True,
+        blank=True,
+        help_text="Para pacientes pediátricos",
+    )
+
+    # Cabeza y Cuello
+    cuero_cabelludo = models.CharField(
+        max_length=20,
+        choices=[("normal", "Normal"), ("anormal", "Anormal")],
+        default="normal",
+        verbose_name="Cuero Cabelludo",
+    )
+    observaciones_cuero_cabelludo = models.TextField(
+        blank=True, null=True, verbose_name="Observaciones Cuero Cabelludo"
+    )
+
+    oidos = models.CharField(
+        max_length=20,
+        choices=[("normal", "Normal"), ("anormal", "Anormal")],
+        default="normal",
+        verbose_name="Oídos",
+    )
+    observaciones_oidos = models.TextField(
+        blank=True, null=True, verbose_name="Observaciones Oídos"
+    )
+
+    nariz = models.CharField(
+        max_length=20,
+        choices=[("normal", "Normal"), ("anormal", "Anormal")],
+        default="normal",
+        verbose_name="Nariz",
+    )
+    observaciones_nariz = models.TextField(
+        blank=True, null=True, verbose_name="Observaciones Nariz"
+    )
+
+    cuello = models.CharField(
+        max_length=20,
+        choices=[("normal", "Normal"), ("anormal", "Anormal")],
+        default="normal",
+        verbose_name="Cuello",
+    )
+    observaciones_cuello = models.TextField(
+        blank=True, null=True, verbose_name="Observaciones Cuello"
+    )
+
+    otros_hallazgos_cabeza_cuello = models.TextField(
+        blank=True, null=True, verbose_name="Otros Hallazgos Cabeza y Cuello"
+    )
+
+    # Tórax / Respiratorio / Cardiovascular
+    forma_torax = models.CharField(
+        max_length=20,
+        choices=[("normal", "Normal"), ("anormal", "Anormal")],
+        default="normal",
+        verbose_name="Forma del Tórax",
+    )
+    observaciones_torax = models.TextField(
+        blank=True, null=True, verbose_name="Observaciones Tórax"
+    )
+
+    murmullo_vesicular = models.CharField(
+        max_length=20,
+        choices=[
+            ("conservado", "Conservado"),
+            ("ausente", "Ausente"),
+            ("disminuido", "Disminuido"),
+        ],
+        default="conservado",
+        verbose_name="Murmullo Vesicular",
+    )
+
+    ruidos_sobreagregados = models.BooleanField(
+        default=False, verbose_name="Ruidos Sobreagregados"
+    )
+    tipo_ruidos = models.CharField(
+        max_length=20,
+        choices=[
+            ("", "Ninguno"),
+            ("crepitantes", "Crepitantes"),
+            ("roncus", "Roncus"),
+            ("sibilancias", "Sibilancias"),
+            ("mixtos", "Mixtos"),
+        ],
+        blank=True,
+        null=True,
+        verbose_name="Tipo de Ruidos",
+    )
+
+    ruidos_cardiacos = models.CharField(
+        max_length=20,
+        choices=[
+            ("ritmicos", "Rítmicos"),
+            ("arritmicos", "Arrítmicos"),
+            ("soplos", "Soplos"),
+        ],
+        default="ritmicos",
+        verbose_name="Ruidos Cardíacos",
+    )
+    observaciones_soplos = models.TextField(
+        blank=True, null=True, verbose_name="Descripción de Soplos"
+    )
+
+    observaciones_cardiorespiratorio = models.TextField(
+        blank=True, null=True, verbose_name="Observaciones Sistema Cardiorrespiratorio"
+    )
+
+    # Abdomen
+    peristaltismo = models.CharField(
+        max_length=20,
+        choices=[
+            ("presente", "Presente"),
+            ("ausente", "Ausente"),
+            ("aumentado", "Aumentado"),
+            ("disminuido", "Disminuido"),
+        ],
+        default="presente",
+        verbose_name="Peristaltismo",
+    )
+
+    pared_abdominal = models.BooleanField(
+        default=False, verbose_name="Alteración Pared Abdominal"
+    )
+    observaciones_pared = models.TextField(
+        blank=True, null=True, verbose_name="Observaciones Pared Abdominal"
+    )
+
+    dolor_abdominal = models.BooleanField(
+        default=False, verbose_name="Dolor a la Palpación"
+    )
+    ubicacion_dolor = models.CharField(
+        max_length=20,
+        choices=[
+            ("", "Ninguna"),
+            ("difuso", "Difuso"),
+            ("csd", "Cuadrante Superior Derecho"),
+            ("csi", "Cuadrante Superior Izquierdo"),
+            ("cid", "Cuadrante Inferior Derecho"),
+            ("cii", "Cuadrante Inferior Izquierdo"),
+        ],
+        blank=True,
+        null=True,
+        verbose_name="Ubicación del Dolor",
+    )
+
+    observaciones_abdomen = models.TextField(
+        blank=True, null=True, verbose_name="Observaciones Abdominales"
+    )
+
+    # Sistema Osteomuscular
+    curvatura_cervical = models.BooleanField(
+        default=False, verbose_name="Alteración Curvatura Cervical"
+    )
+    observaciones_cervical = models.TextField(
+        blank=True, null=True, verbose_name="Observaciones Cervical"
+    )
+
+    curvatura_toracica = models.BooleanField(
+        default=False, verbose_name="Alteración Curvatura Torácica"
+    )
+    observaciones_toracica = models.TextField(
+        blank=True, null=True, verbose_name="Observaciones Torácica"
+    )
+
+    curvatura_lumbar = models.BooleanField(
+        default=False, verbose_name="Alteración Curvatura Lumbar"
+    )
+    observaciones_lumbar = models.TextField(
+        blank=True, null=True, verbose_name="Observaciones Lumbar"
+    )
+
+    arcos_movimiento_superiores = models.BooleanField(
+        default=False, verbose_name="Alteración Arcos Movimiento Superiores"
+    )
+    observaciones_arcos_sup = models.TextField(
+        blank=True, null=True, verbose_name="Observaciones Arcos Superiores"
+    )
+
+    arcos_movimiento_inferiores = models.BooleanField(
+        default=False, verbose_name="Alteración Arcos Movimiento Inferiores"
+    )
+    observaciones_arcos_inf = models.TextField(
+        blank=True, null=True, verbose_name="Observaciones Arcos Inferiores"
+    )
+
+    asimetrias_inferiores = models.BooleanField(
+        default=False, verbose_name="Asimetrías Miembros Inferiores"
+    )
+    observaciones_asimetrias = models.TextField(
+        blank=True, null=True, verbose_name="Observaciones Asimetrías"
+    )
+
+    observaciones_osteomuscular = models.TextField(
+        blank=True, null=True, verbose_name="Observaciones Sistema Osteomuscular"
+    )
+
+    # Piel y Anexos
+    maculas = models.BooleanField(default=False, verbose_name="Máculas")
+    observaciones_maculas = models.TextField(
+        blank=True, null=True, verbose_name="Ubicación Máculas"
+    )
+
+    papulas = models.BooleanField(default=False, verbose_name="Pápulas")
+    observaciones_papulas = models.TextField(
+        blank=True, null=True, verbose_name="Ubicación Pápulas"
+    )
+
+    vesiculas = models.BooleanField(default=False, verbose_name="Vesículas")
+    observaciones_vesiculas = models.TextField(
+        blank=True, null=True, verbose_name="Ubicación Vesículas"
+    )
+
+    pustulas = models.BooleanField(default=False, verbose_name="Pústulas")
+    observaciones_pustulas = models.TextField(
+        blank=True, null=True, verbose_name="Ubicación Pústulas"
+    )
+
+    fisuras = models.BooleanField(default=False, verbose_name="Fisuras")
+    observaciones_fisuras = models.TextField(
+        blank=True, null=True, verbose_name="Ubicación Fisuras"
+    )
+
+    def save(self, *args, **kwargs):
+        """Calcular IMC automáticamente al guardar"""
+        if self.talla and self.peso:
+            talla_metros = self.talla / 100  # Convertir cm a metros
+            self.imc = round(self.peso / (talla_metros * talla_metros), 2)
+        super().save(*args, **kwargs)
+
+    def get_interpretacion_imc(self):
+        """Interpretación del IMC"""
+        if not self.imc:
+            return ""
+
+        if self.imc < 18.5:
+            return "Bajo peso"
+        elif 18.5 <= self.imc < 24.9:
+            return "Peso normal"
+        elif 25 <= self.imc < 29.9:
+            return "Sobrepeso"
+        elif self.imc >= 30:
+            return "Obesidad"
+        return ""
+
+    def get_resumen_signos_vitales(self):
+        """Resumen de signos vitales para mostrar en vistas"""
+        return {
+            "temperatura": f"{self.temperatura}°C"
+            if self.temperatura
+            else "No registrada",
+            "presion_arterial": f"{self.presion_arterial_sistolica}/{self.presion_arterial_diastolica} mmHg",
+            "frecuencia_cardiaca": f"{self.frecuencia_cardiaca} lpm"
+            if self.frecuencia_cardiaca
+            else "No registrada",
+            "frecuencia_respiratoria": f"{self.frecuencia_respiratoria} rpm"
+            if self.frecuencia_respiratoria
+            else "No registrada",
+            "imc": f"{self.imc} ({self.get_interpretacion_imc()})"
+            if self.imc
+            else "No calculado",
+        }
+
+    def has_alteraciones(self):
+        """Verificar si hay alteraciones en el examen"""
+        alteraciones = []
+
+        # Verificar alteraciones por sistema
+        if (
+            self.cuero_cabelludo == "anormal"
+            or self.oidos == "anormal"
+            or self.nariz == "anormal"
+            or self.cuello == "anormal"
+        ):
+            alteraciones.append("Cabeza y Cuello")
+
+        if (
+            self.forma_torax == "anormal"
+            or self.ruidos_sobreagregados
+            or self.ruidos_cardiacos == "soplos"
+        ):
+            alteraciones.append("Cardiorrespiratorio")
+
+        if self.pared_abdominal or self.dolor_abdominal:
+            alteraciones.append("Abdomen")
+
+        if any(
+            [
+                self.curvatura_cervical,
+                self.curvatura_toracica,
+                self.curvatura_lumbar,
+                self.arcos_movimiento_superiores,
+                self.arcos_movimiento_inferiores,
+                self.asimetrias_inferiores,
+            ]
+        ):
+            alteraciones.append("Osteomuscular")
+
+        if any(
+            [self.maculas, self.papulas, self.vesiculas, self.pustulas, self.fisuras]
+        ):
+            alteraciones.append("Piel y Anexos")
+
+        return alteraciones
+
+    class Meta:
+        verbose_name = "Resultado Examen Físico"
+        verbose_name_plural = "Resultados Exámenes Físicos"
+
+    def __str__(self):
+        alteraciones = self.has_alteraciones()
+        estado = (
+            f"Con alteraciones en: {', '.join(alteraciones)}"
+            if alteraciones
+            else "Sin alteraciones significativas"
+        )
+        return f"Examen Físico - {self.visita_examen.visita.paciente} - {estado}"
+
+
+class AntecedentesResult(ResultadoExamenBase):
+    """Modelo principal para Antecedentes Médicos"""
+
+    # Campos de control general
+    tiene_antecedentes = models.BooleanField(
+        default=False, verbose_name="¿Presenta algún antecedente médico?"
+    )
+
+    observaciones_generales = models.TextField(
+        blank=True, null=True, verbose_name="Observaciones Generales"
+    )
+
+    def get_resumen_antecedentes(self):
+        """Resumen de todos los antecedentes del paciente"""
+        resumen = {}
+
+        # Contar antecedentes por tipo
+        resumen["patologicos"] = self.antecedentes_patologicos.filter(
+            activo=True
+        ).count()
+        resumen["quirurgicos"] = self.antecedentes_quirurgicos.filter(
+            activo=True
+        ).count()
+        resumen["farmacologicos"] = self.antecedentes_farmacologicos.filter(
+            activo=True
+        ).count()
+        resumen["toxicos"] = self.antecedentes_toxicos.filter(activo=True).count()
+        resumen["familiares"] = self.antecedentes_familiares.count()
+        resumen["alergicos"] = self.antecedentes_alergicos.filter(activo=True).count()
+        resumen["traumaticos"] = self.antecedentes_traumaticos.filter(
+            activo=True
+        ).count()
+        resumen["gineco"] = self.antecedentes_gineco.count()
+
+        return resumen
+
+    class Meta:
+        verbose_name = "Resultado Antecedentes Médicos"
+        verbose_name_plural = "Resultados Antecedentes Médicos"
+
+    def __str__(self):
+        resumen = self.get_resumen_antecedentes()
+        total = sum(resumen.values())
+        return f"Antecedentes - {self.visita_examen.visita.paciente} - {total} antecedentes registrados"
+
+
+class AntecedentePatologico(models.Model):
+    """Antecedentes Patológicos"""
+
+    TIPOS_PATOLOGIA = [
+        ("hipertension", "Hipertensión arterial"),
+        ("dislipidemia", "Dislipidemia"),
+        ("diabetes", "Diabetes"),
+        ("cancer", "Cáncer"),
+        ("enfermedad_renal", "Enfermedad Renal"),
+        ("enfermedad_cardiaca", "Enfermedad Cardíaca"),
+        ("enfermedad_respiratoria", "Enfermedad Respiratoria"),
+        ("enfermedad_hepatica", "Enfermedad Hepática"),
+        ("enfermedad_tiroidea", "Enfermedad Tiroidea"),
+        ("enfermedad_cerebrovascular", "Enfermedad Cerebrovascular"),
+        ("enfermedad_psiquiatrica", "Enfermedad Psiquiátrica"),
+        ("cefalea", "Cefalea"),
+        ("crisis_convulsivas", "Crisis Convulsivas"),
+        ("enfermedades_neurodegenerativas", "Enfermedades Neurodegenerativas"),
+        ("retardo_mental", "Retardo Mental"),
+        ("dificultades_aprendizaje", "Dificultades del Aprendizaje"),
+        ("sindrome_down", "Síndrome de Down"),
+        ("trastorno_desarrollo", "Trastorno del desarrollo psicomotor"),
+        ("deficit_atencion", "Déficit de atención o hiperactividad"),
+        ("otros", "Otros"),
+    ]
+
+    antecedente_result = models.ForeignKey(
+        AntecedentesResult,
+        on_delete=models.CASCADE,
+        related_name="antecedentes_patologicos",
+    )
+    tipo_patologia = models.CharField(
+        max_length=50, choices=TIPOS_PATOLOGIA, verbose_name="Tipo de Patología"
+    )
+    descripcion_otros = models.CharField(
+        max_length=200, blank=True, null=True, verbose_name="Descripción (si es otros)"
+    )
+    fecha_inicio = models.DateField(verbose_name="Fecha de Inicio")
+    ha_recibido_tratamiento = models.BooleanField(
+        default=False, verbose_name="¿Ha recibido tratamiento?"
+    )
+    detalle_tratamiento = models.TextField(
+        blank=True, null=True, verbose_name="Detalle del Tratamiento"
+    )
+    tiene_complicaciones = models.BooleanField(
+        default=False, verbose_name="¿Tiene complicaciones?"
+    )
+    detalle_complicaciones = models.TextField(
+        blank=True, null=True, verbose_name="Detalle de Complicaciones"
+    )
+    activo = models.BooleanField(default=True, verbose_name="¿Activo actualmente?")
+    fecha_finalizacion = models.DateField(
+        blank=True, null=True, verbose_name="Fecha de Finalización"
+    )
+    observaciones = models.TextField(
+        blank=True, null=True, verbose_name="Observaciones"
+    )
+
+    class Meta:
+        verbose_name = "Antecedente Patológico"
+        verbose_name_plural = "Antecedentes Patológicos"
+
+    def __str__(self):
+        return f"{self.get_tipo_patologia_display()} - {self.fecha_inicio}"
+
+
+class AntecedenteQuirurgico(models.Model):
+    """Antecedentes Quirúrgicos"""
+
+    antecedente_result = models.ForeignKey(
+        AntecedentesResult,
+        on_delete=models.CASCADE,
+        related_name="antecedentes_quirurgicos",
+    )
+    descripcion = models.CharField(
+        max_length=200, verbose_name="Descripción de la Cirugía"
+    )
+    fecha_intervencion = models.DateField(verbose_name="Fecha de Intervención")
+    ha_recibido_tratamiento = models.BooleanField(
+        default=False, verbose_name="¿Ha recibido tratamiento?"
+    )
+    detalle_tratamiento = models.TextField(
+        blank=True, null=True, verbose_name="Detalle del Tratamiento"
+    )
+    tiene_complicaciones = models.BooleanField(
+        default=False, verbose_name="¿Tiene complicaciones?"
+    )
+    detalle_complicaciones = models.TextField(
+        blank=True, null=True, verbose_name="Detalle de Complicaciones"
+    )
+    activo = models.BooleanField(default=True, verbose_name="¿Activo actualmente?")
+    fecha_finalizacion = models.DateField(
+        blank=True, null=True, verbose_name="Fecha de Finalización"
+    )
+    observaciones = models.TextField(
+        blank=True, null=True, verbose_name="Observaciones"
+    )
+
+    class Meta:
+        verbose_name = "Antecedente Quirúrgico"
+        verbose_name_plural = "Antecedentes Quirúrgicos"
+
+    def __str__(self):
+        return f"{self.descripcion} - {self.fecha_intervencion}"
+
+
+class AntecedenteFarmacologico(models.Model):
+    """Antecedentes Farmacológicos"""
+
+    antecedente_result = models.ForeignKey(
+        AntecedentesResult,
+        on_delete=models.CASCADE,
+        related_name="antecedentes_farmacologicos",
+    )
+    descripcion = models.CharField(
+        max_length=200, verbose_name="Descripción del Medicamento/Reacción"
+    )
+    fecha_inicio = models.DateField(verbose_name="Fecha de Inicio")
+    recibio_tratamiento = models.BooleanField(
+        default=False, verbose_name="¿Recibió tratamiento?"
+    )
+    detalle_tratamiento = models.TextField(
+        blank=True, null=True, verbose_name="Detalle del Tratamiento"
+    )
+    tuvo_complicaciones = models.BooleanField(
+        default=False, verbose_name="¿Tuvo complicaciones?"
+    )
+    detalle_complicaciones = models.TextField(
+        blank=True, null=True, verbose_name="Detalle de Complicaciones"
+    )
+    activo = models.BooleanField(default=True, verbose_name="¿Está activo?")
+    fecha_finalizacion = models.DateField(
+        blank=True, null=True, verbose_name="Fecha de Finalización"
+    )
+    observaciones = models.TextField(
+        blank=True, null=True, verbose_name="Observaciones"
+    )
+
+    class Meta:
+        verbose_name = "Antecedente Farmacológico"
+        verbose_name_plural = "Antecedentes Farmacológicos"
+
+    def __str__(self):
+        return f"{self.descripcion} - {self.fecha_inicio}"
+
+
+class AntecedenteToxico(models.Model):
+    """Antecedentes Tóxicos"""
+
+    TIPOS_TOXICO = [
+        ("tabaquismo", "Tabaquismo"),
+        ("alcohol", "Consumo de Alcohol"),
+        ("sustancias_psicoactivas", "Sustancias Psicoactivas"),
+        ("intoxicaciones", "Intoxicaciones"),
+        ("alergias_medicamentos", "Alergias a Medicamentos"),
+        ("otros", "Otros"),
+    ]
+
+    antecedente_result = models.ForeignKey(
+        AntecedentesResult,
+        on_delete=models.CASCADE,
+        related_name="antecedentes_toxicos",
+    )
+    tipos_toxico = models.JSONField(
+        default=list, verbose_name="Tipos de Antecedente Tóxico"
+    )
+    descripcion_otros = models.CharField(
+        max_length=200, blank=True, null=True, verbose_name="Descripción (otros)"
+    )
+    fecha_inicio = models.DateField(verbose_name="Fecha de Inicio")
+    ha_recibido_tratamiento = models.BooleanField(
+        default=False, verbose_name="¿Ha recibido tratamiento?"
+    )
+    detalle_tratamiento = models.TextField(
+        blank=True, null=True, verbose_name="Detalle del Tratamiento"
+    )
+    tiene_complicaciones = models.BooleanField(
+        default=False, verbose_name="¿Tiene complicaciones?"
+    )
+    detalle_complicaciones = models.TextField(
+        blank=True, null=True, verbose_name="Detalle de Complicaciones"
+    )
+    activo = models.BooleanField(default=True, verbose_name="¿Activo actualmente?")
+    fecha_finalizacion = models.DateField(
+        blank=True, null=True, verbose_name="Fecha de Finalización"
+    )
+    observaciones = models.TextField(
+        blank=True, null=True, verbose_name="Observaciones"
+    )
+
+    def get_tipos_display(self):
+        """Obtener nombres legibles de los tipos tóxicos"""
+        tipos_dict = dict(self.TIPOS_TOXICO)
+        return [tipos_dict.get(tipo, tipo) for tipo in self.tipos_toxico]
+
+    class Meta:
+        verbose_name = "Antecedente Tóxico"
+        verbose_name_plural = "Antecedentes Tóxicos"
+
+    def __str__(self):
+        tipos = ", ".join(self.get_tipos_display())
+        return f"{tipos} - {self.fecha_inicio}"
+
+
+class AntecedenteFamiliar(models.Model):
+    """Antecedentes Familiares"""
+
+    antecedente_result = models.ForeignKey(
+        AntecedentesResult,
+        on_delete=models.CASCADE,
+        related_name="antecedentes_familiares",
+    )
+    tipo_antecedente = models.CharField(
+        max_length=200, verbose_name="Tipo de Antecedente"
+    )
+    parentesco = models.CharField(max_length=100, verbose_name="Parentesco")
+    observaciones = models.TextField(
+        blank=True, null=True, verbose_name="Observaciones"
+    )
+
+    class Meta:
+        verbose_name = "Antecedente Familiar"
+        verbose_name_plural = "Antecedentes Familiares"
+
+    def __str__(self):
+        return f"{self.tipo_antecedente} - {self.parentesco}"
+
+
+class AntecedenteAlergico(models.Model):
+    """Antecedentes Alérgicos"""
+
+    antecedente_result = models.ForeignKey(
+        AntecedentesResult,
+        on_delete=models.CASCADE,
+        related_name="antecedentes_alergicos",
+    )
+    descripcion = models.CharField(
+        max_length=200, verbose_name="Descripción de la Alergia"
+    )
+    fecha_inicio = models.DateField(verbose_name="Fecha de Inicio")
+    tratamiento_recibido = models.CharField(
+        max_length=200, blank=True, null=True, verbose_name="Tratamiento Recibido"
+    )
+    detalle_tratamiento = models.TextField(
+        blank=True, null=True, verbose_name="Detalle del Tratamiento"
+    )
+    complicaciones = models.TextField(
+        blank=True, null=True, verbose_name="Complicaciones"
+    )
+    activo = models.BooleanField(default=True, verbose_name="¿Está activo?")
+    fecha_finalizacion = models.DateField(
+        blank=True, null=True, verbose_name="Fecha de Finalización"
+    )
+    observaciones = models.TextField(
+        blank=True, null=True, verbose_name="Observaciones"
+    )
+
+    class Meta:
+        verbose_name = "Antecedente Alérgico"
+        verbose_name_plural = "Antecedentes Alérgicos"
+
+    def __str__(self):
+        return f"{self.descripcion} - {self.fecha_inicio}"
+
+
+class AntecedenteTraumatico(models.Model):
+    """Antecedentes Traumáticos"""
+
+    antecedente_result = models.ForeignKey(
+        AntecedentesResult,
+        on_delete=models.CASCADE,
+        related_name="antecedentes_traumaticos",
+    )
+    descripcion = models.CharField(
+        max_length=200, verbose_name="Descripción del Trauma"
+    )
+    fecha_inicio = models.DateField(verbose_name="Fecha del Trauma")
+    tratamiento_recibido = models.CharField(
+        max_length=200, blank=True, null=True, verbose_name="Tratamiento Recibido"
+    )
+    detalle_tratamiento = models.TextField(
+        blank=True, null=True, verbose_name="Detalle del Tratamiento"
+    )
+    complicaciones = models.TextField(
+        blank=True, null=True, verbose_name="Complicaciones"
+    )
+    activo = models.BooleanField(default=True, verbose_name="¿Está activo?")
+    fecha_finalizacion = models.DateField(
+        blank=True, null=True, verbose_name="Fecha de Finalización"
+    )
+    observaciones = models.TextField(
+        blank=True, null=True, verbose_name="Observaciones"
+    )
+
+    class Meta:
+        verbose_name = "Antecedente Traumático"
+        verbose_name_plural = "Antecedentes Traumáticos"
+
+    def __str__(self):
+        return f"{self.descripcion} - {self.fecha_inicio}"
+
+
+class AntecedenteGinecoObstetrico(models.Model):
+    """Antecedentes Gineco-Obstétricos"""
+
+    antecedente_result = models.OneToOneField(
+        AntecedentesResult, on_delete=models.CASCADE, related_name="antecedentes_gineco"
+    )
+
+    # Menarquia
+    tiene_menarquia = models.BooleanField(
+        default=False, verbose_name="¿Ha tenido menarquia?"
+    )
+    edad_menarquia = models.IntegerField(
+        blank=True, null=True, verbose_name="Edad de Menarquia"
+    )
+
+    # Menopausia
+    tiene_menopausia = models.BooleanField(
+        default=False, verbose_name="¿Ha tenido menopausia?"
+    )
+    edad_menopausia = models.IntegerField(
+        blank=True, null=True, verbose_name="Edad de Menopausia"
+    )
+
+    # Historia obstétrica
+    gravidez = models.IntegerField(default=0, verbose_name="Gravidez (G)")
+    abortos = models.IntegerField(default=0, verbose_name="Abortos (A)")
+    hijos_vivos = models.IntegerField(default=0, verbose_name="Hijos Vivos (HV)")
+
+    # Planificación familiar
+    usa_metodo_planificacion = models.BooleanField(
+        default=False, verbose_name="¿Usa método de planificación?"
+    )
+    metodo_detalle = models.CharField(
+        max_length=100, blank=True, null=True, verbose_name="Método de Planificación"
+    )
+    dosis_planificacion = models.CharField(
+        max_length=100, blank=True, null=True, verbose_name="Dosis"
+    )
+    adherencia_planificacion = models.CharField(
+        max_length=100, blank=True, null=True, verbose_name="Adherencia"
+    )
+    tolerancia_planificacion = models.CharField(
+        max_length=100, blank=True, null=True, verbose_name="Tolerancia"
+    )
+    observaciones = models.TextField(
+        blank=True, null=True, verbose_name="Observaciones"
+    )
+
+    def get_formula_obstetrica(self):
+        """Obtener fórmula obstétrica G-A-HV"""
+        return f"G{self.gravidez}-A{self.abortos}-HV{self.hijos_vivos}"
+
+    class Meta:
+        verbose_name = "Antecedente Gineco-Obstétrico"
+        verbose_name_plural = "Antecedentes Gineco-Obstétricos"
+
+    def __str__(self):
+        formula = self.get_formula_obstetrica()
+        return f"Gineco-Obstétrico - {formula}"
+
+
+class ExamenNeurologicoResult(ResultadoExamenBase):
+    """Modelo para el Examen Neurológico"""
+
+    # ===== I PAR CRANEAL (OLFATORIO) =====
+    # Clavos
+    clavos_izquierdo = models.BooleanField(
+        default=False, verbose_name="Clavos - Fosa nasal izquierda"
+    )
+    clavos_derecho = models.BooleanField(
+        default=False, verbose_name="Clavos - Fosa nasal derecha"
+    )
+
+    # Pimienta
+    pimienta_izquierdo = models.BooleanField(
+        default=False, verbose_name="Pimienta - Fosa nasal izquierda"
+    )
+    pimienta_derecho = models.BooleanField(
+        default=False, verbose_name="Pimienta - Fosa nasal derecha"
+    )
+
+    # Café
+    cafe_izquierdo = models.BooleanField(
+        default=False, verbose_name="Café - Fosa nasal izquierda"
+    )
+    cafe_derecho = models.BooleanField(
+        default=False, verbose_name="Café - Fosa nasal derecha"
+    )
+
+    # ===== II PAR CRANEAL (ÓPTICO) =====
+    agudeza_visual_alterada = models.BooleanField(
+        default=False, verbose_name="Agudeza Visual Alterada"
+    )
+
+    CAMPIMETRIA_CHOICES = [
+        ("", "No evaluada"),
+        ("CV1", "CV1"),
+        ("CV2", "CV2"),
+        ("CV3", "CV3"),
+        ("CV4", "CV4"),
+        ("CV5", "CV5"),
+        ("CV6", "CV6"),
+        ("CV7", "CV7"),
+        ("CV8", "CV8"),
+        ("CV9", "CV9"),
+    ]
+
+    campimetria = models.CharField(
+        max_length=10,
+        choices=CAMPIMETRIA_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Campimetría",
+    )
+
+    FUNDOSCOPIA_CHOICES = [
+        ("normal", "Normal"),
+        ("anormal", "Anormal"),
+    ]
+
+    fundoscopia = models.CharField(
+        max_length=10,
+        choices=FUNDOSCOPIA_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Fundoscopia",
+    )
+
+    # ===== III, IV y VI PAR CRANEAL (OCULOMOTORES) =====
+    diplopia = models.BooleanField(default=False, verbose_name="Diplopía presente")
+
+    ptosis_palpebral = models.BooleanField(
+        default=False, verbose_name="Ptosis palpebral presente"
+    )
+
+    MOVIMIENTOS_CHOICES = [
+        ("normal", "Normal"),
+        ("anormal", "Anormal"),
+    ]
+
+    movimientos_oculares = models.CharField(
+        max_length=10,
+        choices=MOVIMIENTOS_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Movimientos Oculares",
+    )
+
+    # ===== V PAR CRANEAL (TRIGÉMINO) =====
+    # Tacto superficial
+    tacto_frente = models.BooleanField(
+        default=False, verbose_name="Tacto superficial - Frente/globo ocular alterado"
+    )
+    tacto_parpado = models.BooleanField(
+        default=False,
+        verbose_name="Tacto superficial - Párpado inferior/labio superior alterado",
+    )
+    tacto_labio = models.BooleanField(
+        default=False, verbose_name="Tacto superficial - Labio inferior/mentón alterado"
+    )
+
+    # Fuerza muscular
+    fuerza_maseteros = models.BooleanField(
+        default=False, verbose_name="Fuerza muscular - Maseteros alterada"
+    )
+    fuerza_temporales = models.BooleanField(
+        default=False, verbose_name="Fuerza muscular - Temporales alterada"
+    )
+    fuerza_pterigoideos = models.BooleanField(
+        default=False, verbose_name="Fuerza muscular - Pterigoideos alterada"
+    )
+
+    # ===== VII PAR CRANEAL (FACIAL) =====
+    # Mímica facial
+    mimica_frente = models.BooleanField(
+        default=False, verbose_name="Mímica facial - Frente alterada"
+    )
+    mimica_parpados = models.BooleanField(
+        default=False, verbose_name="Mímica facial - Párpados alterada"
+    )
+    mimica_nasal = models.BooleanField(
+        default=False, verbose_name="Mímica facial - Elevación nasal alterada"
+    )
+
+    gusto_tercio_anterior = models.CharField(
+        max_length=10,
+        choices=MOVIMIENTOS_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Gusto tercio anterior de la lengua",
+    )
+
+    # ===== VIII PAR CRANEAL (AUDITIVO) =====
+    weber = models.CharField(
+        max_length=10,
+        choices=MOVIMIENTOS_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Prueba de Weber",
+    )
+
+    rinne = models.CharField(
+        max_length=10,
+        choices=MOVIMIENTOS_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Prueba de Rinne",
+    )
+
+    nistagmus = models.BooleanField(default=False, verbose_name="Nistagmus presente")
+
+    # ===== IX y X PAR CRANEAL (GLOSOFARÍNGEO Y VAGO) =====
+    reflejo_nauseoso = models.CharField(
+        max_length=10,
+        choices=MOVIMIENTOS_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Reflejo nauseoso",
+    )
+
+    posicion_uvula = models.CharField(
+        max_length=10,
+        choices=MOVIMIENTOS_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Posición de la úvula",
+    )
+
+    # ===== XI PAR CRANEAL (ESPINAL ACCESORIO) =====
+    elevacion_hombros = models.CharField(
+        max_length=10,
+        choices=MOVIMIENTOS_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Elevación de hombros",
+    )
+
+    # ===== XII PAR CRANEAL (HIPOGLOSO) =====
+    movimientos_lengua = models.CharField(
+        max_length=10,
+        choices=MOVIMIENTOS_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Movimientos de la lengua",
+    )
+
+    # ===== SENSIBILIDAD =====
+    # Dolor al pinchazo
+    dolor_cuello = models.BooleanField(
+        default=False, verbose_name="Dolor al pinchazo - Cuello alterado"
+    )
+    dolor_torax = models.BooleanField(
+        default=False, verbose_name="Dolor al pinchazo - Tórax alterado"
+    )
+    dolor_brazo_izquierdo = models.BooleanField(
+        default=False, verbose_name="Dolor al pinchazo - Brazo izquierdo alterado"
+    )
+    dolor_brazo_derecho = models.BooleanField(
+        default=False, verbose_name="Dolor al pinchazo - Brazo derecho alterado"
+    )
+    dolor_pierna_izquierda = models.BooleanField(
+        default=False, verbose_name="Dolor al pinchazo - Pierna izquierda alterada"
+    )
+    dolor_pierna_derecha = models.BooleanField(
+        default=False, verbose_name="Dolor al pinchazo - Pierna derecha alterada"
+    )
+
+    # Táctil superficial
+    tactil_cuello = models.BooleanField(
+        default=False, verbose_name="Táctil superficial - Cuello alterado"
+    )
+    tactil_torax = models.BooleanField(
+        default=False, verbose_name="Táctil superficial - Tórax alterado"
+    )
+    tactil_brazo_izquierdo = models.BooleanField(
+        default=False, verbose_name="Táctil superficial - Brazo izquierdo alterado"
+    )
+    tactil_brazo_derecho = models.BooleanField(
+        default=False, verbose_name="Táctil superficial - Brazo derecho alterado"
+    )
+    tactil_pierna_izquierda = models.BooleanField(
+        default=False, verbose_name="Táctil superficial - Pierna izquierda alterada"
+    )
+    tactil_pierna_derecha = models.BooleanField(
+        default=False, verbose_name="Táctil superficial - Pierna derecha alterada"
+    )
+
+    # Térmica
+    termica_cuello = models.BooleanField(
+        default=False, verbose_name="Sensibilidad térmica - Cuello alterada"
+    )
+    termica_torax = models.BooleanField(
+        default=False, verbose_name="Sensibilidad térmica - Tórax alterada"
+    )
+    termica_brazo_izquierdo = models.BooleanField(
+        default=False, verbose_name="Sensibilidad térmica - Brazo izquierdo alterada"
+    )
+    termica_brazo_derecho = models.BooleanField(
+        default=False, verbose_name="Sensibilidad térmica - Brazo derecho alterada"
+    )
+    termica_pierna_izquierda = models.BooleanField(
+        default=False, verbose_name="Sensibilidad térmica - Pierna izquierda alterada"
+    )
+    termica_pierna_derecha = models.BooleanField(
+        default=False, verbose_name="Sensibilidad térmica - Pierna derecha alterada"
+    )
+
+    # ===== REFLEJOS =====
+    REFLEJO_CHOICES = [
+        ("0", "0. Sin respuesta"),
+        ("1", "1. Disminuido"),
+        ("2", "2. Normal"),
+        ("3", "3. Aumentado"),
+        ("4", "4. Clonus agotable"),
+        ("5", "5. Clonus permanente"),
+    ]
+
+    # Maseteriano
+    maseteriano_izquierdo = models.CharField(
+        max_length=1,
+        choices=REFLEJO_CHOICES,
+        default="2",
+        verbose_name="Reflejo maseteriano izquierdo",
+    )
+    maseteriano_derecho = models.CharField(
+        max_length=1,
+        choices=REFLEJO_CHOICES,
+        default="2",
+        verbose_name="Reflejo maseteriano derecho",
+    )
+
+    # Bicipital
+    bicipital_izquierdo = models.CharField(
+        max_length=1,
+        choices=REFLEJO_CHOICES,
+        default="2",
+        verbose_name="Reflejo bicipital izquierdo",
+    )
+    bicipital_derecho = models.CharField(
+        max_length=1,
+        choices=REFLEJO_CHOICES,
+        default="2",
+        verbose_name="Reflejo bicipital derecho",
+    )
+
+    # Tricipital
+    tricipital_izquierdo = models.CharField(
+        max_length=1,
+        choices=REFLEJO_CHOICES,
+        default="2",
+        verbose_name="Reflejo tricipital izquierdo",
+    )
+    tricipital_derecho = models.CharField(
+        max_length=1,
+        choices=REFLEJO_CHOICES,
+        default="2",
+        verbose_name="Reflejo tricipital derecho",
+    )
+
+    # Estiloradial
+    estiloradial_izquierdo = models.CharField(
+        max_length=1,
+        choices=REFLEJO_CHOICES,
+        default="2",
+        verbose_name="Reflejo estiloradial izquierdo",
+    )
+    estiloradial_derecho = models.CharField(
+        max_length=1,
+        choices=REFLEJO_CHOICES,
+        default="2",
+        verbose_name="Reflejo estiloradial derecho",
+    )
+
+    # Rotuliano
+    rotuliano_izquierdo = models.CharField(
+        max_length=1,
+        choices=REFLEJO_CHOICES,
+        default="2",
+        verbose_name="Reflejo rotuliano izquierdo",
+    )
+    rotuliano_derecho = models.CharField(
+        max_length=1,
+        choices=REFLEJO_CHOICES,
+        default="2",
+        verbose_name="Reflejo rotuliano derecho",
+    )
+
+    # Aquiliano
+    aquiliano_izquierdo = models.CharField(
+        max_length=1,
+        choices=REFLEJO_CHOICES,
+        default="2",
+        verbose_name="Reflejo aquiliano izquierdo",
+    )
+    aquiliano_derecho = models.CharField(
+        max_length=1,
+        choices=REFLEJO_CHOICES,
+        default="2",
+        verbose_name="Reflejo aquiliano derecho",
+    )
+
+    # ===== OBSERVACIONES GENERALES =====
+    observaciones_pares_craneales = models.TextField(
+        blank=True, null=True, verbose_name="Observaciones Pares Craneales"
+    )
+
+    observaciones_sensibilidad = models.TextField(
+        blank=True, null=True, verbose_name="Observaciones Sensibilidad"
+    )
+
+    observaciones_reflejos = models.TextField(
+        blank=True, null=True, verbose_name="Observaciones Reflejos"
+    )
+
+    # ===== MÉTODOS AUXILIARES =====
+    def get_alteraciones_pares_craneales(self):
+        """Obtener lista de pares craneales con alteraciones"""
+        alteraciones = []
+
+        # I Par (Olfatorio)
+        if not any(
+            [
+                self.clavos_izquierdo,
+                self.clavos_derecho,
+                self.pimienta_izquierdo,
+                self.pimienta_derecho,
+                self.cafe_izquierdo,
+                self.cafe_derecho,
+            ]
+        ):
+            alteraciones.append("I Par (Olfatorio): Sin respuesta olfatoria")
+
+        # II Par (Óptico)
+        if self.agudeza_visual_alterada or self.fundoscopia == "anormal":
+            alteraciones.append("II Par (Óptico): Alteraciones visuales")
+
+        # III, IV, VI Par (Oculomotores)
+        if (
+            self.diplopia
+            or self.ptosis_palpebral
+            or self.movimientos_oculares == "anormal"
+        ):
+            alteraciones.append(
+                "III, IV, VI Par (Oculomotores): Alteraciones oculomotoras"
+            )
+
+        # V Par (Trigémino)
+        if any(
+            [
+                self.tacto_frente,
+                self.tacto_parpado,
+                self.tacto_labio,
+                self.fuerza_maseteros,
+                self.fuerza_temporales,
+                self.fuerza_pterigoideos,
+            ]
+        ):
+            alteraciones.append("V Par (Trigémino): Alteraciones sensitivas o motoras")
+
+        # VII Par (Facial)
+        if (
+            any([self.mimica_frente, self.mimica_parpados, self.mimica_nasal])
+            or self.gusto_tercio_anterior == "anormal"
+        ):
+            alteraciones.append(
+                "VII Par (Facial): Alteraciones de mímica facial o gusto"
+            )
+
+        # VIII Par (Auditivo)
+        if self.weber == "anormal" or self.rinne == "anormal" or self.nistagmus:
+            alteraciones.append(
+                "VIII Par (Auditivo): Alteraciones auditivas o vestibulares"
+            )
+
+        # IX, X Par (Glosofaríngeo y Vago)
+        if self.reflejo_nauseoso == "anormal" or self.posicion_uvula == "anormal":
+            alteraciones.append(
+                "IX, X Par (Glosofaríngeo y Vago): Alteraciones deglutorias"
+            )
+
+        # XI Par (Espinal Accesorio)
+        if self.elevacion_hombros == "anormal":
+            alteraciones.append(
+                "XI Par (Espinal Accesorio): Alteración elevación hombros"
+            )
+
+        # XII Par (Hipogloso)
+        if self.movimientos_lengua == "anormal":
+            alteraciones.append("XII Par (Hipogloso): Alteración movimientos lengua")
+
+        return alteraciones
+
+    def get_alteraciones_sensibilidad(self):
+        """Obtener alteraciones de sensibilidad por región"""
+        alteraciones = {}
+
+        regiones = [
+            "cuello",
+            "torax",
+            "brazo_izquierdo",
+            "brazo_derecho",
+            "pierna_izquierda",
+            "pierna_derecha",
+        ]
+
+        for region in regiones:
+            region_alt = []
+            if getattr(self, f"dolor_{region}", False):
+                region_alt.append("Dolor al pinchazo")
+            if getattr(self, f"tactil_{region}", False):
+                region_alt.append("Táctil superficial")
+            if getattr(self, f"termica_{region}", False):
+                region_alt.append("Térmica")
+
+            if region_alt:
+                alteraciones[region.replace("_", " ").title()] = region_alt
+
+        return alteraciones
+
+    def get_reflejos_alterados(self):
+        """Obtener reflejos alterados (no normales)"""
+        reflejos_alterados = {}
+
+        reflejos = [
+            "maseteriano",
+            "bicipital",
+            "tricipital",
+            "estiloradial",
+            "rotuliano",
+            "aquiliano",
+        ]
+        lados = ["izquierdo", "derecho"]
+
+        for reflejo in reflejos:
+            for lado in lados:
+                campo = f"{reflejo}_{lado}"
+                valor = getattr(self, campo, "2")
+                if valor != "2":  # No normal
+                    reflejo_nombre = f"{reflejo.title()} {lado}"
+                    reflejos_alterados[reflejo_nombre] = dict(self.REFLEJO_CHOICES)[
+                        valor
+                    ]
+
+        return reflejos_alterados
+
+    def get_resumen_examen(self):
+        """Resumen completo del examen neurológico"""
+        return {
+            "pares_craneales_alterados": len(self.get_alteraciones_pares_craneales()),
+            "regiones_sensibilidad_alteradas": len(
+                self.get_alteraciones_sensibilidad()
+            ),
+            "reflejos_alterados": len(self.get_reflejos_alterados()),
+            "examen_normal": (
+                len(self.get_alteraciones_pares_craneales()) == 0
+                and len(self.get_alteraciones_sensibilidad()) == 0
+                and len(self.get_reflejos_alterados()) == 0
+            ),
+        }
+
+    class Meta:
+        verbose_name = "Resultado Examen Neurológico"
+        verbose_name_plural = "Resultados Exámenes Neurológicos"
+
+    def __str__(self):
+        resumen = self.get_resumen_examen()
+        if resumen["examen_normal"]:
+            estado = "Examen neurológico normal"
+        else:
+            alteraciones = []
+            if resumen["pares_craneales_alterados"] > 0:
+                alteraciones.append(
+                    f"{resumen['pares_craneales_alterados']} pares craneales"
+                )
+            if resumen["regiones_sensibilidad_alteradas"] > 0:
+                alteraciones.append(
+                    f"{resumen['regiones_sensibilidad_alteradas']} regiones sensibilidad"
+                )
+            if resumen["reflejos_alterados"] > 0:
+                alteraciones.append(f"{resumen['reflejos_alterados']} reflejos")
+            estado = f"Alteraciones: {', '.join(alteraciones)}"
+
+        return f"Examen Neurológico - {self.visita_examen.visita.paciente} - {estado}"
+
+
+class MedicamentosResult(ResultadoExamenBase):
+    """Modelo principal para el examen de Medicamentos"""
+
+    observaciones_generales = models.TextField(
+        blank=True,
+        null=True,
+        verbose_name="Observaciones Generales sobre la Medicación",
+    )
+
+    def get_total_medicamentos(self):
+        """Obtener número total de medicamentos"""
+        return self.medicamentos.count()
+
+    def get_medicamentos_activos(self):
+        """Obtener medicamentos activos (sin fecha de finalización o fecha futura)"""
+        from datetime import date
+
+        return self.medicamentos.filter(
+            models.Q(fecha_finalizacion__isnull=True)
+            | models.Q(fecha_finalizacion__gte=date.today())
+        )
+
+    def get_medicamentos_por_via(self):
+        """Agrupar medicamentos por vía de administración"""
+        medicamentos_por_via = {}
+        for medicamento in self.medicamentos.all():
+            via = medicamento.via_administracion
+            if via not in medicamentos_por_via:
+                medicamentos_por_via[via] = []
+            medicamentos_por_via[via].append(medicamento)
+        return medicamentos_por_via
+
+    def get_resumen_medicamentos(self):
+        """Resumen de la medicación del paciente"""
+        total = self.get_total_medicamentos()
+        activos = self.get_medicamentos_activos().count()
+        vias = len(set(med.via_administracion for med in self.medicamentos.all()))
+
+        return {
+            "total_medicamentos": total,
+            "medicamentos_activos": activos,
+            "vias_diferentes": vias,
+            "hay_polifarmacia": total >= 5,  # Criterio común para polifarmacia
+        }
+
+    class Meta:
+        verbose_name = "Resultado Examen de Medicamentos"
+        verbose_name_plural = "Resultados Exámenes de Medicamentos"
+
+    def __str__(self):
+        resumen = self.get_resumen_medicamentos()
+        estado = (
+            f"{resumen['medicamentos_activos']}/{resumen['total_medicamentos']} activos"
+        )
+        if resumen["hay_polifarmacia"]:
+            estado += " (Polifarmacia)"
+        return f"Medicamentos - {self.visita_examen.visita.paciente} - {estado}"
+
+
+class Medicamento(models.Model):
+    """Modelo para cada medicamento individual"""
+
+    PRESENTACION_CHOICES = [
+        ("tableta", "Tableta"),
+        ("capsula", "Cápsula"),
+        ("solucion", "Solución"),
+        ("ampolla", "Ampolla"),
+        ("spray", "Spray"),
+        ("jarabe", "Jarabe"),
+        ("crema", "Crema"),
+        ("pomada", "Pomada"),
+        ("gel", "Gel"),
+        ("ovulos", "Óvulos"),
+        ("supositorio", "Supositorio"),
+        ("parche", "Parche"),
+        ("inhalador", "Inhalador"),
+        ("gotas", "Gotas"),
+        ("otros", "Otros"),
+    ]
+
+    UNIDAD_CHOICES = [
+        ("microgramos", "Microgramos (μg)"),
+        ("miligramos", "Miligramos (mg)"),
+        ("gramos", "Gramos (g)"),
+        ("mililitros", "Mililitros (ml)"),
+        ("porcentaje", "Porcentaje (%)"),
+        ("volumen", "Volumen"),
+        ("unidades_internacionales", "Unidades Internacionales (UI)"),
+        ("miliequivalentes", "Miliequivalentes (mEq)"),
+        ("otros", "Otros"),
+    ]
+
+    VIA_ADMINISTRACION_CHOICES = [
+        ("oral", "Oral"),
+        ("topico", "Tópico"),
+        ("intramuscular", "Intramuscular"),
+        ("subcutaneo", "Subcutáneo"),
+        ("intravenoso", "Intravenoso"),
+        ("intrarectal", "Intrarectal"),
+        ("vaginal", "Vaginal"),
+        ("subdermico", "Subdérmico"),
+        ("otico", "Ótico"),
+        ("optico", "Óptico"),
+        ("intranasal", "Intranasal"),
+        ("inhalatorio", "Inhalatorio"),
+        ("transdermico", "Transdérmico"),
+        ("sublingual", "Sublingual"),
+        ("otros", "Otros"),
+    ]
+
+    medicamentos_result = models.ForeignKey(
+        MedicamentosResult, on_delete=models.CASCADE, related_name="medicamentos"
+    )
+
+    # Información del medicamento
+    nombre_comercial = models.CharField(max_length=200, verbose_name="Nombre Comercial")
+    nombre_generico = models.CharField(
+        max_length=200, blank=True, null=True, verbose_name="Nombre Genérico (DCI)"
+    )
+
+    # Presentación y dosis
+    presentacion = models.CharField(
+        max_length=50, choices=PRESENTACION_CHOICES, verbose_name="Presentación"
+    )
+    concentracion = models.CharField(
+        max_length=100, verbose_name="Concentración", help_text="Ej: 500, 25, 10/5"
+    )
+    unidad = models.CharField(
+        max_length=50, choices=UNIDAD_CHOICES, verbose_name="Unidad de Concentración"
+    )
+
+    # Administración
+    via_administracion = models.CharField(
+        max_length=50,
+        choices=VIA_ADMINISTRACION_CHOICES,
+        verbose_name="Vía de Administración",
+    )
+    cantidad = models.CharField(
+        max_length=100,
+        verbose_name="Cantidad por Toma",
+        help_text="Ej: 1 tableta, 5 ml, 2 gotas",
+    )
+    frecuencia = models.CharField(
+        max_length=100,
+        verbose_name="Frecuencia",
+        help_text="Ej: Cada 8 horas, 2 veces al día, PRN",
+    )
+
+    # Fechas
+    fecha_inicio = models.DateField(verbose_name="Fecha de Inicio")
+    fecha_finalizacion = models.DateField(
+        blank=True,
+        null=True,
+        verbose_name="Fecha de Finalización",
+        help_text="Dejar vacío si es tratamiento continuo",
+    )
+
+    # Indicaciones
+    indicacion = models.TextField(verbose_name="Indicación/Motivo del Tratamiento")
+
+    # Control adicional
+    activo = models.BooleanField(default=True, verbose_name="Medicamento Activo")
+    adherencia = models.CharField(
+        max_length=20,
+        choices=[
+            ("buena", "Buena"),
+            ("regular", "Regular"),
+            ("mala", "Mala"),
+            ("no_evaluada", "No Evaluada"),
+        ],
+        default="no_evaluada",
+        verbose_name="Adherencia al Tratamiento",
+    )
+    efectos_adversos = models.BooleanField(
+        default=False, verbose_name="¿Presenta Efectos Adversos?"
+    )
+    descripcion_efectos_adversos = models.TextField(
+        blank=True, null=True, verbose_name="Descripción de Efectos Adversos"
+    )
+    observaciones = models.TextField(
+        blank=True, null=True, verbose_name="Observaciones"
+    )
+
+    # Campos de auditoría
+    fecha_registro = models.DateTimeField(
+        auto_now_add=True, verbose_name="Fecha de Registro"
+    )
+    fecha_modificacion = models.DateTimeField(
+        auto_now=True, verbose_name="Última Modificación"
+    )
+
+    class Meta:
+        verbose_name = "Medicamento"
+        verbose_name_plural = "Medicamentos"
+        ordering = ["-fecha_inicio", "nombre_comercial"]
+
+    def __str__(self):
+        estado = "Activo" if self.is_medicamento_activo() else "Inactivo"
+        return f"{self.nombre_comercial} {self.get_concentracion_completa()} - {estado}"
+
+
+class RevisionSistemasResult(ResultadoExamenBase):
+    """Modelo para el examen de Revisión por Sistemas"""
+
+    # Campos de control por sistema (hidden inputs del HTML)
+    sintoma_general = models.CharField(
+        max_length=2,
+        choices=[("si", "Sí"), ("no", "No")],
+        default="no",
+        verbose_name="¿Presenta síntomas generales?",
+    )
+
+    sintoma_cabeza_cuello = models.CharField(
+        max_length=2,
+        choices=[("si", "Sí"), ("no", "No")],
+        default="no",
+        verbose_name="¿Presenta síntomas de cabeza y cuello?",
+    )
+
+    sintoma_cardiopulmonar = models.CharField(
+        max_length=2,
+        choices=[("si", "Sí"), ("no", "No")],
+        default="no",
+        verbose_name="¿Presenta síntomas cardiopulmonares?",
+    )
+
+    sintoma_gastrointestinal = models.CharField(
+        max_length=2,
+        choices=[("si", "Sí"), ("no", "No")],
+        default="no",
+        verbose_name="¿Presenta síntomas gastrointestinales?",
+    )
+
+    sintoma_genitourinario = models.CharField(
+        max_length=2,
+        choices=[("si", "Sí"), ("no", "No")],
+        default="no",
+        verbose_name="¿Presenta síntomas genitourinarios?",
+    )
+
+    sintoma_vascular_periferico = models.CharField(
+        max_length=2,
+        choices=[("si", "Sí"), ("no", "No")],
+        default="no",
+        verbose_name="¿Presenta síntomas vasculares periféricos?",
+    )
+
+    sintoma_osteomuscular = models.CharField(
+        max_length=2,
+        choices=[("si", "Sí"), ("no", "No")],
+        default="no",
+        verbose_name="¿Presenta síntomas osteomusculares?",
+    )
+
+    sintoma_piel_faneras = models.CharField(
+        max_length=2,
+        choices=[("si", "Sí"), ("no", "No")],
+        default="no",
+        verbose_name="¿Presenta síntomas de piel y faneras?",
+    )
+
+    sintoma_otros = models.CharField(
+        max_length=2,
+        choices=[("si", "Sí"), ("no", "No")],
+        default="no",
+        verbose_name="¿Presenta otros síntomas?",
+    )
+
+    def get_sistemas_con_sintomas(self):
+        """Obtener lista de sistemas que presentan síntomas"""
+        sistemas_afectados = []
+
+        if self.sintoma_general == "si":
+            sistemas_afectados.append("General")
+        if self.sintoma_cabeza_cuello == "si":
+            sistemas_afectados.append("Cabeza y Cuello")
+        if self.sintoma_cardiopulmonar == "si":
+            sistemas_afectados.append("Cardiopulmonar")
+        if self.sintoma_gastrointestinal == "si":
+            sistemas_afectados.append("Gastrointestinal")
+        if self.sintoma_genitourinario == "si":
+            sistemas_afectados.append("Genitourinario")
+        if self.sintoma_vascular_periferico == "si":
+            sistemas_afectados.append("Vascular Periférico")
+        if self.sintoma_osteomuscular == "si":
+            sistemas_afectados.append("Osteomuscular")
+        if self.sintoma_piel_faneras == "si":
+            sistemas_afectados.append("Piel y Faneras")
+        if self.sintoma_otros == "si":
+            sistemas_afectados.append("Otros")
+
+        return sistemas_afectados
+
+    class Meta:
+        verbose_name = "Resultado Revisión por Sistemas"
+        verbose_name_plural = "Resultados Revisión por Sistemas"
+
+    def __str__(self):
+        sistemas_afectados = self.get_sistemas_con_sintomas()
+        if not sistemas_afectados:
+            estado = "Revisión por sistemas negativa"
+        else:
+            estado = f"{len(sistemas_afectados)} sistemas con síntomas"
+
+        return f"Revisión Sistemas - {self.visita_examen.visita.paciente} - {estado}"
+
+
+class DetalleRevisionSistemas(models.Model):
+    """Modelo para los detalles de síntomas por sistema (arrays del HTML)"""
+
+    revision_sistemas_result = models.ForeignKey(
+        RevisionSistemasResult,
+        on_delete=models.CASCADE,
+        related_name="detalles_sintomas",
+    )
+
+    # Campos que corresponden exactamente a los arrays del HTML
+    sistema = models.CharField(
+        max_length=50,
+        verbose_name="Sistema",
+        help_text="general, cabeza_cuello, cardiopulmonar, etc.",
+    )
+
+    sintoma = models.CharField(
+        max_length=200,
+        verbose_name="Síntoma",
+        help_text="Corresponde a {sistema}_sintoma[]",
+    )
+
+    tiempo = models.CharField(
+        max_length=100,
+        verbose_name="Hace cuánto",
+        help_text="Corresponde a {sistema}_tiempo[]",
+    )
+
+    caracteristicas = models.CharField(
+        max_length=200,
+        verbose_name="Características",
+        help_text="Corresponde a {sistema}_caracteristicas[]",
+    )
+
+    class Meta:
+        verbose_name = "Detalle de Síntoma"
+        verbose_name_plural = "Detalles de Síntomas"
+        ordering = ["sistema", "sintoma"]
+
+    def __str__(self):
+        return f"{self.sistema}: {self.sintoma}"
