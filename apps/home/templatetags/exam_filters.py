@@ -22,3 +22,7 @@ def is_selected(datos, campo, valor):
     if datos and campo in datos:
         return 'selected' if str(datos[campo]) == str(valor) else ''
     return ''
+
+@register.filter
+def to(value, arg):
+    return range(value, int(arg) + 1)

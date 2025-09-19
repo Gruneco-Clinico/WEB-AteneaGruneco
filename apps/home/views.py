@@ -3804,6 +3804,13 @@ def guardar_examen_Cuidador_Zarit(request):
         messages.error(request, "❌ Método no permitido.")
         return redirect("index")
     
+from django.shortcuts import get_object_or_404, redirect
+from django.contrib import messages
+from django.utils import timezone
+from django.contrib.auth.decorators import login_required
+
+from .models import SeguimientoIntervencionesResult, VisitaExamen
+
 
 @login_required
 def guardar_intervenciones(request):
@@ -3813,91 +3820,76 @@ def guardar_intervenciones(request):
             paciente_id = request.POST.get("paciente_id")
             examen_id = request.POST.get("examen_id")
 
+            # Obtener la visita asociada
             visita_examen = get_object_or_404(
                 VisitaExamen, visita_id=visita_id, examen_id=examen_id
             )
 
+            # Marcar como en progreso si está pendiente
             if visita_examen.estado == "pendiente":
                 visita_examen.estado = "en_progreso"
                 visita_examen.fecha_inicio = timezone.now()
                 visita_examen.save()
 
-            # ✅ Recorremos todas las sesiones enviadas
-            for key, value in request.POST.lists():
-                if key.startswith("sesiones["):
-                    # Extraer índice de la sesión (ej: sesiones[3][nombre])
-                    import re
-                    match = re.match(r"sesiones\[(\d+)\]\[(\w+)\]", key)
-                    if not match:
-                        continue
+            # Campos del formulario
+            numero_sesion = request.POST.get("num_sesion")
+            nombre_sesion = request.POST.get("nombre")
+            fecha = request.POST.get("fecha")
+            hora_inicio = request.POST.get("hora_inicio")
+            hora_fin = request.POST.get("hora_fin")
+            asistencia = request.POST.get("asistencia")
+            participacion = request.POST.get("participacion")
+            estado = request.POST.get("estado")
+            tematica = request.POST.get("tematica")
+            observaciones = request.POST.get("observaciones")
 
-                    sesion_num = int(match.group(1))
-                    campo = match.group(2)
-                    valor = value[0] if value else None
+            # Guardar o actualizar la sesión
+            sesion, created = SeguimientoIntervencionesResult.objects.update_or_create(
+                visita_examen=visita_examen,
+                numero_sesion=numero_sesion,
+                defaults={
+                    "nombre_sesion": nombre_sesion,
+                    "fecha": fecha if fecha else None,
+                    "hora_inicio": hora_inicio if hora_inicio else None,
+                    "hora_fin": hora_fin if hora_fin else None,
+                    "asistencia": asistencia,
+                    "participacion": participacion if participacion else None,
+                    "estado": estado,
+                    "tematica": tematica,
+                    "observaciones": observaciones,
+                },
+            )
 
-                    # Guardar en un diccionario por sesión
-                    if f"sesion_{sesion_num}" not in locals():
-                        locals()[f"sesion_{sesion_num}"] = {"numero_sesion": sesion_num}
+            # Si ya se completaron todas las sesiones necesarias, puedes marcar la visita como completada.
+            # Aquí lo dejamos siempre como en progreso, pero puedes añadir tu propia lógica.
+            visita_examen.estado = "en_progreso"
+            visita_examen.save()
 
-                    locals()[f"sesion_{sesion_num}"][campo] = valor
+            if created:
+                messages.success(request, f"✅ Sesión {numero_sesion} guardada exitosamente.")
+            else:
+                messages.success(request, f"✅ Sesión {numero_sesion} actualizada exitosamente.")
 
-            # ✅ Guardar en la BD
-            for var in [v for v in locals() if v.startswith("sesion_")]:
-                data = locals()[var]
-
-                print(f"Guardando sesión {i}")
-                print({
-                    "nombre_sesion": request.POST.get(f"nombre_sesion_{i}"),
-                    "fecha": request.POST.get(f"fecha_{i}"),
-                    "hora_inicio": request.POST.get(f"hora_inicio_{i}"),
-                    "hora_fin": request.POST.get(f"hora_fin_{i}"),
-                    "asistencia": request.POST.get(f"asistencia_{i}"),
-                    "participacion": request.POST.get(f"participacion_{i}"),
-                    "estado": request.POST.get(f"estado_{i}"),
-                    "tematica": request.POST.get(f"tematica_{i}"),
-                    "observaciones": request.POST.get(f"observaciones_{i}"),
-                })
-
-
-                SeguimientoIntervencionesResult.objects.update_or_create(
-                    visita_examen=visita_examen,
-                    numero_sesion=data["numero_sesion"],
-                    defaults={
-                        "nombre_sesion": data.get("nombre"),
-                        "fecha": data.get("fecha") or None,
-                        "hora_inicio": data.get("hora_inicio") or None,
-                        "hora_fin": data.get("hora_fin") or None,
-                        "asistencia": data.get("asistencia") or None,
-                        "participacion": int(data.get("participacion"))
-                            if data.get("participacion") else None,
-                        "estado": data.get("estado"),
-                        "tematica": data.get("tematica"),
-                        "observaciones": data.get("observaciones"),
-                    },
-                )
-
-            messages.success(request, "✅ Intervenciones guardadas correctamente.")
             return redirect("detalle_paciente", paciente_id=paciente_id)
 
         except Exception as e:
             import traceback
             traceback.print_exc()
-            messages.error(request, f"❌ Error al guardar las intervenciones: {str(e)}")
+
+            # Revertir estado si falla
+            try:
+                if "visita_examen" in locals():
+                    visita_examen.estado = "pendiente"
+                    visita_examen.save()
+            except:
+                pass
+
+            messages.error(request, f"❌ Error al guardar la sesión: {str(e)}")
             return redirect("detalle_paciente", paciente_id=paciente_id or 1)
 
     else:
         messages.error(request, "❌ Método no permitido.")
         return redirect("index")
-
-
-
-
-
-
-
-
-
-
 
 
 #######################################################################################

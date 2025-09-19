@@ -6,7 +6,7 @@
     <div class="header-body">
       <div class="row align-items-center py-4">
         <div class="col-lg-6 col-5">
-          <h6 class="h2 text-white d-inline-block mb-0">Formulario de Intervenciones</h6>
+          <h6 class="h2 text-white d-inline-block mb-0">Registro de Sesiones</h6>
         </div>
       </div>
     </div>
@@ -19,20 +19,124 @@
       <div class="card shadow">
         <form method="post" action="{% url 'guardar_intervenciones' %}">
           {% csrf_token %}
+          <input type="hidden" name="visita_id" value="{{ visita_examen }}">
           <input type="hidden" name="paciente_id" value="{{ paciente_id }}">
-          <input type="hidden" name="visita_id" value="{{ visita_id }}">
           <input type="hidden" name="examen_id" value="{{ examen_id }}">
 
           <div class="card-body">
-            <!-- Contenedor de sesiones dinámicas -->
-            <div id="sesiones-container"></div>
 
+            <!-- Selección del número de sesión -->
+            <div class="form-group">
+              <label for="num_sesion"><strong>Seleccione la sesión</strong></label>
+              <select class="form-control" id="num_sesion" name="num_sesion" required>
+                <option value="">Seleccione una sesión</option>
+
+                {% load exam_filters %}
+                {% for i in 1|to:24 %}
+                  <option value="{{ i }}">Sesión {{ i }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <!-- Contenedor dinámico -->
+            <div id="form_sesion" style="display:none;">
+              <div class="card mb-3">
+                <div class="card-header bg-light">
+                  <strong>Sesión seleccionada</strong>
+                </div>
+                <div class="card-body">
+
+                  <div class="form-group">
+                    <label for="nombre"><strong>Nombre de la sesión</strong></label>
+                    <input type="text" class="form-control" name="nombre" id="nombre"
+                          value="{{ datos_sesion.nombre_sesion|default:'' }}">
+                  </div>
+
+                  <div class="form-group">
+                    <label for="fecha"><strong>Fecha</strong></label>
+                    <input type="date" class="form-control" name="fecha" id="fecha"
+                          value="{{ datos_sesion.fecha|date:'Y-m-d' }}">
+                  </div>
+
+                  <div class="form-row">
+                    <div class="col">
+                      <label for="hora_inicio"><strong>Hora inicio</strong></label>
+                      <input type="time" class="form-control" name="hora_inicio" id="hora_inicio"
+                            value="{{ datos_sesion.hora_inicio|time:'H:i' }}">
+                    </div>
+                    <div class="col">
+                      <label for="hora_fin"><strong>Hora fin</strong></label>
+                      <input type="time" class="form-control" name="hora_fin" id="hora_fin"
+                            value="{{ datos_sesion.hora_fin|time:'H:i' }}">
+                    </div>
+                  </div>
+
+                  <div class="form-group mt-3">
+                    <label for="asistencia"><strong>Asistencia</strong></label>
+                    <select class="form-control" name="asistencia" id="asistencia">
+                      {% if datos_sesion.asistencia %}
+                        <option value="{{ datos_sesion.asistencia }}" selected>{{ datos_sesion.asistencia }}</option>
+                      {% else %}
+                        <option value="">Seleccione</option>
+                      {% endif %}
+                      <option value="Sí">Sí</option>
+                      <option value="No">No</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="participacion"><strong>Nivel de participación (1-5)</strong></label>
+                    <select class="form-control" name="participacion" id="participacion">
+                      {% if datos_sesion.participacion %}
+                        <option value="{{ datos_sesion.participacion }}" selected>{{ datos_sesion.participacion }}</option>
+                      {% else %}
+                        <option value="">Seleccione</option>
+                      {% endif %}
+                      <option value="1">1</option>
+                      <option value="2">2</option>
+                      <option value="3">3</option>
+                      <option value="4">4</option>
+                      <option value="5">5</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="estado"><strong>Estado del participante</strong></label>
+                    <select class="form-control" name="estado" id="estado">
+                      {% if datos_sesion.estado %}
+                        <option value="{{ datos_sesion.estado }}" selected>{{ datos_sesion.estado }}</option>
+                      {% else %}
+                        <option value="">Seleccione</option>
+                      {% endif %}
+                      <option value="Motivado">Motivado</option>
+                      <option value="Apático">Apático</option>
+                      <option value="Fatigado">Fatigado</option>
+                      <option value="Ansioso">Ansioso</option>
+                      <option value="Otro">Otro</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="tematica"><strong>Temática abordada</strong></label>
+                    <input type="text" class="form-control" name="tematica" id="tematica"
+                          value="{{ datos_sesion.tematica|default:'' }}">
+                  </div>
+
+                  <div class="form-group">
+                    <label for="observaciones"><strong>Observaciones</strong></label>
+                    <textarea class="form-control" name="observaciones" id="observaciones" rows="2">{{ datos_sesion.observaciones|default:'' }}</textarea>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+            <!-- Botones -->
             <div class="text-right mt-4">
-              <button type="button" id="agregar-sesion" class="btn btn-primary">+ Agregar Sesión</button>
-              <button type="submit" class="btn btn-success">Guardar</button>
-              <br><br>
+              <button type="submit" class="btn btn-primary">Guardar</button>
               <a href="{% url 'detalle_paciente' paciente_id %}" class="btn btn-secondary">Ver Paciente</a>
             </div>
+
           </div>
         </form>
       </div>
@@ -41,94 +145,15 @@
 </div>
 
 <script>
-    let maxSesiones = 24;
-    let sesionActual = 0;
-
-    document.getElementById("agregar-sesion").addEventListener("click", function() {
-        if (sesionActual >= maxSesiones) {
-            alert("No puedes agregar más de 24 sesiones");
-            return;
-        }
-
-        sesionActual++;
-
-        let container = document.getElementById("sesiones-container");
-
-        let div = document.createElement("div");
-        div.classList.add("card", "mb-3");
-        div.innerHTML = `
-        <div class="card-header bg-light"><strong>Sesión ${sesionActual}</strong></div>
-        <div class="card-body">
-
-            <div class="form-group">
-                <label>Nombre de la sesión</label>
-                <input type="text" class="form-control" name="sesiones[${sesionActual}][nombre]">
-            </div>
-
-            <div class="form-group">
-                <label>Fecha</label>
-                <input type="date" class="form-control" name="sesiones[${sesionActual}][fecha]">
-            </div>
-
-            <div class="form-row">
-                <div class="col">
-                    <label>Hora inicio</label>
-                    <input type="time" class="form-control" name="sesiones[${sesionActual}][hora_inicio]">
-                </div>
-                <div class="col">
-                    <label>Hora fin</label>
-                    <input type="time" class="form-control" name="sesiones[${sesionActual}][hora_fin]">
-                </div>
-            </div>
-
-            <div class="form-group mt-3">
-                <label>Asistencia</label>
-                <select class="form-control" name="sesiones[${sesionActual}][asistencia]">
-                    <option value="">Seleccione</option>
-                    <option value="Sí">Sí</option>
-                    <option value="No">No</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label>Nivel de participación (1-5)</label>
-                <select class="form-control" name="sesiones[${sesionActual}][participacion]">
-                    <option value="">Seleccione</option>
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="3">3</option>
-                    <option value="4">4</option>
-                    <option value="5">5</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label>Estado del participante</label>
-                <select class="form-control" name="sesiones[${sesionActual}][estado]">
-                    <option value="">Seleccione</option>
-                    <option value="Motivado">Motivado</option>
-                    <option value="Apático">Apático</option>
-                    <option value="Fatigado">Fatigado</option>
-                    <option value="Ansioso">Ansioso</option>
-                    <option value="Otro">Otro</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label>Temática abordada</label>
-                <input type="text" class="form-control" name="sesiones[${sesionActual}][tematica]">
-            </div>
-
-            <div class="form-group">
-                <label>Observaciones</label>
-                <textarea class="form-control" name="sesiones[${sesionActual}][observaciones]" rows="2"></textarea>
-            </div>
-
-        </div>
-        `;
-
-        container.appendChild(div);
-    });
+document.getElementById("num_sesion").addEventListener("change", function() {
+  const formSesion = document.getElementById("form_sesion");
+  if (this.value) {
+    formSesion.style.display = "block";
+    formSesion.querySelector(".card-header strong").innerText = "Sesión " + this.value;
+  } else {
+    formSesion.style.display = "none";
+  }
+});
 </script>
 
 {% endblock %}
