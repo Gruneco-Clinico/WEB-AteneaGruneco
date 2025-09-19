@@ -347,6 +347,8 @@ class VisitaExamen(models.Model):
                 "consentimientoinformadocuidadorresult_resultado",
                 "anamnesiscuidadorresult_resultado",
                 "anamnesisparticipanteresult_resultado",
+                "anamnesisparticipanteresult_resultado",
+                "seguimientointervencionesresult_resultado",
                 "analisisgeneralresult_resultado",
                 "ExamenFisicoResult_resultado",
                 "AntecedentesResult_resultado",
@@ -444,6 +446,12 @@ class VisitaExamen(models.Model):
             "redlatspanish": "realizar_redlatspanish",
             "cdrcuidador": "realizar_cdrcuidador",
             "cdrparticipante": "realizar_cdrparticipante",
+            "cdrevaluacionclinica": "realizar_cdr_evaluacion_clinica",
+            "anamnesiscuidador": "realizar_anamnesis_cuidador",
+            "anamnesisparticipante": "realizar_anamnesis_participante",
+            "consentimientoinformadocuidador": "realizar_consentimientoinformado_cuidador",
+            "consentimientoinformadoparticipante": "realizar_consentimientoinformado_participante",
+            "seguimientointervenciones": "realizar_seguimiento_intervenciones",
             "analisisgeneral": "realizar_analisisgeneral",
             "examenfisico": "realizar_examen_fisico",
             "antecedentes": "realizar_antecedentes",
@@ -495,6 +503,12 @@ class VisitaExamen(models.Model):
             "redlatspanish": "ver_redlatspanish",
             "cdrcuidador": "ver_cdrcuidador",
             "cdrparticipante": "ver_cdrparticipante",
+            "cdrevaluacionclinica": "ver_cdr_evaluacion_clinica",
+            "anamnesiscuidador": "ver_anamnesis_cuidador",
+            "anamnesisparticipante": "ver_anamnesis_participante",
+            "consentimientoinformadocuidador": "ver_consentimientoinformado_cuidador",
+            "consentimientoinformadoparticipante": "ver_consentimientoinformado_participante",
+            "seguimientointervenciones": "ver_seguimiento_intervenciones",
             "analisisgeneral": "ver_analisis_general",
             "examenfisico": "ver_examen_fisico",
             "antecedentes": "ver_antecedentes",
@@ -542,6 +556,12 @@ class VisitaExamen(models.Model):
             "redlatspanish": "editar_redlatspanish",
             "cdrcuidador": "editar_cdrcuidador",
             "cdrparticipante": "editar_cdrparticipante",
+            "cdrevaluacionclinica": "editar_cdr_evaluacion_clinica",
+            "anamnesiscuidador": "editar_anamnesis_cuidador",
+            "anamnesisparticipante": "editar_anamnesis_participante",
+            "consentimientoinformadocuidador": "editar_consentimientoinformado_cuidador",
+            "consentimientoinformadoparticipante": "editar_consentimientoinformado_participante",
+            "seguimientointervenciones": "editar_seguimiento_intervenciones",
             "analisisgeneral": "editar_analisis_general",
             "examenfisico": "editar_examen_fisico",
             "antecedentes": "editar_antecedentes",
@@ -1792,6 +1812,51 @@ class AnamnesisParticipanteResult(ResultadoExamenBase):
 
     def __str__(self):
         return f"Anamnesis Participante - {self.visita_examen_id}"
+    
+
+class SeguimientoIntervencionesResult(models.Model):
+    visita_examen = models.ForeignKey(
+        "VisitaExamen",
+        on_delete=models.CASCADE,
+        related_name="intervenciones"
+    )
+    numero_sesion = models.IntegerField()  # 1–24
+    nombre_sesion = models.CharField(max_length=200, blank=True, null=True)
+    fecha = models.DateField(blank=True, null=True)
+    hora_inicio = models.TimeField(blank=True, null=True)
+    hora_fin = models.TimeField(blank=True, null=True)
+
+    ASISTENCIA_CHOICES = [
+        ("Sí", "Sí"),
+        ("No", "No"),
+    ]
+    asistencia = models.CharField(max_length=2, choices=ASISTENCIA_CHOICES, blank=True, null=True)
+
+    participacion = models.IntegerField(blank=True, null=True)  # escala 1–5
+
+    ESTADO_CHOICES = [
+        ("Motivado", "Motivado"),
+        ("Apático", "Apático"),
+        ("Fatigado", "Fatigado"),
+        ("Ansioso", "Ansioso"),
+        ("Otro", "Otro"),
+    ]
+    estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, blank=True, null=True)
+
+    tematica = models.CharField(max_length=200, blank=True, null=True)
+    observaciones = models.TextField(blank=True, null=True)
+
+    creado_en = models.DateTimeField(auto_now_add=True)
+    actualizado_en = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ("visita_examen", "numero_sesion")  # ✅ evita duplicados
+
+    def __str__(self):
+        return f"Sesión {self.numero_sesion} - {self.visita_examen}"
+
+
+
 
 
 # examenes generales
@@ -3589,3 +3654,5 @@ class DetalleRevisionSistemas(models.Model):
 
     def __str__(self):
         return f"{self.sistema}: {self.sintoma}"
+    
+

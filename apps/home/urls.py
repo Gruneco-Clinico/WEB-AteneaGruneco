@@ -184,6 +184,12 @@ urlpatterns = [
         views.guardar_anamnesis_participante,
         name="guardar_anamnesis_participante",
     ),
+    path(
+        "guardar_intervenciones/",
+        views.guardar_intervenciones,
+        name="guardar_intervenciones",
+    ),
+    
     # examanes generales
     path(
         "guardar_examen_analisis/",

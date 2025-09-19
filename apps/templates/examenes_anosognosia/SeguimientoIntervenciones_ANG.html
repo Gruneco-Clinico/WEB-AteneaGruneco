@@ -1,0 +1,134 @@
+{% extends 'layouts/base.html' %}
+{% block content %}
+
+<div class="header bg-primary pb-6">
+  <div class="container-fluid">
+    <div class="header-body">
+      <div class="row align-items-center py-4">
+        <div class="col-lg-6 col-5">
+          <h6 class="h2 text-white d-inline-block mb-0">Formulario de Intervenciones</h6>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid mt--6">
+  <div class="row">
+    <div class="col">
+      <div class="card shadow">
+        <form method="post" action="{% url 'guardar_intervenciones' %}">
+          {% csrf_token %}
+          <input type="hidden" name="paciente_id" value="{{ paciente_id }}">
+          <input type="hidden" name="visita_id" value="{{ visita_id }}">
+          <input type="hidden" name="examen_id" value="{{ examen_id }}">
+
+          <div class="card-body">
+            <!-- Contenedor de sesiones dinámicas -->
+            <div id="sesiones-container"></div>
+
+            <div class="text-right mt-4">
+              <button type="button" id="agregar-sesion" class="btn btn-primary">+ Agregar Sesión</button>
+              <button type="submit" class="btn btn-success">Guardar</button>
+              <br><br>
+              <a href="{% url 'detalle_paciente' paciente_id %}" class="btn btn-secondary">Ver Paciente</a>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+    let maxSesiones = 24;
+    let sesionActual = 0;
+
+    document.getElementById("agregar-sesion").addEventListener("click", function() {
+        if (sesionActual >= maxSesiones) {
+            alert("No puedes agregar más de 24 sesiones");
+            return;
+        }
+
+        sesionActual++;
+
+        let container = document.getElementById("sesiones-container");
+
+        let div = document.createElement("div");
+        div.classList.add("card", "mb-3");
+        div.innerHTML = `
+        <div class="card-header bg-light"><strong>Sesión ${sesionActual}</strong></div>
+        <div class="card-body">
+
+            <div class="form-group">
+                <label>Nombre de la sesión</label>
+                <input type="text" class="form-control" name="sesiones[${sesionActual}][nombre]">
+            </div>
+
+            <div class="form-group">
+                <label>Fecha</label>
+                <input type="date" class="form-control" name="sesiones[${sesionActual}][fecha]">
+            </div>
+
+            <div class="form-row">
+                <div class="col">
+                    <label>Hora inicio</label>
+                    <input type="time" class="form-control" name="sesiones[${sesionActual}][hora_inicio]">
+                </div>
+                <div class="col">
+                    <label>Hora fin</label>
+                    <input type="time" class="form-control" name="sesiones[${sesionActual}][hora_fin]">
+                </div>
+            </div>
+
+            <div class="form-group mt-3">
+                <label>Asistencia</label>
+                <select class="form-control" name="sesiones[${sesionActual}][asistencia]">
+                    <option value="">Seleccione</option>
+                    <option value="Sí">Sí</option>
+                    <option value="No">No</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Nivel de participación (1-5)</label>
+                <select class="form-control" name="sesiones[${sesionActual}][participacion]">
+                    <option value="">Seleccione</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Estado del participante</label>
+                <select class="form-control" name="sesiones[${sesionActual}][estado]">
+                    <option value="">Seleccione</option>
+                    <option value="Motivado">Motivado</option>
+                    <option value="Apático">Apático</option>
+                    <option value="Fatigado">Fatigado</option>
+                    <option value="Ansioso">Ansioso</option>
+                    <option value="Otro">Otro</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Temática abordada</label>
+                <input type="text" class="form-control" name="sesiones[${sesionActual}][tematica]">
+            </div>
+
+            <div class="form-group">
+                <label>Observaciones</label>
+                <textarea class="form-control" name="sesiones[${sesionActual}][observaciones]" rows="2"></textarea>
+            </div>
+
+        </div>
+        `;
+
+        container.appendChild(div);
+    });
+</script>
+
+{% endblock %}

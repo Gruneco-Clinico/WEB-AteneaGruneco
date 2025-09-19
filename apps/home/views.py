@@ -55,6 +55,7 @@ from .models import (
     ConsentimientoInformadoCuidadorResult,
     AnamnesisCuidadorResult,
     AnamnesisParticipanteResult,
+    SeguimientoIntervencionesResult,
     AnalisisGeneralResult,
     DiagnosticoCIE10,
     DiagnosticoDSMV,
@@ -730,9 +731,8 @@ def realizar_examen(request, visita_id, examen_id, paciente_id):
         17: {"template": "examenes_sueno/sueno_Berlín.html", "model": BerlinResult},
         18: {"template": "examenes_sueno/sueno_atenas.html", "model": AtenasResult},
         19: {"template": "examenes_sueno/sueno_ISI.html", "model": ISIResult},
-        21: {
-            "template": "examenes_anosognosia/Anosognosia_Participante_EuroQoL.html",
-            "model": EuroQol5D5LResult,
+        21: {"template": "examenes_anosognosia/Anosognosia_Participante_EuroQoL.html",
+             "model": EuroQol5D5LResult,
         },
         22: {
             "template": "examenes_anosognosia/Anosognosia_Participante_EVA_EuroQoL.html",
@@ -805,6 +805,10 @@ def realizar_examen(request, visita_id, examen_id, paciente_id):
         39: {
             "template": "examenes_anosognosia/Anamnesis_Participante_ANG.html",
             "model": AnamnesisParticipanteResult,
+        },
+        40: {
+            "template": "examenes_anosognosia/SeguimientoIntervenciones_ANG.html",
+            "model": SeguimientoIntervencionesResult,
         },
     }
 
@@ -998,6 +1002,7 @@ def ver_resultado_examen(request, visita_examen_id):
         "ConsentimientoInformadoCuidadorResult": "examenes_resultados/resultado_consentimientoinformadocuidador.html",
         "AnamnesisCuidadorResult": "examenes_resultados/resultado_anamnesiscuidador.html",
         "AnamnesisParticipanteResult": "examenes_resultados/resultado_anamnesisparticipante.html",
+        "SeguimientoIntervencionesResult": "examenes_resultados/resultado_seguimientointervenciones.html",
         # Agregar más según tus exámenes
     }
 
@@ -3798,6 +3803,101 @@ def guardar_examen_Cuidador_Zarit(request):
     else:
         messages.error(request, "❌ Método no permitido.")
         return redirect("index")
+    
+
+@login_required
+def guardar_intervenciones(request):
+    if request.method == "POST":
+        try:
+            visita_id = request.POST.get("visita_id")
+            paciente_id = request.POST.get("paciente_id")
+            examen_id = request.POST.get("examen_id")
+
+            visita_examen = get_object_or_404(
+                VisitaExamen, visita_id=visita_id, examen_id=examen_id
+            )
+
+            if visita_examen.estado == "pendiente":
+                visita_examen.estado = "en_progreso"
+                visita_examen.fecha_inicio = timezone.now()
+                visita_examen.save()
+
+            # ✅ Recorremos todas las sesiones enviadas
+            for key, value in request.POST.lists():
+                if key.startswith("sesiones["):
+                    # Extraer índice de la sesión (ej: sesiones[3][nombre])
+                    import re
+                    match = re.match(r"sesiones\[(\d+)\]\[(\w+)\]", key)
+                    if not match:
+                        continue
+
+                    sesion_num = int(match.group(1))
+                    campo = match.group(2)
+                    valor = value[0] if value else None
+
+                    # Guardar en un diccionario por sesión
+                    if f"sesion_{sesion_num}" not in locals():
+                        locals()[f"sesion_{sesion_num}"] = {"numero_sesion": sesion_num}
+
+                    locals()[f"sesion_{sesion_num}"][campo] = valor
+
+            # ✅ Guardar en la BD
+            for var in [v for v in locals() if v.startswith("sesion_")]:
+                data = locals()[var]
+
+                print(f"Guardando sesión {i}")
+                print({
+                    "nombre_sesion": request.POST.get(f"nombre_sesion_{i}"),
+                    "fecha": request.POST.get(f"fecha_{i}"),
+                    "hora_inicio": request.POST.get(f"hora_inicio_{i}"),
+                    "hora_fin": request.POST.get(f"hora_fin_{i}"),
+                    "asistencia": request.POST.get(f"asistencia_{i}"),
+                    "participacion": request.POST.get(f"participacion_{i}"),
+                    "estado": request.POST.get(f"estado_{i}"),
+                    "tematica": request.POST.get(f"tematica_{i}"),
+                    "observaciones": request.POST.get(f"observaciones_{i}"),
+                })
+
+
+                SeguimientoIntervencionesResult.objects.update_or_create(
+                    visita_examen=visita_examen,
+                    numero_sesion=data["numero_sesion"],
+                    defaults={
+                        "nombre_sesion": data.get("nombre"),
+                        "fecha": data.get("fecha") or None,
+                        "hora_inicio": data.get("hora_inicio") or None,
+                        "hora_fin": data.get("hora_fin") or None,
+                        "asistencia": data.get("asistencia") or None,
+                        "participacion": int(data.get("participacion"))
+                            if data.get("participacion") else None,
+                        "estado": data.get("estado"),
+                        "tematica": data.get("tematica"),
+                        "observaciones": data.get("observaciones"),
+                    },
+                )
+
+            messages.success(request, "✅ Intervenciones guardadas correctamente.")
+            return redirect("detalle_paciente", paciente_id=paciente_id)
+
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            messages.error(request, f"❌ Error al guardar las intervenciones: {str(e)}")
+            return redirect("detalle_paciente", paciente_id=paciente_id or 1)
+
+    else:
+        messages.error(request, "❌ Método no permitido.")
+        return redirect("index")
+
+
+
+
+
+
+
+
+
+
 
 
 #######################################################################################
