@@ -200,6 +200,13 @@ urlpatterns = [
     name="resumen_sesiones",
     ),
 
+    #INTEGRACIÓN RECUÉRDAME
+
+    path("estadisticas/", 
+    views.estadisticas, 
+    name="estadisticas"
+    ),
+
     
     # examanes generales
     path(

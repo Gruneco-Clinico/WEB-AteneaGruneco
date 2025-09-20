@@ -265,6 +265,61 @@
           </table>
         </div>
       </div>
+
+
+      <!-- 🔹 Nueva tarjeta con tabla de métricas PostHog -->
+      <div class="card mt-4">
+        <div class="card-header border-0">
+          <h3 class="mb-0">Métricas PostHog</h3>
+        </div>
+        <div class="table-responsive">
+          <table class="table align-items-center table-flush">
+            <thead class="thead-light">
+              <tr>
+                <th scope="col">Evento</th>
+                <th scope="col">Usuario</th>
+                <th scope="col">Fecha</th>
+                <th scope="col">Propiedades</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for metric in metrics %}
+                <tr>
+                  <td>{{ metric.event }}</td>
+                  <td>{{ metric.distinct_id }}</td>
+                  <td>{{ metric.timestamp }}</td>
+                  <td>{{ metric.properties }}</td>
+                </tr>
+              {% empty %}
+                <tr>
+                  <td colspan="4" class="text-center">No hay métricas aún</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <!-- 🔹 Fin tabla métricas -->
+
+      <!-- 🔹 Nueva tarjeta con gráfico DAU -->
+      <div class="card mt-4">
+        <div class="card-header border-0">
+          <h3 class="mb-0">Daily Active Users (DAU)</h3>
+        </div>
+        <div class="card-body">
+          <p>Labels crudos: {{ labels }}</p>
+          <p>Values crudos: {{ values }}</p>
+          <canvas id="dauChart" width="400" height="200"></canvas>
+        </div>
+      </div>
+      <!-- 🔹 Fin tarjeta gráfico DAU -->
+
+
+
+
+
+
+
     </div>
     <div class="col-xl-4">
       <div class="card">
@@ -412,4 +467,39 @@
 <script src="/static/assets/vendor/chart.js/dist/Chart.min.js"></script>
 <script src="/static/assets/vendor/chart.js/dist/Chart.extension.js"></script>
 
+<!-- Inserta los datos como JSON seguro -->
+{{ labels|json_script:"dau-labels" }}
+{{ values|json_script:"dau-values" }}
+
+<script>
+  const dauLabels = JSON.parse(document.getElementById("dau-labels").textContent);
+  const dauValues = JSON.parse(document.getElementById("dau-values").textContent);
+
+  new Chart(document.getElementById("dauChart"), {
+    type: "line",
+    data: {
+      labels: dauLabels,
+      datasets: [{
+        label: "Usuarios Activos Diarios",
+        data: dauValues,
+        borderColor: "blue",
+        backgroundColor: "rgba(0, 0, 255, 0.1)",
+        fill: true,
+        tension: 0.3
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: true },
+      },
+      scales: {
+        y: { beginAtZero: true }
+      }
+    }
+  });
+</script>
+
+
 {% endblock javascripts %}
+

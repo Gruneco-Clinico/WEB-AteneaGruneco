@@ -1877,7 +1877,25 @@ class SeguimientoIntervencionesResult(models.Model):
         return f"Sesión {self.numero_sesion} - {self.visita_examen}"
 
 
+#### INTEGRACIÓN RECUÉRDAME
 
+class InteractionMetric(models.Model):
+    event = models.CharField(max_length=255)
+    distinct_id = models.CharField(max_length=255)
+    timestamp = models.DateTimeField()
+    properties = models.JSONField()
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.event} - {self.timestamp}"
+    
+
+
+
+
+
+    
 
 
 # examenes generales

@@ -141,3 +141,14 @@ MESSAGE_TAGS = {
     message_constants.WARNING: 'warning',
     message_constants.ERROR: 'error',
 }
+
+
+
+#### INTEGRACIÓN RECUÉRDAME
+
+# settings.py
+POSTHOG_PERSONAL_API_KEY = "phx_IZAgbd0Yz5PbND0I5haEW40WNM8XTxToBAyJZ2bUShgCY6h"
+POSTHOG_PROJECT_ID = "158471"
+POSTHOG_API_URL = "https://us.posthog.com"
+POSTHOG_INSIGHT_ID = "nL40xbp4"
+

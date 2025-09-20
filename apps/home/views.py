@@ -12,6 +12,11 @@ from django.shortcuts import redirect
 from django.contrib import messages
 from django.utils import timezone
 from django.http import JsonResponse
+from .posthog_service import get_posthog_events, get_insight_data #Integración RecuérdaMe
+import requests #Integración RecuérdaMe
+from django.conf import settings #Integración RecuérdaMe
+from django.http import JsonResponse, HttpResponseServerError #Integración RecuérdaMe
+from .models import InteractionMetric #Integración RecuérdaMe
 from datetime import datetime, date
 from .models import (
     DatosDemograficos,
@@ -3972,6 +3977,60 @@ def resumen_sesiones(request, visita_id, examen_id):
     }
 
     return JsonResponse(data)
+
+
+##### INTEGRACIÓN RECUÉRDAME
+
+def sync_posthog_data(request):
+    events = get_posthog_events(limit=100)
+
+    for ev in events:
+        InteractionMetric.objects.get_or_create(
+            event=ev.get("event"),
+            distinct_id=ev.get("distinct_id"),
+            timestamp=datetime.fromisoformat(ev.get("timestamp").replace("Z", "+00:00")),
+            defaults={"properties": ev.get("properties", {})}
+        )
+
+    return render(request, "home/statistic.html", {"metrics": InteractionMetric.objects.all()})
+
+def estadisticas(request):
+    url = f"{settings.POSTHOG_API_URL}/api/projects/{settings.POSTHOG_PROJECT_ID}/query/"
+    headers = {
+        "Authorization": f"Bearer {settings.POSTHOG_PERSONAL_API_KEY}",
+        "Content-Type": "application/json",
+    }
+    query = {
+        "kind": "TrendsQuery",
+        "series": [
+            {"kind": "EventsNode", "event": "$pageview", "name": "$pageview", "math": "dau"}
+        ],
+        "interval": "day",
+        "dateRange": {"date_from": "-30d", "explicitDate": False},
+    }
+
+    try:
+        response = requests.post(url, headers=headers, json={"query": query})
+        response.raise_for_status()
+        data = response.json()
+
+        # Extraer datos de resultados
+        results = data.get("results", [])
+        if results:
+            labels = results[0].get("labels", [])
+            values = results[0].get("data", [])
+        else:
+            labels, values = [], []
+
+        # Renderizar tu template con datos
+        return render(request, "home/stadistic.html", {
+            "labels": labels,
+            "values": values,
+        })
+
+    except requests.exceptions.RequestException as e:
+        return HttpResponseServerError(f"Error al obtener datos: {e}")
+
 
 
 
