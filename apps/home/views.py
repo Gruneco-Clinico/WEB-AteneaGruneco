@@ -3981,55 +3981,75 @@ def resumen_sesiones(request, visita_id, examen_id):
 
 ##### INTEGRACIÓN RECUÉRDAME
 
-def sync_posthog_data(request):
-    events = get_posthog_events(limit=100)
-
-    for ev in events:
-        InteractionMetric.objects.get_or_create(
-            event=ev.get("event"),
-            distinct_id=ev.get("distinct_id"),
-            timestamp=datetime.fromisoformat(ev.get("timestamp").replace("Z", "+00:00")),
-            defaults={"properties": ev.get("properties", {})}
-        )
-
-    return render(request, "home/statistic.html", {"metrics": InteractionMetric.objects.all()})
-
 def estadisticas(request):
-    url = f"{settings.POSTHOG_API_URL}/api/projects/{settings.POSTHOG_PROJECT_ID}/query/"
+    url_query = f"{settings.POSTHOG_API_URL}/api/projects/{settings.POSTHOG_PROJECT_ID}/query/"
     headers = {
         "Authorization": f"Bearer {settings.POSTHOG_PERSONAL_API_KEY}",
         "Content-Type": "application/json",
     }
-    query = {
-        "kind": "TrendsQuery",
-        "series": [
-            {"kind": "EventsNode", "event": "$pageview", "name": "$pageview", "math": "dau"}
-        ],
-        "interval": "day",
-        "dateRange": {"date_from": "-30d", "explicitDate": False},
-    }
 
     try:
-        response = requests.post(url, headers=headers, json={"query": query})
-        response.raise_for_status()
-        data = response.json()
+        # --------- 1. DAU (TrendsQuery) ---------
+        query_dau = {
+            "kind": "TrendsQuery",
+            "series": [
+                {"kind": "EventsNode", "event": "$pageview", "name": "$pageview", "math": "dau"}
+            ],
+            "interval": "day",
+            "dateRange": {"date_from": "-30d", "explicitDate": False},
+        }
 
-        # Extraer datos de resultados
-        results = data.get("results", [])
-        if results:
-            labels = results[0].get("labels", [])
-            values = results[0].get("data", [])
-        else:
-            labels, values = [], []
+        r1 = requests.post(url_query, headers=headers, json={"query": query_dau})
+        r1.raise_for_status()
+        data_dau = r1.json()
 
-        # Renderizar tu template con datos
+        dau_labels, dau_values = [], []
+        results_dau = data_dau.get("results", [])
+        if results_dau:
+            dau_labels = results_dau[0].get("labels", [])
+            dau_values = results_dau[0].get("data", [])
+
+        # --------- 2. Growth Accounting (LifecycleQuery) ---------
+        query_growth = {
+            "kind": "LifecycleQuery",
+            "series": [{"event": "$pageview"}],  # puedes cambiar el evento si quieres otro
+            "dateRange": {"date_from": "-30d"},
+            "interval": "day"
+        }
+
+        r2 = requests.post(url_query, headers=headers, json={"query": query_growth})
+        r2.raise_for_status()
+        data_growth = r2.json()
+
+        growth_labels, growth_datasets = [], []
+        results_growth = data_growth.get("results", [])
+        if results_growth:
+            # Todas las series comparten las mismas fechas
+            growth_labels = results_growth[0].get("days", [])
+            for serie in results_growth:
+                raw_label = serie.get("label", "")
+                clean_label = raw_label.split(" - ")[-1].capitalize()
+
+                # Dejamos los datos tal cual, incluso negativos
+                data = serie.get("data", [])
+
+                growth_datasets.append({
+                    "label": clean_label,
+                    "data": data,
+                })
+
+        # Renderizamos template
         return render(request, "home/stadistic.html", {
-            "labels": labels,
-            "values": values,
+            "labels": dau_labels,
+            "values": dau_values,
+            "growth_labels": growth_labels,
+            "growth_datasets": growth_datasets,
         })
 
     except requests.exceptions.RequestException as e:
         return HttpResponseServerError(f"Error al obtener datos: {e}")
+    
+
 
 
 

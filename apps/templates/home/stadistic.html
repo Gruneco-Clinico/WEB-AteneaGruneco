@@ -1,4 +1,6 @@
 {% extends 'layouts/base.html' %}
+{% load static %}
+
 
 <!-- Specific CSS goes HERE -->
 {% block stylesheets %}{% endblock stylesheets %} {% block content %}
@@ -266,54 +268,47 @@
         </div>
       </div>
 
-
-      <!-- 🔹 Nueva tarjeta con tabla de métricas PostHog -->
-      <div class="card mt-4">
+      <!-- Gráfico DAU -->
+      <!-- <div class="card mt-4">
         <div class="card-header border-0">
-          <h3 class="mb-0">Métricas PostHog</h3>
-        </div>
-        <div class="table-responsive">
-          <table class="table align-items-center table-flush">
-            <thead class="thead-light">
-              <tr>
-                <th scope="col">Evento</th>
-                <th scope="col">Usuario</th>
-                <th scope="col">Fecha</th>
-                <th scope="col">Propiedades</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for metric in metrics %}
-                <tr>
-                  <td>{{ metric.event }}</td>
-                  <td>{{ metric.distinct_id }}</td>
-                  <td>{{ metric.timestamp }}</td>
-                  <td>{{ metric.properties }}</td>
-                </tr>
-              {% empty %}
-                <tr>
-                  <td colspan="4" class="text-center">No hay métricas aún</td>
-                </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-      </div>
-      <!-- 🔹 Fin tabla métricas -->
-
-      <!-- 🔹 Nueva tarjeta con gráfico DAU -->
-      <div class="card mt-4">
-        <div class="card-header border-0">
-          <h3 class="mb-0">Daily Active Users (DAU)</h3>
+          <h3 class="mb-0">Usuarios Activos Diarios</h3>
         </div>
         <div class="card-body">
-          <p>Labels crudos: {{ labels }}</p>
-          <p>Values crudos: {{ values }}</p>
           <canvas id="dauChart" width="400" height="200"></canvas>
         </div>
-      </div>
-      <!-- 🔹 Fin tarjeta gráfico DAU -->
+      </div> -->
 
+      <div class="card mt-4 shadow">
+        <div class="card-header d-flex align-items-center">
+          <!-- Logo -->
+          <img src="{% static 'assets/img/theme/RecuerdaMe.png' %}" 
+              alt="Logo" 
+              style="height: 40px;" 
+              class="mr-2">
+          <!-- Título -->
+          <h3 class="mb-0">Usuarios Activos Diarios</h3>
+        </div>
+        <div class="card-body">
+          <canvas id="dauChart" width="300" height="100"></canvas>
+        </div>
+      </div>
+
+      <!-- Gráfico Growth accounting -->
+
+      <div class="card mt-4 shadow">
+        <div class="card-header d-flex align-items-center">
+          <!-- Logo -->
+          <img src="{% static 'assets/img/theme/RecuerdaMe.png' %}" 
+              alt="Logo" 
+              style="height: 40px;" 
+              class="mr-2">
+          <!-- Título -->
+          <h3 class="mb-0">Crecimiento</h3>
+        </div>
+        <div class="card-body">
+          <canvas id="growthChart" width="300" height="100"></canvas>
+        </div>
+      </div>
 
 
 
@@ -455,8 +450,7 @@
       </div>
     </div>
   </div>
-
-  {% include "includes/footer.html" %}
+{% include "includes/footer.html" %}
 </div>
 
 {% endblock content %}
@@ -467,11 +461,16 @@
 <script src="/static/assets/vendor/chart.js/dist/Chart.min.js"></script>
 <script src="/static/assets/vendor/chart.js/dist/Chart.extension.js"></script>
 
-<!-- Inserta los datos como JSON seguro -->
+<!-- DAU -->
 {{ labels|json_script:"dau-labels" }}
 {{ values|json_script:"dau-values" }}
 
+<!-- Growth Accounting -->
+{{ growth_labels|json_script:"growth-labels" }}
+{{ growth_datasets|json_script:"growth-datasets" }}
+
 <script>
+  // === Gráfico DAU ===
   const dauLabels = JSON.parse(document.getElementById("dau-labels").textContent);
   const dauValues = JSON.parse(document.getElementById("dau-values").textContent);
 
@@ -498,8 +497,57 @@
       }
     }
   });
+
+
+  // === Gráfico Growth Accounting ===
+  const growthLabels = JSON.parse(document.getElementById("growth-labels").textContent);
+  const growthDatasets = JSON.parse(document.getElementById("growth-datasets").textContent);
+
+  // Colores fijos para cada categoría
+  const colors = {
+    "Returning": "rgba(75, 192, 192, 0.6)",   // verde
+    "New": "rgba(54, 162, 235, 0.6)",        // azul
+    "Resurrecting": "rgba(153, 102, 255, 0.6)", // violeta
+    "Dormant": "rgba(255, 99, 132, 0.6)"     // rojo
+  };
+
+  // Traducción de etiquetas al español
+  const traducciones = {
+    "Returning": "Recurrentes",
+    "New": "Nuevos",
+    "Resurrecting": "Resurgentes",
+    "Dormant": "Latentes"
+  };
+
+  new Chart(document.getElementById("growthChart"), {
+    type: "bar",
+    data: {
+      labels: growthLabels,
+      datasets: growthDatasets.map(ds => ({
+        label: traducciones[ds.label] || ds.label, 
+        data: ds.data,
+        backgroundColor: colors[ds.label] || "rgba(200,200,200,0.6)",
+      }))
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { position: "top" }
+      },
+      scales: {
+        x: { stacked: true },
+        y: {
+          stacked: true,
+          beginAtZero: true,
+          // Esto permite que se dibujen negativos
+          min: Math.min(-5, Math.min(...growthDatasets.flatMap(ds => ds.data))),
+          max: Math.max(5, Math.max(...growthDatasets.flatMap(ds => ds.data)))
+        }
+      }
+    }
+  });
+
+
 </script>
 
-
 {% endblock javascripts %}
-
