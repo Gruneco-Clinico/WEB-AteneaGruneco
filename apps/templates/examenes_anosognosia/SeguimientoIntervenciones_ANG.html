@@ -73,7 +73,7 @@
 
                   <div class="form-group mt-3">
                     <label for="asistencia"><strong>Asistencia</strong></label>
-                    <select class="form-control" name="asistencia" id="asistencia">
+                    <select class="form-control" name="asistencia" id="asistencia" required>
                       {% if datos_sesion.asistencia %}
                         <option value="{{ datos_sesion.asistencia }}" selected>{{ datos_sesion.asistencia }}</option>
                       {% else %}
@@ -86,17 +86,17 @@
 
                   <div class="form-group">
                     <label for="participacion"><strong>Nivel de participación (1-5)</strong></label>
-                    <select class="form-control" name="participacion" id="participacion">
+                    <select class="form-control" name="participacion" id="participacion" required>
                       {% if datos_sesion.participacion %}
                         <option value="{{ datos_sesion.participacion }}" selected>{{ datos_sesion.participacion }}</option>
                       {% else %}
                         <option value="">Seleccione</option>
                       {% endif %}
-                      <option value="1">1</option>
-                      <option value="2">2</option>
-                      <option value="3">3</option>
-                      <option value="4">4</option>
-                      <option value="5">5</option>
+                      <option value="1">1. Muy baja: No participa o lo hace mínimamente, mostrando desinterés o pasividad.</option>
+                      <option value="2">2. Baja: Participa de manera limitada; su contribución es esporádica y poco activa.</option>
+                      <option value="3">3. Moderada: Participa de manera consistente, pero con iniciativa limitada o solo cuando se le solicita.</option>
+                      <option value="4">4. Alta: Participa activamente, contribuye con ideas y se involucra en la mayoría de actividades.</option>
+                      <option value="5">5. Muy alta: Participa de manera excepcional, lidera discusiones, propone ideas y motiva a otros a involucrarse.</option>
                     </select>
                   </div>
 
@@ -124,7 +124,7 @@
 
                   <div class="form-group">
                     <label for="observaciones"><strong>Observaciones</strong></label>
-                    <textarea class="form-control" name="observaciones" id="observaciones" rows="2">{{ datos_sesion.observaciones|default:'' }}</textarea>
+                    <textarea class="form-control" name="observaciones" id="observaciones" rows="4">{{ datos_sesion.observaciones|default:'' }}</textarea>
                   </div>
 
                 </div>
