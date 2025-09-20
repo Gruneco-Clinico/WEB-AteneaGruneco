@@ -2597,6 +2597,8 @@ def guardar_examen_Cuidador_NPI(request):
                 data[f"{item}_F_G"] = request.POST.get(f"{item}_resultado")
                 data[f"{item}_distres"] = request.POST.get(f"{item}_distres_texto")
 
+                data["carga_total"] = request.POST.get("carga_total", 0)
+
             # Crear o actualizar el resultado del NPI
             npi, created = CuidadorNPIResult.objects.update_or_create(
                 visita_examen=visita_examen, defaults=data
@@ -3343,6 +3345,15 @@ def guardar_examen_BettyFerrel(request):
                     "estado_espiritual",
                 ]
             }
+
+            # Obtener puntaje total enviado por JS
+            puntaje_total = request.POST.get("puntaje_total", 0)
+            try:
+                puntaje_total = int(puntaje_total)
+            except ValueError:
+                puntaje_total = 0
+
+            campos["puntaje_total"] = puntaje_total
 
             # Guardar o actualizar
             bettyferrel, created = BettyFerrelResult.objects.update_or_create(

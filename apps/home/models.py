@@ -1122,6 +1122,8 @@ class CuidadorNPIResult(ResultadoExamenBase):
     apetito_distres = models.CharField(max_length=50, blank=True, null=True)
 
     puntaje_total = models.IntegerField(blank=True, null=True, default=0)
+    carga_total = models.IntegerField(blank=True, null=True, default=0)
+
 
 
     def calcular_puntaje_total(self):
@@ -1732,6 +1734,8 @@ class BettyFerrelResult(ResultadoExamenBase):
     proposito_vida = models.CharField(max_length=255, blank=True, null=True)
     esperanza = models.CharField(max_length=255, blank=True, null=True)
     estado_espiritual = models.CharField(max_length=255, blank=True, null=True)
+
+    puntaje_total = models.IntegerField(default=0)
 
     def __str__(self):
         return f"Betty Ferrel - {self.visita_examen}"

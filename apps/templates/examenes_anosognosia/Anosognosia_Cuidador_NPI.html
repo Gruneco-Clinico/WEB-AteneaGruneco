@@ -47,8 +47,12 @@
                 <p><strong>Puntaje total:</strong> 
                     <span id="puntaje-display">{{ datos_examen.puntaje_total|default:"0" }}</span>
                 </p>
+                <p><strong>Carga total:</strong> 
+                    <span id="carga-display">{{ datos_examen.carga_total|default:"0" }}</span>
+                </p>
                 <!-- Campo oculto para enviar el total -->
                 <input type="hidden" name="puntaje_total" id="puntaje_total" value="{{ datos_examen.puntaje_total|default:'0' }}">
+                <input type="hidden" name="carga_total" id="carga_total" value="{{ datos_examen.carga_total|default:'0' }}">
             </div>
 
             <div class="text-right mt-4">
@@ -104,17 +108,28 @@
 
     function actualizarPuntajeTotal() {
       let total = 0;
+      let carga = 0; 
+
       items.forEach(item => {
         const resultado = document.getElementById(`${item}_resultado`);
+        const distres = document.querySelector(`select[name="${item}_distres"]`);
+
         if (resultado) total += parseInt(resultado.value || 0);
+        if (distres) carga += parseInt(distres.value || 0); 
       });
 
       const display = document.getElementById("puntaje-display");
       const hidden = document.getElementById("puntaje_total");
-      const contenedor = document.getElementById("resultado-container");
-
       if (display) display.innerText = total;
       if (hidden) hidden.value = total;
+
+
+      const carga_hidden = document.getElementById("carga_total");
+      const carga_display = document.getElementById("carga-display");
+      if (carga_hidden) carga_hidden.value = carga;
+      if (carga_display) carga_display.innerText = carga;
+
+      const contenedor = document.getElementById("resultado-container");
       if (contenedor) contenedor.style.display = "block";
     }
 
@@ -139,9 +154,8 @@
       });
     });
 
-    // ⚡ NUEVO: Llenar los hidden con los textos al cargar (para edición)
     items.forEach(item => {
-      actualizarResultadoYTextos(item); // Esto asegura que aunque no se cambie nada, los hidden tendrán valor
+      actualizarResultadoYTextos(item);
     });
 
   });
