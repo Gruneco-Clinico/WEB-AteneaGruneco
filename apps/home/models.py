@@ -1121,6 +1121,23 @@ class CuidadorNPIResult(ResultadoExamenBase):
     apetito_F_G = models.IntegerField(blank=True, null=True)
     apetito_distres = models.CharField(max_length=50, blank=True, null=True)
 
+    puntaje_total = models.IntegerField(blank=True, null=True, default=0)
+
+
+    def calcular_puntaje_total(self):
+        items_fg = [
+            self.ideas_delirantes_F_G, self.alucinaciones_F_G, self.agitacion_F_G,
+            self.depresion_F_G, self.ansiedad_F_G, self.euforia_F_G,
+            self.apatia_F_G, self.desinhibicion_F_G, self.irritabilidad_F_G,
+            self.conducta_motor_F_G, self.sueno_F_G, self.apetito_F_G,
+        ]
+        
+        return sum(int(x) for x in items_fg if x not in (None, ""))
+
+    def save(self, *args, **kwargs):
+        self.puntaje_total = self.calcular_puntaje_total()
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return f"NPI - Paciente {self.visita_examen_id}"
 

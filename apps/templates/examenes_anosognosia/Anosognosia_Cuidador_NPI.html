@@ -28,7 +28,6 @@
               <strong>Instrucciones:</strong> Seleccione "Sí", "No" o "No Sabe" para cada ítem. Si selecciona "Sí", aparecerán los campos de Frecuencia, Gravedad y Distrés.
             </div>
 
-            {% comment %} Reemplaza este bloque por cada ítem {% endcomment %}
             {% include "includes/npi_item.html" with numero=1 nombre="ideas_delirantes" label="Ideas delirantes" %}
             {% include "includes/npi_item.html" with numero=2 nombre="alucinaciones" label="Alucinaciones" %}
             {% include "includes/npi_item.html" with numero=3 nombre="agitacion" label="Agitación/Agresión" %}
@@ -41,6 +40,16 @@
             {% include "includes/npi_item.html" with numero=10 nombre="conducta_motor" label="Conducta Motora Aberrante" %}
             {% include "includes/npi_item.html" with numero=11 nombre="sueno" label="Sueño" %}
             {% include "includes/npi_item.html" with numero=12 nombre="apetito" label="Apetito/Alimentación" %}
+            
+
+            <div class="alert alert-success mt-4" id="resultado-container" style="display: none;">
+                <h4 class="alert-heading">Resultado del Inventario Neuropsiquiátrico (NPI)</h4>
+                <p><strong>Puntaje total:</strong> 
+                    <span id="puntaje-display">{{ datos_examen.puntaje_total|default:"0" }}</span>
+                </p>
+                <!-- Campo oculto para enviar el total -->
+                <input type="hidden" name="puntaje_total" id="puntaje_total" value="{{ datos_examen.puntaje_total|default:'0' }}">
+            </div>
 
             <div class="text-right mt-4">
               <button type="submit" class="btn btn-primary">Guardar</button>
@@ -89,6 +98,24 @@
       const frec_val = parseInt(frec?.value || 0);
       const grav_val = parseInt(grav?.value || 0);
       if (resultado) resultado.value = frec_val * grav_val;
+
+      actualizarPuntajeTotal();
+    }
+
+    function actualizarPuntajeTotal() {
+      let total = 0;
+      items.forEach(item => {
+        const resultado = document.getElementById(`${item}_resultado`);
+        if (resultado) total += parseInt(resultado.value || 0);
+      });
+
+      const display = document.getElementById("puntaje-display");
+      const hidden = document.getElementById("puntaje_total");
+      const contenedor = document.getElementById("resultado-container");
+
+      if (display) display.innerText = total;
+      if (hidden) hidden.value = total;
+      if (contenedor) contenedor.style.display = "block";
     }
 
     // Mostrar subitems al cargar
@@ -111,8 +138,16 @@
         }
       });
     });
+
+    // ⚡ NUEVO: Llenar los hidden con los textos al cargar (para edición)
+    items.forEach(item => {
+      actualizarResultadoYTextos(item); // Esto asegura que aunque no se cambie nada, los hidden tendrán valor
+    });
+
   });
 </script>
+
+
 
 
 

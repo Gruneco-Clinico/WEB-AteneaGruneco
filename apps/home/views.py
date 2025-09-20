@@ -11,6 +11,7 @@ from django.contrib.auth import login, authenticate, logout
 from django.shortcuts import redirect
 from django.contrib import messages
 from django.utils import timezone
+from django.http import JsonResponse
 from datetime import datetime, date
 from .models import (
     DatosDemograficos,
@@ -2580,9 +2581,18 @@ def guardar_examen_Cuidador_NPI(request):
             data = {}
             for item in items:
                 data[item] = request.POST.get(item)
-                data[f"{item}_frecuencia"] = request.POST.get(
-                    f"{item}_frecuencia_texto"
-                )
+
+                # frec = request.POST.get(f"{item}_frecuencia") or request.POST.get(f"{item}_frecuencia_texto")
+                # grav = request.POST.get(f"{item}_gravedad") or request.POST.get(f"{item}_gravedad_texto")
+                # dist = request.POST.get(f"{item}_distres") or request.POST.get(f"{item}_distres_texto")
+                # fg = request.POST.get(f"{item}_resultado") or 0
+
+
+                # data[f"{item}_frecuencia"] = frec
+                # data[f"{item}_gravedad"] = grav
+                # data[f"{item}_F_G"] = fg
+                # data[f"{item}_distres"] = dist
+                data[f"{item}_frecuencia"] = request.POST.get(f"{item}_frecuencia_texto")
                 data[f"{item}_gravedad"] = request.POST.get(f"{item}_gravedad_texto")
                 data[f"{item}_F_G"] = request.POST.get(f"{item}_resultado")
                 data[f"{item}_distres"] = request.POST.get(f"{item}_distres_texto")
@@ -3803,14 +3813,6 @@ def guardar_examen_Cuidador_Zarit(request):
     else:
         messages.error(request, "❌ Método no permitido.")
         return redirect("index")
-    
-from django.shortcuts import get_object_or_404, redirect
-from django.contrib import messages
-from django.utils import timezone
-from django.contrib.auth.decorators import login_required
-
-from .models import SeguimientoIntervencionesResult, VisitaExamen
-
 
 @login_required
 def guardar_intervenciones(request):
@@ -3890,6 +3892,77 @@ def guardar_intervenciones(request):
     else:
         messages.error(request, "❌ Método no permitido.")
         return redirect("index")
+
+@login_required
+def obtener_datos_sesion(request, visita_id, examen_id, num_sesion):
+    visita_examen = get_object_or_404(
+        VisitaExamen, visita_id=visita_id, examen_id=examen_id
+    )
+    try:
+        sesion = SeguimientoIntervencionesResult.objects.get(
+            visita_examen=visita_examen, numero_sesion=num_sesion
+        )
+        data = {
+            "nombre": sesion.nombre_sesion,
+            "fecha": sesion.fecha.strftime("%Y-%m-%d") if sesion.fecha else "",
+            "hora_inicio": sesion.hora_inicio.strftime("%H:%M") if sesion.hora_inicio else "",
+            "hora_fin": sesion.hora_fin.strftime("%H:%M") if sesion.hora_fin else "",
+            "asistencia": sesion.asistencia,
+            "participacion": sesion.participacion,
+            "estado": sesion.estado,
+            "tematica": sesion.tematica,
+            "observaciones": sesion.observaciones,
+        }
+    except SeguimientoIntervencionesResult.DoesNotExist:
+        data = {}
+
+    return JsonResponse(data)
+
+@login_required
+def resumen_sesiones(request, visita_id, examen_id):
+    visita_examen = get_object_or_404(
+        VisitaExamen, visita_id=visita_id, examen_id=examen_id
+    )
+
+    sesiones = SeguimientoIntervencionesResult.objects.filter(
+        visita_examen=visita_examen
+    ).order_by("numero_sesion")
+
+    if sesiones.count() < 24:
+        return JsonResponse({"error": "Aún no se han completado las 24 sesiones."})
+
+    total_sesiones = 24
+    asistidas = sesiones.filter(asistencia="Sí").count()
+
+    porcentaje_asistencia = round((asistidas / total_sesiones) * 100, 2)
+    conteo_asistencia = f"{asistidas}/{total_sesiones}"
+
+    participaciones = [s.participacion for s in sesiones if s.participacion]
+    promedio_participacion = (
+        round(sum(map(int, participaciones)) / len(participaciones), 2)
+        if participaciones else 0
+    )
+
+    tendencia_participacion = [
+        int(s.participacion) if s.participacion else None
+        for s in sesiones
+    ]
+
+    alerta = None
+    if porcentaje_asistencia < 70:
+        alerta = "⚠️ Riesgo de abandono (asistencia < 70%)"
+
+    data = {
+        "porcentaje_asistencia": porcentaje_asistencia,
+        "conteo_asistencia": conteo_asistencia,
+        "promedio_participacion": promedio_participacion,
+        "tendencia_participacion": tendencia_participacion,
+        "alerta": alerta,
+    }
+
+    return JsonResponse(data)
+
+
 
 
 #######################################################################################

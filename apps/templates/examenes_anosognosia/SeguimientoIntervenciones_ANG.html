@@ -131,6 +131,8 @@
               </div>
             </div>
 
+            
+
             <!-- Botones -->
             <div class="text-right mt-4">
               <button type="submit" class="btn btn-primary">Guardar</button>
@@ -142,18 +144,109 @@
       </div>
     </div>
   </div>
+
+  <!-- Resumen Final de Sesiones -->
+  <div id="resumenFinal" style="display:none;" class="card mt-4">
+    <div class="card-header bg-light">
+      <strong>📊 Resumen de las 24 Sesiones</strong>
+    </div>
+    <div class="card-body">
+      <ul>
+        <li><strong>Porcentaje de asistencia:</strong> <span id="resumenAsistencia"></span>%</li>
+        <li><strong>Sesiones asistidas:</strong> <span id="resumenConteo"></span></li>
+        <li><strong>Promedio de participación:</strong> <span id="resumenPromedio"></span></li>
+      </ul>
+      <div id="resumenAlerta" style="color:red; font-weight:bold;"></div>
+
+      <!-- Gráfico -->
+      <canvas id="graficoParticipacion" height="120"></canvas>
+    </div>
+  </div>
+
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
 document.getElementById("num_sesion").addEventListener("change", function() {
   const formSesion = document.getElementById("form_sesion");
-  if (this.value) {
+  const visitaId = "{{ visita_examen }}";  // Asegúrate de que aquí es el ID numérico
+  const examenId = "{{ examen_id }}";
+  const numSesion = this.value;
+
+  if (numSesion) {
+    // Mostrar el formulario apenas selecciona
     formSesion.style.display = "block";
-    formSesion.querySelector(".card-header strong").innerText = "Sesión " + this.value;
+    formSesion.querySelector(".card-header strong").innerText = "Sesión " + numSesion;
+
+    // Construir la URL usando la ruta de Django
+    const url = "{% url 'obtener_datos_sesion' 0 0 0 %}"
+                  .replace("/0/0/0/", `/${visitaId}/${examenId}/${numSesion}/`);
+
+    fetch(url)
+      .then(response => response.json())
+      .then(data => {
+        // Rellenar los inputs con los datos recibidos
+        document.getElementById("nombre").value = data.nombre || "";
+        document.getElementById("fecha").value = data.fecha || "";
+        document.getElementById("hora_inicio").value = data.hora_inicio || "";
+        document.getElementById("hora_fin").value = data.hora_fin || "";
+        document.getElementById("asistencia").value = data.asistencia || "";
+        document.getElementById("participacion").value = data.participacion || "";
+        document.getElementById("estado").value = data.estado || "";
+        document.getElementById("tematica").value = data.tematica || "";
+        document.getElementById("observaciones").value = data.observaciones || "";
+      })
+      .catch(error => {
+        console.error("Error cargando datos de la sesión:", error);
+      });
+
   } else {
+    // Si no selecciona nada, esconder
     formSesion.style.display = "none";
   }
 });
 </script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  const urlResumen = "{% url 'resumen_sesiones' visita_examen examen_id %}";
+
+  fetch(urlResumen)
+    .then(response => response.json())
+    .then(data => {
+      if (!data.error) {
+        document.getElementById("resumenFinal").style.display = "block";
+
+        document.getElementById("resumenAsistencia").textContent = data.porcentaje_asistencia;
+        document.getElementById("resumenConteo").textContent = data.conteo_asistencia;
+        document.getElementById("resumenPromedio").textContent = data.promedio_participacion;
+
+        if (data.alerta) {
+          document.getElementById("resumenAlerta").textContent = data.alerta;
+        }
+
+        // Gráfico de tendencia
+        const ctx = document.getElementById("graficoParticipacion");
+        new Chart(ctx, {
+          type: "line",
+          data: {
+            labels: data.tendencia_participacion.map((_, i) => "Sesión " + (i+1)),
+            datasets: [{
+              label: "Participación",
+              data: data.tendencia_participacion,
+              borderColor: "blue",
+              fill: false,
+              tension: 0.2
+            }]
+          }
+        });
+      }
+    })
+    .catch(error => console.error("Error cargando resumen:", error));
+});
+</script>
+
+
 
 {% endblock %}

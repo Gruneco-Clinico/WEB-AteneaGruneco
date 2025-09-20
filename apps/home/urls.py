@@ -189,6 +189,17 @@ urlpatterns = [
         views.guardar_intervenciones,
         name="guardar_intervenciones",
     ),
+    path(
+        "obtener_datos_sesion/<int:visita_id>/<int:examen_id>/<int:num_sesion>/",
+        views.obtener_datos_sesion,
+        name="obtener_datos_sesion",
+    ),
+    path(
+    "resumen_sesiones/<int:visita_id>/<int:examen_id>/",
+    views.resumen_sesiones,
+    name="resumen_sesiones",
+    ),
+
     
     # examanes generales
     path(

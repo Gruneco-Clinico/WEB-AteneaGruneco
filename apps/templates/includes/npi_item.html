@@ -1,8 +1,13 @@
+{% load custom_filters %}
+
+
 <div class="form-group">
   <label><strong>{{ numero }}. {{ label }}</strong></label>
   <select class="form-control toggle-subitems" name="{{ nombre }}" data-target="grupo{{ numero }}" required>
-    {% if datos_examen and datos_examen.nombre %}
-      <option value="{{ datos_examen.nombre }}" selected>{{ datos_examen.nombre|capfirst }}</option>
+    {% if datos_examen and datos_examen|get_item:nombre %}
+      <option value="{{ datos_examen|get_item:nombre }}" selected>
+        {{ datos_examen|get_item:nombre|capfirst }}
+      </option>
     {% else %}
       <option value="" disabled selected>Seleccione una opción</option>
     {% endif %}
@@ -12,61 +17,92 @@
   </select>
 </div>
 
-<div class="ml-4 mb-3 border-left pl-3 d-none" id="grupo{{ numero }}">
+<div class="ml-4 mb-3 border-left pl-3 {% if not datos_examen or datos_examen|get_item:nombre != 'si' %}d-none{% endif %}" id="grupo{{ numero }}">
   <!-- Frecuencia -->
   <div class="form-group">
     <label>Frecuencia</label>
     <select class="form-control frecuencia-select" name="{{ nombre }}_frecuencia" data-item="{{ nombre }}">
-      {% if datos_examen and datos_examen.nombre_frecuencia %}
-        <option value="{{ datos_examen.nombre_frecuencia }}" selected>{{ datos_examen.nombre_frecuencia_texto }}</option>
-      {% else %}
-        <option value="" disabled selected>Seleccione una opción</option>
-      {% endif %}
+      {% with key=nombre|concat:"_frecuencia" %}
+        {% if datos_examen|get_item:key %}
+          <option value="{{ datos_examen|get_item:key }}" selected>
+            {{ datos_examen|get_item:key }}
+          </option>
+        {% else %}
+          <option value="" disabled selected>Seleccione una opción</option>
+        {% endif %}
+      {% endwith %}
       <option value="1" data-text="1. Ocasionalmente">1. Ocasionalmente</option>
       <option value="2" data-text="2. A menudo">2. A menudo</option>
       <option value="3" data-text="3. Frecuentemente">3. Frecuentemente</option>
       <option value="4" data-text="4. Muy frecuentemente">4. Muy frecuentemente</option>
     </select>
-    <input type="hidden" name="{{ nombre }}_frecuencia_texto" id="{{ nombre }}_frecuencia_texto">
+    <input type="hidden" name="{{ nombre }}_frecuencia_texto" id="{{ nombre }}_frecuencia_texto" value="{% with key=nombre|concat:'_frecuencia' %}{{ datos_examen|get_item:key|default:'' }}{% endwith %}">
   </div>
 
   <!-- Gravedad -->
   <div class="form-group">
     <label>Gravedad</label>
-    <select class="form-control gravedad-select" name="{{ nombre }}_gravedad" data-item="{{ nombre }}">
-      {% if datos_examen and datos_examen.nombre_gravedad %}
-        <option value="{{ datos_examen.nombre_gravedad }}" selected>{{ datos_examen.nombre_gravedad_texto }}</option>
-      {% else %}
-        <option value="" disabled selected>Seleccione una opción</option>
-      {% endif %}
-      <option value="1" data-text="1. Leve">1. Leve</option>
-      <option value="2" data-text="2. Moderada">2. Moderada</option>
-      <option value="3" data-text="3. Marcada">3. Marcada</option>
-    </select>
-    <input type="hidden" name="{{ nombre }}_gravedad_texto" id="{{ nombre }}_gravedad_texto">
+    {% with key=nombre|concat:"_gravedad" %}
+      <select class="form-control gravedad-select" name="{{ nombre }}_gravedad" data-item="{{ nombre }}">
+        {% if datos_examen and datos_examen|get_item:key %}
+          <option value="{{ datos_examen|get_item:key }}" selected>
+            {{ datos_examen|get_item:key }}
+          </option>
+        {% else %}
+          <option value="" disabled selected>Seleccione una opción</option>
+        {% endif %}
+        {% endwith %}
+        <option value="1" data-text="1. Leve">1. Leve</option>
+        <option value="2" data-text="2. Moderada">2. Moderada</option>
+        <option value="3" data-text="3. Marcada">3. Marcada</option>
+      </select>
+      <input type="hidden" name="{{ nombre }}_gravedad_texto" id="{{ nombre }}_gravedad_texto" value="{% with key=nombre|concat:'_gravedad' %}{{ datos_examen|get_item:key|default:'' }}{% endwith %}">
+    
   </div>
 
   <!-- Resultado FG -->
   <div class="form-group">
     <label>Frecuencia × Gravedad</label>
-    <input type="text" class="form-control resultado-fg" name="{{ nombre }}_resultado" id="{{ nombre }}_resultado" readonly value="{{ datos_examen.nombre_resultado|default:'0' }}">
+    {% with fkey=nombre|concat:"_frecuencia" gkey=nombre|concat:"_gravedad" %}
+      {% with f=datos_examen|get_item:fkey g=datos_examen|get_item:gkey %}
+        {% with f_int=f|to_int g_int=g|to_int %}
+          <p class="text-muted small">
+            Frecuencia (raw): {{ f }} → (int): {{ f_int }} <br>
+            Gravedad (raw): {{ g }} → (int): {{ g_int }} <br>
+            F*G: {{ f_int|mul:g_int }}
+          </p>
+
+          <input type="text" class="form-control resultado-fg"
+                name="{{ nombre }}_resultado"
+                id="{{ nombre }}_resultado"
+                readonly
+                value="{{ f_int|mul:g_int }}">
+        {% endwith %}
+      {% endwith %}
+    {% endwith %}
   </div>
+
 
   <!-- Distrés -->
   <div class="form-group">
     <label>Distrés</label>
-    <select class="form-control distres-select" name="{{ nombre }}_distres" data-item="{{ nombre }}">
-      {% if datos_examen and datos_examen.nombre_distres %}
-        <option value="{{ datos_examen.nombre_distres }}" selected>{{ datos_examen.nombre_distres_texto }}</option>
-      {% else %}
-        <option value="" disabled selected>Seleccione una opción</option>
-      {% endif %}
-      <option value="1" data-text="1. Nada">1. Nada</option>
-      <option value="2" data-text="2. Leve">2. Leve</option>
-      <option value="3" data-text="3. Moderada">3. Moderada</option>
-      <option value="4" data-text="4. Marcada">4. Marcada</option>
-      <option value="5" data-text="5. Extrema">5. Extrema</option>
-    </select>
-    <input type="hidden" name="{{ nombre }}_distres_texto" id="{{ nombre }}_distres_texto">
+    {% with key=nombre|concat:"_distres" %}
+      <select class="form-control distres-select" name="{{ nombre }}_distres" data-item="{{ nombre }}">
+        {% if datos_examen and datos_examen|get_item:key %}
+          <option value="{{ datos_examen|get_item:key }}" selected>
+            {{ datos_examen|get_item:key }}
+          </option>
+        {% else %}
+          <option value="" disabled selected>Seleccione una opción</option>
+        {% endif %}
+        {% endwith %}
+        <option value="1" data-text="1. Nada">1. Nada</option>
+        <option value="2" data-text="2. Leve">2. Leve</option>
+        <option value="3" data-text="3. Moderada">3. Moderada</option>
+        <option value="4" data-text="4. Marcada">4. Marcada</option>
+        <option value="5" data-text="5. Extrema">5. Extrema</option>
+      </select>
+      <input type="hidden" name="{{ nombre }}_distres_texto" id="{{ nombre }}_distres_texto" value="{% with key=nombre|concat:'_distres' %}{{ datos_examen|get_item:key|default:'' }}{% endwith %}">
   </div>
+
 </div>
