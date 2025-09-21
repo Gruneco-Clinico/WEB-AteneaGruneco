@@ -268,15 +268,6 @@
         </div>
       </div>
 
-      <!-- Gráfico DAU -->
-      <!-- <div class="card mt-4">
-        <div class="card-header border-0">
-          <h3 class="mb-0">Usuarios Activos Diarios</h3>
-        </div>
-        <div class="card-body">
-          <canvas id="dauChart" width="400" height="200"></canvas>
-        </div>
-      </div> -->
 
       <div class="card mt-4 shadow">
         <div class="card-header d-flex align-items-center">
@@ -310,8 +301,56 @@
         </div>
       </div>
 
+      <!-- Device Type -->
 
+      <div class="card mt-4 shadow">
+        <div class="card-header d-flex align-items-center">
+          <img src="{% static 'assets/img/theme/RecuerdaMe.png' %}" 
+              alt="Logo" 
+              style="height: 40px;" 
+              class="mr-2">
+          <h3 class="mb-0">Usuarios por tipo de dispositivo (Último mes)</h3>
+        </div>
 
+        <p>Labels: <span id="device-labels-debug"></span></p>
+        <p>Values: <span id="device-values-debug"></span></p>
+
+        <div class="card-body">
+          <canvas id="deviceChart" width="300" height="100"></canvas>
+        </div>
+      </div>
+
+      <!-- Identify User -->
+
+      <div class="col-xl-4">
+        <div class="card">
+          <div class="card-header border-0">
+            <div class="row align-items-center">
+              <div class="col">
+                <h3 class="mb-0">Ingresos por Usuario (Últimos 30 días)</h3>
+              </div>
+            </div>
+          </div>
+          <div class="table-responsive">
+
+            <!-- Debug: mostrar arrays recibidos -->
+            <p id="user-labels-debug" style="color:red;"></p>
+            <p id="user-values-debug" style="color:red;"></p>
+
+            <table class="table align-items-center table-flush">
+              <thead class="thead-light">
+                <tr>
+                  <th scope="col">Email</th>
+                  <th scope="col">Cantidad de Ingresos</th>
+                </tr>
+              </thead>
+              <tbody id="user-login-table">
+                <!-- Filas se generarán con JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
 
 
 
@@ -469,6 +508,20 @@
 {{ growth_labels|json_script:"growth-labels" }}
 {{ growth_datasets|json_script:"growth-datasets" }}
 
+<!-- Device type -->
+{{ device_labels|json_script:"device-labels" }}
+{{ device_values|json_script:"device-values" }}
+
+<!-- Identify user -->
+{{ user_labels|json_script:"user-labels" }}
+{{ user_values|json_script:"user-values" }}
+
+
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+
+
+
+
 <script>
   // === Gráfico DAU ===
   const dauLabels = JSON.parse(document.getElementById("dau-labels").textContent);
@@ -547,6 +600,52 @@
     }
   });
 
+  // === Gráfico Device Type ===
+  const deviceLabels = JSON.parse(document.getElementById("device-labels").textContent);
+  const deviceValues = JSON.parse(document.getElementById("device-values").textContent);
+
+  // Mostrar en los <p> para depuración
+  document.getElementById("device-labels-debug").textContent = JSON.stringify(deviceLabels);
+  document.getElementById("device-values-debug").textContent = JSON.stringify(deviceValues);
+
+  new Chart(document.getElementById("deviceChart"), {
+    type: "doughnut",
+    data: {
+      labels: deviceLabels,
+      datasets: [{
+        data: deviceValues,
+        backgroundColor: ["#007bff", "#28a745", "#ffc107", "#dc3545"], // azul, verde, amarillo, rojo
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { position: "right" },
+        tooltip: { enabled: true }
+      }
+    }
+  });
+
+  // === Tabla Identify User ===
+  const userLabels = JSON.parse(document.getElementById("user-labels").textContent);
+  const userValues = JSON.parse(document.getElementById("user-values").textContent);
+
+  document.getElementById("user-labels-debug").textContent = "User Labels: " + JSON.stringify(userLabels);
+  document.getElementById("user-values-debug").textContent = "User Values: " + JSON.stringify(userValues);
+
+  const tbody = document.getElementById("user-login-table");
+
+  userLabels.forEach((email, i) => {
+    const count = userValues[i];
+
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <th scope="row">${email}</th>
+      <td>${count}</td>
+    `;
+    tbody.appendChild(row);
+  });
+  
 
 </script>
 

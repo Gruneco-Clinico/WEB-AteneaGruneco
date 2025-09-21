@@ -3979,7 +3979,7 @@ def resumen_sesiones(request, visita_id, examen_id):
     return JsonResponse(data)
 
 
-##### INTEGRACIÓN RECUÉRDAME
+##### INTEGRACIÓN RECUÉRDAME A LAS ESTADÍSTICAS
 
 def estadisticas(request):
     url_query = f"{settings.POSTHOG_API_URL}/api/projects/{settings.POSTHOG_PROJECT_ID}/query/"
@@ -4038,19 +4038,261 @@ def estadisticas(request):
                     "data": data,
                 })
 
-        # Renderizamos template
+        # # --------- 3. Device Type (TrendsQuery) ---------
+
+        # --------- 3. Device Type (Insight) ---------
+        device_labels, device_values = [], []
+
+        # 1. Obtener el insight ya configurado
+        url_insight = f"{settings.POSTHOG_API_URL}/api/projects/{settings.POSTHOG_PROJECT_ID}/insights/{settings.POSTHOG_DEVICE_TYPE_INSIGHT_ID}/"
+        r = requests.get(url_insight, headers=headers)
+        r.raise_for_status()
+        insight = r.json()
+
+        # 2. Ejecutar la query del insight
+        query = insight.get("query")
+        url_query = f"{settings.POSTHOG_API_URL}/api/projects/{settings.POSTHOG_PROJECT_ID}/query/"
+        r = requests.post(url_query, headers=headers, json={"query": query})
+        r.raise_for_status()
+        data = r.json()
+
+        results = data.get("results") or data.get("result") or []
+
+        device_translation = {
+            "Desktop": "Computador",
+            "Mobile": "Celular",
+            "Tablet": "Tablet"
+        }
+
+        if results:
+            for serie in results:
+                # label / breakdown del dispositivo
+                device = serie.get("breakdown_value") or serie.get("breakdown") or serie.get("label") or "Otro"
+                if isinstance(device, list):
+                    device = device[0] if device else "Otro"
+
+                # normalizar al español
+                device_name = device_translation.get(device, device)
+
+                # sacar valores → PostHog los devuelve en "data", "result" o "count"
+                total = None
+                if "aggregated_value" in serie and serie["aggregated_value"] is not None:
+                    total = serie["aggregated_value"]
+                elif "count" in serie and serie["count"] is not None:
+                    total = serie["count"]
+                elif "data" in serie:
+                    total = sum(serie.get("data", []))
+                elif "result" in serie:
+                    vals = serie.get("result", [])
+                    if isinstance(vals, list):
+                        total = sum(v for v in vals if isinstance(v, (int, float)))
+
+                total = int(total or 0)
+
+                device_labels.append(device_name)
+                device_values.append(total)
+
+        # device_types = ["Desktop", "Mobile", "Tablet"]
+        # device_labels, device_values = [], []
+
+        # device_translation = {
+        #     "Desktop": "Computador",
+        #     "Mobile": "Celular",
+        #     "Tablet": "Tablet"
+        # }
+
+        # for dt in device_types:
+        #     query = {
+        #         "kind": "TrendsQuery",
+        #         "series": [
+        #             {
+        #                 "kind": "EventsNode",
+        #                 "event": "$pageview",
+        #                 "name": dt,
+        #                 "properties": [{"key": "$device_type", "value": dt}],
+        #                 "math": "dau"
+        #             }
+        #         ],
+        #         "interval": "day",
+        #         "dateRange": {"date_from": "-30d", "explicitDate": False}
+        #     }
+        #     r = requests.post(url_query, headers=headers, json={"query": query})
+        #     r.raise_for_status()
+        #     result = r.json().get("results", [])
+        #     if result:
+        #         device_labels.append(device_translation[dt])
+        #         # sumamos los valores diarios
+
+        #         daily_data = result[0].get("data", [])
+        #         device_values.append(sum(daily_data))
+
+
+        # --------- 4. Ingresos por usuario (Login) ---------
+        # user_labels, user_values = [], []
+
+        # query_logins = {
+        #     "kind": "TrendsQuery",
+        #     "series": [
+        #         {
+        #             "kind": "EventsNode",
+        #             "event": "user_logged_in",
+        #             "name": "Login",
+        #             "math": "dau"
+        #         }
+        #     ],
+        #     "interval": "day",
+        #     "dateRange": {"date_from": "-30d", "explicitDate": False}
+        # }
+
+        # r = requests.post(url_query, headers=headers, json={"query": query_logins})
+        # r.raise_for_status()
+        # results = r.json().get("results", [])
+
+        # if results:
+        #     for serie in results:
+        #         # Si enviaste email como propiedad, lo puedes extraer aquí
+        #         email = serie.get("properties", {}).get("email") or serie.get("label")
+        #         daily_data = serie.get("data", [])
+        #         total_logins = sum(daily_data) if daily_data else 0
+        #         user_labels.append(email)
+        #         user_values.append(total_logins)
+
+        # --------- 4. Ingresos por usuario (Login) ---------
+        # 1. Traer el insight (para obtener la query)
+        url_insight = f"{settings.POSTHOG_API_URL}/api/projects/{settings.POSTHOG_PROJECT_ID}/insights/{settings.POSTHOG_IDENTIFY_COUNT_INSIGHT_ID}/"
+        r = requests.get(url_insight, headers=headers)
+        r.raise_for_status()
+        insight = r.json()
+
+        # 2. Ejecutar la query del insight
+        query = insight.get("query")
+        url_query = f"{settings.POSTHOG_API_URL}/api/projects/{settings.POSTHOG_PROJECT_ID}/query/"
+        r = requests.post(url_query, headers=headers, json={"query": query})
+        r.raise_for_status()
+        data = r.json()
+
+        # DEBUG: imprime la respuesta cruda (recorta si es muy larga)
+        print("Raw data (first 20000 chars):", json.dumps(data, indent=2)[:20000])
+
+        user_labels, user_values = [], []
+
+        def flatten(x):
+            """Generador recursivo que aplana listas anidadas."""
+            if isinstance(x, list):
+                for el in x:
+                    yield from flatten(el)
+            else:
+                yield x
+
+        def extract_numbers_from_value(v):
+            """Dado un elemento v (num, str numérica, dict...), intenta extraer un número."""
+            if v is None:
+                return None
+            # Si es dict, buscar claves típicas
+            if isinstance(v, dict):
+                for k in ("aggregated_value", "aggregated", "count", "value", "y", "total"):
+                    if k in v and v[k] is not None:
+                        try:
+                            return float(v[k])
+                        except Exception:
+                            pass
+                return None
+            # Si es numérico directo
+            if isinstance(v, (int, float)):
+                return float(v)
+            # Si es string que contiene número
+            if isinstance(v, str):
+                try:
+                    return float(v)
+                except Exception:
+                    return None
+            return None
+
+        results = data.get("results") or data.get("result") or []
+
+        if results:
+            for idx, serie in enumerate(results):
+                # Email / label
+                email_field = serie.get("breakdown_value") or serie.get("breakdown") or serie.get("label") or "Sin label"
+                if isinstance(email_field, list):
+                    email = email_field[0] if email_field else "Sin email"
+                else:
+                    email = email_field
+
+                # 1) Priorizar aggregated_value
+                total_sum = None
+                if "aggregated_value" in serie and serie.get("aggregated_value") is not None:
+                    total_sum = serie.get("aggregated_value")
+
+                # 2) luego count
+                if total_sum in (None, "") and "count" in serie and serie.get("count") is not None:
+                    total_sum = serie.get("count")
+
+                # 3) luego buscar arrays con números en keys comunes
+                if total_sum in (None, ""):
+                    # posibles keys donde PostHog pone los valores por día
+                    for key in ("result", "data", "values", "series", "points"):
+                        if key in serie and serie.get(key) is not None:
+                            vals = serie.get(key)
+                            # aplanar y extraer números
+                            nums = []
+                            for item in flatten(vals):
+                                num = extract_numbers_from_value(item)
+                                if num is not None:
+                                    nums.append(num)
+                            if nums:
+                                total_sum = sum(nums)
+                                break
+
+                # 4) si todavía no hay nada, intentar inspeccionar el propio 'serie' (por si vienen anidados)
+                if total_sum in (None, ""):
+                    # Buscar cualquier número en los valores del dict serie
+                    nums = []
+                    for v in serie.values():
+                        for item in flatten([v]):
+                            num = extract_numbers_from_value(item)
+                            if num is not None:
+                                nums.append(num)
+                    if nums:
+                        total_sum = sum(nums)
+
+                # Normalizar total_sum a int (0 si no se encontró)
+                try:
+                    total_sum = int(total_sum) if total_sum is not None else 0
+                except Exception:
+                    try:
+                        total_sum = int(float(total_sum))
+                    except Exception:
+                        total_sum = 0
+
+                # DEBUG por cada serie: claves y lo que extrajimos
+                print(f"Serie #{idx}: keys={list(serie.keys())}")
+                sample_debug = {k: serie.get(k) for k in ("breakdown_value", "breakdown", "label", "aggregated_value", "count", "result", "data")}
+                print(" Sample:", json.dumps(sample_debug, default=str))
+                print(" Extracted total_sum:", total_sum)
+
+                # Guardar si es email válido (o si quieres mostrar otros breakdowns, ajusta aquí)
+                if isinstance(email, str) and "@" in email:
+                    user_labels.append(email)
+                    user_values.append(total_sum)
+
+        # Ahora renderizas normalmente
         return render(request, "home/stadistic.html", {
             "labels": dau_labels,
             "values": dau_values,
             "growth_labels": growth_labels,
             "growth_datasets": growth_datasets,
+            "device_labels": device_labels,
+            "device_values": device_values,
+            "user_labels": user_labels,
+            "user_values": user_values,
         })
 
     except requests.exceptions.RequestException as e:
         return HttpResponseServerError(f"Error al obtener datos: {e}")
     
 
-
+        
 
 
 
