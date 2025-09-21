@@ -309,48 +309,72 @@
               alt="Logo" 
               style="height: 40px;" 
               class="mr-2">
-          <h3 class="mb-0">Usuarios por tipo de dispositivo (Último mes)</h3>
+          <h3 class="mb-0">Usuarios por tipo de dispositivo (Últimos 30 días)</h3>
         </div>
 
-        <p>Labels: <span id="device-labels-debug"></span></p>
-        <p>Values: <span id="device-values-debug"></span></p>
+        <!-- <p>Labels: <span id="device-labels-debug"></span></p>
+        <p>Values: <span id="device-values-debug"></span></p> -->
 
         <div class="card-body">
           <canvas id="deviceChart" width="300" height="100"></canvas>
         </div>
       </div>
 
-      <!-- Identify User -->
 
-      <div class="col-xl-4">
-        <div class="card">
-          <div class="card-header border-0">
-            <div class="row align-items-center">
-              <div class="col">
-                <h3 class="mb-0">Ingresos por Usuario (Últimos 30 días)</h3>
-              </div>
-            </div>
-          </div>
-          <div class="table-responsive">
+      <!-- Sesiones (Pageview -> Pageleave) -->
+      <!-- <div class="col-xl-6"> -->
+      <div class="card">
+        <div class="card-header d-flex align-items-center">
+          <img src="{% static 'assets/img/theme/RecuerdaMe.png' %}" 
+              alt="Logo" 
+              style="height: 40px;" 
+              class="mr-2">
+          <h3 class="mb-0">Resumen de sesiones por usuario (inicio y fin)</h3>
+        </div>
+        <div class="table-responsive">
 
-            <!-- Debug: mostrar arrays recibidos -->
-            <p id="user-labels-debug" style="color:red;"></p>
-            <p id="user-values-debug" style="color:red;"></p>
+          <pre id="debug-sessions"></pre>
+          <pre>{{ session_rows|json_script:"session-rows-debug" }}</pre>
+          <pre id="debug-raw"></pre>
 
-            <table class="table align-items-center table-flush">
-              <thead class="thead-light">
+
+          <table class="table align-items-center table-flush">
+            <thead class="thead-light">
+              <tr>
+                <th>Email</th>
+                <!-- <th>Paso</th> -->
+                <th>Ingresados</th>
+                <th>Convertidos</th>
+                <th>Dropped</th>
+                <th>Conversión (%)</th>
+                <th>Tiempo Promedio</th>
+                <th>Tiempo Mediano</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in session_rows %}
                 <tr>
-                  <th scope="col">Email</th>
-                  <th scope="col">Cantidad de Ingresos</th>
+                  <td>{{ row.email }}</td>
+                  <!-- <td>{{ row.step_name }}</td> -->
+                  <td>{{ row.entered }}</td>
+                  <td>{{ row.converted }}</td>
+                  <td>{{ row.dropped_off }}</td>
+                  <td>{{ row.conversion_rate }}%</td>
+                  <td>{{ row.avg_time }}</td>
+                  <td>{{ row.median_time }}</td>
                 </tr>
-              </thead>
-              <tbody id="user-login-table">
-                <!-- Filas se generarán con JS -->
-              </tbody>
-            </table>
-          </div>
+              {% empty %}
+                <tr><td colspan="7">No hay datos</td></tr>
+              {% endfor %}
+            </tbody>
+
+          </table>
         </div>
       </div>
+      <!-- </div> -->
+
+
+
 
 
 
@@ -487,6 +511,47 @@
           </table>
         </div>
       </div>
+
+
+
+
+      <!-- Identify User -->
+
+      <!-- <div class="col-xl-4"> -->
+      <div class="card">
+        <div class="card-header border-0">
+          <div class="row align-items-center">
+            <div class="col">
+              <h3 class="mb-0">Ingresos por Usuario (Últimos 30 días)</h3>
+            </div>
+          </div>
+        </div>
+        <div class="table-responsive">
+
+          <!-- Debug: mostrar arrays recibidos -->
+          <!-- <p id="user-labels-debug" style="color:red;"></p>
+          <p id="user-values-debug" style="color:red;"></p> -->
+
+          <table class="table align-items-center table-flush">
+            <thead class="thead-light">
+              <tr>
+                <th scope="col">Email</th>
+                <th scope="col">Cantidad de Ingresos</th>
+              </tr>
+            </thead>
+            <tbody id="user-login-table">
+              <!-- Filas se generarán con JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <!-- </div> -->
+      
+
+      
+
+
+
     </div>
   </div>
 {% include "includes/footer.html" %}
@@ -516,11 +581,16 @@
 {{ user_labels|json_script:"user-labels" }}
 {{ user_values|json_script:"user-values" }}
 
+<!-- Sesiones -->
+{{ session_rows|json_script:"session-rows" }}
+
+
+
+<script id="session-raw" type="application/json">
+  {{ session_raw|safe }}
+</script>
 
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
-
-
-
 
 <script>
   // === Gráfico DAU ===
@@ -605,8 +675,8 @@
   const deviceValues = JSON.parse(document.getElementById("device-values").textContent);
 
   // Mostrar en los <p> para depuración
-  document.getElementById("device-labels-debug").textContent = JSON.stringify(deviceLabels);
-  document.getElementById("device-values-debug").textContent = JSON.stringify(deviceValues);
+  // document.getElementById("device-labels-debug").textContent = JSON.stringify(deviceLabels);
+  // document.getElementById("device-values-debug").textContent = JSON.stringify(deviceValues);
 
   new Chart(document.getElementById("deviceChart"), {
     type: "doughnut",
@@ -630,8 +700,8 @@
   const userLabels = JSON.parse(document.getElementById("user-labels").textContent);
   const userValues = JSON.parse(document.getElementById("user-values").textContent);
 
-  document.getElementById("user-labels-debug").textContent = "User Labels: " + JSON.stringify(userLabels);
-  document.getElementById("user-values-debug").textContent = "User Values: " + JSON.stringify(userValues);
+  // document.getElementById("user-labels-debug").textContent = "User Labels: " + JSON.stringify(userLabels);
+  // document.getElementById("user-values-debug").textContent = "User Values: " + JSON.stringify(userValues);
 
   const tbody = document.getElementById("user-login-table");
 
@@ -645,6 +715,40 @@
     `;
     tbody.appendChild(row);
   });
+
+  // === Tabla Sesiones ===
+  const sessionRows = JSON.parse(document.getElementById("session-rows").textContent);
+
+  // console.log("=== RAW sessionRows ===", sessionRows);
+  // document.getElementById("debug-sessions").textContent = JSON.stringify(sessionRows, null, 2);
+  // console.log("DEBUG SessionRows:", JSON.parse(document.getElementById("session-rows-debug").textContent));
+
+  // const raw = JSON.parse(document.getElementById("session-raw").textContent);
+  // console.log("=== RAW DATA FRONT ===", raw);
+
+  // document.getElementById("debug-raw").textContent = 
+  //   "Raw PostHog Data: " + JSON.stringify(raw, null, 2);
+
+
+  const tbodySessions = document.getElementById("session-table");
+  tbodySessions.innerHTML = ""; // limpiar antes
+
+  sessionRows.forEach(row => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <th scope="row">${row.email}</th>
+      // <td>${row.step}</td>
+      <td>${row.entered}</td>
+      <td>${row.converted}</td>
+      <td>${row.dropped_off}</td>
+      <td>${row.conversion_rate}%</td>
+      <td>${row.avg_time || "–"}</td>
+      <td>${row.median_time || "–"}</td>
+    `;
+    tbodySessions.appendChild(tr);
+  });
+
+
   
 
 </script>

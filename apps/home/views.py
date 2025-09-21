@@ -4038,8 +4038,6 @@ def estadisticas(request):
                     "data": data,
                 })
 
-        # # --------- 3. Device Type (TrendsQuery) ---------
-
         # --------- 3. Device Type (Insight) ---------
         device_labels, device_values = [], []
 
@@ -4092,70 +4090,6 @@ def estadisticas(request):
                 device_labels.append(device_name)
                 device_values.append(total)
 
-        # device_types = ["Desktop", "Mobile", "Tablet"]
-        # device_labels, device_values = [], []
-
-        # device_translation = {
-        #     "Desktop": "Computador",
-        #     "Mobile": "Celular",
-        #     "Tablet": "Tablet"
-        # }
-
-        # for dt in device_types:
-        #     query = {
-        #         "kind": "TrendsQuery",
-        #         "series": [
-        #             {
-        #                 "kind": "EventsNode",
-        #                 "event": "$pageview",
-        #                 "name": dt,
-        #                 "properties": [{"key": "$device_type", "value": dt}],
-        #                 "math": "dau"
-        #             }
-        #         ],
-        #         "interval": "day",
-        #         "dateRange": {"date_from": "-30d", "explicitDate": False}
-        #     }
-        #     r = requests.post(url_query, headers=headers, json={"query": query})
-        #     r.raise_for_status()
-        #     result = r.json().get("results", [])
-        #     if result:
-        #         device_labels.append(device_translation[dt])
-        #         # sumamos los valores diarios
-
-        #         daily_data = result[0].get("data", [])
-        #         device_values.append(sum(daily_data))
-
-
-        # --------- 4. Ingresos por usuario (Login) ---------
-        # user_labels, user_values = [], []
-
-        # query_logins = {
-        #     "kind": "TrendsQuery",
-        #     "series": [
-        #         {
-        #             "kind": "EventsNode",
-        #             "event": "user_logged_in",
-        #             "name": "Login",
-        #             "math": "dau"
-        #         }
-        #     ],
-        #     "interval": "day",
-        #     "dateRange": {"date_from": "-30d", "explicitDate": False}
-        # }
-
-        # r = requests.post(url_query, headers=headers, json={"query": query_logins})
-        # r.raise_for_status()
-        # results = r.json().get("results", [])
-
-        # if results:
-        #     for serie in results:
-        #         # Si enviaste email como propiedad, lo puedes extraer aquí
-        #         email = serie.get("properties", {}).get("email") or serie.get("label")
-        #         daily_data = serie.get("data", [])
-        #         total_logins = sum(daily_data) if daily_data else 0
-        #         user_labels.append(email)
-        #         user_values.append(total_logins)
 
         # --------- 4. Ingresos por usuario (Login) ---------
         # 1. Traer el insight (para obtener la query)
@@ -4276,7 +4210,83 @@ def estadisticas(request):
                     user_labels.append(email)
                     user_values.append(total_sum)
 
-        # Ahora renderizas normalmente
+        # --------- 5. Sesiones (Pageview -> Pageleave) ---------
+        session_rows = []
+        
+        # 1. Traer el insight
+        url_insight = f"{settings.POSTHOG_API_URL}/api/projects/{settings.POSTHOG_PROJECT_ID}/insights/{settings.POSTHOG_SESION_TIME_INSIGHT_ID}/"
+        r = requests.get(url_insight, headers=headers)
+        r.raise_for_status()
+        insight = r.json()
+
+        # 2. Ejecutar la query
+        query = insight.get("query")
+        url_query = f"{settings.POSTHOG_API_URL}/api/projects/{settings.POSTHOG_PROJECT_ID}/query/"
+        r = requests.post(url_query, headers=headers, json={"query": query})
+        r.raise_for_status()
+
+        data = r.json()
+        print("=== RAW DATA FROM POSTHOG ===")
+        print(json.dumps(data, indent=2))  # imprime en consola el JSON completo
+
+        # 🔹 Extraer resultados: manejar funnels que devuelven "steps"
+        if isinstance(data, dict):
+            results = data.get("steps") or data.get("results") or data.get("result") or []
+        elif isinstance(data, list):
+            results = data
+        else:
+            results = []
+
+        def safe_num(x):
+            try:
+                return float(x)
+            except Exception:
+                return None
+
+        def format_seconds(seconds):
+            if not seconds:
+                return None
+            seconds = int(seconds)
+            m, s = divmod(seconds, 60)
+            if m > 0:
+                return f"{m}m {s}s"
+            return f"{s}s"
+
+        # 3. Iterar sobre cada step del funnel
+        for serie in results:
+            # A veces viene en lista
+            if isinstance(serie, list) and serie:
+                last = serie[-1] #leavepage
+                first = serie[0] #viewpage
+            elif isinstance(serie, dict):
+                first = last = serie
+            else:
+                continue
+
+            # 🔹 Identificar usuario/email/breakdown
+            email_field = last.get("breakdown_value") or last.get("breakdown") or last.get("label") or "Sin dato"
+            if isinstance(email_field, list):
+                email = email_field[0] if email_field else "Sin dato"
+            else:
+                email = email_field
+
+            entered = safe_num(first.get("count")) or 0
+            converted = safe_num(last.get("count")) or 0
+            dropped = max(entered - converted, 0)
+
+            session_rows.append({
+                "email": email,
+                # "raw_keys": ", ".join(serie.keys()), 
+                # "step": step_name,
+                "entered": int(entered),
+                "converted": converted,
+                "dropped_off": int(dropped),
+                "conversion_rate": round((converted / entered) * 100, 2) if entered > 0 else 0,
+                "avg_time": format_seconds(last.get("average_conversion_time")),
+                "median_time": format_seconds(last.get("median_conversion_time")),
+            })
+        
+        # 5. Renderizar template
         return render(request, "home/stadistic.html", {
             "labels": dau_labels,
             "values": dau_values,
@@ -4286,11 +4296,11 @@ def estadisticas(request):
             "device_values": device_values,
             "user_labels": user_labels,
             "user_values": user_values,
+            "session_rows": session_rows,
         })
 
     except requests.exceptions.RequestException as e:
         return HttpResponseServerError(f"Error al obtener datos: {e}")
-    
 
         
 
