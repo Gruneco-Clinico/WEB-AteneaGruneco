@@ -197,14 +197,13 @@
                     <span class="mr-2">{{ stat.percent }}%</span>
                     <div>
                       <div class="progress">
-                        <div
-                          class="progress-bar bg-gradient-{{ stat.color }}"
-                          role="progressbar"
-                          aria-valuenow="{{ stat.percent }}"
-                          aria-valuemin="0"
-                          aria-valuemax="100"
-                          style="width: {{ stat.percent|default:0|floatformat:0 }}%;"
-                        ></div>
+                        <div class="progress-bar bg-gradient-{{ stat.color }}"
+                            role="progressbar"
+                            aria-valuenow="{{ stat.percent|default_if_none:0|floatformat:0 }}"
+                            aria-valuemin="0"
+                            aria-valuemax="100"
+                            style="width: {{ stat.percent|default_if_none:0|floatformat:0 }}%;">
+                        </div>
                       </div>
                     </div>
                   </div>
