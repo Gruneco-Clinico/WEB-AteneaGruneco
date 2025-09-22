@@ -1,3 +1,5 @@
+{% load static %}
+
 <style>
   /* Animación de apertura y cierre de la barra lateral */
   .sidenav {
@@ -62,15 +64,30 @@
               <span class="nav-link-text">Inicio</span>
             </a>
           </li>
+
+          <li class="nav-item">
+            <a
+              class="nav-link {% if 'atenea_estadisticas' in segment %} active {% endif %}"
+              href="/atenea_estadisticas/"
+            >
+              <i class="ni ni-chart-pie-35 text-blue"></i>
+              <span class="nav-link-text">Estadísticas</span>
+            </a>
+          </li>
+
           <li class="nav-item">
             <a
               class="nav-link {% if 'estadisticas' in segment %} active {% endif %}"
               href="/estadisticas/"
             >
               <i class="ni ni-chart-pie-35 text-blue"></i>
-              <span class="nav-link-text">Estadisticas</span>
+              <img src="{% static 'assets/img/theme/RecuerdaMe.png' %}" 
+                  alt="Logo" 
+                  style="height: 35px;" 
+                  class="ml-2">
             </a>
           </li>
+          
           <li class="nav-item">
             <a
               class="nav-link {% if 'tables' in segment %} active {% endif %}"

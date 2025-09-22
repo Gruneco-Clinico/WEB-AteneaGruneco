@@ -1,0 +1,381 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+{% load custom_filters %}
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}{% endblock stylesheets %} {% block content %}
+<!-- Header -->
+<div class="header bg-primary pb-6">
+  <div class="container-fluid">
+    <div class="header-body">
+      <div class="row align-items-center py-4">
+        <div class="col-lg-6 col-7">
+          <h6 class="h2 text-white d-inline-block mb-0">GRUNECO</h6>
+          <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
+            <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
+              <li class="breadcrumb-item">
+                <a href="#"><i class="fas fa-home"></i></a>
+              </li>
+              <li class="breadcrumb-item"><a href="#">Atenea</a></li>
+              <li class="breadcrumb-item active" aria-current="page">
+                Estadísticas Atenea
+              </li>
+            </ol>
+          </nav>
+        </div>
+      </div>
+      <!-- Card stats -->
+      <div class="row">
+
+        <!-- Número de participantes por proyecto -->
+        {% for p in proyectos_info %}
+        <div class="col-xl-4 col-md-6 mb-3">
+          <div class="card card-stats">
+            <div class="card-body">
+              <div class="row">
+                <div class="col">
+                  <h5 class="card-title text-uppercase text-muted mb-0">
+                    {{ p.label }}
+                  </h5>
+
+                  <!-- Cantidad de Participantes por Proyecto -->
+                  <div class="d-flex align-items-baseline">
+                    <span class="h2 font-weight-bold mb-0 mr-3">{{ p.participants }}</span>
+                    <small class="text-muted">Participantes</small>
+                  </div>
+
+                  <!-- Datos recolectados por Proyecto (Exámenes completados)-->
+                  <div class="mt-2 d-flex align-items-baseline">
+                    <span class="h3 font-weight-semibold mb-0 mr-3 text-success">{{ p.exams_completed }}</span>
+                    <small class="text-muted">Datos recolectados (exámenes completados)</small>
+                  </div>
+
+                </div>
+
+                <div class="col-auto">
+                  <div class="icon icon-shape bg-gradient-blue text-white rounded-circle shadow">
+                    <i class="ni ni-briefcase-24"></i>
+                  </div>
+                </div>
+              </div>
+
+              <p class="mt-3 mb-0 text-sm">
+                <span class="text-success mr-2">
+                  <i class="fa fa-arrow-up"></i>
+                  Nuevos participantes en curso
+                </span>
+                <span class="text-nowrap">Actualizado recientemente</span>
+              </p>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Page content -->
+<div class="container-fluid mt--6">
+  <div class="row mb-0">
+    {% for p in proyectos_info %}
+    <div class="col-xl-6">
+      <!-- <div class="card">
+        <div class="card-header border-0">
+          <div class="row align-items-center">
+            <div class="col">
+              <h3 class="mb-0">Estadísticas Clínicas</h3>
+            </div>
+            <div class="col text-right">
+              <a href="#!" class="btn btn-sm btn-primary">Ver detalles</a>
+            </div>
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table class="table align-items-center table-flush">
+            <thead class="thead-light">
+              <tr>
+                <th scope="col">Rango de Edad</th>
+                <th scope="col">Número de Participantes</th>
+                <th scope="col">Prevalencia de Condiciones Médicas</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>18-30 años</td>
+                <td>80</td>
+                <td>Insomnio (25%), Ansiedad (15%)</td>
+              </tr>
+              <tr>
+                <td>31-45 años</td>
+                <td>120</td>
+                <td>Insomnio (40%), Depresión (20%)</td>
+              </tr>
+              <tr>
+                <td>46-60 años</td>
+                <td>90</td>
+                <td>Apnea del sueño (30%), Hipertensión (25%)</td>
+              </tr>
+              <tr>
+                <td>60+ años</td>
+                <td>60</td>
+                <td>Insomnio (50%), Enfermedades crónicas (35%)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div> -->
+
+      <div class="card">
+          <div class="card-header border-0">
+            <div class="row align-items-center">
+              <div class="col">
+                <h3 class="mb-0">Estadísticas Clínicas - {{ p.label }}</h3>
+              </div>
+              <div class="col text-right">
+                <a href="#!" class="btn btn-sm btn-primary">Ver detalles</a>
+              </div>
+            </div>
+          </div>
+          <div class="table-responsive">
+            <table class="table align-items-center table-flush">
+              <thead class="thead-light">
+                <tr>
+                  <th scope="col">Rango de Edad</th>
+                  <th scope="col">Número de Participantes</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for stat in p.clinical_stats %}
+                  <tr>
+                    <td>{{ stat.rango }}</td>
+                    <td>{{ stat.count }}</td>
+                  </tr>
+                {% empty %}
+                  <tr>
+                    <td colspan="2" class="text-center text-muted">
+                      No hay participantes registrados
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+
+
+      <!-- Gráficos que van a la derecha -->
+
+    </div>
+
+    <div class="col-xl-6">
+      <div class="card">
+        <div class="card-header border-0">
+          <div class="row align-items-center">
+            <div class="col">
+              <h3 class="mb-0">Distribución Demográfica - {{ p.label }}</h3>
+            </div>
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table class="table align-items-center table-flush">
+            <thead class="thead-light">
+              <tr>
+                <th scope="col">Categoría</th>
+                <th scope="col">Cantidad</th>
+                <th scope="col">Porcentaje</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for stat in p.demografia %}
+              <tr>
+                <th scope="row">{{ stat.label }}</th>
+                <td>{{ stat.count }}</td>
+                <td>
+                  <div class="d-flex align-items-center">
+                    <span class="mr-2">{{ stat.percent }}%</span>
+                    <div>
+                      <div class="progress">
+                        <div
+                          class="progress-bar bg-gradient-{{ stat.color }}"
+                          role="progressbar"
+                          aria-valuenow="{{ stat.percent }}"
+                          aria-valuemin="0"
+                          aria-valuemax="100"
+                          style="width: {{ stat.percent|default:0|floatformat:0 }}%;"
+                        ></div>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="3" class="text-center text-muted">
+                  No hay participantes registrados
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <!-- <div class="col-xl-6"> -->
+      <!-- <div class="card">
+        <div class="card-header border-0">
+          <div class="row align-items-center">
+            <div class="col">
+              <h3 class="mb-0">Distribución Demográfica</h3>
+            </div>
+            <div class="col text-right">
+              <a href="#!" class="btn btn-sm btn-primary">Ver Detalles</a>
+            </div>
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table class="table align-items-center table-flush">
+            <thead class="thead-light">
+              <tr>
+                <th scope="col">Categoría</th>
+                <th scope="col">Cantidad</th>
+                <th scope="col">Porcentaje</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row">Género: Masculino</th>
+                <td>150</td>
+                <td>
+                  <div class="d-flex align-items-center">
+                    <span class="mr-2">60%</span>
+                    <div>
+                      <div class="progress">
+                        <div
+                          class="progress-bar bg-gradient-primary"
+                          role="progressbar"
+                          aria-valuenow="60"
+                          aria-valuemin="0"
+                          aria-valuemax="100"
+                          style="width: 60%"
+                        ></div>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <th scope="row">Género: Femenino</th>
+                <td>100</td>
+                <td>
+                  <div class="d-flex align-items-center">
+                    <span class="mr-2">40%</span>
+                    <div>
+                      <div class="progress">
+                        <div
+                          class="progress-bar bg-gradient-info"
+                          role="progressbar"
+                          aria-valuenow="40"
+                          aria-valuemin="0"
+                          aria-valuemax="100"
+                          style="width: 40%"
+                        ></div>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <th scope="row">Escolaridad: Primaria</th>
+                <td>50</td>
+                <td>
+                  <div class="d-flex align-items-center">
+                    <span class="mr-2">20%</span>
+                    <div>
+                      <div class="progress">
+                        <div
+                          class="progress-bar bg-gradient-warning"
+                          role="progressbar"
+                          aria-valuenow="20"
+                          aria-valuemin="0"
+                          aria-valuemax="100"
+                          style="width: 20%"
+                        ></div>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <th scope="row">Escolaridad: Secundaria</th>
+                <td>120</td>
+                <td>
+                  <div class="d-flex align-items-center">
+                    <span class="mr-2">48%</span>
+                    <div>
+                      <div class="progress">
+                        <div
+                          class="progress-bar bg-gradient-success"
+                          role="progressbar"
+                          aria-valuenow="48"
+                          aria-valuemin="0"
+                          aria-valuemax="100"
+                          style="width: 48%"
+                        ></div>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <th scope="row">Escolaridad: Universitaria</th>
+                <td>80</td>
+                <td>
+                  <div class="d-flex align-items-center">
+                    <span class="mr-2">32%</span>
+                    <div>
+                      <div class="progress">
+                        <div
+                          class="progress-bar bg-gradient-danger"
+                          role="progressbar"
+                          aria-valuenow="32"
+                          aria-valuemin="0"
+                          aria-valuemax="100"
+                          style="width: 32%"
+                        ></div>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div> -->
+    <!-- </div> -->
+    {% endfor %}
+  </div>
+  
+{% include "includes/footer.html" %}
+</div>
+
+{% endblock content %}
+
+
+{% block javascripts %}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+ 
+
+<!-- Chart.js (v4 desde CDN, estable y actualizado) -->
+<!-- <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1"></script> -->
+
+<!-- Plugin de etiquetas (compatible con Chart.js v4) -->
+<!-- <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script> -->
+
+<!-- <script src="/static/assets/vendor/chart.js/dist/Chart.min.js"></script>
+<script src="/static/assets/vendor/chart.js/dist/Chart.extension.js"></script> -->
+
+{% endblock javascripts %}

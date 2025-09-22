@@ -13,7 +13,7 @@ urlpatterns = [
     # path('ads/', views.ads, name='ads'),
     path("index/", views.index, name="index"),
     path(
-        "estadisticas/", views.estadisticas, name="estadisticas"
+        "atenea_estadisticas/", views.atenea_estadisticas, name="atenea_estadisticas"
     ),  # Página de estadísticas
     path("login/", login_view, name="login"),
     path("logout/", views.logout_view, name="logout"),

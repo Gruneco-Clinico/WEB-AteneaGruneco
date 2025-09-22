@@ -158,12 +158,111 @@ def index(request):
     html_template = loader.get_template("home/index.html")
     return HttpResponse(html_template.render(context, request))
 
-
 @login_required(login_url="/login/")
 @user_passes_test(is_superuser, login_url="/login/")
-def estadisticas(request):
-    context = {"segment": "estadisticas"}
-    return render(request, "home/stadistic.html", context)
+def atenea_estadisticas(request):
+    context = {"segment": "atenea_estadisticas"}
+
+    proyectos_a_buscar = [
+        ("Anosognosia", "Anosognosia"),
+        ("Proyecto Sueño", "Proyecto Sueño"),
+        ("Envejecimiento", "Envejecimiento"),
+    ]
+
+    proyectos_info = []
+
+    for term, label in proyectos_a_buscar:
+        qs = Proyecto.objects.filter(nombre__icontains=term)
+
+        participantes_count = 0
+        exams_completed = 0
+        clinical_stats = []
+        genero_stats = []
+        escolaridad_stats = []
+
+        if qs.exists():
+            # Participantes únicos
+            patient_ids = qs.values_list("pacientes", flat=True)
+            unique_patients = DatosDemograficos.objects.filter(id__in=patient_ids)
+
+            participantes_count = unique_patients.count()
+
+            # Distribución género
+            if participantes_count > 0:
+                hombres = unique_patients.filter(genero__iexact="M").count()
+                mujeres = unique_patients.filter(genero__iexact="F").count()
+
+                genero_stats = [
+                    {
+                        "label": "Género: Masculino",
+                        "count": hombres,
+                        "percent": round((hombres / participantes_count) * 100, 2),
+                        "color": "primary",
+                    },
+                    {
+                        "label": "Género: Femenino",
+                        "count": mujeres,
+                        "percent": round((mujeres / participantes_count) * 100, 2),
+                        "color": "info",
+                    },
+                ]
+
+            # Distribución escolaridad
+            if participantes_count > 0:
+                for nivel, color in [
+                    ("primario", "warning"),
+                    ("bachiller", "warning"),
+                    ("universidad", "success"),
+                    ("maestria", "danger"),
+                    ("doctorado", "danger"),
+                    ("especializacion", "danger"),
+                ]:
+                    count = unique_patients.filter(escolaridad__iexact=nivel).count()
+                    escolaridad_stats.append(
+                        {
+                            "label": f"Escolaridad: {nivel}",
+                            "count": count,
+                            "percent": round((count / participantes_count) * 100, 2),
+                            "color": color,
+                        }
+                    )
+
+            # Exámenes completados
+            exams_qs = VisitaExamen.objects.filter(
+                visita__Tipo_visita__proyecto__in=qs,
+                estado="completado",
+            )
+            exams_completed = exams_qs.count()
+
+            # --- Distribución por rangos de edad ---
+            rangos = [
+                (18, 30, "18-30 años"),
+                (31, 45, "31-45 años"),
+                (46, 60, "46-60 años"),
+                (61, 200, "60+ años"),  # límite alto grande
+            ]
+
+            for (min_age, max_age, label_rango) in rangos:
+                count = unique_patients.filter(
+                    edad__gte=min_age, edad__lte=max_age
+                ).count()
+                clinical_stats.append({
+                    "rango": label_rango,
+                    "count": count,
+                })
+
+        proyectos_info.append({
+            "term": term,
+            "label": label,
+            "participants": participantes_count,
+            "exams_completed": exams_completed,
+            "clinical_stats": clinical_stats,
+            "demografia": genero_stats + escolaridad_stats,
+        })
+
+    context["proyectos_info"] = proyectos_info
+    return render(request, "home/statistics_atenea.html", context)
+
 
 
 # pacientes
@@ -3625,7 +3724,7 @@ def guardar_anamnesis_cuidador(request):
                 "lugar_nacimiento": request.POST.get("lugar_nacimiento"),
                 "lugar_procedencia": request.POST.get("lugar_procedencia"),
                 "edad": request.POST.get("edad"),
-                "sexo": request.POST.get("sexo"),
+                "genero": request.POST.get("genero"),
                 "estado_civil": request.POST.get("estado_civil"),
                 "relacion": request.POST.get("relacion"),
                 "tiempo_acompanando": request.POST.get("tiempo_acompanando"),
@@ -3979,8 +4078,10 @@ def resumen_sesiones(request, visita_id, examen_id):
     return JsonResponse(data)
 
 
-##### INTEGRACIÓN RECUÉRDAME A LAS ESTADÍSTICAS
+# Estadísticas - RecuérdaMe
 
+@login_required(login_url="/login/")
+@user_passes_test(is_superuser, login_url="/login/")
 def estadisticas(request):
     url_query = f"{settings.POSTHOG_API_URL}/api/projects/{settings.POSTHOG_PROJECT_ID}/query/"
     headers = {
@@ -4106,7 +4207,7 @@ def estadisticas(request):
         data = r.json()
 
         # DEBUG: imprime la respuesta cruda (recorta si es muy larga)
-        print("Raw data (first 20000 chars):", json.dumps(data, indent=2)[:20000])
+        #print("Raw data (first 20000 chars):", json.dumps(data, indent=2)[:20000])
 
         user_labels, user_values = [], []
 
@@ -4200,10 +4301,10 @@ def estadisticas(request):
                         total_sum = 0
 
                 # DEBUG por cada serie: claves y lo que extrajimos
-                print(f"Serie #{idx}: keys={list(serie.keys())}")
+                #print(f"Serie #{idx}: keys={list(serie.keys())}")
                 sample_debug = {k: serie.get(k) for k in ("breakdown_value", "breakdown", "label", "aggregated_value", "count", "result", "data")}
-                print(" Sample:", json.dumps(sample_debug, default=str))
-                print(" Extracted total_sum:", total_sum)
+                #print(" Sample:", json.dumps(sample_debug, default=str))
+                #print(" Extracted total_sum:", total_sum)
 
                 # Guardar si es email válido (o si quieres mostrar otros breakdowns, ajusta aquí)
                 if isinstance(email, str) and "@" in email:
@@ -4226,8 +4327,8 @@ def estadisticas(request):
         r.raise_for_status()
 
         data = r.json()
-        print("=== RAW DATA FROM POSTHOG ===")
-        print(json.dumps(data, indent=2))  # imprime en consola el JSON completo
+        #print("=== RAW DATA FROM POSTHOG ===")
+        #print(json.dumps(data, indent=2))  # imprime en consola el JSON completo
 
         # 🔹 Extraer resultados: manejar funnels que devuelven "steps"
         if isinstance(data, dict):
@@ -4305,8 +4406,8 @@ def estadisticas(request):
             data = r.json()
 
             # DEBUG opcional
-            print("=== RAW DATA (Vistas por página) ===")
-            print(json.dumps(data, indent=2)[:20000])
+            #print("=== RAW DATA (Vistas por página) ===")
+            #print(json.dumps(data, indent=2)[:20000])
 
             results = []
 
@@ -4322,11 +4423,10 @@ def estadisticas(request):
 
             if results:
 
-                print("=== KEYS EN RESULTS ===")
-                for idx, serie in enumerate(results):
-                    print(f"Serie {idx}: keys={list(serie.keys())}")
-                    print(" Sample:", json.dumps(serie, indent=2)[:500])
-
+                # print("=== KEYS EN RESULTS ===")
+                # for idx, serie in enumerate(results):
+                #     print(f"Serie {idx}: keys={list(serie.keys())}")
+                #     print(" Sample:", json.dumps(serie, indent=2)[:500])
 
                 for idx, serie in enumerate(results):
                     # Nombre de la sección
@@ -4341,7 +4441,7 @@ def estadisticas(request):
 
                     total = int(total or 0)
 
-                    print(f"Sección: {section} → {total}")  # DEBUG
+                    #print(f"Sección: {section} → {total}")  # DEBUG
 
                     views_labels.append(section)
                     views_values.append(total)
@@ -4373,7 +4473,6 @@ def estadisticas(request):
 
             results = data.get("results") or data.get("result") or []
 
-            # 4. Construir diccionario { email: { pagina: count } }
             user_page_views = {}
 
             if results:
@@ -4390,12 +4489,11 @@ def estadisticas(request):
                     else:
                         email = email_field
 
-                    # Página (forzamos a int si es posible)
                     page_raw = serie.get("order") or serie.get("page") or 0
                     try:
                         page = int(page_raw)
                     except Exception:
-                        page = page_raw  # si no es numérico, se deja como string
+                        page = page_raw
 
                     # Conteo
                     total = 0
@@ -4411,8 +4509,6 @@ def estadisticas(request):
             # 5. Ordenar y preparar labels/filas
             emails_sorted = sorted(list(emails_set))
 
-
-            # --- 1. Definir el mapa de labels ---
             label_map = {
                 0: "Sección: Información en Salud",
                 1: "Sección: Pasatiempos",
@@ -4439,12 +4535,12 @@ def estadisticas(request):
             views_matrix = []
             for email in emails_sorted:
                 row = {"email": email}
-                for page in all_pages:  # aquí page es 0,1,2...12
+                for page in all_pages: 
                     row[label_map[page]] = user_page_views.get(email, {}).get(page, 0)
                 views_matrix.append(row)
 
         # 5. Renderizar template
-        return render(request, "home/stadistic.html", {
+        return render(request, "home/statistics_recuerdame.html", {
             "labels": dau_labels,
             "values": dau_values,
             "growth_labels": growth_labels,
