@@ -1,5 +1,7 @@
 {% extends 'layouts/base.html' %}
 {% load static %}
+{% load custom_filters %}
+
 
 
 <!-- Specific CSS goes HERE -->
@@ -147,7 +149,7 @@
 
 <!-- Page content -->
 <div class="container-fluid mt--6">
-  <div class="row">
+  <!-- <div class="row">
     <div class="col-xl-8">
       <div class="card bg-default">
         <div class="card-header bg-transparent">
@@ -193,9 +195,7 @@
           </div>
         </div>
         <div class="card-body">
-          <!-- Chart -->
           <div class="chart">
-            <!-- Chart wrapper -->
             <canvas id="chart-sales-dark" class="chart-canvas"></canvas>
           </div>
         </div>
@@ -212,14 +212,13 @@
           </div>
         </div>
         <div class="card-body">
-          <!-- Chart -->
           <div class="chart">
             <canvas id="chart-bars" class="chart-canvas"></canvas>
           </div>
         </div>
       </div>
     </div>
-  </div>
+  </div> -->
   <div class="row">
     <div class="col-xl-8">
       <div class="card">
@@ -271,12 +270,10 @@
 
       <div class="card mt-4 shadow">
         <div class="card-header d-flex align-items-center">
-          <!-- Logo -->
           <img src="{% static 'assets/img/theme/RecuerdaMe.png' %}" 
               alt="Logo" 
               style="height: 40px;" 
               class="mr-2">
-          <!-- Título -->
           <h3 class="mb-0">Usuarios Activos Diarios</h3>
         </div>
         <div class="card-body">
@@ -288,12 +285,10 @@
 
       <div class="card mt-4 shadow">
         <div class="card-header d-flex align-items-center">
-          <!-- Logo -->
           <img src="{% static 'assets/img/theme/RecuerdaMe.png' %}" 
               alt="Logo" 
               style="height: 40px;" 
               class="mr-2">
-          <!-- Título -->
           <h3 class="mb-0">Crecimiento</h3>
         </div>
         <div class="card-body">
@@ -301,28 +296,28 @@
         </div>
       </div>
 
-      <!-- Device Type -->
-
+      <!-- Vistas por página -->
       <div class="card mt-4 shadow">
         <div class="card-header d-flex align-items-center">
           <img src="{% static 'assets/img/theme/RecuerdaMe.png' %}" 
               alt="Logo" 
               style="height: 40px;" 
               class="mr-2">
-          <h3 class="mb-0">Usuarios por tipo de dispositivo (Últimos 30 días)</h3>
+          <h3 class="mb-0">Vistas por sección/página (Últimos 30 días)</h3>
         </div>
 
-        <!-- <p>Labels: <span id="device-labels-debug"></span></p>
-        <p>Values: <span id="device-values-debug"></span></p> -->
+        <!-- <p>Labels: <span id="views-labels-debug"></span></p>
+        <p>Values: <span id="views-values-debug"></span></p> -->
 
         <div class="card-body">
-          <canvas id="deviceChart" width="300" height="100"></canvas>
+          <canvas id="viewsChart"></canvas>
         </div>
       </div>
 
+      
+
 
       <!-- Sesiones (Pageview -> Pageleave) -->
-      <!-- <div class="col-xl-6"> -->
       <div class="card">
         <div class="card-header d-flex align-items-center">
           <img src="{% static 'assets/img/theme/RecuerdaMe.png' %}" 
@@ -351,7 +346,7 @@
                 <th>Tiempo Mediano</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody id="session-table">
               {% for row in session_rows %}
                 <tr>
                   <td>{{ row.email }}</td>
@@ -371,12 +366,54 @@
           </table>
         </div>
       </div>
-      <!-- </div> -->
 
 
+      <!-- Views de cada página por usuario  -->
+      <div class="card mt-4 shadow">
+        <div class="card-header d-flex align-items-center">
+          <img src="{% static 'assets/img/theme/RecuerdaMe.png' %}" 
+              alt="Logo" 
+              style="height: 40px;" 
+              class="mr-2">
+          <h3 class="mb-0">Vistas por usuario y página</h3>
+        </div>
 
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-bordered">
+              <thead class="thead-light">
+                <tr>
+                  <th>Usuario</th>
+                  {% for page in views_labels_breakdown %}
+                    <th>{{ page }}</th>
+                  {% endfor %}
+                </tr>
+              </thead>
+              <tbody>
+                {% for row in views_matrix %}
+                  <tr>
+                    <td>{{ row.email }}</td>
+                    {% for page in views_labels_breakdown %}
+                      <td>{{ row|get_item:page }}</td>
+                    {% endfor %}
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
 
+            <!-- Debug temporal -->
+        <!-- <pre>{{ views_matrix|safe }}</pre>
+        <pre>{{ views_labels_breakdown|safe }}</pre> -->
+        </div>
 
+      
+
+      </div>
+
+      
+
+      <!-- Gráficos que van a la derecha -->
 
     </div>
     <div class="col-xl-4">
@@ -392,6 +429,7 @@
           </div>
         </div>
         <div class="table-responsive">
+
           <!-- Demographic table -->
           <table class="table align-items-center table-flush">
             <thead class="thead-light">
@@ -513,11 +551,28 @@
       </div>
 
 
+      <!-- Device Type -->
+
+      <div class="card mt-4 shadow">
+        <div class="card-header d-flex align-items-center">
+          <img src="{% static 'assets/img/theme/RecuerdaMe.png' %}" 
+              alt="Logo" 
+              style="height: 40px;" 
+              class="mr-2">
+          <h3 class="mb-0">Usuarios por tipo de dispositivo (Últimos 30 días)</h3>
+        </div>
+
+        <!-- <p>Labels: <span id="device-labels-debug"></span></p>
+        <p>Values: <span id="device-values-debug"></span></p> -->
+
+        <div class="card-body">
+          <canvas id="deviceChart"></canvas>
+        </div>
+      </div>
 
 
       <!-- Identify User -->
 
-      <!-- <div class="col-xl-4"> -->
       <div class="card">
         <div class="card-header border-0">
           <div class="row align-items-center">
@@ -528,7 +583,6 @@
         </div>
         <div class="table-responsive">
 
-          <!-- Debug: mostrar arrays recibidos -->
           <!-- <p id="user-labels-debug" style="color:red;"></p>
           <p id="user-values-debug" style="color:red;"></p> -->
 
@@ -545,13 +599,7 @@
           </table>
         </div>
       </div>
-      <!-- </div> -->
       
-
-      
-
-
-
     </div>
   </div>
 {% include "includes/footer.html" %}
@@ -559,11 +607,21 @@
 
 {% endblock content %}
 
-<!-- Specific JS goes HERE -->
+
 {% block javascripts %}
 
-<script src="/static/assets/vendor/chart.js/dist/Chart.min.js"></script>
-<script src="/static/assets/vendor/chart.js/dist/Chart.extension.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+ 
+
+<!-- Chart.js (v4 desde CDN, estable y actualizado) -->
+<!-- <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1"></script> -->
+
+<!-- Plugin de etiquetas (compatible con Chart.js v4) -->
+<!-- <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script> -->
+
+<!-- <script src="/static/assets/vendor/chart.js/dist/Chart.min.js"></script>
+<script src="/static/assets/vendor/chart.js/dist/Chart.extension.js"></script> -->
 
 <!-- DAU -->
 {{ labels|json_script:"dau-labels" }}
@@ -584,172 +642,218 @@
 <!-- Sesiones -->
 {{ session_rows|json_script:"session-rows" }}
 
+<!-- Vistas por página -->
+{{ views_labels|json_script:"views-labels" }}
+{{ views_dataset|json_script:"views-dataset" }}
 
 
 <script id="session-raw" type="application/json">
   {{ session_raw|safe }}
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
-
 <script>
-  // === Gráfico DAU ===
-  const dauLabels = JSON.parse(document.getElementById("dau-labels").textContent);
-  const dauValues = JSON.parse(document.getElementById("dau-values").textContent);
 
-  new Chart(document.getElementById("dauChart"), {
-    type: "line",
-    data: {
-      labels: dauLabels,
-      datasets: [{
-        label: "Usuarios Activos Diarios",
-        data: dauValues,
-        borderColor: "blue",
-        backgroundColor: "rgba(0, 0, 255, 0.1)",
-        fill: true,
-        tension: 0.3
-      }]
+// document.addEventListener("DOMContentLoaded", () => {
+  // === Gráfico DAU ===
+const dauLabels = JSON.parse(document.getElementById("dau-labels").textContent);
+const dauValues = JSON.parse(document.getElementById("dau-values").textContent);
+
+new Chart(document.getElementById("dauChart"), {
+  type: "line",
+  data: {
+    labels: dauLabels,
+    datasets: [{
+      label: "Usuarios Activos Diarios",
+      data: dauValues,
+      borderColor: "blue",
+      backgroundColor: "rgba(0, 0, 255, 0.1)",
+      fill: true,
+      tension: 0.3
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { display: true },
     },
-    options: {
-      responsive: true,
-      plugins: {
-        legend: { display: true },
-      },
-      scales: {
-        y: { beginAtZero: true }
+    scales: {
+      y: { beginAtZero: true }
+    }
+  }
+});
+
+
+// === Gráfico Growth Accounting ===
+const growthLabels = JSON.parse(document.getElementById("growth-labels").textContent);
+const growthDatasets = JSON.parse(document.getElementById("growth-datasets").textContent);
+
+// Colores fijos para cada categoría
+const colors = {
+  "Returning": "rgba(75, 192, 192, 0.6)",   // verde
+  "New": "rgba(54, 162, 235, 0.6)",        // azul
+  "Resurrecting": "rgba(153, 102, 255, 0.6)", // violeta
+  "Dormant": "rgba(255, 99, 132, 0.6)"     // rojo
+};
+
+// Traducción de etiquetas
+const traducciones = {
+  "Returning": "Recurrentes",
+  "New": "Nuevos",
+  "Resurrecting": "Resurgentes",
+  "Dormant": "Latentes"
+};
+
+new Chart(document.getElementById("growthChart"), {
+  type: "bar",
+  data: {
+    labels: growthLabels,
+    datasets: growthDatasets.map(ds => ({
+      label: traducciones[ds.label] || ds.label, 
+      data: ds.data,
+      backgroundColor: colors[ds.label] || "rgba(200,200,200,0.6)",
+    }))
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { position: "top" }
+    },
+    scales: {
+      x: { stacked: true },
+      y: {
+        stacked: true,
+        beginAtZero: true,
+        // Dibujar negativos
+        min: Math.min(-5, Math.min(...growthDatasets.flatMap(ds => ds.data))),
+        max: Math.max(5, Math.max(...growthDatasets.flatMap(ds => ds.data)))
       }
     }
-  });
+  }
+});
+
+// === Gráfico Device Type ===
+const deviceLabels = JSON.parse(document.getElementById("device-labels").textContent);
+const deviceValues = JSON.parse(document.getElementById("device-values").textContent);
+
+new Chart(document.getElementById("deviceChart"), {
+  type: "doughnut",
+  data: {
+    labels: deviceLabels,
+    datasets: [{
+      data: deviceValues,
+      backgroundColor: ["#007bff", "#28a745", "#ffc107", "#dc3545"], // azul, verde, amarillo, rojo
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { position: "right" },
+      tooltip: { enabled: true }
+    }
+  }
+});
+
+// === Tabla Identify User ===
+const userLabels = JSON.parse(document.getElementById("user-labels").textContent);
+const userValues = JSON.parse(document.getElementById("user-values").textContent);
+
+const tbody = document.getElementById("user-login-table");
+
+userLabels.forEach((email, i) => {
+  const count = userValues[i];
+
+  const row = document.createElement("tr");
+  row.innerHTML = `
+    <th scope="row">${email}</th>
+    <td>${count}</td>
+  `;
+  tbody.appendChild(row);
+});
+
+// === Tabla Sesiones ===
+const sessionRows = JSON.parse(document.getElementById("session-rows").textContent);
+
+const tbodySessions = document.getElementById("session-table");
+tbodySessions.innerHTML = ""; // limpiar antes
+
+sessionRows.forEach(row => {
+  const tr = document.createElement("tr");
+  tr.innerHTML = `
+    <th scope="row">${row.email}</th>
+    <td>${row.entered}</td>
+    <td>${row.converted}</td>
+    <td>${row.dropped_off}</td>
+    <td>${row.conversion_rate}%</td>
+    <td>${row.avg_time || "–"}</td>
+    <td>${row.median_time || "–"}</td>
+  `;
+  tbodySessions.appendChild(tr);
+});
 
 
-  // === Gráfico Growth Accounting ===
-  const growthLabels = JSON.parse(document.getElementById("growth-labels").textContent);
-  const growthDatasets = JSON.parse(document.getElementById("growth-datasets").textContent);
+// === Gráfico Vistas por Página ===
+const viewsLabels = JSON.parse(document.getElementById("views-labels").textContent);
+const viewsDataset = JSON.parse(document.getElementById("views-dataset").textContent);
 
-  // Colores fijos para cada categoría
-  const colors = {
-    "Returning": "rgba(75, 192, 192, 0.6)",   // verde
-    "New": "rgba(54, 162, 235, 0.6)",        // azul
-    "Resurrecting": "rgba(153, 102, 255, 0.6)", // violeta
-    "Dormant": "rgba(255, 99, 132, 0.6)"     // rojo
-  };
+// console.log("Views Labels:", viewsLabels);
+// console.log("Views Dataset:", viewsDataset);
 
-  // Traducción de etiquetas al español
-  const traducciones = {
-    "Returning": "Recurrentes",
-    "New": "Nuevos",
-    "Resurrecting": "Resurgentes",
-    "Dormant": "Latentes"
-  };
+// Diccionario de mapeo
+const labelMap = {
+  0: "Sección: Información en Salud",
+  1: "Sección: Pasatiempos",
+  2: "Sección: Encuentros",
+  3: "Sección: Fortalece tu mente",
+  4: "Sección: Hazlo consciente",
+  5: "Hazlo Consciente - Módulo 2",
+  6: "Hazlo Consciente - Módulo 3",
+  7: "Hazlo Consciente - Módulo 4",
+  8: "Pasatiempos - Plantas",
+  9: "Pasatiempos - Mascotas",
+  10: "Pasatiempos - Recetas",
+  11: "Pasatiempos - Ejercicio",
+  12: "Polijuego"
+};
 
-  new Chart(document.getElementById("growthChart"), {
-    type: "bar",
-    data: {
-      labels: growthLabels,
-      datasets: growthDatasets.map(ds => ({
-        label: traducciones[ds.label] || ds.label, 
-        data: ds.data,
-        backgroundColor: colors[ds.label] || "rgba(200,200,200,0.6)",
-      }))
+// Reemplazar labels numéricos por nombres
+const mappedLabels = viewsLabels.map(num => labelMap[num] || num);
+
+new Chart(document.getElementById("viewsChart"), {
+  type: "bar",
+  data: {
+    labels: mappedLabels,
+    datasets: viewsDataset
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: function(context) {
+            return context.raw; // solo muestra el valor
+          }
+        }
+      }
     },
-    options: {
-      responsive: true,
-      plugins: {
-        legend: { position: "top" }
+    scales: {
+      x: {
+        ticks: {
+          autoSkip: false,
+          maxRotation: 45,
+          minRotation: 0
+        }
       },
-      scales: {
-        x: { stacked: true },
-        y: {
-          stacked: true,
-          beginAtZero: true,
-          // Esto permite que se dibujen negativos
-          min: Math.min(-5, Math.min(...growthDatasets.flatMap(ds => ds.data))),
-          max: Math.max(5, Math.max(...growthDatasets.flatMap(ds => ds.data)))
+      y: {
+        beginAtZero: true,
+        title: {
+          display: true,
+          text: "Cantidad de vistas"
         }
       }
     }
-  });
-
-  // === Gráfico Device Type ===
-  const deviceLabels = JSON.parse(document.getElementById("device-labels").textContent);
-  const deviceValues = JSON.parse(document.getElementById("device-values").textContent);
-
-  // Mostrar en los <p> para depuración
-  // document.getElementById("device-labels-debug").textContent = JSON.stringify(deviceLabels);
-  // document.getElementById("device-values-debug").textContent = JSON.stringify(deviceValues);
-
-  new Chart(document.getElementById("deviceChart"), {
-    type: "doughnut",
-    data: {
-      labels: deviceLabels,
-      datasets: [{
-        data: deviceValues,
-        backgroundColor: ["#007bff", "#28a745", "#ffc107", "#dc3545"], // azul, verde, amarillo, rojo
-      }]
-    },
-    options: {
-      responsive: true,
-      plugins: {
-        legend: { position: "right" },
-        tooltip: { enabled: true }
-      }
-    }
-  });
-
-  // === Tabla Identify User ===
-  const userLabels = JSON.parse(document.getElementById("user-labels").textContent);
-  const userValues = JSON.parse(document.getElementById("user-values").textContent);
-
-  // document.getElementById("user-labels-debug").textContent = "User Labels: " + JSON.stringify(userLabels);
-  // document.getElementById("user-values-debug").textContent = "User Values: " + JSON.stringify(userValues);
-
-  const tbody = document.getElementById("user-login-table");
-
-  userLabels.forEach((email, i) => {
-    const count = userValues[i];
-
-    const row = document.createElement("tr");
-    row.innerHTML = `
-      <th scope="row">${email}</th>
-      <td>${count}</td>
-    `;
-    tbody.appendChild(row);
-  });
-
-  // === Tabla Sesiones ===
-  const sessionRows = JSON.parse(document.getElementById("session-rows").textContent);
-
-  // console.log("=== RAW sessionRows ===", sessionRows);
-  // document.getElementById("debug-sessions").textContent = JSON.stringify(sessionRows, null, 2);
-  // console.log("DEBUG SessionRows:", JSON.parse(document.getElementById("session-rows-debug").textContent));
-
-  // const raw = JSON.parse(document.getElementById("session-raw").textContent);
-  // console.log("=== RAW DATA FRONT ===", raw);
-
-  // document.getElementById("debug-raw").textContent = 
-  //   "Raw PostHog Data: " + JSON.stringify(raw, null, 2);
-
-
-  const tbodySessions = document.getElementById("session-table");
-  tbodySessions.innerHTML = ""; // limpiar antes
-
-  sessionRows.forEach(row => {
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <th scope="row">${row.email}</th>
-      // <td>${row.step}</td>
-      <td>${row.entered}</td>
-      <td>${row.converted}</td>
-      <td>${row.dropped_off}</td>
-      <td>${row.conversion_rate}%</td>
-      <td>${row.avg_time || "–"}</td>
-      <td>${row.median_time || "–"}</td>
-    `;
-    tbodySessions.appendChild(tr);
-  });
-
-
-  
+  }
+});
 
 </script>
 

@@ -4285,7 +4285,164 @@ def estadisticas(request):
                 "avg_time": format_seconds(last.get("average_conversion_time")),
                 "median_time": format_seconds(last.get("median_conversion_time")),
             })
+
+
+            # --------- 6. Conteo de vistas por página ---------
         
+            views_labels, views_values = [], []
+
+            # 1. Traer el insight
+            url_insight = f"{settings.POSTHOG_API_URL}/api/projects/{settings.POSTHOG_PROJECT_ID}/insights/{settings.POSTHOG_VIEWS_PER_PAGE}/"
+            r = requests.get(url_insight, headers=headers)
+            r.raise_for_status()
+            insight = r.json()
+
+            # 2. Ejecutar la query del insight
+            query = insight.get("query")
+            url_query = f"{settings.POSTHOG_API_URL}/api/projects/{settings.POSTHOG_PROJECT_ID}/query/"
+            r = requests.post(url_query, headers=headers, json={"query": query})
+            r.raise_for_status()
+            data = r.json()
+
+            # DEBUG opcional
+            print("=== RAW DATA (Vistas por página) ===")
+            print(json.dumps(data, indent=2)[:20000])
+
+            results = []
+
+            if isinstance(data, dict):
+                if "results" in data and isinstance(data["results"], list):
+                    results = data["results"]
+                elif "result" in data and isinstance(data["result"], list):
+                    results = data["result"]
+                elif "data" in data and isinstance(data["data"], list):
+                    results = data["data"]
+            elif isinstance(data, list):
+                results = data
+
+            if results:
+
+                print("=== KEYS EN RESULTS ===")
+                for idx, serie in enumerate(results):
+                    print(f"Serie {idx}: keys={list(serie.keys())}")
+                    print(" Sample:", json.dumps(serie, indent=2)[:500])
+
+
+                for idx, serie in enumerate(results):
+                    # Nombre de la sección
+                    section = (
+                        serie.get("order")
+                    )
+
+                    # Total de vistas
+                    total = None
+                    if "aggregated_value" in serie and serie["aggregated_value"] is not None:
+                        total = serie["aggregated_value"]
+
+                    total = int(total or 0)
+
+                    print(f"Sección: {section} → {total}")  # DEBUG
+
+                    views_labels.append(section)
+                    views_values.append(total)
+
+            # Construir dataset en formato Chart.js
+            views_dataset = [{
+                "label": views_labels,
+                "data": views_values,
+            }]
+
+
+           # --------- 7. Vistas por página con breakdown por email ---------
+            # 1. Variables de salida
+            user_views_labels, views_matrix = [], []
+            emails_set = set()
+
+            # 2. Traer el insight desde PostHog
+            url_insight = f"{settings.POSTHOG_API_URL}/api/projects/{settings.POSTHOG_PROJECT_ID}/insights/{settings.POSTHOG_PAGES_VIEWS_PER_USER}/"
+            r = requests.get(url_insight, headers=headers)
+            r.raise_for_status()
+            insight = r.json()
+
+            # 3. Ejecutar la query del insight
+            query = insight.get("query")
+            url_query = f"{settings.POSTHOG_API_URL}/api/projects/{settings.POSTHOG_PROJECT_ID}/query/"
+            r = requests.post(url_query, headers=headers, json={"query": query})
+            r.raise_for_status()
+            data = r.json()
+
+            results = data.get("results") or data.get("result") or []
+
+            # 4. Construir diccionario { email: { pagina: count } }
+            user_page_views = {}
+
+            if results:
+                for serie in results:
+                    # Email
+                    email_field = (
+                        serie.get("breakdown_value")
+                        or serie.get("breakdown")
+                        or serie.get("label")
+                        or "Sin email"
+                    )
+                    if isinstance(email_field, list):
+                        email = email_field[0] if email_field else "Sin email"
+                    else:
+                        email = email_field
+
+                    # Página (forzamos a int si es posible)
+                    page_raw = serie.get("order") or serie.get("page") or 0
+                    try:
+                        page = int(page_raw)
+                    except Exception:
+                        page = page_raw  # si no es numérico, se deja como string
+
+                    # Conteo
+                    total = 0
+                    if "aggregated_value" in serie and serie["aggregated_value"] is not None:
+                        total = int(serie["aggregated_value"] or 0)
+
+                    # Guardar
+                    emails_set.add(email)
+                    if email not in user_page_views:
+                        user_page_views[email] = {}
+                    user_page_views[email][page] = total
+
+            # 5. Ordenar y preparar labels/filas
+            emails_sorted = sorted(list(emails_set))
+
+
+            # --- 1. Definir el mapa de labels ---
+            label_map = {
+                0: "Sección: Información en Salud",
+                1: "Sección: Pasatiempos",
+                2: "Sección: Encuentros",
+                3: "Sección: Fortalece tu mente",
+                4: "Sección: Hazlo consciente",
+                5: "Hazlo Consciente - Módulo 2",
+                6: "Hazlo Consciente - Módulo 3",
+                7: "Hazlo Consciente - Módulo 4",
+                8: "Pasatiempos - Plantas",
+                9: "Pasatiempos - Mascotas",
+                10: "Pasatiempos - Recetas",
+                11: "Pasatiempos - Ejercicio",
+                12: "Polijuego"
+            }
+
+            # --- 2. Forzar que siempre existan todas las páginas del 0 al 12 ---
+            all_pages = list(range(0, 13))
+
+            # --- 3. Labels visibles para la tabla ---
+            user_views_labels = [label_map[p] for p in all_pages]
+
+            # matriz final
+            views_matrix = []
+            for email in emails_sorted:
+                row = {"email": email}
+                for page in all_pages:  # aquí page es 0,1,2...12
+                    row[label_map[page]] = user_page_views.get(email, {}).get(page, 0)
+                views_matrix.append(row)
+
         # 5. Renderizar template
         return render(request, "home/stadistic.html", {
             "labels": dau_labels,
@@ -4297,10 +4454,16 @@ def estadisticas(request):
             "user_labels": user_labels,
             "user_values": user_values,
             "session_rows": session_rows,
+            "views_labels": views_labels,
+            "views_dataset":views_dataset,
+            "views_labels_breakdown": user_views_labels,
+            "views_matrix": views_matrix,
         })
 
     except requests.exceptions.RequestException as e:
         return HttpResponseServerError(f"Error al obtener datos: {e}")
+    
+
 
         
 
