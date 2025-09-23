@@ -1,844 +1,733 @@
-{% extends 'layouts/base.html' %}
+{% extends 'layouts/base.html' %} {% block content %}
 
-{% block content %}
 <div class="header bg-primary pb-6">
   <div class="container-fluid">
     <div class="header-body">
       <div class="row align-items-center py-4">
         <div class="col-lg-6 col-5">
-          <h6 class="h2 text-white d-inline-block mb-0">Información del Paciente</h6>
-          <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
-            <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
-              <li class="breadcrumb-item"><a href="#"><i class="fas fa-home"></i></a></li>
-              <li class="breadcrumb-item"><a href="#">Pacientes</a></li>
-              <li class="breadcrumb-item"><a href="#">Volver</a></li>
-            </ol>
-          </nav>
+          <h6 class="h2 text-white d-inline-block mb-0">
+            <i class="fas fa-file-medical-alt mr-2"></i>
+            Antecedentes Médicos
+          </h6>
+        </div>
+        <div class="col-lg-6 col-7 text-right">
+          <span class="text-white-50">
+            <i class="fas fa-calendar-alt mr-1"></i>
+            {% now "d/m/Y" %}
+          </span>
         </div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Contenido principal -->
 <div class="container-fluid mt--6">
   <div class="row">
     <div class="col">
       <div class="card shadow">
-        <!-- Card Header -->
         <div class="card-header border-0">
           <div class="row align-items-center">
             <div class="col">
-              <h3 class="mb-0">Antecedentes Médicos</h3>
-            </div>
-            <div class="col text-right">
-              <span class="text-muted">Fecha: {% now "d/m/Y" %}</span>
+              <h3 class="mb-0">Historial de Antecedentes Médicos</h3>
+              <p class="text-muted mb-0">
+                Gestione los antecedentes médicos del paciente
+              </p>
             </div>
           </div>
         </div>
 
-        <!-- Card Body -->
         <div class="card-body">
-          <form method="post" action="{% url 'guardar_examen_antecedentes' %}">
+          <form
+            method="post"
+            action="{% url 'guardar_examen_antecedentes' %}"
+            id="formAntecedentes"
+          >
             {% csrf_token %}
-            <input type="hidden" name="visita_id" id="visita_id" value="{{ visita_examen }}" />
-            <input type="hidden" name="paciente_id" id="paciente_id" value="{{ paciente_id }}" />
-            <input type="hidden" name="examen_id" id="examen_id" value="{{ examen_id }}" />
+            <input type="hidden" name="visita_id" value="{{ visita_examen }}" />
+            <input type="hidden" name="paciente_id" value="{{ paciente_id }}" />
+            <input type="hidden" name="examen_id" value="{{ examen_id }}" />
 
-            <!-- Navigation Tabs -->
-            <ul class="nav nav-pills nav-fill mb-4" id="antecedentesTabs" role="tablist">
+            <!-- Control general -->
+            <div class="row mb-4">
+              <div class="col-md-6">
+                <div class="custom-control custom-switch">
+                  <input
+                    type="checkbox"
+                    class="custom-control-input"
+                    id="tiene_antecedentes"
+                    name="tiene_antecedentes"
+                    value="true"
+                  />
+                  <label class="custom-control-label" for="tiene_antecedentes">
+                    <strong>¿Presenta algún antecedente médico?</strong>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Navegación -->
+            <ul
+              class="nav nav-pills nav-fill mb-4"
+              id="antecedentesTabs"
+              role="tablist"
+            >
               <li class="nav-item">
-                <a class="nav-link active" id="patologicos-tab" data-toggle="tab" href="#patologicos"
-                  role="tab">Patológicos</a>
+                <a
+                  class="nav-link active"
+                  id="patologicos-tab"
+                  data-toggle="tab"
+                  href="#patologicos"
+                  role="tab"
+                >
+                  <i class="fas fa-disease mr-1"></i>Patológicos
+                  <span class="badge badge-light ml-2" id="count-patologicos"
+                    >0</span
+                  >
+                </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" id="quirurgicos-tab" data-toggle="tab" href="#quirurgicos"
-                  role="tab">Quirúrgicos</a>
+                <a
+                  class="nav-link"
+                  id="quirurgicos-tab"
+                  data-toggle="tab"
+                  href="#quirurgicos"
+                  role="tab"
+                >
+                  <i class="fas fa-scalpel mr-1"></i>Quirúrgicos
+                  <span class="badge badge-light ml-2" id="count-quirurgicos"
+                    >0</span
+                  >
+                </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" id="farmacologicos-tab" data-toggle="tab" href="#farmacologicos"
-                  role="tab">Farmacológicos</a>
+                <a
+                  class="nav-link"
+                  id="farmacologicos-tab"
+                  data-toggle="tab"
+                  href="#farmacologicos"
+                  role="tab"
+                >
+                  <i class="fas fa-pills mr-1"></i>Farmacológicos
+                  <span class="badge badge-light ml-2" id="count-farmacologicos"
+                    >0</span
+                  >
+                </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" id="toxicos-tab" data-toggle="tab" href="#toxicos" role="tab">Tóxicos</a>
+                <a
+                  class="nav-link"
+                  id="toxicos-tab"
+                  data-toggle="tab"
+                  href="#toxicos"
+                  role="tab"
+                >
+                  <i class="fas fa-smoking mr-1"></i>Tóxicos
+                  <span class="badge badge-light ml-2" id="count-toxicos"
+                    >0</span
+                  >
+                </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" id="familiares-tab" data-toggle="tab" href="#familiares" role="tab">Familiares</a>
+                <a
+                  class="nav-link"
+                  id="familiares-tab"
+                  data-toggle="tab"
+                  href="#familiares"
+                  role="tab"
+                >
+                  <i class="fas fa-users mr-1"></i>Familiares
+                  <span class="badge badge-light ml-2" id="count-familiares"
+                    >0</span
+                  >
+                </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" id="otros-tab" data-toggle="tab" href="#otros" role="tab">Otros</a>
+                <a
+                  class="nav-link"
+                  id="alergicos-tab"
+                  data-toggle="tab"
+                  href="#alergicos"
+                  role="tab"
+                >
+                  <i class="fas fa-allergies mr-1"></i>Alérgicos
+                  <span class="badge badge-light ml-2" id="count-alergicos"
+                    >0</span
+                  >
+                </a>
+              </li>
+              <li class="nav-item">
+                <a
+                  class="nav-link"
+                  id="traumaticos-tab"
+                  data-toggle="tab"
+                  href="#traumaticos"
+                  role="tab"
+                >
+                  <i class="fas fa-band-aid mr-1"></i>Traumáticos
+                  <span class="badge badge-light ml-2" id="count-traumaticos"
+                    >0</span
+                  >
+                </a>
+              </li>
+              <li class="nav-item">
+                <a
+                  class="nav-link"
+                  id="gineco-tab"
+                  data-toggle="tab"
+                  href="#gineco"
+                  role="tab"
+                >
+                  <i class="fas fa-venus mr-1"></i>Gineco-Obstétricos
+                  <span class="badge badge-light ml-2" id="count-gineco"
+                    >0</span
+                  >
+                </a>
+              </li>
+              <!-- NUEVAS PESTAÑAS -->
+              <li class="nav-item">
+                <a
+                  class="nav-link"
+                  id="epidemiologicos-tab"
+                  data-toggle="tab"
+                  href="#epidemiologicos"
+                  role="tab"
+                >
+                  <i class="fas fa-virus mr-1"></i>Epidemiológicos
+                  <span
+                    class="badge badge-light ml-2"
+                    id="count-epidemiologicos"
+                    >0</span
+                  >
+                </a>
+              </li>
+              <li class="nav-item">
+                <a
+                  class="nav-link"
+                  id="ets-tab"
+                  data-toggle="tab"
+                  href="#ets"
+                  role="tab"
+                >
+                  <i class="fas fa-shield-virus mr-1"></i>ETS
+                  <span class="badge badge-light ml-2" id="count-ets">0</span>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a
+                  class="nav-link"
+                  id="hospitalizaciones-tab"
+                  data-toggle="tab"
+                  href="#hospitalizaciones"
+                  role="tab"
+                >
+                  <i class="fas fa-hospital mr-1"></i>Hospitalizaciones
+                  <span
+                    class="badge badge-light ml-2"
+                    id="count-hospitalizaciones"
+                    >0</span
+                  >
+                </a>
+              </li>
+              <li class="nav-item">
+                <a
+                  class="nav-link"
+                  id="inmunizaciones-tab"
+                  data-toggle="tab"
+                  href="#inmunizaciones"
+                  role="tab"
+                >
+                  <i class="fas fa-syringe mr-1"></i>Inmunizaciones
+                  <span class="badge badge-light ml-2" id="count-inmunizaciones"
+                    >0</span
+                  >
+                </a>
+              </li>
+              <li class="nav-item">
+                <a
+                  class="nav-link"
+                  id="transfusionales-tab"
+                  data-toggle="tab"
+                  href="#transfusionales"
+                  role="tab"
+                >
+                  <i class="fas fa-tint mr-1"></i>Transfusionales
+                  <span
+                    class="badge badge-light ml-2"
+                    id="count-transfusionales"
+                    >0</span
+                  >
+                </a>
               </li>
             </ul>
 
-            <div class="tab-content" id="antecedentesTabContent">
-              <!-- Antecedentes Patológicos -->
-              <div class="tab-pane fade show active" id="patologicos" role="tabpanel">
-                <div class="card bg-gradient-default shadow-sm mb-4">
-                  <div class="card-header bg-transparent">
-                    <h4 class="text-white mb-0">Antecedentes Patológicos</h4>
+            <div class="tab-content">
+              <!-- PATOLÓGICOS -->
+              <div
+                class="tab-pane fade show active"
+                id="patologicos"
+                role="tabpanel"
+              >
+                <div class="card bg-gradient-default shadow-sm">
+                  <div
+                    class="card-header bg-transparent d-flex justify-content-between align-items-center"
+                  >
+                    <h4 class="text-white mb-0">
+                      <i class="fas fa-disease mr-2"></i>Antecedentes
+                      Patológicos
+                    </h4>
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-outline-light"
+                      onclick="agregarAntecedente('patologicos')"
+                    >
+                      <i class="fas fa-plus mr-1"></i>Nuevo Registro
+                    </button>
                   </div>
                   <div class="card-body bg-white">
-                    <div class="form-group">
-                      <div class="custom-control custom-switch">
-                        <input type="checkbox" class="custom-control-input" id="antecedente_patologico"
-                          name="antecedente_patologico" value="Si">
-                        <label class="custom-control-label" for="antecedente_patologico">¿Presenta algún antecedente
-                          patológico?</label>
-                      </div>
-                    </div>
-
-                    <div id="contenido_patologico" style="display: none;">
-                      <div class="row">
-                        <div class="col-md-6">
-                          <div class="form-group">
-                            <label class="form-control-label">Tipo de patología</label>
-                            <select class="form-control" name="tipo_patologia" id="tipo_patologia">
-                              <option value="">Seleccione...</option>
-                              <option value="Hipertensión arterial">Hipertensión arterial</option>
-                              <option value="Dislipidemia">Dislipidemia</option>
-                              <option value="Diabetes">Diabetes</option>
-                              <option value="Cáncer">Cáncer</option>
-                              <option value="Enfermedad Renal">Enfermedad Renal</option>
-                              <option value="Enfermedad Cardíaca">Enfermedad Cardíaca</option>
-                              <option value="Enfermedad Respiratoria">Enfermedad Respiratoria</option>
-                              <option value="Enfermedad Hepática">Enfermedad Hepática</option>
-                              <option value="Enfermedad Tiroidea">Enfermedad Tiroidea</option>
-                              <option value="Enfermedad Cerebrovascular">Enfermedad Cerebrovascular</option>
-                              <option value="Enfermedad Psiquiátrica">Enfermedad Psiquiátrica</option>
-                              <option value="Cefalea">Cefalea</option>
-                              <option value="Crisis Convulsivas">Crisis Convulsivas</option>
-                              <option value="Enfermedades Neurodegenerativas">Enfermedades Neurodegenerativas</option>
-                              <option value="Retardo Mental">Retardo Mental</option>
-                              <option value="Dificultades del Aprendizaje">Dificultades del Aprendizaje</option>
-                              <option value="Síndrome de Down">Síndrome de Down</option>
-                              <option value="Trastorno del desarrollo psicomotor">Trastorno del desarrollo psicomotor
-                              </option>
-                              <option value="Déficit de atención o hiperactividad">Déficit de atención o hiperactividad
-                              </option>
-                              <option value="Otros">Otros</option>
-                            </select>
-                          </div>
-                        </div>
-                        <div class="col-md-6">
-                          <div class="form-group">
-                            <label class="form-control-label">Fecha de inicio</label>
-                            <input type="date" class="form-control" name="fecha_inicio_patologia">
-                          </div>
-                        </div>
-                      </div>
-
-                      <div class="row">
-                        <div class="col-md-4">
-                          <div class="form-group">
-                            <div class="custom-control custom-switch">
-                              <input type="checkbox" class="custom-control-input" id="tratamiento_patologico"
-                                name="tratamiento_patologico" value="Si">
-                              <label class="custom-control-label" for="tratamiento_patologico">¿Ha recibido
-                                tratamiento?</label>
-                            </div>
-                          </div>
-                        </div>
-                        <div class="col-md-8">
-                          <div class="form-group">
-                            <label class="form-control-label">Tratamiento (detallar tipo y posología)</label>
-                            <input type="text" class="form-control" name="detalle_tratamiento_patologico">
-                          </div>
-                        </div>
-                      </div>
-
-                      <div class="row">
-                        <div class="col-md-4">
-                          <div class="form-group">
-                            <div class="custom-control custom-switch">
-                              <input type="checkbox" class="custom-control-input" id="complicaciones_patologico"
-                                name="complicaciones_patologico" value="Si">
-                              <label class="custom-control-label" for="complicaciones_patologico">¿Complicaciones
-                                asociadas?</label>
-                            </div>
-                          </div>
-                        </div>
-                        <div class="col-md-8">
-                          <div class="form-group">
-                            <label class="form-control-label">Detallar complicaciones</label>
-                            <input type="text" class="form-control" name="detalle_complicaciones_patologico">
-                          </div>
-                        </div>
-                      </div>
-
-                      <div class="row">
-                        <div class="col-md-4">
-                          <div class="form-group">
-                            <div class="custom-control custom-switch">
-                              <input type="checkbox" class="custom-control-input" id="activo_patologico"
-                                name="activo_patologico" value="Si">
-                              <label class="custom-control-label" for="activo_patologico">¿Activo actualmente?</label>
-                            </div>
-                          </div>
-                        </div>
-                        <div class="col-md-4">
-                          <div class="form-group">
-                            <label class="form-control-label">Fecha de finalización</label>
-                            <input type="date" class="form-control" name="fecha_finalizacion_patologico">
-                          </div>
-                        </div>
-                        <div class="col-md-4">
-                          <div class="form-group">
-                            <label class="form-control-label">Observaciones</label>
-                            <input type="text" class="form-control" name="observaciones_patologico">
-                          </div>
-                        </div>
+                    <div id="contenedor-patologicos">
+                      <div
+                        class="alert alert-info text-center"
+                        id="empty-patologicos"
+                      >
+                        <i class="fas fa-info-circle mr-2"></i>
+                        No hay antecedentes patológicos registrados. Haga clic
+                        en "Nuevo Registro" para agregar.
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <!-- Antecedentes Quirúrgicos -->
+              <!-- QUIRÚRGICOS -->
               <div class="tab-pane fade" id="quirurgicos" role="tabpanel">
-                <div class="card bg-gradient-default shadow-sm mb-4">
-                  <div class="card-header bg-transparent">
-                    <h4 class="text-white mb-0">Antecedentes Quirúrgicos</h4>
+                <div class="card bg-gradient-default shadow-sm">
+                  <div
+                    class="card-header bg-transparent d-flex justify-content-between align-items-center"
+                  >
+                    <h4 class="text-white mb-0">
+                      <i class="fas fa-scalpel mr-2"></i>Antecedentes
+                      Quirúrgicos
+                    </h4>
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-outline-light"
+                      onclick="agregarAntecedente('quirurgicos')"
+                    >
+                      <i class="fas fa-plus mr-1"></i>Nuevo Registro
+                    </button>
                   </div>
                   <div class="card-body bg-white">
-                    <div class="form-group">
-                      <div class="custom-control custom-switch">
-                        <input type="checkbox" class="custom-control-input" id="antecedente_quirurgico"
-                          name="antecedente_quirurgico" value="Si">
-                        <label class="custom-control-label" for="antecedente_quirurgico">¿Presenta algún antecedente
-                          quirúrgico?</label>
-                      </div>
-                    </div>
-
-                    <div id="contenido_quirurgico" style="display: none;">
-                      <div class="row">
-                        <div class="col-md-8">
-                          <div class="form-group">
-                            <label class="form-control-label">Descripción</label>
-                            <input type="text" class="form-control" name="descripcion_quirurgico">
-                          </div>
-                        </div>
-                        <div class="col-md-4">
-                          <div class="form-group">
-                            <label class="form-control-label">Fecha de intervención</label>
-                            <input type="date" class="form-control" name="fecha_inicio_quirurgico">
-                          </div>
-                        </div>
-                      </div>
-
-                      <div class="row">
-                        <div class="col-md-4">
-                          <div class="form-group">
-                            <div class="custom-control custom-switch">
-                              <input type="checkbox" class="custom-control-input" id="tratamiento_quirurgico"
-                                name="tratamiento_quirurgico" value="Si">
-                              <label class="custom-control-label" for="tratamiento_quirurgico">¿Ha recibido
-                                tratamiento?</label>
-                            </div>
-                          </div>
-                        </div>
-                        <div class="col-md-8">
-                          <div class="form-group">
-                            <label class="form-control-label">Tratamiento (detallar tipo y posología)</label>
-                            <input type="text" class="form-control" name="detalle_tratamiento_quirurgico">
-                          </div>
-                        </div>
-                      </div>
-
-                      <div class="row">
-                        <div class="col-md-4">
-                          <div class="form-group">
-                            <div class="custom-control custom-switch">
-                              <input type="checkbox" class="custom-control-input" id="complicaciones_quirurgico"
-                                name="complicaciones_quirurgico" value="Si">
-                              <label class="custom-control-label" for="complicaciones_quirurgico">¿Complicaciones
-                                asociadas?</label>
-                            </div>
-                          </div>
-                        </div>
-                        <div class="col-md-8">
-                          <div class="form-group">
-                            <label class="form-control-label">Detallar complicaciones</label>
-                            <input type="text" class="form-control" name="detalle_complicaciones_quirurgico">
-                          </div>
-                        </div>
-                      </div>
-
-                      <div class="row">
-                        <div class="col-md-4">
-                          <div class="form-group">
-                            <div class="custom-control custom-switch">
-                              <input type="checkbox" class="custom-control-input" id="activo_quirurgico"
-                                name="activo_quirurgico" value="Si">
-                              <label class="custom-control-label" for="activo_quirurgico">¿Activo actualmente?</label>
-                            </div>
-                          </div>
-                        </div>
-                        <div class="col-md-4">
-                          <div class="form-group">
-                            <label class="form-control-label">Fecha de finalización</label>
-                            <input type="date" class="form-control" name="fecha_finalizacion_quirurgico">
-                          </div>
-                        </div>
-                        <div class="col-md-4">
-                          <div class="form-group">
-                            <label class="form-control-label">Observaciones</label>
-                            <input type="text" class="form-control" name="observaciones_quirurgico">
-                          </div>
-                        </div>
+                    <div id="contenedor-quirurgicos">
+                      <div
+                        class="alert alert-info text-center"
+                        id="empty-quirurgicos"
+                      >
+                        <i class="fas fa-info-circle mr-2"></i>
+                        No hay antecedentes quirúrgicos registrados. Haga clic
+                        en "Nuevo Registro" para agregar.
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <!-- Antecedentes Farmacológicos -->
+              <!-- FARMACOLÓGICOS -->
               <div class="tab-pane fade" id="farmacologicos" role="tabpanel">
-                <div class="card bg-gradient-default shadow-sm mb-4">
-                  <div class="card-header bg-transparent">
-                    <h4 class="text-white mb-0">Antecedentes Farmacológicos</h4>
+                <div class="card bg-gradient-default shadow-sm">
+                  <div
+                    class="card-header bg-transparent d-flex justify-content-between align-items-center"
+                  >
+                    <h4 class="text-white mb-0">
+                      <i class="fas fa-pills mr-2"></i>Antecedentes
+                      Farmacológicos
+                    </h4>
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-outline-light"
+                      onclick="agregarAntecedente('farmacologicos')"
+                    >
+                      <i class="fas fa-plus mr-1"></i>Nuevo Registro
+                    </button>
                   </div>
                   <div class="card-body bg-white">
-                    <div class="form-group">
-                      <div class="custom-control custom-switch">
-                        <input type="checkbox" class="custom-control-input" id="antecedente_farmacologico"
-                          name="antecedente_farmacologico" value="Si">
-                        <label class="custom-control-label" for="antecedente_farmacologico">¿Tiene antecedentes
-                          farmacológicos?</label>
-                      </div>
-                    </div>
-
-                    <div id="contenido_farmacologico" style="display: none;">
-                      <div class="row">
-                        <div class="col-md-6">
-                          <div class="form-group">
-                            <label class="form-control-label">Descripción</label>
-                            <input type="text" class="form-control" name="descripcion_farmacologico">
-                          </div>
-                        </div>
-                        <div class="col-md-6">
-                          <div class="form-group">
-                            <label class="form-control-label">Fecha de inicio</label>
-                            <input type="date" class="form-control" name="fecha_inicio_farmacologico">
-                          </div>
-                        </div>
-                      </div>
-
-                      <div class="row">
-                        <div class="col-md-4">
-                          <div class="form-group">
-                            <div class="custom-control custom-switch">
-                              <input type="checkbox" class="custom-control-input" id="tratamiento_farmacologico"
-                                name="tratamiento_farmacologico" value="Si">
-                              <label class="custom-control-label" for="tratamiento_farmacologico">¿Recibió
-                                tratamiento?</label>
-                            </div>
-                          </div>
-                        </div>
-                        <div class="col-md-8">
-                          <div class="form-group">
-                            <label class="form-control-label">Detalle del tratamiento</label>
-                            <input type="text" class="form-control" name="detalle_tratamiento_farmacologico">
-                          </div>
-                        </div>
-                      </div>
-
-                      <div class="row">
-                        <div class="col-md-4">
-                          <div class="form-group">
-                            <div class="custom-control custom-switch">
-                              <input type="checkbox" class="custom-control-input" id="complicaciones_farmacologico"
-                                name="complicaciones_farmacologico" value="Si">
-                              <label class="custom-control-label" for="complicaciones_farmacologico">¿Tuvo
-                                complicaciones?</label>
-                            </div>
-                          </div>
-                        </div>
-                        <div class="col-md-8">
-                          <div class="form-group">
-                            <label class="form-control-label">Detalle de complicaciones</label>
-                            <input type="text" class="form-control" name="detalle_complicaciones_farmacologico">
-                          </div>
-                        </div>
-                      </div>
-
-                      <div class="row">
-                        <div class="col-md-4">
-                          <div class="form-group">
-                            <div class="custom-control custom-switch">
-                              <input type="checkbox" class="custom-control-input" id="activo_farmacologico"
-                                name="activo_farmacologico" value="Si">
-                              <label class="custom-control-label" for="activo_farmacologico">¿Está activo?</label>
-                            </div>
-                          </div>
-                        </div>
-                        <div class="col-md-4">
-                          <div class="form-group">
-                            <label class="form-control-label">Fecha de finalización</label>
-                            <input type="date" class="form-control" name="fecha_finalizacion_farmacologico">
-                          </div>
-                        </div>
-                        <div class="col-md-4">
-                          <div class="form-group">
-                            <label class="form-control-label">Observaciones</label>
-                            <input type="text" class="form-control" name="observaciones_farmacologico">
-                          </div>
-                        </div>
+                    <div id="contenedor-farmacologicos">
+                      <div
+                        class="alert alert-info text-center"
+                        id="empty-farmacologicos"
+                      >
+                        <i class="fas fa-info-circle mr-2"></i>
+                        No hay antecedentes farmacológicos registrados. Haga
+                        clic en "Nuevo Registro" para agregar.
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <!-- Antecedentes Tóxicos -->
+              <!-- TÓXICOS -->
               <div class="tab-pane fade" id="toxicos" role="tabpanel">
-                <div class="card bg-gradient-default shadow-sm mb-4">
-                  <div class="card-header bg-transparent">
-                    <h4 class="text-white mb-0">Antecedentes Tóxicos</h4>
+                <div class="card bg-gradient-default shadow-sm">
+                  <div
+                    class="card-header bg-transparent d-flex justify-content-between align-items-center"
+                  >
+                    <h4 class="text-white mb-0">
+                      <i class="fas fa-smoking mr-2"></i>Antecedentes Tóxicos
+                    </h4>
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-outline-light"
+                      onclick="agregarAntecedente('toxicos')"
+                    >
+                      <i class="fas fa-plus mr-1"></i>Nuevo Registro
+                    </button>
                   </div>
                   <div class="card-body bg-white">
-                    <div class="form-group">
-                      <div class="custom-control custom-switch">
-                        <input type="checkbox" class="custom-control-input" id="antecedente_toxico"
-                          name="antecedente_toxico" value="Si">
-                        <label class="custom-control-label" for="antecedente_toxico">¿Presenta algún antecedente
-                          tóxico?</label>
-                      </div>
-                    </div>
-
-                    <div id="contenido_toxico" style="display: none;">
-                      <div class="form-group">
-                        <label class="form-control-label">Tipo de antecedente</label>
-                        <div class="row">
-                          <div class="col-md-6">
-                            <div class="custom-control custom-checkbox">
-                              <input type="checkbox" class="custom-control-input" id="tabaquismo" name="tipo_toxico[]"
-                                value="Tabaquismo">
-                              <label class="custom-control-label" for="tabaquismo">Tabaquismo</label>
-                            </div>
-                            <div class="custom-control custom-checkbox">
-                              <input type="checkbox" class="custom-control-input" id="alcohol" name="tipo_toxico[]"
-                                value="Consumo de Alcohol">
-                              <label class="custom-control-label" for="alcohol">Consumo de Alcohol</label>
-                            </div>
-                            <div class="custom-control custom-checkbox">
-                              <input type="checkbox" class="custom-control-input" id="sustancias" name="tipo_toxico[]"
-                                value="Sustancias Psicoactivas">
-                              <label class="custom-control-label" for="sustancias">Sustancias Psicoactivas</label>
-                            </div>
-                          </div>
-                          <div class="col-md-6">
-                            <div class="custom-control custom-checkbox">
-                              <input type="checkbox" class="custom-control-input" id="intoxicaciones"
-                                name="tipo_toxico[]" value="Intoxicaciones">
-                              <label class="custom-control-label" for="intoxicaciones">Intoxicaciones</label>
-                            </div>
-                            <div class="custom-control custom-checkbox">
-                              <input type="checkbox" class="custom-control-input" id="alergias_medicamentos"
-                                name="tipo_toxico[]" value="Alergias a Medicamentos">
-                              <label class="custom-control-label" for="alergias_medicamentos">Alergias a
-                                Medicamentos</label>
-                            </div>
-                            <div class="custom-control custom-checkbox">
-                              <input type="checkbox" class="custom-control-input" id="otros_toxicos"
-                                name="tipo_toxico[]" value="Otros">
-                              <label class="custom-control-label" for="otros_toxicos">Otros</label>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div class="row">
-                        <div class="col-md-4">
-                          <div class="form-group">
-                            <label class="form-control-label">Fecha de inicio</label>
-                            <input type="date" class="form-control" name="fecha_inicio_toxico">
-                          </div>
-                        </div>
-                        <div class="col-md-4">
-                          <div class="form-group">
-                            <div class="custom-control custom-switch">
-                              <input type="checkbox" class="custom-control-input" id="tratamiento_toxico"
-                                name="tratamiento_toxico" value="Si">
-                              <label class="custom-control-label" for="tratamiento_toxico">¿Ha recibido
-                                tratamiento?</label>
-                            </div>
-                          </div>
-                        </div>
-                        <div class="col-md-4">
-                          <div class="form-group">
-                            <label class="form-control-label">Tratamiento (detallar)</label>
-                            <input type="text" class="form-control" name="detalle_tratamiento_toxico">
-                          </div>
-                        </div>
-                      </div>
-
-                      <div class="row">
-                        <div class="col-md-4">
-                          <div class="form-group">
-                            <div class="custom-control custom-switch">
-                              <input type="checkbox" class="custom-control-input" id="complicaciones_toxico"
-                                name="complicaciones_toxico" value="Si">
-                              <label class="custom-control-label" for="complicaciones_toxico">¿Complicaciones
-                                asociadas?</label>
-                            </div>
-                          </div>
-                        </div>
-                        <div class="col-md-8">
-                          <div class="form-group">
-                            <label class="form-control-label">Detallar complicaciones</label>
-                            <input type="text" class="form-control" name="detalle_complicaciones_toxico">
-                          </div>
-                        </div>
-                      </div>
-
-                      <div class="row">
-                        <div class="col-md-4">
-                          <div class="form-group">
-                            <div class="custom-control custom-switch">
-                              <input type="checkbox" class="custom-control-input" id="activo_toxico"
-                                name="activo_toxico" value="Si">
-                              <label class="custom-control-label" for="activo_toxico">¿Activo actualmente?</label>
-                            </div>
-                          </div>
-                        </div>
-                        <div class="col-md-4">
-                          <div class="form-group">
-                            <label class="form-control-label">Fecha de finalización</label>
-                            <input type="date" class="form-control" name="fecha_finalizacion_toxico">
-                          </div>
-                        </div>
-                        <div class="col-md-4">
-                          <div class="form-group">
-                            <label class="form-control-label">Observaciones</label>
-                            <input type="text" class="form-control" name="observaciones_toxico">
-                          </div>
-                        </div>
+                    <div id="contenedor-toxicos">
+                      <div
+                        class="alert alert-info text-center"
+                        id="empty-toxicos"
+                      >
+                        <i class="fas fa-info-circle mr-2"></i>
+                        No hay antecedentes tóxicos registrados. Haga clic en
+                        "Nuevo Registro" para agregar.
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <!-- Antecedentes Familiares -->
+              <!-- FAMILIARES -->
               <div class="tab-pane fade" id="familiares" role="tabpanel">
-                <div class="card bg-gradient-default shadow-sm mb-4">
-                  <div class="card-header bg-transparent">
-                    <h4 class="text-white mb-0">Antecedentes Familiares</h4>
+                <div class="card bg-gradient-default shadow-sm">
+                  <div
+                    class="card-header bg-transparent d-flex justify-content-between align-items-center"
+                  >
+                    <h4 class="text-white mb-0">
+                      <i class="fas fa-users mr-2"></i>Antecedentes Familiares
+                    </h4>
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-outline-light"
+                      onclick="agregarAntecedente('familiares')"
+                    >
+                      <i class="fas fa-plus mr-1"></i>Nuevo Registro
+                    </button>
                   </div>
                   <div class="card-body bg-white">
-                    <div class="form-group">
-                      <div class="custom-control custom-switch">
-                        <input type="checkbox" class="custom-control-input" id="antecedente_fami"
-                          name="antecedente_fami" value="Si">
-                        <label class="custom-control-label" for="antecedente_fami">¿Presenta algún antecedente
-                          familiar?</label>
-                      </div>
-                    </div>
-
-                    <div id="contenido_familiar" style="display: none;">
-                      <div class="row">
-                        <div class="col-md-6">
-                          <div class="form-group">
-                            <label class="form-control-label">Tipo de antecedente</label>
-                            <input type="text" class="form-control" name="tipo_antecedente_familiar">
-                          </div>
-                        </div>
-                        <div class="col-md-6">
-                          <div class="form-group">
-                            <label class="form-control-label">Parentesco</label>
-                            <input type="text" class="form-control" name="parentesco">
-                          </div>
-                        </div>
-                      </div>
-
-                      <div class="form-group">
-                        <label class="form-control-label">Observaciones</label>
-                        <textarea class="form-control" name="observaciones_familiar" rows="3"></textarea>
+                    <div id="contenedor-familiares">
+                      <div
+                        class="alert alert-info text-center"
+                        id="empty-familiares"
+                      >
+                        <i class="fas fa-info-circle mr-2"></i>
+                        No hay antecedentes familiares registrados. Haga clic en
+                        "Nuevo Registro" para agregar.
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <!-- Otros Antecedentes -->
-              <div class="tab-pane fade" id="otros" role="tabpanel">
-                <div class="card bg-gradient-default shadow-sm mb-4">
-                  <div class="card-header bg-transparent">
-                    <h4 class="text-white mb-0">Otros Antecedentes</h4>
+              <!-- ALÉRGICOS -->
+              <div class="tab-pane fade" id="alergicos" role="tabpanel">
+                <div class="card bg-gradient-default shadow-sm">
+                  <div
+                    class="card-header bg-transparent d-flex justify-content-between align-items-center"
+                  >
+                    <h4 class="text-white mb-0">
+                      <i class="fas fa-allergies mr-2"></i>Antecedentes
+                      Alérgicos
+                    </h4>
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-outline-light"
+                      onclick="agregarAntecedente('alergicos')"
+                    >
+                      <i class="fas fa-plus mr-1"></i>Nuevo Registro
+                    </button>
                   </div>
                   <div class="card-body bg-white">
-                    <!-- Alérgicos -->
-                    <div class="form-group">
-                      <div class="custom-control custom-switch">
-                        <input type="checkbox" class="custom-control-input" id="antecedente_alergico"
-                          name="antecedente_alergico" value="Si">
-                        <label class="custom-control-label" for="antecedente_alergico">¿Presenta antecedentes
-                          alérgicos?</label>
-                      </div>
-                    </div>
-
-                    <div id="contenido_alergico" style="display: none;">
-                      <div class="row">
-                        <div class="col-md-6">
-                          <div class="form-group">
-                            <label class="form-control-label">Descripción</label>
-                            <input type="text" class="form-control" name="descripcion_alergico">
-                          </div>
-                        </div>
-                        <div class="col-md-6">
-                          <div class="form-group">
-                            <label class="form-control-label">Fecha de inicio</label>
-                            <input type="date" class="form-control" name="fecha_inicio_alergico">
-                          </div>
-                        </div>
-                      </div>
-
-                      <div class="row">
-                        <div class="col-md-4">
-                          <div class="form-group">
-                            <label class="form-control-label">Tratamiento recibido</label>
-                            <input type="text" class="form-control" name="tratamiento_alergico">
-                          </div>
-                        </div>
-                        <div class="col-md-4">
-                          <div class="form-group">
-                            <label class="form-control-label">Detalles del tratamiento</label>
-                            <input type="text" class="form-control" name="detalle_tratamiento_alergico">
-                          </div>
-                        </div>
-                        <div class="col-md-4">
-                          <div class="form-group">
-                            <label class="form-control-label">Complicaciones</label>
-                            <input type="text" class="form-control" name="complicaciones_alergico">
-                          </div>
-                        </div>
-                      </div>
-
-                      <div class="row">
-                        <div class="col-md-4">
-                          <div class="form-group">
-                            <div class="custom-control custom-switch">
-                              <input type="checkbox" class="custom-control-input" id="activo_alergico"
-                                name="activo_alergico" value="Si">
-                              <label class="custom-control-label" for="activo_alergico">¿Está activo?</label>
-                            </div>
-                          </div>
-                        </div>
-                        <div class="col-md-4">
-                          <div class="form-group">
-                            <label class="form-control-label">Fecha de finalización</label>
-                            <input type="date" class="form-control" name="fecha_finalizacion_alergico">
-                          </div>
-                        </div>
-                        <div class="col-md-4">
-                          <div class="form-group">
-                            <label class="form-control-label">Observaciones</label>
-                            <input type="text" class="form-control" name="observaciones_alergico">
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <hr class="my-4">
-
-                    <!-- Traumáticos -->
-                    <div class="form-group">
-                      <div class="custom-control custom-switch">
-                        <input type="checkbox" class="custom-control-input" id="antecedente_traumatico"
-                          name="antecedente_traumatico" value="Si">
-                        <label class="custom-control-label" for="antecedente_traumatico">¿Presenta antecedentes
-                          traumáticos?</label>
-                      </div>
-                    </div>
-
-                    <div id="contenido_traumatico" style="display: none;">
-                      <div class="row">
-                        <div class="col-md-6">
-                          <div class="form-group">
-                            <label class="form-control-label">Descripción</label>
-                            <input type="text" class="form-control" name="descripcion_traumatico">
-                          </div>
-                        </div>
-                        <div class="col-md-6">
-                          <div class="form-group">
-                            <label class="form-control-label">Fecha de inicio</label>
-                            <input type="date" class="form-control" name="fecha_inicio_traumatico">
-                          </div>
-                        </div>
-                      </div>
-
-                      <div class="row">
-                        <div class="col-md-4">
-                          <div class="form-group">
-                            <label class="form-control-label">Tratamiento recibido</label>
-                            <input type="text" class="form-control" name="tratamiento_traumatico">
-                          </div>
-                        </div>
-                        <div class="col-md-4">
-                          <div class="form-group">
-                            <label class="form-control-label">Detalles del tratamiento</label>
-                            <input type="text" class="form-control" name="detalle_tratamiento_traumatico">
-                          </div>
-                        </div>
-                        <div class="col-md-4">
-                          <div class="form-group">
-                            <label class="form-control-label">Complicaciones</label>
-                            <input type="text" class="form-control" name="complicaciones_traumatico">
-                          </div>
-                        </div>
-                      </div>
-
-                      <div class="row">
-                        <div class="col-md-4">
-                          <div class="form-group">
-                            <div class="custom-control custom-switch">
-                              <input type="checkbox" class="custom-control-input" id="activo_traumatico"
-                                name="activo_traumatico" value="Si">
-                              <label class="custom-control-label" for="activo_traumatico">¿Está activo?</label>
-                            </div>
-                          </div>
-                        </div>
-                        <div class="col-md-4">
-                          <div class="form-group">
-                            <label class="form-control-label">Fecha de finalización</label>
-                            <input type="date" class="form-control" name="fecha_finalizacion_traumatico">
-                          </div>
-                        </div>
-                        <div class="col-md-4">
-                          <div class="form-group">
-                            <label class="form-control-label">Observaciones</label>
-                            <input type="text" class="form-control" name="observaciones_traumatico">
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <hr class="my-4">
-
-                    <!-- Gineco-Obstétricos -->
-                    <div class="form-group">
-                      <div class="custom-control custom-switch">
-                        <input type="checkbox" class="custom-control-input" id="antecedente_gineco"
-                          name="antecedente_gineco" value="Si">
-                        <label class="custom-control-label" for="antecedente_gineco">¿Presenta antecedentes
-                          gineco-obstétricos?</label>
-                      </div>
-                    </div>
-
-                    <div id="contenido_gineco" style="display: none;">
-                      <div class="row">
-                        <div class="col-md-4">
-                          <div class="form-group">
-                            <div class="custom-control custom-switch">
-                              <input type="checkbox" class="custom-control-input" id="menarquia" name="menarquia"
-                                value="Si">
-                              <label class="custom-control-label" for="menarquia">Menarquia</label>
-                            </div>
-                          </div>
-                        </div>
-                        <div class="col-md-4">
-                          <div class="form-group">
-                            <label class="form-control-label">Edad Menarquia</label>
-                            <input type="number" class="form-control" name="edad_menarquia">
-                          </div>
-                        </div>
-                      </div>
-
-                      <div class="row">
-                        <div class="col-md-4">
-                          <div class="form-group">
-                            <div class="custom-control custom-switch">
-                              <input type="checkbox" class="custom-control-input" id="menopausia" name="menopausia"
-                                value="Si">
-                              <label class="custom-control-label" for="menopausia">Menopausia</label>
-                            </div>
-                          </div>
-                        </div>
-                        <div class="col-md-4">
-                          <div class="form-group">
-                            <label class="form-control-label">Edad Menopausia</label>
-                            <input type="number" class="form-control" name="edad_menopausia">
-                          </div>
-                        </div>
-                      </div>
-
-                      <div class="row">
-                        <div class="col-md-3">
-                          <div class="form-group">
-                            <label class="form-control-label">Gravidez</label>
-                            <input type="number" class="form-control" name="gravidez">
-                          </div>
-                        </div>
-                        <div class="col-md-3">
-                          <div class="form-group">
-                            <label class="form-control-label">Abortos</label>
-                            <input type="number" class="form-control" name="abortos">
-                          </div>
-                        </div>
-                        <div class="col-md-3">
-                          <div class="form-group">
-                            <label class="form-control-label">Hijos Vivos</label>
-                            <input type="number" class="form-control" name="hijos_vivos">
-                          </div>
-                        </div>
-                      </div>
-
-                      <div class="row">
-                        <div class="col-md-4">
-                          <div class="form-group">
-                            <div class="custom-control custom-switch">
-                              <input type="checkbox" class="custom-control-input" id="metodo_planificacion"
-                                name="metodo_planificacion" value="Si">
-                              <label class="custom-control-label" for="metodo_planificacion">Método de
-                                planificación</label>
-                            </div>
-                          </div>
-                        </div>
-                        <div class="col-md-4">
-                          <div class="form-group">
-                            <label class="form-control-label">Método</label>
-                            <input type="text" class="form-control" name="metodo_detalle">
-                          </div>
-                        </div>
-                        <div class="col-md-4">
-                          <div class="form-group">
-                            <label class="form-control-label">Dosis</label>
-                            <input type="text" class="form-control" name="dosis_planificacion">
-                          </div>
-                        </div>
-                      </div>
-
-                      <div class="row">
-                        <div class="col-md-4">
-                          <div class="form-group">
-                            <label class="form-control-label">Adherencia</label>
-                            <input type="text" class="form-control" name="adherencia_planificacion">
-                          </div>
-                        </div>
-                        <div class="col-md-4">
-                          <div class="form-group">
-                            <label class="form-control-label">Tolerancia</label>
-                            <input type="text" class="form-control" name="tolerancia_planificacion">
-                          </div>
-                        </div>
-                        <div class="col-md-4">
-                          <div class="form-group">
-                            <label class="form-control-label">Observaciones</label>
-                            <input type="text" class="form-control" name="observaciones_gineco">
-                          </div>
-                        </div>
+                    <div id="contenedor-alergicos">
+                      <div
+                        class="alert alert-info text-center"
+                        id="empty-alergicos"
+                      >
+                        <i class="fas fa-info-circle mr-2"></i>
+                        No hay antecedentes alérgicos registrados. Haga clic en
+                        "Nuevo Registro" para agregar.
                       </div>
                     </div>
                   </div>
+                </div>
+              </div>
+              <!-- TRAUMÁTICOS -->
+              <div class="tab-pane fade" id="traumaticos" role="tabpanel">
+                <div class="card bg-gradient-default shadow-sm">
+                  <div
+                    class="card-header bg-transparent d-flex justify-content-between align-items-center"
+                  >
+                    <h4 class="text-white mb-0">
+                      <i class="fas fa-band-aid mr-2"></i>Antecedentes
+                      Traumáticos
+                    </h4>
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-outline-light"
+                      onclick="agregarAntecedente('traumaticos')"
+                    >
+                      <i class="fas fa-plus mr-1"></i>Nuevo Registro
+                    </button>
+                  </div>
+                  <div class="card-body bg-white">
+                    <div id="contenedor-traumaticos">
+                      <div
+                        class="alert alert-info text-center"
+                        id="empty-traumaticos"
+                      >
+                        <i class="fas fa-info-circle mr-2"></i>
+                        No hay antecedentes traumáticos registrados. Haga clic
+                        en "Nuevo Registro" para agregar.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- GINECO-OBSTÉTRICOS -->
+              <div class="tab-pane fade" id="gineco" role="tabpanel">
+                <div class="card bg-gradient-default shadow-sm">
+                  <div
+                    class="card-header bg-transparent d-flex justify-content-between align-items-center"
+                  >
+                    <h4 class="text-white mb-0">
+                      <i class="fas fa-venus mr-2"></i>Antecedentes
+                      Gineco-Obstétricos
+                    </h4>
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-outline-light"
+                      onclick="agregarAntecedente('gineco')"
+                    >
+                      <i class="fas fa-plus mr-1"></i>Nuevo Registro
+                    </button>
+                  </div>
+                  <div class="card-body bg-white">
+                    <div id="contenedor-gineco">
+                      <div
+                        class="alert alert-info text-center"
+                        id="empty-gineco"
+                      >
+                        <i class="fas fa-info-circle mr-2"></i>
+                        No hay antecedentes gineco-obstétricos registrados. Haga
+                        clic en "Nuevo Registro" para agregar.
+                      </div>
+                      <!-- Contenido único para gineco-obstétricos -->
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="tab-pane fade" id="epidemiologicos" role="tabpanel">
+                <div class="card bg-gradient-default shadow-sm">
+                  <div
+                    class="card-header bg-transparent d-flex justify-content-between align-items-center"
+                  >
+                    <h4 class="text-white mb-0">
+                      <i class="fas fa-virus mr-2"></i>Antecedentes
+                      Epidemiológicos
+                    </h4>
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-outline-light"
+                      onclick="agregarAntecedente('epidemiologicos')"
+                    >
+                      <i class="fas fa-plus mr-1"></i>Nuevo Registro
+                    </button>
+                  </div>
+                  <div class="card-body bg-white">
+                    <div id="contenedor-epidemiologicos">
+                      <div
+                        class="alert alert-info text-center"
+                        id="empty-epidemiologicos"
+                      >
+                        <i class="fas fa-info-circle mr-2"></i>
+                        No hay antecedentes epidemiológicos registrados. Haga
+                        clic en "Nuevo Registro" para agregar.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- ENFERMEDADES DE TRANSMISIÓN SEXUAL -->
+              <div class="tab-pane fade" id="ets" role="tabpanel">
+                <div class="card bg-gradient-default shadow-sm">
+                  <div
+                    class="card-header bg-transparent d-flex justify-content-between align-items-center"
+                  >
+                    <h4 class="text-white mb-0">
+                      <i class="fas fa-shield-virus mr-2"></i>Enfermedades de
+                      Transmisión Sexual
+                    </h4>
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-outline-light"
+                      onclick="agregarAntecedente('ets')"
+                    >
+                      <i class="fas fa-plus mr-1"></i>Nuevo Registro
+                    </button>
+                  </div>
+                  <div class="card-body bg-white">
+                    <div id="contenedor-ets">
+                      <div class="alert alert-info text-center" id="empty-ets">
+                        <i class="fas fa-info-circle mr-2"></i>
+                        No hay enfermedades de transmisión sexual registradas.
+                        Haga clic en "Nuevo Registro" para agregar.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- HOSPITALIZACIONES -->
+              <div class="tab-pane fade" id="hospitalizaciones" role="tabpanel">
+                <div class="card bg-gradient-default shadow-sm">
+                  <div
+                    class="card-header bg-transparent d-flex justify-content-between align-items-center"
+                  >
+                    <h4 class="text-white mb-0">
+                      <i class="fas fa-hospital mr-2"></i>Hospitalizaciones
+                    </h4>
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-outline-light"
+                      onclick="agregarAntecedente('hospitalizaciones')"
+                    >
+                      <i class="fas fa-plus mr-1"></i>Nuevo Registro
+                    </button>
+                  </div>
+                  <div class="card-body bg-white">
+                    <div id="contenedor-hospitalizaciones">
+                      <div
+                        class="alert alert-info text-center"
+                        id="empty-hospitalizaciones"
+                      >
+                        <i class="fas fa-info-circle mr-2"></i>
+                        No hay hospitalizaciones registradas. Haga clic en
+                        "Nuevo Registro" para agregar.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- INMUNIZACIONES -->
+              <div class="tab-pane fade" id="inmunizaciones" role="tabpanel">
+                <div class="card bg-gradient-default shadow-sm">
+                  <div
+                    class="card-header bg-transparent d-flex justify-content-between align-items-center"
+                  >
+                    <h4 class="text-white mb-0">
+                      <i class="fas fa-syringe mr-2"></i>Inmunizaciones
+                    </h4>
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-outline-light"
+                      onclick="agregarAntecedente('inmunizaciones')"
+                    >
+                      <i class="fas fa-plus mr-1"></i>Nuevo Registro
+                    </button>
+                  </div>
+                  <div class="card-body bg-white">
+                    <div id="contenedor-inmunizaciones">
+                      <div
+                        class="alert alert-info text-center"
+                        id="empty-inmunizaciones"
+                      >
+                        <i class="fas fa-info-circle mr-2"></i>
+                        No hay inmunizaciones registradas. Haga clic en "Nuevo
+                        Registro" para agregar.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- TRANSFUSIONALES -->
+              <div class="tab-pane fade" id="transfusionales" role="tabpanel">
+                <div class="card bg-gradient-default shadow-sm">
+                  <div
+                    class="card-header bg-transparent d-flex justify-content-between align-items-center"
+                  >
+                    <h4 class="text-white mb-0">
+                      <i class="fas fa-tint mr-2"></i>Antecedentes
+                      Transfusionales
+                    </h4>
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-outline-light"
+                      onclick="agregarAntecedente('transfusionales')"
+                    >
+                      <i class="fas fa-plus mr-1"></i>Nuevo Registro
+                    </button>
+                  </div>
+                  <div class="card-body bg-white">
+                    <div id="contenedor-transfusionales">
+                      <div
+                        class="alert alert-info text-center"
+                        id="empty-transfusionales"
+                      >
+                        <i class="fas fa-info-circle mr-2"></i>
+                        No hay antecedentes transfusionales registrados. Haga
+                        clic en "Nuevo Registro" para agregar.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Observaciones generales -->
+            <div class="row mt-4">
+              <div class="col-12">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold"
+                    >Observaciones Generales</label
+                  >
+                  <textarea
+                    class="form-control"
+                    name="observaciones_generales"
+                    rows="3"
+                    placeholder="Observaciones adicionales sobre los antecedentes del paciente..."
+                  ></textarea>
                 </div>
               </div>
             </div>
 
             <!-- Botones de acción -->
             <div class="row mt-4">
-              <div class="col-12 text-right">
-                <button type="submit" class="btn btn-primary">Guardar Antecedentes</button>
-                <a href="{% url 'detalle_paciente' paciente_id %}" class="btn btn-secondary">Ver Paciente</a>
+              <div class="col-12">
+                <div class="d-flex justify-content-between">
+                  <button
+                    type="button"
+                    class="btn btn-outline-danger"
+                    onclick="limpiarFormulario()"
+                  >
+                    <i class="fas fa-trash mr-2"></i>Limpiar Todo
+                  </button>
+                  <div>
+                    <button
+                      type="button"
+                      class="btn btn-outline-secondary mr-2"
+                      onclick="validarFormulario()"
+                    >
+                      <i class="fas fa-check mr-2"></i>Validar
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                      <i class="fas fa-save mr-2"></i>Guardar Antecedentes
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           </form>
@@ -847,37 +736,1466 @@
     </div>
   </div>
 </div>
-<script>
-  document.addEventListener('DOMContentLoaded', function () {
-    // Función para mostrar/ocultar opciones adicionales
-    function toggleOptions(checkboxId, optionsId) {
-      const checkbox = document.getElementById(checkboxId);
-      const options = document.getElementById(optionsId);
 
-      checkbox.addEventListener('change', function () {
-        if (checkbox.checked) {
-          options.style.display = 'block';
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Contadores para cada tipo de antecedente
+    const contadores = {
+      patologicos: 0,
+      quirurgicos: 0,
+      farmacologicos: 0,
+      toxicos: 0,
+      familiares: 0,
+      alergicos: 0,
+      traumaticos: 0,
+      gineco: 0,
+      epidemiologicos: 0,
+      ets: 0,
+      hospitalizaciones: 0,
+      inmunizaciones: 0,
+      transfusionales: 0,
+    };
+
+    // Plantillas que corresponden exactamente a tus modelos Django
+    const plantillas = {
+      patologicos: function (indice) {
+        return `
+        <div class="card mb-3 border-left-primary" data-index="${indice}">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h6 class="mb-0">
+              <i class="fas fa-disease text-primary mr-2"></i>
+              Antecedente Patológico #${indice + 1}
+            </h6>
+            <button type="button" class="btn btn-sm btn-outline-danger" onclick="eliminarItem(this, 'patologicos')">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">Tipo de patología *</label>
+                  <select class="form-control" name="patologicos[${indice}][tipo_patologia]" required>
+                    <option value="">Seleccione una opción...</option>
+                    <option value="hipertension">Hipertensión arterial</option>
+                    <option value="dislipidemia">Dislipidemia</option>
+                    <option value="diabetes">Diabetes</option>
+                    <option value="cancer">Cáncer</option>
+                    <option value="enfermedad_renal">Enfermedad Renal</option>
+                    <option value="enfermedad_cardiaca">Enfermedad Cardíaca</option>
+                    <option value="enfermedad_respiratoria">Enfermedad Respiratoria</option>
+                    <option value="enfermedad_hepatica">Enfermedad Hepática</option>
+                    <option value="enfermedad_tiroidea">Enfermedad Tiroidea</option>
+                    <option value="enfermedad_cerebrovascular">Enfermedad Cerebrovascular</option>
+                    <option value="enfermedad_psiquiatrica">Enfermedad Psiquiátrica</option>
+                    <option value="cefalea">Cefalea</option>
+                    <option value="crisis_convulsivas">Crisis Convulsivas</option>
+                    <option value="enfermedades_neurodegenerativas">Enfermedades Neurodegenerativas</option>
+                    <option value="retardo_mental">Retardo Mental</option>
+                    <option value="dificultades_aprendizaje">Dificultades del Aprendizaje</option>
+                    <option value="sindrome_down">Síndrome de Down</option>
+                    <option value="trastorno_desarrollo">Trastorno del desarrollo psicomotor</option>
+                    <option value="deficit_atencion">Déficit de atención o hiperactividad</option>
+                    <option value="otros">Otros</option>
+                  </select>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">Fecha de inicio *</label>
+                  <input type="date" class="form-control" name="patologicos[${indice}][fecha_inicio]" required>
+                </div>
+              </div>
+            </div>
+            
+            <div class="row">
+              <div class="col-md-12">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">Descripción (si es otros)</label>
+                  <input type="text" class="form-control" name="patologicos[${indice}][descripcion_otros]" placeholder="Especifique si seleccionó 'Otros'">
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <div class="custom-control custom-switch">
+                    <input type="checkbox" class="custom-control-input" 
+                           id="tratamiento_pat_${indice}" name="patologicos[${indice}][ha_recibido_tratamiento]" value="true">
+                    <label class="custom-control-label" for="tratamiento_pat_${indice}">¿Ha recibido tratamiento?</label>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <div class="custom-control custom-switch">
+                    <input type="checkbox" class="custom-control-input" 
+                           id="complicaciones_pat_${indice}" name="patologicos[${indice}][tiene_complicaciones]" value="true">
+                    <label class="custom-control-label" for="complicaciones_pat_${indice}">¿Tiene complicaciones?</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">Detalle del tratamiento</label>
+                  <textarea class="form-control" name="patologicos[${indice}][detalle_tratamiento]" rows="2" placeholder="Describa el tratamiento recibido..."></textarea>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">Detalle de complicaciones</label>
+                  <textarea class="form-control" name="patologicos[${indice}][detalle_complicaciones]" rows="2" placeholder="Describa las complicaciones..."></textarea>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <div class="custom-control custom-switch">
+                    <input type="checkbox" class="custom-control-input" 
+                           id="activo_pat_${indice}" name="patologicos[${indice}][activo]" value="true" checked>
+                    <label class="custom-control-label" for="activo_pat_${indice}">¿Activo actualmente?</label>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">Fecha de finalización</label>
+                  <input type="date" class="form-control" name="patologicos[${indice}][fecha_finalizacion]">
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-12">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">Observaciones</label>
+                  <textarea class="form-control" name="patologicos[${indice}][observaciones]" rows="2" placeholder="Observaciones adicionales..."></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+      },
+
+      quirurgicos: function (indice) {
+        return `
+        <div class="card mb-3 border-left-info" data-index="${indice}">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h6 class="mb-0">
+              <i class="fas fa-scalpel text-info mr-2"></i>
+              Antecedente Quirúrgico #${indice + 1}
+            </h6>
+            <button type="button" class="btn btn-sm btn-outline-danger" onclick="eliminarItem(this, 'quirurgicos')">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-8">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">Descripción de la cirugía *</label>
+                  <input type="text" class="form-control" name="quirurgicos[${indice}][descripcion]" required placeholder="Tipo de procedimiento quirúrgico...">
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">Fecha de intervención *</label>
+                  <input type="date" class="form-control" name="quirurgicos[${indice}][fecha_intervencion]" required>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <div class="custom-control custom-switch">
+                    <input type="checkbox" class="custom-control-input" 
+                           id="tratamiento_quir_${indice}" name="quirurgicos[${indice}][ha_recibido_tratamiento]" value="true">
+                    <label class="custom-control-label" for="tratamiento_quir_${indice}">¿Ha recibido tratamiento?</label>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <div class="custom-control custom-switch">
+                    <input type="checkbox" class="custom-control-input" 
+                           id="complicaciones_quir_${indice}" name="quirurgicos[${indice}][tiene_complicaciones]" value="true">
+                    <label class="custom-control-label" for="complicaciones_quir_${indice}">¿Tuvo complicaciones?</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">Detalle del tratamiento</label>
+                  <textarea class="form-control" name="quirurgicos[${indice}][detalle_tratamiento]" rows="2" placeholder="Tratamiento postoperatorio..."></textarea>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">Detalle de complicaciones</label>
+                  <textarea class="form-control" name="quirurgicos[${indice}][detalle_complicaciones]" rows="2" placeholder="Complicaciones durante o después de la cirugía..."></textarea>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <div class="custom-control custom-switch">
+                    <input type="checkbox" class="custom-control-input" 
+                           id="activo_quir_${indice}" name="quirurgicos[${indice}][activo]" value="true" checked>
+                    <label class="custom-control-label" for="activo_quir_${indice}">¿Activo actualmente?</label>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">Fecha de finalización</label>
+                  <input type="date" class="form-control" name="quirurgicos[${indice}][fecha_finalizacion]">
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-12">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">Observaciones</label>
+                  <textarea class="form-control" name="quirurgicos[${indice}][observaciones]" rows="2" placeholder="Observaciones adicionales..."></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+      },
+
+      farmacologicos: function (indice) {
+        return `
+        <div class="card mb-3 border-left-success" data-index="${indice}">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h6 class="mb-0">
+              <i class="fas fa-pills text-success mr-2"></i>
+              Antecedente Farmacológico #${indice + 1}
+            </h6>
+            <button type="button" class="btn btn-sm btn-outline-danger" onclick="eliminarItem(this, 'farmacologicos')">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-8">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">Descripción del medicamento/reacción *</label>
+                  <input type="text" class="form-control" name="farmacologicos[${indice}][descripcion]" required placeholder="Nombre del medicamento y reacción...">
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">Fecha de inicio *</label>
+                  <input type="date" class="form-control" name="farmacologicos[${indice}][fecha_inicio]" required>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <div class="custom-control custom-switch">
+                    <input type="checkbox" class="custom-control-input" 
+                           id="tratamiento_farm_${indice}" name="farmacologicos[${indice}][recibio_tratamiento]" value="true">
+                    <label class="custom-control-label" for="tratamiento_farm_${indice}">¿Recibió tratamiento?</label>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <div class="custom-control custom-switch">
+                    <input type="checkbox" class="custom-control-input" 
+                           id="complicaciones_farm_${indice}" name="farmacologicos[${indice}][tuvo_complicaciones]" value="true">
+                    <label class="custom-control-label" for="complicaciones_farm_${indice}">¿Tuvo complicaciones?</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">Detalle del tratamiento</label>
+                  <textarea class="form-control" name="farmacologicos[${indice}][detalle_tratamiento]" rows="2" placeholder="Tratamiento recibido para la reacción..."></textarea>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">Detalle de complicaciones</label>
+                  <textarea class="form-control" name="farmacologicos[${indice}][detalle_complicaciones]" rows="2" placeholder="Complicaciones presentadas..."></textarea>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <div class="custom-control custom-switch">
+                    <input type="checkbox" class="custom-control-input" 
+                           id="activo_farm_${indice}" name="farmacologicos[${indice}][activo]" value="true" checked>
+                    <label class="custom-control-label" for="activo_farm_${indice}">¿Está activo?</label>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">Fecha de finalización</label>
+                  <input type="date" class="form-control" name="farmacologicos[${indice}][fecha_finalizacion]">
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-12">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">Observaciones</label>
+                  <textarea class="form-control" name="farmacologicos[${indice}][observaciones]" rows="2" placeholder="Observaciones adicionales..."></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+      },
+
+      toxicos: function (indice) {
+        return `
+        <div class="card mb-3 border-left-warning" data-index="${indice}">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h6 class="mb-0">
+              <i class="fas fa-smoking text-warning mr-2"></i>
+              Antecedente Tóxico #${indice + 1}
+            </h6>
+            <button type="button" class="btn btn-sm btn-outline-danger" onclick="eliminarItem(this, 'toxicos')">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">Tipos de antecedente tóxico *</label>
+                  <div class="custom-controls-stacked">
+                    <div class="custom-control custom-checkbox">
+                      <input type="checkbox" class="custom-control-input" id="toxico_tabaquismo_${indice}" name="toxicos[${indice}][tipos_toxico][]" value="tabaquismo">
+                      <label class="custom-control-label" for="toxico_tabaquismo_${indice}">Tabaquismo</label>
+                    </div>
+                    <div class="custom-control custom-checkbox">
+                      <input type="checkbox" class="custom-control-input" id="toxico_alcohol_${indice}" name="toxicos[${indice}][tipos_toxico][]" value="alcohol">
+                      <label class="custom-control-label" for="toxico_alcohol_${indice}">Consumo de Alcohol</label>
+                    </div>
+                    <div class="custom-control custom-checkbox">
+                      <input type="checkbox" class="custom-control-input" id="toxico_sustancias_${indice}" name="toxicos[${indice}][tipos_toxico][]" value="sustancias_psicoactivas">
+                      <label class="custom-control-label" for="toxico_sustancias_${indice}">Sustancias Psicoactivas</label>
+                    </div>
+                    <div class="custom-control custom-checkbox">
+                      <input type="checkbox" class="custom-control-input" id="toxico_intoxicaciones_${indice}" name="toxicos[${indice}][tipos_toxico][]" value="intoxicaciones">
+                      <label class="custom-control-label" for="toxico_intoxicaciones_${indice}">Intoxicaciones</label>
+                    </div>
+                    <div class="custom-control custom-checkbox">
+                      <input type="checkbox" class="custom-control-input" id="toxico_alergias_${indice}" name="toxicos[${indice}][tipos_toxico][]" value="alergias_medicamentos">
+                      <label class="custom-control-label" for="toxico_alergias_${indice}">Alergias a Medicamentos</label>
+                    </div>
+                    <div class="custom-control custom-checkbox">
+                      <input type="checkbox" class="custom-control-input" id="toxico_otros_${indice}" name="toxicos[${indice}][tipos_toxico][]" value="otros">
+                      <label class="custom-control-label" for="toxico_otros_${indice}">Otros</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">Fecha de inicio *</label>
+                  <input type="date" class="form-control" name="toxicos[${indice}][fecha_inicio]" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">Descripción (otros)</label>
+                  <input type="text" class="form-control" name="toxicos[${indice}][descripcion_otros]" placeholder="Especifique si seleccionó 'Otros'">
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <div class="custom-control custom-switch">
+                    <input type="checkbox" class="custom-control-input" 
+                           id="tratamiento_tox_${indice}" name="toxicos[${indice}][ha_recibido_tratamiento]" value="true">
+                    <label class="custom-control-label" for="tratamiento_tox_${indice}">¿Ha recibido tratamiento?</label>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <div class="custom-control custom-switch">
+                    <input type="checkbox" class="custom-control-input" 
+                           id="complicaciones_tox_${indice}" name="toxicos[${indice}][tiene_complicaciones]" value="true">
+                    <label class="custom-control-label" for="complicaciones_tox_${indice}">¿Tiene complicaciones?</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">Detalle del tratamiento</label>
+                  <textarea class="form-control" name="toxicos[${indice}][detalle_tratamiento]" rows="2" placeholder="Tratamiento de desintoxicación o rehabilitación..."></textarea>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">Detalle de complicaciones</label>
+                  <textarea class="form-control" name="toxicos[${indice}][detalle_complicaciones]" rows="2" placeholder="Complicaciones del consumo..."></textarea>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <div class="custom-control custom-switch">
+                    <input type="checkbox" class="custom-control-input" 
+                           id="activo_tox_${indice}" name="toxicos[${indice}][activo]" value="true" checked>
+                    <label class="custom-control-label" for="activo_tox_${indice}">¿Activo actualmente?</label>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">Fecha de finalización</label>
+                  <input type="date" class="form-control" name="toxicos[${indice}][fecha_finalizacion]">
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-12">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">Observaciones</label>
+                  <textarea class="form-control" name="toxicos[${indice}][observaciones]" rows="2" placeholder="Observaciones adicionales..."></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+      },
+
+      familiares: function (indice) {
+        return `
+        <div class="card mb-3 border-left-secondary" data-index="${indice}">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h6 class="mb-0">
+              <i class="fas fa-users text-secondary mr-2"></i>
+              Antecedente Familiar #${indice + 1}
+            </h6>
+            <button type="button" class="btn btn-sm btn-outline-danger" onclick="eliminarItem(this, 'familiares')">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">Tipo de antecedente *</label>
+                  <input type="text" class="form-control" name="familiares[${indice}][tipo_antecedente]" required placeholder="Enfermedad o condición médica...">
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">Parentesco *</label>
+                  <input type="text" class="form-control" name="familiares[${indice}][parentesco]" required placeholder="Relación familiar...">
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-12">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">Observaciones</label>
+                  <textarea class="form-control" name="familiares[${indice}][observaciones]" rows="2" placeholder="Información adicional sobre el antecedente familiar..."></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+      },
+
+      alergicos: function (indice) {
+        return `
+        <div class="card mb-3 border-left-danger" data-index="${indice}">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h6 class="mb-0">
+              <i class="fas fa-allergies text-danger mr-2"></i>
+              Antecedente Alérgico #${indice + 1}
+            </h6>
+            <button type="button" class="btn btn-sm btn-outline-danger" onclick="eliminarItem(this, 'alergicos')">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-8">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">Descripción de la alergia *</label>
+                  <input type="text" class="form-control" name="alergicos[${indice}][descripcion]" required placeholder="Alérgeno y tipo de reacción...">
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">Fecha de inicio *</label>
+                  <input type="date" class="form-control" name="alergicos[${indice}][fecha_inicio]" required>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">Tratamiento recibido</label>
+                  <input type="text" class="form-control" name="alergicos[${indice}][tratamiento_recibido]" placeholder="Medicamentos utilizados...">
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">Fecha de finalización</label>
+                  <input type="date" class="form-control" name="alergicos[${indice}][fecha_finalizacion]">
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">Detalle del tratamiento</label>
+                  <textarea class="form-control" name="alergicos[${indice}][detalle_tratamiento]" rows="2" placeholder="Descripción del tratamiento..."></textarea>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">Complicaciones</label>
+                  <textarea class="form-control" name="alergicos[${indice}][complicaciones]" rows="2" placeholder="Complicaciones de la alergia..."></textarea>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <div class="custom-control custom-switch">
+                    <input type="checkbox" class="custom-control-input" 
+                           id="activo_aler_${indice}" name="alergicos[${indice}][activo]" value="true" checked>
+                    <label class="custom-control-label" for="activo_aler_${indice}">¿Está activo?</label>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">Observaciones</label>
+                  <textarea class="form-control" name="alergicos[${indice}][observaciones]" rows="2" placeholder="Observaciones adicionales..."></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+      },
+      traumaticos: function (indice) {
+        return `
+    <div class="card mb-3 border-left-warning" data-index="${indice}">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h6 class="mb-0">
+          <i class="fas fa-band-aid text-warning mr-2"></i>
+          Antecedente Traumático #${indice + 1}
+        </h6>
+        <button type="button" class="btn btn-sm btn-outline-danger" onclick="eliminarItem(this, 'traumaticos')">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-8">
+            <div class="form-group">
+              <label class="form-control-label font-weight-bold">Descripción del trauma *</label>
+              <input type="text" class="form-control" name="traumaticos[${indice}][descripcion]" required placeholder="Tipo de trauma o lesión...">
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="form-group">
+              <label class="form-control-label font-weight-bold">Fecha del trauma *</label>
+              <input type="date" class="form-control" name="traumaticos[${indice}][fecha_inicio]" required>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group">
+              <label class="form-control-label font-weight-bold">Tratamiento recibido</label>
+              <input type="text" class="form-control" name="traumaticos[${indice}][tratamiento_recibido]" placeholder="Tratamiento inmediato...">
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label class="form-control-label font-weight-bold">Fecha de finalización</label>
+              <input type="date" class="form-control" name="traumaticos[${indice}][fecha_finalizacion]">
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group">
+              <label class="form-control-label font-weight-bold">Detalle del tratamiento</label>
+              <textarea class="form-control" name="traumaticos[${indice}][detalle_tratamiento]" rows="2" placeholder="Descripción detallada del tratamiento..."></textarea>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label class="form-control-label font-weight-bold">Complicaciones</label>
+              <textarea class="form-control" name="traumaticos[${indice}][complicaciones]" rows="2" placeholder="Complicaciones del trauma..."></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group">
+              <div class="custom-control custom-switch">
+                <input type="checkbox" class="custom-control-input" 
+                       id="activo_traum_${indice}" name="traumaticos[${indice}][activo]" value="true" checked>
+                <label class="custom-control-label" for="activo_traum_${indice}">¿Está activo?</label>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label class="form-control-label font-weight-bold">Observaciones</label>
+              <textarea class="form-control" name="traumaticos[${indice}][observaciones]" rows="2" placeholder="Observaciones adicionales..."></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+      },
+
+      gineco: function (indice) {
+        return `
+    <div class="card border-left-info">
+      <div class="card-header">
+        <h6 class="mb-0">
+          <i class="fas fa-venus text-info mr-2"></i>
+          Antecedentes Gineco-Obstétricos
+        </h6>
+      </div>
+      <div class="card-body">
+        <!-- Menarquia -->
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group">
+              <div class="custom-control custom-switch">
+                <input type="checkbox" class="custom-control-input" id="tiene_menarquia" name="gineco[tiene_menarquia]" value="true">
+                <label class="custom-control-label" for="tiene_menarquia">¿Ha tenido menarquia?</label>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label class="form-control-label font-weight-bold">Edad de menarquia</label>
+              <input type="number" class="form-control" name="gineco[edad_menarquia]" min="8" max="20" placeholder="Años">
+            </div>
+          </div>
+        </div>
+
+        <!-- Menopausia -->
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group">
+              <div class="custom-control custom-switch">
+                <input type="checkbox" class="custom-control-input" id="tiene_menopausia" name="gineco[tiene_menopausia]" value="true">
+                <label class="custom-control-label" for="tiene_menopausia">¿Ha tenido menopausia?</label>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label class="form-control-label font-weight-bold">Edad de menopausia</label>
+              <input type="number" class="form-control" name="gineco[edad_menopausia]" min="35" max="65" placeholder="Años">
+            </div>
+          </div>
+        </div>
+
+        <!-- Historia obstétrica -->
+        <div class="row">
+          <div class="col-md-4">
+            <div class="form-group">
+              <label class="form-control-label font-weight-bold">Gravidez (G)</label>
+              <input type="number" class="form-control" name="gineco[gravidez]" value="0" min="0">
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="form-group">
+              <label class="form-control-label font-weight-bold">Abortos (A)</label>
+              <input type="number" class="form-control" name="gineco[abortos]" value="0" min="0">
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="form-group">
+              <label class="form-control-label font-weight-bold">Hijos Vivos (HV)</label>
+              <input type="number" class="form-control" name="gineco[hijos_vivos]" value="0" min="0">
+            </div>
+          </div>
+        </div>
+
+        <!-- Planificación familiar -->
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group">
+              <div class="custom-control custom-switch">
+                <input type="checkbox" class="custom-control-input" id="usa_planificacion" name="gineco[usa_metodo_planificacion]" value="true">
+                <label class="custom-control-label" for="usa_planificacion">¿Usa método de planificación?</label>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label class="form-control-label font-weight-bold">Método de planificación</label>
+              <input type="text" class="form-control" name="gineco[metodo_detalle]" placeholder="Tipo de método...">
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-4">
+            <div class="form-group">
+              <label class="form-control-label font-weight-bold">Dosis</label>
+              <input type="text" class="form-control" name="gineco[dosis_planificacion]" placeholder="Dosis del método...">
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="form-group">
+              <label class="form-control-label font-weight-bold">Adherencia</label>
+              <input type="text" class="form-control" name="gineco[adherencia_planificacion]" placeholder="Nivel de adherencia...">
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="form-group">
+              <label class="form-control-label font-weight-bold">Tolerancia</label>
+              <input type="text" class="form-control" name="gineco[tolerancia_planificacion]" placeholder="Tolerancia al método...">
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-12">
+            <div class="form-group">
+              <label class="form-control-label font-weight-bold">Observaciones</label>
+              <textarea class="form-control" name="gineco[observaciones]" rows="2" placeholder="Observaciones adicionales..."></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+      },
+
+      epidemiologicos: function (indice) {
+        return `
+        <div class="card mb-3 border-left-info" data-index="${indice}">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h6 class="mb-0">
+              <i class="fas fa-virus text-info mr-2"></i>
+              Antecedente Epidemiológico #${indice + 1}
+            </h6>
+            <button type="button" class="btn btn-sm btn-outline-danger" onclick="eliminarItem(this, 'epidemiologicos')">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-8">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">Descripción *</label>
+                  <input type="text" class="form-control" name="epidemiologicos[${indice}][descripcion]" required placeholder="Descripción del antecedente epidemiológico...">
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">Fecha de inicio *</label>
+                  <input type="date" class="form-control" name="epidemiologicos[${indice}][fecha_inicio]" required>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <div class="custom-control custom-switch">
+                    <input type="checkbox" class="custom-control-input" 
+                           id="tratamiento_epi_${indice}" name="epidemiologicos[${indice}][ha_recibido_tratamiento]" value="true">
+                    <label class="custom-control-label" for="tratamiento_epi_${indice}">¿Ha recibido tratamiento?</label>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <div class="custom-control custom-switch">
+                    <input type="checkbox" class="custom-control-input" 
+                           id="complicaciones_epi_${indice}" name="epidemiologicos[${indice}][complicaciones_asociadas]" value="true">
+                    <label class="custom-control-label" for="complicaciones_epi_${indice}">¿Complicaciones asociadas?</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">Tratamiento (detallar tipo y posología)</label>
+                  <textarea class="form-control" name="epidemiologicos[${indice}][tratamiento_detalle]" rows="2" placeholder="Detalle del tratamiento recibido..."></textarea>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">Detallar complicaciones</label>
+                  <textarea class="form-control" name="epidemiologicos[${indice}][detallar_complicaciones]" rows="2" placeholder="Descripción de las complicaciones..."></textarea>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <div class="custom-control custom-switch">
+                    <input type="checkbox" class="custom-control-input" 
+                           id="activo_epi_${indice}" name="epidemiologicos[${indice}][activo_actualmente]" value="true" checked>
+                    <label class="custom-control-label" for="activo_epi_${indice}">¿Activo actualmente?</label>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">Fecha de finalización</label>
+                  <input type="date" class="form-control" name="epidemiologicos[${indice}][fecha_finalizacion]">
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-12">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">Observaciones</label>
+                  <textarea class="form-control" name="epidemiologicos[${indice}][observaciones]" rows="2" placeholder="Observaciones adicionales..."></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+      },
+
+      ets: function (indice) {
+        return `
+        <div class="card mb-3 border-left-danger" data-index="${indice}">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h6 class="mb-0">
+              <i class="fas fa-shield-virus text-danger mr-2"></i>
+              Enfermedad de Transmisión Sexual #${indice + 1}
+            </h6>
+            <button type="button" class="btn btn-sm btn-outline-danger" onclick="eliminarItem(this, 'ets')">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-8">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">Descripción *</label>
+                  <input type="text" class="form-control" name="ets[${indice}][descripcion]" required placeholder="Tipo de enfermedad de transmisión sexual...">
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">Fecha de inicio *</label>
+                  <input type="date" class="form-control" name="ets[${indice}][fecha_inicio]" required>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <div class="custom-control custom-switch">
+                    <input type="checkbox" class="custom-control-input" 
+                           id="tratamiento_ets_${indice}" name="ets[${indice}][ha_recibido_tratamiento]" value="true">
+                    <label class="custom-control-label" for="tratamiento_ets_${indice}">¿Ha recibido tratamiento?</label>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <div class="custom-control custom-switch">
+                    <input type="checkbox" class="custom-control-input" 
+                           id="complicaciones_ets_${indice}" name="ets[${indice}][complicaciones_asociadas]" value="true">
+                    <label class="custom-control-label" for="complicaciones_ets_${indice}">¿Complicaciones asociadas?</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">Tratamiento (detallar tipo y posología)</label>
+                  <textarea class="form-control" name="ets[${indice}][tratamiento_detalle]" rows="2" placeholder="Detalle del tratamiento recibido..."></textarea>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">Detallar complicaciones</label>
+                  <textarea class="form-control" name="ets[${indice}][detallar_complicaciones]" rows="2" placeholder="Descripción de las complicaciones..."></textarea>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <div class="custom-control custom-switch">
+                    <input type="checkbox" class="custom-control-input" 
+                           id="activo_ets_${indice}" name="ets[${indice}][activo_actualmente]" value="true" checked>
+                    <label class="custom-control-label" for="activo_ets_${indice}">¿Activo actualmente?</label>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">Fecha de finalización</label>
+                  <input type="date" class="form-control" name="ets[${indice}][fecha_finalizacion]">
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-12">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">Observaciones</label>
+                  <textarea class="form-control" name="ets[${indice}][observaciones]" rows="2" placeholder="Observaciones adicionales..."></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+      },
+
+      hospitalizaciones: function (indice) {
+        return `
+        <div class="card mb-3 border-left-warning" data-index="${indice}">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h6 class="mb-0">
+              <i class="fas fa-hospital text-warning mr-2"></i>
+              Hospitalización #${indice + 1}
+            </h6>
+            <button type="button" class="btn btn-sm btn-outline-danger" onclick="eliminarItem(this, 'hospitalizaciones')">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-8">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">Causa de la hospitalización *</label>
+                  <input type="text" class="form-control" name="hospitalizaciones[${indice}][causa_hospitalizacion]" required placeholder="Motivo de la hospitalización...">
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">Fecha de inicio *</label>
+                  <input type="date" class="form-control" name="hospitalizaciones[${indice}][fecha_inicio]" required>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">Duración</label>
+                  <input type="text" class="form-control" name="hospitalizaciones[${indice}][duracion]" placeholder="Ej: 5 días, 2 semanas...">
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">Hospital/Clínica</label>
+                  <input type="text" class="form-control" name="hospitalizaciones[${indice}][institucion]" placeholder="Nombre de la institución...">
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-12">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">Observaciones</label>
+                  <textarea class="form-control" name="hospitalizaciones[${indice}][observaciones]" rows="2" placeholder="Observaciones adicionales sobre la hospitalización..."></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+      },
+
+      inmunizaciones: function (indice) {
+        return `
+        <div class="card mb-3 border-left-success" data-index="${indice}">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h6 class="mb-0">
+              <i class="fas fa-syringe text-success mr-2"></i>
+              Inmunización #${indice + 1}
+            </h6>
+            <button type="button" class="btn btn-sm btn-outline-danger" onclick="eliminarItem(this, 'inmunizaciones')">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">Vacuna o inmunización *</label>
+                  <input type="text" class="form-control" name="inmunizaciones[${indice}][vacuna_inmunizacion]" required placeholder="Nombre de la vacuna...">
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">Número de dosis</label>
+                  <input type="number" class="form-control" name="inmunizaciones[${indice}][numero_dosis]" min="1" placeholder="1, 2, 3...">
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">Fecha última dosis</label>
+                  <input type="date" class="form-control" name="inmunizaciones[${indice}][fecha_ultima_dosis]">
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">Laboratorio</label>
+                  <input type="text" class="form-control" name="inmunizaciones[${indice}][laboratorio]" placeholder="Laboratorio fabricante...">
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">Lote</label>
+                  <input type="text" class="form-control" name="inmunizaciones[${indice}][lote]" placeholder="Número de lote...">
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-12">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">Observaciones</label>
+                  <textarea class="form-control" name="inmunizaciones[${indice}][observaciones]" rows="2" placeholder="Reacciones adversas, observaciones..."></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+      },
+
+      transfusionales: function (indice) {
+        return `
+        <div class="card mb-3 border-left-primary" data-index="${indice}">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h6 class="mb-0">
+              <i class="fas fa-tint text-primary mr-2"></i>
+              Transfusión #${indice + 1}
+            </h6>
+            <button type="button" class="btn btn-sm btn-outline-danger" onclick="eliminarItem(this, 'transfusionales')">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">Motivo de la transfusión *</label>
+                  <input type="text" class="form-control" name="transfusionales[${indice}][motivo_transfusion]" required placeholder="Razón médica para la transfusión...">
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">Número de unidades</label>
+                  <input type="number" class="form-control" name="transfusionales[${indice}][numero_unidades]" min="1" placeholder="1, 2, 3...">
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">Fecha última transfusión</label>
+                  <input type="date" class="form-control" name="transfusionales[${indice}][fecha_ultima_transfusion]">
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">Tipo de componente</label>
+                  <select class="form-control" name="transfusionales[${indice}][tipo_componente]">
+                    <option value="">Seleccione...</option>
+                    <option value="globulos_rojos">Glóbulos Rojos</option>
+                    <option value="plaquetas">Plaquetas</option>
+                    <option value="plasma">Plasma</option>
+                    <option value="sangre_total">Sangre Total</option>
+                    <option value="otros">Otros</option>
+                  </select>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">Institución</label>
+                  <input type="text" class="form-control" name="transfusionales[${indice}][institucion]" placeholder="Hospital/Clínica donde se realizó...">
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <div class="custom-control custom-switch">
+                    <input type="checkbox" class="custom-control-input" 
+                           id="reacciones_trans_${indice}" name="transfusionales[${indice}][tuvo_reacciones]" value="true">
+                    <label class="custom-control-label" for="reacciones_trans_${indice}">¿Tuvo reacciones adversas?</label>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">Detalle de reacciones</label>
+                  <textarea class="form-control" name="transfusionales[${indice}][detalle_reacciones]" rows="2" placeholder="Descripción de reacciones adversas..."></textarea>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-12">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">Observaciones</label>
+                  <textarea class="form-control" name="transfusionales[${indice}][observaciones]" rows="2" placeholder="Observaciones adicionales..."></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+      },
+    };
+
+    // Función para agregar nuevos antecedentes
+    window.agregarAntecedente = function (tipo) {
+      console.log("Agregando antecedente:", tipo); // DEBUG
+      const contenedor = document.getElementById(`contenedor-${tipo}`);
+      const emptyAlert = document.getElementById(`empty-${tipo}`);
+      const indice = contadores[tipo];
+
+      // Ocultar mensaje de vacío
+      if (emptyAlert) {
+        emptyAlert.style.display = "none";
+      }
+
+      // Crear nuevo elemento
+      const nuevoElemento = document.createElement("div");
+      nuevoElemento.innerHTML = plantillas[tipo](indice);
+      contenedor.appendChild(nuevoElemento.firstElementChild);
+
+      // Incrementar contador
+      contadores[tipo]++;
+      actualizarContador(tipo);
+    };
+
+    // Función para eliminar elementos
+    window.eliminarItem = function (boton, tipo) {
+      const item = boton.closest(".card");
+      item.remove();
+
+      // Renumerar elementos restantes
+      renumerarElementos(tipo);
+      actualizarContador(tipo);
+    };
+
+    // Función para renumerar elementos CORREGIDA
+    function renumerarElementos(tipo) {
+      const elementos = document.querySelectorAll(
+        `#contenedor-${tipo} .card[data-index]`
+      );
+      contadores[tipo] = elementos.length; // Actualizar contador real
+
+      elementos.forEach((elemento, indice) => {
+        const titulo = elemento.querySelector(".card-header h6");
+        const inputs = elemento.querySelectorAll("input, select, textarea");
+
+        // Actualizar título
+        if (titulo) {
+          titulo.innerHTML = titulo.innerHTML.replace(/#\d+/, `#${indice + 1}`);
+        }
+
+        // Actualizar atributos name e id
+        inputs.forEach((input) => {
+          if (input.name) {
+            input.name = input.name.replace(/\[\d+\]/, `[${indice}]`);
+          }
+          if (input.id) {
+            input.id = input.id.replace(/_\d+/, `_${indice}`);
+          }
+        });
+
+        // Actualizar labels
+        const labels = elemento.querySelectorAll("label[for]");
+        labels.forEach((label) => {
+          if (label.getAttribute("for")) {
+            label.setAttribute(
+              "for",
+              label.getAttribute("for").replace(/_\d+/, `_${indice}`)
+            );
+          }
+        });
+
+        // Actualizar data-index
+        elemento.setAttribute("data-index", indice);
+      });
+
+      // Mostrar mensaje vacío si no hay elementos
+      if (elementos.length === 0) {
+        const emptyAlert = document.getElementById(`empty-${tipo}`);
+        if (emptyAlert) {
+          emptyAlert.style.display = "block";
+        }
+      }
+    }
+
+    // Función para actualizar contadores en las pestañas
+    function actualizarContador(tipo) {
+      const badge = document.getElementById(`count-${tipo}`);
+      if (badge) {
+        badge.textContent = contadores[tipo];
+        badge.className =
+          contadores[tipo] > 0
+            ? "badge badge-primary ml-2"
+            : "badge badge-light ml-2";
+      }
+    }
+
+    // FUNCIÓN CORREGIDA: Recopilar datos de un tipo específico
+    function recopilarDatosTipo(tipo) {
+      console.log("🔍 Recopilando datos para:", tipo); // DEBUG
+      const contenedor = document.getElementById(`contenedor-${tipo}`);
+      if (!contenedor) {
+        console.log("❌ No se encontró contenedor para:", tipo);
+        return [];
+      }
+
+      const elementos = contenedor.querySelectorAll(".card[data-index]");
+      console.log(`📋 Elementos encontrados para ${tipo}:`, elementos.length); // DEBUG
+      const datos = [];
+
+      elementos.forEach((elemento, indiceReal) => {
+        const item = {};
+        const inputs = elemento.querySelectorAll("input, select, textarea");
+        console.log(
+          `🔧 Procesando elemento ${indiceReal} con ${inputs.length} inputs`
+        ); // DEBUG
+
+        inputs.forEach((input) => {
+          if (input.name && input.name.includes(`${tipo}[`)) {
+            // Usar regex más flexible para extraer el campo
+            const match = input.name.match(/\[([^\]]+)\]$/);
+            if (match) {
+              const fieldName = match[1];
+
+              if (input.type === "checkbox") {
+                if (fieldName === "tipos_toxico") {
+                  // Manejar checkboxes múltiples para tóxicos
+                  if (!item[fieldName]) item[fieldName] = [];
+                  if (input.checked) {
+                    item[fieldName].push(input.value);
+                  }
+                } else {
+                  item[fieldName] = input.checked;
+                }
+              } else if (input.type === "number") {
+                item[fieldName] = input.value ? parseInt(input.value) : null;
+              } else {
+                item[fieldName] = input.value || "";
+              }
+
+              console.log(`📝 Campo ${fieldName}:`, item[fieldName]); // DEBUG
+            }
+          }
+        });
+
+        // Solo agregar si tiene datos relevantes
+        if (Object.keys(item).length > 0) {
+          datos.push(item);
+          console.log(`✅ Item ${indiceReal} agregado:`, item); // DEBUG
+        }
+      });
+
+      console.log(`🎯 Datos finales para ${tipo}:`, datos); // DEBUG
+      return datos;
+    }
+
+    // Función específica para gineco-obstétricos
+    function recopilarDatosGineco() {
+      console.log("🔍 Recopilando datos gineco-obstétricos"); // DEBUG
+      const contenedor = document.getElementById("contenedor-gineco");
+      if (!contenedor) {
+        console.log("❌ No se encontró contenedor gineco");
+        return {};
+      }
+
+      const inputs = contenedor.querySelectorAll("input, select, textarea");
+      const datos = {};
+
+      inputs.forEach((input) => {
+        if (input.name && input.name.startsWith("gineco[")) {
+          const fieldName = input.name.match(/gineco\[([^\]]+)\]/)?.[1];
+          if (fieldName) {
+            if (input.type === "checkbox") {
+              datos[fieldName] = input.checked;
+            } else if (input.type === "number") {
+              datos[fieldName] = input.value ? parseInt(input.value) : null;
+            } else {
+              datos[fieldName] = input.value || "";
+            }
+            console.log(`📝 Gineco campo ${fieldName}:`, datos[fieldName]); // DEBUG
+          }
+        }
+      });
+
+      console.log("🎯 Datos gineco finales:", datos); // DEBUG
+      return datos;
+    }
+
+    // INTERCEPTAR EL ENVÍO DEL FORMULARIO
+    const form = document.getElementById("formAntecedentes");
+    if (form) {
+      form.addEventListener("submit", function (e) {
+        console.log("🚀 Formulario enviándose..."); // DEBUG
+
+        // Recopilar datos de todos los tipos de antecedentes
+        const tiposAntecedentes = [
+          "patologicos",
+          "quirurgicos",
+          "farmacologicos",
+          "toxicos",
+          "familiares",
+          "alergicos",
+          "traumaticos",
+          "epidemiologicos",
+          "ets",
+          "hospitalizaciones",
+          "inmunizaciones",
+          "transfusionales",
+        ];
+
+        tiposAntecedentes.forEach((tipo) => {
+          const datos = recopilarDatosTipo(tipo);
+          if (datos.length > 0) {
+            console.log(`✅ Creando campo oculto para ${tipo} con:`, datos); // DEBUG
+            // Crear input hidden con los datos JSON
+            const hiddenInput = document.createElement("input");
+            hiddenInput.type = "hidden";
+            hiddenInput.name = `${tipo}_data`;
+            hiddenInput.value = JSON.stringify(datos);
+            this.appendChild(hiddenInput);
+          } else {
+            console.log(`⚠️ No hay datos para ${tipo}`); // DEBUG
+          }
+        });
+
+        // Manejar gineco-obstétricos por separado
+        const ginecoData = recopilarDatosGineco();
+        if (Object.keys(ginecoData).length > 0) {
+          console.log("✅ Creando campo oculto para gineco con:", ginecoData); // DEBUG
+          const hiddenInput = document.createElement("input");
+          hiddenInput.type = "hidden";
+          hiddenInput.name = "gineco_data";
+          hiddenInput.value = JSON.stringify(ginecoData);
+          this.appendChild(hiddenInput);
+        }
+
+        console.log("🎯 Datos preparados, enviando formulario..."); // DEBUG
+      });
+    } else {
+      console.error("❌ No se encontró el formulario #formAntecedentes");
+    }
+
+    // Control del checkbox principal
+    const checkboxAntecedentes = document.getElementById("tiene_antecedentes");
+    if (checkboxAntecedentes) {
+      checkboxAntecedentes.addEventListener("change", function () {
+        const tabsContainer =
+          document.getElementById("antecedentesTabs").parentElement;
+        if (this.checked) {
+          tabsContainer.style.display = "block";
         } else {
-          options.style.display = 'none';
+          tabsContainer.style.display = "none";
         }
       });
     }
 
-    // Llamar a la función para cada sección de antecedentes
-    toggleOptions('antecedente_fami', 'contenido_familiar');
-    toggleOptions('antecedente_gineco', 'contenido_gineco');
-    toggleOptions('antecedente_patologico', 'contenido_patologico');
-    toggleOptions('antecedente_quirurgico', 'contenido_quirurgico');
-    toggleOptions('antecedente_farmacologico', 'contenido_farmacologico');
-    toggleOptions('antecedente_traumatico', 'contenido_traumatico');
-    toggleOptions('antecedente_alergico', 'contenido_alergico');
-    toggleOptions('antecedente_toxico', 'contenido_toxico');
-    toggleOptions('antecedente_epidemiologico', 'contenido_epidemiologico');
-    toggleOptions('antecedente_inmunizacion', 'contenido_inmunizacion');
-    toggleOptions('antecedente_transfusional', 'contenido_transfusional');
-    toggleOptions('antecedente_hospitalizacion', 'contenido_hospitalizacion');
+    // Otras funciones (mantener igual)
+    window.limpiarFormulario = function () {
+      if (
+        confirm("¿Está seguro de que desea limpiar todos los antecedentes?")
+      ) {
+        Object.keys(contadores).forEach((tipo) => {
+          const contenedor = document.getElementById(`contenedor-${tipo}`);
+          const elementos = contenedor.querySelectorAll(".card[data-index]");
+          elementos.forEach((elemento) => elemento.remove());
+          contadores[tipo] = 0;
+          actualizarContador(tipo);
 
-    // Repite para cada sección de antecedentes
+          const emptyAlert = document.getElementById(`empty-${tipo}`);
+          if (emptyAlert) emptyAlert.style.display = "block";
+        });
+
+        const observaciones = document.querySelector(
+          'textarea[name="observaciones_generales"]'
+        );
+        if (observaciones) observaciones.value = "";
+
+        if (checkboxAntecedentes) checkboxAntecedentes.checked = false;
+      }
+    };
+
+    window.validarFormulario = function () {
+      alert("Función de validación - implementar según necesidades");
+    };
   });
 </script>
+
 {% endblock content %}

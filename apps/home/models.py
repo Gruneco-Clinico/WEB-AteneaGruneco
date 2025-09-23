@@ -313,9 +313,6 @@ class VisitaExamen(models.Model):
         """Retorna la instancia del resultado específico del examen si existe."""
         if not hasattr(self, "_resultado_cache"):
             self._resultado_cache = None
-            print(
-                f"DEBUG get_resultado_instance - Buscando resultado para VisitaExamen ID: {self.id}"
-            )
 
             # Lista de related_names que Django generará automáticamente
             possible_related_names = [
@@ -359,46 +356,27 @@ class VisitaExamen(models.Model):
 
             for related_name in possible_related_names:
                 try:
-                    print(f"DEBUG - Probando: {related_name}")
-                    resultado = getattr(self, related_name)
-                    self._resultado_cache = resultado
-                    print(
-                        f"DEBUG - ¡ENCONTRADO! {related_name}: {type(resultado).__name__}"
-                    )
                     break
                 except AttributeError:
-                    print(f"DEBUG - No existe atributo: {related_name}")
                     continue
                 except Exception as e:
-                    print(f"DEBUG - Error en {related_name}: {str(e)}")
                     continue
-
-            if self._resultado_cache is None:
-                print(
-                    f"DEBUG - NINGÚN resultado encontrado para VisitaExamen {self.id}"
-                )
 
         return self._resultado_cache
 
     @property
     def esta_realizado(self):
         """Verifica si el examen está completado y tiene un resultado concreto asociado."""
-        print(f"DEBUG esta_realizado - ID: {self.id}, Estado: {self.estado}")
 
         estado_completado = self.estado == "completado"
-        print(f"DEBUG esta_realizado - Estado completado: {estado_completado}")
 
         resultado = self.get_resultado_instance()
         tiene_resultado = resultado is not None
-        print(f"DEBUG esta_realizado - Tiene resultado: {tiene_resultado}")
 
         if resultado:
-            print(
-                f"DEBUG esta_realizado - Tipo de resultado: {type(resultado).__name__}"
-            )
+            pass
 
         final_result = estado_completado and tiene_resultado
-        print(f"DEBUG esta_realizado - Resultado final: {final_result}")
 
         return final_result
 
@@ -1124,16 +1102,22 @@ class CuidadorNPIResult(ResultadoExamenBase):
     puntaje_total = models.IntegerField(blank=True, null=True, default=0)
     carga_total = models.IntegerField(blank=True, null=True, default=0)
 
-
-
     def calcular_puntaje_total(self):
         items_fg = [
-            self.ideas_delirantes_F_G, self.alucinaciones_F_G, self.agitacion_F_G,
-            self.depresion_F_G, self.ansiedad_F_G, self.euforia_F_G,
-            self.apatia_F_G, self.desinhibicion_F_G, self.irritabilidad_F_G,
-            self.conducta_motor_F_G, self.sueno_F_G, self.apetito_F_G,
+            self.ideas_delirantes_F_G,
+            self.alucinaciones_F_G,
+            self.agitacion_F_G,
+            self.depresion_F_G,
+            self.ansiedad_F_G,
+            self.euforia_F_G,
+            self.apatia_F_G,
+            self.desinhibicion_F_G,
+            self.irritabilidad_F_G,
+            self.conducta_motor_F_G,
+            self.sueno_F_G,
+            self.apetito_F_G,
         ]
-        
+
         return sum(int(x) for x in items_fg if x not in (None, ""))
 
     def save(self, *args, **kwargs):
@@ -1833,13 +1817,11 @@ class AnamnesisParticipanteResult(ResultadoExamenBase):
 
     def __str__(self):
         return f"Anamnesis Participante - {self.visita_examen_id}"
-    
+
 
 class SeguimientoIntervencionesResult(models.Model):
     visita_examen = models.ForeignKey(
-        "VisitaExamen",
-        on_delete=models.CASCADE,
-        related_name="intervenciones"
+        "VisitaExamen", on_delete=models.CASCADE, related_name="intervenciones"
     )
     numero_sesion = models.IntegerField()  # 1–24
     nombre_sesion = models.CharField(max_length=200, blank=True, null=True)
@@ -1851,7 +1833,9 @@ class SeguimientoIntervencionesResult(models.Model):
         ("Sí", "Sí"),
         ("No", "No"),
     ]
-    asistencia = models.CharField(max_length=2, choices=ASISTENCIA_CHOICES, blank=True, null=True)
+    asistencia = models.CharField(
+        max_length=2, choices=ASISTENCIA_CHOICES, blank=True, null=True
+    )
 
     participacion = models.IntegerField(blank=True, null=True)  # escala 1–5
 
@@ -1862,7 +1846,9 @@ class SeguimientoIntervencionesResult(models.Model):
         ("Ansioso", "Ansioso"),
         ("Otro", "Otro"),
     ]
-    estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, blank=True, null=True)
+    estado = models.CharField(
+        max_length=20, choices=ESTADO_CHOICES, blank=True, null=True
+    )
 
     tematica = models.CharField(max_length=200, blank=True, null=True)
     observaciones = models.TextField(blank=True, null=True)
@@ -1879,6 +1865,7 @@ class SeguimientoIntervencionesResult(models.Model):
 
 #### INTEGRACIÓN RECUÉRDAME
 
+
 class InteractionMetric(models.Model):
     event = models.CharField(max_length=255)
     distinct_id = models.CharField(max_length=255)
@@ -1889,13 +1876,6 @@ class InteractionMetric(models.Model):
 
     def __str__(self):
         return f"{self.event} - {self.timestamp}"
-    
-
-
-
-
-
-    
 
 
 # examenes generales
@@ -2412,8 +2392,27 @@ class ExamenFisicoResult(ResultadoExamenBase):
         return f"Examen Físico - {self.visita_examen.visita.paciente} - {estado}"
 
 
-class AntecedentesResult(ResultadoExamenBase):
-    """Modelo principal para Antecedentes Médicos"""
+class AntecedentesResult(models.Model):  # CAMBIO: Ya no hereda de ResultadoExamenBase
+    """Modelo principal para Antecedentes Médicos - ÚNICO POR PACIENTE"""
+
+    # NUEVO: Relación directa con el paciente (único)
+    paciente = models.OneToOneField(
+        DatosDemograficos,
+        on_delete=models.CASCADE,
+        related_name="antecedentes_medicos",
+        verbose_name="Paciente",
+        null=True,
+        blank=True,
+    )
+
+    # MANTENER: Referencia a la visita actual para tracking
+    ultima_visita_examen = models.ForeignKey(
+        "VisitaExamen",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name="Última Visita de Actualización",
+    )
 
     # Campos de control general
     tiene_antecedentes = models.BooleanField(
@@ -2423,6 +2422,12 @@ class AntecedentesResult(ResultadoExamenBase):
     observaciones_generales = models.TextField(
         blank=True, null=True, verbose_name="Observaciones Generales"
     )
+
+    # NUEVOS: Campos de auditoría
+    fecha_creacion = models.DateTimeField(auto_now_add=True, null=True)
+    fecha_actualizacion = models.DateTimeField(auto_now=True)
+    creado_por = models.CharField(max_length=100, blank=True, null=True)
+    actualizado_por = models.CharField(max_length=100, blank=True, null=True)
 
     def get_resumen_antecedentes(self):
         """Resumen de todos los antecedentes del paciente"""
@@ -2444,18 +2449,85 @@ class AntecedentesResult(ResultadoExamenBase):
         resumen["traumaticos"] = self.antecedentes_traumaticos.filter(
             activo=True
         ).count()
-        resumen["gineco"] = self.antecedentes_gineco.count()
+        resumen["gineco"] = (
+            self.antecedentes_gineco.count()
+            if hasattr(self, "antecedentes_gineco")
+            else 0
+        )
+
+        # Nuevos antecedentes
+        resumen["epidemiologicos"] = self.antecedentes_epidemiologicos.filter(
+            activo_actualmente=True
+        ).count()
+        resumen["ets"] = self.antecedentes_ets.filter(curado=False).count()
+        resumen["hospitalizaciones"] = self.antecedentes_hospitalizaciones.count()
+        resumen["inmunizaciones"] = self.antecedentes_inmunizaciones.count()
+        resumen["transfusionales"] = self.antecedentes_transfusionales.count()
 
         return resumen
 
+    @classmethod
+    def get_or_create_for_patient(cls, paciente, visita_examen=None, usuario=None):
+        """
+        Obtiene o crea el registro de antecedentes para un paciente específico
+        """
+        antecedentes, created = cls.objects.get_or_create(
+            paciente=paciente,
+            defaults={
+                "ultima_visita_examen": visita_examen,
+                "creado_por": usuario.username if usuario else None,
+                "actualizado_por": usuario.username if usuario else None,
+            },
+        )
+
+        # Si ya existe, actualizar la referencia de la última visita
+        if not created and visita_examen:
+            antecedentes.ultima_visita_examen = visita_examen
+            antecedentes.actualizado_por = usuario.username if usuario else None
+            antecedentes.save()
+
+        return antecedentes, created
+
     class Meta:
-        verbose_name = "Resultado Antecedentes Médicos"
-        verbose_name_plural = "Resultados Antecedentes Médicos"
+        verbose_name = "Antecedentes Médicos del Paciente"
+        verbose_name_plural = "Antecedentes Médicos de Pacientes"
 
     def __str__(self):
         resumen = self.get_resumen_antecedentes()
         total = sum(resumen.values())
-        return f"Antecedentes - {self.visita_examen.visita.paciente} - {total} antecedentes registrados"
+        return f"Antecedentes - {self.paciente} - {total} registros - Últ. actualización: {self.fecha_actualizacion.strftime('%d/%m/%Y')}"
+
+
+class AntecedentesVisitaLink(models.Model):
+    """
+    Modelo puente que conecta el examen de antecedentes con cada visita
+    para mantener el tracking de cuándo se revisa/actualiza
+    """
+
+    visita_examen = models.OneToOneField(
+        "VisitaExamen", on_delete=models.CASCADE, related_name="antecedentes_link"
+    )
+
+    antecedentes_result = models.ForeignKey(
+        AntecedentesResult, on_delete=models.CASCADE, related_name="visitas_links"
+    )
+
+    # Estado específico para esta visita
+    fue_revisado = models.BooleanField(default=False)
+    fue_actualizado = models.BooleanField(default=False)
+    notas_visita = models.TextField(
+        blank=True, null=True, verbose_name="Notas específicas de esta visita"
+    )
+
+    fecha_revision = models.DateTimeField(auto_now=True)
+    revisado_por = models.CharField(max_length=100, blank=True, null=True)
+
+    class Meta:
+        verbose_name = "Enlace Antecedentes-Visita"
+        verbose_name_plural = "Enlaces Antecedentes-Visitas"
+
+    def __str__(self):
+        return f"Antecedentes {self.antecedentes_result.paciente} - Visita {self.visita_examen.visita.nombre}"
 
 
 class AntecedentePatologico(models.Model):
@@ -2819,6 +2891,234 @@ class AntecedenteGinecoObstetrico(models.Model):
     def __str__(self):
         formula = self.get_formula_obstetrica()
         return f"Gineco-Obstétrico - {formula}"
+
+
+class AntecedenteEpidemiologico(models.Model):
+    """Antecedentes Epidemiológicos"""
+
+    antecedente_result = models.ForeignKey(
+        AntecedentesResult,
+        on_delete=models.CASCADE,
+        related_name="antecedentes_epidemiologicos",
+    )
+    tipo_antecedente = models.CharField(
+        max_length=200, verbose_name="Tipo de Antecedente Epidemiológico"
+    )
+    fecha_inicio = models.DateField(verbose_name="Fecha de Inicio")
+    tratamiento_detalle = models.TextField(
+        blank=True, null=True, verbose_name="Detalle del Tratamiento"
+    )
+    complicaciones_asociadas = models.BooleanField(
+        default=False, verbose_name="¿Complicaciones asociadas?"
+    )
+    detallar_complicaciones = models.TextField(
+        blank=True, null=True, verbose_name="Detalle de Complicaciones"
+    )
+    activo_actualmente = models.BooleanField(
+        default=True, verbose_name="¿Activo actualmente?"
+    )
+    fecha_finalizacion = models.DateField(
+        blank=True, null=True, verbose_name="Fecha de Finalización"
+    )
+    observaciones = models.TextField(
+        blank=True, null=True, verbose_name="Observaciones"
+    )
+
+    class Meta:
+        verbose_name = "Antecedente Epidemiológico"
+        verbose_name_plural = "Antecedentes Epidemiológicos"
+
+    def __str__(self):
+        return f"{self.tipo_antecedente} - {self.fecha_inicio}"
+
+
+class AntecedenteETS(models.Model):
+    """Antecedentes de Enfermedades de Transmisión Sexual"""
+
+    antecedente_result = models.ForeignKey(
+        AntecedentesResult,
+        on_delete=models.CASCADE,
+        related_name="antecedentes_ets",
+    )
+    tipo_ets = models.CharField(max_length=200, verbose_name="Tipo de ETS")
+    fecha_diagnostico = models.DateField(verbose_name="Fecha de Diagnóstico")
+    tratamiento_recibido = models.BooleanField(
+        default=False, verbose_name="¿Ha recibido tratamiento?"
+    )
+    detalle_tratamiento = models.TextField(
+        blank=True, null=True, verbose_name="Detalle del Tratamiento"
+    )
+    complicaciones = models.BooleanField(
+        default=False, verbose_name="¿Tuvo complicaciones?"
+    )
+    detalle_complicaciones = models.TextField(
+        blank=True, null=True, verbose_name="Detalle de Complicaciones"
+    )
+    curado = models.BooleanField(default=False, verbose_name="¿Está curado?")
+    fecha_curacion = models.DateField(
+        blank=True, null=True, verbose_name="Fecha de Curación"
+    )
+    observaciones = models.TextField(
+        blank=True, null=True, verbose_name="Observaciones"
+    )
+
+    class Meta:
+        verbose_name = "Antecedente ETS"
+        verbose_name_plural = "Antecedentes ETS"
+
+    def __str__(self):
+        return f"{self.tipo_ets} - {self.fecha_diagnostico}"
+
+
+class AntecedenteHospitalizacion(models.Model):
+    """Antecedentes de Hospitalizaciones"""
+
+    antecedente_result = models.ForeignKey(
+        AntecedentesResult,
+        on_delete=models.CASCADE,
+        related_name="antecedentes_hospitalizaciones",
+    )
+    motivo_hospitalizacion = models.CharField(
+        max_length=300, verbose_name="Motivo de Hospitalización"
+    )
+    fecha_ingreso = models.DateField(verbose_name="Fecha de Ingreso")
+    fecha_egreso = models.DateField(
+        blank=True, null=True, verbose_name="Fecha de Egreso"
+    )
+    institucion = models.CharField(max_length=200, verbose_name="Institución/Hospital")
+    dias_hospitalizacion = models.IntegerField(
+        blank=True, null=True, verbose_name="Días de Hospitalización"
+    )
+    complicaciones_durante = models.BooleanField(
+        default=False, verbose_name="¿Complicaciones durante la hospitalización?"
+    )
+    detalle_complicaciones = models.TextField(
+        blank=True, null=True, verbose_name="Detalle de Complicaciones"
+    )
+    secuelas = models.BooleanField(default=False, verbose_name="¿Quedaron secuelas?")
+    detalle_secuelas = models.TextField(
+        blank=True, null=True, verbose_name="Detalle de Secuelas"
+    )
+    observaciones = models.TextField(
+        blank=True, null=True, verbose_name="Observaciones"
+    )
+
+    class Meta:
+        verbose_name = "Antecedente de Hospitalización"
+        verbose_name_plural = "Antecedentes de Hospitalizaciones"
+
+    def __str__(self):
+        return f"{self.motivo_hospitalizacion} - {self.fecha_ingreso}"
+
+
+class AntecedenteInmunizacion(models.Model):
+    """Antecedentes de Inmunizaciones/Vacunas"""
+
+    TIPO_VACUNA_CHOICES = [
+        ("covid19", "COVID-19"),
+        ("influenza", "Influenza"),
+        ("hepatitis_b", "Hepatitis B"),
+        ("tetanos", "Tétanos"),
+        ("fiebre_amarilla", "Fiebre Amarilla"),
+        ("neumococo", "Neumococo"),
+        ("otras", "Otras"),
+    ]
+
+    antecedente_result = models.ForeignKey(
+        AntecedentesResult,
+        on_delete=models.CASCADE,
+        related_name="antecedentes_inmunizaciones",
+    )
+    tipo_vacuna = models.CharField(
+        max_length=50, choices=TIPO_VACUNA_CHOICES, verbose_name="Tipo de Vacuna"
+    )
+    nombre_vacuna = models.CharField(
+        max_length=200,
+        blank=True,
+        null=True,
+        verbose_name="Nombre Específico de la Vacuna",
+    )
+    fecha_aplicacion = models.DateField(verbose_name="Fecha de Aplicación")
+    dosis_numero = models.IntegerField(default=1, verbose_name="Número de Dosis")
+    lugar_aplicacion = models.CharField(
+        max_length=200, blank=True, null=True, verbose_name="Lugar de Aplicación"
+    )
+    reacciones_adversas = models.BooleanField(
+        default=False, verbose_name="¿Tuvo reacciones adversas?"
+    )
+    detalle_reacciones = models.TextField(
+        blank=True, null=True, verbose_name="Detalle de Reacciones Adversas"
+    )
+    refuerzo_programado = models.BooleanField(
+        default=False, verbose_name="¿Necesita refuerzo?"
+    )
+    fecha_proximo_refuerzo = models.DateField(
+        blank=True, null=True, verbose_name="Fecha Próximo Refuerzo"
+    )
+    observaciones = models.TextField(
+        blank=True, null=True, verbose_name="Observaciones"
+    )
+
+    class Meta:
+        verbose_name = "Antecedente de Inmunización"
+        verbose_name_plural = "Antecedentes de Inmunizaciones"
+
+    def __str__(self):
+        return f"{self.get_tipo_vacuna_display()} - Dosis {self.dosis_numero} - {self.fecha_aplicacion}"
+
+
+class AntecedenteTransfusional(models.Model):
+    """Antecedentes Transfusionales"""
+
+    TIPO_COMPONENTE_CHOICES = [
+        ("sangre_total", "Sangre Total"),
+        ("globulos_rojos", "Glóbulos Rojos"),
+        ("plaquetas", "Plaquetas"),
+        ("plasma", "Plasma"),
+        ("albumina", "Albúmina"),
+        ("crioprecipitados", "Crioprecipitados"),
+        ("otros", "Otros"),
+    ]
+
+    antecedente_result = models.ForeignKey(
+        AntecedentesResult,
+        on_delete=models.CASCADE,
+        related_name="antecedentes_transfusionales",
+    )
+    tipo_componente = models.CharField(
+        max_length=50,
+        choices=TIPO_COMPONENTE_CHOICES,
+        verbose_name="Tipo de Componente Transfundido",
+    )
+    fecha_transfusion = models.DateField(verbose_name="Fecha de Transfusión")
+    motivo_transfusion = models.CharField(
+        max_length=300, verbose_name="Motivo de la Transfusión"
+    )
+    cantidad_unidades = models.IntegerField(
+        default=1, verbose_name="Cantidad de Unidades"
+    )
+    institucion = models.CharField(
+        max_length=200, verbose_name="Institución donde se realizó"
+    )
+    tuvo_reacciones = models.BooleanField(
+        default=False, verbose_name="¿Tuvo reacciones adversas?"
+    )
+    detalle_reacciones = models.TextField(
+        blank=True, null=True, verbose_name="Detalle de Reacciones"
+    )
+    grupo_sanguineo_confirmado = models.CharField(
+        max_length=10, blank=True, null=True, verbose_name="Grupo Sanguíneo Confirmado"
+    )
+    observaciones = models.TextField(
+        blank=True, null=True, verbose_name="Observaciones"
+    )
+
+    class Meta:
+        verbose_name = "Antecedente Transfusional"
+        verbose_name_plural = "Antecedentes Transfusionales"
+
+    def __str__(self):
+        return f"{self.get_tipo_componente_display()} - {self.fecha_transfusion}"
 
 
 class ExamenNeurologicoResult(ResultadoExamenBase):
@@ -3693,5 +3993,3 @@ class DetalleRevisionSistemas(models.Model):
 
     def __str__(self):
         return f"{self.sistema}: {self.sintoma}"
-    
-
