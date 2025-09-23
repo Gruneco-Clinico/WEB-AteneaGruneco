@@ -169,6 +169,21 @@
   textarea.form-control {
     min-height: 120px;
   }
+
+  .btn-remove {
+    background-color: #f5365c;
+    border-color: #f5365c;
+    color: white;
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    margin-top: 0.5rem;
+  }
+
+  .btn-remove:hover {
+    background-color: #ec0c38;
+    border-color: #ec0c38;
+    color: white;
+  }
 </style>
 
 <div class="header bg-primary pb-6 page-header">
@@ -177,7 +192,8 @@
       <div class="row align-items-center py-4">
         <div class="col-lg-6 col-5">
           <h6 class="h2 text-white d-inline-block mb-0">
-            Información del Paciente
+            {% if modo_edicion %} Editar Análisis y Diagnóstico {% else %}
+            Análisis y Diagnóstico {% endif %}
           </h6>
           <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
             <ol
@@ -245,7 +261,9 @@
                     name="analisis_historia"
                     rows="4"
                     placeholder="Ingrese un análisis detallado de la historia clínica"
-                  ></textarea>
+                  >
+{% if datos_examen.analisis_historia %}{{ datos_examen.analisis_historia }}{% endif %}</textarea
+                  >
                 </div>
               </div>
               <div class="col-md-12">
@@ -256,7 +274,9 @@
                     name="plan_tratamiento"
                     rows="4"
                     placeholder="Describa el plan de tratamiento propuesto"
-                  ></textarea>
+                  >
+{% if datos_examen.plan_tratamiento %}{{ datos_examen.plan_tratamiento }}{% endif %}</textarea
+                  >
                 </div>
               </div>
             </div>
@@ -269,6 +289,119 @@
                 <div class="form-group">
                   <div class="diagnostico-header">Diagnósticos CIE-10</div>
                   <div id="diagnosticos-cie10">
+                    {% if modo_edicion and datos_examen.diagnosticos_cie10 %}
+                    {%for diagnostico in datos_examen.diagnosticos_cie10 %}
+                    <div class="diagnostico-cie10 diagnostico-container mb-3">
+                      <div class="row">
+                        <div class="col-md-4">
+                          <div class="form-group mb-2">
+                            <label class="form-control-label"
+                              >Código CIE-10</label
+                            >
+                            <input
+                              type="text"
+                              class="form-control"
+                              name="cie10_codigo[]"
+                              placeholder="Ej. F32.9"
+                              value="{{ diagnostico.codigo }}"
+                            />
+                          </div>
+                        </div>
+                        <div class="col-md-4">
+                          <div class="form-group mb-2">
+                            <label class="form-control-label"
+                              >Diagnóstico</label
+                            >
+                            <input
+                              type="text"
+                              class="form-control"
+                              name="cie10_diagnostico[]"
+                              placeholder="Descripción del diagnóstico"
+                              value="{{ diagnostico.diagnostico }}"
+                            />
+                          </div>
+                        </div>
+                        <div class="col-md-3">
+                          <label class="form-control-label">Estado</label>
+                          <div
+                            class="checkbox-custom custom-control custom-checkbox"
+                          >
+                            <input
+                              type="checkbox"
+                              class="custom-control-input"
+                              name="cie10_estado_{{ forloop.counter }}"
+                              value="confirmado_nuevo"
+                              id="cie10-confirmado-nuevo-{{ forloop.counter }}"
+                              {%
+                              if
+                              diagnostico.confirmado_nuevo
+                              %}checked{%
+                              endif
+                              %}
+                            />
+                            <label
+                              class="custom-control-label"
+                              for="cie10-confirmado-nuevo-{{ forloop.counter }}"
+                              >Confirmado Nuevo</label
+                            >
+                          </div>
+                          <div
+                            class="checkbox-custom custom-control custom-checkbox"
+                          >
+                            <input
+                              type="checkbox"
+                              class="custom-control-input"
+                              name="cie10_estado_{{ forloop.counter }}"
+                              value="confirmado_antiguo"
+                              id="cie10-confirmado-antiguo-{{ forloop.counter }}"
+                              {%
+                              if
+                              diagnostico.confirmado_antiguo
+                              %}checked{%
+                              endif
+                              %}
+                            />
+                            <label
+                              class="custom-control-label"
+                              for="cie10-confirmado-antiguo-{{ forloop.counter }}"
+                              >Confirmado Antiguo</label
+                            >
+                          </div>
+                          <div
+                            class="checkbox-custom custom-control custom-checkbox"
+                          >
+                            <input
+                              type="checkbox"
+                              class="custom-control-input"
+                              name="cie10_estado_{{ forloop.counter }}"
+                              value="en_estudio"
+                              id="cie10-en-estudio-{{ forloop.counter }}"
+                              {%
+                              if
+                              diagnostico.en_estudio
+                              %}checked{%
+                              endif
+                              %}
+                            />
+                            <label
+                              class="custom-control-label"
+                              for="cie10-en-estudio-{{ forloop.counter }}"
+                              >En Estudio</label
+                            >
+                          </div>
+                        </div>
+                        <div class="col-md-1">
+                          <button
+                            type="button"
+                            class="btn btn-remove remove-diagnostico"
+                            onclick="removerDiagnostico(this)"
+                          >
+                            <i class="fas fa-trash"></i>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                    {% endfor %} {% else %}
                     <div class="diagnostico-cie10 diagnostico-container mb-3">
                       <div class="row">
                         <div class="col-md-4">
@@ -350,6 +483,7 @@
                         </div>
                       </div>
                     </div>
+                    {% endif %}
                   </div>
                   <button
                     type="button"
@@ -370,6 +504,119 @@
                 <div class="form-group">
                   <div class="diagnostico-header">Diagnósticos DSM-V</div>
                   <div id="diagnosticos-dsmv">
+                    {% if modo_edicion and datos_examen.diagnosticos_dsmv %}
+                    {%for diagnostico in datos_examen.diagnosticos_dsmv %}
+                    <div class="diagnostico-dsmv diagnostico-container mb-3">
+                      <div class="row">
+                        <div class="col-md-4">
+                          <div class="form-group mb-2">
+                            <label class="form-control-label"
+                              >Código DSM-V</label
+                            >
+                            <input
+                              type="text"
+                              class="form-control"
+                              name="dsmv_codigo[]"
+                              placeholder="Ej. 296.2x"
+                              value="{{ diagnostico.codigo }}"
+                            />
+                          </div>
+                        </div>
+                        <div class="col-md-4">
+                          <div class="form-group mb-2">
+                            <label class="form-control-label"
+                              >Diagnóstico</label
+                            >
+                            <input
+                              type="text"
+                              class="form-control"
+                              name="dsmv_diagnostico[]"
+                              placeholder="Descripción del diagnóstico"
+                              value="{{ diagnostico.diagnostico }}"
+                            />
+                          </div>
+                        </div>
+                        <div class="col-md-3">
+                          <label class="form-control-label">Estado</label>
+                          <div
+                            class="checkbox-custom custom-control custom-checkbox"
+                          >
+                            <input
+                              type="checkbox"
+                              class="custom-control-input"
+                              name="dsmv_estado_{{ forloop.counter }}"
+                              value="confirmado_nuevo"
+                              id="dsmv-confirmado-nuevo-{{ forloop.counter }}"
+                              {%
+                              if
+                              diagnostico.confirmado_nuevo
+                              %}checked{%
+                              endif
+                              %}
+                            />
+                            <label
+                              class="custom-control-label"
+                              for="dsmv-confirmado-nuevo-{{ forloop.counter }}"
+                              >Confirmado Nuevo</label
+                            >
+                          </div>
+                          <div
+                            class="checkbox-custom custom-control custom-checkbox"
+                          >
+                            <input
+                              type="checkbox"
+                              class="custom-control-input"
+                              name="dsmv_estado_{{ forloop.counter }}"
+                              value="confirmado_antiguo"
+                              id="dsmv-confirmado-antiguo-{{ forloop.counter }}"
+                              {%
+                              if
+                              diagnostico.confirmado_antiguo
+                              %}checked{%
+                              endif
+                              %}
+                            />
+                            <label
+                              class="custom-control-label"
+                              for="dsmv-confirmado-antiguo-{{ forloop.counter }}"
+                              >Confirmado Antiguo</label
+                            >
+                          </div>
+                          <div
+                            class="checkbox-custom custom-control custom-checkbox"
+                          >
+                            <input
+                              type="checkbox"
+                              class="custom-control-input"
+                              name="dsmv_estado_{{ forloop.counter }}"
+                              value="en_estudio"
+                              id="dsmv-en-estudio-{{ forloop.counter }}"
+                              {%
+                              if
+                              diagnostico.en_estudio
+                              %}checked{%
+                              endif
+                              %}
+                            />
+                            <label
+                              class="custom-control-label"
+                              for="dsmv-en-estudio-{{ forloop.counter }}"
+                              >En Estudio</label
+                            >
+                          </div>
+                        </div>
+                        <div class="col-md-1">
+                          <button
+                            type="button"
+                            class="btn btn-remove remove-diagnostico"
+                            onclick="removerDiagnostico(this)"
+                          >
+                            <i class="fas fa-trash"></i>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                    {% endfor %} {% else %}
                     <div class="diagnostico-dsmv diagnostico-container mb-3">
                       <div class="row">
                         <div class="col-md-4">
@@ -451,6 +698,7 @@
                         </div>
                       </div>
                     </div>
+                    {% endif %}
                   </div>
                   <button
                     type="button"
@@ -471,6 +719,119 @@
                 <div class="form-group">
                   <div class="diagnostico-header">Diagnósticos ICSD-3</div>
                   <div id="diagnosticos-icsd3">
+                    {% if modo_edicion and datos_examen.diagnosticos_icsd3 %}
+                    {%for diagnostico in datos_examen.diagnosticos_icsd3 %}
+                    <div class="diagnostico-icsd3 diagnostico-container mb-3">
+                      <div class="row">
+                        <div class="col-md-4">
+                          <div class="form-group mb-2">
+                            <label class="form-control-label"
+                              >Código ICSD-3</label
+                            >
+                            <input
+                              type="text"
+                              class="form-control"
+                              name="icsd3_codigo[]"
+                              placeholder="Ej. G47.00"
+                              value="{{ diagnostico.codigo }}"
+                            />
+                          </div>
+                        </div>
+                        <div class="col-md-4">
+                          <div class="form-group mb-2">
+                            <label class="form-control-label"
+                              >Diagnóstico</label
+                            >
+                            <input
+                              type="text"
+                              class="form-control"
+                              name="icsd3_diagnostico[]"
+                              placeholder="Descripción del diagnóstico"
+                              value="{{ diagnostico.diagnostico }}"
+                            />
+                          </div>
+                        </div>
+                        <div class="col-md-3">
+                          <label class="form-control-label">Estado</label>
+                          <div
+                            class="checkbox-custom custom-control custom-checkbox"
+                          >
+                            <input
+                              type="checkbox"
+                              class="custom-control-input"
+                              name="icsd3_estado_{{ forloop.counter }}"
+                              value="confirmado_nuevo"
+                              id="icsd3-confirmado-nuevo-{{ forloop.counter }}"
+                              {%
+                              if
+                              diagnostico.confirmado_nuevo
+                              %}checked{%
+                              endif
+                              %}
+                            />
+                            <label
+                              class="custom-control-label"
+                              for="icsd3-confirmado-nuevo-{{ forloop.counter }}"
+                              >Confirmado Nuevo</label
+                            >
+                          </div>
+                          <div
+                            class="checkbox-custom custom-control custom-checkbox"
+                          >
+                            <input
+                              type="checkbox"
+                              class="custom-control-input"
+                              name="icsd3_estado_{{ forloop.counter }}"
+                              value="confirmado_antiguo"
+                              id="icsd3-confirmado-antiguo-{{ forloop.counter }}"
+                              {%
+                              if
+                              diagnostico.confirmado_antiguo
+                              %}checked{%
+                              endif
+                              %}
+                            />
+                            <label
+                              class="custom-control-label"
+                              for="icsd3-confirmado-antiguo-{{ forloop.counter }}"
+                              >Confirmado Antiguo</label
+                            >
+                          </div>
+                          <div
+                            class="checkbox-custom custom-control custom-checkbox"
+                          >
+                            <input
+                              type="checkbox"
+                              class="custom-control-input"
+                              name="icsd3_estado_{{ forloop.counter }}"
+                              value="en_estudio"
+                              id="icsd3-en-estudio-{{ forloop.counter }}"
+                              {%
+                              if
+                              diagnostico.en_estudio
+                              %}checked{%
+                              endif
+                              %}
+                            />
+                            <label
+                              class="custom-control-label"
+                              for="icsd3-en-estudio-{{ forloop.counter }}"
+                              >En Estudio</label
+                            >
+                          </div>
+                        </div>
+                        <div class="col-md-1">
+                          <button
+                            type="button"
+                            class="btn btn-remove remove-diagnostico"
+                            onclick="removerDiagnostico(this)"
+                          >
+                            <i class="fas fa-trash"></i>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                    {% endfor %} {% else %}
                     <div class="diagnostico-icsd3 diagnostico-container mb-3">
                       <div class="row">
                         <div class="col-md-4">
@@ -552,6 +913,7 @@
                         </div>
                       </div>
                     </div>
+                    {% endif %}
                   </div>
                   <button
                     type="button"
@@ -565,138 +927,223 @@
             </div>
 
             <div class="section-divider"></div>
-
             <!-- Diagnósticos No Clasificados -->
-            <div class="row">
-              <div class="col-md-12">
-                <div class="form-group">
-                  <div class="diagnostico-header">
-                    Diagnósticos No Clasificados
+            <!-- Diagnósticos No Clasificados -->
+<div class="row">
+  <div class="col-md-12">
+    <div class="form-group">
+      <div class="diagnostico-header">Diagnósticos No Clasificados</div>
+      <div id="diagnosticos-noclasi">
+        {% if modo_edicion and datos_examen.diagnosticos_no_clasificados %}
+          {% for diagnostico in datos_examen.diagnosticos_no_clasificados %}
+            <div class="diagnostico-noclasi diagnostico-container mb-3">
+              <div class="row">
+                <div class="col-md-7">
+                  <div class="form-group mb-2">
+                    <label class="form-control-label">Diagnóstico</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      name="noclasi_diagnostico[]"
+                      placeholder="Descripción del diagnóstico no clasificado"
+                      value="{{ diagnostico.diagnostico }}"
+                    />
                   </div>
-                  <div id="diagnosticos-noclasi">
-                    <div class="diagnostico-noclasi diagnostico-container mb-3">
-                      <div class="row">
-                        <div class="col-md-8">
-                          <div class="form-group mb-2">
-                            <label class="form-control-label"
-                              >Diagnóstico</label
+                </div>
+                <div class="col-md-4">
+                  <label class="form-control-label">Estado</label>
+                  <div class="checkbox-custom custom-control custom-checkbox">
+                    <input
+                      type="checkbox"
+                      class="custom-control-input"
+                      name="noclasi_estado_{{ forloop.counter }}"
+                      value="confirmado_nuevo"
+                      id="noclasi-confirmado-nuevo-{{ forloop.counter }}"
+                      {% if diagnostico.confirmado_nuevo %}checked{% endif %}
+                    />
+                    <label
+                      class="custom-control-label"
+                      for="noclasi-confirmado-nuevo-{{ forloop.counter }}"
+                      >Confirmado Nuevo</label
+                    >
+                  </div>
+                  <div class="checkbox-custom custom-control custom-checkbox">
+                    <input
+                      type="checkbox"
+                      class="custom-control-input"
+                      name="noclasi_estado_{{ forloop.counter }}"
+                      value="confirmado_antiguo"
+                      id="noclasi-confirmado-antiguo-{{ forloop.counter }}"
+                      {% if diagnostico.confirmado_antiguo %}checked{% endif %}
+                    />
+                    <label
+                      class="custom-control-label"
+                      for="noclasi-confirmado-antiguo-{{ forloop.counter }}"
+                      >Confirmado Antiguo</label
+                    >
+                  </div>
+                  <div class="checkbox-custom custom-control custom-checkbox">
+                    <input
+                      type="checkbox"
+                      class="custom-control-input"
+                      name="noclasi_estado_{{ forloop.counter }}"
+                      value="en_estudio"
+                      id="noclasi-en-estudio-{{ forloop.counter }}"
+                      {% if diagnostico.en_estudio %}checked{% endif %}
+                    />
+                    <label
+                      class="custom-control-label"
+                      for="noclasi-en-estudio-{{ forloop.counter }}"
+                      >En Estudio</label
+                    >
+                  </div>
+                </div>
+                <div class="col-md-1">
+                  <button
+                    type="button"
+                    class="btn btn-remove remove-diagnostico"
+                    onclick="removerDiagnostico(this)"
+                  >
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <div class="diagnostico-noclasi diagnostico-container mb-3">
+            <div class="row">
+              <div class="col-md-7">
+                <div class="form-group mb-2">
+                  <label class="form-control-label">Diagnóstico</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    name="noclasi_diagnostico[]"
+                    placeholder="Descripción del diagnóstico no clasificado"
+                  />
+                </div>
+              </div>
+              <div class="col-md-5">
+                <label class="form-control-label">Estado</label>
+                <div class="checkbox-custom custom-control custom-checkbox">
+                  <input
+                    type="checkbox"
+                    class="custom-control-input"
+                    name="noclasi_estado[]"
+                    value="confirmado_nuevo"
+                    id="noclasi-confirmado-nuevo-1"
+                  />
+                  <label
+                    class="custom-control-label"
+                    for="noclasi-confirmado-nuevo-1"
+                    >Confirmado Nuevo</label
+                  >
+                </div>
+                <div class="checkbox-custom custom-control custom-checkbox">
+                  <input
+                    type="checkbox"
+                    class="custom-control-input"
+                    name="noclasi_estado[]"
+                    value="confirmado_antiguo"
+                    id="noclasi-confirmado-antiguo-1"
+                  />
+                  <label
+                    class="custom-control-label"
+                    for="noclasi-confirmado-antiguo-1"
+                    >Confirmado Antiguo</label
+                  >
+                </div>
+                <div class="checkbox-custom custom-control custom-checkbox">
+                  <input
+                    type="checkbox"
+                    class="custom-control-input"
+                    name="noclasi_estado[]"
+                    value="en_estudio"
+                    id="noclasi-en-estudio-1"
+                  />
+                  <label
+                    class="custom-control-label"
+                    for="noclasi-en-estudio-1"
+                    >En Estudio</label
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+      <button
+        type="button"
+        id="agregar-diagnostico-noclasi"
+        class="btn btn-primary add-button"
+      >
+        <i class="fas fa-plus mr-1"></i> Agregar Diagnóstico No Clasificado
+      </button>
+    </div>
+  </div>
+</div>
+          </div>
+          </div>
+                        <div class="section-divider"></div>
+
+                        <!-- Botón de guardado -->
+                        <div class="row">
+                          <div class="col-md-12 text-right">
+                            <button type="submit" class="btn btn-save">
+                              <i class="fas fa-save mr-1"></i>
+                              {% if modo_edicion %}Actualizar{% else %}Guardar{% endif %}
+                              Examen
+                            </button>
+                            <a
+                              href="{% url 'detalle_paciente' paciente_id %}"
+                              class="btn btn-view"
                             >
-                            <input
-                              type="text"
-                              class="form-control"
-                              name="noclasi_diagnostico[]"
-                              placeholder="Descripción del diagnóstico no clasificado"
-                            />
-                          </div>
-                        </div>
-                        <div class="col-md-4">
-                          <label class="form-control-label">Estado</label>
-                          <div
-                            class="checkbox-custom custom-control custom-checkbox"
-                          >
-                            <input
-                              type="checkbox"
-                              class="custom-control-input"
-                              name="noclasi_estado[]"
-                              value="confirmado_nuevo"
-                              id="noclasi-confirmado-nuevo-1"
-                            />
-                            <label
-                              class="custom-control-label"
-                              for="noclasi-confirmado-nuevo-1"
-                              >Confirmado Nuevo</label
-                            >
-                          </div>
-                          <div
-                            class="checkbox-custom custom-control custom-checkbox"
-                          >
-                            <input
-                              type="checkbox"
-                              class="custom-control-input"
-                              name="noclasi_estado[]"
-                              value="confirmado_antiguo"
-                              id="noclasi-confirmado-antiguo-1"
-                            />
-                            <label
-                              class="custom-control-label"
-                              for="noclasi-confirmado-antiguo-1"
-                              >Confirmado Antiguo</label
-                            >
-                          </div>
-                          <div
-                            class="checkbox-custom custom-control custom-checkbox"
-                          >
-                            <input
-                              type="checkbox"
-                              class="custom-control-input"
-                              name="noclasi_estado[]"
-                              value="en_estudio"
-                              id="noclasi-en-estudio-1"
-                            />
-                            <label
-                              class="custom-control-label"
-                              for="noclasi-en-estudio-1"
-                              >En Estudio</label
-                            >
+                              <i class="fas fa-user mr-1"></i> Ver Paciente
+                            </a>
                           </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                  <button
-                    type="button"
-                    id="agregar-diagnostico-noclasi"
-                    class="btn btn-primary add-button"
-                  >
-                    <i class="fas fa-plus mr-1"></i> Agregar Diagnóstico No
-                    Clasificado
-                  </button>
                 </div>
-              </div>
+              </form>
             </div>
-            <div class="section-divider"></div>
-
-            <!-- Botón de guardado -->
-            <div class="row">
-              <div class="col-md-12 text-right">
-                <button type="submit" class="btn btn-save">
-                  <i class="fas fa-save mr-1"></i> Guardar Examen
-                </button>
-                <a
-                  href="{% url 'detalle_paciente' paciente_id %}"
-                  class="btn btn-view"
-                >
-                  <i class="fas fa-user mr-1"></i> Ver Paciente
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </form>
-</div>
 
 <!-- Script para agregar dinámicamente más diagnósticos -->
 <script>
   document.addEventListener("DOMContentLoaded", function () {
     const agregarCIE10 = document.getElementById("agregar-diagnostico-cie10");
     const agregarDSMV = document.getElementById("agregar-diagnostico-dsmv");
-    const containerCIE10 = document.getElementById("diagnosticos-cie10");
-    const containerDSMV = document.getElementById("diagnosticos-dsmv");
     const agregarICSD3 = document.getElementById("agregar-diagnostico-icsd3");
     const agregarNoClasi = document.getElementById(
       "agregar-diagnostico-noclasi"
     );
+
+    const containerCIE10 = document.getElementById("diagnosticos-cie10");
+    const containerDSMV = document.getElementById("diagnosticos-dsmv");
     const containerICSD3 = document.getElementById("diagnosticos-icsd3");
     const containerNoClasi = document.getElementById("diagnosticos-noclasi");
 
-    let contadorICSD3 = 1;
-    let contadorNoClasi = 1;
+    // Contar diagnósticos existentes para IDs únicos
+    let contadorCIE10 = document.querySelectorAll(".diagnostico-cie10").length;
+    let contadorDSMV = document.querySelectorAll(".diagnostico-dsmv").length;
+    let contadorICSD3 = document.querySelectorAll(".diagnostico-icsd3").length;
+    let contadorNoClasi = document.querySelectorAll(
+      ".diagnostico-noclasi"
+    ).length;
 
-    let contadorCIE10 = 1;
-    let contadorDSMV = 1;
+    // Función para remover diagnóstico
+    window.removerDiagnostico = function (button) {
+      const diagnosticoContainer = button.closest(
+        ".diagnostico-cie10, .diagnostico-dsmv, .diagnostico-icsd3, .diagnostico-noclasi"
+      );
+      if (diagnosticoContainer) {
+        diagnosticoContainer.remove();
+      }
+    };
 
+    // Agregar CIE-10
     agregarCIE10.addEventListener("click", function () {
       contadorCIE10++;
       const nuevodiagnostico = document.createElement("div");
@@ -719,7 +1166,7 @@
               <input type="text" class="form-control" name="cie10_diagnostico[]" placeholder="Descripción del diagnóstico">
             </div>
           </div>
-          <div class="col-md-4">
+          <div class="col-md-3">
             <label class="form-control-label">Estado</label>
             <div class="checkbox-custom custom-control custom-checkbox">
               <input type="checkbox" class="custom-control-input" name="cie10_estado[]" value="confirmado_nuevo" id="cie10-confirmado-nuevo-${contadorCIE10}">
@@ -734,11 +1181,17 @@
               <label class="custom-control-label" for="cie10-en-estudio-${contadorCIE10}">En Estudio</label>
             </div>
           </div>
+          <div class="col-md-1">
+            <button type="button" class="btn btn-remove remove-diagnostico" onclick="removerDiagnostico(this)">
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
         </div>
       `;
       containerCIE10.appendChild(nuevodiagnostico);
     });
 
+    // Agregar DSM-V
     agregarDSMV.addEventListener("click", function () {
       contadorDSMV++;
       const nuevodiagnostico = document.createElement("div");
@@ -761,7 +1214,7 @@
               <input type="text" class="form-control" name="dsmv_diagnostico[]" placeholder="Descripción del diagnóstico">
             </div>
           </div>
-          <div class="col-md-4">
+          <div class="col-md-3">
             <label class="form-control-label">Estado</label>
             <div class="checkbox-custom custom-control custom-checkbox">
               <input type="checkbox" class="custom-control-input" name="dsmv_estado[]" value="confirmado_nuevo" id="dsmv-confirmado-nuevo-${contadorDSMV}">
@@ -776,12 +1229,17 @@
               <label class="custom-control-label" for="dsmv-en-estudio-${contadorDSMV}">En Estudio</label>
             </div>
           </div>
+          <div class="col-md-1">
+            <button type="button" class="btn btn-remove remove-diagnostico" onclick="removerDiagnostico(this)">
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
         </div>
       `;
       containerDSMV.appendChild(nuevodiagnostico);
     });
 
-    // Agregar estos nuevos listeners al final de tu script
+    // Agregar ICSD-3
     agregarICSD3.addEventListener("click", function () {
       contadorICSD3++;
       const nuevodiagnostico = document.createElement("div");
@@ -791,39 +1249,45 @@
         "mb-3"
       );
       nuevodiagnostico.innerHTML = `
-    <div class="row">
-      <div class="col-md-4">
-        <div class="form-group mb-2">
-          <label class="form-control-label">Código ICSD-3</label>
-          <input type="text" class="form-control" name="icsd3_codigo[]" placeholder="Ej. G47.00">
+        <div class="row">
+          <div class="col-md-4">
+            <div class="form-group mb-2">
+              <label class="form-control-label">Código ICSD-3</label>
+              <input type="text" class="form-control" name="icsd3_codigo[]" placeholder="Ej. G47.00">
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="form-group mb-2">
+              <label class="form-control-label">Diagnóstico</label>
+              <input type="text" class="form-control" name="icsd3_diagnostico[]" placeholder="Descripción del diagnóstico">
+            </div>
+          </div>
+          <div class="col-md-3">
+            <label class="form-control-label">Estado</label>
+            <div class="checkbox-custom custom-control custom-checkbox">
+              <input type="checkbox" class="custom-control-input" name="icsd3_estado[]" value="confirmado_nuevo" id="icsd3-confirmado-nuevo-${contadorICSD3}">
+              <label class="custom-control-label" for="icsd3-confirmado-nuevo-${contadorICSD3}">Confirmado Nuevo</label>
+            </div>
+            <div class="checkbox-custom custom-control custom-checkbox">
+              <input type="checkbox" class="custom-control-input" name="icsd3_estado[]" value="confirmado_antiguo" id="icsd3-confirmado-antiguo-${contadorICSD3}">
+              <label class="custom-control-label" for="icsd3-confirmado-antiguo-${contadorICSD3}">Confirmado Antiguo</label>
+            </div>
+            <div class="checkbox-custom custom-control custom-checkbox">
+              <input type="checkbox" class="custom-control-input" name="icsd3_estado[]" value="en_estudio" id="icsd3-en-estudio-${contadorICSD3}">
+              <label class="custom-control-label" for="icsd3-en-estudio-${contadorICSD3}">En Estudio</label>
+            </div>
+          </div>
+          <div class="col-md-1">
+            <button type="button" class="btn btn-remove remove-diagnostico" onclick="removerDiagnostico(this)">
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
         </div>
-      </div>
-      <div class="col-md-4">
-        <div class="form-group mb-2">
-          <label class="form-control-label">Diagnóstico</label>
-          <input type="text" class="form-control" name="icsd3_diagnostico[]" placeholder="Descripción del diagnóstico">
-        </div>
-      </div>
-      <div class="col-md-4">
-        <label class="form-control-label">Estado</label>
-        <div class="checkbox-custom custom-control custom-checkbox">
-          <input type="checkbox" class="custom-control-input" name="icsd3_estado[]" value="confirmado_nuevo" id="icsd3-confirmado-nuevo-${contadorICSD3}">
-          <label class="custom-control-label" for="icsd3-confirmado-nuevo-${contadorICSD3}">Confirmado Nuevo</label>
-        </div>
-        <div class="checkbox-custom custom-control custom-checkbox">
-          <input type="checkbox" class="custom-control-input" name="icsd3_estado[]" value="confirmado_antiguo" id="icsd3-confirmado-antiguo-${contadorICSD3}">
-          <label class="custom-control-label" for="icsd3-confirmado-antiguo-${contadorICSD3}">Confirmado Antiguo</label>
-        </div>
-        <div class="checkbox-custom custom-control custom-checkbox">
-          <input type="checkbox" class="custom-control-input" name="icsd3_estado[]" value="en_estudio" id="icsd3-en-estudio-${contadorICSD3}">
-          <label class="custom-control-label" for="icsd3-en-estudio-${contadorICSD3}">En Estudio</label>
-        </div>
-      </div>
-    </div>
-  `;
+      `;
       containerICSD3.appendChild(nuevodiagnostico);
     });
 
+    // Agregar No Clasificado
     agregarNoClasi.addEventListener("click", function () {
       contadorNoClasi++;
       const nuevodiagnostico = document.createElement("div");
@@ -833,30 +1297,35 @@
         "mb-3"
       );
       nuevodiagnostico.innerHTML = `
-    <div class="row">
-      <div class="col-md-8">
-        <div class="form-group mb-2">
-          <label class="form-control-label">Diagnóstico</label>
-          <input type="text" class="form-control" name="noclasi_diagnostico[]" placeholder="Descripción del diagnóstico no clasificado">
+        <div class="row">
+          <div class="col-md-7">
+            <div class="form-group mb-2">
+              <label class="form-control-label">Diagnóstico</label>
+              <input type="text" class="form-control" name="noclasi_diagnostico[]" placeholder="Descripción del diagnóstico no clasificado">
+            </div>
+          </div>
+          <div class="col-md-4">
+            <label class="form-control-label">Estado</label>
+            <div class="checkbox-custom custom-control custom-checkbox">
+              <input type="checkbox" class="custom-control-input" name="noclasi_estado[]" value="confirmado_nuevo" id="noclasi-confirmado-nuevo-${contadorNoClasi}">
+              <label class="custom-control-label" for="noclasi-confirmado-nuevo-${contadorNoClasi}">Confirmado Nuevo</label>
+            </div>
+            <div class="checkbox-custom custom-control custom-checkbox">
+              <input type="checkbox" class="custom-control-input" name="noclasi_estado[]" value="confirmado_antiguo" id="noclasi-confirmado-antiguo-${contadorNoClasi}">
+              <label class="custom-control-label" for="noclasi-confirmado-antiguo-${contadorNoClasi}">Confirmado Antiguo</label>
+            </div>
+            <div class="checkbox-custom custom-control custom-checkbox">
+              <input type="checkbox" class="custom-control-input" name="noclasi_estado[]" value="en_estudio" id="noclasi-en-estudio-${contadorNoClasi}">
+              <label class="custom-control-label" for="noclasi-en-estudio-${contadorNoClasi}">En Estudio</label>
+            </div>
+          </div>
+          <div class="col-md-1">
+            <button type="button" class="btn btn-remove remove-diagnostico" onclick="removerDiagnostico(this)">
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
         </div>
-      </div>
-      <div class="col-md-4">
-        <label class="form-control-label">Estado</label>
-        <div class="checkbox-custom custom-control custom-checkbox">
-          <input type="checkbox" class="custom-control-input" name="noclasi_estado[]" value="confirmado_nuevo" id="noclasi-confirmado-nuevo-${contadorNoClasi}">
-          <label class="custom-control-label" for="noclasi-confirmado-nuevo-${contadorNoClasi}">Confirmado Nuevo</label>
-        </div>
-        <div class="checkbox-custom custom-control custom-checkbox">
-          <input type="checkbox" class="custom-control-input" name="noclasi_estado[]" value="confirmado_antiguo" id="noclasi-confirmado-antiguo-${contadorNoClasi}">
-          <label class="custom-control-label" for="noclasi-confirmado-antiguo-${contadorNoClasi}">Confirmado Antiguo</label>
-        </div>
-        <div class="checkbox-custom custom-control custom-checkbox">
-          <input type="checkbox" class="custom-control-input" name="noclasi_estado[]" value="en_estudio" id="noclasi-en-estudio-${contadorNoClasi}">
-          <label class="custom-control-label" for="noclasi-en-estudio-${contadorNoClasi}">En Estudio</label>
-        </div>
-      </div>
-    </div>
-  `;
+      `;
       containerNoClasi.appendChild(nuevodiagnostico);
     });
   });

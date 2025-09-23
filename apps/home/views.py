@@ -12,11 +12,14 @@ from django.shortcuts import redirect
 from django.contrib import messages
 from django.utils import timezone
 from django.http import JsonResponse
-from .posthog_service import get_posthog_events, get_insight_data #Integración RecuérdaMe
-import requests #Integración RecuérdaMe
-from django.conf import settings #Integración RecuérdaMe
-from django.http import JsonResponse, HttpResponseServerError #Integración RecuérdaMe
-from .models import InteractionMetric #Integración RecuérdaMe
+from .posthog_service import (
+    get_posthog_events,
+    get_insight_data,
+)  # Integración RecuérdaMe
+import requests  # Integración RecuérdaMe
+from django.conf import settings  # Integración RecuérdaMe
+from django.http import JsonResponse, HttpResponseServerError  # Integración RecuérdaMe
+from .models import InteractionMetric  # Integración RecuérdaMe
 from datetime import datetime, date
 from .models import (
     DatosDemograficos,
@@ -158,6 +161,7 @@ def index(request):
     html_template = loader.get_template("home/index.html")
     return HttpResponse(html_template.render(context, request))
 
+
 @login_required(login_url="/login/")
 @user_passes_test(is_superuser, login_url="/login/")
 def atenea_estadisticas(request):
@@ -242,27 +246,30 @@ def atenea_estadisticas(request):
                 (61, 200, "60+ años"),  # límite alto grande
             ]
 
-            for (min_age, max_age, label_rango) in rangos:
+            for min_age, max_age, label_rango in rangos:
                 count = unique_patients.filter(
                     edad__gte=min_age, edad__lte=max_age
                 ).count()
-                clinical_stats.append({
-                    "rango": label_rango,
-                    "count": count,
-                })
+                clinical_stats.append(
+                    {
+                        "rango": label_rango,
+                        "count": count,
+                    }
+                )
 
-        proyectos_info.append({
-            "term": term,
-            "label": label,
-            "participants": participantes_count,
-            "exams_completed": exams_completed,
-            "clinical_stats": clinical_stats,
-            "demografia": genero_stats + escolaridad_stats,
-        })
+        proyectos_info.append(
+            {
+                "term": term,
+                "label": label,
+                "participants": participantes_count,
+                "exams_completed": exams_completed,
+                "clinical_stats": clinical_stats,
+                "demografia": genero_stats + escolaridad_stats,
+            }
+        )
 
     context["proyectos_info"] = proyectos_info
     return render(request, "home/statistics_atenea.html", context)
-
 
 
 # pacientes
@@ -836,8 +843,9 @@ def realizar_examen(request, visita_id, examen_id, paciente_id):
         17: {"template": "examenes_sueno/sueno_Berlín.html", "model": BerlinResult},
         18: {"template": "examenes_sueno/sueno_atenas.html", "model": AtenasResult},
         19: {"template": "examenes_sueno/sueno_ISI.html", "model": ISIResult},
-        21: {"template": "examenes_anosognosia/Anosognosia_Participante_EuroQoL.html",
-             "model": EuroQol5D5LResult,
+        21: {
+            "template": "examenes_anosognosia/Anosognosia_Participante_EuroQoL.html",
+            "model": EuroQol5D5LResult,
         },
         22: {
             "template": "examenes_anosognosia/Anosognosia_Participante_EVA_EuroQoL.html",
@@ -1022,6 +1030,71 @@ def realizar_examen(request, visita_id, examen_id, paciente_id):
                     datos_examen["tipos_queja"] = list(
                         anamnesis.tipos_queja_detalle.values(
                             "nombre", "inicio", "evolucion", "frecuencia", "gravedad"
+                        )
+                    )
+
+                    modo_edicion = True
+
+                # ===================================================
+                # CASO ESPECIAL: ANÁLISIS GENERAL (ID 7)
+                # ===================================================
+                elif int(examen_id) == 7 and isinstance(
+                    resultado, AnalisisGeneralResult
+                ):
+                    # Obtener datos básicos del modelo principal
+                    datos_examen = model_to_dict(resultado)
+                    datos_examen.pop("id", None)
+                    datos_examen.pop("visita_examen", None)
+
+                    # Obtener relaciones hijas con prefetch para optimización
+                    analisis = AnalisisGeneralResult.objects.prefetch_related(
+                        "diagnosticos_cie10",
+                        "diagnosticos_dsmv",
+                        "diagnosticos_icsd3",
+                        "diagnosticos_no_clasificados",
+                    ).get(id=resultado.id)
+
+                    # Agregar las relaciones al diccionario de datos
+                    datos_examen["diagnosticos_cie10"] = list(
+                        analisis.diagnosticos_cie10.values(
+                            "codigo",
+                            "diagnostico",
+                            "confirmado_nuevo",
+                            "confirmado_antiguo",
+                            "en_estudio",
+                            "orden",
+                        )
+                    )
+
+                    datos_examen["diagnosticos_dsmv"] = list(
+                        analisis.diagnosticos_dsmv.values(
+                            "codigo",
+                            "diagnostico",
+                            "confirmado_nuevo",
+                            "confirmado_antiguo",
+                            "en_estudio",
+                            "orden",
+                        )
+                    )
+
+                    datos_examen["diagnosticos_icsd3"] = list(
+                        analisis.diagnosticos_icsd3.values(
+                            "codigo",
+                            "diagnostico",
+                            "confirmado_nuevo",
+                            "confirmado_antiguo",
+                            "en_estudio",
+                            "orden",
+                        )
+                    )
+
+                    datos_examen["diagnosticos_no_clasificados"] = list(
+                        analisis.diagnosticos_no_clasificados.values(
+                            "diagnostico",
+                            "confirmado_nuevo",
+                            "confirmado_antiguo",
+                            "en_estudio",
+                            "orden",
                         )
                     )
 
@@ -2691,12 +2764,13 @@ def guardar_examen_Cuidador_NPI(request):
                 # dist = request.POST.get(f"{item}_distres") or request.POST.get(f"{item}_distres_texto")
                 # fg = request.POST.get(f"{item}_resultado") or 0
 
-
                 # data[f"{item}_frecuencia"] = frec
                 # data[f"{item}_gravedad"] = grav
                 # data[f"{item}_F_G"] = fg
                 # data[f"{item}_distres"] = dist
-                data[f"{item}_frecuencia"] = request.POST.get(f"{item}_frecuencia_texto")
+                data[f"{item}_frecuencia"] = request.POST.get(
+                    f"{item}_frecuencia_texto"
+                )
                 data[f"{item}_gravedad"] = request.POST.get(f"{item}_gravedad_texto")
                 data[f"{item}_F_G"] = request.POST.get(f"{item}_resultado")
                 data[f"{item}_distres"] = request.POST.get(f"{item}_distres_texto")
@@ -3929,6 +4003,7 @@ def guardar_examen_Cuidador_Zarit(request):
         messages.error(request, "❌ Método no permitido.")
         return redirect("index")
 
+
 @login_required
 def guardar_intervenciones(request):
     if request.method == "POST":
@@ -3983,14 +4058,19 @@ def guardar_intervenciones(request):
             visita_examen.save()
 
             if created:
-                messages.success(request, f"✅ Sesión {numero_sesion} guardada exitosamente.")
+                messages.success(
+                    request, f"✅ Sesión {numero_sesion} guardada exitosamente."
+                )
             else:
-                messages.success(request, f"✅ Sesión {numero_sesion} actualizada exitosamente.")
+                messages.success(
+                    request, f"✅ Sesión {numero_sesion} actualizada exitosamente."
+                )
 
             return redirect("detalle_paciente", paciente_id=paciente_id)
 
         except Exception as e:
             import traceback
+
             traceback.print_exc()
 
             # Revertir estado si falla
@@ -4008,6 +4088,7 @@ def guardar_intervenciones(request):
         messages.error(request, "❌ Método no permitido.")
         return redirect("index")
 
+
 @login_required
 def obtener_datos_sesion(request, visita_id, examen_id, num_sesion):
     visita_examen = get_object_or_404(
@@ -4020,7 +4101,9 @@ def obtener_datos_sesion(request, visita_id, examen_id, num_sesion):
         data = {
             "nombre": sesion.nombre_sesion,
             "fecha": sesion.fecha.strftime("%Y-%m-%d") if sesion.fecha else "",
-            "hora_inicio": sesion.hora_inicio.strftime("%H:%M") if sesion.hora_inicio else "",
+            "hora_inicio": sesion.hora_inicio.strftime("%H:%M")
+            if sesion.hora_inicio
+            else "",
             "hora_fin": sesion.hora_fin.strftime("%H:%M") if sesion.hora_fin else "",
             "asistencia": sesion.asistencia,
             "participacion": sesion.participacion,
@@ -4032,6 +4115,7 @@ def obtener_datos_sesion(request, visita_id, examen_id, num_sesion):
         data = {}
 
     return JsonResponse(data)
+
 
 @login_required
 def resumen_sesiones(request, visita_id, examen_id):
@@ -4055,12 +4139,12 @@ def resumen_sesiones(request, visita_id, examen_id):
     participaciones = [s.participacion for s in sesiones if s.participacion]
     promedio_participacion = (
         round(sum(map(int, participaciones)) / len(participaciones), 2)
-        if participaciones else 0
+        if participaciones
+        else 0
     )
 
     tendencia_participacion = [
-        int(s.participacion) if s.participacion else None
-        for s in sesiones
+        int(s.participacion) if s.participacion else None for s in sesiones
     ]
 
     alerta = None
@@ -4080,10 +4164,13 @@ def resumen_sesiones(request, visita_id, examen_id):
 
 # Estadísticas - RecuérdaMe
 
+
 @login_required(login_url="/login/")
 @user_passes_test(is_superuser, login_url="/login/")
 def estadisticas(request):
-    url_query = f"{settings.POSTHOG_API_URL}/api/projects/{settings.POSTHOG_PROJECT_ID}/query/"
+    url_query = (
+        f"{settings.POSTHOG_API_URL}/api/projects/{settings.POSTHOG_PROJECT_ID}/query/"
+    )
     headers = {
         "Authorization": f"Bearer {settings.POSTHOG_PERSONAL_API_KEY}",
         "Content-Type": "application/json",
@@ -4094,7 +4181,12 @@ def estadisticas(request):
         query_dau = {
             "kind": "TrendsQuery",
             "series": [
-                {"kind": "EventsNode", "event": "$pageview", "name": "$pageview", "math": "dau"}
+                {
+                    "kind": "EventsNode",
+                    "event": "$pageview",
+                    "name": "$pageview",
+                    "math": "dau",
+                }
             ],
             "interval": "day",
             "dateRange": {"date_from": "-30d", "explicitDate": False},
@@ -4113,9 +4205,11 @@ def estadisticas(request):
         # --------- 2. Growth Accounting (LifecycleQuery) ---------
         query_growth = {
             "kind": "LifecycleQuery",
-            "series": [{"event": "$pageview"}],  # puedes cambiar el evento si quieres otro
+            "series": [
+                {"event": "$pageview"}
+            ],  # puedes cambiar el evento si quieres otro
             "dateRange": {"date_from": "-30d"},
-            "interval": "day"
+            "interval": "day",
         }
 
         r2 = requests.post(url_query, headers=headers, json={"query": query_growth})
@@ -4134,10 +4228,12 @@ def estadisticas(request):
                 # Dejamos los datos tal cual, incluso negativos
                 data = serie.get("data", [])
 
-                growth_datasets.append({
-                    "label": clean_label,
-                    "data": data,
-                })
+                growth_datasets.append(
+                    {
+                        "label": clean_label,
+                        "data": data,
+                    }
+                )
 
         # --------- 3. Device Type (Insight) ---------
         device_labels, device_values = [], []
@@ -4160,13 +4256,18 @@ def estadisticas(request):
         device_translation = {
             "Desktop": "Computador",
             "Mobile": "Celular",
-            "Tablet": "Tablet"
+            "Tablet": "Tablet",
         }
 
         if results:
             for serie in results:
                 # label / breakdown del dispositivo
-                device = serie.get("breakdown_value") or serie.get("breakdown") or serie.get("label") or "Otro"
+                device = (
+                    serie.get("breakdown_value")
+                    or serie.get("breakdown")
+                    or serie.get("label")
+                    or "Otro"
+                )
                 if isinstance(device, list):
                     device = device[0] if device else "Otro"
 
@@ -4175,7 +4276,10 @@ def estadisticas(request):
 
                 # sacar valores → PostHog los devuelve en "data", "result" o "count"
                 total = None
-                if "aggregated_value" in serie and serie["aggregated_value"] is not None:
+                if (
+                    "aggregated_value" in serie
+                    and serie["aggregated_value"] is not None
+                ):
                     total = serie["aggregated_value"]
                 elif "count" in serie and serie["count"] is not None:
                     total = serie["count"]
@@ -4190,7 +4294,6 @@ def estadisticas(request):
 
                 device_labels.append(device_name)
                 device_values.append(total)
-
 
         # --------- 4. Ingresos por usuario (Login) ---------
         # 1. Traer el insight (para obtener la query)
@@ -4207,7 +4310,7 @@ def estadisticas(request):
         data = r.json()
 
         # DEBUG: imprime la respuesta cruda (recorta si es muy larga)
-        #print("Raw data (first 20000 chars):", json.dumps(data, indent=2)[:20000])
+        # print("Raw data (first 20000 chars):", json.dumps(data, indent=2)[:20000])
 
         user_labels, user_values = [], []
 
@@ -4225,7 +4328,14 @@ def estadisticas(request):
                 return None
             # Si es dict, buscar claves típicas
             if isinstance(v, dict):
-                for k in ("aggregated_value", "aggregated", "count", "value", "y", "total"):
+                for k in (
+                    "aggregated_value",
+                    "aggregated",
+                    "count",
+                    "value",
+                    "y",
+                    "total",
+                ):
                     if k in v and v[k] is not None:
                         try:
                             return float(v[k])
@@ -4248,7 +4358,12 @@ def estadisticas(request):
         if results:
             for idx, serie in enumerate(results):
                 # Email / label
-                email_field = serie.get("breakdown_value") or serie.get("breakdown") or serie.get("label") or "Sin label"
+                email_field = (
+                    serie.get("breakdown_value")
+                    or serie.get("breakdown")
+                    or serie.get("label")
+                    or "Sin label"
+                )
                 if isinstance(email_field, list):
                     email = email_field[0] if email_field else "Sin email"
                 else:
@@ -4256,11 +4371,18 @@ def estadisticas(request):
 
                 # 1) Priorizar aggregated_value
                 total_sum = None
-                if "aggregated_value" in serie and serie.get("aggregated_value") is not None:
+                if (
+                    "aggregated_value" in serie
+                    and serie.get("aggregated_value") is not None
+                ):
                     total_sum = serie.get("aggregated_value")
 
                 # 2) luego count
-                if total_sum in (None, "") and "count" in serie and serie.get("count") is not None:
+                if (
+                    total_sum in (None, "")
+                    and "count" in serie
+                    and serie.get("count") is not None
+                ):
                     total_sum = serie.get("count")
 
                 # 3) luego buscar arrays con números en keys comunes
@@ -4301,10 +4423,21 @@ def estadisticas(request):
                         total_sum = 0
 
                 # DEBUG por cada serie: claves y lo que extrajimos
-                #print(f"Serie #{idx}: keys={list(serie.keys())}")
-                sample_debug = {k: serie.get(k) for k in ("breakdown_value", "breakdown", "label", "aggregated_value", "count", "result", "data")}
-                #print(" Sample:", json.dumps(sample_debug, default=str))
-                #print(" Extracted total_sum:", total_sum)
+                # print(f"Serie #{idx}: keys={list(serie.keys())}")
+                sample_debug = {
+                    k: serie.get(k)
+                    for k in (
+                        "breakdown_value",
+                        "breakdown",
+                        "label",
+                        "aggregated_value",
+                        "count",
+                        "result",
+                        "data",
+                    )
+                }
+                # print(" Sample:", json.dumps(sample_debug, default=str))
+                # print(" Extracted total_sum:", total_sum)
 
                 # Guardar si es email válido (o si quieres mostrar otros breakdowns, ajusta aquí)
                 if isinstance(email, str) and "@" in email:
@@ -4313,7 +4446,7 @@ def estadisticas(request):
 
         # --------- 5. Sesiones (Pageview -> Pageleave) ---------
         session_rows = []
-        
+
         # 1. Traer el insight
         url_insight = f"{settings.POSTHOG_API_URL}/api/projects/{settings.POSTHOG_PROJECT_ID}/insights/{settings.POSTHOG_SESION_TIME_INSIGHT_ID}/"
         r = requests.get(url_insight, headers=headers)
@@ -4327,12 +4460,14 @@ def estadisticas(request):
         r.raise_for_status()
 
         data = r.json()
-        #print("=== RAW DATA FROM POSTHOG ===")
-        #print(json.dumps(data, indent=2))  # imprime en consola el JSON completo
+        # print("=== RAW DATA FROM POSTHOG ===")
+        # print(json.dumps(data, indent=2))  # imprime en consola el JSON completo
 
         # 🔹 Extraer resultados: manejar funnels que devuelven "steps"
         if isinstance(data, dict):
-            results = data.get("steps") or data.get("results") or data.get("result") or []
+            results = (
+                data.get("steps") or data.get("results") or data.get("result") or []
+            )
         elif isinstance(data, list):
             results = data
         else:
@@ -4357,15 +4492,20 @@ def estadisticas(request):
         for serie in results:
             # A veces viene en lista
             if isinstance(serie, list) and serie:
-                last = serie[-1] #leavepage
-                first = serie[0] #viewpage
+                last = serie[-1]  # leavepage
+                first = serie[0]  # viewpage
             elif isinstance(serie, dict):
                 first = last = serie
             else:
                 continue
 
             # 🔹 Identificar usuario/email/breakdown
-            email_field = last.get("breakdown_value") or last.get("breakdown") or last.get("label") or "Sin dato"
+            email_field = (
+                last.get("breakdown_value")
+                or last.get("breakdown")
+                or last.get("label")
+                or "Sin dato"
+            )
             if isinstance(email_field, list):
                 email = email_field[0] if email_field else "Sin dato"
             else:
@@ -4375,21 +4515,24 @@ def estadisticas(request):
             converted = safe_num(last.get("count")) or 0
             dropped = max(entered - converted, 0)
 
-            session_rows.append({
-                "email": email,
-                # "raw_keys": ", ".join(serie.keys()), 
-                # "step": step_name,
-                "entered": int(entered),
-                "converted": converted,
-                "dropped_off": int(dropped),
-                "conversion_rate": round((converted / entered) * 100, 2) if entered > 0 else 0,
-                "avg_time": format_seconds(last.get("average_conversion_time")),
-                "median_time": format_seconds(last.get("median_conversion_time")),
-            })
-
+            session_rows.append(
+                {
+                    "email": email,
+                    # "raw_keys": ", ".join(serie.keys()),
+                    # "step": step_name,
+                    "entered": int(entered),
+                    "converted": converted,
+                    "dropped_off": int(dropped),
+                    "conversion_rate": round((converted / entered) * 100, 2)
+                    if entered > 0
+                    else 0,
+                    "avg_time": format_seconds(last.get("average_conversion_time")),
+                    "median_time": format_seconds(last.get("median_conversion_time")),
+                }
+            )
 
             # --------- 6. Conteo de vistas por página ---------
-        
+
             views_labels, views_values = [], []
 
             # 1. Traer el insight
@@ -4406,8 +4549,8 @@ def estadisticas(request):
             data = r.json()
 
             # DEBUG opcional
-            #print("=== RAW DATA (Vistas por página) ===")
-            #print(json.dumps(data, indent=2)[:20000])
+            # print("=== RAW DATA (Vistas por página) ===")
+            # print(json.dumps(data, indent=2)[:20000])
 
             results = []
 
@@ -4422,7 +4565,6 @@ def estadisticas(request):
                 results = data
 
             if results:
-
                 # print("=== KEYS EN RESULTS ===")
                 # for idx, serie in enumerate(results):
                 #     print(f"Serie {idx}: keys={list(serie.keys())}")
@@ -4430,30 +4572,32 @@ def estadisticas(request):
 
                 for idx, serie in enumerate(results):
                     # Nombre de la sección
-                    section = (
-                        serie.get("order")
-                    )
+                    section = serie.get("order")
 
                     # Total de vistas
                     total = None
-                    if "aggregated_value" in serie and serie["aggregated_value"] is not None:
+                    if (
+                        "aggregated_value" in serie
+                        and serie["aggregated_value"] is not None
+                    ):
                         total = serie["aggregated_value"]
 
                     total = int(total or 0)
 
-                    #print(f"Sección: {section} → {total}")  # DEBUG
+                    # print(f"Sección: {section} → {total}")  # DEBUG
 
                     views_labels.append(section)
                     views_values.append(total)
 
             # Construir dataset en formato Chart.js
-            views_dataset = [{
-                "label": views_labels,
-                "data": views_values,
-            }]
+            views_dataset = [
+                {
+                    "label": views_labels,
+                    "data": views_values,
+                }
+            ]
 
-
-           # --------- 7. Vistas por página con breakdown por email ---------
+            # --------- 7. Vistas por página con breakdown por email ---------
             # 1. Variables de salida
             user_views_labels, views_matrix = [], []
             emails_set = set()
@@ -4497,7 +4641,10 @@ def estadisticas(request):
 
                     # Conteo
                     total = 0
-                    if "aggregated_value" in serie and serie["aggregated_value"] is not None:
+                    if (
+                        "aggregated_value" in serie
+                        and serie["aggregated_value"] is not None
+                    ):
                         total = int(serie["aggregated_value"] or 0)
 
                     # Guardar
@@ -4522,7 +4669,7 @@ def estadisticas(request):
                 9: "Pasatiempos - Mascotas",
                 10: "Pasatiempos - Recetas",
                 11: "Pasatiempos - Ejercicio",
-                12: "Polijuego"
+                12: "Polijuego",
             }
 
             # --- 2. Forzar que siempre existan todas las páginas del 0 al 12 ---
@@ -4535,35 +4682,33 @@ def estadisticas(request):
             views_matrix = []
             for email in emails_sorted:
                 row = {"email": email}
-                for page in all_pages: 
+                for page in all_pages:
                     row[label_map[page]] = user_page_views.get(email, {}).get(page, 0)
                 views_matrix.append(row)
 
         # 5. Renderizar template
-        return render(request, "home/statistics_recuerdame.html", {
-            "labels": dau_labels,
-            "values": dau_values,
-            "growth_labels": growth_labels,
-            "growth_datasets": growth_datasets,
-            "device_labels": device_labels,
-            "device_values": device_values,
-            "user_labels": user_labels,
-            "user_values": user_values,
-            "session_rows": session_rows,
-            "views_labels": views_labels,
-            "views_dataset":views_dataset,
-            "views_labels_breakdown": user_views_labels,
-            "views_matrix": views_matrix,
-        })
+        return render(
+            request,
+            "home/statistics_recuerdame.html",
+            {
+                "labels": dau_labels,
+                "values": dau_values,
+                "growth_labels": growth_labels,
+                "growth_datasets": growth_datasets,
+                "device_labels": device_labels,
+                "device_values": device_values,
+                "user_labels": user_labels,
+                "user_values": user_values,
+                "session_rows": session_rows,
+                "views_labels": views_labels,
+                "views_dataset": views_dataset,
+                "views_labels_breakdown": user_views_labels,
+                "views_matrix": views_matrix,
+            },
+        )
 
     except requests.exceptions.RequestException as e:
         return HttpResponseServerError(f"Error al obtener datos: {e}")
-    
-
-
-        
-
-
 
 
 #######################################################################################
