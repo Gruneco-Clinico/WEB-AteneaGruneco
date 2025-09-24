@@ -250,7 +250,7 @@
                               {% if visita_examen.esta_realizado %}
                               <!-- Examen Completado -->
                               <div class="btn-group btn-group-sm w-100" role="group">
-                                <a href="{% url 'ver_resultado_examen' visita_examen.id %}"
+                                <a href="{% url 'generar_pdf_examen_generico' visita_examen.id %}" 
                                   class="btn btn-success flex-fill">
                                   <i class="fas fa-eye mr-1"></i>Ver
                                 </a>

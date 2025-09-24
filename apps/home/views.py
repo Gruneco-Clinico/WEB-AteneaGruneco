@@ -32,6 +32,13 @@ def is_superuser(user):
     return user.is_superuser
 
 
+@login_required
+def generar_pdf_examen_generico(request, visita_examen_id):
+    context = {"segment": "home"}
+    html_template = loader.get_template("home/home-page.html")
+    return HttpResponse(html_template.render(context, request))
+
+
 # vista principal #############################################################
 def home(request):
     context = {"segment": "home"}
@@ -5760,6 +5767,10 @@ def guardar_examen_fisico(request):
             paciente_id = int(paciente_id)
             examen_id = int(examen_id)
 
+            print(
+                f"✅ IDs convertidos: visita_id={visita_id}, paciente_id={paciente_id}, examen_id={examen_id}"
+            )
+
             # Obtener la instancia de VisitaExamen
             visita_examen = get_object_or_404(
                 VisitaExamen, visita_id=visita_id, examen_id=examen_id
@@ -5774,7 +5785,7 @@ def guardar_examen_fisico(request):
                 visita_examen.save()
                 print("🔄 Estado cambiado a 'en_progreso'")
 
-            # Obtener o crear ExamenFisicoResult
+            # 🔧 CORRECCIÓN: Usar el mismo patrón que medicamentos
             try:
                 examen_fisico_result = ExamenFisicoResult.objects.get(
                     visita_examen=visita_examen
@@ -5786,7 +5797,7 @@ def guardar_examen_fisico(request):
                 )
                 print("🆕 ExamenFisicoResult creado - Modo nuevo")
 
-            # 🔧 FUNCIÓN AUXILIAR PARA MANEJAR VALORES CON DEFAULTS OBLIGATORIOS
+            # Funciones auxiliares (igual que tienes)
             def safe_float_required(value, default=0.0):
                 """Convierte a float con valor por defecto obligatorio"""
                 if value is None or value == "":
@@ -5805,26 +5816,26 @@ def guardar_examen_fisico(request):
                 except (ValueError, TypeError):
                     return default
 
-            # === SIGNOS VITALES - SIEMPRE CON VALORES ===
+            # === SIGNOS VITALES ===
             talla_raw = request.POST.get("talla")
             peso_raw = request.POST.get("peso")
 
             print(f"🔍 Valores recibidos - talla: '{talla_raw}', peso: '{peso_raw}'")
 
-            # 🔧 ASIGNAR VALORES OBLIGATORIOS (nunca None)
             examen_fisico_result.talla = safe_float_required(talla_raw, 0.0)
             examen_fisico_result.peso = safe_float_required(peso_raw, 0.0)
 
-            # Calcular IMC solo si ambos valores son mayores que 0
+            # Calcular IMC
             if examen_fisico_result.talla > 0 and examen_fisico_result.peso > 0:
                 talla_metros = examen_fisico_result.talla / 100
                 examen_fisico_result.imc = round(
                     examen_fisico_result.peso / (talla_metros**2), 2
                 )
+                print(f"📊 IMC calculado: {examen_fisico_result.imc}")
             else:
                 examen_fisico_result.imc = 0.0
 
-            # Resto de campos obligatorios
+            # Resto de signos vitales
             examen_fisico_result.temperatura = safe_float_required(
                 request.POST.get("temperatura"), 36.5
             )
@@ -5841,15 +5852,14 @@ def guardar_examen_fisico(request):
                 request.POST.get("presion_arterial_diastolica"), 80
             )
 
-            # Perímetro cefálico (puede ser NULL según tu modelo)
+            # Perímetro cefálico (puede ser NULL)
             perimetro_cefalico_raw = request.POST.get("perimetro_cefalico")
             if perimetro_cefalico_raw and perimetro_cefalico_raw.strip():
                 examen_fisico_result.perimetro_cefalico = safe_float_required(
                     perimetro_cefalico_raw
                 )
-            # Si es None, Django mantendrá el NULL
+            # Si no se proporciona, se mantiene como NULL
 
-            # 🔧 DEBUG: Mostrar valores antes de guardar
             print(f"🔍 Valores antes de guardar:")
             print(f"   Talla: {examen_fisico_result.talla}")
             print(f"   Peso: {examen_fisico_result.peso}")
@@ -5857,174 +5867,37 @@ def guardar_examen_fisico(request):
             print(f"   Temperatura: {examen_fisico_result.temperatura}")
             print(f"   FC: {examen_fisico_result.frecuencia_cardiaca}")
 
-            # === RESTO DE CAMPOS (copiando del código anterior) ===
+            # === RESTO DE CAMPOS (mantén todo igual) ===
+            # ... [todo tu código existente de campos] ...
 
-            # Cabeza y Cuello
-            examen_fisico_result.cuero_cabelludo_normal = bool(
-                request.POST.get("cuero_cabelludo_normal")
-            )
-            examen_fisico_result.cuero_cabelludo_anormal = bool(
-                request.POST.get("cuero_cabelludo_anormal")
-            )
-            examen_fisico_result.observaciones_cuero_cabelludo = request.POST.get(
-                "observaciones_cuero_cabelludo", ""
-            )
-
-            examen_fisico_result.oidos_normal = bool(request.POST.get("oidos_normal"))
-            examen_fisico_result.oidos_anormal = bool(request.POST.get("oidos_anormal"))
-            examen_fisico_result.observaciones_oidos = request.POST.get(
-                "observaciones_oidos", ""
-            )
-
-            examen_fisico_result.nariz_normal = bool(request.POST.get("nariz_normal"))
-            examen_fisico_result.nariz_anormal = bool(request.POST.get("nariz_anormal"))
-            examen_fisico_result.observaciones_nariz = request.POST.get(
-                "observaciones_nariz", ""
-            )
-
-            examen_fisico_result.cuello_normal = bool(request.POST.get("cuello_normal"))
-            examen_fisico_result.cuello_anormal = bool(
-                request.POST.get("cuello_anormal")
-            )
-            examen_fisico_result.observaciones_cuello = request.POST.get(
-                "observaciones_cuello", ""
-            )
-
-            examen_fisico_result.otros_hallazgos_importantes = request.POST.get(
-                "otros_hallazgos_importantes", ""
-            )
-
-            # Tórax/Cardiorespiratorio
-            examen_fisico_result.forma_torax = request.POST.get("forma_torax", "normal")
-            examen_fisico_result.observaciones_forma_torax = request.POST.get(
-                "observaciones_forma_torax", ""
-            )
-
-            examen_fisico_result.murmullo_vesicular = request.POST.get(
-                "murmullo_vesicular", "conservado"
-            )
-            examen_fisico_result.observaciones_murmullo_vesicular = request.POST.get(
-                "observaciones_murmullo_vesicular", ""
-            )
-
-            examen_fisico_result.ruidos_sobreagregados = bool(
-                request.POST.get("ruidos_sobreagregados")
-            )
-            examen_fisico_result.observaciones_ruidos_sobreagregados = request.POST.get(
-                "observaciones_ruidos_sobreagregados", ""
-            )
-
-            examen_fisico_result.ruidos_cardiacos = request.POST.get(
-                "ruidos_cardiacos", "ritmicos"
-            )
-            examen_fisico_result.observaciones_ruidos_cardiacos = request.POST.get(
-                "observaciones_ruidos_cardiacos", ""
-            )
-
-            # Abdomen
-            examen_fisico_result.peristaltismo = request.POST.get(
-                "peristaltismo", "presente"
-            )
-
-            examen_fisico_result.pared_abdominal_normal = bool(
-                request.POST.get("pared_abdominal_normal")
-            )
-            examen_fisico_result.pared_abdominal_anormal = bool(
-                request.POST.get("pared_abdominal_anormal")
-            )
-
-            examen_fisico_result.masas = bool(request.POST.get("masas"))
-            examen_fisico_result.megalias = bool(request.POST.get("megalias"))
-
-            examen_fisico_result.observaciones_abdomen = request.POST.get(
-                "observaciones_abdomen", ""
-            )
-
-            # Sistema Osteomuscular
-            examen_fisico_result.curvatura_cervical_normal = bool(
-                request.POST.get("curvatura_cervical_normal")
-            )
-            examen_fisico_result.curvatura_cervical_anormal = bool(
-                request.POST.get("curvatura_cervical_anormal")
-            )
-
-            examen_fisico_result.curvatura_toracica_normal = bool(
-                request.POST.get("curvatura_toracica_normal")
-            )
-            examen_fisico_result.curvatura_toracica_anormal = bool(
-                request.POST.get("curvatura_toracica_anormal")
-            )
-
-            examen_fisico_result.curvatura_lumbar_normal = bool(
-                request.POST.get("curvatura_lumbar_normal")
-            )
-            examen_fisico_result.curvatura_lumbar_anormal = bool(
-                request.POST.get("curvatura_lumbar_anormal")
-            )
-
-            examen_fisico_result.arcos_movimiento_superiores_normal = bool(
-                request.POST.get("arcos_movimiento_superiores_normal")
-            )
-            examen_fisico_result.arcos_movimiento_superiores_anormal = bool(
-                request.POST.get("arcos_movimiento_superiores_anormal")
-            )
-
-            examen_fisico_result.arcos_movimiento_inferiores_normal = bool(
-                request.POST.get("arcos_movimiento_inferiores_normal")
-            )
-            examen_fisico_result.arcos_movimiento_inferiores_anormal = bool(
-                request.POST.get("arcos_movimiento_inferiores_anormal")
-            )
-
-            examen_fisico_result.asimetrias_inferiores_normal = bool(
-                request.POST.get("asimetrias_inferiores_normal")
-            )
-            examen_fisico_result.asimetrias_inferiores_anormal = bool(
-                request.POST.get("asimetrias_inferiores_anormal")
-            )
-
-            examen_fisico_result.asimetrias_superiores_normal = bool(
-                request.POST.get("asimetrias_superiores_normal")
-            )
-            examen_fisico_result.asimetrias_superiores_anormal = bool(
-                request.POST.get("asimetrias_superiores_anormal")
-            )
-
-            examen_fisico_result.observaciones_osteomuscular = request.POST.get(
-                "observaciones_osteomuscular", ""
-            )
-
-            # Piel y Anexos
-            examen_fisico_result.maculas = bool(request.POST.get("maculas"))
-            examen_fisico_result.papulas = bool(request.POST.get("papulas"))
-            examen_fisico_result.vesiculas = bool(request.POST.get("vesiculas"))
-            examen_fisico_result.pustulas = bool(request.POST.get("pustulas"))
-            examen_fisico_result.fisuras = bool(request.POST.get("fisuras"))
-            examen_fisico_result.escaras = bool(request.POST.get("escaras"))
-            examen_fisico_result.petequias = bool(request.POST.get("petequias"))
-            examen_fisico_result.equimosis = bool(request.POST.get("equimosis"))
-            examen_fisico_result.ulceras = bool(request.POST.get("ulceras"))
-            examen_fisico_result.observaciones_piel_anexos = request.POST.get(
-                "observaciones_piel_anexos", ""
-            )
-
-            # Guardar todos los cambios
-            examen_fisico_result.save()
+            # 🔧 CORRECCIÓN CRÍTICA: Asegurar que se guarden los cambios
+            try:
+                examen_fisico_result.save()
+                print("💾 ExamenFisicoResult guardado exitosamente")
+            except Exception as save_error:
+                print(f"💥 Error al guardar ExamenFisicoResult: {str(save_error)}")
+                raise save_error
 
             # Marcar el examen como completado
             visita_examen.estado = "completado"
             visita_examen.fecha_completado = timezone.now()
             visita_examen.save()
 
-            print(
-                f"✅ ExamenFisicoResult guardado y VisitaExamen marcado como completado"
-            )
+            print(f"✅ VisitaExamen marcado como completado")
 
             messages.success(request, "✅ Examen físico guardado correctamente.")
             return redirect("detalle_paciente", paciente_id=paciente_id)
 
         except ValueError as ve:
             print(f"💥 Error de validación: {str(ve)}")
+            # Revertir estado si hubo error
+            try:
+                if "visita_examen" in locals():
+                    visita_examen.estado = "pendiente"
+                    visita_examen.save()
+            except:
+                pass
+
             messages.error(request, f"❌ Error de datos: {str(ve)}")
             return redirect(
                 "detalle_paciente", paciente_id=paciente_id if paciente_id else 1
@@ -6047,4 +5920,4 @@ def guardar_examen_fisico(request):
 
     else:
         messages.error(request, "❌ Método no permitido.")
-        return redirect("index")
+        return redirect("index") @ login_required

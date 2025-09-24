@@ -11,6 +11,11 @@ urlpatterns = [
     # Páginas principales
     path("", views.home, name="home"),  # Página de inicio gruneco.com.co
     # path('ads/', views.ads, name='ads'),
+    path(
+        "examen/<int:visita_examen_id>/pdf/",
+        views.generar_pdf_examen_generico,
+        name="generar_pdf_examen_generico",
+    ),
     path("index/", views.index, name="index"),
     path(
         "atenea_estadisticas/", views.atenea_estadisticas, name="atenea_estadisticas"
