@@ -739,6 +739,28 @@
 
 <script>
   document.addEventListener("DOMContentLoaded", function () {
+    // Variables de datos existentes (viene del servidor) - CORREGIDO
+    let datosExamen = null;
+    let modoEdicion = false;
+    
+    try {
+      // Manejo seguro de datos del servidor
+      {% if datos_examen %}
+        datosExamen = {{ datos_examen|safe }};
+      {% endif %}
+      
+      {% if modo_edicion %}
+        modoEdicion = true;
+      {% endif %}
+    } catch (error) {
+      console.error("Error al cargar datos del servidor:", error);
+      datosExamen = null;
+      modoEdicion = false;
+    }
+    
+    console.log("🔍 Modo edición:", modoEdicion);
+    console.log("📋 Datos existentes:", datosExamen);
+
     // Contadores para cada tipo de antecedente
     const contadores = {
       patologicos: 0,
@@ -1074,6 +1096,7 @@
       `;
       },
 
+      
       toxicos: function (indice) {
         return `
         <div class="card mb-3 border-left-warning" data-index="${indice}">
@@ -1091,32 +1114,15 @@
               <div class="col-md-6">
                 <div class="form-group">
                   <label class="form-control-label font-weight-bold">Tipos de antecedente tóxico *</label>
-                  <div class="custom-controls-stacked">
-                    <div class="custom-control custom-checkbox">
-                      <input type="checkbox" class="custom-control-input" id="toxico_tabaquismo_${indice}" name="toxicos[${indice}][tipos_toxico][]" value="tabaquismo">
-                      <label class="custom-control-label" for="toxico_tabaquismo_${indice}">Tabaquismo</label>
-                    </div>
-                    <div class="custom-control custom-checkbox">
-                      <input type="checkbox" class="custom-control-input" id="toxico_alcohol_${indice}" name="toxicos[${indice}][tipos_toxico][]" value="alcohol">
-                      <label class="custom-control-label" for="toxico_alcohol_${indice}">Consumo de Alcohol</label>
-                    </div>
-                    <div class="custom-control custom-checkbox">
-                      <input type="checkbox" class="custom-control-input" id="toxico_sustancias_${indice}" name="toxicos[${indice}][tipos_toxico][]" value="sustancias_psicoactivas">
-                      <label class="custom-control-label" for="toxico_sustancias_${indice}">Sustancias Psicoactivas</label>
-                    </div>
-                    <div class="custom-control custom-checkbox">
-                      <input type="checkbox" class="custom-control-input" id="toxico_intoxicaciones_${indice}" name="toxicos[${indice}][tipos_toxico][]" value="intoxicaciones">
-                      <label class="custom-control-label" for="toxico_intoxicaciones_${indice}">Intoxicaciones</label>
-                    </div>
-                    <div class="custom-control custom-checkbox">
-                      <input type="checkbox" class="custom-control-input" id="toxico_alergias_${indice}" name="toxicos[${indice}][tipos_toxico][]" value="alergias_medicamentos">
-                      <label class="custom-control-label" for="toxico_alergias_${indice}">Alergias a Medicamentos</label>
-                    </div>
-                    <div class="custom-control custom-checkbox">
-                      <input type="checkbox" class="custom-control-input" id="toxico_otros_${indice}" name="toxicos[${indice}][tipos_toxico][]" value="otros">
-                      <label class="custom-control-label" for="toxico_otros_${indice}">Otros</label>
-                    </div>
-                  </div>
+                  <select class="form-control" name="toxicos[${indice}][tipos_toxico]" required multiple>
+                    <option value="tabaquismo">Tabaquismo</option>
+                    <option value="alcohol">Consumo de Alcohol</option>
+                    <option value="sustancias_psicoactivas">Sustancias Psicoactivas</option>
+                    <option value="intoxicaciones">Intoxicaciones</option>
+                    <option value="alergias_medicamentos">Alergias a Medicamentos</option>
+                    <option value="otros">Otros</option>
+                  </select>
+                  <small class="form-text text-muted">Mantén presionado Ctrl (Cmd en Mac) para seleccionar múltiples opciones</small>
                 </div>
               </div>
               <div class="col-md-6">
@@ -1708,61 +1714,104 @@
       `;
       },
 
-      hospitalizaciones: function (indice) {
-        return `
-        <div class="card mb-3 border-left-warning" data-index="${indice}">
-          <div class="card-header d-flex justify-content-between align-items-center">
-            <h6 class="mb-0">
-              <i class="fas fa-hospital text-warning mr-2"></i>
-              Hospitalización #${indice + 1}
-            </h6>
-            <button type="button" class="btn btn-sm btn-outline-danger" onclick="eliminarItem(this, 'hospitalizaciones')">
-              <i class="fas fa-times"></i>
-            </button>
+      // ...existing code...
+hospitalizaciones: function (indice) {
+  return `
+    <div class="card mb-3 border-left-warning" data-index="${indice}">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h6 class="mb-0">
+          <i class="fas fa-hospital text-warning mr-2"></i>
+          Hospitalización #${indice + 1}
+        </h6>
+        <button type="button" class="btn btn-sm btn-outline-danger" onclick="eliminarItem(this, 'hospitalizaciones')">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-8">
+            <div class="form-group">
+              <label class="form-control-label font-weight-bold">Motivo de hospitalización *</label>
+              <input type="text" class="form-control" name="hospitalizaciones[${indice}][motivo_hospitalizacion]" required placeholder="Motivo de la hospitalización...">
+            </div>
           </div>
-          <div class="card-body">
-            <div class="row">
-              <div class="col-md-8">
-                <div class="form-group">
-                  <label class="form-control-label font-weight-bold">Causa de la hospitalización *</label>
-                  <input type="text" class="form-control" name="hospitalizaciones[${indice}][causa_hospitalizacion]" required placeholder="Motivo de la hospitalización...">
-                </div>
-              </div>
-              <div class="col-md-4">
-                <div class="form-group">
-                  <label class="form-control-label font-weight-bold">Fecha de inicio *</label>
-                  <input type="date" class="form-control" name="hospitalizaciones[${indice}][fecha_inicio]" required>
-                </div>
+          <div class="col-md-4">
+            <div class="form-group">
+              <label class="form-control-label font-weight-bold">Institución/Hospital *</label>
+              <input type="text" class="form-control" name="hospitalizaciones[${indice}][institucion]" required placeholder="Nombre de la institución...">
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-4">
+            <div class="form-group">
+              <label class="form-control-label font-weight-bold">Fecha de ingreso *</label>
+              <input type="date" class="form-control" name="hospitalizaciones[${indice}][fecha_ingreso]" required>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="form-group">
+              <label class="form-control-label font-weight-bold">Fecha de egreso</label>
+              <input type="date" class="form-control" name="hospitalizaciones[${indice}][fecha_egreso]" placeholder="Fecha de salida">
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="form-group">
+              <label class="form-control-label font-weight-bold">Días de hospitalización</label>
+              <input type="number" class="form-control" name="hospitalizaciones[${indice}][dias_hospitalizacion]" min="1" placeholder="Número de días...">
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group">
+              <div class="custom-control custom-switch">
+                <input type="checkbox" class="custom-control-input" 
+                       id="complicaciones_hosp_${indice}" name="hospitalizaciones[${indice}][complicaciones_durante]" value="true">
+                <label class="custom-control-label" for="complicaciones_hosp_${indice}">¿Complicaciones durante la hospitalización?</label>
               </div>
             </div>
-
-            <div class="row">
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label class="form-control-label font-weight-bold">Duración</label>
-                  <input type="text" class="form-control" name="hospitalizaciones[${indice}][duracion]" placeholder="Ej: 5 días, 2 semanas...">
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label class="form-control-label font-weight-bold">Hospital/Clínica</label>
-                  <input type="text" class="form-control" name="hospitalizaciones[${indice}][institucion]" placeholder="Nombre de la institución...">
-                </div>
-              </div>
-            </div>
-
-            <div class="row">
-              <div class="col-md-12">
-                <div class="form-group">
-                  <label class="form-control-label font-weight-bold">Observaciones</label>
-                  <textarea class="form-control" name="hospitalizaciones[${indice}][observaciones]" rows="2" placeholder="Observaciones adicionales sobre la hospitalización..."></textarea>
-                </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <div class="custom-control custom-switch">
+                <input type="checkbox" class="custom-control-input" 
+                       id="secuelas_hosp_${indice}" name="hospitalizaciones[${indice}][secuelas]" value="true">
+                <label class="custom-control-label" for="secuelas_hosp_${indice}">¿Quedaron secuelas?</label>
               </div>
             </div>
           </div>
         </div>
-      `;
-      },
+
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group">
+              <label class="form-control-label font-weight-bold">Detalle de complicaciones</label>
+              <textarea class="form-control" name="hospitalizaciones[${indice}][detalle_complicaciones]" rows="3" placeholder="Describa las complicaciones durante la hospitalización..."></textarea>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label class="form-control-label font-weight-bold">Detalle de secuelas</label>
+              <textarea class="form-control" name="hospitalizaciones[${indice}][detalle_secuelas]" rows="3" placeholder="Describa las secuelas que quedaron..."></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-12">
+            <div class="form-group">
+              <label class="form-control-label font-weight-bold">Observaciones</label>
+              <textarea class="form-control" name="hospitalizaciones[${indice}][observaciones]" rows="2" placeholder="Observaciones adicionales sobre la hospitalización..."></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+},
 
       inmunizaciones: function (indice) {
         return `
@@ -1914,11 +1963,19 @@
       },
     };
 
+    // ======= FUNCIONES PRINCIPALES (SIN DUPLICAR) =======
+    
     // Función para agregar nuevos antecedentes
-    window.agregarAntecedente = function (tipo) {
-      console.log("Agregando antecedente:", tipo); // DEBUG
+    function agregarAntecedente(tipo) {
+      console.log("🔧 Agregando antecedente:", tipo); // DEBUG
       const contenedor = document.getElementById(`contenedor-${tipo}`);
       const emptyAlert = document.getElementById(`empty-${tipo}`);
+      
+      if (!contenedor) {
+        console.error(`❌ No se encontró contenedor para ${tipo}`);
+        return;
+      }
+      
       const indice = contadores[tipo];
 
       // Ocultar mensaje de vacío
@@ -1926,27 +1983,49 @@
         emptyAlert.style.display = "none";
       }
 
+      // Verificar que existe la plantilla
+      if (!plantillas[tipo]) {
+        console.error(`❌ No se encontró plantilla para ${tipo}`);
+        return;
+      }
+
       // Crear nuevo elemento
       const nuevoElemento = document.createElement("div");
       nuevoElemento.innerHTML = plantillas[tipo](indice);
-      contenedor.appendChild(nuevoElemento.firstElementChild);
+      
+      const elementoFinal = nuevoElemento.firstElementChild;
+      if (elementoFinal) {
+        contenedor.appendChild(elementoFinal);
+        
+        // Incrementar contador
+        contadores[tipo]++;
+        actualizarContador(tipo);
+        
+        console.log(`✅ Antecedente ${tipo} #${indice + 1} agregado correctamente`);
+      } else {
+        console.error(`❌ Error al crear elemento para ${tipo}`);
+      }
+    }
 
-      // Incrementar contador
-      contadores[tipo]++;
-      actualizarContador(tipo);
-    };
-
-    // Función para eliminar elementos
-    window.eliminarItem = function (boton, tipo) {
+    function eliminarItem(boton, tipo) {
+      if (!boton) {
+        console.error("❌ Botón no válido para eliminar");
+        return;
+      }
+      
       const item = boton.closest(".card");
-      item.remove();
+      if (item) {
+        item.remove();
+        
+        // Renumerar elementos restantes
+        renumerarElementos(tipo);
+        actualizarContador(tipo);
+        
+        console.log(`✅ Elemento ${tipo} eliminado`);
+      }
+    }
 
-      // Renumerar elementos restantes
-      renumerarElementos(tipo);
-      actualizarContador(tipo);
-    };
-
-    // Función para renumerar elementos CORREGIDA
+    // Función para renumerar elementos
     function renumerarElementos(tipo) {
       const elementos = document.querySelectorAll(
         `#contenedor-${tipo} .card[data-index]`
@@ -2008,9 +2087,126 @@
       }
     }
 
-    // FUNCIÓN CORREGIDA: Recopilar datos de un tipo específico
+    // FUNCIÓN PARA LLENAR DATOS DE UN ITEM
+    function llenarDatosItem(tipo, indice, datos) {
+      const contenedor = document.getElementById(`contenedor-${tipo}`);
+      if (!contenedor) {
+        console.log(`❌ No se encontró contenedor para ${tipo}`);
+        return;
+      }
+
+      // Buscar el elemento por data-index o por posición
+      const elemento = contenedor.querySelector(`[data-index="${indice}"]`) || contenedor.children[indice];
+      if (!elemento) {
+        console.log(`❌ No se encontró elemento ${indice} para ${tipo}`);
+        return;
+      }
+
+      console.log(`🔧 Llenando datos para ${tipo}[${indice}]:`, datos);
+
+      // Llenar cada campo
+      Object.keys(datos).forEach(campo => {
+        const input = elemento.querySelector(`[name="${tipo}[${indice}][${campo}]"]`);
+        if (input) {
+          if (input.type === "checkbox") {
+            input.checked = Boolean(datos[campo]);
+          } else if (input.tagName === "SELECT") {
+            if (input.multiple && Array.isArray(datos[campo])) {
+              // Select múltiple (como tipos_toxico)
+              Array.from(input.options).forEach(option => {
+                option.selected = datos[campo].includes(option.value);
+              });
+            } else {
+              input.value = datos[campo] || "";
+            }
+          } else {
+            input.value = datos[campo] || "";
+          }
+          console.log(`✅ Campo ${campo} llenado con:`, datos[campo]);
+        } else {
+          console.log(`⚠️ No se encontró input para ${campo} en ${tipo}[${indice}]`);
+        }
+      });
+    }
+
+    // FUNCIÓN PARA LLENAR DATOS GINECO-OBSTÉTRICOS
+    function llenarDatosGineco(datos) {
+      const contenedor = document.getElementById("contenedor-gineco");
+      if (!contenedor || !datos) return;
+
+      Object.keys(datos).forEach(campo => {
+        const input = contenedor.querySelector(`[name="gineco[${campo}]"]`);
+        if (input) {
+          if (input.type === "checkbox") {
+            input.checked = datos[campo];
+          } else {
+            input.value = datos[campo] || "";
+          }
+        }
+      });
+    }
+
+    // FUNCIÓN PARA CARGAR DATOS EXISTENTES
+    function cargarDatosExistentes() {
+      if (!modoEdicion || !datosExamen || typeof datosExamen !== 'object') {
+        console.log("⚠️ No hay modo edición o datos existentes válidos");
+        return;
+      }
+
+      console.log("🔄 Cargando datos existentes...");
+
+      // Cargar checkbox principal si existe
+      if (datosExamen.tiene_antecedentes !== undefined) {
+        const checkboxPrincipal = document.getElementById("tiene_antecedentes");
+        if (checkboxPrincipal) {
+          checkboxPrincipal.checked = datosExamen.tiene_antecedentes;
+          // Disparar evento change para mostrar/ocultar secciones
+          checkboxPrincipal.dispatchEvent(new Event('change'));
+        }
+      }
+
+      // Cargar observaciones generales si existen
+      if (datosExamen.observaciones_generales) {
+        const observacionesField = document.querySelector('[name="observaciones_generales"]');
+        if (observacionesField) {
+          observacionesField.value = datosExamen.observaciones_generales;
+        }
+      }
+
+      // Cargar cada tipo de antecedente
+      Object.keys(contadores).forEach(tipo => {
+        if (datosExamen[tipo] && Array.isArray(datosExamen[tipo]) && datosExamen[tipo].length > 0) {
+          console.log(`📋 Cargando ${tipo}:`, datosExamen[tipo]);
+          datosExamen[tipo].forEach((item, index) => {
+            // Agregar el elemento
+            agregarAntecedente(tipo);
+            
+            // Llenar los datos después de un pequeño delay
+            setTimeout(() => {
+              llenarDatosItem(tipo, index, item);
+            }, 50 * (index + 1)); // Delay escalonado
+          });
+        }
+      });
+
+      // Cargar datos gineco-obstétricos (caso especial)
+      if (datosExamen.gineco_obstetricos && typeof datosExamen.gineco_obstetricos === 'object' && Object.keys(datosExamen.gineco_obstetricos).length > 0) {
+        // Primero agregar la sección gineco si no existe
+        if (contadores.gineco === 0) {
+          agregarAntecedente('gineco');
+        }
+        setTimeout(() => {
+          llenarDatosGineco(datosExamen.gineco_obstetricos);
+        }, 200);
+      }
+
+      console.log("✅ Carga de datos existentes completada");
+    }
+
+    // ======= FUNCIONES DE RECOPILACIÓN DE DATOS =======
+
     function recopilarDatosTipo(tipo) {
-      console.log("🔍 Recopilando datos para:", tipo); // DEBUG
+      console.log("🔍 Recopilando datos para:", tipo);
       const contenedor = document.getElementById(`contenedor-${tipo}`);
       if (!contenedor) {
         console.log("❌ No se encontró contenedor para:", tipo);
@@ -2018,58 +2214,43 @@
       }
 
       const elementos = contenedor.querySelectorAll(".card[data-index]");
-      console.log(`📋 Elementos encontrados para ${tipo}:`, elementos.length); // DEBUG
+      console.log(`📋 Elementos encontrados para ${tipo}:`, elementos.length);
       const datos = [];
 
       elementos.forEach((elemento, indiceReal) => {
         const item = {};
         const inputs = elemento.querySelectorAll("input, select, textarea");
-        console.log(
-          `🔧 Procesando elemento ${indiceReal} con ${inputs.length} inputs`
-        ); // DEBUG
 
         inputs.forEach((input) => {
           if (input.name && input.name.includes(`${tipo}[`)) {
-            // Usar regex más flexible para extraer el campo
             const match = input.name.match(/\[([^\]]+)\]$/);
             if (match) {
               const fieldName = match[1];
 
               if (input.type === "checkbox") {
-                if (fieldName === "tipos_toxico") {
-                  // Manejar checkboxes múltiples para tóxicos
-                  if (!item[fieldName]) item[fieldName] = [];
-                  if (input.checked) {
-                    item[fieldName].push(input.value);
-                  }
-                } else {
-                  item[fieldName] = input.checked;
-                }
+                item[fieldName] = input.checked;
               } else if (input.type === "number") {
                 item[fieldName] = input.value ? parseInt(input.value) : null;
+              } else if (input.tagName === "SELECT" && input.multiple) {
+                const selectedValues = Array.from(input.selectedOptions).map(option => option.value);
+                item[fieldName] = selectedValues;
               } else {
                 item[fieldName] = input.value || "";
               }
-
-              console.log(`📝 Campo ${fieldName}:`, item[fieldName]); // DEBUG
             }
           }
         });
 
-        // Solo agregar si tiene datos relevantes
         if (Object.keys(item).length > 0) {
           datos.push(item);
-          console.log(`✅ Item ${indiceReal} agregado:`, item); // DEBUG
         }
       });
 
-      console.log(`🎯 Datos finales para ${tipo}:`, datos); // DEBUG
       return datos;
     }
 
-    // Función específica para gineco-obstétricos
     function recopilarDatosGineco() {
-      console.log("🔍 Recopilando datos gineco-obstétricos"); // DEBUG
+      console.log("🔍 Recopilando datos gineco-obstétricos");
       const contenedor = document.getElementById("contenedor-gineco");
       if (!contenedor) {
         console.log("❌ No se encontró contenedor gineco");
@@ -2090,111 +2271,77 @@
             } else {
               datos[fieldName] = input.value || "";
             }
-            console.log(`📝 Gineco campo ${fieldName}:`, datos[fieldName]); // DEBUG
           }
         }
       });
 
-      console.log("🎯 Datos gineco finales:", datos); // DEBUG
       return datos;
     }
 
-    // INTERCEPTAR EL ENVÍO DEL FORMULARIO
+    // ======= EXPONER FUNCIONES AL SCOPE GLOBAL =======
+    window.agregarAntecedente = agregarAntecedente;
+    window.eliminarItem = eliminarItem;
+
+    // ======= CONTROL DEL CHECKBOX PRINCIPAL =======
+    const checkboxAntecedentes = document.getElementById("tiene_antecedentes");
+    if (checkboxAntecedentes) {
+      checkboxAntecedentes.addEventListener("change", function () {
+        const tabsContainer = document.getElementById("antecedentesTabs");
+        if (tabsContainer && tabsContainer.parentElement) {
+          const containerParent = tabsContainer.parentElement;
+          if (this.checked) {
+            containerParent.style.display = "block";
+          } else {
+            containerParent.style.display = "none";
+          }
+        }
+      });
+      
+      // Ejecutar al cargar si ya está marcado
+      if (checkboxAntecedentes.checked) {
+        checkboxAntecedentes.dispatchEvent(new Event('change'));
+      }
+    }
+
+    // ======= MANEJO DEL ENVÍO DEL FORMULARIO =======
     const form = document.getElementById("formAntecedentes");
     if (form) {
       form.addEventListener("submit", function (e) {
-        console.log("🚀 Formulario enviándose..."); // DEBUG
+        console.log("🚀 Formulario enviándose...");
 
-        // Recopilar datos de todos los tipos de antecedentes
         const tiposAntecedentes = [
-          "patologicos",
-          "quirurgicos",
-          "farmacologicos",
-          "toxicos",
-          "familiares",
-          "alergicos",
-          "traumaticos",
-          "epidemiologicos",
-          "ets",
-          "hospitalizaciones",
-          "inmunizaciones",
-          "transfusionales",
+          "patologicos", "quirurgicos", "farmacologicos", "toxicos",
+          "familiares", "alergicos", "traumaticos", "epidemiologicos",
+          "ets", "hospitalizaciones", "inmunizaciones", "transfusionales",
         ];
 
         tiposAntecedentes.forEach((tipo) => {
           const datos = recopilarDatosTipo(tipo);
           if (datos.length > 0) {
-            console.log(`✅ Creando campo oculto para ${tipo} con:`, datos); // DEBUG
-            // Crear input hidden con los datos JSON
             const hiddenInput = document.createElement("input");
             hiddenInput.type = "hidden";
             hiddenInput.name = `${tipo}_data`;
             hiddenInput.value = JSON.stringify(datos);
             this.appendChild(hiddenInput);
-          } else {
-            console.log(`⚠️ No hay datos para ${tipo}`); // DEBUG
           }
         });
 
         // Manejar gineco-obstétricos por separado
         const ginecoData = recopilarDatosGineco();
         if (Object.keys(ginecoData).length > 0) {
-          console.log("✅ Creando campo oculto para gineco con:", ginecoData); // DEBUG
           const hiddenInput = document.createElement("input");
           hiddenInput.type = "hidden";
           hiddenInput.name = "gineco_data";
           hiddenInput.value = JSON.stringify(ginecoData);
           this.appendChild(hiddenInput);
         }
-
-        console.log("🎯 Datos preparados, enviando formulario..."); // DEBUG
-      });
-    } else {
-      console.error("❌ No se encontró el formulario #formAntecedentes");
-    }
-
-    // Control del checkbox principal
-    const checkboxAntecedentes = document.getElementById("tiene_antecedentes");
-    if (checkboxAntecedentes) {
-      checkboxAntecedentes.addEventListener("change", function () {
-        const tabsContainer =
-          document.getElementById("antecedentesTabs").parentElement;
-        if (this.checked) {
-          tabsContainer.style.display = "block";
-        } else {
-          tabsContainer.style.display = "none";
-        }
       });
     }
 
-    // Otras funciones (mantener igual)
-    window.limpiarFormulario = function () {
-      if (
-        confirm("¿Está seguro de que desea limpiar todos los antecedentes?")
-      ) {
-        Object.keys(contadores).forEach((tipo) => {
-          const contenedor = document.getElementById(`contenedor-${tipo}`);
-          const elementos = contenedor.querySelectorAll(".card[data-index]");
-          elementos.forEach((elemento) => elemento.remove());
-          contadores[tipo] = 0;
-          actualizarContador(tipo);
+    // ======= CARGAR DATOS AL INICIAR =======
+    cargarDatosExistentes();
 
-          const emptyAlert = document.getElementById(`empty-${tipo}`);
-          if (emptyAlert) emptyAlert.style.display = "block";
-        });
-
-        const observaciones = document.querySelector(
-          'textarea[name="observaciones_generales"]'
-        );
-        if (observaciones) observaciones.value = "";
-
-        if (checkboxAntecedentes) checkboxAntecedentes.checked = false;
-      }
-    };
-
-    window.validarFormulario = function () {
-      alert("Función de validación - implementar según necesidades");
-    };
+    console.log("🎯 JavaScript inicializado correctamente");
   });
 </script>
 

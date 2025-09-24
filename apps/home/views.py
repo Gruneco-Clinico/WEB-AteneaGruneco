@@ -1046,6 +1046,209 @@ def realizar_examen(request, visita_id, examen_id, paciente_id):
                     datos_examen.pop("visita_examen", None)
                     modo_edicion = True
 
+            # CASO ESPECIAL: ANTECEDENTES (ID 5) - FUERA DEL IF ANTERIOR
+            # ===================================================
+            elif int(examen_id) == 5:
+                # Para antecedentes, verificar si existe un AntecedentesVisitaLink
+                try:
+                    antecedentes_link = AntecedentesVisitaLink.objects.get(
+                        visita_examen=visita_examen_obj
+                    )
+                    antecedentes_result = antecedentes_link.antecedentes_result
+
+                    if antecedentes_result:
+                        # Obtener datos básicos del modelo principal
+                        datos_examen = model_to_dict(antecedentes_result)
+                        datos_examen.pop("id", None)
+                        datos_examen.pop("paciente", None)
+
+                        # Obtener relaciones hijas con prefetch para optimización
+                        antecedentes = AntecedentesResult.objects.prefetch_related(
+                            "antecedentes_patologicos",
+                            "antecedentes_quirurgicos",
+                            "antecedentes_farmacologicos",
+                            "antecedentes_toxicos",
+                            "antecedentes_familiares",
+                            "antecedentes_alergicos",
+                            "antecedentes_traumaticos",
+                            "antecedentes_gineco",
+                            "antecedentes_epidemiologicos",
+                            "antecedentes_ets",
+                            "antecedentes_hospitalizaciones",
+                            "antecedentes_inmunizaciones",
+                            "antecedentes_transfusionales",
+                        ).get(id=antecedentes_result.id)
+
+                        # Agregar las relaciones al diccionario de datos
+                        datos_examen["patologicos"] = list(
+                            antecedentes.antecedentes_patologicos.values(
+                                "tipo_patologia",
+                                "descripcion_otros",
+                                "fecha_inicio",
+                                "ha_recibido_tratamiento",
+                                "detalle_tratamiento",
+                                "tiene_complicaciones",
+                                "detalle_complicaciones",
+                                "activo",
+                                "fecha_finalizacion",
+                                "observaciones",
+                            )
+                        )
+
+                        datos_examen["quirurgicos"] = list(
+                            antecedentes.antecedentes_quirurgicos.values(
+                                "descripcion",
+                                "fecha_intervencion",
+                                "ha_recibido_tratamiento",
+                                "detalle_tratamiento",
+                                "tiene_complicaciones",
+                                "detalle_complicaciones",
+                                "activo",
+                                "fecha_finalizacion",
+                                "observaciones",
+                            )
+                        )
+
+                        datos_examen["farmacologicos"] = list(
+                            antecedentes.antecedentes_farmacologicos.values(
+                                "descripcion",
+                                "fecha_inicio",
+                                "recibio_tratamiento",
+                                "detalle_tratamiento",
+                                "tuvo_complicaciones",
+                                "detalle_complicaciones",
+                                "activo",
+                                "fecha_finalizacion",
+                                "observaciones",
+                            )
+                        )
+
+                        datos_examen["toxicos"] = list(
+                            antecedentes.antecedentes_toxicos.values(
+                                "tipos_toxico",
+                                "descripcion_otros",
+                                "fecha_inicio",
+                                "ha_recibido_tratamiento",
+                                "detalle_tratamiento",
+                                "tiene_complicaciones",
+                                "detalle_complicaciones",
+                                "activo",
+                                "fecha_finalizacion",
+                                "observaciones",
+                            )
+                        )
+
+                        datos_examen["familiares"] = list(
+                            antecedentes.antecedentes_familiares.values(
+                                "tipo_antecedente", "parentesco", "observaciones"
+                            )
+                        )
+
+                        datos_examen["alergicos"] = list(
+                            antecedentes.antecedentes_alergicos.values(
+                                "descripcion",
+                                "fecha_inicio",
+                                "tratamiento_recibido",
+                                "detalle_tratamiento",
+                                "complicaciones",
+                                "activo",
+                                "fecha_finalizacion",
+                                "observaciones",
+                            )
+                        )
+
+                        datos_examen["traumaticos"] = list(
+                            antecedentes.antecedentes_traumaticos.values(
+                                "descripcion",
+                                "fecha_inicio",
+                                "tratamiento_recibido",
+                                "detalle_tratamiento",
+                                "complicaciones",
+                                "activo",
+                                "fecha_finalizacion",
+                                "observaciones",
+                            )
+                        )
+
+                        # Gineco-obstétricos (OneToOne)
+                        if (
+                            hasattr(antecedentes, "antecedentes_gineco")
+                            and antecedentes.antecedentes_gineco
+                        ):
+                            gineco_data = model_to_dict(
+                                antecedentes.antecedentes_gineco
+                            )
+                            gineco_data.pop("id", None)
+                            gineco_data.pop("antecedente_result", None)
+                            datos_examen["gineco_obstetricos"] = gineco_data
+                        else:
+                            datos_examen["gineco_obstetricos"] = {}
+
+                        datos_examen["epidemiologicos"] = list(
+                            antecedentes.antecedentes_epidemiologicos.values(
+                                "tipo_antecedente",
+                                "fecha_inicio",
+                                "tratamiento_detalle",
+                                "complicaciones_asociadas",
+                                "detallar_complicaciones",
+                                "activo_actualmente",
+                                "fecha_finalizacion",
+                                "observaciones",
+                            )
+                        )
+
+                        datos_examen["ets"] = list(
+                            antecedentes.antecedentes_ets.values(
+                                "tipo_ets",
+                                "fecha_diagnostico",
+                                "tratamiento_recibido",
+                                "detalle_tratamiento",
+                                "complicaciones",
+                                "detalle_complicaciones",
+                                "curado",
+                                "fecha_curacion",
+                                "observaciones",
+                            )
+                        )
+
+                        datos_examen["hospitalizaciones"] = list(
+                            antecedentes.antecedentes_hospitalizaciones.values(
+                                "motivo_hospitalizacion",
+                                "fecha_ingreso",
+                                "fecha_egreso",
+                                "duracion",
+                                "institucion",
+                                "observaciones",
+                            )
+                        )
+
+                        datos_examen["inmunizaciones"] = list(
+                            antecedentes.antecedentes_inmunizaciones.values(
+                                "nombre_vacuna",
+                                "fecha_aplicacion",
+                                "dosis_numero",
+                                "observaciones",
+                            )
+                        )
+
+                        datos_examen["transfusionales"] = list(
+                            antecedentes.antecedentes_transfusionales.values(
+                                "motivo_transfusion",
+                                "fecha_transfusion",
+                                "tipo_componente",
+                                "cantidad_unidades",
+                                "tuvo_reacciones",
+                                "detalle_reacciones",
+                                "observaciones",
+                            )
+                        )
+
+                        modo_edicion = True
+
+                except AntecedentesVisitaLink.DoesNotExist:
+                    # No hay antecedentes previos para esta visita
+                    pass
+
     except VisitaExamen.DoesNotExist:
         messages.error(request, "Visita-examen no encontrada")
         return redirect("detalle_paciente", paciente_id=paciente_id)
@@ -4836,6 +5039,7 @@ def guardar_examen_antecedentes(request):
             epidemiologicos_data = request.POST.get("epidemiologicos_data")
             ets_data = request.POST.get("ets_data")
             hospitalizaciones_data = request.POST.get("hospitalizaciones_data")
+            print("Hospitalizaciones data:", hospitalizaciones_data)  # DEBUG
             inmunizaciones_data = request.POST.get("inmunizaciones_data")
             transfusionales_data = request.POST.get("transfusionales_data")
 
@@ -5169,33 +5373,67 @@ def guardar_examen_antecedentes(request):
                     antecedentes_guardados.append("ETS")
 
             # ===== PROCESAR HOSPITALIZACIONES (NUEVO) =====
+            # ...existing code...
             if hospitalizaciones_data:
                 hospitalizaciones_list = json.loads(hospitalizaciones_data)
+                print("Hospitalizaciones list:", hospitalizaciones_list)  # DEBUG
                 antecedentes_result.antecedentes_hospitalizaciones.all().delete()
 
                 for item in hospitalizaciones_list:
-                    if item.get("causa_hospitalizacion"):
+                    if item.get(
+                        "motivo_hospitalizacion"
+                    ):  # Cambio: usar el nombre correcto del campo
                         tiene_antecedentes = True
+
+                        # Manejar fecha_egreso de forma segura
+                        fecha_egreso = None
+                        if item.get("fecha_egreso"):
+                            try:
+                                fecha_egreso = datetime.strptime(
+                                    item.get("fecha_egreso"), "%Y-%m-%d"
+                                ).date()
+                            except (ValueError, TypeError):
+                                fecha_egreso = None
+
+                        # Manejar fecha_ingreso de forma segura
+                        fecha_ingreso = None
+                        if item.get("fecha_ingreso"):
+                            try:
+                                fecha_ingreso = datetime.strptime(
+                                    item.get("fecha_ingreso"), "%Y-%m-%d"
+                                ).date()
+                            except (ValueError, TypeError):
+                                fecha_ingreso = None
+
+                        # Convertir días_hospitalizacion a entero de forma segura
+                        dias_hospitalizacion = None
+                        if item.get("dias_hospitalizacion"):
+                            try:
+                                dias_hospitalizacion = int(
+                                    item.get("dias_hospitalizacion")
+                                )
+                            except (ValueError, TypeError):
+                                dias_hospitalizacion = None
+
                         AntecedenteHospitalizacion.objects.create(
                             antecedente_result=antecedentes_result,
-                            motivo_hospitalizacion=item.get("causa_hospitalizacion"),
-                            fecha_ingreso=datetime.strptime(
-                                item.get("fecha_inicio"), "%Y-%m-%d"
-                            ).date()
-                            if item.get("fecha_inicio")
-                            else None,
-                            fecha_egreso=datetime.strptime(
-                                item.get("fecha_finalizacion"), "%Y-%m-%d"
-                            ).date()
-                            if item.get("fecha_finalizacion")
-                            else None,
-                            duracion=item.get("duracion", ""),
+                            motivo_hospitalizacion=item.get("motivo_hospitalizacion"),
+                            fecha_ingreso=fecha_ingreso,
+                            fecha_egreso=fecha_egreso,
                             institucion=item.get("institucion", ""),
+                            dias_hospitalizacion=dias_hospitalizacion,
+                            complicaciones_durante=item.get(
+                                "complicaciones_durante", False
+                            ),
+                            detalle_complicaciones=item.get(
+                                "detalle_complicaciones", ""
+                            ),
+                            secuelas=item.get("secuelas", False),
+                            detalle_secuelas=item.get("detalle_secuelas", ""),
                             observaciones=item.get("observaciones", ""),
                         )
                 if hospitalizaciones_list:
                     antecedentes_guardados.append("Hospitalizaciones")
-
             # ===== PROCESAR INMUNIZACIONES (NUEVO) =====
             if inmunizaciones_data:
                 inmunizaciones_list = json.loads(inmunizaciones_data)
@@ -5286,3 +5524,7 @@ def guardar_examen_antecedentes(request):
     else:
         messages.error(request, "❌ Método no permitido.")
         return redirect("index")
+
+        return redirect("proyectos")
+
+    return render(request, "home/proyectos.html", context)
