@@ -159,12 +159,14 @@
     <div class="header-body">
       <div class="row align-items-center py-4">
         <div class="col-lg-6 col-5">
-          <h6 class="h2 text-white d-inline-block mb-0">Información del Paciente</h6>
+          <h6 class="h2 text-white d-inline-block mb-0">
+            {% if modo_edicion %}Editar{% else %}Registrar{% endif %} Medicamentos
+          </h6>
           <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
             <ol class="breadcrumb breadcrumb-custom breadcrumb-links breadcrumb-dark">
               <li class="breadcrumb-item"><a href="#"><i class="fas fa-home"></i></a></li>
-              <li class="breadcrumb-item"><a href="/pacientes/">Pacientes</a></li>
-              <li class="breadcrumb-item"><a href="/pacientes/">Volver</a></li>
+              <li class="breadcrumb-item"><a href="{% url 'detalle_paciente' paciente_id %}">Paciente</a></li>
+              <li class="breadcrumb-item active" aria-current="page">Medicamentos</li>
             </ol>
           </nav>
         </div>
@@ -174,19 +176,46 @@
 </div>
 
 <div class="container-fluid mt--6">
-  <form method="post" action="{% url 'guardar_examen_medicamentos' %}">
+  <form method="post" action="{% url 'guardar_examen_medicamentos' %}" id="formMedicamentos">
     {% csrf_token %}
     <div class="row">
       <div class="col">
         <div class="custom-card">
           <div class="custom-header">
-            <h3 class="mb-0"><i class="fas fa-pills mr-2 text-primary"></i>Medicamentos</h3>
-            <input type="hidden" name="visita_id" id="visita_id" value="{{ visita_examen }}" />
-            <input type="hidden" name="paciente_id" id="paciente_id" value="{{ paciente_id }}" />
-            <input type="hidden" name="examen_id" id="examen_id" value="{{ examen_id }}" />
+            <h3 class="mb-0"><i class="fas fa-pills mr-2 text-primary"></i>Medicamentos del Paciente</h3>
+            <input type="hidden" name="visita_id" value="{{ visita_examen }}" />
+            <input type="hidden" name="paciente_id" value="{{ paciente_id }}" />
+            <input type="hidden" name="examen_id" value="{{ examen_id }}" />
+            {% if modo_edicion %}
+              <span class="badge badge-info ml-2">Modo Edición</span>
+            {% endif %}
           </div>
           <div class="custom-body">
-            <div id="medicamentos"></div>
+            <!-- Observaciones generales -->
+            <div class="row mb-4">
+              <div class="col-12">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">
+                    <i class="fas fa-notes-medical text-primary mr-2"></i>
+                    Observaciones Generales sobre la Medicación
+                  </label>
+                  <textarea class="form-control" name="observaciones_generales" rows="3" 
+                            placeholder="Observaciones generales sobre el tratamiento farmacológico del paciente..."></textarea>
+                </div>
+              </div>
+            </div>
+
+            <hr>
+
+            <div id="medicamentos-container"></div>
+            
+            <!-- Mensaje cuando no hay medicamentos -->
+            <div id="empty-medicamentos" class="text-center py-4" style="display: block;">
+              <i class="fas fa-pills text-muted" style="font-size: 3rem;"></i>
+              <p class="text-muted mt-2">No hay medicamentos registrados</p>
+              <p class="text-muted">Haz clic en "Agregar Medicamento" para comenzar</p>
+            </div>
+
             <button type="button" id="agregar-medicamento" class="btn btn-primary mt-3">
               <i class="fas fa-plus mr-2"></i>Agregar Medicamento
             </button>
@@ -194,6 +223,7 @@
         </div>
       </div>
     </div>
+    
     <div class="row mt-4">
       <div class="col-12 action-buttons">
         <div>
@@ -203,7 +233,8 @@
         </div>
         <div>
           <button type="submit" class="btn btn-primary">
-            <i class="fas fa-save mr-2"></i>Guardar Examen
+            <i class="fas fa-save mr-2"></i>
+            {% if modo_edicion %}Actualizar{% else %}Guardar{% endif %} Medicamentos
           </button>
           <a href="{% url 'detalle_paciente' paciente_id %}" class="btn btn-view ml-2">
             <i class="fas fa-user mr-2"></i>Ver Paciente
@@ -215,133 +246,374 @@
 </div>
 
 <script>
-  document.addEventListener('DOMContentLoaded', function () {
-    document.getElementById('agregar-medicamento').addEventListener('click', function () {
-      const div = document.createElement('div');
-      div.classList.add('medicamento', 'mb-3', 'animate__animated', 'animate__fadeIn');
-      div.innerHTML = `
-      <div class="card p-3">
-        <div class="row">
-          <div class="col-md-6">
-            <div class="form-group">
-              <label class="form-control-label"><i class="fas fa-tag text-primary mr-1"></i> Nombre Comercial</label>
-              <input type="text" class="form-control" name="nombre_comercial[]" placeholder="Ingrese el nombre comercial">
-            </div>
+document.addEventListener('DOMContentLoaded', function () {
+  // Variables para datos existentes
+  let datosExistentes = null;
+  let modoEdicion = false;
+  let contadorMedicamentos = 0;
+
+  // Cargar datos del servidor si existen
+  try {
+    {% if datos_medicamentos %}
+      datosExistentes = {{ datos_medicamentos|safe }};
+    {% endif %}
+    
+    {% if modo_edicion %}
+      modoEdicion = true;
+    {% endif %}
+  } catch (error) {
+    console.error("Error al cargar datos:", error);
+  }
+
+  console.log("🔍 Modo edición:", modoEdicion);
+  console.log("📋 Datos existentes:", datosExistentes);
+
+  // Función para crear template de medicamento basado en tu modelo
+  function crearTemplateMedicamento(indice, datos = {}) {
+    return `
+      <div class="medicamento mb-4 animate__animated animate__fadeIn" data-index="${indice}">
+        <div class="card border-left-primary">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h6 class="mb-0">
+              <i class="fas fa-pills text-primary mr-2"></i>
+              Medicamento #${indice + 1}
+            </h6>
+            <button type="button" class="btn btn-sm btn-outline-danger eliminar-medicamento">
+              <i class="fas fa-times"></i>
+            </button>
           </div>
-          <div class="col-md-6">
-            <div class="form-group">
-              <label class="form-control-label"><i class="fas fa-prescription text-primary mr-1"></i> Nombre Genérico</label>
-              <input type="text" class="form-control" name="nombre_generico[]" placeholder="Ingrese el nombre genérico">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">
+                    <i class="fas fa-tag text-primary mr-1"></i> Nombre Comercial *
+                  </label>
+                  <input type="text" class="form-control" name="nombre_comercial[]" required
+                         value="${datos.nombre_comercial || ''}" 
+                         placeholder="Ej: Acetaminofén, Losartán...">
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">
+                    <i class="fas fa-prescription text-primary mr-1"></i> Nombre Genérico (DCI)
+                  </label>
+                  <input type="text" class="form-control" name="nombre_generico[]" 
+                         value="${datos.nombre_generico || ''}" 
+                         placeholder="Ej: Paracetamol, Losartán potásico...">
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-md-6">
-            <div class="form-group">
-              <label class="form-control-label"><i class="fas fa-tablets text-primary mr-1"></i> Presentación</label>
-              <select class="form-control" name="presentacion[]">
-                <option>Tableta</option>
-                <option>Cápsula</option>
-                <option>Solución</option>
-                <option>Ampolla</option>
-                <option>Spray</option>
-              </select>
+            
+            <div class="row">
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">
+                    <i class="fas fa-tablets text-primary mr-1"></i> Presentación *
+                  </label>
+                  <select class="form-control" name="presentacion[]" required>
+                    <option value="">Seleccionar...</option>
+                    <option value="tableta" ${datos.presentacion === 'tableta' ? 'selected' : ''}>Tableta</option>
+                    <option value="capsula" ${datos.presentacion === 'capsula' ? 'selected' : ''}>Cápsula</option>
+                    <option value="solucion" ${datos.presentacion === 'solucion' ? 'selected' : ''}>Solución</option>
+                    <option value="ampolla" ${datos.presentacion === 'ampolla' ? 'selected' : ''}>Ampolla</option>
+                    <option value="spray" ${datos.presentacion === 'spray' ? 'selected' : ''}>Spray</option>
+                    <option value="jarabe" ${datos.presentacion === 'jarabe' ? 'selected' : ''}>Jarabe</option>
+                    <option value="crema" ${datos.presentacion === 'crema' ? 'selected' : ''}>Crema</option>
+                    <option value="pomada" ${datos.presentacion === 'pomada' ? 'selected' : ''}>Pomada</option>
+                    <option value="gel" ${datos.presentacion === 'gel' ? 'selected' : ''}>Gel</option>
+                    <option value="ovulos" ${datos.presentacion === 'ovulos' ? 'selected' : ''}>Óvulos</option>
+                    <option value="supositorio" ${datos.presentacion === 'supositorio' ? 'selected' : ''}>Supositorio</option>
+                    <option value="parche" ${datos.presentacion === 'parche' ? 'selected' : ''}>Parche</option>
+                    <option value="inhalador" ${datos.presentacion === 'inhalador' ? 'selected' : ''}>Inhalador</option>
+                    <option value="gotas" ${datos.presentacion === 'gotas' ? 'selected' : ''}>Gotas</option>
+                    <option value="otros" ${datos.presentacion === 'otros' ? 'selected' : ''}>Otros</option>
+                  </select>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">
+                    <i class="fas fa-flask text-primary mr-1"></i> Concentración *
+                  </label>
+                  <input type="text" class="form-control" name="concentracion[]" required
+                         value="${datos.concentracion || ''}" 
+                         placeholder="Ej: 500, 25, 10/5">
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">
+                    <i class="fas fa-weight text-primary mr-1"></i> Unidad *
+                  </label>
+                  <select class="form-control" name="unidad[]" required>
+                    <option value="">Seleccionar...</option>
+                    <option value="microgramos" ${datos.unidad === 'microgramos' ? 'selected' : ''}>Microgramos (μg)</option>
+                    <option value="miligramos" ${datos.unidad === 'miligramos' ? 'selected' : ''}>Miligramos (mg)</option>
+                    <option value="gramos" ${datos.unidad === 'gramos' ? 'selected' : ''}>Gramos (g)</option>
+                    <option value="mililitros" ${datos.unidad === 'mililitros' ? 'selected' : ''}>Mililitros (ml)</option>
+                    <option value="porcentaje" ${datos.unidad === 'porcentaje' ? 'selected' : ''}>Porcentaje (%)</option>
+                    <option value="volumen" ${datos.unidad === 'volumen' ? 'selected' : ''}>Volumen</option>
+                    <option value="unidades_internacionales" ${datos.unidad === 'unidades_internacionales' ? 'selected' : ''}>Unidades Internacionales (UI)</option>
+                    <option value="miliequivalentes" ${datos.unidad === 'miliequivalentes' ? 'selected' : ''}>Miliequivalentes (mEq)</option>
+                    <option value="otros" ${datos.unidad === 'otros' ? 'selected' : ''}>Otros</option>
+                  </select>
+                </div>
+              </div>
             </div>
-          </div>
-          <div class="col-md-6">
-            <div class="form-group">
-              <label class="form-control-label"><i class="fas fa-flask text-primary mr-1"></i> Concentración</label>
-              <input type="text" class="form-control" name="concentracion[]" placeholder="Ingrese la concentración">
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">
+                    <i class="fas fa-route text-primary mr-1"></i> Vía de Administración *
+                  </label>
+                  <select class="form-control" name="via_administracion[]" required>
+                    <option value="">Seleccionar...</option>
+                    <option value="oral" ${datos.via_administracion === 'oral' ? 'selected' : ''}>Oral</option>
+                    <option value="topico" ${datos.via_administracion === 'topico' ? 'selected' : ''}>Tópico</option>
+                    <option value="intramuscular" ${datos.via_administracion === 'intramuscular' ? 'selected' : ''}>Intramuscular</option>
+                    <option value="subcutaneo" ${datos.via_administracion === 'subcutaneo' ? 'selected' : ''}>Subcutáneo</option>
+                    <option value="intravenoso" ${datos.via_administracion === 'intravenoso' ? 'selected' : ''}>Intravenoso</option>
+                    <option value="intrarectal" ${datos.via_administracion === 'intrarectal' ? 'selected' : ''}>Intrarectal</option>
+                    <option value="vaginal" ${datos.via_administracion === 'vaginal' ? 'selected' : ''}>Vaginal</option>
+                    <option value="subdermico" ${datos.via_administracion === 'subdermico' ? 'selected' : ''}>Subdérmico</option>
+                    <option value="otico" ${datos.via_administracion === 'otico' ? 'selected' : ''}>Ótico</option>
+                    <option value="optico" ${datos.via_administracion === 'optico' ? 'selected' : ''}>Óptico</option>
+                    <option value="intranasal" ${datos.via_administracion === 'intranasal' ? 'selected' : ''}>Intranasal</option>
+                    <option value="inhalatorio" ${datos.via_administracion === 'inhalatorio' ? 'selected' : ''}>Inhalatorio</option>
+                    <option value="transdermico" ${datos.via_administracion === 'transdermico' ? 'selected' : ''}>Transdérmico</option>
+                    <option value="sublingual" ${datos.via_administracion === 'sublingual' ? 'selected' : ''}>Sublingual</option>
+                    <option value="otros" ${datos.via_administracion === 'otros' ? 'selected' : ''}>Otros</option>
+                  </select>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">
+                    <i class="fas fa-tally text-primary mr-1"></i> Cantidad por Toma *
+                  </label>
+                  <input type="text" class="form-control" name="cantidad[]" required
+                         value="${datos.cantidad || ''}" 
+                         placeholder="Ej: 1 tableta, 5 ml, 2 gotas">
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">
+                    <i class="fas fa-clock text-primary mr-1"></i> Frecuencia *
+                  </label>
+                  <input type="text" class="form-control" name="frecuencia[]" required
+                         value="${datos.frecuencia || ''}" 
+                         placeholder="Ej: Cada 8 horas, 2 veces al día, PRN">
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-md-6">
-            <div class="form-group">
-              <label class="form-control-label"><i class="fas fa-weight text-primary mr-1"></i> Unidad</label>
-              <select class="form-control" name="unidad[]">
-                <option>Microgramos</option>
-                <option>Miligramos</option>
-                <option>Gramos</option>
-                <option>Mililitros</option>
-                <option>Porcentaje</option>
-                <option>Volumen</option>
-              </select>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">
+                    <i class="fas fa-calendar-plus text-primary mr-1"></i> Fecha de Inicio *
+                  </label>
+                  <input type="date" class="form-control" name="fecha_inicio[]" required
+                         value="${datos.fecha_inicio || ''}">
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">
+                    <i class="fas fa-calendar-check text-primary mr-1"></i> Fecha de Finalización
+                  </label>
+                  <input type="date" class="form-control" name="fecha_finalizacion[]" 
+                         value="${datos.fecha_finalizacion || ''}"
+                         placeholder="Dejar vacío si es tratamiento continuo">
+                  <small class="text-muted">Dejar vacío si es tratamiento continuo</small>
+                </div>
+              </div>
             </div>
-          </div>
-          <div class="col-md-6">
-            <div class="form-group">
-              <label class="form-control-label"><i class="fas fa-route text-primary mr-1"></i> Vía de Administración</label>
-              <select class="form-control" name="via_administracion[]">
-                <option>Oral</option>
-                <option>Tópico</option>
-                <option>Intramuscular</option>
-                <option>Subcutáneo</option>
-                <option>Intravenoso</option>
-                <option>Intrarectal</option>
-                <option>Vaginal</option>
-                <option>Subdérmico</option>
-                <option>Ótico</option>
-                <option>Óptico</option>
-                <option>Intranasal</option>
-              </select>
+
+            <div class="row">
+              <div class="col-md-12">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">
+                    <i class="fas fa-info-circle text-primary mr-1"></i> Indicación/Motivo del Tratamiento *
+                  </label>
+                  <textarea class="form-control" name="indicacion[]" rows="2" required
+                            placeholder="Ej: Para el control de la hipertensión arterial. Tomar preferiblemente en ayunas.">${datos.indicacion || ''}</textarea>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-md-6">
-            <div class="form-group">
-              <label class="form-control-label"><i class="fas fa-tally text-primary mr-1"></i> Cantidad</label>
-              <input type="text" class="form-control" name="cantidad[]" placeholder="Ingrese la cantidad">
+
+            <!-- Campos adicionales del modelo -->
+            <div class="row">
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">
+                    <i class="fas fa-check-circle text-primary mr-1"></i> Adherencia al Tratamiento
+                  </label>
+                  <select class="form-control" name="adherencia[]">
+                    <option value="no_evaluada" ${datos.adherencia === 'no_evaluada' ? 'selected' : ''}>No Evaluada</option>
+                    <option value="buena" ${datos.adherencia === 'buena' ? 'selected' : ''}>Buena</option>
+                    <option value="regular" ${datos.adherencia === 'regular' ? 'selected' : ''}>Regular</option>
+                    <option value="mala" ${datos.adherencia === 'mala' ? 'selected' : ''}>Mala</option>
+                  </select>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-group">
+                  <div class="custom-control custom-switch mt-4">
+                    <input type="checkbox" class="custom-control-input efectos-adversos-check" 
+                           id="efectos_adversos_${indice}" name="efectos_adversos[]" value="true"
+                           ${datos.efectos_adversos ? 'checked' : ''}>
+                    <label class="custom-control-label" for="efectos_adversos_${indice}">¿Presenta Efectos Adversos?</label>
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
-          <div class="col-md-6">
-            <div class="form-group">
-              <label class="form-control-label"><i class="fas fa-clock text-primary mr-1"></i> Frecuencia</label>
-              <input type="text" class="form-control" name="frecuencia[]" placeholder="Ingrese la frecuencia">
+
+            <div class="row efectos-adversos-detalle" style="display: ${datos.efectos_adversos ? 'block' : 'none'};">
+              <div class="col-md-12">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">
+                    <i class="fas fa-exclamation-triangle text-warning mr-1"></i> Descripción de Efectos Adversos
+                  </label>
+                  <textarea class="form-control" name="descripcion_efectos_adversos[]" rows="2" 
+                            placeholder="Describa los efectos adversos presentados...">${datos.descripcion_efectos_adversos || ''}</textarea>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-md-6">
-            <div class="form-group">
-              <label class="form-control-label"><i class="fas fa-calendar-plus text-primary mr-1"></i> Fecha de Inicio</label>
-              <input type="date" class="form-control" name="fecha_inicio[]">
-            </div>
-          </div>
-          <div class="col-md-6">
-            <div class="form-group">
-              <label class="form-control-label"><i class="fas fa-calendar-check text-primary mr-1"></i> Fecha de Finalización</label>
-              <input type="date" class="form-control" name="fecha_finalizacion[]">
-            </div>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-md-12">
-            <div class="form-group">
-              <label class="form-control-label"><i class="fas fa-info-circle text-primary mr-1"></i> Indicación</label>
-              <textarea class="form-control" name="indicacion[]" rows="3" placeholder="Ingrese las indicaciones"></textarea>
+
+            <div class="row">
+              <div class="col-md-12">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">
+                    <i class="fas fa-notes-medical text-primary mr-1"></i> Observaciones
+                  </label>
+                  <textarea class="form-control" name="observaciones[]" rows="2" 
+                            placeholder="Observaciones adicionales sobre este medicamento...">${datos.observaciones || ''}</textarea>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
-      <div class="text-right">
-        <button type="button" class="btn btn-danger btn-sm eliminar-medicamento mt-2">
-          <i class="fas fa-trash mr-1"></i> Eliminar Medicamento
-        </button>
-      </div>
-      <hr>
-      `;
-      document.getElementById('medicamentos').appendChild(div);
-      div.querySelector('.eliminar-medicamento').addEventListener('click', function () {
-        div.classList.add('animate__animated', 'animate__fadeOut');
-        setTimeout(() => div.remove(), 300);
-      });
+    `;
+  }
+
+  // Función para agregar medicamento
+  function agregarMedicamento(datos = {}) {
+    const container = document.getElementById('medicamentos-container');
+    const emptyMessage = document.getElementById('empty-medicamentos');
+    
+    const div = document.createElement('div');
+    div.innerHTML = crearTemplateMedicamento(contadorMedicamentos, datos);
+    const medicamentoElement = div.firstElementChild;
+    
+    container.appendChild(medicamentoElement);
+    
+    // Ocultar mensaje vacío
+    emptyMessage.style.display = 'none';
+    
+    // Agregar event listener para eliminar
+    medicamentoElement.querySelector('.eliminar-medicamento').addEventListener('click', function() {
+      eliminarMedicamento(medicamentoElement);
+    });
+
+    // Event listener para mostrar/ocultar efectos adversos
+    const efectosCheck = medicamentoElement.querySelector('.efectos-adversos-check');
+    const efectosDetalle = medicamentoElement.querySelector('.efectos-adversos-detalle');
+    
+    efectosCheck.addEventListener('change', function() {
+      efectosDetalle.style.display = this.checked ? 'block' : 'none';
     });
     
-    // Agregar el primer medicamento automáticamente
-    document.getElementById('agregar-medicamento').click();
+    contadorMedicamentos++;
+    console.log(`✅ Medicamento #${contadorMedicamentos} agregado`);
+  }
+
+  // Función para eliminar medicamento
+  function eliminarMedicamento(elemento) {
+    elemento.classList.add('animate__fadeOut');
+    setTimeout(() => {
+      elemento.remove();
+      
+      // Mostrar mensaje vacío si no hay medicamentos
+      const container = document.getElementById('medicamentos-container');
+      if (container.children.length === 0) {
+        document.getElementById('empty-medicamentos').style.display = 'block';
+      }
+      
+      // Renumerar medicamentos
+      renumerarMedicamentos();
+    }, 300);
+  }
+
+  // Función para renumerar medicamentos
+  function renumerarMedicamentos() {
+    const medicamentos = document.querySelectorAll('.medicamento');
+    medicamentos.forEach((medicamento, index) => {
+      medicamento.setAttribute('data-index', index);
+      const titulo = medicamento.querySelector('.card-header h6');
+      titulo.innerHTML = `<i class="fas fa-pills text-primary mr-2"></i>Medicamento #${index + 1}`;
+    });
+    contadorMedicamentos = medicamentos.length;
+  }
+
+  // Función para cargar datos existentes
+  function cargarDatosExistentes() {
+    if (modoEdicion && datosExistentes && Array.isArray(datosExistentes)) {
+      console.log("🔄 Cargando medicamentos existentes...");
+      
+      datosExistentes.forEach(medicamento => {
+        agregarMedicamento(medicamento);
+      });
+      
+      console.log(`✅ Se cargaron ${datosExistentes.length} medicamento(s)`);
+    } else {
+      // Agregar un medicamento vacío si no hay datos
+      agregarMedicamento();
+    }
+  }
+
+  // Event listeners
+  document.getElementById('agregar-medicamento').addEventListener('click', function() {
+    agregarMedicamento();
   });
+
+  document.getElementById('formMedicamentos').addEventListener('submit', function(e) {
+    const medicamentos = document.querySelectorAll('.medicamento');
+    
+    if (medicamentos.length === 0) {
+      e.preventDefault();
+      alert('⚠️ Debes agregar al menos un medicamento.');
+      return false;
+    }
+
+    // Validar que al menos uno tenga nombre comercial
+    let tieneNombres = false;
+    medicamentos.forEach(medicamento => {
+      const nombreComercial = medicamento.querySelector('input[name="nombre_comercial[]"]').value.trim();
+      
+      if (nombreComercial) {
+        tieneNombres = true;
+      }
+    });
+
+    if (!tieneNombres) {
+      e.preventDefault();
+      alert('⚠️ Al menos un medicamento debe tener nombre comercial.');
+      return false;
+    }
+
+    console.log(`📤 Enviando formulario con ${medicamentos.length} medicamento(s)`);
+  });
+
+  // Inicializar
+  cargarDatosExistentes();
+  console.log("🎯 JavaScript de medicamentos inicializado");
+});
 </script>
 
 <!-- Incluir FontAwesome si no está ya en el layout base -->

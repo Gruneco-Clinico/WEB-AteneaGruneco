@@ -195,19 +195,12 @@ urlpatterns = [
         name="obtener_datos_sesion",
     ),
     path(
-    "resumen_sesiones/<int:visita_id>/<int:examen_id>/",
-    views.resumen_sesiones,
-    name="resumen_sesiones",
+        "resumen_sesiones/<int:visita_id>/<int:examen_id>/",
+        views.resumen_sesiones,
+        name="resumen_sesiones",
     ),
-
-    #INTEGRACIÓN RECUÉRDAME
-
-    path("estadisticas/", 
-    views.estadisticas, 
-    name="estadisticas"
-    ),
-
-    
+    # INTEGRACIÓN RECUÉRDAME
+    path("estadisticas/", views.estadisticas, name="estadisticas"),
     # examanes generales
     path(
         "guardar_examen_analisis/",
@@ -218,5 +211,10 @@ urlpatterns = [
         "guardar_examen_antecedentes/",
         views.guardar_examen_antecedentes,
         name="guardar_examen_antecedentes",
+    ),
+    path(
+        "guardar_examen_medicamentos/",
+        views.guardar_examen_medicamentos,
+        name="guardar_examen_medicamentos",
     ),
 ]

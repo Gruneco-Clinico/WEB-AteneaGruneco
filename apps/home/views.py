@@ -18,7 +18,6 @@ from .posthog_service import (
 )  # Integración RecuérdaMe
 from django.conf import settings  # Integración RecuérdaMe
 from django.http import JsonResponse, HttpResponseServerError  # Integración RecuérdaMe
-from .models import InteractionMetric  # Integración RecuérdaMe
 from datetime import datetime, date
 from .models import *
 from .forms import ProyectoForm, RegistroDemograficoForm
@@ -5525,6 +5524,216 @@ def guardar_examen_antecedentes(request):
         messages.error(request, "❌ Método no permitido.")
         return redirect("index")
 
-        return redirect("proyectos")
 
-    return render(request, "home/proyectos.html", context)
+@login_required
+def guardar_examen_medicamentos(request):
+    if request.method == "POST":
+        try:
+            visita_id = request.POST.get("visita_id")
+            paciente_id = request.POST.get("paciente_id")
+            examen_id = request.POST.get("examen_id")
+
+            # Obtener la instancia de VisitaExamen
+            visita_examen = get_object_or_404(
+                VisitaExamen, visita_id=visita_id, examen_id=examen_id
+            )
+
+            # Marcar como iniciado si está pendiente
+            if visita_examen.estado == "pendiente":
+                visita_examen.estado = "en_progreso"
+                visita_examen.fecha_inicio = timezone.now()
+                visita_examen.save()
+
+            # 🔧 CORRECCIÓN: Obtener o crear MedicamentosResult de forma correcta
+            try:
+                medicamentos_result = MedicamentosResult.objects.get(
+                    visita_examen=visita_examen
+                )
+                print("📋 MedicamentosResult encontrado - Modo edición")
+            except MedicamentosResult.DoesNotExist:
+                medicamentos_result = MedicamentosResult.objects.create(
+                    visita_examen=visita_examen
+                )
+
+            # Actualizar observaciones generales
+            observaciones_generales = request.POST.get("observaciones_generales", "")
+            medicamentos_result.observaciones_generales = observaciones_generales
+            medicamentos_result.save()
+
+            # Obtener arrays de datos de medicamentos
+            nombres_comerciales = request.POST.getlist("nombre_comercial[]")
+            nombres_genericos = request.POST.getlist("nombre_generico[]")
+            presentaciones = request.POST.getlist("presentacion[]")
+            concentraciones = request.POST.getlist("concentracion[]")
+            unidades = request.POST.getlist("unidad[]")
+            vias_administracion = request.POST.getlist("via_administracion[]")
+            cantidades = request.POST.getlist("cantidad[]")
+            frecuencias = request.POST.getlist("frecuencia[]")
+            fechas_inicio = request.POST.getlist("fecha_inicio[]")
+            fechas_finalizacion = request.POST.getlist("fecha_finalizacion[]")
+            indicaciones = request.POST.getlist("indicacion[]")
+
+            # Campos adicionales
+            adherencias = request.POST.getlist("adherencia[]")
+            efectos_adversos = request.POST.getlist("efectos_adversos[]")
+            descripciones_efectos = request.POST.getlist(
+                "descripcion_efectos_adversos[]"
+            )
+            observaciones_medicamentos = request.POST.getlist("observaciones[]")
+
+            # 🔧 CORRECCIÓN: Eliminar medicamentos existentes antes de crear nuevos
+            medicamentos_existentes = medicamentos_result.medicamentos.all()
+            count_eliminados = medicamentos_existentes.count()
+            medicamentos_existentes.delete()
+
+            medicamentos_guardados = 0
+
+            # Procesar cada medicamento
+            for i in range(len(nombres_comerciales)):
+                nombre_comercial = (
+                    nombres_comerciales[i].strip()
+                    if i < len(nombres_comerciales)
+                    else ""
+                )
+
+                print(f"🔍 Procesando medicamento {i + 1}: {nombre_comercial}")
+
+                # Validar que al menos el nombre comercial esté presente
+                if nombre_comercial:
+                    # Manejar fechas de forma segura
+                    fecha_inicio = None
+                    if i < len(fechas_inicio) and fechas_inicio[i]:
+                        try:
+                            fecha_inicio = datetime.strptime(
+                                fechas_inicio[i], "%Y-%m-%d"
+                            ).date()
+                        except (ValueError, TypeError) as e:
+                            print(f"⚠️ Error en fecha_inicio {i}: {e}")
+                            fecha_inicio = None
+
+                    fecha_finalizacion = None
+                    if i < len(fechas_finalizacion) and fechas_finalizacion[i]:
+                        try:
+                            fecha_finalizacion = datetime.strptime(
+                                fechas_finalizacion[i], "%Y-%m-%d"
+                            ).date()
+                        except (ValueError, TypeError) as e:
+                            print(f"⚠️ Error en fecha_finalizacion {i}: {e}")
+                            fecha_finalizacion = None
+
+                    # Manejar efectos adversos
+                    tiene_efectos_adversos = False
+                    if i < len(efectos_adversos):
+                        tiene_efectos_adversos = efectos_adversos[i] == "true"
+
+                    # 🔧 CORRECCIÓN: Verificar que el campo 'presentacion' es obligatorio
+                    presentacion = (
+                        presentaciones[i]
+                        if i < len(presentaciones) and presentaciones[i]
+                        else "tableta"
+                    )
+                    concentracion = (
+                        concentraciones[i]
+                        if i < len(concentraciones) and concentraciones[i]
+                        else "No especificada"
+                    )
+                    unidad = (
+                        unidades[i]
+                        if i < len(unidades) and unidades[i]
+                        else "miligramos"
+                    )
+                    via_administracion = (
+                        vias_administracion[i]
+                        if i < len(vias_administracion) and vias_administracion[i]
+                        else "oral"
+                    )
+                    cantidad = (
+                        cantidades[i] if i < len(cantidades) and cantidades[i] else "1"
+                    )
+                    frecuencia = (
+                        frecuencias[i]
+                        if i < len(frecuencias) and frecuencias[i]
+                        else "No especificada"
+                    )
+                    indicacion = (
+                        indicaciones[i]
+                        if i < len(indicaciones) and indicaciones[i]
+                        else "No especificada"
+                    )
+
+                    # Crear el medicamento
+                    try:
+                        medicamento = Medicamento.objects.create(
+                            medicamentos_result=medicamentos_result,
+                            nombre_comercial=nombre_comercial,
+                            nombre_generico=nombres_genericos[i].strip()
+                            if i < len(nombres_genericos)
+                            else "",
+                            presentacion=presentacion,
+                            concentracion=concentracion,
+                            unidad=unidad,
+                            via_administracion=via_administracion,
+                            cantidad=cantidad,
+                            frecuencia=frecuencia,
+                            fecha_inicio=fecha_inicio,
+                            fecha_finalizacion=fecha_finalizacion,
+                            indicacion=indicacion,
+                            adherencia=adherencias[i]
+                            if i < len(adherencias)
+                            else "no_evaluada",
+                            efectos_adversos=tiene_efectos_adversos,
+                            descripcion_efectos_adversos=descripciones_efectos[i]
+                            if i < len(descripciones_efectos)
+                            else "",
+                            observaciones=observaciones_medicamentos[i]
+                            if i < len(observaciones_medicamentos)
+                            else "",
+                            activo=True,  # Por defecto activo
+                        )
+                        medicamentos_guardados += 1
+                        print(
+                            f"✅ Medicamento guardado: {medicamento.nombre_comercial}"
+                        )
+
+                    except Exception as e:
+                        print(f"❌ Error al crear medicamento {i + 1}: {str(e)}")
+                        # Continuar con el siguiente medicamento
+                        continue
+                else:
+                    print(f"⚠️ Medicamento {i + 1} omitido - sin nombre comercial")
+
+            print(f"📊 Total medicamentos guardados: {medicamentos_guardados}")
+
+            # Marcar el examen como completado solo si se guardó al menos un medicamento
+            if medicamentos_guardados > 0:
+                visita_examen.estado = "completado"
+                visita_examen.fecha_completado = timezone.now()
+                visita_examen.save()
+
+                messages.success(
+                    request,
+                    f"✅ Se guardaron {medicamentos_guardados} medicamento(s) correctamente.",
+                )
+            else:
+                # Revertir el estado si no se guardó nada
+                visita_examen.estado = "pendiente"
+                visita_examen.save()
+                messages.warning(request, "⚠️ No se guardó ningún medicamento válido.")
+
+            return redirect("detalle_paciente", paciente_id=paciente_id)
+
+        except Exception as e:
+            # Revertir estado si hubo error
+            try:
+                if "visita_examen" in locals():
+                    visita_examen.estado = "pendiente"
+                    visita_examen.save()
+            except:
+                pass
+
+            messages.error(request, f"❌ Error al guardar los medicamentos: {str(e)}")
+            return redirect("detalle_paciente", paciente_id=paciente_id or 1)
+
+    else:
+        messages.error(request, "❌ Método no permitido.")
+        return redirect("index")
