@@ -161,13 +161,6 @@
                           <small class="form-text text-muted">Normal: <90 mmHg </small>
                         </div>
                       </div>
-                      <div class="col-md-4">
-                        <div class="form-group">
-                          <label class="form-control-label">Perímetro Cefálico (cm)</label>
-                          <input type="number" step="0.1" class="form-control" name="perimetro_cefalico">
-                          <small class="form-text text-muted">Para pacientes pediátricos</small>
-                        </div>
-                      </div>
                     </div>
                   </div>
                 </div>
@@ -182,63 +175,96 @@
                     <div class="row">
                       <div class="col-md-4">
                         <div class="form-group">
+                          <label class="form-control-label">Perímetro Cefálico (cm)</label>
+                          <input type="number" step="0.1" class="form-control" name="perimetro_cefalico">
+                          <small class="form-text text-muted">Para pacientes pediátricos</small>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-3">
+                        <div class="form-group">
                           <label class="form-control-label">Cuero Cabelludo</label>
-                          <select class="form-control" name="cuero_cabelludo" id="cuero_cabelludo">
-                            <option value="normal">Normal</option>
-                            <option value="anormal">Anormal</option>
-                          </select>
-                          <div id="obsCC" class="mt-2 d-none">
+                          <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="cuero_cabelludo_normal" 
+                                   name="cuero_cabelludo" value="normal">
+                            <label class="custom-control-label" for="cuero_cabelludo_normal">Normal</label>
+                          </div>
+                          <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="cuero_cabelludo_anormal" 
+                                   name="cuero_cabelludo" value="anormal">
+                            <label class="custom-control-label" for="cuero_cabelludo_anormal">Anormal</label>
+                          </div>
+                          <div class="mt-2">
                             <input type="text" class="form-control" placeholder="Observaciones"
                               name="observaciones_cuero_cabelludo">
                           </div>
                         </div>
                       </div>
-                      <div class="col-md-4">
+                      <div class="col-md-3">
                         <div class="form-group">
                           <label class="form-control-label">Oídos</label>
-                          <select class="form-control" name="oidos" id="oidos">
-                            <option value="normal">Normal</option>
-                            <option value="anormal">Anormal</option>
-                          </select>
-                          <div id="obsOidos" class="mt-2 d-none">
+                          <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="oidos_normal" 
+                                   name="oidos" value="normal">
+                            <label class="custom-control-label" for="oidos_normal">Normal</label>
+                          </div>
+                          <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="oidos_anormal" 
+                                   name="oidos" value="anormal">
+                            <label class="custom-control-label" for="oidos_anormal">Anormal</label>
+                          </div>
+                          <div class="mt-2">
                             <input type="text" class="form-control" placeholder="Observaciones"
                               name="observaciones_oidos">
                           </div>
                         </div>
                       </div>
-                      <div class="col-md-4">
+                      <div class="col-md-3">
                         <div class="form-group">
                           <label class="form-control-label">Nariz</label>
-                          <select class="form-control" name="nariz" id="nariz">
-                            <option value="normal">Normal</option>
-                            <option value="anormal">Anormal</option>
-                          </select>
-                          <div id="obsNariz" class="mt-2 d-none">
+                          <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="nariz_normal" 
+                                   name="nariz" value="normal">
+                            <label class="custom-control-label" for="nariz_normal">Normal</label>
+                          </div>
+                          <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="nariz_anormal" 
+                                   name="nariz" value="anormal">
+                            <label class="custom-control-label" for="nariz_anormal">Anormal</label>
+                          </div>
+                          <div class="mt-2">
                             <input type="text" class="form-control" placeholder="Observaciones"
                               name="observaciones_nariz">
                           </div>
                         </div>
                       </div>
-                    </div>
-                    <div class="row mt-3">
-                      <div class="col-md-4">
+                      <div class="col-md-3">
                         <div class="form-group">
                           <label class="form-control-label">Cuello</label>
-                          <select class="form-control" name="cuello" id="cuello">
-                            <option value="normal">Normal</option>
-                            <option value="anormal">Anormal</option>
-                          </select>
-                          <div id="obsCuello" class="mt-2 d-none">
+                          <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="cuello_normal" 
+                                   name="cuello" value="normal">
+                            <label class="custom-control-label" for="cuello_normal">Normal</label>
+                          </div>
+                          <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="cuello_anormal" 
+                                   name="cuello" value="anormal">
+                            <label class="custom-control-label" for="cuello_anormal">Anormal</label>
+                          </div>
+                          <div class="mt-2">
                             <input type="text" class="form-control" placeholder="Observaciones"
                               name="observaciones_cuello">
                           </div>
                         </div>
                       </div>
-                      <div class="col-md-8">
+                    </div>
+                    <div class="row mt-3">
+                      <div class="col-md-12">
                         <div class="form-group">
                           <label class="form-control-label">Otros Hallazgos Importantes</label>
-                          <textarea class="form-control" rows="2" name="otros_hallazgos_cabeza_cuello"
-                            placeholder="Describa otros hallazgos relevantes en cabeza y cuello"></textarea>
+                          <input type="text" class="form-control" name="otros_hallazgos_importantes"
+                            placeholder="Describa otros hallazgos relevantes en cabeza y cuello">
                         </div>
                       </div>
                     </div>
@@ -256,13 +282,13 @@
                       <div class="col-md-4">
                         <div class="form-group">
                           <label class="form-control-label">Forma del Tórax</label>
-                          <select class="form-control" name="forma_torax" id="forma_torax">
-                            <option value="normal">Normal</option>
+                          <select class="form-control" name="forma_torax">
+                            <option value="normal" selected>Normal</option>
                             <option value="anormal">Anormal</option>
                           </select>
-                          <div id="obsTorax" class="mt-2 d-none">
-                            <input type="text" class="form-control" placeholder="Especificar alteración"
-                              name="observaciones_torax">
+                          <div class="mt-2">
+                            <input type="text" class="form-control" placeholder="Observaciones"
+                              name="observaciones_forma_torax">
                           </div>
                         </div>
                       </div>
@@ -270,53 +296,44 @@
                         <div class="form-group">
                           <label class="form-control-label">Murmullo Vesicular</label>
                           <select class="form-control" name="murmullo_vesicular">
-                            <option value="conservado">Conservado</option>
+                            <option value="conservado" selected>Conservado</option>
                             <option value="ausente">Ausente</option>
                             <option value="disminuido">Disminuido</option>
                           </select>
+                          <div class="mt-2">
+                            <input type="text" class="form-control" placeholder="Observaciones"
+                              name="observaciones_murmullo_vesicular">
+                          </div>
                         </div>
                       </div>
                       <div class="col-md-4">
                         <div class="form-group">
                           <label class="form-control-label">Ruidos Sobreagregados</label>
-                          <div class="custom-control custom-switch">
-                            <input type="checkbox" class="custom-control-input" id="ruidos_switch"
+                          <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="ruidos_sobreagregados"
                               name="ruidos_sobreagregados" value="1">
-                            <label class="custom-control-label" for="ruidos_switch">Presente</label>
+                            <label class="custom-control-label" for="ruidos_sobreagregados">Presente</label>
                           </div>
-                          <div id="obsRuidos" class="mt-2 d-none">
-                            <select class="form-control" name="tipo_ruidos">
-                              <option value="">Seleccione tipo</option>
-                              <option value="crepitantes">Crepitantes</option>
-                              <option value="roncus">Roncus</option>
-                              <option value="sibilancias">Sibilancias</option>
-                              <option value="mixtos">Mixtos</option>
-                            </select>
+                          <div class="mt-2">
+                            <input type="text" class="form-control" placeholder="Observaciones"
+                              name="observaciones_ruidos_sobreagregados">
                           </div>
                         </div>
                       </div>
                     </div>
                     <div class="row mt-3">
-                      <div class="col-md-4">
+                      <div class="col-md-6">
                         <div class="form-group">
                           <label class="form-control-label">Ruidos Cardíacos</label>
-                          <select class="form-control" name="ruidos_cardiacos" id="ruidos_cardiacos">
-                            <option value="ritmicos">Rítmicos</option>
+                          <select class="form-control" name="ruidos_cardiacos">
+                            <option value="ritmicos" selected>Rítmicos</option>
                             <option value="arritmicos">Arrítmicos</option>
                             <option value="soplos">Soplos</option>
                           </select>
-                          <div id="obsSoplos" class="mt-2 d-none">
-                            <input type="text" class="form-control" placeholder="Descripción de soplos"
-                              name="observaciones_soplos">
+                          <div class="mt-2">
+                            <input type="text" class="form-control" placeholder="Observaciones"
+                              name="observaciones_ruidos_cardiacos">
                           </div>
-                        </div>
-                      </div>
-                      <div class="col-md-8">
-                        <div class="form-group">
-                          <label class="form-control-label">Observaciones adicionales del sistema
-                            cardiorrespiratorio</label>
-                          <textarea class="form-control" rows="2" name="observaciones_cardiorespiratorio"
-                            placeholder="Describa otros hallazgos relevantes"></textarea>
                         </div>
                       </div>
                     </div>
@@ -331,48 +348,47 @@
                   </div>
                   <div class="card-body bg-white">
                     <div class="row">
-                      <div class="col-md-4">
+                      <div class="col-md-3">
                         <div class="form-group">
                           <label class="form-control-label">Peristaltismo</label>
                           <select class="form-control" name="peristaltismo">
-                            <option value="presente">Presente</option>
+                            <option value="presente" selected>Presente</option>
                             <option value="ausente">Ausente</option>
-                            <option value="aumentado">Aumentado</option>
-                            <option value="disminuido">Disminuido</option>
                           </select>
                         </div>
                       </div>
-                      <div class="col-md-4">
+                      <div class="col-md-3">
                         <div class="form-group">
                           <label class="form-control-label">Pared Abdominal</label>
-                          <div class="custom-control custom-switch">
-                            <input type="checkbox" class="custom-control-input" id="pared_switch" name="pared_abdominal"
-                              value="1">
-                            <label class="custom-control-label" for="pared_switch">Alteración presente</label>
+                          <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="pared_abdominal_normal"
+                              name="pared_abdominal" value="normal">
+                            <label class="custom-control-label" for="pared_abdominal_normal">Normal</label>
                           </div>
-                          <div id="obsPared" class="mt-2 d-none">
-                            <input type="text" class="form-control" placeholder="Descripción"
-                              name="observaciones_pared">
+                          <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="pared_abdominal_anormal"
+                              name="pared_abdominal" value="anormal">
+                            <label class="custom-control-label" for="pared_abdominal_anormal">Anormal</label>
                           </div>
                         </div>
                       </div>
-                      <div class="col-md-4">
+                      <div class="col-md-3">
                         <div class="form-group">
-                          <label class="form-control-label">Dolor a la palpación</label>
-                          <div class="custom-control custom-switch">
-                            <input type="checkbox" class="custom-control-input" id="dolor_switch" name="dolor_abdominal"
-                              value="1">
-                            <label class="custom-control-label" for="dolor_switch">Presente</label>
+                          <label class="form-control-label">Masas</label>
+                          <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="masas"
+                              name="masas" value="1">
+                            <label class="custom-control-label" for="masas">Presente</label>
                           </div>
-                          <div id="obsDolor" class="mt-2 d-none">
-                            <select class="form-control" name="ubicacion_dolor">
-                              <option value="">Seleccione localización</option>
-                              <option value="difuso">Difuso</option>
-                              <option value="csd">Cuadrante superior derecho</option>
-                              <option value="csi">Cuadrante superior izquierdo</option>
-                              <option value="cid">Cuadrante inferior derecho</option>
-                              <option value="cii">Cuadrante inferior izquierdo</option>
-                            </select>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <label class="form-control-label">Megalias</label>
+                          <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="megalias"
+                              name="megalias" value="1">
+                            <label class="custom-control-label" for="megalias">Presente</label>
                           </div>
                         </div>
                       </div>
@@ -380,9 +396,9 @@
                     <div class="row mt-3">
                       <div class="col-md-12">
                         <div class="form-group">
-                          <label class="form-control-label">Observaciones abdominales adicionales</label>
-                          <textarea class="form-control" rows="2" name="observaciones_abdomen"
-                            placeholder="Visceromegalias, distensión, masas, etc."></textarea>
+                          <label class="form-control-label">Observaciones</label>
+                          <input type="text" class="form-control" name="observaciones_abdomen"
+                            placeholder="Describa otros hallazgos relevantes">
                         </div>
                       </div>
                     </div>
@@ -401,86 +417,109 @@
                       <div class="col-md-4">
                         <div class="form-group">
                           <label class="form-control-label">Curvatura Cervical</label>
-                          <div class="custom-control custom-switch">
-                            <input type="checkbox" class="custom-control-input" id="cervical_switch"
-                              name="curvatura_cervical" value="1">
-                            <label class="custom-control-label" for="cervical_switch">Alteración presente</label>
+                          <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="curvatura_cervical_normal"
+                              name="curvatura_cervical" value="normal">
+                            <label class="custom-control-label" for="curvatura_cervical_normal">Normal</label>
                           </div>
-                          <div id="obsCervical" class="mt-2 d-none">
-                            <input type="text" class="form-control" placeholder="Descripción"
-                              name="observaciones_cervical">
+                          <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="curvatura_cervical_anormal"
+                              name="curvatura_cervical" value="anormal">
+                            <label class="custom-control-label" for="curvatura_cervical_anormal">Anormal</label>
                           </div>
                         </div>
                       </div>
                       <div class="col-md-4">
                         <div class="form-group">
                           <label class="form-control-label">Curvatura Torácica</label>
-                          <div class="custom-control custom-switch">
-                            <input type="checkbox" class="custom-control-input" id="toracica_switch"
-                              name="curvatura_toracica" value="1">
-                            <label class="custom-control-label" for="toracica_switch">Alteración presente</label>
+                          <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="curvatura_toracica_normal"
+                              name="curvatura_toracica" value="normal">
+                            <label class="custom-control-label" for="curvatura_toracica_normal">Normal</label>
                           </div>
-                          <div id="obsToracica" class="mt-2 d-none">
-                            <input type="text" class="form-control" placeholder="Descripción"
-                              name="observaciones_toracica">
+                          <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="curvatura_toracica_anormal"
+                              name="curvatura_toracica" value="anormal">
+                            <label class="custom-control-label" for="curvatura_toracica_anormal">Anormal</label>
                           </div>
                         </div>
                       </div>
                       <div class="col-md-4">
                         <div class="form-group">
                           <label class="form-control-label">Curvatura Lumbar</label>
-                          <div class="custom-control custom-switch">
-                            <input type="checkbox" class="custom-control-input" id="lumbar_switch"
-                              name="curvatura_lumbar" value="1">
-                            <label class="custom-control-label" for="lumbar_switch">Alteración presente</label>
+                          <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="curvatura_lumbar_normal"
+                              name="curvatura_lumbar" value="normal">
+                            <label class="custom-control-label" for="curvatura_lumbar_normal">Normal</label>
                           </div>
-                          <div id="obsLumbar" class="mt-2 d-none">
-                            <input type="text" class="form-control" placeholder="Descripción"
-                              name="observaciones_lumbar">
+                          <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="curvatura_lumbar_anormal"
+                              name="curvatura_lumbar" value="anormal">
+                            <label class="custom-control-label" for="curvatura_lumbar_anormal">Anormal</label>
                           </div>
                         </div>
                       </div>
                     </div>
                     <div class="row mt-3">
-                      <div class="col-md-4">
+                      <div class="col-md-6">
                         <div class="form-group">
-                          <label class="form-control-label">Arcos Movimiento - Miembros Superiores</label>
-                          <div class="custom-control custom-switch">
-                            <input type="checkbox" class="custom-control-input" id="arcos_sup_switch"
-                              name="arcos_movimiento_superiores" value="1">
-                            <label class="custom-control-label" for="arcos_sup_switch">Alteración presente</label>
+                          <label class="form-control-label">Arcos de Movimiento - Miembros Superiores</label>
+                          <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="arcos_superiores_normal"
+                              name="arcos_movimiento_superiores" value="normal">
+                            <label class="custom-control-label" for="arcos_superiores_normal">Normal</label>
                           </div>
-                          <div id="obsArcosSup" class="mt-2 d-none">
-                            <input type="text" class="form-control" placeholder="Descripción"
-                              name="observaciones_arcos_sup">
+                          <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="arcos_superiores_anormal"
+                              name="arcos_movimiento_superiores" value="anormal">
+                            <label class="custom-control-label" for="arcos_superiores_anormal">Anormal</label>
                           </div>
                         </div>
                       </div>
-                      <div class="col-md-4">
+                      <div class="col-md-6">
                         <div class="form-group">
-                          <label class="form-control-label">Arcos Movimiento - Miembros Inferiores</label>
-                          <div class="custom-control custom-switch">
-                            <input type="checkbox" class="custom-control-input" id="arcos_inf_switch"
-                              name="arcos_movimiento_inferiores" value="1">
-                            <label class="custom-control-label" for="arcos_inf_switch">Alteración presente</label>
+                          <label class="form-control-label">Arcos de Movimiento - Miembros Inferiores</label>
+                          <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="arcos_inferiores_normal"
+                              name="arcos_movimiento_inferiores" value="normal">
+                            <label class="custom-control-label" for="arcos_inferiores_normal">Normal</label>
                           </div>
-                          <div id="obsArcosInf" class="mt-2 d-none">
-                            <input type="text" class="form-control" placeholder="Descripción"
-                              name="observaciones_arcos_inf">
+                          <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="arcos_inferiores_anormal"
+                              name="arcos_movimiento_inferiores" value="anormal">
+                            <label class="custom-control-label" for="arcos_inferiores_anormal">Anormal</label>
                           </div>
                         </div>
                       </div>
-                      <div class="col-md-4">
+                    </div>
+                    <div class="row mt-3">
+                      <div class="col-md-6">
                         <div class="form-group">
                           <label class="form-control-label">Asimetrías - Miembros Inferiores</label>
-                          <div class="custom-control custom-switch">
-                            <input type="checkbox" class="custom-control-input" id="asim_switch"
-                              name="asimetrias_inferiores" value="1">
-                            <label class="custom-control-label" for="asim_switch">Presente</label>
+                          <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="asimetrias_inferiores_normal"
+                              name="asimetrias_inferiores" value="normal">
+                            <label class="custom-control-label" for="asimetrias_inferiores_normal">Normal</label>
                           </div>
-                          <div id="obsAsim" class="mt-2 d-none">
-                            <input type="text" class="form-control" placeholder="Descripción"
-                              name="observaciones_asimetrias">
+                          <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="asimetrias_inferiores_anormal"
+                              name="asimetrias_inferiores" value="anormal">
+                            <label class="custom-control-label" for="asimetrias_inferiores_anormal">Anormal</label>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                        <div class="form-group">
+                          <label class="form-control-label">Asimetrías - Miembros Superiores</label>
+                          <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="asimetrias_superiores_normal"
+                              name="asimetrias_superiores" value="normal">
+                            <label class="custom-control-label" for="asimetrias_superiores_normal">Normal</label>
+                          </div>
+                          <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="asimetrias_superiores_anormal"
+                              name="asimetrias_superiores" value="anormal">
+                            <label class="custom-control-label" for="asimetrias_superiores_anormal">Anormal</label>
                           </div>
                         </div>
                       </div>
@@ -488,9 +527,9 @@
                     <div class="row mt-3">
                       <div class="col-md-12">
                         <div class="form-group">
-                          <label class="form-control-label">Observaciones adicionales del sistema osteomuscular</label>
-                          <textarea class="form-control" rows="2" name="observaciones_osteomuscular"
-                            placeholder="Otros hallazgos relevantes"></textarea>
+                          <label class="form-control-label">Observaciones</label>
+                          <input type="text" class="form-control" name="observaciones_osteomuscular"
+                            placeholder="Otros hallazgos relevantes">
                         </div>
                       </div>
                     </div>
@@ -508,56 +547,40 @@
                       <div class="col-md-3">
                         <div class="form-group">
                           <label class="form-control-label">Máculas</label>
-                          <div class="custom-control custom-switch">
-                            <input type="checkbox" class="custom-control-input" id="maculas_switch" name="maculas"
-                              value="1">
-                            <label class="custom-control-label" for="maculas_switch">Presente</label>
-                          </div>
-                          <div id="obsMaculas" class="mt-2 d-none">
-                            <input type="text" class="form-control" placeholder="Ubicación"
-                              name="observaciones_maculas">
+                          <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="maculas"
+                              name="maculas" value="1">
+                            <label class="custom-control-label" for="maculas">Presente</label>
                           </div>
                         </div>
                       </div>
                       <div class="col-md-3">
                         <div class="form-group">
                           <label class="form-control-label">Pápulas</label>
-                          <div class="custom-control custom-switch">
-                            <input type="checkbox" class="custom-control-input" id="papulas_switch" name="papulas"
-                              value="1">
-                            <label class="custom-control-label" for="papulas_switch">Presente</label>
-                          </div>
-                          <div id="obsPapulas" class="mt-2 d-none">
-                            <input type="text" class="form-control" placeholder="Ubicación"
-                              name="observaciones_papulas">
+                          <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="papulas"
+                              name="papulas" value="1">
+                            <label class="custom-control-label" for="papulas">Presente</label>
                           </div>
                         </div>
                       </div>
                       <div class="col-md-3">
                         <div class="form-group">
                           <label class="form-control-label">Vesículas</label>
-                          <div class="custom-control custom-switch">
-                            <input type="checkbox" class="custom-control-input" id="vesiculas_switch" name="vesiculas"
-                              value="1">
-                            <label class="custom-control-label" for="vesiculas_switch">Presente</label>
-                          </div>
-                          <div id="obsVesiculas" class="mt-2 d-none">
-                            <input type="text" class="form-control" placeholder="Ubicación"
-                              name="observaciones_vesiculas">
+                          <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="vesiculas"
+                              name="vesiculas" value="1">
+                            <label class="custom-control-label" for="vesiculas">Presente</label>
                           </div>
                         </div>
                       </div>
                       <div class="col-md-3">
                         <div class="form-group">
                           <label class="form-control-label">Pústulas</label>
-                          <div class="custom-control custom-switch">
-                            <input type="checkbox" class="custom-control-input" id="pustulas_switch" name="pustulas"
-                              value="1">
-                            <label class="custom-control-label" for="pustulas_switch">Presente</label>
-                          </div>
-                          <div id="obsPustulas" class="mt-2 d-none">
-                            <input type="text" class="form-control" placeholder="Ubicación"
-                              name="observaciones_pustulas">
+                          <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="pustulas"
+                              name="pustulas" value="1">
+                            <label class="custom-control-label" for="pustulas">Presente</label>
                           </div>
                         </div>
                       </div>
@@ -566,19 +589,62 @@
                       <div class="col-md-3">
                         <div class="form-group">
                           <label class="form-control-label">Fisuras</label>
-                          <div class="custom-control custom-switch">
-                            <input type="checkbox" class="custom-control-input" id="fisuras_switch" name="fisuras"
-                              value="1">
-                            <label class="custom-control-label" for="fisuras_switch">Presente</label>
-                          </div>
-                          <div id="obsFisuras" class="mt-2 d-none">
-                            <input type="text" class="form-control" placeholder="Ubicación"
-                              name="observaciones_fisuras">
+                          <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="fisuras"
+                              name="fisuras" value="1">
+                            <label class="custom-control-label" for="fisuras">Presente</label>
                           </div>
                         </div>
                       </div>
-
-
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <label class="form-control-label">Escaras</label>
+                          <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="escaras"
+                              name="escaras" value="1">
+                            <label class="custom-control-label" for="escaras">Presente</label>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <label class="form-control-label">Petequias</label>
+                          <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="petequias"
+                              name="petequias" value="1">
+                            <label class="custom-control-label" for="petequias">Presente</label>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <label class="form-control-label">Equímosis</label>
+                          <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="equimosis"
+                              name="equimosis" value="1">
+                            <label class="custom-control-label" for="equimosis">Presente</label>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row mt-3">
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <label class="form-control-label">Úlceras</label>
+                          <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="ulceras"
+                              name="ulceras" value="1">
+                            <label class="custom-control-label" for="ulceras">Presente</label>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-md-9">
+                        <div class="form-group">
+                          <label class="form-control-label">Observaciones</label>
+                          <input type="text" class="form-control" name="observaciones_piel_anexos"
+                            placeholder="Describa otros hallazgos relevantes">
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>

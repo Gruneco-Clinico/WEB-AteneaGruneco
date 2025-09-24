@@ -217,4 +217,9 @@ urlpatterns = [
         views.guardar_examen_medicamentos,
         name="guardar_examen_medicamentos",
     ),
+    path(
+        "guardar_examen_fisico/",
+        views.guardar_examen_fisico,
+        name="guardar_examen_fisico",
+    ),
 ]
