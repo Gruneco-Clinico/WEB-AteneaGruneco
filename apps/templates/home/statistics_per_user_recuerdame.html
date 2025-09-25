@@ -2,8 +2,6 @@
 {% load static %}
 {% load custom_filters %}
 
-
-
 <!-- Specific CSS goes HERE -->
 {% block stylesheets %}{% endblock stylesheets %} {% block content %}
 <!-- Header -->
@@ -26,292 +24,18 @@
           </nav>
         </div>
       </div>
-      <!-- Card stats -->
-      <!-- <div class="row">
-        <div class="col-xl-3 col-md-6">
-          <div class="card card-stats">
-            <div class="card-body">
-              <div class="row">
-                <div class="col">
-                  <h5 class="card-title text-uppercase text-muted mb-0">
-                    Participantes Proyecto Sueño
-                  </h5>
-                  <span class="h2 font-weight-bold mb-0"> 150 <br /> </span>
-                </div>
-                <div class="col-auto">
-                  <div
-                    class="icon icon-shape bg-gradient-blue text-white rounded-circle shadow"
-                  >
-                    <i class="ni ni-single-02"></i>
-                  </div>
-                </div>
-              </div>
-              <p class="mt-3 mb-0 text-sm">
-                <span class="text-success mr-2"
-                  ><i class="fa fa-arrow-up"></i> Nuevos participantes en
-                  curso</span
-                >
-                <span class="text-nowrap">Actualizado recientemente</span>
-              </p>
-            </div>
-          </div>
-        </div>
-        <div class="col-xl-3 col-md-6">
-          <div class="card card-stats">
-            <div class="card-body">
-              <div class="row">
-                <div class="col">
-                  <h5 class="card-title text-uppercase text-muted mb-0">
-                    Participantes Proyecto Envejecimiento
-                  </h5>
-                  <span class="h2 font-weight-bold mb-0"> 15 <br /> </span>
-                </div>
-                <div class="col-auto">
-                  <div
-                    class="icon icon-shape bg-gradient-blue text-white rounded-circle shadow"
-                  >
-                    <i class="ni ni-single-02"></i>
-                  </div>
-                </div>
-              </div>
-              <p class="mt-3 mb-0 text-sm">
-                <span class="text-success mr-2"
-                  ><i class="fa fa-arrow-up"></i> Nuevos participantes en
-                  curso</span
-                >
-                <span class="text-nowrap">Actualizado recientemente</span>
-              </p>
-            </div>
-          </div>
-        </div>
-        <div class="col-xl-3 col-md-6">
-          <div class="card card-stats">
-            <div class="card-body">
-              <div class="row">
-                <div class="col">
-                  <h5 class="card-title text-uppercase text-muted mb-0">
-                    Datos Recolectados
-                  </h5>
-                  <span class="h2 font-weight-bold mb-0"> 34 </span>
-                </div>
-                <div class="col-auto">
-                  <div
-                    class="icon icon-shape bg-gradient-green text-white rounded-circle shadow"
-                  >
-                    <i class="ni ni-folder-17"></i>
-                  </div>
-                </div>
-              </div>
-              <p class="mt-3 mb-0 text-sm">
-                <span class="text-warning mr-2"
-                  ><i class="fa fa-info-circle"></i> Detalles en informes</span
-                >
-                <span class="text-nowrap">Consulta el último reporte</span>
-              </p>
-            </div>
-          </div>
-        </div>
-        <div class="col-xl-3 col-md-6">
-          <div class="card card-stats">
-            <div class="card-body">
-              <div class="row">
-                <div class="col">
-                  <h5 class="card-title text-uppercase text-muted mb-0">
-                    Datos Recolectados
-                  </h5>
-                  <span class="h2 font-weight-bold mb-0"> 34 </span>
-                </div>
-                <div class="col-auto">
-                  <div
-                    class="icon icon-shape bg-gradient-green text-white rounded-circle shadow"
-                  >
-                    <i class="ni ni-chart-bar-32"></i>
-                  </div>
-                </div>
-              </div>
-              <p class="mt-3 mb-0 text-sm">
-                <span class="text-warning mr-2"
-                  ><i class="fa fa-info-circle"></i> Detalles en informes</span
-                >
-                <span class="text-nowrap">Consulta el último reporte</span>
-              </p>
-            </div>
-          </div>
-        </div>
-      </div> -->
     </div>
   </div>
 </div>
 
 <!-- Page content -->
 <div class="container-fluid mt--6">
-  <!-- <div class="row">
-    <div class="col-xl-8">
-      <div class="card bg-default">
-        <div class="card-header bg-transparent">
-          <div class="row align-items-center">
-            <div class="col">
-              <h6 class="text-light text-uppercase ls-1 mb-1">Overview</h6>
-              <h5 class="h3 text-white mb-0">Sales value</h5>
-            </div>
-            <div class="col">
-              <ul class="nav nav-pills justify-content-end">
-                <li
-                  class="nav-item mr-2 mr-md-0"
-                  data-toggle="chart"
-                  data-target="#chart-sales-dark"
-                  data-update='{"data":{"datasets":[{"data":[0, 20, 10, 30, 15, 40, 20, 60, 60]}]}}'
-                  data-prefix="$"
-                  data-suffix="k"
-                >
-                  <a
-                    href="#"
-                    class="nav-link py-2 px-3 active"
-                    data-toggle="tab"
-                  >
-                    <span class="d-none d-md-block">Month</span>
-                    <span class="d-md-none">M</span>
-                  </a>
-                </li>
-                <li
-                  class="nav-item"
-                  data-toggle="chart"
-                  data-target="#chart-sales-dark"
-                  data-update='{"data":{"datasets":[{"data":[0, 20, 5, 25, 10, 30, 15, 40, 40]}]}}'
-                  data-prefix="$"
-                  data-suffix="k"
-                >
-                  <a href="#" class="nav-link py-2 px-3" data-toggle="tab">
-                    <span class="d-none d-md-block">Week</span>
-                    <span class="d-md-none">W</span>
-                  </a>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-        <div class="card-body">
-          <div class="chart">
-            <canvas id="chart-sales-dark" class="chart-canvas"></canvas>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="col-xl-4">
-      <div class="card">
-        <div class="card-header bg-transparent">
-          <div class="row align-items-center">
-            <div class="col">
-              <h6 class="text-uppercase text-muted ls-1 mb-1">Performance</h6>
-              <h5 class="h3 mb-0">Total orders</h5>
-            </div>
-          </div>
-        </div>
-        <div class="card-body">
-          <div class="chart">
-            <canvas id="chart-bars" class="chart-canvas"></canvas>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div> -->
   <div class="row">
     <div class="col-xl-8">
-      <!-- <div class="card">
-        <div class="card-header border-0">
-          <div class="row align-items-center">
-            <div class="col">
-              <h3 class="mb-0">Estadísticas Clínicas</h3>
-            </div>
-            <div class="col text-right">
-              <a href="#!" class="btn btn-sm btn-primary">Ver detalles</a>
-            </div>
-          </div>
-        </div>
-        <div class="table-responsive">
-          <table class="table align-items-center table-flush">
-            <thead class="thead-light">
-              <tr>
-                <th scope="col">Rango de Edad</th>
-                <th scope="col">Número de Participantes</th>
-                <th scope="col">Prevalencia de Condiciones Médicas</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>18-30 años</td>
-                <td>80</td>
-                <td>Insomnio (25%), Ansiedad (15%)</td>
-              </tr>
-              <tr>
-                <td>31-45 años</td>
-                <td>120</td>
-                <td>Insomnio (40%), Depresión (20%)</td>
-              </tr>
-              <tr>
-                <td>46-60 años</td>
-                <td>90</td>
-                <td>Apnea del sueño (30%), Hipertensión (25%)</td>
-              </tr>
-              <tr>
-                <td>60+ años</td>
-                <td>60</td>
-                <td>Insomnio (50%), Enfermedades crónicas (35%)</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div> -->
-
-
-      <!-- <div class="card mt-4 shadow">
-        <div class="card-header d-flex align-items-center">
-          <img src="{% static 'assets/img/theme/RecuerdaMe.png' %}" 
-              alt="Logo" 
-              style="height: 40px;" 
-              class="mr-2">
-          <h3 class="mb-0">Usuarios Activos Diarios</h3>
-        </div>
-        <div class="card-body">
-          <canvas id="dauChart" width="300" height="100"></canvas>
-        </div>
-      </div> -->
-
-      <!-- Gráfico Growth accounting -->
-
-      <!-- <div class="card mt-4 shadow">
-        <div class="card-header d-flex align-items-center">
-          <img src="{% static 'assets/img/theme/RecuerdaMe.png' %}" 
-              alt="Logo" 
-              style="height: 40px;" 
-              class="mr-2">
-          <h3 class="mb-0">Crecimiento</h3>
-        </div>
-        <div class="card-body">
-          <canvas id="growthChart" width="300" height="100"></canvas>
-        </div>
-      </div> -->
-
-      <!-- Vistas por página -->
-      <!-- <div class="card mt-4 shadow">
-        <div class="card-header d-flex align-items-center">
-          <img src="{% static 'assets/img/theme/RecuerdaMe.png' %}" 
-              alt="Logo" 
-              style="height: 40px;" 
-              class="mr-2">
-          <h3 class="mb-0">Vistas por sección/página (Últimos 30 días)</h3>
-        </div> -->
-
-        <!-- <p>Labels: <span id="views-labels-debug"></span></p>
-        <p>Values: <span id="views-values-debug"></span></p> -->
-
         <div class="card-body">
           <canvas id="viewsChart"></canvas>
         </div>
       </div>
-
-      
-
 
       <!-- Sesiones (Pageview -> Pageleave) -->
       <div class="card">
@@ -333,7 +57,6 @@
             <thead class="thead-light">
               <tr>
                 <th>Email</th>
-                <!-- <th>Paso</th> -->
                 <th>Ingresados</th>
                 <th>Convertidos</th>
                 <th>Dropped</th>
@@ -346,7 +69,6 @@
               {% for row in session_rows %}
                 <tr>
                   <td>{{ row.email }}</td>
-                  <!-- <td>{{ row.step_name }}</td> -->
                   <td>{{ row.entered }}</td>
                   <td>{{ row.converted }}</td>
                   <td>{{ row.dropped_off }}</td>
@@ -403,170 +125,12 @@
         <pre>{{ views_labels_breakdown|safe }}</pre> -->
         </div>
 
-      
-
       </div>
 
-      
-
       <!-- Gráficos que van a la derecha -->
-
     </div>
     <div class="col-xl-4">
-      <!-- <div class="card">
-        <div class="card-header border-0">
-          <div class="row align-items-center">
-            <div class="col">
-              <h3 class="mb-0">Distribución Demográfica</h3>
-            </div>
-            <div class="col text-right">
-              <a href="#!" class="btn btn-sm btn-primary">Ver Detalles</a>
-            </div>
-          </div>
-        </div>
-        <div class="table-responsive">
-          <table class="table align-items-center table-flush">
-            <thead class="thead-light">
-              <tr>
-                <th scope="col">Categoría</th>
-                <th scope="col">Cantidad</th>
-                <th scope="col">Porcentaje</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <th scope="row">Género: Masculino</th>
-                <td>150</td>
-                <td>
-                  <div class="d-flex align-items-center">
-                    <span class="mr-2">60%</span>
-                    <div>
-                      <div class="progress">
-                        <div
-                          class="progress-bar bg-gradient-primary"
-                          role="progressbar"
-                          aria-valuenow="60"
-                          aria-valuemin="0"
-                          aria-valuemax="100"
-                          style="width: 60%"
-                        ></div>
-                      </div>
-                    </div>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <th scope="row">Género: Femenino</th>
-                <td>100</td>
-                <td>
-                  <div class="d-flex align-items-center">
-                    <span class="mr-2">40%</span>
-                    <div>
-                      <div class="progress">
-                        <div
-                          class="progress-bar bg-gradient-info"
-                          role="progressbar"
-                          aria-valuenow="40"
-                          aria-valuemin="0"
-                          aria-valuemax="100"
-                          style="width: 40%"
-                        ></div>
-                      </div>
-                    </div>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <th scope="row">Escolaridad: Primaria</th>
-                <td>50</td>
-                <td>
-                  <div class="d-flex align-items-center">
-                    <span class="mr-2">20%</span>
-                    <div>
-                      <div class="progress">
-                        <div
-                          class="progress-bar bg-gradient-warning"
-                          role="progressbar"
-                          aria-valuenow="20"
-                          aria-valuemin="0"
-                          aria-valuemax="100"
-                          style="width: 20%"
-                        ></div>
-                      </div>
-                    </div>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <th scope="row">Escolaridad: Secundaria</th>
-                <td>120</td>
-                <td>
-                  <div class="d-flex align-items-center">
-                    <span class="mr-2">48%</span>
-                    <div>
-                      <div class="progress">
-                        <div
-                          class="progress-bar bg-gradient-success"
-                          role="progressbar"
-                          aria-valuenow="48"
-                          aria-valuemin="0"
-                          aria-valuemax="100"
-                          style="width: 48%"
-                        ></div>
-                      </div>
-                    </div>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <th scope="row">Escolaridad: Universitaria</th>
-                <td>80</td>
-                <td>
-                  <div class="d-flex align-items-center">
-                    <span class="mr-2">32%</span>
-                    <div>
-                      <div class="progress">
-                        <div
-                          class="progress-bar bg-gradient-danger"
-                          role="progressbar"
-                          aria-valuenow="32"
-                          aria-valuemin="0"
-                          aria-valuemax="100"
-                          style="width: 32%"
-                        ></div>
-                      </div>
-                    </div>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div> -->
-
-
-      <!-- Device Type -->
-
-      <!-- <div class="card mt-4 shadow">
-        <div class="card-header d-flex align-items-center">
-          <img src="{% static 'assets/img/theme/RecuerdaMe.png' %}" 
-              alt="Logo" 
-              style="height: 40px;" 
-              class="mr-2">
-          <h3 class="mb-0">Usuarios por tipo de dispositivo (Últimos 30 días)</h3>
-        </div> -->
-
-        <!-- <p>Labels: <span id="device-labels-debug"></span></p>
-        <p>Values: <span id="device-values-debug"></span></p> -->
-
-        <!-- <div class="card-body">
-          <canvas id="deviceChart"></canvas>
-        </div>
-      </div> -->
-
-
       <!-- Identify User -->
-
       <div class="card">
         <div class="card-header border-0">
           <div class="row align-items-center">
@@ -596,9 +160,13 @@
       
     </div>
 
-    <a href="{% url 'estadisticas' %}" class="btn btn-secondary mt-3">
-        ← Volver
-    </a>
+    
+
+    <div class="d-flex justify-content-end mt-3">
+      <a href="{% url 'estadisticas' %}" class="btn btn-outline-info">
+          ← Volver
+      </a>
+    </div>
 
 
   </div>
@@ -614,27 +182,6 @@
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
  
 
-<!-- Chart.js (v4 desde CDN, estable y actualizado) -->
-<!-- <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1"></script> -->
-
-<!-- Plugin de etiquetas (compatible con Chart.js v4) -->
-<!-- <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script> -->
-
-<!-- <script src="/static/assets/vendor/chart.js/dist/Chart.min.js"></script>
-<script src="/static/assets/vendor/chart.js/dist/Chart.extension.js"></script> -->
-
-<!-- DAU -->
-<!-- {{ labels|json_script:"dau-labels" }}
-{{ values|json_script:"dau-values" }} -->
-
-<!-- Growth Accounting -->
-<!-- {{ growth_labels|json_script:"growth-labels" }}
-{{ growth_datasets|json_script:"growth-datasets" }} -->
-
-<!-- Device type -->
-<!-- {{ device_labels|json_script:"device-labels" }}
-{{ device_values|json_script:"device-values" }} -->
-
 <!-- Identify user -->
 {{ user_labels|json_script:"user-labels" }}
 {{ user_values|json_script:"user-values" }}
@@ -642,116 +189,12 @@
 <!-- Sesiones -->
 {{ session_rows|json_script:"session-rows" }}
 
-<!-- Vistas por página -->
-<!-- {{ views_labels|json_script:"views-labels" }}
-{{ views_dataset|json_script:"views-dataset" }} -->
-
 
 <script id="session-raw" type="application/json">
   {{ session_raw|safe }}
 </script>
 
 <script>
-
-// document.addEventListener("DOMContentLoaded", () => {
-  // === Gráfico DAU ===
-// const dauLabels = JSON.parse(document.getElementById("dau-labels").textContent);
-// const dauValues = JSON.parse(document.getElementById("dau-values").textContent);
-
-// new Chart(document.getElementById("dauChart"), {
-//   type: "line",
-//   data: {
-//     labels: dauLabels,
-//     datasets: [{
-//       label: "Usuarios Activos Diarios",
-//       data: dauValues,
-//       borderColor: "blue",
-//       backgroundColor: "rgba(0, 0, 255, 0.1)",
-//       fill: true,
-//       tension: 0.3
-//     }]
-//   },
-//   options: {
-//     responsive: true,
-//     plugins: {
-//       legend: { display: true },
-//     },
-//     scales: {
-//       y: { beginAtZero: true }
-//     }
-//   }
-// });
-
-
-// === Gráfico Growth Accounting ===
-// const growthLabels = JSON.parse(document.getElementById("growth-labels").textContent);
-// const growthDatasets = JSON.parse(document.getElementById("growth-datasets").textContent);
-
-// // Colores fijos para cada categoría
-// const colors = {
-//   "Returning": "rgba(75, 192, 192, 0.6)",   // verde
-//   "New": "rgba(54, 162, 235, 0.6)",        // azul
-//   "Resurrecting": "rgba(153, 102, 255, 0.6)", // violeta
-//   "Dormant": "rgba(255, 99, 132, 0.6)"     // rojo
-// };
-
-// // Traducción de etiquetas
-// const traducciones = {
-//   "Returning": "Recurrentes",
-//   "New": "Nuevos",
-//   "Resurrecting": "Resurgentes",
-//   "Dormant": "Latentes"
-// };
-
-// new Chart(document.getElementById("growthChart"), {
-//   type: "bar",
-//   data: {
-//     labels: growthLabels,
-//     datasets: growthDatasets.map(ds => ({
-//       label: traducciones[ds.label] || ds.label, 
-//       data: ds.data,
-//       backgroundColor: colors[ds.label] || "rgba(200,200,200,0.6)",
-//     }))
-//   },
-//   options: {
-//     responsive: true,
-//     plugins: {
-//       legend: { position: "top" }
-//     },
-//     scales: {
-//       x: { stacked: true },
-//       y: {
-//         stacked: true,
-//         beginAtZero: true,
-//         // Dibujar negativos
-//         min: Math.min(-5, Math.min(...growthDatasets.flatMap(ds => ds.data))),
-//         max: Math.max(5, Math.max(...growthDatasets.flatMap(ds => ds.data)))
-//       }
-//     }
-//   }
-// });
-
-// === Gráfico Device Type ===
-// const deviceLabels = JSON.parse(document.getElementById("device-labels").textContent);
-// const deviceValues = JSON.parse(document.getElementById("device-values").textContent);
-
-// new Chart(document.getElementById("deviceChart"), {
-//   type: "doughnut",
-//   data: {
-//     labels: deviceLabels,
-//     datasets: [{
-//       data: deviceValues,
-//       backgroundColor: ["#007bff", "#28a745", "#ffc107", "#dc3545"], // azul, verde, amarillo, rojo
-//     }]
-//   },
-//   options: {
-//     responsive: true,
-//     plugins: {
-//       legend: { position: "right" },
-//       tooltip: { enabled: true }
-//     }
-//   }
-// });
 
 // === Tabla Identify User ===
 const userLabels = JSON.parse(document.getElementById("user-labels").textContent);
@@ -789,70 +232,6 @@ sessionRows.forEach(row => {
   `;
   tbodySessions.appendChild(tr);
 });
-
-// === Gráfico Vistas por Página ===
-// const viewsLabels = JSON.parse(document.getElementById("views-labels").textContent);
-// const viewsDataset = JSON.parse(document.getElementById("views-dataset").textContent);
-
-// // console.log("Views Labels:", viewsLabels);
-// // console.log("Views Dataset:", viewsDataset);
-
-// // Diccionario de mapeo
-// const labelMap = {
-//   0: "Sección: Información en Salud",
-//   1: "Sección: Pasatiempos",
-//   2: "Sección: Encuentros",
-//   3: "Sección: Fortalece tu mente",
-//   4: "Sección: Hazlo consciente",
-//   5: "Hazlo Consciente - Módulo 2",
-//   6: "Hazlo Consciente - Módulo 3",
-//   7: "Hazlo Consciente - Módulo 4",
-//   8: "Pasatiempos - Plantas",
-//   9: "Pasatiempos - Mascotas",
-//   10: "Pasatiempos - Recetas",
-//   11: "Pasatiempos - Ejercicio",
-//   12: "Polijuego"
-// };
-
-// // Reemplazar labels numéricos por nombres
-// const mappedLabels = viewsLabels.map(num => labelMap[num] || num);
-
-// new Chart(document.getElementById("viewsChart"), {
-//   type: "bar",
-//   data: {
-//     labels: mappedLabels,
-//     datasets: viewsDataset
-//   },
-//   options: {
-//     responsive: true,
-//     plugins: {
-//       legend: { display: false },
-//       tooltip: {
-//         callbacks: {
-//           label: function(context) {
-//             return context.raw; // solo muestra el valor
-//           }
-//         }
-//       }
-//     },
-//     scales: {
-//       x: {
-//         ticks: {
-//           autoSkip: false,
-//           maxRotation: 45,
-//           minRotation: 0
-//         }
-//       },
-//       y: {
-//         beginAtZero: true,
-//         title: {
-//           display: true,
-//           text: "Cantidad de vistas"
-//         }
-//       }
-//     }
-//   }
-// });
 
 </script>
 

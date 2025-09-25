@@ -411,7 +411,8 @@
                 <th scope="col" class="sort" data-sort="name">Nombre</th>
                 <th scope="col" class="sort" data-sort="age">Edad</th>
                 <th scope="col" class="sort" data-sort="gender">Fecha nacimiento</th>
-                <th scope="col" class="sort" data-sort="status">Ocupación</th>
+                <!-- <th scope="col" class="sort" data-sort="status">Ocupación</th> -->
+                <th scope="col" class="sort" data-sort="projects">Proyectos asociados</th>
                 <th scope="col">Acciones</th>
               </tr>
             </thead>
@@ -422,7 +423,16 @@
                 <td>{{ paciente.primer_nombre }} {{ paciente.primer_apellido }}</td>
                 <td><span class="badge badge-pill badge-success">{{ paciente.edad }} años</span></td>
                 <td>{{ paciente.fecha_nacimiento|date:"d/m/Y" }}</td>
-                <td>{{ paciente.ocupacion|title }}</td>
+                <!-- <td>{{ paciente.ocupacion|title }}</td> -->
+                <td>
+                  {% if paciente.proyectos.exists %}
+                    {% for proyecto in paciente.proyectos.all %}
+                      <span class="badge badge-info">{{ proyecto.nombre }}</span>
+                    {% endfor %}
+                  {% else %}
+                    <span class="text-muted">Sin proyectos</span>
+                  {% endif %}
+                </td>
                 <td>
                   <a href="{% url 'detalle_paciente' paciente.id %}" class="btn btn-sm btn-neutral"
                     title="Ver detalles">

@@ -4497,8 +4497,7 @@ def estadisticas(request):
                 "data": views_values,
             }
         ]
-
-
+        
         # 5. Renderizar template
         return render(
             request,
@@ -4510,13 +4509,8 @@ def estadisticas(request):
                 "growth_datasets": growth_datasets,
                 "device_labels": device_labels,
                 "device_values": device_values,
-                #"user_labels": user_labels,
-                #"user_values": user_values,
-                #"session_rows": session_rows,
                 "views_labels": views_labels,
                 "views_dataset": views_dataset,
-                #"views_labels_breakdown": user_views_labels,
-                #"views_matrix": views_matrix,
             },
         )
 
@@ -4853,17 +4847,9 @@ def estadisticas_por_usuario(request):
             request,
             "home/statistics_per_user_recuerdame.html",
             {
-                # "labels": dau_labels,
-                # "values": dau_values,
-                # "growth_labels": growth_labels,
-                # "growth_datasets": growth_datasets,
-                # "device_labels": device_labels,
-                # "device_values": device_values,
                 "user_labels": user_labels,
                 "user_values": user_values,
                 "session_rows": session_rows,
-                # "views_labels": views_labels,
-                # "views_dataset": views_dataset,
                 "views_labels_breakdown": user_views_labels,
                 "views_matrix": views_matrix,
             },
