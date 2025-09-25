@@ -96,7 +96,7 @@
                       <div class="col-md-4">
                         <div class="form-group">
                           <label class="form-control-label">Talla (cm) <span class="text-danger">*</span></label>
-                          <input type="number" step="0.1" class="form-control" name="talla" id="talla" required>
+                          <input type="number" step="0.1" class="form-control" name="talla" id="talla" value="{{ datos_examen.talla|default:'' }}" required>
                           <small class="form-text text-muted">Rango normal adultos: 150-190 cm</small>
                         </div>
                       </div>
@@ -105,7 +105,7 @@
                       <div class="col-md-4">
                         <div class="form-group">
                           <label class="form-control-label">Peso (kg) <span class="text-danger">*</span></label>
-                          <input type="number" step="0.1" class="form-control" name="peso" id="peso" required>
+                          <input type="number" step="0.1" class="form-control" name="peso" id="peso" value="{{ datos_examen.peso|default:'' }}" required>
                           <small class="form-text text-muted">Rango normal adultos: 45-100 kg</small>
                         </div>
                       </div>
@@ -123,7 +123,7 @@
                       <div class="col-md-4">
                         <div class="form-group">
                           <label class="form-control-label">Temperatura (°C) <span class="text-danger">*</span></label>
-                          <input type="number" step="0.1" class="form-control" name="temperatura" required>
+                          <input type="number" step="0.1" class="form-control" name="temperatura" value="{{ datos_examen.temperatura|default:'' }}" required>
                           <small class="form-text text-muted">Normal: 36.1-37.2°C</small>
                         </div>
                       </div>
@@ -131,7 +131,7 @@
                         <div class="form-group">
                           <label class="form-control-label">Frecuencia Cardíaca (lpm) <span
                               class="text-danger">*</span></label>
-                          <input type="number" class="form-control" name="frecuencia_cardiaca" required>
+                          <input type="number" class="form-control" name="frecuencia_cardiaca" value="{{ datos_examen.frecuencia_cardiaca|default:'' }}" required>
                           <small class="form-text text-muted">Normal adultos: 60-100 lpm</small>
                         </div>
                       </div>
@@ -139,7 +139,7 @@
                         <div class="form-group">
                           <label class="form-control-label">Frecuencia Respiratoria (rpm) <span
                               class="text-danger">*</span></label>
-                          <input type="number" class="form-control" name="frecuencia_respiratoria" required>
+                          <input type="number" class="form-control" name="frecuencia_respiratoria" value="{{ datos_examen.frecuencia_respiratoria|default:'' }}" required>
                           <small class="form-text text-muted">Normal adultos: 12-20 rpm</small>
                         </div>
                       </div>
@@ -149,7 +149,7 @@
                         <div class="form-group">
                           <label class="form-control-label">Presión Arterial Sistólica (mmHg) <span
                               class="text-danger">*</span></label>
-                          <input type="number" class="form-control" name="presion_arterial_sistolica" required>
+                          <input type="number" class="form-control" name="presion_arterial_sistolica" value="{{ datos_examen.presion_arterial_sistolica|default:'' }}" required>
                           <small class="form-text text-muted">Normal: <140 mmHg </small>
                         </div>
                       </div>
@@ -157,7 +157,7 @@
                         <div class="form-group">
                           <label class="form-control-label">Presión Arterial Diastólica (mmHg) <span
                               class="text-danger">*</span></label>
-                          <input type="number" class="form-control" name="presion_arterial_diastolica" required>
+                          <input type="number" class="form-control" name="presion_arterial_diastolica" value="{{ datos_examen.presion_arterial_diastolica|default:'' }}" required>
                           <small class="form-text text-muted">Normal: <90 mmHg </small>
                         </div>
                       </div>
@@ -176,7 +176,8 @@
                       <div class="col-md-4">
                         <div class="form-group">
                           <label class="form-control-label">Perímetro Cefálico (cm)</label>
-                          <input type="number" step="0.1" class="form-control" name="perimetro_cefalico">
+                          <input type="number" step="0.1" class="form-control" name="perimetro_cefalico" 
+                                 value="{{ datos_examen.perimetro_cefalico|default:'' }}">
                           <small class="form-text text-muted">Para pacientes pediátricos</small>
                         </div>
                       </div>
@@ -187,17 +188,19 @@
                           <label class="form-control-label">Cuero Cabelludo</label>
                           <div class="custom-control custom-checkbox">
                             <input type="checkbox" class="custom-control-input" id="cuero_cabelludo_normal" 
-                                   name="cuero_cabelludo" value="normal">
+                                   name="cuero_cabelludo" value="normal"
+                                   {% if datos_examen.cuero_cabelludo_normal %}checked{% endif %}>
                             <label class="custom-control-label" for="cuero_cabelludo_normal">Normal</label>
                           </div>
                           <div class="custom-control custom-checkbox">
                             <input type="checkbox" class="custom-control-input" id="cuero_cabelludo_anormal" 
-                                   name="cuero_cabelludo" value="anormal">
+                                   name="cuero_cabelludo" value="anormal"
+                                   {% if datos_examen.cuero_cabelludo_anormal %}checked{% endif %}>
                             <label class="custom-control-label" for="cuero_cabelludo_anormal">Anormal</label>
                           </div>
                           <div class="mt-2">
                             <input type="text" class="form-control" placeholder="Observaciones"
-                              name="observaciones_cuero_cabelludo">
+                              name="observaciones_cuero_cabelludo" value="{{ datos_examen.observaciones_cuero_cabelludo|default:'' }}">
                           </div>
                         </div>
                       </div>
@@ -206,17 +209,19 @@
                           <label class="form-control-label">Oídos</label>
                           <div class="custom-control custom-checkbox">
                             <input type="checkbox" class="custom-control-input" id="oidos_normal" 
-                                   name="oidos" value="normal">
+                                   name="oidos" value="normal" 
+                                   {% if datos_examen.oidos_normal %}checked{% endif %}>
                             <label class="custom-control-label" for="oidos_normal">Normal</label>
                           </div>
                           <div class="custom-control custom-checkbox">
                             <input type="checkbox" class="custom-control-input" id="oidos_anormal" 
-                                   name="oidos" value="anormal">
+                                   name="oidos" value="anormal"
+                                   {% if datos_examen.oidos_anormal %}checked{% endif %}>
                             <label class="custom-control-label" for="oidos_anormal">Anormal</label>
                           </div>
                           <div class="mt-2">
                             <input type="text" class="form-control" placeholder="Observaciones"
-                              name="observaciones_oidos">
+                              name="observaciones_oidos" value="{{ datos_examen.observaciones_oidos|default:'' }}">
                           </div>
                         </div>
                       </div>
@@ -225,17 +230,19 @@
                           <label class="form-control-label">Nariz</label>
                           <div class="custom-control custom-checkbox">
                             <input type="checkbox" class="custom-control-input" id="nariz_normal" 
-                                   name="nariz" value="normal">
+                                   name="nariz" value="normal" 
+                                   {% if datos_examen.nariz_normal %}checked{% endif %}>
                             <label class="custom-control-label" for="nariz_normal">Normal</label>
                           </div>
                           <div class="custom-control custom-checkbox">
                             <input type="checkbox" class="custom-control-input" id="nariz_anormal" 
-                                   name="nariz" value="anormal">
+                                   name="nariz" value="anormal" 
+                                   {% if datos_examen.nariz_anormal %}checked{% endif %}>
                             <label class="custom-control-label" for="nariz_anormal">Anormal</label>
                           </div>
                           <div class="mt-2">
                             <input type="text" class="form-control" placeholder="Observaciones"
-                              name="observaciones_nariz">
+                              name="observaciones_nariz" value="{{ datos_examen.observaciones_nariz|default:'' }}">
                           </div>
                         </div>
                       </div>
@@ -244,17 +251,19 @@
                           <label class="form-control-label">Cuello</label>
                           <div class="custom-control custom-checkbox">
                             <input type="checkbox" class="custom-control-input" id="cuello_normal" 
-                                   name="cuello" value="normal">
+                                   name="cuello" value="normal" 
+                                   {% if datos_examen.cuello_normal %}checked{% endif %}>
                             <label class="custom-control-label" for="cuello_normal">Normal</label>
                           </div>
                           <div class="custom-control custom-checkbox">
                             <input type="checkbox" class="custom-control-input" id="cuello_anormal" 
-                                   name="cuello" value="anormal">
+                                   name="cuello" value="anormal" 
+                                   {% if datos_examen.cuello_anormal %}checked{% endif %}>
                             <label class="custom-control-label" for="cuello_anormal">Anormal</label>
                           </div>
                           <div class="mt-2">
                             <input type="text" class="form-control" placeholder="Observaciones"
-                              name="observaciones_cuello">
+                              name="observaciones_cuello" value="{{ datos_examen.observaciones_cuello|default:'' }}">
                           </div>
                         </div>
                       </div>
@@ -264,7 +273,7 @@
                         <div class="form-group">
                           <label class="form-control-label">Otros Hallazgos Importantes</label>
                           <input type="text" class="form-control" name="otros_hallazgos_importantes"
-                            placeholder="Describa otros hallazgos relevantes en cabeza y cuello">
+                            placeholder="Describa otros hallazgos relevantes en cabeza y cuello" value="{{ datos_examen.otros_hallazgos_importantes|default:'' }}">
                         </div>
                       </div>
                     </div>
@@ -283,12 +292,12 @@
                         <div class="form-group">
                           <label class="form-control-label">Forma del Tórax</label>
                           <select class="form-control" name="forma_torax">
-                            <option value="normal" selected>Normal</option>
-                            <option value="anormal">Anormal</option>
+                            <option value="normal" {% if datos_examen.forma_torax == "normal" %}selected{% endif %}>Normal</option>
+                            <option value="anormal" {% if datos_examen.forma_torax == "anormal" %}selected{% endif %}>Anormal</option>
                           </select>
                           <div class="mt-2">
                             <input type="text" class="form-control" placeholder="Observaciones"
-                              name="observaciones_forma_torax">
+                              name="observaciones_forma_torax" value="{{ datos_examen.observaciones_forma_torax|default:'' }}">
                           </div>
                         </div>
                       </div>
@@ -296,13 +305,13 @@
                         <div class="form-group">
                           <label class="form-control-label">Murmullo Vesicular</label>
                           <select class="form-control" name="murmullo_vesicular">
-                            <option value="conservado" selected>Conservado</option>
-                            <option value="ausente">Ausente</option>
-                            <option value="disminuido">Disminuido</option>
+                            <option value="conservado" {% if datos_examen.murmullo_vesicular == "conservado" %}selected{% endif %}>Conservado</option>
+                            <option value="ausente" {% if datos_examen.murmullo_vesicular == "ausente" %}selected{% endif %}>Ausente</option>
+                            <option value="disminuido" {% if datos_examen.murmullo_vesicular == "disminuido" %}selected{% endif %}>Disminuido</option>
                           </select>
                           <div class="mt-2">
                             <input type="text" class="form-control" placeholder="Observaciones"
-                              name="observaciones_murmullo_vesicular">
+                              name="observaciones_murmullo_vesicular" value="{{ datos_examen.observaciones_murmullo_vesicular|default:'' }}">
                           </div>
                         </div>
                       </div>
@@ -311,12 +320,12 @@
                           <label class="form-control-label">Ruidos Sobreagregados</label>
                           <div class="custom-control custom-checkbox">
                             <input type="checkbox" class="custom-control-input" id="ruidos_sobreagregados"
-                              name="ruidos_sobreagregados" value="1">
+                              name="ruidos_sobreagregados" value="1" {% if datos_examen.ruidos_sobreagregados == 1 %}checked{% endif %}>
                             <label class="custom-control-label" for="ruidos_sobreagregados">Presente</label>
                           </div>
                           <div class="mt-2">
                             <input type="text" class="form-control" placeholder="Observaciones"
-                              name="observaciones_ruidos_sobreagregados">
+                              name="observaciones_ruidos_sobreagregados" value="{{ datos_examen.observaciones_ruidos_sobreagregados|default:'' }}">
                           </div>
                         </div>
                       </div>
@@ -326,13 +335,13 @@
                         <div class="form-group">
                           <label class="form-control-label">Ruidos Cardíacos</label>
                           <select class="form-control" name="ruidos_cardiacos">
-                            <option value="ritmicos" selected>Rítmicos</option>
-                            <option value="arritmicos">Arrítmicos</option>
-                            <option value="soplos">Soplos</option>
+                            <option value="ritmicos" {% if datos_examen.ruidos_cardiacos == "ritmicos" %}selected{% endif %}>Rítmicos</option>
+                            <option value="arritmicos" {% if datos_examen.ruidos_cardiacos == "arritmicos" %}selected{% endif %}>Arrítmicos</option>
+                            <option value="soplos" {% if datos_examen.ruidos_cardiacos == "soplos" %}selected{% endif %}>Soplos</option>
                           </select>
                           <div class="mt-2">
                             <input type="text" class="form-control" placeholder="Observaciones"
-                              name="observaciones_ruidos_cardiacos">
+                              name="observaciones_ruidos_cardiacos" value="{{ datos_examen.observaciones_ruidos_cardiacos|default:'' }}">
                           </div>
                         </div>
                       </div>
@@ -352,8 +361,8 @@
                         <div class="form-group">
                           <label class="form-control-label">Peristaltismo</label>
                           <select class="form-control" name="peristaltismo">
-                            <option value="presente" selected>Presente</option>
-                            <option value="ausente">Ausente</option>
+                            <option value="presente" {% if datos_examen.peristaltismo == "presente" %}selected{% endif %}>Presente</option>
+                            <option value="ausente" {% if datos_examen.peristaltismo == "ausente" %}selected{% endif %}>Ausente</option>
                           </select>
                         </div>
                       </div>
@@ -362,12 +371,12 @@
                           <label class="form-control-label">Pared Abdominal</label>
                           <div class="custom-control custom-checkbox">
                             <input type="checkbox" class="custom-control-input" id="pared_abdominal_normal"
-                              name="pared_abdominal" value="normal">
+                              name="pared_abdominal" value="normal" {% if datos_examen.pared_abdominal == "normal" %}checked{% endif %}>
                             <label class="custom-control-label" for="pared_abdominal_normal">Normal</label>
                           </div>
                           <div class="custom-control custom-checkbox">
                             <input type="checkbox" class="custom-control-input" id="pared_abdominal_anormal"
-                              name="pared_abdominal" value="anormal">
+                              name="pared_abdominal" value="anormal " {% if datos_examen.pared_abdominal == "anormal" %}checked{% endif %}>
                             <label class="custom-control-label" for="pared_abdominal_anormal">Anormal</label>
                           </div>
                         </div>
@@ -377,7 +386,7 @@
                           <label class="form-control-label">Masas</label>
                           <div class="custom-control custom-checkbox">
                             <input type="checkbox" class="custom-control-input" id="masas"
-                              name="masas" value="1">
+                              name="masas" value="1" {% if datos_examen.masas == "1" %}checked{% endif %}>
                             <label class="custom-control-label" for="masas">Presente</label>
                           </div>
                         </div>
@@ -387,7 +396,7 @@
                           <label class="form-control-label">Megalias</label>
                           <div class="custom-control custom-checkbox">
                             <input type="checkbox" class="custom-control-input" id="megalias"
-                              name="megalias" value="1">
+                              name="megalias" value="1" {% if datos_examen.megalias == "1" %}checked{% endif %}>
                             <label class="custom-control-label" for="megalias">Presente</label>
                           </div>
                         </div>
@@ -398,7 +407,7 @@
                         <div class="form-group">
                           <label class="form-control-label">Observaciones</label>
                           <input type="text" class="form-control" name="observaciones_abdomen"
-                            placeholder="Describa otros hallazgos relevantes">
+                            placeholder="Describa otros hallazgos relevantes" value="{{ datos_examen.observaciones_abdomen|default:'' }}">
                         </div>
                       </div>
                     </div>

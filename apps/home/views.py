@@ -5748,8 +5748,13 @@ def guardar_examen_medicamentos(request):
 
 @login_required
 def guardar_examen_fisico(request):
+    """
+    Vista para guardar el examen físico general basada en el template
+    General_ExamenFísico.html y siguiendo el patrón del examen de sueño
+    """
     if request.method == "POST":
         try:
+            # Obtener IDs del formulario
             visita_id = request.POST.get("visita_id")
             paciente_id = request.POST.get("paciente_id")
             examen_id = request.POST.get("examen_id")
@@ -5767,10 +5772,6 @@ def guardar_examen_fisico(request):
             paciente_id = int(paciente_id)
             examen_id = int(examen_id)
 
-            print(
-                f"✅ IDs convertidos: visita_id={visita_id}, paciente_id={paciente_id}, examen_id={examen_id}"
-            )
-
             # Obtener la instancia de VisitaExamen
             visita_examen = get_object_or_404(
                 VisitaExamen, visita_id=visita_id, examen_id=examen_id
@@ -5785,94 +5786,310 @@ def guardar_examen_fisico(request):
                 visita_examen.save()
                 print("🔄 Estado cambiado a 'en_progreso'")
 
-            # 🔧 CORRECCIÓN: Usar el mismo patrón que medicamentos
-            try:
-                examen_fisico_result = ExamenFisicoResult.objects.get(
-                    visita_examen=visita_examen
+            # Crear o actualizar el resultado del examen físico
+            examen_fisico, created = ExamenFisicoResult.objects.get_or_create(
+                visita_examen=visita_examen,
+                defaults={
+                    # === SIGNOS VITALES ===
+                    "talla": safe_float_required(request.POST.get("talla"), 0.0),
+                    "peso": safe_float_required(request.POST.get("peso"), 0.0),
+                    "temperatura": safe_float_required(
+                        request.POST.get("temperatura"), 36.5
+                    ),
+                    "frecuencia_cardiaca": safe_int_required(
+                        request.POST.get("frecuencia_cardiaca"), 70
+                    ),
+                    "frecuencia_respiratoria": safe_int_required(
+                        request.POST.get("frecuencia_respiratoria"), 16
+                    ),
+                    "presion_arterial_sistolica": safe_int_required(
+                        request.POST.get("presion_arterial_sistolica"), 120
+                    ),
+                    "presion_arterial_diastolica": safe_int_required(
+                        request.POST.get("presion_arterial_diastolica"), 80
+                    ),
+                    "perimetro_cefalico": safe_float_optional(
+                        request.POST.get("perimetro_cefalico")
+                    ),
+                    # === CABEZA Y CUELLO ===
+                    "cuero_cabelludo_normal": "normal"
+                    in request.POST.getlist("cuero_cabelludo"),
+                    "cuero_cabelludo_anormal": "anormal"
+                    in request.POST.getlist("cuero_cabelludo"),
+                    "observaciones_cuero_cabelludo": request.POST.get(
+                        "observaciones_cuero_cabelludo", ""
+                    ),
+                    "oidos_normal": "normal" in request.POST.getlist("oidos"),
+                    "oidos_anormal": "anormal" in request.POST.getlist("oidos"),
+                    "observaciones_oidos": request.POST.get("observaciones_oidos", ""),
+                    "nariz_normal": "normal" in request.POST.getlist("nariz"),
+                    "nariz_anormal": "anormal" in request.POST.getlist("nariz"),
+                    "observaciones_nariz": request.POST.get("observaciones_nariz", ""),
+                    "cuello_normal": "normal" in request.POST.getlist("cuello"),
+                    "cuello_anormal": "anormal" in request.POST.getlist("cuello"),
+                    "observaciones_cuello": request.POST.get(
+                        "observaciones_cuello", ""
+                    ),
+                    "otros_hallazgos_importantes": request.POST.get(
+                        "otros_hallazgos_importantes", ""
+                    ),
+                    # === TÓRAX / CARDIORESPIRATORIO ===
+                    "forma_torax": request.POST.get("forma_torax", "normal"),
+                    "observaciones_forma_torax": request.POST.get(
+                        "observaciones_forma_torax", ""
+                    ),
+                    "murmullo_vesicular": request.POST.get(
+                        "murmullo_vesicular", "conservado"
+                    ),
+                    "observaciones_murmullo_vesicular": request.POST.get(
+                        "observaciones_murmullo_vesicular", ""
+                    ),
+                    "ruidos_sobreagregados": bool(
+                        request.POST.get("ruidos_sobreagregados")
+                    ),
+                    "observaciones_ruidos_sobreagregados": request.POST.get(
+                        "observaciones_ruidos_sobreagregados", ""
+                    ),
+                    "ruidos_cardiacos": request.POST.get(
+                        "ruidos_cardiacos", "ritmicos"
+                    ),
+                    "observaciones_ruidos_cardiacos": request.POST.get(
+                        "observaciones_ruidos_cardiacos", ""
+                    ),
+                    # === ABDOMEN ===
+                    "peristaltismo": request.POST.get("peristaltismo", "presente"),
+                    "pared_abdominal_normal": "normal"
+                    in request.POST.getlist("pared_abdominal"),
+                    "pared_abdominal_anormal": "anormal"
+                    in request.POST.getlist("pared_abdominal"),
+                    "masas": bool(request.POST.get("masas")),
+                    "megalias": bool(request.POST.get("megalias")),
+                    "observaciones_abdomen": request.POST.get(
+                        "observaciones_abdomen", ""
+                    ),
+                    # === OSTEOMUSCULAR ===
+                    "curvatura_cervical_normal": "normal"
+                    in request.POST.getlist("curvatura_cervical"),
+                    "curvatura_cervical_anormal": "anormal"
+                    in request.POST.getlist("curvatura_cervical"),
+                    "curvatura_toracica_normal": "normal"
+                    in request.POST.getlist("curvatura_toracica"),
+                    "curvatura_toracica_anormal": "anormal"
+                    in request.POST.getlist("curvatura_toracica"),
+                    "curvatura_lumbar_normal": "normal"
+                    in request.POST.getlist("curvatura_lumbar"),
+                    "curvatura_lumbar_anormal": "anormal"
+                    in request.POST.getlist("curvatura_lumbar"),
+                    "arcos_movimiento_superiores_normal": "normal"
+                    in request.POST.getlist("arcos_movimiento_superiores"),
+                    "arcos_movimiento_superiores_anormal": "anormal"
+                    in request.POST.getlist("arcos_movimiento_superiores"),
+                    "arcos_movimiento_inferiores_normal": "normal"
+                    in request.POST.getlist("arcos_movimiento_inferiores"),
+                    "arcos_movimiento_inferiores_anormal": "anormal"
+                    in request.POST.getlist("arcos_movimiento_inferiores"),
+                    "asimetrias_inferiores_normal": "normal"
+                    in request.POST.getlist("asimetrias_inferiores"),
+                    "asimetrias_inferiores_anormal": "anormal"
+                    in request.POST.getlist("asimetrias_inferiores"),
+                    "asimetrias_superiores_normal": "normal"
+                    in request.POST.getlist("asimetrias_superiores"),
+                    "asimetrias_superiores_anormal": "anormal"
+                    in request.POST.getlist("asimetrias_superiores"),
+                    "observaciones_osteomuscular": request.POST.get(
+                        "observaciones_osteomuscular", ""
+                    ),
+                    # === PIEL Y ANEXOS ===
+                    "maculas": bool(request.POST.get("maculas")),
+                    "papulas": bool(request.POST.get("papulas")),
+                    "vesiculas": bool(request.POST.get("vesiculas")),
+                    "pustulas": bool(request.POST.get("pustulas")),
+                    "fisuras": bool(request.POST.get("fisuras")),
+                    "escaras": bool(request.POST.get("escaras")),
+                    "petequias": bool(request.POST.get("petequias")),
+                    "equimosis": bool(request.POST.get("equimosis")),
+                    "ulceras": bool(request.POST.get("ulceras")),
+                    "observaciones_piel_anexos": request.POST.get(
+                        "observaciones_piel_anexos", ""
+                    ),
+                },
+            )
+
+            # Si no es nuevo, actualizar los campos
+            if not created:
+                print("📝 Actualizando examen existente")
+
+                # === SIGNOS VITALES ===
+                examen_fisico.talla = safe_float_required(
+                    request.POST.get("talla"), 0.0
                 )
-                print("📋 ExamenFisicoResult encontrado - Modo edición")
-            except ExamenFisicoResult.DoesNotExist:
-                examen_fisico_result = ExamenFisicoResult.objects.create(
-                    visita_examen=visita_examen
+                examen_fisico.peso = safe_float_required(request.POST.get("peso"), 0.0)
+                examen_fisico.temperatura = safe_float_required(
+                    request.POST.get("temperatura"), 36.5
                 )
-                print("🆕 ExamenFisicoResult creado - Modo nuevo")
-
-            # Funciones auxiliares (igual que tienes)
-            def safe_float_required(value, default=0.0):
-                """Convierte a float con valor por defecto obligatorio"""
-                if value is None or value == "":
-                    return default
-                try:
-                    return float(value)
-                except (ValueError, TypeError):
-                    return default
-
-            def safe_int_required(value, default=0):
-                """Convierte a int con valor por defecto obligatorio"""
-                if value is None or value == "":
-                    return default
-                try:
-                    return int(value)
-                except (ValueError, TypeError):
-                    return default
-
-            # === SIGNOS VITALES ===
-            talla_raw = request.POST.get("talla")
-            peso_raw = request.POST.get("peso")
-
-            print(f"🔍 Valores recibidos - talla: '{talla_raw}', peso: '{peso_raw}'")
-
-            examen_fisico_result.talla = safe_float_required(talla_raw, 0.0)
-            examen_fisico_result.peso = safe_float_required(peso_raw, 0.0)
-
-            # Calcular IMC
-            if examen_fisico_result.talla > 0 and examen_fisico_result.peso > 0:
-                talla_metros = examen_fisico_result.talla / 100
-                examen_fisico_result.imc = round(
-                    examen_fisico_result.peso / (talla_metros**2), 2
+                examen_fisico.frecuencia_cardiaca = safe_int_required(
+                    request.POST.get("frecuencia_cardiaca"), 70
                 )
-                print(f"📊 IMC calculado: {examen_fisico_result.imc}")
+                examen_fisico.frecuencia_respiratoria = safe_int_required(
+                    request.POST.get("frecuencia_respiratoria"), 16
+                )
+                examen_fisico.presion_arterial_sistolica = safe_int_required(
+                    request.POST.get("presion_arterial_sistolica"), 120
+                )
+                examen_fisico.presion_arterial_diastolica = safe_int_required(
+                    request.POST.get("presion_arterial_diastolica"), 80
+                )
+                examen_fisico.perimetro_cefalico = safe_float_optional(
+                    request.POST.get("perimetro_cefalico")
+                )
+
+                # === CABEZA Y CUELLO ===
+                examen_fisico.cuero_cabelludo_normal = "normal" in request.POST.getlist(
+                    "cuero_cabelludo"
+                )
+                examen_fisico.cuero_cabelludo_anormal = (
+                    "anormal" in request.POST.getlist("cuero_cabelludo")
+                )
+                examen_fisico.observaciones_cuero_cabelludo = request.POST.get(
+                    "observaciones_cuero_cabelludo", ""
+                )
+
+                examen_fisico.oidos_normal = "normal" in request.POST.getlist("oidos")
+                examen_fisico.oidos_anormal = "anormal" in request.POST.getlist("oidos")
+                examen_fisico.observaciones_oidos = request.POST.get(
+                    "observaciones_oidos", ""
+                )
+
+                examen_fisico.nariz_normal = "normal" in request.POST.getlist("nariz")
+                examen_fisico.nariz_anormal = "anormal" in request.POST.getlist("nariz")
+                examen_fisico.observaciones_nariz = request.POST.get(
+                    "observaciones_nariz", ""
+                )
+
+                examen_fisico.cuello_normal = "normal" in request.POST.getlist("cuello")
+                examen_fisico.cuello_anormal = "anormal" in request.POST.getlist(
+                    "cuello"
+                )
+                examen_fisico.observaciones_cuello = request.POST.get(
+                    "observaciones_cuello", ""
+                )
+
+                examen_fisico.otros_hallazgos_importantes = request.POST.get(
+                    "otros_hallazgos_importantes", ""
+                )
+
+                # === TÓRAX / CARDIORESPIRATORIO ===
+                examen_fisico.forma_torax = request.POST.get("forma_torax", "normal")
+                examen_fisico.observaciones_forma_torax = request.POST.get(
+                    "observaciones_forma_torax", ""
+                )
+                examen_fisico.murmullo_vesicular = request.POST.get(
+                    "murmullo_vesicular", "conservado"
+                )
+                examen_fisico.observaciones_murmullo_vesicular = request.POST.get(
+                    "observaciones_murmullo_vesicular", ""
+                )
+                examen_fisico.ruidos_sobreagregados = bool(
+                    request.POST.get("ruidos_sobreagregados")
+                )
+                examen_fisico.observaciones_ruidos_sobreagregados = request.POST.get(
+                    "observaciones_ruidos_sobreagregados", ""
+                )
+                examen_fisico.ruidos_cardiacos = request.POST.get(
+                    "ruidos_cardiacos", "ritmicos"
+                )
+                examen_fisico.observaciones_ruidos_cardiacos = request.POST.get(
+                    "observaciones_ruidos_cardiacos", ""
+                )
+
+                # === ABDOMEN ===
+                examen_fisico.peristaltismo = request.POST.get(
+                    "peristaltismo", "presente"
+                )
+                examen_fisico.pared_abdominal_normal = "normal" in request.POST.getlist(
+                    "pared_abdominal"
+                )
+                examen_fisico.pared_abdominal_anormal = (
+                    "anormal" in request.POST.getlist("pared_abdominal")
+                )
+                examen_fisico.masas = bool(request.POST.get("masas"))
+                examen_fisico.megalias = bool(request.POST.get("megalias"))
+                examen_fisico.observaciones_abdomen = request.POST.get(
+                    "observaciones_abdomen", ""
+                )
+
+                # === OSTEOMUSCULAR ===
+                examen_fisico.curvatura_cervical_normal = (
+                    "normal" in request.POST.getlist("curvatura_cervical")
+                )
+                examen_fisico.curvatura_cervical_anormal = (
+                    "anormal" in request.POST.getlist("curvatura_cervical")
+                )
+                examen_fisico.curvatura_toracica_normal = (
+                    "normal" in request.POST.getlist("curvatura_toracica")
+                )
+                examen_fisico.curvatura_toracica_anormal = (
+                    "anormal" in request.POST.getlist("curvatura_toracica")
+                )
+                examen_fisico.curvatura_lumbar_normal = (
+                    "normal" in request.POST.getlist("curvatura_lumbar")
+                )
+                examen_fisico.curvatura_lumbar_anormal = (
+                    "anormal" in request.POST.getlist("curvatura_lumbar")
+                )
+                examen_fisico.arcos_movimiento_superiores_normal = (
+                    "normal" in request.POST.getlist("arcos_movimiento_superiores")
+                )
+                examen_fisico.arcos_movimiento_superiores_anormal = (
+                    "anormal" in request.POST.getlist("arcos_movimiento_superiores")
+                )
+                examen_fisico.arcos_movimiento_inferiores_normal = (
+                    "normal" in request.POST.getlist("arcos_movimiento_inferiores")
+                )
+                examen_fisico.arcos_movimiento_inferiores_anormal = (
+                    "anormal" in request.POST.getlist("arcos_movimiento_inferiores")
+                )
+                examen_fisico.asimetrias_inferiores_normal = (
+                    "normal" in request.POST.getlist("asimetrias_inferiores")
+                )
+                examen_fisico.asimetrias_inferiores_anormal = (
+                    "anormal" in request.POST.getlist("asimetrias_inferiores")
+                )
+                examen_fisico.asimetrias_superiores_normal = (
+                    "normal" in request.POST.getlist("asimetrias_superiores")
+                )
+                examen_fisico.asimetrias_superiores_anormal = (
+                    "anormal" in request.POST.getlist("asimetrias_superiores")
+                )
+                examen_fisico.observaciones_osteomuscular = request.POST.get(
+                    "observaciones_osteomuscular", ""
+                )
+
+                # === PIEL Y ANEXOS ===
+                examen_fisico.maculas = bool(request.POST.get("maculas"))
+                examen_fisico.papulas = bool(request.POST.get("papulas"))
+                examen_fisico.vesiculas = bool(request.POST.get("vesiculas"))
+                examen_fisico.pustulas = bool(request.POST.get("pustulas"))
+                examen_fisico.fisuras = bool(request.POST.get("fisuras"))
+                examen_fisico.escaras = bool(request.POST.get("escaras"))
+                examen_fisico.petequias = bool(request.POST.get("petequias"))
+                examen_fisico.equimosis = bool(request.POST.get("equimosis"))
+                examen_fisico.ulceras = bool(request.POST.get("ulceras"))
+                examen_fisico.observaciones_piel_anexos = request.POST.get(
+                    "observaciones_piel_anexos", ""
+                )
+
+            # Calcular IMC si tenemos talla y peso
+            if examen_fisico.talla > 0 and examen_fisico.peso > 0:
+                talla_metros = examen_fisico.talla / 100
+                examen_fisico.imc = round(examen_fisico.peso / (talla_metros**2), 2)
+                print(f"📊 IMC calculado: {examen_fisico.imc}")
             else:
-                examen_fisico_result.imc = 0.0
+                examen_fisico.imc = 0.0
 
-            # Resto de signos vitales
-            examen_fisico_result.temperatura = safe_float_required(
-                request.POST.get("temperatura"), 36.5
-            )
-            examen_fisico_result.frecuencia_cardiaca = safe_int_required(
-                request.POST.get("frecuencia_cardiaca"), 70
-            )
-            examen_fisico_result.frecuencia_respiratoria = safe_int_required(
-                request.POST.get("frecuencia_respiratoria"), 16
-            )
-            examen_fisico_result.presion_arterial_sistolica = safe_int_required(
-                request.POST.get("presion_arterial_sistolica"), 120
-            )
-            examen_fisico_result.presion_arterial_diastolica = safe_int_required(
-                request.POST.get("presion_arterial_diastolica"), 80
-            )
-
-            # Perímetro cefálico (puede ser NULL)
-            perimetro_cefalico_raw = request.POST.get("perimetro_cefalico")
-            if perimetro_cefalico_raw and perimetro_cefalico_raw.strip():
-                examen_fisico_result.perimetro_cefalico = safe_float_required(
-                    perimetro_cefalico_raw
-                )
-            # Si no se proporciona, se mantiene como NULL
-
-            print(f"🔍 Valores antes de guardar:")
-            print(f"   Talla: {examen_fisico_result.talla}")
-            print(f"   Peso: {examen_fisico_result.peso}")
-            print(f"   IMC: {examen_fisico_result.imc}")
-            print(f"   Temperatura: {examen_fisico_result.temperatura}")
-            print(f"   FC: {examen_fisico_result.frecuencia_cardiaca}")
-
-            # === RESTO DE CAMPOS (mantén todo igual) ===
-            # ... [todo tu código existente de campos] ...
-
-            # 🔧 CORRECCIÓN CRÍTICA: Asegurar que se guarden los cambios
+            # Guardar los cambios
             try:
-                examen_fisico_result.save()
+                examen_fisico.save()
                 print("💾 ExamenFisicoResult guardado exitosamente")
             except Exception as save_error:
                 print(f"💥 Error al guardar ExamenFisicoResult: {str(save_error)}")
@@ -5885,7 +6102,9 @@ def guardar_examen_fisico(request):
 
             print(f"✅ VisitaExamen marcado como completado")
 
-            messages.success(request, "✅ Examen físico guardado correctamente.")
+            messages.success(
+                request, "✅ Examen físico general guardado correctamente."
+            )
             return redirect("detalle_paciente", paciente_id=paciente_id)
 
         except ValueError as ve:
@@ -5920,4 +6139,35 @@ def guardar_examen_fisico(request):
 
     else:
         messages.error(request, "❌ Método no permitido.")
-        return redirect("index") @ login_required
+        return redirect("index")
+
+
+# === FUNCIONES AUXILIARES ===
+def safe_float_required(value, default=0.0):
+    """Convierte a float con valor por defecto obligatorio"""
+    if value is None or value == "":
+        return default
+    try:
+        return float(value)
+    except (ValueError, TypeError):
+        return default
+
+
+def safe_int_required(value, default=0):
+    """Convierte a int con valor por defecto obligatorio"""
+    if value is None or value == "":
+        return default
+    try:
+        return int(value)
+    except (ValueError, TypeError):
+        return default
+
+
+def safe_float_optional(value):
+    """Convierte a float o retorna None si no hay valor"""
+    if value is None or value == "":
+        return None
+    try:
+        return float(value)
+    except (ValueError, TypeError):
+        return None
