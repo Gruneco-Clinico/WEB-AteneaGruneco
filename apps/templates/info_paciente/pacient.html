@@ -263,10 +263,14 @@
                               {% if visita_examen.esta_realizado %}
                               <!-- Examen Completado -->
                               <div class="btn-group btn-group-sm w-100" role="group">
-                                <a href="{% url 'generar_pdf_examen_generico' visita_examen.id %}" 
+                                <!-- <a href="{% url 'generar_pdf_examen_generico' visita_examen.id %}" 
                                   class="btn btn-success flex-fill">
                                   <i class="fas fa-eye mr-1"></i>Ver
+                                </a> -->
+                                <a href="{{ visita_examen.get_url_ver }}" class="btn btn-success flex-fill">
+                                  <i class="fas fa-eye mr-1"></i>Ver
                                 </a>
+
                                 {% if visita_examen.puede_editarse %}
                                 <a href="{% url 'realizar_examen' visita_examen.visita.id visita_examen.examen.id visita_examen.visita.paciente.id %}"
                                   class="btn btn-warning flex-fill">

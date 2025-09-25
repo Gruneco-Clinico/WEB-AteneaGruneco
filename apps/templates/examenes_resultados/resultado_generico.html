@@ -1,0 +1,26 @@
+{% extends "layouts/base.html" %}
+{% block content %}
+<div class="container mt-4">
+  <h3 class="mb-3">Resultado: {{ visita_examen.examen.nombre }}</h3>
+  <p><strong>Paciente:</strong> {{ paciente }}</p>
+  <hr>
+
+  <div class="card shadow-sm p-3">
+    <ul class="list-group">
+      {% for campo, valor in datos_resultado.items %}
+        <li class="list-group-item d-flex justify-content-between">
+          <span><strong>{{ campo }}</strong></span>
+          <span>{{ valor }}</span>
+        </li>
+      {% empty %}
+        <li class="list-group-item">⚠️ No hay resultados disponibles</li>
+      {% endfor %}
+    </ul>
+  </div>
+
+  <div class="mt-3">
+    <a href="{% url 'detalle_paciente' paciente.id %}" class="btn btn-secondary">Volver</a>
+  </div>
+</div>
+{% endblock %}
+

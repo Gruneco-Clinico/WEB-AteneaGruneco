@@ -20,7 +20,7 @@
               </li>
               <li class="breadcrumb-item"><a href="#">Atenea</a></li>
               <li class="breadcrumb-item active" aria-current="page">
-                Estadísticas RecuérdaMe
+                Estadísticas por usuario - RecuérdaMe
               </li>
             </ol>
           </nav>
@@ -144,7 +144,6 @@
 </div>
 
 <!-- Page content -->
-
 <div class="container-fluid mt--6">
   <!-- <div class="row">
     <div class="col-xl-8">
@@ -216,15 +215,7 @@
       </div>
     </div>
   </div> -->
-
-  <div class="text-center mt-4">
-    <a href="{% url 'estadisticas_por_usuario' %}" class="btn btn-primary">
-      Ver estadísticas por usuario
-    </a>
-  </div>
-
   <div class="row">
-    
     <div class="col-xl-8">
       <!-- <div class="card">
         <div class="card-header border-0">
@@ -273,7 +264,7 @@
       </div> -->
 
 
-      <div class="card mt-4 shadow">
+      <!-- <div class="card mt-4 shadow">
         <div class="card-header d-flex align-items-center">
           <img src="{% static 'assets/img/theme/RecuerdaMe.png' %}" 
               alt="Logo" 
@@ -284,11 +275,11 @@
         <div class="card-body">
           <canvas id="dauChart" width="300" height="100"></canvas>
         </div>
-      </div>
+      </div> -->
 
       <!-- Gráfico Growth accounting -->
 
-      <div class="card mt-4 shadow">
+      <!-- <div class="card mt-4 shadow">
         <div class="card-header d-flex align-items-center">
           <img src="{% static 'assets/img/theme/RecuerdaMe.png' %}" 
               alt="Logo" 
@@ -299,17 +290,17 @@
         <div class="card-body">
           <canvas id="growthChart" width="300" height="100"></canvas>
         </div>
-      </div>
+      </div> -->
 
       <!-- Vistas por página -->
-      <div class="card mt-4 shadow">
+      <!-- <div class="card mt-4 shadow">
         <div class="card-header d-flex align-items-center">
           <img src="{% static 'assets/img/theme/RecuerdaMe.png' %}" 
               alt="Logo" 
               style="height: 40px;" 
               class="mr-2">
           <h3 class="mb-0">Vistas por sección/página (Últimos 30 días)</h3>
-        </div>
+        </div> -->
 
         <!-- <p>Labels: <span id="views-labels-debug"></span></p>
         <p>Values: <span id="views-values-debug"></span></p> -->
@@ -323,7 +314,7 @@
 
 
       <!-- Sesiones (Pageview -> Pageleave) -->
-      <!-- <div class="card">
+      <div class="card">
         <div class="card-header d-flex align-items-center">
           <img src="{% static 'assets/img/theme/RecuerdaMe.png' %}" 
               alt="Logo" 
@@ -342,6 +333,7 @@
             <thead class="thead-light">
               <tr>
                 <th>Email</th>
+                <!-- <th>Paso</th> -->
                 <th>Ingresados</th>
                 <th>Convertidos</th>
                 <th>Dropped</th>
@@ -354,6 +346,7 @@
               {% for row in session_rows %}
                 <tr>
                   <td>{{ row.email }}</td>
+                  <!-- <td>{{ row.step_name }}</td> -->
                   <td>{{ row.entered }}</td>
                   <td>{{ row.converted }}</td>
                   <td>{{ row.dropped_off }}</td>
@@ -368,11 +361,11 @@
 
           </table>
         </div>
-      </div> -->
+      </div>
 
 
       <!-- Views de cada página por usuario  -->
-      <!-- <div class="card mt-4 shadow">
+      <div class="card mt-4 shadow">
         <div class="card-header d-flex align-items-center">
           <img src="{% static 'assets/img/theme/RecuerdaMe.png' %}" 
               alt="Logo" 
@@ -404,8 +397,15 @@
               </tbody>
             </table>
           </div>
+
+            <!-- Debug temporal -->
+        <!-- <pre>{{ views_matrix|safe }}</pre>
+        <pre>{{ views_labels_breakdown|safe }}</pre> -->
         </div>
-      </div> -->
+
+      
+
+      </div>
 
       
 
@@ -547,27 +547,27 @@
 
       <!-- Device Type -->
 
-      <div class="card mt-4 shadow">
+      <!-- <div class="card mt-4 shadow">
         <div class="card-header d-flex align-items-center">
           <img src="{% static 'assets/img/theme/RecuerdaMe.png' %}" 
               alt="Logo" 
               style="height: 40px;" 
               class="mr-2">
           <h3 class="mb-0">Usuarios por tipo de dispositivo (Últimos 30 días)</h3>
-        </div>
+        </div> -->
 
         <!-- <p>Labels: <span id="device-labels-debug"></span></p>
         <p>Values: <span id="device-values-debug"></span></p> -->
 
-        <div class="card-body">
+        <!-- <div class="card-body">
           <canvas id="deviceChart"></canvas>
         </div>
-      </div>
+      </div> -->
 
 
       <!-- Identify User -->
 
-      <!-- <div class="card">
+      <div class="card">
         <div class="card-header border-0">
           <div class="row align-items-center">
             <div class="col">
@@ -577,6 +577,9 @@
         </div>
         <div class="table-responsive">
 
+          <!-- <p id="user-labels-debug" style="color:red;"></p>
+          <p id="user-values-debug" style="color:red;"></p> -->
+
           <table class="table align-items-center table-flush">
             <thead class="thead-light">
               <tr>
@@ -585,12 +588,18 @@
               </tr>
             </thead>
             <tbody id="user-login-table">
+              <!-- Filas se generarán con JS -->
             </tbody>
           </table>
         </div>
-      </div> -->
+      </div>
       
     </div>
+
+    <a href="{% url 'estadisticas' %}" class="btn btn-secondary mt-3">
+        ← Volver
+    </a>
+
 
   </div>
 {% include "includes/footer.html" %}
@@ -615,239 +624,235 @@
 <script src="/static/assets/vendor/chart.js/dist/Chart.extension.js"></script> -->
 
 <!-- DAU -->
-{{ labels|json_script:"dau-labels" }}
-{{ values|json_script:"dau-values" }}
+<!-- {{ labels|json_script:"dau-labels" }}
+{{ values|json_script:"dau-values" }} -->
 
 <!-- Growth Accounting -->
-{{ growth_labels|json_script:"growth-labels" }}
-{{ growth_datasets|json_script:"growth-datasets" }}
+<!-- {{ growth_labels|json_script:"growth-labels" }}
+{{ growth_datasets|json_script:"growth-datasets" }} -->
 
 <!-- Device type -->
-{{ device_labels|json_script:"device-labels" }}
-{{ device_values|json_script:"device-values" }}
+<!-- {{ device_labels|json_script:"device-labels" }}
+{{ device_values|json_script:"device-values" }} -->
 
 <!-- Identify user -->
-<!-- {{ user_labels|json_script:"user-labels" }}
-{{ user_values|json_script:"user-values" }} -->
+{{ user_labels|json_script:"user-labels" }}
+{{ user_values|json_script:"user-values" }}
 
 <!-- Sesiones -->
-<!-- {{ session_rows|json_script:"session-rows" }} -->
+{{ session_rows|json_script:"session-rows" }}
 
 <!-- Vistas por página -->
-{{ views_labels|json_script:"views-labels" }}
-{{ views_dataset|json_script:"views-dataset" }}
+<!-- {{ views_labels|json_script:"views-labels" }}
+{{ views_dataset|json_script:"views-dataset" }} -->
 
 
-<!-- <script id="session-raw" type="application/json">
+<script id="session-raw" type="application/json">
   {{ session_raw|safe }}
-</script> -->
-
+</script>
 
 <script>
 
 // document.addEventListener("DOMContentLoaded", () => {
   // === Gráfico DAU ===
-const dauLabels = JSON.parse(document.getElementById("dau-labels").textContent);
-const dauValues = JSON.parse(document.getElementById("dau-values").textContent);
+// const dauLabels = JSON.parse(document.getElementById("dau-labels").textContent);
+// const dauValues = JSON.parse(document.getElementById("dau-values").textContent);
 
-new Chart(document.getElementById("dauChart"), {
-  type: "line",
-  data: {
-    labels: dauLabels,
-    datasets: [{
-      label: "Usuarios Activos Diarios",
-      data: dauValues,
-      borderColor: "blue",
-      backgroundColor: "rgba(0, 0, 255, 0.1)",
-      fill: true,
-      tension: 0.3
-    }]
-  },
-  options: {
-    responsive: true,
-    plugins: {
-      legend: { display: true },
-    },
-    scales: {
-      y: { beginAtZero: true }
-    }
-  }
-});
+// new Chart(document.getElementById("dauChart"), {
+//   type: "line",
+//   data: {
+//     labels: dauLabels,
+//     datasets: [{
+//       label: "Usuarios Activos Diarios",
+//       data: dauValues,
+//       borderColor: "blue",
+//       backgroundColor: "rgba(0, 0, 255, 0.1)",
+//       fill: true,
+//       tension: 0.3
+//     }]
+//   },
+//   options: {
+//     responsive: true,
+//     plugins: {
+//       legend: { display: true },
+//     },
+//     scales: {
+//       y: { beginAtZero: true }
+//     }
+//   }
+// });
 
 
 // === Gráfico Growth Accounting ===
-const growthLabels = JSON.parse(document.getElementById("growth-labels").textContent);
-const growthDatasets = JSON.parse(document.getElementById("growth-datasets").textContent);
+// const growthLabels = JSON.parse(document.getElementById("growth-labels").textContent);
+// const growthDatasets = JSON.parse(document.getElementById("growth-datasets").textContent);
 
-// Colores fijos para cada categoría
-const colors = {
-  "Returning": "rgba(75, 192, 192, 0.6)",   // verde
-  "New": "rgba(54, 162, 235, 0.6)",        // azul
-  "Resurrecting": "rgba(153, 102, 255, 0.6)", // violeta
-  "Dormant": "rgba(255, 99, 132, 0.6)"     // rojo
-};
+// // Colores fijos para cada categoría
+// const colors = {
+//   "Returning": "rgba(75, 192, 192, 0.6)",   // verde
+//   "New": "rgba(54, 162, 235, 0.6)",        // azul
+//   "Resurrecting": "rgba(153, 102, 255, 0.6)", // violeta
+//   "Dormant": "rgba(255, 99, 132, 0.6)"     // rojo
+// };
 
-// Traducción de etiquetas
-const traducciones = {
-  "Returning": "Recurrentes",
-  "New": "Nuevos",
-  "Resurrecting": "Resurgentes",
-  "Dormant": "Latentes"
-};
+// // Traducción de etiquetas
+// const traducciones = {
+//   "Returning": "Recurrentes",
+//   "New": "Nuevos",
+//   "Resurrecting": "Resurgentes",
+//   "Dormant": "Latentes"
+// };
 
-new Chart(document.getElementById("growthChart"), {
-  type: "bar",
-  data: {
-    labels: growthLabels,
-    datasets: growthDatasets.map(ds => ({
-      label: traducciones[ds.label] || ds.label, 
-      data: ds.data,
-      backgroundColor: colors[ds.label] || "rgba(200,200,200,0.6)",
-    }))
-  },
-  options: {
-    responsive: true,
-    plugins: {
-      legend: { position: "top" }
-    },
-    scales: {
-      x: { stacked: true },
-      y: {
-        stacked: true,
-        beginAtZero: true,
-        // Dibujar negativos
-        min: Math.min(-5, Math.min(...growthDatasets.flatMap(ds => ds.data))),
-        max: Math.max(5, Math.max(...growthDatasets.flatMap(ds => ds.data)))
-      }
-    }
-  }
-});
+// new Chart(document.getElementById("growthChart"), {
+//   type: "bar",
+//   data: {
+//     labels: growthLabels,
+//     datasets: growthDatasets.map(ds => ({
+//       label: traducciones[ds.label] || ds.label, 
+//       data: ds.data,
+//       backgroundColor: colors[ds.label] || "rgba(200,200,200,0.6)",
+//     }))
+//   },
+//   options: {
+//     responsive: true,
+//     plugins: {
+//       legend: { position: "top" }
+//     },
+//     scales: {
+//       x: { stacked: true },
+//       y: {
+//         stacked: true,
+//         beginAtZero: true,
+//         // Dibujar negativos
+//         min: Math.min(-5, Math.min(...growthDatasets.flatMap(ds => ds.data))),
+//         max: Math.max(5, Math.max(...growthDatasets.flatMap(ds => ds.data)))
+//       }
+//     }
+//   }
+// });
 
 // === Gráfico Device Type ===
-const deviceLabels = JSON.parse(document.getElementById("device-labels").textContent);
-const deviceValues = JSON.parse(document.getElementById("device-values").textContent);
+// const deviceLabels = JSON.parse(document.getElementById("device-labels").textContent);
+// const deviceValues = JSON.parse(document.getElementById("device-values").textContent);
 
-new Chart(document.getElementById("deviceChart"), {
-  type: "doughnut",
-  data: {
-    labels: deviceLabels,
-    datasets: [{
-      data: deviceValues,
-      backgroundColor: ["#007bff", "#28a745", "#ffc107", "#dc3545"], // azul, verde, amarillo, rojo
-    }]
-  },
-  options: {
-    responsive: true,
-    plugins: {
-      legend: { position: "right" },
-      tooltip: { enabled: true }
-    }
-  }
-});
+// new Chart(document.getElementById("deviceChart"), {
+//   type: "doughnut",
+//   data: {
+//     labels: deviceLabels,
+//     datasets: [{
+//       data: deviceValues,
+//       backgroundColor: ["#007bff", "#28a745", "#ffc107", "#dc3545"], // azul, verde, amarillo, rojo
+//     }]
+//   },
+//   options: {
+//     responsive: true,
+//     plugins: {
+//       legend: { position: "right" },
+//       tooltip: { enabled: true }
+//     }
+//   }
+// });
 
 // === Tabla Identify User ===
-// const userLabels = JSON.parse(document.getElementById("user-labels").textContent);
-// const userValues = JSON.parse(document.getElementById("user-values").textContent);
+const userLabels = JSON.parse(document.getElementById("user-labels").textContent);
+const userValues = JSON.parse(document.getElementById("user-values").textContent);
 
-// const tbody = document.getElementById("user-login-table");
+const tbody = document.getElementById("user-login-table");
 
-// userLabels.forEach((email, i) => {
-//   const count = userValues[i];
+userLabels.forEach((email, i) => {
+  const count = userValues[i];
 
-//   const row = document.createElement("tr");
-//   row.innerHTML = `
-//     <th scope="row">${email}</th>
-//     <td>${count}</td>
-//   `;
-//   tbody.appendChild(row);
-// });
+  const row = document.createElement("tr");
+  row.innerHTML = `
+    <th scope="row">${email}</th>
+    <td>${count}</td>
+  `;
+  tbody.appendChild(row);
+});
 
 // === Tabla Sesiones ===
-// const sessionRows = JSON.parse(document.getElementById("session-rows").textContent);
+const sessionRows = JSON.parse(document.getElementById("session-rows").textContent);
 
-// const tbodySessions = document.getElementById("session-table");
-// tbodySessions.innerHTML = "";
+const tbodySessions = document.getElementById("session-table");
+tbodySessions.innerHTML = ""; // limpiar antes
 
-// sessionRows.forEach(row => {
-//   const tr = document.createElement("tr");
-//   tr.innerHTML = `
-//     <th scope="row">${row.email}</th>
-//     <td>${row.entered}</td>
-//     <td>${row.converted}</td>
-//     <td>${row.dropped_off}</td>
-//     <td>${row.conversion_rate}%</td>
-//     <td>${row.avg_time || "–"}</td>
-//     <td>${row.median_time || "–"}</td>
-//   `;
-//   tbodySessions.appendChild(tr);
-// });
-
-
-
+sessionRows.forEach(row => {
+  const tr = document.createElement("tr");
+  tr.innerHTML = `
+    <th scope="row">${row.email}</th>
+    <td>${row.entered}</td>
+    <td>${row.converted}</td>
+    <td>${row.dropped_off}</td>
+    <td>${row.conversion_rate}%</td>
+    <td>${row.avg_time || "–"}</td>
+    <td>${row.median_time || "–"}</td>
+  `;
+  tbodySessions.appendChild(tr);
+});
 
 // === Gráfico Vistas por Página ===
-const viewsLabels = JSON.parse(document.getElementById("views-labels").textContent);
-const viewsDataset = JSON.parse(document.getElementById("views-dataset").textContent);
+// const viewsLabels = JSON.parse(document.getElementById("views-labels").textContent);
+// const viewsDataset = JSON.parse(document.getElementById("views-dataset").textContent);
 
-// console.log("Views Labels:", viewsLabels);
-// console.log("Views Dataset:", viewsDataset);
+// // console.log("Views Labels:", viewsLabels);
+// // console.log("Views Dataset:", viewsDataset);
 
-// Diccionario de mapeo
-const labelMap = {
-  0: "Sección: Información en Salud",
-  1: "Sección: Pasatiempos",
-  2: "Sección: Encuentros",
-  3: "Sección: Fortalece tu mente",
-  4: "Sección: Hazlo consciente",
-  5: "Hazlo Consciente - Módulo 2",
-  6: "Hazlo Consciente - Módulo 3",
-  7: "Hazlo Consciente - Módulo 4",
-  8: "Pasatiempos - Plantas",
-  9: "Pasatiempos - Mascotas",
-  10: "Pasatiempos - Recetas",
-  11: "Pasatiempos - Ejercicio",
-  12: "Polijuego"
-};
+// // Diccionario de mapeo
+// const labelMap = {
+//   0: "Sección: Información en Salud",
+//   1: "Sección: Pasatiempos",
+//   2: "Sección: Encuentros",
+//   3: "Sección: Fortalece tu mente",
+//   4: "Sección: Hazlo consciente",
+//   5: "Hazlo Consciente - Módulo 2",
+//   6: "Hazlo Consciente - Módulo 3",
+//   7: "Hazlo Consciente - Módulo 4",
+//   8: "Pasatiempos - Plantas",
+//   9: "Pasatiempos - Mascotas",
+//   10: "Pasatiempos - Recetas",
+//   11: "Pasatiempos - Ejercicio",
+//   12: "Polijuego"
+// };
 
-// Reemplazar labels numéricos por nombres
-const mappedLabels = viewsLabels.map(num => labelMap[num] || num);
+// // Reemplazar labels numéricos por nombres
+// const mappedLabels = viewsLabels.map(num => labelMap[num] || num);
 
-new Chart(document.getElementById("viewsChart"), {
-  type: "bar",
-  data: {
-    labels: mappedLabels,
-    datasets: viewsDataset
-  },
-  options: {
-    responsive: true,
-    plugins: {
-      legend: { display: false },
-      tooltip: {
-        callbacks: {
-          label: function(context) {
-            return context.raw; // solo muestra el valor
-          }
-        }
-      }
-    },
-    scales: {
-      x: {
-        ticks: {
-          autoSkip: false,
-          maxRotation: 45,
-          minRotation: 0
-        }
-      },
-      y: {
-        beginAtZero: true,
-        title: {
-          display: true,
-          text: "Cantidad de vistas"
-        }
-      }
-    }
-  }
-});
+// new Chart(document.getElementById("viewsChart"), {
+//   type: "bar",
+//   data: {
+//     labels: mappedLabels,
+//     datasets: viewsDataset
+//   },
+//   options: {
+//     responsive: true,
+//     plugins: {
+//       legend: { display: false },
+//       tooltip: {
+//         callbacks: {
+//           label: function(context) {
+//             return context.raw; // solo muestra el valor
+//           }
+//         }
+//       }
+//     },
+//     scales: {
+//       x: {
+//         ticks: {
+//           autoSkip: false,
+//           maxRotation: 45,
+//           minRotation: 0
+//         }
+//       },
+//       y: {
+//         beginAtZero: true,
+//         title: {
+//           display: true,
+//           text: "Cantidad de vistas"
+//         }
+//       }
+//     }
+//   }
+// });
 
 </script>
 

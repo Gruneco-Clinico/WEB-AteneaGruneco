@@ -59,11 +59,14 @@ urlpatterns = [
     path("eliminar-visita/<int:visita_id>/", views.eliminar_v, name="eliminar_v"),
     path("editar-visita/<int:visita_id>/", views.editar_v, name="editar_v"),
     # Exámenes
-    path(
-        "examen/resultado/<int:visita_examen_id>/",
-        views.ver_resultado_examen,
-        name="ver_resultado_examen",
-    ),
+    # path(
+    #     "examen/resultado/<int:visita_examen_id>/",
+    #     views.ver_resultado_examen,
+    #     name="ver_resultado_examen",
+    # ),
+
+    path("examenes/ver/<int:visita_examen_id>/", views.ver_resultado_examen, name="ver_resultado_examen"),
+
     path(
         "realizar_examen/<int:visita_id>/<int:examen_id>/<int:paciente_id>/",
         views.realizar_examen,
@@ -205,7 +208,16 @@ urlpatterns = [
         name="resumen_sesiones",
     ),
     # INTEGRACIÓN RECUÉRDAME
-    path("estadisticas/", views.estadisticas, name="estadisticas"),
+
+    path(
+        "estadisticas/", 
+        views.estadisticas, 
+        name="estadisticas"),
+    path("estadisticas_por_usuario/", 
+         views.estadisticas_por_usuario, 
+         name="estadisticas_por_usuario"),
+
+
     # examanes generales
     path(
         "guardar_examen_analisis/",
