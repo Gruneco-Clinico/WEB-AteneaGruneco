@@ -144,8 +144,23 @@ class DatosDemograficos(models.Model):
         unique=True, verbose_name="Correo Electrónico", default="sincorreo@example.com"
     )
 
+    ### Para códigos ANG-consecutivos
+
+    codigo = models.CharField(
+        max_length=10,
+        blank=True,
+        null=True,
+        unique=True,
+        verbose_name="Código del Paciente"
+    )
+
     def __str__(self):
-        return f"{self.primer_nombre} {self.primer_apellido}"
+        return f"{self.primer_nombre} {self.primer_apellido} ({self.codigo or 'sin código'})"
+
+
+    # Antes estaba esto: 
+    # def __str__(self):
+    #     return f"{self.primer_nombre} {self.primer_apellido}"
 
 
 class Proyecto(models.Model):
@@ -257,6 +272,38 @@ class Visita(models.Model):
 
     def __str__(self):
         return f"{self.nombre} - {self.proyecto.nombre}"
+    
+    # Para códigos ANG-XXX consecutivos
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+        # Asignar código único si aplica
+        if (
+            self.Tipo_visita
+            and self.Tipo_visita.proyecto.nombre == "Anosognosia"
+            and self.Tipo_visita.nombre == "PosIntervención"
+        ):
+            paciente = self.paciente
+            if paciente and not paciente.codigo:
+                # Obtener el último código asignado
+                ultimo = (
+                    DatosDemograficos.objects.exclude(codigo__isnull=True)
+                    .exclude(codigo__exact="")
+                    .order_by("-codigo")
+                    .first()
+                )
+                if ultimo and ultimo.codigo:
+                    try:
+                        numero = int(ultimo.codigo.split("-")[1])
+                    except (IndexError, ValueError):
+                        numero = 0
+                else:
+                    numero = 0
+
+                # Generar nuevo consecutivo
+                nuevo_codigo = f"ANG-{numero+1:03d}"
+                paciente.codigo = nuevo_codigo
+                paciente.save()
 
 
 class VisitaExamen(models.Model):
@@ -521,6 +568,11 @@ class VisitaExamen(models.Model):
                 pass
 
         return f"/examenes/ver/{self.id}/"
+
+        # try:
+        #     return reverse("ver_resultado_examen", args=[self.id])
+        # except Exception:
+        #     return f"/examenes/ver/{self.id}/"
 
     def get_url_editar(self):
         """Retorna la URL para editar el examen"""
