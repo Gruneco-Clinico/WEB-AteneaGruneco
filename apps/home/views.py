@@ -4167,12 +4167,9 @@ def guardar_intervenciones(request):
             print(f"🔎 Nombre: {visita_examen.examen.nombre}")
 
             if total_sesiones >= 24:
-                # ✅ Si ya se cumplieron las 24 sesiones, marcar como completado
                 visita_examen.estado = "completado"
-                visita_examen.esta_realizado = "True"
                 visita_examen.fecha_completado = timezone.now()
             else:
-                # 🚧 Mientras tanto, sigue en progreso
                 visita_examen.estado = "en_progreso"
 
             visita_examen.save()

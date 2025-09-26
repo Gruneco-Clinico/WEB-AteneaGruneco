@@ -2,8 +2,6 @@
 {% load static %}
 {% load custom_filters %}
 
-
-
 <!-- Specific CSS goes HERE -->
 {% block stylesheets %}{% endblock stylesheets %} {% block content %}
 <!-- Header -->
@@ -20,7 +18,7 @@
               </li>
               <li class="breadcrumb-item"><a href="#">Atenea</a></li>
               <li class="breadcrumb-item active" aria-current="page">
-                Estadísticas RecuérdaMe
+                Estadísticas RecuérdaMe - últimos 30 días
               </li>
             </ol>
           </nav>
@@ -34,8 +32,8 @@
 
 <div class="container-fluid mt--6">
   <div class="text-center mt-4">
-    <a href="{% url 'estadisticas_por_usuario' %}" class="btn btn-light border">
-      Ver estadísticas por usuario
+    <a href="{% url 'estadisticas_por_usuario' %}" class="btn btn-sm btn-neutral" title="Ver estadísticas por usuario">
+      <i class="fas fa-chart-bar"></i> Ver estadísticas por usuario
     </a>
   </div>
 
@@ -44,10 +42,12 @@
     <div class="col-xl-8">
       <div class="card mt-4 shadow">
         <div class="card-header d-flex align-items-center">
-          <img src="{% static 'assets/img/theme/RecuerdaMe.png' %}" 
-              alt="Logo" 
-              style="height: 40px;" 
-              class="mr-2">
+          <a href="https://recuerdame.gna.org.co/" target="_blank">
+              <img src="{% static 'assets/img/theme/RecuerdaMe.png' %}" 
+                  alt="Logo" 
+                  style="height: 40px;" 
+                  class="mr-2">
+          </a>
           <h3 class="mb-0">Usuarios Activos Diarios</h3>
         </div>
         <div class="card-body">
@@ -59,10 +59,12 @@
 
       <div class="card mt-4 shadow">
         <div class="card-header d-flex align-items-center">
-          <img src="{% static 'assets/img/theme/RecuerdaMe.png' %}" 
-              alt="Logo" 
-              style="height: 40px;" 
-              class="mr-2">
+          <a href="https://recuerdame.gna.org.co/" target="_blank">
+              <img src="{% static 'assets/img/theme/RecuerdaMe.png' %}" 
+                  alt="Logo" 
+                  style="height: 40px;" 
+                  class="mr-2">
+          </a>
           <h3 class="mb-0">Crecimiento</h3>
         </div>
         <div class="card-body">
@@ -74,11 +76,13 @@
 
       <div class="card mt-4 shadow">
         <div class="card-header d-flex align-items-center">
-          <img src="{% static 'assets/img/theme/RecuerdaMe.png' %}" 
-              alt="Logo" 
-              style="height: 40px;" 
-              class="mr-2">
-          <h3 class="mb-0">Vistas por sección/página (Últimos 30 días)</h3>
+          <a href="https://recuerdame.gna.org.co/" target="_blank">
+              <img src="{% static 'assets/img/theme/RecuerdaMe.png' %}" 
+                  alt="Logo" 
+                  style="height: 40px;" 
+                  class="mr-2">
+          </a>
+          <h3 class="mb-0">Número de vistas por sección/página</h3>
         </div>
 
         <!-- <p>Labels: <span id="views-labels-debug"></span></p>
@@ -96,11 +100,13 @@
       <!-- Device Type -->
       <div class="card mt-4 shadow">
         <div class="card-header d-flex align-items-center">
-          <img src="{% static 'assets/img/theme/RecuerdaMe.png' %}" 
-              alt="Logo" 
-              style="height: 40px;" 
-              class="mr-2">
-          <h3 class="mb-0">Usuarios por tipo de dispositivo (Últimos 30 días)</h3>
+          <a href="https://recuerdame.gna.org.co/" target="_blank">
+              <img src="{% static 'assets/img/theme/RecuerdaMe.png' %}" 
+                  alt="Logo" 
+                  style="height: 40px;" 
+                  class="mr-2">
+          </a>
+          <h3 class="mb-0">Cantidad de usuarios por tipo de dispositivo</h3>
         </div>
 
         <!-- <p>Labels: <span id="device-labels-debug"></span></p>
