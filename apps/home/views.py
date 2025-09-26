@@ -1276,79 +1276,46 @@ def realizar_examen(request, visita_id, examen_id, paciente_id):
 
 @login_required
 def ver_resultado_examen(request, visita_examen_id):
-    """Vista genérica para mostrar resultados de cualquier examen"""
     visita_examen = get_object_or_404(VisitaExamen, id=visita_examen_id)
 
-    # Verificar que el examen esté completado
     if not visita_examen.esta_realizado:
         messages.error(request, "Este examen aún no ha sido completado.")
-        return redirect(
-            "detalle_paciente", paciente_id=visita_examen.visita.paciente.id
+        return redirect("detalle_paciente", paciente_id=visita_examen.visita.paciente.id)
+
+    # SeguimientoIntervenciones - es diferente al resto
+    if visita_examen.examen.nombre == "SeguimientoIntervencionesParticipantes_ANG":
+
+        sesiones = SeguimientoIntervencionesResult.objects.filter(
+            visita_examen=visita_examen
+        ).order_by("numero_sesion")
+
+        paciente = visita_examen.visita.paciente
+
+        context = {
+            "visita_examen": visita_examen,
+            "sesiones": sesiones,
+            "paciente": paciente,
+        }
+        return render(
+            request,
+            "examenes_resultados/resultado_seguimientointervenciones.html", context
         )
 
-    # Obtener el resultado específico del examen
+    # Caso genérico
     resultado = visita_examen.get_resultado_instance()
 
     if not resultado:
         messages.error(request, "No se encontraron resultados para este examen.")
-        return redirect(
-            "detalle_paciente", paciente_id=visita_examen.visita.paciente.id
-        )
+        return redirect("detalle_paciente", paciente_id=visita_examen.visita.paciente.id)
 
-    # Convertir el resultado a diccionario para el template
     datos_resultado = {}
     for field in resultado._meta.fields:
-        if field.name != "visita_examen":  # Excluir la relación
+        if field.name != "visita_examen":
             valor = getattr(resultado, field.name)
             datos_resultado[field.verbose_name or field.name] = valor
 
-    # Determinar el template específico basado en el tipo de examen
-    template_mapping = {
-        "SuenoFisicoResult": "examenes_resultados/resultado_sueno_fisico.html",
-        "AtenasResult": "examenes_resultados/resultado_atenas.html",
-        "PittsburghResult": "examenes_resultados/resultado_pittsburgh.html",
-        "EpworthResult": "examenes_resultados/resultado_epworth.html",
-        "LawtonBrodyResult": "examenes_resultados/resultado_lawtonbrody.html",
-        "CuidadorNPIResult": "examenes_resultados/resultado_cuidadornpi.html",
-        "EuroQol5D5LResult": "examenes_resultados/resultado_euroqol.html",
-        "EuroQolEVASaludResult": "examenes_resultados/resultado_evasaludeuroqol.html",
-        "MoCAResult": "examenes_resultados/resultado_moca.html",
-        "ParticipanteYesavageResult": "examenes_resultados/resultado_yesavage.html",
-        "ZaritResult": "examenes_resultados/resultado_zarit.html",
-        "AQDCuidadorResult": "examenes_resultados/resultado_aqdcuidador.html",
-        "AQDParticipanteResult": "examenes_resultados/resultado_aqdparticipante.html",
-        "CDRCuidadorResult": "examenes_resultados/resultado_cdrcuidador.html",
-        "CDRParticipanteResult": "examenes_resultados/resultado_cdrparticipante.html",
-        "RedLatSpanishResult": "examenes_resultados/resultado_redlatspanish.html",
-        "AdherenciaTerapeuticaResult": "examenes_resultados/resultado_adherenciaterapeutica.html",
-        "BettyFerrelResult": "examenes_resultados/resultado_bettyferrel.html",
-        "PuntajeCDRResult": "examenes_resultados/resultado_puntajeCDR.html",
-        "ConsentimientoInformadoParticipanteResult": "examenes_resultados/resultado_consentimientoinformadoparticipante.html",
-        "ConsentimientoInformadoCuidadorResult": "examenes_resultados/resultado_consentimientoinformadocuidador.html",
-        "AnamnesisCuidadorResult": "examenes_resultados/resultado_anamnesiscuidador.html",
-        "AnamnesisParticipanteResult": "examenes_resultados/resultado_anamnesisparticipante.html",
-        "SeguimientoIntervencionesResult": "examenes_resultados/resultado_seguimientointervenciones.html",
-        # Agregar más según tus exámenes
-    }
-
-    tipo_resultado = resultado.__class__.__name__
-    template = template_mapping.get(
-        tipo_resultado, "examenes_resultados/resultado_generico.html"
-    )
-
-    # return render(
-    #     request,
-    #     template,
-    #     {
-    #         "visita_examen": visita_examen,
-    #         "resultado": resultado,
-    #         "datos_resultado": datos_resultado,
-    #         "paciente": visita_examen.visita.paciente,
-    #     },
-    # )
-
     return render(
-    request,
+        request,
         "examenes_resultados/resultado_generico.html",
         {
             "visita_examen": visita_examen,
@@ -4180,22 +4147,38 @@ def guardar_intervenciones(request):
                 numero_sesion=numero_sesion,
                 defaults={
                     "nombre_sesion": nombre_sesion,
-                    "fecha": fecha if fecha else None,
-                    "hora_inicio": hora_inicio if hora_inicio else None,
-                    "hora_fin": hora_fin if hora_fin else None,
+                    "fecha": fecha or None,
+                    "hora_inicio": hora_inicio or None,
+                    "hora_fin": hora_fin or None,
                     "asistencia": asistencia,
-                    "participacion": participacion if participacion else None,
+                    "participacion": participacion or None,
                     "estado": estado,
                     "tematica": tematica,
                     "observaciones": observaciones,
                 },
             )
 
-            # Si ya se completaron todas las sesiones necesarias, puedes marcar la visita como completada.
-            # Aquí lo dejamos siempre como en progreso, pero puedes añadir tu propia lógica.
-            visita_examen.estado = "en_progreso"
-            visita_examen.save()
+            # Verificar cantidad de sesiones
+            total_sesiones = SeguimientoIntervencionesResult.objects.filter(
+                visita_examen=visita_examen
+            ).count()
 
+            print(f"🔎 Total de sesiones guardadas para {visita_examen.id}: {total_sesiones}")
+            print(f"🔎 Nombre: {visita_examen.examen.nombre}")
+
+            if total_sesiones >= 24:
+                # ✅ Si ya se cumplieron las 24 sesiones, marcar como completado
+                visita_examen.estado = "completado"
+                visita_examen.esta_realizado = "True"
+                visita_examen.fecha_completado = timezone.now()
+            else:
+                # 🚧 Mientras tanto, sigue en progreso
+                visita_examen.estado = "en_progreso"
+
+            visita_examen.save()
+            
+
+            # Mensaje de confirmación
             if created:
                 messages.success(
                     request, f"✅ Sesión {numero_sesion} guardada exitosamente."
@@ -4208,20 +4191,14 @@ def guardar_intervenciones(request):
             return redirect("detalle_paciente", paciente_id=paciente_id)
 
         except Exception as e:
-            # Revertir estado si falla
-            try:
-                if "visita_examen" in locals():
-                    visita_examen.estado = "pendiente"
-                    visita_examen.save()
-            except:
-                pass
-
+        
             messages.error(request, f"❌ Error al guardar la sesión: {str(e)}")
             return redirect("detalle_paciente", paciente_id=paciente_id or 1)
 
     else:
         messages.error(request, "❌ Método no permitido.")
         return redirect("index")
+
 
 
 @login_required

@@ -1891,7 +1891,7 @@ class AnamnesisParticipanteResult(ResultadoExamenBase):
 
 class SeguimientoIntervencionesResult(models.Model):
     visita_examen = models.ForeignKey(
-        "VisitaExamen", on_delete=models.CASCADE, related_name="intervenciones"
+        "VisitaExamen", on_delete=models.CASCADE, related_name="seguimientointervencionesresult_resultado"
     )
     numero_sesion = models.IntegerField()  # 1–24
     nombre_sesion = models.CharField(max_length=200, blank=True, null=True)

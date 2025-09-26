@@ -1,0 +1,147 @@
+{% extends "layouts/base.html" %}
+{% block content %}
+<div class="container mt-4">
+
+  <!-- Encabezado -->
+  <div class="card shadow-sm mb-4">
+    <div class="card-body">
+      <h3 class="card-title mb-2">
+        🧾 Reporte de examen: <span class="text-primary">{{ visita_examen.examen.nombre }}</span>
+      </h3>
+      <p class="mb-1"><strong>Paciente:</strong> {{ paciente }}</p>
+      <p class="text-muted mb-0">
+        <small>
+          Fecha de finalización: 
+          {% if visita_examen.fecha_completado %}
+            {{ visita_examen.fecha_completado|date:"d/m/Y H:i" }}
+          {% else %}
+            <span class="text-warning">⏳ En progreso</span>
+          {% endif %}
+        </small>
+      </p>
+    </div>
+  </div>
+
+  <!-- Tabla de sesiones -->
+  <div class="card shadow-sm">
+    <div class="card-header bg-light">
+      <h5 class="mb-0">📌 Registro de sesiones (1 - 24)</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-bordered table-hover align-middle">
+            <thead class="table-light">
+              <tr>
+                <th>#</th>
+                <th>Nombre</th>
+                <th>Fecha</th>
+                <th>Hora inicio</th>
+                <th>Hora fin</th>
+                <th>Asistencia</th>
+                <th>Participación</th>
+                <th>Estado</th>
+                <th>Temática</th>
+                <th>Observaciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for s in sesiones %}
+            <tr>
+                <td><strong>{{ s.numero_sesion }}</strong></td>
+                <td>{{ s.nombre_sesion|default:"-" }}</td>
+                <td>{{ s.fecha|date:"d/m/Y"|default:"-" }}</td>
+                <td>{{ s.hora_inicio|time:"H:i"|default:"-" }}</td>
+                <td>{{ s.hora_fin|time:"H:i"|default:"-" }}</td>
+                <td>
+                    {% if s.asistencia == "Sí" %}
+                        <span class="badge bg-success">Sí</span>
+                    {% elif s.asistencia == "No" %}
+                        <span class="badge bg-danger">No</span>
+                    {% else %}
+                        <span class="badge bg-secondary">-</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if s.participacion %}
+                        <span class="badge bg-info text-dark">{{ s.participacion }}</span>
+                    {% else %}
+                        <span class="badge bg-secondary">-</span>
+                    {% endif %}
+                </td>
+                <td>{{ s.estado|default:"-" }}</td>
+                <td>{{ s.tematica|default:"-" }}</td>
+                <td>{{ s.observaciones|default:"-" }}</td>
+            </tr>
+            {% endfor %}
+
+            </tbody>
+          </table>
+        </div>
+      
+    </div>
+  </div>
+
+  <!-- Resumen dinámico -->
+  <div class="card shadow-sm mt-4" id="resumenFinal" style="display:none;">
+    <div class="card-header bg-light">
+      <h5 class="mb-0">📊 Resumen</h5>
+    </div>
+    <div class="card-body">
+      <p><strong>Total de sesiones registradas:</strong> <span id="totalSesiones"></span></p>
+      <p><strong>Sesiones asistidas:</strong> <span id="sesionesAsistidas"></span></p>
+      <p><strong>Participación promedio:</strong> <span id="promedioParticipacion"></span></p>
+      <p id="alertaResumen" class="text-danger fw-bold"></p>
+      <canvas id="graficoParticipacion" height="80"></canvas>
+    </div>
+  </div>
+
+  <div class="d-flex justify-content-end mt-4">
+    <a href="{% url 'detalle_paciente' paciente.id %}" class="btn btn-outline-secondary">
+      ← Volver
+    </a>
+  </div>
+
+  </div>
+    {% include "includes/footer.html" %}
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  const urlResumen = "{% url 'resumen_sesiones' visita_examen.id visita_examen.examen.id %}";
+
+  fetch(urlResumen)
+    .then(response => response.json())
+    .then(data => {
+      if (!data.error) {
+        document.getElementById("resumenFinal").style.display = "block";
+        document.getElementById("totalSesiones").textContent = 24;
+        document.getElementById("sesionesAsistidas").textContent = data.conteo_asistencia;
+        document.getElementById("promedioParticipacion").textContent = data.promedio_participacion;
+        if (data.alerta) {
+          document.getElementById("alertaResumen").textContent = data.alerta;
+        }
+
+        const ctx = document.getElementById("graficoParticipacion");
+        new Chart(ctx, {
+          type: "line",
+          data: {
+            labels: data.tendencia_participacion.map((_, i) => "Sesión " + (i+1)),
+            datasets: [{
+              label: "Participación",
+              data: data.tendencia_participacion,
+              borderColor: "blue",
+              fill: false,
+              tension: 0.2
+            }]
+          }
+        });
+      }
+    })
+    .catch(error => console.error("Error cargando resumen:", error));
+});
+</script>
+
+{% endblock %}

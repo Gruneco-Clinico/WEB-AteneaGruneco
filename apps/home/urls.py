@@ -207,6 +207,7 @@ urlpatterns = [
         views.resumen_sesiones,
         name="resumen_sesiones",
     ),
+    
     # INTEGRACIÓN RECUÉRDAME
 
     path(
