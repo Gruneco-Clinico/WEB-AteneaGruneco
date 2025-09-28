@@ -38,13 +38,13 @@
       </div>
 
       <!-- Sesiones (Pageview -> Pageleave) -->
-      <div class="card">
+      <div class="card mb-4 shadow">
         <div class="card-header d-flex align-items-center">
           <img src="{% static 'assets/img/theme/RecuerdaMe.png' %}" 
               alt="Logo" 
               style="height: 40px;" 
               class="mr-2">
-          <h3 class="mb-0">Resumen de sesiones por usuario (inicio y fin)</h3>
+          <h3 class="mb-0">Resumen de sesiones</h3>
         </div>
         <div class="table-responsive">
 
@@ -80,51 +80,23 @@
                 <tr><td colspan="7">No hay datos</td></tr>
               {% endfor %}
             </tbody>
-
           </table>
         </div>
       </div>
 
 
       <!-- Views de cada página por usuario  -->
-      <div class="card mt-4 shadow">
+      <div class="card mb-4 shadow">
         <div class="card-header d-flex align-items-center">
           <img src="{% static 'assets/img/theme/RecuerdaMe.png' %}" 
               alt="Logo" 
               style="height: 40px;" 
               class="mr-2">
-          <h3 class="mb-0">Vistas por usuario y página</h3>
+          <h3 class="mb-0"></i>Vistas por página</h3>
         </div>
-
         <div class="card-body">
-          <div class="table-responsive">
-            <table class="table table-bordered">
-              <thead class="thead-light">
-                <tr>
-                  <th>Usuario</th>
-                  {% for page in views_labels_breakdown %}
-                    <th>{{ page }}</th>
-                  {% endfor %}
-                </tr>
-              </thead>
-              <tbody>
-                {% for row in views_matrix %}
-                  <tr>
-                    <td>{{ row.email }}</td>
-                    {% for page in views_labels_breakdown %}
-                      <td>{{ row|get_item:page }}</td>
-                    {% endfor %}
-                  </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
-
-            <!-- Debug temporal -->
-        <!-- <pre>{{ views_matrix|safe }}</pre>
-        <pre>{{ views_labels_breakdown|safe }}</pre> -->
+          <canvas id="viewsPerPageChart" width="500" height="350"></canvas>
         </div>
-
       </div>
 
       <!-- Gráficos que van a la derecha -->
@@ -135,7 +107,7 @@
         <div class="card-header border-0">
           <div class="row align-items-center">
             <div class="col">
-              <h3 class="mb-0">Ingresos por Usuario (Últimos 30 días)</h3>
+              <h3 class="mb-0">Ingresos</h3>
             </div>
           </div>
         </div>
@@ -160,10 +132,8 @@
       
     </div>
 
-    
-
     <div class="d-flex justify-content-end mt-3">
-      <a href="{% url 'estadisticas' %}" class="btn btn-outline-info">
+      <a href="{% url 'listado_usuarios_recuerdame' %}" class="btn btn-outline-info">
           ← Volver
       </a>
     </div>
@@ -188,6 +158,12 @@
 
 <!-- Sesiones -->
 {{ session_rows|json_script:"session-rows" }}
+
+
+<!-- Vistas por página -->
+{{ views_matrix|json_script:"views-matrix" }}
+{{ views_labels_breakdown|json_script:"views-labels-breakdown" }}
+
 
 
 <script id="session-raw" type="application/json">
@@ -223,15 +199,61 @@ sessionRows.forEach(row => {
   const tr = document.createElement("tr");
   tr.innerHTML = `
     <th scope="row">${row.email}</th>
-    <td>${row.entered}</td>
-    <td>${row.converted}</td>
-    <td>${row.dropped_off}</td>
-    <td>${row.conversion_rate}%</td>
-    <td>${row.avg_time || "–"}</td>
-    <td>${row.median_time || "–"}</td>
+    <td class="text-center">${row.entered}</td>
+    <td class="text-center">${row.converted}</td>
+    <td class="text-center">${row.dropped_off}</td>
+    <td class="text-center">
+      <span class="badge badge-success">
+        ${row.conversion_rate}%
+      </span>
+    </td>
+    <td class="text-center">${row.avg_time || "–"}</td>
+    <td class="text-center">${row.median_time || "–"}</td>
   `;
   tbodySessions.appendChild(tr);
 });
+
+// === Vistas por usuario y página ===
+const viewsMatrix = JSON.parse(document.getElementById("views-matrix").textContent);
+const viewsLabels = JSON.parse(document.getElementById("views-labels-breakdown").textContent);
+
+const ctxViews = document.getElementById("viewsPerPageChart").getContext("2d");
+
+// Tomar siempre el primer usuario (porque tu view está por email)
+const userRow = viewsMatrix[0];
+
+// Extraer valores en el mismo orden de labels
+const userViewsData = viewsLabels.map(label => userRow[label] || 0);
+
+new Chart(ctxViews, {
+  type: "bar",
+  data: {
+    labels: viewsLabels,
+    datasets: [{
+      label: `Vistas de ${userRow.email}`,
+      data: userViewsData,
+      backgroundColor: "rgba(54, 162, 235, 0.6)",
+      borderColor: "rgba(54, 162, 235, 1)",
+      borderWidth: 1
+    }]
+  },
+  options: {
+    indexAxis: "y", // barras horizontales, si prefieres vertical quítalo
+    responsive: true,
+    plugins: {
+      legend: { display: false },
+      datalabels: {
+        anchor: "end",
+        align: "right",
+        formatter: value => value > 0 ? value : ""
+      }
+    },
+    scales: {
+      x: { beginAtZero: true }
+    }
+  }
+});
+
 
 </script>
 

@@ -214,9 +214,14 @@ urlpatterns = [
         "estadisticas/", 
         views.estadisticas, 
         name="estadisticas"),
-    path("estadisticas_por_usuario/", 
-         views.estadisticas_por_usuario, 
-         name="estadisticas_por_usuario"),
+    # path("estadisticas_por_usuario/", 
+    #      views.estadisticas_por_usuario, 
+    #      name="estadisticas_por_usuario"),
+    path("listado_usuarios_recuerdame/", 
+         views.listado_usuarios_recuerdame, 
+         name="listado_usuarios_recuerdame"),
+    
+    path("estadisticas/usuarios/<str:email>/", views.estadisticas_usuario_detalle, name="estadisticas_usuario_detalle"),
 
 
     # examanes generales

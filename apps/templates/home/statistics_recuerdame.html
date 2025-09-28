@@ -2,9 +2,7 @@
 {% load static %}
 {% load custom_filters %}
 
-<!-- Specific CSS goes HERE -->
 {% block stylesheets %}{% endblock stylesheets %} {% block content %}
-<!-- Header -->
 <div class="header bg-primary pb-6">
   <div class="container-fluid">
     <div class="header-body">
@@ -28,11 +26,9 @@
   </div>
 </div>
 
-<!-- Page content -->
-
 <div class="container-fluid mt--6">
   <div class="text-center mt-4">
-    <a href="{% url 'estadisticas_por_usuario' %}" class="btn btn-sm btn-neutral" title="Ver estadísticas por usuario">
+    <a href="{% url 'listado_usuarios_recuerdame' %}" class="btn btn-sm btn-neutral" title="Ver estadísticas por usuario">
       <i class="fas fa-chart-bar"></i> Ver estadísticas por usuario
     </a>
   </div>
