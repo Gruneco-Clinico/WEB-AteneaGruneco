@@ -2,8 +2,7 @@
 {% load static %}
 {% load custom_filters %}
 
-<!-- Specific CSS goes HERE -->
-{% block stylesheets %}{% endblock stylesheets %} {% block content %}
+{% block content %}
 <!-- Header -->
 <div class="header bg-primary pb-6">
   <div class="container-fluid">
@@ -13,9 +12,7 @@
           <h6 class="h2 text-white d-inline-block mb-0">GRUNECO</h6>
           <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
             <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
-              <li class="breadcrumb-item">
-                <a href="#"><i class="fas fa-home"></i></a>
-              </li>
+              <li class="breadcrumb-item"><a href="#"><i class="fas fa-home"></i></a></li>
               <li class="breadcrumb-item"><a href="#">Atenea</a></li>
               <li class="breadcrumb-item active" aria-current="page">
                 Estadísticas por usuario - RecuérdaMe
@@ -31,28 +28,20 @@
 <!-- Page content -->
 <div class="container-fluid mt--6">
   <div class="row">
-    <div class="col-xl-8">
-        <div class="card-body">
-          <canvas id="viewsChart"></canvas>
-        </div>
-      </div>
 
-      <!-- Sesiones (Pageview -> Pageleave) -->
+    <!-- Tabla resumen de sesiones -->
+    <div class="col-12">
       <div class="card mb-4 shadow">
         <div class="card-header d-flex align-items-center">
-          <img src="{% static 'assets/img/theme/RecuerdaMe.png' %}" 
-              alt="Logo" 
-              style="height: 40px;" 
-              class="mr-2">
+          <a href="https://recuerdame.gna.org.co/" target="_blank">
+              <img src="{% static 'assets/img/theme/RecuerdaMe.png' %}" 
+                  alt="Logo" 
+                  style="height: 40px;" 
+                  class="mr-2">
+          </a>
           <h3 class="mb-0">Resumen de sesiones</h3>
         </div>
         <div class="table-responsive">
-
-          <pre id="debug-sessions"></pre>
-          <pre>{{ session_rows|json_script:"session-rows-debug" }}</pre>
-          <pre id="debug-raw"></pre>
-
-
           <table class="table align-items-center table-flush">
             <thead class="thead-light">
               <tr>
@@ -83,67 +72,118 @@
           </table>
         </div>
       </div>
-
-
-      <!-- Views de cada página por usuario  -->
+    </div>
+    
+    <!-- Columna izquierda -->
+    <div class="col-xl-7">
+      
+      <!-- Vistas por página -->
       <div class="card mb-4 shadow">
         <div class="card-header d-flex align-items-center">
-          <img src="{% static 'assets/img/theme/RecuerdaMe.png' %}" 
-              alt="Logo" 
-              style="height: 40px;" 
-              class="mr-2">
-          <h3 class="mb-0"></i>Vistas por página</h3>
+          <a href="https://recuerdame.gna.org.co/" target="_blank">
+              <img src="{% static 'assets/img/theme/RecuerdaMe.png' %}" 
+                  alt="Logo" 
+                  style="height: 40px;" 
+                  class="mr-2">
+          </a>
+          <h3 class="mb-0">Vistas por página</h3>
         </div>
         <div class="card-body">
-          <canvas id="viewsPerPageChart" width="500" height="350"></canvas>
+          <canvas id="viewsPerPageChart" width="500" height="300"></canvas>
         </div>
       </div>
 
-      <!-- Gráficos que van a la derecha -->
+      <!-- DAU por usuario -->
+      <div class="card mb-4 shadow">
+        <div class="card-header d-flex align-items-center">
+          <a href="https://recuerdame.gna.org.co/" target="_blank">
+              <img src="{% static 'assets/img/theme/RecuerdaMe.png' %}" 
+                  alt="Logo" 
+                  style="height: 40px;" 
+                  class="mr-2">
+          </a>
+          <h3 class="mb-0">Frecuencia de uso ({{ email }})</h3>
+        </div>
+        <div class="card-body">
+          <canvas id="dauUserChart" width="300" height="100"></canvas>
+        </div>
+      </div>
     </div>
-    <div class="col-xl-4">
-      <!-- Identify User -->
-      <div class="card">
-        <div class="card-header border-0">
-          <div class="row align-items-center">
-            <div class="col">
-              <h3 class="mb-0">Ingresos</h3>
-            </div>
-          </div>
+
+
+
+    <!-- Columna derecha -->
+    <div class="col-xl-5">
+
+      <!-- Tabla de ingresos -->
+      <div class="card mb-4 shadow">
+        <div class="card-header d-flex align-items-center">
+          <a href="https://recuerdame.gna.org.co/" target="_blank">
+            <img src="{% static 'assets/img/theme/RecuerdaMe.png' %}" 
+                alt="Logo" 
+                style="height: 40px;" 
+                class="mr-2">
+          </a>
+          <h3 class="mb-0">Ingresos</h3>
         </div>
         <div class="table-responsive">
-
-          <!-- <p id="user-labels-debug" style="color:red;"></p>
-          <p id="user-values-debug" style="color:red;"></p> -->
-
-          <table class="table align-items-center table-flush">
+          <table class="table align-items-center table-flush text-center">
             <thead class="thead-light">
               <tr>
                 <th scope="col">Email</th>
                 <th scope="col">Cantidad de Ingresos</th>
               </tr>
             </thead>
-            <tbody id="user-login-table">
-              <!-- Filas se generarán con JS -->
+            <tbody id="user-login-table"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card mb-4 shadow">
+        <div class="card-header d-flex align-items-center">
+          <a href="https://recuerdame.gna.org.co/" target="_blank">
+            <img src="{% static 'assets/img/theme/RecuerdaMe.png' %}" 
+                alt="Logo" style="height: 40px;" class="mr-2">
+          </a>
+          <h3 class="mb-0">Actividad global</h3>
+        </div>
+        <div class="table-responsive">
+          <table class="table align-items-center table-flush text-center">
+            <thead class="thead-light">
+              <tr>
+                <th>Email</th>
+                <th>Número de eventos</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in autocapture_rows %}
+                <tr>
+                  <td>{{ row.email }}</td>
+                  <td>{{ row.count }}</td>
+                </tr>
+              {% empty %}
+                <tr><td colspan="2">No hay datos</td></tr>
+              {% endfor %}
             </tbody>
           </table>
         </div>
       </div>
+
       
     </div>
-
-    <div class="d-flex justify-content-end mt-3">
-      <a href="{% url 'listado_usuarios_recuerdame' %}" class="btn btn-outline-info">
-          ← Volver
-      </a>
-    </div>
-
-
   </div>
-{% include "includes/footer.html" %}
-</div>
 
+  <!-- Botón volver -->
+  <div class="d-flex justify-content-end mt-3">
+    <a href="{% url 'listado_usuarios_recuerdame' %}" class="btn btn-outline-info">
+        ← Volver
+    </a>
+  </div>
+
+  {% include "includes/footer.html" %}
+</div>
 {% endblock content %}
+
 
 
 {% block javascripts %}
@@ -163,6 +203,10 @@
 <!-- Vistas por página -->
 {{ views_matrix|json_script:"views-matrix" }}
 {{ views_labels_breakdown|json_script:"views-labels-breakdown" }}
+
+<!-- DAU -->
+{{ dau_user_labels|json_script:"dau-user-labels" }}
+{{ dau_user_values|json_script:"dau-user-values" }}
 
 
 
@@ -211,6 +255,36 @@ sessionRows.forEach(row => {
     <td class="text-center">${row.median_time || "–"}</td>
   `;
   tbodySessions.appendChild(tr);
+});
+
+
+// === DAU ===
+
+const dauUserLabels = JSON.parse(document.getElementById("dau-user-labels").textContent);
+const dauUserValues = JSON.parse(document.getElementById("dau-user-values").textContent);
+
+new Chart(document.getElementById("dauUserChart"), {
+  type: "line",
+  data: {
+    labels: dauUserLabels,
+    datasets: [{
+      label: "DAU ({{ email }})",
+      data: dauUserValues,
+      borderColor: "green",
+      backgroundColor: "rgba(0, 128, 0, 0.1)",
+      fill: true,
+      tension: 0.3
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { display: true },
+    },
+    scales: {
+      y: { beginAtZero: true }
+    }
+  }
 });
 
 // === Vistas por usuario y página ===

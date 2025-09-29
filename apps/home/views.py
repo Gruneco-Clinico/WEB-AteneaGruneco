@@ -4491,348 +4491,6 @@ def estadisticas(request):
     except requests.exceptions.RequestException as e:
         return HttpResponseServerError(f"Error al obtener datos: {e}")
 
-    
-    
-
-# @login_required(login_url="/login/")
-# @user_passes_test(is_superuser, login_url="/login/")
-# def estadisticas_por_usuario(request):
-        
-#     url_query = (
-#         f"{settings.POSTHOG_API_URL}/api/projects/{settings.POSTHOG_PROJECT_ID}/query/"
-#     )
-#     headers = {
-#         "Authorization": f"Bearer {settings.POSTHOG_PERSONAL_API_KEY}",
-#         "Content-Type": "application/json",
-#     }
-
-#     try:
-
-#         # --------- 4. Ingresos por usuario (Login) ---------
-#         # 1. Traer el insight (para obtener la query)
-#         url_insight = f"{settings.POSTHOG_API_URL}/api/projects/{settings.POSTHOG_PROJECT_ID}/insights/{settings.POSTHOG_IDENTIFY_COUNT_INSIGHT_ID}/"
-#         r = requests.get(url_insight, headers=headers)
-#         r.raise_for_status()
-#         insight = r.json()
-
-#         # 2. Ejecutar la query del insight
-#         query = insight.get("query")
-#         url_query = f"{settings.POSTHOG_API_URL}/api/projects/{settings.POSTHOG_PROJECT_ID}/query/"
-#         r = requests.post(url_query, headers=headers, json={"query": query})
-#         r.raise_for_status()
-#         data = r.json()
-
-#         # DEBUG: imprime la respuesta cruda (recorta si es muy larga)
-#         # print("Raw data (first 20000 chars):", json.dumps(data, indent=2)[:20000])
-
-#         user_labels, user_values = [], []
-
-#         def flatten(x):
-#             """Generador recursivo que aplana listas anidadas."""
-#             if isinstance(x, list):
-#                 for el in x:
-#                     yield from flatten(el)
-#             else:
-#                 yield x
-
-#         def extract_numbers_from_value(v):
-#             """Dado un elemento v (num, str numérica, dict...), intenta extraer un número."""
-#             if v is None:
-#                 return None
-#             # Si es dict, buscar claves típicas
-#             if isinstance(v, dict):
-#                 for k in (
-#                     "aggregated_value",
-#                     "aggregated",
-#                     "count",
-#                     "value",
-#                     "y",
-#                     "total",
-#                 ):
-#                     if k in v and v[k] is not None:
-#                         try:
-#                             return float(v[k])
-#                         except Exception:
-#                             pass
-#                 return None
-#             # Si es numérico directo
-#             if isinstance(v, (int, float)):
-#                 return float(v)
-#             # Si es string que contiene número
-#             if isinstance(v, str):
-#                 try:
-#                     return float(v)
-#                 except Exception:
-#                     return None
-#             return None
-
-#         results = data.get("results") or data.get("result") or []
-
-#         if results:
-#             for idx, serie in enumerate(results):
-#                 # Email / label
-#                 email_field = (
-#                     serie.get("breakdown_value")
-#                     or serie.get("breakdown")
-#                     or serie.get("label")
-#                     or "Sin label"
-#                 )
-#                 if isinstance(email_field, list):
-#                     email = email_field[0] if email_field else "Sin email"
-#                 else:
-#                     email = email_field
-
-#                 # 1) Priorizar aggregated_value
-#                 total_sum = None
-#                 if (
-#                     "aggregated_value" in serie
-#                     and serie.get("aggregated_value") is not None
-#                 ):
-#                     total_sum = serie.get("aggregated_value")
-
-#                 # 2) luego count
-#                 if (
-#                     total_sum in (None, "")
-#                     and "count" in serie
-#                     and serie.get("count") is not None
-#                 ):
-#                     total_sum = serie.get("count")
-
-#                 # 3) luego buscar arrays con números en keys comunes
-#                 if total_sum in (None, ""):
-#                     # posibles keys donde PostHog pone los valores por día
-#                     for key in ("result", "data", "values", "series", "points"):
-#                         if key in serie and serie.get(key) is not None:
-#                             vals = serie.get(key)
-#                             # aplanar y extraer números
-#                             nums = []
-#                             for item in flatten(vals):
-#                                 num = extract_numbers_from_value(item)
-#                                 if num is not None:
-#                                     nums.append(num)
-#                             if nums:
-#                                 total_sum = sum(nums)
-#                                 break
-
-#                 # 4) si todavía no hay nada, intentar inspeccionar el propio 'serie' (por si vienen anidados)
-#                 if total_sum in (None, ""):
-#                     # Buscar cualquier número en los valores del dict serie
-#                     nums = []
-#                     for v in serie.values():
-#                         for item in flatten([v]):
-#                             num = extract_numbers_from_value(item)
-#                             if num is not None:
-#                                 nums.append(num)
-#                     if nums:
-#                         total_sum = sum(nums)
-
-#                 # Normalizar total_sum a int (0 si no se encontró)
-#                 try:
-#                     total_sum = int(total_sum) if total_sum is not None else 0
-#                 except Exception:
-#                     try:
-#                         total_sum = int(float(total_sum))
-#                     except Exception:
-#                         total_sum = 0
-
-#                 # Guardar si es email válido (o si quieres mostrar otros breakdowns, ajusta aquí)
-#                 if isinstance(email, str) and "@" in email:
-#                     user_labels.append(email)
-#                     user_values.append(total_sum)
-
-#         # --------- 5. Sesiones (Pageview -> Pageleave) ---------
-#         session_rows = []
-
-#         # 1. Traer el insight
-#         url_insight = f"{settings.POSTHOG_API_URL}/api/projects/{settings.POSTHOG_PROJECT_ID}/insights/{settings.POSTHOG_SESION_TIME_INSIGHT_ID}/"
-#         r = requests.get(url_insight, headers=headers)
-#         r.raise_for_status()
-#         insight = r.json()
-
-#         # 2. Ejecutar la query
-#         query = insight.get("query")
-#         url_query = f"{settings.POSTHOG_API_URL}/api/projects/{settings.POSTHOG_PROJECT_ID}/query/"
-#         r = requests.post(url_query, headers=headers, json={"query": query})
-#         r.raise_for_status()
-
-#         data = r.json()
-#         # print("=== RAW DATA FROM POSTHOG ===")
-#         # print(json.dumps(data, indent=2))  # imprime en consola el JSON completo
-
-#         # 🔹 Extraer resultados: manejar funnels que devuelven "steps"
-#         if isinstance(data, dict):
-#             results = (
-#                 data.get("steps") or data.get("results") or data.get("result") or []
-#             )
-#         elif isinstance(data, list):
-#             results = data
-#         else:
-#             results = []
-
-#         def safe_num(x):
-#             try:
-#                 return float(x)
-#             except Exception:
-#                 return None
-
-#         def format_seconds(seconds):
-#             if not seconds:
-#                 return None
-#             seconds = int(seconds)
-#             m, s = divmod(seconds, 60)
-#             if m > 0:
-#                 return f"{m}m {s}s"
-#             return f"{s}s"
-
-#         # 3. Iterar sobre cada step del funnel
-#         for serie in results:
-#             # A veces viene en lista
-#             if isinstance(serie, list) and serie:
-#                 last = serie[-1]  # leavepage
-#                 first = serie[0]  # viewpage
-#             elif isinstance(serie, dict):
-#                 first = last = serie
-#             else:
-#                 continue
-
-#             # 🔹 Identificar usuario/email/breakdown
-#             email_field = (
-#                 last.get("breakdown_value")
-#                 or last.get("breakdown")
-#                 or last.get("label")
-#                 or "Sin dato"
-#             )
-#             if isinstance(email_field, list):
-#                 email = email_field[0] if email_field else "Sin dato"
-#             else:
-#                 email = email_field
-
-#             entered = safe_num(first.get("count")) or 0
-#             converted = safe_num(last.get("count")) or 0
-#             dropped = max(entered - converted, 0)
-
-#             session_rows.append(
-#                 {
-#                     "email": email,
-#                     # "raw_keys": ", ".join(serie.keys()),
-#                     # "step": step_name,
-#                     "entered": int(entered),
-#                     "converted": converted,
-#                     "dropped_off": int(dropped),
-#                     "conversion_rate": round((converted / entered) * 100, 2)
-#                     if entered > 0
-#                     else 0,
-#                     "avg_time": format_seconds(last.get("average_conversion_time")),
-#                     "median_time": format_seconds(last.get("median_conversion_time")),
-#                 }
-#             )
-
-#         # --------- 7. Vistas por página con breakdown por email ---------
-#         # 1. Variables de salida
-#         user_views_labels, views_matrix = [], []
-#         emails_set = set()
-
-#         # 2. Traer el insight desde PostHog
-#         url_insight = f"{settings.POSTHOG_API_URL}/api/projects/{settings.POSTHOG_PROJECT_ID}/insights/{settings.POSTHOG_PAGES_VIEWS_PER_USER}/"
-#         r = requests.get(url_insight, headers=headers)
-#         r.raise_for_status()
-#         insight = r.json()
-
-#         # 3. Ejecutar la query del insight
-#         query = insight.get("query")
-#         url_query = f"{settings.POSTHOG_API_URL}/api/projects/{settings.POSTHOG_PROJECT_ID}/query/"
-#         r = requests.post(url_query, headers=headers, json={"query": query})
-#         r.raise_for_status()
-#         data = r.json()
-
-#         results = data.get("results") or data.get("result") or []
-
-#         user_page_views = {}
-
-#         if results:
-#             for serie in results:
-#                 # Email
-#                 email_field = (
-#                     serie.get("breakdown_value")
-#                     or serie.get("breakdown")
-#                     or serie.get("label")
-#                     or "Sin email"
-#                 )
-#                 if isinstance(email_field, list):
-#                     email = email_field[0] if email_field else "Sin email"
-#                 else:
-#                     email = email_field
-
-#                 page_raw = serie.get("order") or serie.get("page") or 0
-#                 try:
-#                     page = int(page_raw)
-#                 except Exception:
-#                     page = page_raw
-
-#                 # Conteo
-#                 total = 0
-#                 if (
-#                     "aggregated_value" in serie
-#                     and serie["aggregated_value"] is not None
-#                 ):
-#                     total = int(serie["aggregated_value"] or 0)
-
-#                 # Guardar
-#                 emails_set.add(email)
-#                 if email not in user_page_views:
-#                     user_page_views[email] = {}
-#                 user_page_views[email][page] = total
-
-#         # 5. Ordenar y preparar labels/filas
-#         emails_sorted = sorted(list(emails_set))
-
-#         label_map = {
-#             0: "Sección: Información en Salud",
-#             1: "Sección: Pasatiempos",
-#             2: "Sección: Encuentros",
-#             3: "Sección: Fortalece tu mente",
-#             4: "Sección: Hazlo consciente",
-#             5: "Hazlo Consciente - Módulo 2",
-#             6: "Hazlo Consciente - Módulo 3",
-#             7: "Hazlo Consciente - Módulo 4",
-#             8: "Pasatiempos - Plantas",
-#             9: "Pasatiempos - Mascotas",
-#             10: "Pasatiempos - Recetas",
-#             11: "Pasatiempos - Ejercicio",
-#             12: "Polijuego",
-#         }
-
-#         # --- 2. Forzar que siempre existan todas las páginas del 0 al 12 ---
-#         all_pages = list(range(0, 13))
-
-#         # --- 3. Labels visibles para la tabla ---
-#         user_views_labels = [label_map[p] for p in all_pages]
-
-#         # matriz final
-#         views_matrix = []
-#         for email in emails_sorted:
-#             row = {"email": email}
-#             for page in all_pages:
-#                 row[label_map[page]] = user_page_views.get(email, {}).get(page, 0)
-#             views_matrix.append(row)
-
-#              # 5. Renderizar template
-#         return render(
-#             request,
-#             "home/statistics_per_user_recuerdame.html",
-#             {
-#                 "user_labels": user_labels,
-#                 "user_values": user_values,
-#                 "session_rows": session_rows,
-#                 "views_labels_breakdown": user_views_labels,
-#                 "views_matrix": views_matrix,
-#             },
-#         )
-
-#     except requests.exceptions.RequestException as e:
-#         return HttpResponseServerError(f"Error al obtener datos: {e}")
-
-
 
 @login_required(login_url="/login/")
 @user_passes_test(is_superuser, login_url="/login/")
@@ -5072,6 +4730,98 @@ def estadisticas_usuario_detalle(request, email):
             row[label_map[page]] = user_page_views.get(email, {}).get(page, 0)
         views_matrix.append(row)
 
+        # --------- DAU por usuario (Insight con breakdown) ---------
+        url_insight = f"{settings.POSTHOG_API_URL}/api/projects/{settings.POSTHOG_PROJECT_ID}/insights/{settings.POSTHOG_DAU_PER_USER_ID}/"
+        r = requests.get(url_insight, headers=headers)
+        r.raise_for_status()
+        insight = r.json()
+
+        query = insight.get("query")
+        r = requests.post(url_query, headers=headers, json={"query": query})
+        r.raise_for_status()
+        data = r.json()
+
+        dau_user_labels, dau_user_values = [], []
+
+        results = data.get("results") or data.get("result") or []
+        if results:
+            for serie in results:
+                email_field = (
+                    serie.get("breakdown_value")
+                    or serie.get("breakdown")
+                    or serie.get("label")
+                    or "Sin email"
+                )
+                if isinstance(email_field, list):
+                    email_value = email_field[0] if email_field else "Sin email"
+                else:
+                    email_value = email_field
+
+                # 👇 Filtramos SOLO el email solicitado
+                if str(email_value).lower() != str(email).lower():
+                    continue
+
+                dau_user_labels = serie.get("labels", [])
+                dau_user_values = serie.get("data", [])
+                break
+
+        # --------- Autocapture por usuario ---------
+        url_insight = f"{settings.POSTHOG_API_URL}/api/projects/{settings.POSTHOG_PROJECT_ID}/insights/{settings.POSTHOG_AUTOCAPTURE_PER_USER_ID}/"
+        r = requests.get(url_insight, headers=headers)
+        r.raise_for_status()
+        insight = r.json()
+
+        query = insight.get("query")
+        r = requests.post(url_query, headers=headers, json={"query": query})
+        r.raise_for_status()
+        data = r.json()
+
+        autocapture_rows = []
+
+        results = data.get("results") or data.get("result") or []
+        if results:
+            for serie in results:
+                email_field = (
+                    serie.get("breakdown_value")
+                    or serie.get("breakdown")
+                    or serie.get("label")
+                    or "Sin email"
+                )
+                if isinstance(email_field, list):
+                    email_value = email_field[0] if email_field else "Sin email"
+                else:
+                    email_value = email_field
+
+                # 👇 Filtramos SOLO el email solicitado
+                if str(email_value).lower() != str(email).lower():
+                    continue
+
+                count = int(serie.get("aggregated_value") or serie.get("count") or 0)
+
+                autocapture_rows.append({
+                    "email": email_value,
+                    "count": count,
+                })
+
+        if session_rows:
+            campos = {
+                "email": email,
+                "ingresos": user_values[0] if user_values else 0,
+                "sesiones_ingresadas": session_rows[0]["entered"],
+                "sesiones_convertidas": session_rows[0]["converted"],
+                "sesiones_abandonadas": session_rows[0]["dropped_off"],
+                "conversion_rate": session_rows[0]["conversion_rate"],
+                "tiempo_promedio": session_rows[0]["avg_time"],
+                "tiempo_mediano": session_rows[0]["median_time"],
+                "total_clicks": autocapture_rows[0]["count"] if autocapture_rows else 0,
+            }
+
+            EstadisticasUsuarioResult.objects.update_or_create(
+                email=email,
+                defaults=campos,
+            )
+
+
         # Render
         return render(
             request,
@@ -5083,6 +4833,10 @@ def estadisticas_usuario_detalle(request, email):
                 "session_rows": session_rows,
                 "views_labels_breakdown": user_views_labels,
                 "views_matrix": views_matrix,
+                "dau_user_labels": dau_user_labels,
+                "dau_user_values": dau_user_values,
+                "autocapture_rows": autocapture_rows,
+
             },
         )
 
