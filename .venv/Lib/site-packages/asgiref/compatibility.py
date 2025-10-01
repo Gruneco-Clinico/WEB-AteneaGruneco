@@ -1,6 +1,6 @@
+import asyncio
 import inspect
-
-from .sync import iscoroutinefunction
+import sys
 
 
 def is_double_callable(application):
@@ -19,10 +19,10 @@ def is_double_callable(application):
     if hasattr(application, "__call__"):
         # We only check to see if its __call__ is a coroutine function -
         # if it's not, it still might be a coroutine function itself.
-        if iscoroutinefunction(application.__call__):
+        if asyncio.iscoroutinefunction(application.__call__):
             return False
     # Non-classes we just check directly
-    return not iscoroutinefunction(application)
+    return not asyncio.iscoroutinefunction(application)
 
 
 def double_to_single_callable(application):
@@ -46,3 +46,16 @@ def guarantee_single_callable(application):
     if is_double_callable(application):
         application = double_to_single_callable(application)
     return application
+
+
+if sys.version_info >= (3, 7):
+    # these were introduced in 3.7
+    get_running_loop = asyncio.get_running_loop
+    run_future = asyncio.run
+    create_task = asyncio.create_task
+else:
+    # marked as deprecated in 3.10, did not exist before 3.7
+    get_running_loop = asyncio.get_event_loop
+    run_future = asyncio.ensure_future
+    # does nothing, this is fine for <3.7
+    create_task = lambda task: task

@@ -1,10 +1,11 @@
+from cx_Oracle import CLOB
+
 from django.contrib.gis.db.backends.base.adapter import WKTAdapter
 from django.contrib.gis.geos import GeometryCollection, Polygon
-from django.db.backends.oracle.oracledb_any import oracledb
 
 
 class OracleSpatialAdapter(WKTAdapter):
-    input_size = oracledb.CLOB
+    input_size = CLOB
 
     def __init__(self, geom):
         """
@@ -18,9 +19,7 @@ class OracleSpatialAdapter(WKTAdapter):
             if self._polygon_must_be_fixed(geom):
                 geom = self._fix_polygon(geom)
         elif isinstance(geom, GeometryCollection):
-            if any(
-                isinstance(g, Polygon) and self._polygon_must_be_fixed(g) for g in geom
-            ):
+            if any(isinstance(g, Polygon) and self._polygon_must_be_fixed(g) for g in geom):
                 geom = self._fix_geometry_collection(geom)
 
         self.wkt = geom.wkt
@@ -28,9 +27,12 @@ class OracleSpatialAdapter(WKTAdapter):
 
     @staticmethod
     def _polygon_must_be_fixed(poly):
-        return not poly.empty and (
-            not poly.exterior_ring.is_counterclockwise
-            or any(x.is_counterclockwise for x in poly)
+        return (
+            not poly.empty and
+            (
+                not poly.exterior_ring.is_counterclockwise or
+                any(x.is_counterclockwise for x in poly)
+            )
         )
 
     @classmethod

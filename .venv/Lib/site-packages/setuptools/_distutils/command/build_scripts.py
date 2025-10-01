@@ -4,13 +4,15 @@ Implements the Distutils 'build_scripts' command."""
 
 import os
 import re
-from stat import ST_MODE
-from distutils import sysconfig
-from distutils.core import Command
-from distutils.dep_util import newer
-from distutils.util import convert_path
-from distutils import log
 import tokenize
+from distutils import sysconfig
+from distutils._log import log
+from stat import ST_MODE
+from typing import ClassVar
+
+from .._modified import newer
+from ..core import Command
+from ..util import convert_path
 
 shebang_pattern = re.compile('^#!.*python[0-9.]*([ \t].*)?$')
 """
@@ -22,10 +24,9 @@ first_line_re = shebang_pattern
 
 
 class build_scripts(Command):
-
     description = "\"build\" scripts (copy and fixup #! line)"
 
-    user_options = [
+    user_options: ClassVar[list[tuple[str, str, str]]] = [
         ('build-dir=', 'd', "directory to \"build\" (copy) to"),
         ('force', 'f', "forcibly build everything (ignore file timestamps"),
         ('executable=', 'e', "specify final destination interpreter path"),
@@ -96,7 +97,7 @@ class build_scripts(Command):
         else:
             first_line = f.readline()
             if not first_line:
-                self.warn("%s is an empty file (skipping)" % script)
+                self.warn(f"{script} is an empty file (skipping)")
                 return
 
             shebang_match = shebang_pattern.match(first_line)
@@ -110,8 +111,7 @@ class build_scripts(Command):
                 else:
                     executable = os.path.join(
                         sysconfig.get_config_var("BINDIR"),
-                        "python%s%s"
-                        % (
+                        "python{}{}".format(
                             sysconfig.get_config_var("VERSION"),
                             sysconfig.get_config_var("EXE"),
                         ),
@@ -157,9 +157,7 @@ class build_scripts(Command):
         try:
             shebang.encode('utf-8')
         except UnicodeEncodeError:
-            raise ValueError(
-                "The shebang ({!r}) is not encodable " "to utf-8".format(shebang)
-            )
+            raise ValueError(f"The shebang ({shebang!r}) is not encodable to utf-8")
 
         # If the script is encoded to a custom encoding (use a
         # #coding:xxx cookie), the shebang has to be encodable to
@@ -168,6 +166,6 @@ class build_scripts(Command):
             shebang.encode(encoding)
         except UnicodeEncodeError:
             raise ValueError(
-                "The shebang ({!r}) is not encodable "
-                "to the script encoding ({})".format(shebang, encoding)
+                f"The shebang ({shebang!r}) is not encodable "
+                f"to the script encoding ({encoding})"
             )

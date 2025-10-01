@@ -7,17 +7,16 @@
 # Dinu Gherman <gherman@darwin.in-berlin.de>, 2011
 # kristjan <kristjan.schmidt@googlemail.com>, 2011
 # Matthieu Desplantes <matmututu@gmail.com>, 2021
-# Meiyer <interdist+translations@gmail.com>, 2022
-# Nikolay Korotkiy <sikmir@disroot.org>, 2017-2018
-# Robin van der Vliet <info@robinvandervliet.com>, 2019
+# Nikolay Korotkiy <sikmir@gmail.com>, 2017-2018
+# Robin van der Vliet <info@robinvandervliet.nl>, 2019
 # Adamo Mesha <adam.raizen@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-17 05:23-0500\n"
-"PO-Revision-Date: 2022-05-25 06:49+0000\n"
-"Last-Translator: Meiyer <interdist+translations@gmail.com>, 2022\n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2021-04-13 08:22+0000\n"
+"Last-Translator: Matthieu Desplantes <matmututu@gmail.com>\n"
 "Language-Team: Esperanto (http://www.transifex.com/django/django/language/"
 "eo/)\n"
 "MIME-Version: 1.0\n"
@@ -195,7 +194,7 @@ msgid "Kyrgyz"
 msgstr "Kirgiza"
 
 msgid "Luxembourgish"
-msgstr "Luksemburga"
+msgstr "Lukszemburga"
 
 msgid "Lithuanian"
 msgstr "Litova"
@@ -215,14 +214,11 @@ msgstr "Mongola"
 msgid "Marathi"
 msgstr "Marata"
 
-msgid "Malay"
-msgstr "Malaja"
-
 msgid "Burmese"
 msgstr "Birma"
 
 msgid "Norwegian Bokmål"
-msgstr "Norvega (bokmål)"
+msgstr "Norvega Bbokmål"
 
 msgid "Nepali"
 msgstr "Nepala"
@@ -335,48 +331,44 @@ msgid "…"
 msgstr "…"
 
 msgid "That page number is not an integer"
-msgstr "Tia paĝnumero ne estas entjero"
+msgstr "Tuo paĝnumero ne estas entjero"
 
 msgid "That page number is less than 1"
-msgstr "La paĝnumero estas malpli ol 1"
+msgstr "Tuo paĝnumero estas malpli ol 1"
 
 msgid "That page contains no results"
 msgstr "Tiu paĝo ne enhavas rezultojn"
 
 msgid "Enter a valid value."
-msgstr "Enigu ĝustan valoron."
+msgstr "Enigu validan valoron."
 
 msgid "Enter a valid URL."
-msgstr "Enigu ĝustan retadreson."
+msgstr "Enigu validan adreson."
 
 msgid "Enter a valid integer."
-msgstr "Enigu ĝustaforman entjeron."
+msgstr "Enigu validan entjero."
 
 msgid "Enter a valid email address."
-msgstr "Enigu ĝustaforman retpoŝtan adreson."
+msgstr "Enigu validan retpoŝtan adreson."
 
 #. Translators: "letters" means latin letters: a-z and A-Z.
 msgid ""
 "Enter a valid “slug” consisting of letters, numbers, underscores or hyphens."
 msgstr ""
-"Enigu ĝustan “ĵetonvorton” konsistantan el latinaj literoj, ciferoj, "
-"substrekoj, aŭ dividstrekoj."
 
 msgid ""
 "Enter a valid “slug” consisting of Unicode letters, numbers, underscores, or "
 "hyphens."
 msgstr ""
-"Enigu ĝustan “ĵetonvorton” konsistantan el Unikodaj literoj, ciferoj, "
-"substrekoj, aŭ dividstrekoj."
 
 msgid "Enter a valid IPv4 address."
-msgstr "Enigu ĝustaforman IPv4-adreson."
+msgstr "Enigu validan IPv4-adreson."
 
 msgid "Enter a valid IPv6 address."
-msgstr "Enigu ĝustaforman IPv6-adreson."
+msgstr "Enigu validan IPv6-adreson."
 
 msgid "Enter a valid IPv4 or IPv6 address."
-msgstr "Enigu ĝustaforman IPv4- aŭ IPv6-adreson."
+msgstr "Enigu validan IPv4 aŭ IPv6-adreson."
 
 msgid "Enter only digits separated by commas."
 msgstr "Enigu nur ciferojn apartigitajn per komoj."
@@ -395,10 +387,6 @@ msgid "Ensure this value is greater than or equal to %(limit_value)s."
 msgstr "Certigu ke ĉi tiu valoro estas pli ol aŭ egala al %(limit_value)s."
 
 #, python-format
-msgid "Ensure this value is a multiple of step size %(limit_value)s."
-msgstr "Certigu ke ĉi tiu valoro estas oblo de paŝo-grando %(limit_value)s."
-
-#, python-format
 msgid ""
 "Ensure this value has at least %(limit_value)d character (it has "
 "%(show_value)d)."
@@ -409,7 +397,7 @@ msgstr[0] ""
 "Certigu, ke tiu valoro havas %(limit_value)d signon (ĝi havas "
 "%(show_value)d)."
 msgstr[1] ""
-"Certigu ke ĉi tiu valoro enhavas almenaŭ %(limit_value)d signojn (ĝi havas "
+"Certigu, ke tiu valoro havas %(limit_value)d signojn (ĝi havas "
 "%(show_value)d)."
 
 #, python-format
@@ -423,7 +411,7 @@ msgstr[0] ""
 "Certigu, ke tio valuto maksimume havas %(limit_value)d karakterojn (ĝi havas "
 "%(show_value)d)."
 msgstr[1] ""
-"Certigu ke ĉi tiu valoro maksimume enhavas %(limit_value)d signojn (ĝi havas "
+"Certigu, ke tiu valoro maksimume havas %(limit_value)d signojn (ĝi havas "
 "%(show_value)d)."
 
 msgid "Enter a number."
@@ -454,8 +442,6 @@ msgid ""
 "File extension “%(extension)s” is not allowed. Allowed extensions are: "
 "%(allowed_extensions)s."
 msgstr ""
-"Sufikso “%(extension)s” de dosiernomo ne estas permesita. Eblaj sufiksoj "
-"estas: %(allowed_extensions)s."
 
 msgid "Null characters are not allowed."
 msgstr "Nulsignoj ne estas permesitaj."
@@ -468,12 +454,8 @@ msgid "%(model_name)s with this %(field_labels)s already exists."
 msgstr "%(model_name)s kun tiuj %(field_labels)s jam ekzistas."
 
 #, python-format
-msgid "Constraint “%(name)s” is violated."
-msgstr "Limigo “%(name)s” estas malobservita."
-
-#, python-format
 msgid "Value %(value)r is not a valid choice."
-msgstr "Valoro %(value)r ne estas ebla elekto."
+msgstr "Valoro %(value)r ne estas valida elekto."
 
 msgid "This field cannot be null."
 msgstr "Tiu ĉi kampo ne povas esti senvalora (null)."
@@ -485,8 +467,8 @@ msgstr "Tiu ĉi kampo ne povas esti malplena."
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "%(model_name)s kun tiu %(field_label)s jam ekzistas."
 
-#. Translators: The 'lookup_type' is one of 'date', 'year' or
-#. 'month'. Eg: "Title must be unique for pub_date year"
+#. Translators: The 'lookup_type' is one of 'date', 'year' or 'month'.
+#. Eg: "Title must be unique for pub_date year"
 #, python-format
 msgid ""
 "%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
@@ -499,13 +481,11 @@ msgstr "Kampo de tipo: %(field_type)s"
 
 #, python-format
 msgid "“%(value)s” value must be either True or False."
-msgstr "La valoro “%(value)s” devas esti aŭ Vera (True) aŭ Malvera (False)."
+msgstr ""
 
 #, python-format
 msgid "“%(value)s” value must be either True, False, or None."
 msgstr ""
-"La valoro “%(value)s” devas esti Vera (True), Malvera (False), aŭ Nenia "
-"(None)."
 
 msgid "Boolean (Either True or False)"
 msgstr "Bulea (Vera aŭ Malvera)"
@@ -515,7 +495,7 @@ msgid "String (up to %(max_length)s)"
 msgstr "Ĉeno (ĝis %(max_length)s)"
 
 msgid "Comma-separated integers"
-msgstr "Perkome disigitaj entjeroj"
+msgstr "Kom-apartigitaj entjeroj"
 
 #, python-format
 msgid ""
@@ -530,8 +510,6 @@ msgid ""
 "“%(value)s” value has the correct format (YYYY-MM-DD) but it is an invalid "
 "date."
 msgstr ""
-"La valoro “%(value)s” havas la ĝustan formaton (JJJJ-MM-TT), sed ĝi estas "
-"neekzistanta dato."
 
 msgid "Date (without time)"
 msgstr "Dato (sen horo)"
@@ -541,23 +519,19 @@ msgid ""
 "“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
 "uuuuuu]][TZ] format."
 msgstr ""
-"La valoro “%(value)s” havas malĝustan formaton. Ĝi devas esti en la formato "
-"JJJJ-MM-TT HH:MM[:ss[.µµµµµµ]][TZ]."
 
 #, python-format
 msgid ""
 "“%(value)s” value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
 "[TZ]) but it is an invalid date/time."
 msgstr ""
-"La valoro “%(value)s” havas la ĝustan formaton (JJJJ-MM-TT HH:MM[:ss[."
-"µµµµµµ]][TZ]), sed ĝi estas neekzistanta dato/tempo."
 
 msgid "Date (with time)"
 msgstr "Dato (kun horo)"
 
 #, python-format
 msgid "“%(value)s” value must be a decimal number."
-msgstr "La valoro “%(value)s” devas esti dekuma frakcio."
+msgstr ""
 
 msgid "Decimal number"
 msgstr "Dekuma nombro"
@@ -567,8 +541,6 @@ msgid ""
 "“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
 "uuuuuu] format."
 msgstr ""
-"La valoro “%(value)s” havas malĝustan formaton. Ĝi devas esti en la formato "
-"[TT] [[HH:]MM:]ss[.µµµµµµ]."
 
 msgid "Duration"
 msgstr "Daŭro"
@@ -577,14 +549,14 @@ msgid "Email address"
 msgstr "Retpoŝtadreso"
 
 msgid "File path"
-msgstr "Dosierindiko"
+msgstr "Dosiervojo"
 
 #, python-format
 msgid "“%(value)s” value must be a float."
-msgstr "La valoro “%(value)s” devas esti glitpunkta nombro."
+msgstr ""
 
 msgid "Floating point number"
-msgstr "Glitpunkta nombro"
+msgstr "Glitkoma nombro"
 
 #, python-format
 msgid "“%(value)s” value must be an integer."
@@ -594,7 +566,7 @@ msgid "Integer"
 msgstr "Entjero"
 
 msgid "Big (8 byte) integer"
-msgstr "Granda (8–bitoka) entjero"
+msgstr "Granda (8 bitoka) entjero"
 
 msgid "Small integer"
 msgstr "Malgranda entjero"
@@ -608,14 +580,12 @@ msgstr "IP-adreso"
 #, python-format
 msgid "“%(value)s” value must be either None, True or False."
 msgstr ""
-"La valoro “%(value)s” devas esti Nenia (None), Vera (True), aŭ Malvera "
-"(False)."
 
 msgid "Boolean (Either True, False or None)"
-msgstr "Buleo (Vera, Malvera, aŭ Nenia)"
+msgstr "Buleo (Vera, Malvera aŭ Neniu)"
 
 msgid "Positive big integer"
-msgstr "Pozitiva granda entjero"
+msgstr ""
 
 msgid "Positive integer"
 msgstr "Pozitiva entjero"
@@ -635,16 +605,12 @@ msgid ""
 "“%(value)s” value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
 "format."
 msgstr ""
-"La valoro “%(value)s” havas malĝustan formaton. Ĝi devas esti en la formato "
-"HH:MM[:ss[.µµµµµµ]]."
 
 #, python-format
 msgid ""
 "“%(value)s” value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
 "invalid time."
 msgstr ""
-"La valoro “%(value)s” havas la (HH:MM[:ss[.µµµµµµ]]), sed tio estas "
-"neekzistanta tempo."
 
 msgid "Time"
 msgstr "Horo"
@@ -653,14 +619,14 @@ msgid "URL"
 msgstr "URL"
 
 msgid "Raw binary data"
-msgstr "Kruda duuma datumo"
+msgstr "Kruda binara datumo"
 
 #, python-format
 msgid "“%(value)s” is not a valid UUID."
-msgstr "“%(value)s” ne estas ĝustaforma UUID."
+msgstr ""
 
 msgid "Universally unique identifier"
-msgstr "Universale unika identigilo"
+msgstr "Universe unika identigilo"
 
 msgid "File"
 msgstr "Dosiero"
@@ -672,11 +638,11 @@ msgid "A JSON object"
 msgstr "JSON-objekto"
 
 msgid "Value must be valid JSON."
-msgstr "La valoro devas esti ĝustaforma JSON."
+msgstr ""
 
 #, python-format
 msgid "%(model)s instance with %(field)s %(value)r does not exist."
-msgstr "Ekzemplero de %(model)s kun %(field)s egala al %(value)r ne ekzistas."
+msgstr "%(model)s kazo kun %(field)s %(value)r ne ekzistas."
 
 msgid "Foreign Key (type determined by related field)"
 msgstr "Fremda ŝlosilo (tipo determinita per rilata kampo)"
@@ -708,20 +674,20 @@ msgid "Enter a whole number."
 msgstr "Enigu plenan nombron."
 
 msgid "Enter a valid date."
-msgstr "Enigu ĝustan daton."
+msgstr "Enigu validan daton."
 
 msgid "Enter a valid time."
-msgstr "Enigu ĝustan horon."
+msgstr "Enigu validan horon."
 
 msgid "Enter a valid date/time."
-msgstr "Enigu ĝustan daton/tempon."
+msgstr "Enigu validan daton/tempon."
 
 msgid "Enter a valid duration."
-msgstr "Enigu ĝustan daŭron."
+msgstr "Enigu validan daŭron."
 
 #, python-brace-format
 msgid "The number of days must be between {min_days} and {max_days}."
-msgstr "La nombro de tagoj devas esti inter {min_days} kaj {max_days}."
+msgstr "La nombro da tagoj devas esti inter {min_days} kaj {max_days}."
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr ""
@@ -742,23 +708,23 @@ msgstr[0] ""
 "Certigu, ke tio dosiernomo maksimume havas %(max)d karakteron (ĝi havas "
 "%(length)d)."
 msgstr[1] ""
-"Certigu ke la dosiernomo maksimume havas %(max)d signojn (ĝi havas "
+"Certigu, ke tiu dosiernomo maksimume havas %(max)d signojn (ĝi havas "
 "%(length)d)."
 
 msgid "Please either submit a file or check the clear checkbox, not both."
 msgstr ""
-"Bonvolu aŭ alŝuti dosieron, aŭ elekti la vakigan markobutonon, sed ne ambaŭ."
+"Bonvolu aŭ alŝuti dosieron, aŭ elekti la malplenan markobutonon, ne ambaŭ."
 
 msgid ""
 "Upload a valid image. The file you uploaded was either not an image or a "
 "corrupted image."
 msgstr ""
-"Alŝutu ĝustaforman bildon. La alŝutita dosiero ne estas bildo aŭ estas "
+"Alŝutu validan bildon. La alŝutita dosiero ne estas bildo, aŭ estas "
 "difektita bildo."
 
 #, python-format
 msgid "Select a valid choice. %(value)s is not one of the available choices."
-msgstr "Elektu ekzistantan opcion. %(value)s ne estas el la eblaj elektoj."
+msgstr "Elektu validan elekton. %(value)s ne estas el la eblaj elektoj."
 
 msgid "Enter a list of values."
 msgstr "Enigu liston de valoroj."
@@ -767,10 +733,10 @@ msgid "Enter a complete value."
 msgstr "Enigu kompletan valoron."
 
 msgid "Enter a valid UUID."
-msgstr "Enigu ĝustaforman UUID."
+msgstr "Enigu validan UUID-n."
 
 msgid "Enter a valid JSON."
-msgstr "Enigu ĝustaforman JSON."
+msgstr ""
 
 #. Translators: This is the default suffix added to form field labels
 msgid ":"
@@ -785,21 +751,18 @@ msgid ""
 "ManagementForm data is missing or has been tampered with. Missing fields: "
 "%(field_names)s. You may need to file a bug report if the issue persists."
 msgstr ""
-"La datumoj de la mastruma ManagementForm mankas aŭ estis malice modifitaj. "
-"Mankas la kampoj: %(field_names)s. Se la problemo plu okazas, vi poveble "
-"devintus raporti cimon."
 
 #, python-format
-msgid "Please submit at most %(num)d form."
-msgid_plural "Please submit at most %(num)d forms."
-msgstr[0] "Bonvolu forsendi maksimume %(num)d formularon."
-msgstr[1] "Bonvolu forsendi maksimume %(num)d formularojn."
+msgid "Please submit at most %d form."
+msgid_plural "Please submit at most %d forms."
+msgstr[0] ""
+msgstr[1] ""
 
 #, python-format
-msgid "Please submit at least %(num)d form."
-msgid_plural "Please submit at least %(num)d forms."
-msgstr[0] "Bonvolu forsendi almenaŭ %(num)d formularon."
-msgstr[1] "Bonvolu forsendi almenaŭ %(num)d formularojn."
+msgid "Please submit at least %d form."
+msgid_plural "Please submit at least %d forms."
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "Order"
 msgstr "Ordo"
@@ -828,22 +791,20 @@ msgid "Please correct the duplicate values below."
 msgstr "Bonvolu ĝustigi la duoblan valoron sube."
 
 msgid "The inline value did not match the parent instance."
-msgstr "La enteksta valoro ne egalas la patran ekzempleron."
+msgstr "La enteksta valoro ne egalas la patran aperon."
 
 msgid "Select a valid choice. That choice is not one of the available choices."
-msgstr "Elektu ekzistantan opcion. Ĉi tiu opcio ne estas el la eblaj elektoj."
+msgstr "Elektu validan elekton. Ĉi tiu elekto ne estas el la eblaj elektoj."
 
 #, python-format
 msgid "“%(pk)s” is not a valid value."
-msgstr "“%(pk)s” estas neakceptebla valoro."
+msgstr ""
 
 #, python-format
 msgid ""
 "%(datetime)s couldn’t be interpreted in time zone %(current_timezone)s; it "
 "may be ambiguous or it may not exist."
 msgstr ""
-"Ne eblis interpreti %(datetime)s en la tempo-zono %(current_timezone)s. Ĝi "
-"eble estas ambigua aŭ ne ekzistas en tiu tempo-zono."
 
 msgid "Clear"
 msgstr "Vakigi"
@@ -1035,7 +996,7 @@ msgstr "feb."
 
 msgctxt "abbrev. month"
 msgid "March"
-msgstr "mar."
+msgstr "marto"
 
 msgctxt "abbrev. month"
 msgid "April"
@@ -1122,7 +1083,7 @@ msgid "December"
 msgstr "Decembro"
 
 msgid "This is not a valid IPv6 address."
-msgstr "Tio ne estas ĝustaforma IPv6-adreso."
+msgstr "Tiu ne estas valida IPv6-adreso."
 
 #, python-format
 msgctxt "String to return when truncating text"
@@ -1137,150 +1098,133 @@ msgid ", "
 msgstr ", "
 
 #, python-format
-msgid "%(num)d year"
-msgid_plural "%(num)d years"
-msgstr[0] "%(num)d jaro"
-msgstr[1] "%(num)d jaroj"
+msgid "%d year"
+msgid_plural "%d years"
+msgstr[0] "%d jaro"
+msgstr[1] "%d jaroj"
 
 #, python-format
-msgid "%(num)d month"
-msgid_plural "%(num)d months"
-msgstr[0] "%(num)d monato"
-msgstr[1] "%(num)d monatoj"
+msgid "%d month"
+msgid_plural "%d months"
+msgstr[0] "%d monato"
+msgstr[1] "%d monatoj"
 
 #, python-format
-msgid "%(num)d week"
-msgid_plural "%(num)d weeks"
-msgstr[0] "%(num)d semajno"
-msgstr[1] "%(num)d semajnoj"
+msgid "%d week"
+msgid_plural "%d weeks"
+msgstr[0] "%d semajno"
+msgstr[1] "%d semajnoj"
 
 #, python-format
-msgid "%(num)d day"
-msgid_plural "%(num)d days"
-msgstr[0] "%(num)d tago"
-msgstr[1] "%(num)d tagoj"
+msgid "%d day"
+msgid_plural "%d days"
+msgstr[0] "%d tago"
+msgstr[1] "%d tagoj"
 
 #, python-format
-msgid "%(num)d hour"
-msgid_plural "%(num)d hours"
-msgstr[0] "%(num)d horo"
-msgstr[1] "%(num)d horoj"
+msgid "%d hour"
+msgid_plural "%d hours"
+msgstr[0] "%d horo"
+msgstr[1] "%d horoj"
 
 #, python-format
-msgid "%(num)d minute"
-msgid_plural "%(num)d minutes"
-msgstr[0] "%(num)d minuto"
-msgstr[1] "%(num)d minutoj"
+msgid "%d minute"
+msgid_plural "%d minutes"
+msgstr[0] "%d minuto"
+msgstr[1] "%d minutoj"
 
 msgid "Forbidden"
-msgstr "Malpermesita"
+msgstr "Malpermesa"
 
 msgid "CSRF verification failed. Request aborted."
-msgstr "Kontrolo de CSRF malsukcesis. Peto ĉesigita."
+msgstr "CSRF konfirmo malsukcesis. Peto ĉesigita."
 
 msgid ""
 "You are seeing this message because this HTTPS site requires a “Referer "
-"header” to be sent by your web browser, but none was sent. This header is "
+"header” to be sent by your Web browser, but none was sent. This header is "
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""
-"Vi vidas tiun ĉi mesaĝon ĉar ĉi-tiu HTTPS-retejo postulas ricevi la "
-"kapinstrukcion “Referer” de via retumilo, sed neniu estis sendita. Tia "
-"kapinstrukcio estas bezonata pro sekurecaj kialoj, por certigi ke via "
-"retumilo ne agas laŭ nedezirataj instrukcioj de maliculoj."
 
 msgid ""
 "If you have configured your browser to disable “Referer” headers, please re-"
 "enable them, at least for this site, or for HTTPS connections, or for “same-"
 "origin” requests."
 msgstr ""
-"Se la agordoj de via retumilo malebligas la kapinstrukciojn “Referer”, "
-"bonvolu ebligi ilin por tiu ĉi retejo, aŭ por HTTPS-konektoj, aŭ por petoj "
-"el sama fonto (“same-origin”)."
 
 msgid ""
 "If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
 "including the “Referrer-Policy: no-referrer” header, please remove them. The "
 "CSRF protection requires the “Referer” header to do strict referer checking. "
-"If you’re concerned about privacy, use alternatives like <a "
-"rel=\"noreferrer\" …> for links to third-party sites."
+"If you’re concerned about privacy, use alternatives like <a rel=\"noreferrer"
+"\" …> for links to third-party sites."
 msgstr ""
-"Se vi uzas la etikedon <meta name=\"referrer\" content=\"no-referrer\"> aŭ "
-"sendas la kapinstrukcion “Referrer-Policy: no-referrer”, bonvolu forigi "
-"ilin. La protekto kontraŭ CSRF postulas la ĉeeston de la kapinstrukcio "
-"“Referer”, kaj strikte kontrolas la referencantan fonton. Se vi zorgas pri "
-"privateco, uzu alternativojn kiajn <a rel=\"noreferrer\" …> por ligiloj al "
-"eksteraj retejoj."
 
 msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
 "submitting forms. This cookie is required for security reasons, to ensure "
 "that your browser is not being hijacked by third parties."
 msgstr ""
-"Vi vidas tiun ĉi mesaĝon ĉar ĉi-tiu retejo postulas ke CSRF-kuketo estu "
-"sendita kune kun la formularoj. Tia kuketo estas bezonata pro sekurecaj "
-"kialoj, por certigi ke via retumilo ne agas laŭ nedezirataj instrukcioj de "
-"maliculoj."
+"Vi vidas tiun mesaĝon ĉar tiu-ĉi retejo postulas CSRF kuketon sendante "
+"formojn. Tiu-ĉi kuketo estas bezonata pro motivoj de sekureco, por certigi "
+"ke via retumilo ne esti forrabita de triaj partioj."
 
 msgid ""
 "If you have configured your browser to disable cookies, please re-enable "
 "them, at least for this site, or for “same-origin” requests."
 msgstr ""
-"Se la agordoj de via retumilo malebligas kuketojn, bonvolu ebligi ilin por "
-"tiu ĉi retejo aŭ por petoj el sama fonto (“same-origin”)."
 
 msgid "More information is available with DEBUG=True."
 msgstr "Pliaj informoj estas videblaj kun DEBUG=True."
 
 msgid "No year specified"
-msgstr "Neniu jaro indikita"
+msgstr "Neniu jaro specifita"
 
 msgid "Date out of range"
 msgstr "Dato ne en la intervalo"
 
 msgid "No month specified"
-msgstr "Neniu monato indikita"
+msgstr "Neniu monato specifita"
 
 msgid "No day specified"
-msgstr "Neniu tago indikita"
+msgstr "Neniu tago specifita"
 
 msgid "No week specified"
-msgstr "Neniu semajno indikita"
+msgstr "Neniu semajno specifita"
 
 #, python-format
 msgid "No %(verbose_name_plural)s available"
-msgstr "Neniuj %(verbose_name_plural)s estas disponeblaj"
+msgstr "Neniu %(verbose_name_plural)s disponeblaj"
 
 #, python-format
 msgid ""
 "Future %(verbose_name_plural)s not available because %(class_name)s."
 "allow_future is False."
 msgstr ""
-"Estontaj %(verbose_name_plural)s ne disponeblas ĉar %(class_name)s."
+"Estonta %(verbose_name_plural)s ne disponeblas ĉar %(class_name)s."
 "allow_future estas Malvera."
 
 #, python-format
 msgid "Invalid date string “%(datestr)s” given format “%(format)s”"
-msgstr "Erarforma dato-ĉeno “%(datestr)s” se uzi la formaton “%(format)s”"
+msgstr ""
 
 #, python-format
 msgid "No %(verbose_name)s found matching the query"
-msgstr "Neniu %(verbose_name)s trovita kongrua kun la informpeto"
+msgstr "Neniu %(verbose_name)s trovita kongruas kun la informpeto"
 
 msgid "Page is not “last”, nor can it be converted to an int."
-msgstr "Paĝo ne estas “lasta”, nek eblas konverti ĝin en entjeron."
+msgstr ""
 
 #, python-format
 msgid "Invalid page (%(page_number)s): %(message)s"
-msgstr "Malĝusta paĝo (%(page_number)s): %(message)s"
+msgstr "Nevalida paĝo (%(page_number)s): %(message)s"
 
 #, python-format
 msgid "Empty list and “%(class_name)s.allow_empty” is False."
 msgstr ""
-"La listo estas malplena dum “%(class_name)s.allow_empty” estas Malvera."
 
 msgid "Directory indexes are not allowed here."
-msgstr "Dosierujaj indeksoj ne estas permesitaj ĉi tie."
+msgstr "Dosierujaj indeksoj ne estas permesitaj tie."
 
 #, python-format
 msgid "“%(path)s” does not exist"
@@ -1304,19 +1248,19 @@ msgstr ""
 #, python-format
 msgid ""
 "You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
-"%(version)s/ref/settings/#debug\" target=\"_blank\" "
-"rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
-"configured any URLs."
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> is in your settings file and you have not configured any "
+"URLs."
 msgstr ""
 "Vi vidas ĉi tiun paĝon ĉar <a href=\"https://docs.djangoproject.com/en/"
 "%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener\">DEBUG = "
 "True</a> estas en via agorda dosiero kaj vi ne agordis ajnan URL."
 
 msgid "Django Documentation"
-msgstr "Dĵanga dokumentaro"
+msgstr "Djanga dokumentaro"
 
 msgid "Topics, references, &amp; how-to’s"
-msgstr "Temoj, referencoj, kaj instruiloj"
+msgstr ""
 
 msgid "Tutorial: A Polling App"
 msgstr "Instruilo: apo pri enketoj"
@@ -1325,7 +1269,7 @@ msgid "Get started with Django"
 msgstr "Komencu kun Dĵango"
 
 msgid "Django Community"
-msgstr "Dĵanga komunumo"
+msgstr "Djanga komunumo"
 
 msgid "Connect, get help, or contribute"
 msgstr "Konektiĝu, ricevu helpon aŭ kontribuu"

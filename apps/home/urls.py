@@ -64,9 +64,11 @@ urlpatterns = [
     #     views.ver_resultado_examen,
     #     name="ver_resultado_examen",
     # ),
-
-    path("examenes/ver/<int:visita_examen_id>/", views.ver_resultado_examen, name="ver_resultado_examen"),
-
+    path(
+        "examenes/ver/<int:visita_examen_id>/",
+        views.ver_resultado_examen,
+        name="ver_resultado_examen",
+    ),
     path(
         "realizar_examen/<int:visita_id>/<int:examen_id>/<int:paciente_id>/",
         views.realizar_examen,
@@ -207,23 +209,21 @@ urlpatterns = [
         views.resumen_sesiones,
         name="resumen_sesiones",
     ),
-    
     # INTEGRACIÓN RECUÉRDAME
-
-    path(
-        "estadisticas/", 
-        views.estadisticas, 
-        name="estadisticas"),
-    # path("estadisticas_por_usuario/", 
-    #      views.estadisticas_por_usuario, 
+    path("estadisticas/", views.estadisticas, name="estadisticas"),
+    # path("estadisticas_por_usuario/",
+    #      views.estadisticas_por_usuario,
     #      name="estadisticas_por_usuario"),
-    path("listado_usuarios_recuerdame/", 
-         views.listado_usuarios_recuerdame, 
-         name="listado_usuarios_recuerdame"),
-    
-    path("estadisticas/usuarios/<str:email>/", views.estadisticas_usuario_detalle, name="estadisticas_usuario_detalle"),
-
-
+    path(
+        "listado_usuarios_recuerdame/",
+        views.listado_usuarios_recuerdame,
+        name="listado_usuarios_recuerdame",
+    ),
+    path(
+        "estadisticas/usuarios/<str:email>/",
+        views.estadisticas_usuario_detalle,
+        name="estadisticas_usuario_detalle",
+    ),
     # examanes generales
     path(
         "guardar_examen_analisis/",
@@ -244,5 +244,15 @@ urlpatterns = [
         "guardar_examen_fisico/",
         views.guardar_examen_fisico,
         name="guardar_examen_fisico",
+    ),
+    path(
+        "guardar_revision_sistemas/",
+        views.guardar_revision_sistemas,
+        name="guardar_revision_sistemas",
+    ),
+    path(
+        "guardar_examen_neurologico/",
+        views.guardar_examen_neurologico,
+        name="guardar_examen_neurologico",
     ),
 ]

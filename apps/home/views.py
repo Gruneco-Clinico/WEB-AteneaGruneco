@@ -23,7 +23,7 @@ from .models import *
 from .forms import ProyectoForm, RegistroDemograficoForm
 import json
 from django.forms.models import model_to_dict
-import requests # Integración RecuérdaMe
+import requests  # Integración RecuérdaMe
 
 # from weasyprint import HTML
 from django.contrib.auth import update_session_auth_hash
@@ -1256,6 +1256,91 @@ def realizar_examen(request, visita_id, examen_id, paciente_id):
                     # No hay antecedentes previos para esta visita
                     pass
 
+            # ===================================================
+            # CASO ESPECIAL: REVISIÓN POR SISTEMAS (ID 4)
+            # ===================================================
+            elif int(examen_id) == 4 and isinstance(resultado, RevisionSistemasResult):
+                print(
+                    f"🔍 Cargando datos de Revisión por Sistemas para edición: ID {resultado.id}"
+                )
+
+                # Obtener datos básicos del modelo principal
+                datos_examen = model_to_dict(resultado)
+                datos_examen.pop("id", None)
+                datos_examen.pop("visita_examen", None)
+
+                # Obtener los detalles de síntomas relacionados
+                detalles = DetalleRevisionSistemas.objects.filter(
+                    revision_sistemas_result=resultado
+                ).order_by("sistema", "sintoma")
+
+                # Organizar detalles por sistema para el template
+                sistemas_detalles = {}
+                for detalle in detalles:
+                    if detalle.sistema not in sistemas_detalles:
+                        sistemas_detalles[detalle.sistema] = []
+
+                    sistemas_detalles[detalle.sistema].append(
+                        {
+                            "sintoma": detalle.sintoma,
+                            "tiempo": detalle.tiempo,
+                            "caracteristicas": detalle.caracteristicas,
+                        }
+                    )
+
+                datos_examen["sistemas_detalles"] = sistemas_detalles
+
+                print(f"📋 Datos cargados:")
+                print(
+                    f"   - Campos de control: {[k for k, v in datos_examen.items() if k.startswith('sintoma_') and v == 'si']}"
+                )
+                print(f"   - Sistemas con detalles: {list(sistemas_detalles.keys())}")
+                print(
+                    f"   - Total síntomas: {sum(len(sintomas) for sintomas in sistemas_detalles.values())}"
+                )
+
+                modo_edicion = True
+
+            # En la vista realizar_examen, agregar después de los otros casos especiales:
+
+            # ===================================================
+            # CASO ESPECIAL: EXAMEN NEUROLÓGICO (ID 5)
+            # ===================================================
+            elif int(examen_id) == 5 and isinstance(resultado, ExamenNeurologicoResult):
+                print(
+                    f"🧠 Cargando datos de Examen Neurológico para edición: ID {resultado.id}"
+                )
+
+                # Obtener datos básicos del modelo
+                datos_examen = model_to_dict(resultado)
+                datos_examen.pop("id", None)
+                datos_examen.pop("visita_examen", None)
+
+                # Formatear campos None como cadenas vacías para el template
+                for field_name, field_value in datos_examen.items():
+                    if field_value is None:
+                        datos_examen[field_name] = ""
+                    elif isinstance(field_value, bool):
+                        datos_examen[field_name] = field_value
+                    elif hasattr(field_value, "strftime"):  # Es una fecha
+                        datos_examen[field_name] = field_value.strftime("%Y-%m-%d")
+
+                # Generar resumen para debug
+                resumen = resultado.get_resumen_examen()
+                alteraciones_pares = resultado.get_alteraciones_pares_craneales()
+                alteraciones_sensibilidad = resultado.get_alteraciones_sensibilidad()
+                reflejos_alterados = resultado.get_reflejos_alterados()
+
+                print(f"📋 Datos cargados:")
+                print(f"   - Examen normal: {resumen['examen_normal']}")
+                print(f"   - Pares craneales alterados: {len(alteraciones_pares)}")
+                print(
+                    f"   - Regiones sensibilidad alteradas: {len(alteraciones_sensibilidad)}"
+                )
+                print(f"   - Reflejos alterados: {len(reflejos_alterados)}")
+
+                modo_edicion = True
+
     except VisitaExamen.DoesNotExist:
         messages.error(request, "Visita-examen no encontrada")
         return redirect("detalle_paciente", paciente_id=paciente_id)
@@ -1280,11 +1365,12 @@ def ver_resultado_examen(request, visita_examen_id):
 
     if not visita_examen.esta_realizado:
         messages.error(request, "Este examen aún no ha sido completado.")
-        return redirect("detalle_paciente", paciente_id=visita_examen.visita.paciente.id)
+        return redirect(
+            "detalle_paciente", paciente_id=visita_examen.visita.paciente.id
+        )
 
     # SeguimientoIntervenciones - es diferente al resto
     if visita_examen.examen.nombre == "SeguimientoIntervencionesParticipantes_ANG":
-
         sesiones = SeguimientoIntervencionesResult.objects.filter(
             visita_examen=visita_examen
         ).order_by("numero_sesion")
@@ -1298,7 +1384,8 @@ def ver_resultado_examen(request, visita_examen_id):
         }
         return render(
             request,
-            "examenes_resultados/resultado_seguimientointervenciones.html", context
+            "examenes_resultados/resultado_seguimientointervenciones.html",
+            context,
         )
 
     # Caso genérico
@@ -1306,7 +1393,9 @@ def ver_resultado_examen(request, visita_examen_id):
 
     if not resultado:
         messages.error(request, "No se encontraron resultados para este examen.")
-        return redirect("detalle_paciente", paciente_id=visita_examen.visita.paciente.id)
+        return redirect(
+            "detalle_paciente", paciente_id=visita_examen.visita.paciente.id
+        )
 
     datos_resultado = {}
     for field in resultado._meta.fields:
@@ -1324,7 +1413,6 @@ def ver_resultado_examen(request, visita_examen_id):
             "paciente": visita_examen.visita.paciente,
         },
     )
-
 
 
 # examenes sueno
@@ -4163,7 +4251,9 @@ def guardar_intervenciones(request):
                 visita_examen=visita_examen
             ).count()
 
-            print(f"🔎 Total de sesiones guardadas para {visita_examen.id}: {total_sesiones}")
+            print(
+                f"🔎 Total de sesiones guardadas para {visita_examen.id}: {total_sesiones}"
+            )
             print(f"🔎 Nombre: {visita_examen.examen.nombre}")
 
             if total_sesiones >= 24:
@@ -4173,7 +4263,6 @@ def guardar_intervenciones(request):
                 visita_examen.estado = "en_progreso"
 
             visita_examen.save()
-            
 
             # Mensaje de confirmación
             if created:
@@ -4188,14 +4277,12 @@ def guardar_intervenciones(request):
             return redirect("detalle_paciente", paciente_id=paciente_id)
 
         except Exception as e:
-        
             messages.error(request, f"❌ Error al guardar la sesión: {str(e)}")
             return redirect("detalle_paciente", paciente_id=paciente_id or 1)
 
     else:
         messages.error(request, "❌ Método no permitido.")
         return redirect("index")
-
 
 
 @login_required
@@ -4404,8 +4491,6 @@ def estadisticas(request):
                 device_labels.append(device_name)
                 device_values.append(total)
 
-        
-
         # --------- 6. Conteo de vistas por página ---------
 
         views_labels, views_values = [], []
@@ -4471,7 +4556,7 @@ def estadisticas(request):
                 "data": views_values,
             }
         ]
-        
+
         # 5. Renderizar template
         return render(
             request,
@@ -4540,16 +4625,17 @@ def listado_usuarios_recuerdame(request):
         )
     except requests.exceptions.RequestException as e:
         return HttpResponseServerError(f"Error al obtener datos: {e}")
-    
 
-    
+
 @login_required(login_url="/login/")
 @user_passes_test(is_superuser, login_url="/login/")
 def estadisticas_usuario_detalle(request, email):
     """
     Muestra las métricas de PostHog para un usuario específico (email).
     """
-    url_query = f"{settings.POSTHOG_API_URL}/api/projects/{settings.POSTHOG_PROJECT_ID}/query/"
+    url_query = (
+        f"{settings.POSTHOG_API_URL}/api/projects/{settings.POSTHOG_PROJECT_ID}/query/"
+    )
     headers = {
         "Authorization": f"Bearer {settings.POSTHOG_PERSONAL_API_KEY}",
         "Content-Type": "application/json",
@@ -4646,7 +4732,6 @@ def estadisticas_usuario_detalle(request, email):
                     else:
                         return f"{sec}s"
 
-
                 session_rows.append(
                     {
                         "email": email_value,
@@ -4659,7 +4744,9 @@ def estadisticas_usuario_detalle(request, email):
                         # "avg_time": last.get("average_conversion_time"),
                         # "median_time": last.get("median_conversion_time"),
                         "avg_time": format_seconds(last.get("average_conversion_time")),
-                        "median_time": format_seconds(last.get("median_conversion_time")),
+                        "median_time": format_seconds(
+                            last.get("median_conversion_time")
+                        ),
                     }
                 )
 
@@ -4798,10 +4885,12 @@ def estadisticas_usuario_detalle(request, email):
 
                 count = int(serie.get("aggregated_value") or serie.get("count") or 0)
 
-                autocapture_rows.append({
-                    "email": email_value,
-                    "count": count,
-                })
+                autocapture_rows.append(
+                    {
+                        "email": email_value,
+                        "count": count,
+                    }
+                )
 
         if session_rows:
             campos = {
@@ -4821,7 +4910,6 @@ def estadisticas_usuario_detalle(request, email):
                 defaults=campos,
             )
 
-
         # Render
         return render(
             request,
@@ -4836,13 +4924,11 @@ def estadisticas_usuario_detalle(request, email):
                 "dau_user_labels": dau_user_labels,
                 "dau_user_values": dau_user_values,
                 "autocapture_rows": autocapture_rows,
-
             },
         )
 
     except requests.exceptions.RequestException as e:
         return HttpResponseServerError(f"Error al obtener datos: {e}")
-
 
 
 #######################################################################################
@@ -6200,3 +6286,417 @@ def safe_float_optional(value):
         return float(value)
     except (ValueError, TypeError):
         return None
+
+
+@login_required
+def guardar_revision_sistemas(request):
+    """Vista específica para guardar el examen de Revisión por Sistemas"""
+    if request.method == "POST":
+        visita_id = request.POST.get("visita_id")
+        paciente_id = request.POST.get("paciente_id")
+        examen_id = request.POST.get("examen_id")
+
+        print(
+            f"🔄 Guardando Revisión por Sistemas - Visita: {visita_id}, Examen: {examen_id}, Paciente: {paciente_id}"
+        )
+
+        try:
+            # ===================================================
+            # 1. OBTENER OBJETOS PRINCIPALES
+            # ===================================================
+            visita = get_object_or_404(Visita, id=visita_id)
+            examen = get_object_or_404(Examen, id=examen_id)
+            paciente = get_object_or_404(DatosDemograficos, id=paciente_id)
+
+            # Obtener o crear VisitaExamen
+            visita_examen, created = VisitaExamen.objects.get_or_create(
+                visita=visita, examen=examen, defaults={"estado": "pendiente"}
+            )
+
+            print(
+                f"✅ VisitaExamen {'creado' if created else 'obtenido'}: ID {visita_examen.id}"
+            )
+
+            # ===================================================
+            # 2. OBTENER O CREAR EL RESULTADO PRINCIPAL
+            # ===================================================
+            resultado, resultado_created = RevisionSistemasResult.objects.get_or_create(
+                visita_examen=visita_examen, defaults={}
+            )
+
+            accion = "creado" if resultado_created else "actualizado"
+            print(f"✅ RevisionSistemasResult {accion}: ID {resultado.id}")
+
+            # ===================================================
+            # 3. ACTUALIZAR CAMPOS DE CONTROL DE SISTEMAS
+            # ===================================================
+            sistemas = [
+                "general",
+                "cabeza_cuello",
+                "cardiopulmonar",
+                "gastrointestinal",
+                "genitourinario",
+                "vascular_periferico",
+                "osteomuscular",
+                "piel_faneras",
+                "otros",
+            ]
+
+            sistemas_activados = []
+            for sistema in sistemas:
+                campo_sintoma = f"sintoma_{sistema}"
+                valor_sintoma = request.POST.get(campo_sintoma, "no")
+
+                # Actualizar campo en el modelo principal
+                setattr(resultado, campo_sintoma, valor_sintoma)
+
+                if valor_sintoma == "si":
+                    sistemas_activados.append(sistema)
+                    print(f"🔵 Sistema activado: {sistema}")
+
+            resultado.save()
+            print(
+                f"💾 Campos de control guardados: {len(sistemas_activados)} sistemas activos"
+            )
+
+            # ===================================================
+            # 4. PROCESAR SÍNTOMAS DETALLADOS
+            # ===================================================
+            # Eliminar detalles existentes para actualización completa
+            DetalleRevisionSistemas.objects.filter(
+                revision_sistemas_result=resultado
+            ).delete()
+            print("🗑️ Detalles de síntomas previos eliminados")
+
+            total_sintomas_guardados = 0
+
+            for sistema in sistemas_activados:
+                # Obtener arrays del formulario
+                sintomas = request.POST.getlist(f"{sistema}_sintoma[]")
+                tiempos = request.POST.getlist(f"{sistema}_tiempo[]")
+                caracteristicas_list = request.POST.getlist(
+                    f"{sistema}_caracteristicas[]"
+                )
+
+                print(f"📋 Sistema {sistema}:")
+                print(f"   - Síntomas: {len(sintomas)}")
+                print(f"   - Tiempos: {len(tiempos)}")
+                print(f"   - Características: {len(caracteristicas_list)}")
+
+                # Crear detalles para cada síntoma del sistema
+                for i in range(len(sintomas)):
+                    sintoma = sintomas[i].strip() if i < len(sintomas) else ""
+                    tiempo = tiempos[i].strip() if i < len(tiempos) else ""
+                    caracteristica = (
+                        caracteristicas_list[i].strip()
+                        if i < len(caracteristicas_list)
+                        else ""
+                    )
+
+                    # Solo guardar si hay contenido en el síntoma
+                    if sintoma:
+                        detalle = DetalleRevisionSistemas.objects.create(
+                            revision_sistemas_result=resultado,
+                            sistema=sistema,
+                            sintoma=sintoma,
+                            tiempo=tiempo,
+                            caracteristicas=caracteristica,
+                        )
+                        total_sintomas_guardados += 1
+                        print(
+                            f"   ✅ Síntoma guardado: '{sintoma}' - Tiempo: '{tiempo}' - Características: '{caracteristica}'"
+                        )
+
+            # ===================================================
+            # 5. ACTUALIZAR ESTADO DE LA VISITA-EXAMEN
+            # ===================================================
+            visita_examen.estado = "completado"
+            visita_examen.fecha_completado = timezone.now()
+            visita_examen.save()
+
+            print(
+                f"🎯 VisitaExamen actualizada: estado=completado, fecha={visita_examen.fecha_completado}"
+            )
+
+            # ===================================================
+            # 6. MENSAJE DE ÉXITO Y REDIRECCIÓN
+            # ===================================================
+            mensaje_resumen = (
+                f"Revisión por Sistemas {accion} correctamente. "
+                f"Sistemas evaluados: {len(sistemas_activados)}, "
+                f"Síntomas registrados: {total_sintomas_guardados}"
+            )
+
+            messages.success(request, mensaje_resumen)
+            print(f"✅ {mensaje_resumen}")
+
+            return redirect("detalle_paciente", paciente_id=paciente_id)
+
+        except Exception as e:
+            print(f"💥 Error en guardar_revision_sistemas: {str(e)}")
+            import traceback
+
+            traceback.print_exc()
+            messages.error(
+                request, f"Error al procesar Revisión por Sistemas: {str(e)}"
+            )
+            return redirect("detalle_paciente", paciente_id=paciente_id)
+
+    # Si no es POST, redirigir al home
+    return redirect("home")
+
+
+@login_required
+def guardar_examen_neurologico(request):
+    """Vista específica para guardar el examen neurológico"""
+    if request.method == "POST":
+        visita_examen_id = request.POST.get("visita_examen")
+        paciente_id = request.POST.get("paciente_id")
+        examen_id = request.POST.get("examen_id")
+
+        print(
+            f"🧠 Guardando Examen Neurológico - VisitaExamen: {visita_examen_id}, Examen: {examen_id}, Paciente: {paciente_id}"
+        )
+
+        try:
+            # ===================================================
+            # 1. OBTENER OBJETOS PRINCIPALES
+            # ===================================================
+            visita_examen = get_object_or_404(VisitaExamen, id=visita_examen_id)
+            paciente = get_object_or_404(DatosDemograficos, id=paciente_id)
+
+            # ===================================================
+            # 2. OBTENER O CREAR EL RESULTADO
+            # ===================================================
+            resultado, created = ExamenNeurologicoResult.objects.get_or_create(
+                visita_examen=visita_examen, defaults={}
+            )
+
+            accion = "creado" if created else "actualizado"
+            print(f"✅ ExamenNeurologicoResult {accion}: ID {resultado.id}")
+
+            # ===================================================
+            # 3. PROCESAR CAMPOS I PAR CRANEAL (OLFATORIO)
+            # ===================================================
+            resultado.clavos_izquierdo = request.POST.get("clavos_izquierdo") == "on"
+            resultado.clavos_derecho = request.POST.get("clavos_derecho") == "on"
+            resultado.pimienta_izquierdo = (
+                request.POST.get("pimienta_izquierdo") == "on"
+            )
+            resultado.pimienta_derecho = request.POST.get("pimienta_derecho") == "on"
+            resultado.cafe_izquierdo = request.POST.get("cafe_izquierdo") == "on"
+            resultado.cafe_derecho = request.POST.get("cafe_derecho") == "on"
+
+            # ===================================================
+            # 4. PROCESAR CAMPOS II PAR CRANEAL (ÓPTICO)
+            # ===================================================
+            resultado.agudeza_visual_alterada = (
+                request.POST.get("agudeza_visual") == "on"
+            )
+            resultado.campimetria = request.POST.get("campimetria") or None
+            resultado.fundoscopia = request.POST.get("fundoscopia") or None
+
+            # ===================================================
+            # 5. PROCESAR CAMPOS III, IV, VI PAR (OCULOMOTORES)
+            # ===================================================
+            resultado.diplopia = request.POST.get("diplopia") == "on"
+            resultado.ptosis_palpebral = request.POST.get("ptosis_palpebral") == "on"
+            resultado.movimientos_oculares = request.POST.get("mov_oculares") or None
+
+            # ===================================================
+            # 6. PROCESAR CAMPOS V PAR CRANEAL (TRIGÉMINO)
+            # ===================================================
+            # Tacto superficial
+            resultado.tacto_frente = request.POST.get("tacto_frente") == "on"
+            resultado.tacto_parpado = request.POST.get("tacto_parpado") == "on"
+            resultado.tacto_labio = request.POST.get("tacto_labio") == "on"
+
+            # Fuerza muscular
+            resultado.fuerza_maseteros = request.POST.get("fuerza_maseteros") == "on"
+            resultado.fuerza_temporales = request.POST.get("fuerza_temporales") == "on"
+            resultado.fuerza_pterigoideos = (
+                request.POST.get("fuerza_pterigoideos") == "on"
+            )
+
+            # ===================================================
+            # 7. PROCESAR CAMPOS VII PAR CRANEAL (FACIAL)
+            # ===================================================
+            resultado.mimica_frente = request.POST.get("mimica_frente") == "on"
+            resultado.mimica_parpados = request.POST.get("mimica_parpados") == "on"
+            resultado.mimica_nasal = request.POST.get("mimica_nasal") == "on"
+            resultado.gusto_tercio_anterior = (
+                request.POST.get("gusto_tercio_anterior") or None
+            )
+
+            # ===================================================
+            # 8. PROCESAR CAMPOS VIII PAR CRANEAL (AUDITIVO)
+            # ===================================================
+            resultado.weber = request.POST.get("weber") or None
+            resultado.rinne = request.POST.get("rinne") or None
+            resultado.nistagmus = request.POST.get("nistagmus") == "on"
+
+            # ===================================================
+            # 9. PROCESAR CAMPOS IX Y X PAR (GLOSOFARÍNGEO Y VAGO)
+            # ===================================================
+            resultado.reflejo_nauseoso = request.POST.get("reflejo_nauseoso") or None
+            resultado.posicion_uvula = request.POST.get("posicion_uvula") or None
+
+            # ===================================================
+            # 10. PROCESAR CAMPOS XI PAR (ESPINAL ACCESORIO)
+            # ===================================================
+            resultado.elevacion_hombros = request.POST.get("elevacion_hombros") or None
+
+            # ===================================================
+            # 11. PROCESAR CAMPOS XII PAR (HIPOGLOSO)
+            # ===================================================
+            resultado.movimientos_lengua = (
+                request.POST.get("movimientos_lengua") or None
+            )
+
+            # ===================================================
+            # 12. PROCESAR SENSIBILIDAD
+            # ===================================================
+            # Dolor al pinchazo
+            resultado.dolor_cuello = request.POST.get("dolor_cuello") == "on"
+            resultado.dolor_torax = request.POST.get("dolor_torax") == "on"
+            resultado.dolor_brazo_izquierdo = (
+                request.POST.get("dolor_brazo_izquierdo") == "on"
+            )
+            resultado.dolor_brazo_derecho = (
+                request.POST.get("dolor_brazo_derecho") == "on"
+            )
+            resultado.dolor_pierna_izquierda = (
+                request.POST.get("dolor_pierna_izquierda") == "on"
+            )
+            resultado.dolor_pierna_derecha = (
+                request.POST.get("dolor_pierna_derecha") == "on"
+            )
+
+            # Táctil superficial
+            resultado.tactil_cuello = request.POST.get("tactil_cuello") == "on"
+            resultado.tactil_torax = request.POST.get("tactil_torax") == "on"
+            resultado.tactil_brazo_izquierdo = (
+                request.POST.get("tactil_brazo_izquierdo") == "on"
+            )
+            resultado.tactil_brazo_derecho = (
+                request.POST.get("tactil_brazo_derecho") == "on"
+            )
+            resultado.tactil_pierna_izquierda = (
+                request.POST.get("tactil_pierna_izquierda") == "on"
+            )
+            resultado.tactil_pierna_derecha = (
+                request.POST.get("tactil_pierna_derecha") == "on"
+            )
+
+            # Térmica
+            resultado.termica_cuello = request.POST.get("termica_cuello") == "on"
+            resultado.termica_torax = request.POST.get("termica_torax") == "on"
+            resultado.termica_brazo_izquierdo = (
+                request.POST.get("termica_brazo_izquierdo") == "on"
+            )
+            resultado.termica_brazo_derecho = (
+                request.POST.get("termica_brazo_derecho") == "on"
+            )
+            resultado.termica_pierna_izquierda = (
+                request.POST.get("termica_pierna_izquierda") == "on"
+            )
+            resultado.termica_pierna_derecha = (
+                request.POST.get("termica_pierna_derecha") == "on"
+            )
+
+            # ===================================================
+            # 13. PROCESAR REFLEJOS
+            # ===================================================
+            resultado.maseteriano_izquierdo = request.POST.get(
+                "maseteriano_izquierdo", "2"
+            )
+            resultado.maseteriano_derecho = request.POST.get("maseteriano_derecho", "2")
+            resultado.bicipital_izquierdo = request.POST.get("bicipital_izquierdo", "2")
+            resultado.bicipital_derecho = request.POST.get("bicipital_derecho", "2")
+            resultado.tricipital_izquierdo = request.POST.get(
+                "tricipital_izquierdo", "2"
+            )
+            resultado.tricipital_derecho = request.POST.get("tricipital_derecho", "2")
+            resultado.estiloradial_izquierdo = request.POST.get(
+                "estiloradial_izquierdo", "2"
+            )
+            resultado.estiloradial_derecho = request.POST.get(
+                "estiloradial_derecho", "2"
+            )
+            resultado.rotuliano_izquierdo = request.POST.get("rotuliano_izquierdo", "2")
+            resultado.rotuliano_derecho = request.POST.get("rotuliano_derecho", "2")
+            resultado.aquiliano_izquierdo = request.POST.get("aquiliano_izquierdo", "2")
+            resultado.aquiliano_derecho = request.POST.get("aquiliano_derecho", "2")
+
+            # ===================================================
+            # 14. PROCESAR OBSERVACIONES
+            # ===================================================
+            resultado.observaciones_pares_craneales = request.POST.get(
+                "observaciones_pares_craneales", ""
+            ).strip()
+            resultado.observaciones_sensibilidad = request.POST.get(
+                "observaciones_sensibilidad", ""
+            ).strip()
+            resultado.observaciones_reflejos = request.POST.get(
+                "observaciones_reflejos", ""
+            ).strip()
+
+            # ===================================================
+            # 15. GUARDAR RESULTADO
+            # ===================================================
+            resultado.save()
+            print(f"💾 ExamenNeurologicoResult guardado correctamente")
+
+            # ===================================================
+            # 16. ACTUALIZAR ESTADO DE LA VISITA-EXAMEN
+            # ===================================================
+            visita_examen.estado = "completado"
+            visita_examen.fecha_completado = timezone.now()
+            visita_examen.save()
+
+            print(
+                f"🎯 VisitaExamen actualizada: estado=completado, fecha={visita_examen.fecha_completado}"
+            )
+
+            # ===================================================
+            # 17. GENERAR RESUMEN PARA EL MENSAJE
+            # ===================================================
+            resumen = resultado.get_resumen_examen()
+            alteraciones_pares = resultado.get_alteraciones_pares_craneales()
+            alteraciones_sensibilidad = resultado.get_alteraciones_sensibilidad()
+            reflejos_alterados = resultado.get_reflejos_alterados()
+
+            if resumen["examen_normal"]:
+                mensaje_resumen = (
+                    f"Examen Neurológico {accion} correctamente. Resultado: NORMAL"
+                )
+            else:
+                detalles = []
+                if alteraciones_pares:
+                    detalles.append(
+                        f"{len(alteraciones_pares)} pares craneales alterados"
+                    )
+                if alteraciones_sensibilidad:
+                    detalles.append(
+                        f"{len(alteraciones_sensibilidad)} regiones de sensibilidad alteradas"
+                    )
+                if reflejos_alterados:
+                    detalles.append(f"{len(reflejos_alterados)} reflejos alterados")
+
+                mensaje_resumen = f"Examen Neurológico {accion} correctamente. Alteraciones: {', '.join(detalles)}"
+
+            messages.success(request, mensaje_resumen)
+            print(f"✅ {mensaje_resumen}")
+
+            return redirect("detalle_paciente", paciente_id=paciente_id)
+
+        except Exception as e:
+            print(f"💥 Error en guardar_examen_neurologico: {str(e)}")
+            import traceback
+
+            traceback.print_exc()
+            messages.error(request, f"Error al procesar Examen Neurológico: {str(e)}")
+            return redirect("detalle_paciente", paciente_id=paciente_id)
+
+    # Si no es POST, redirigir al home
+    return redirect("home")

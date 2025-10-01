@@ -215,7 +215,7 @@
         </div>
         <!-- Card body -->
         <div class="card-body">
-          <form method="post" action="{% url 'guardar_examen' %}">
+          <form method="post" action="{% url 'guardar_revision_sistemas' %}">
             {% csrf_token %}
             <input type="hidden" name="visita_id" id="visita_id" value="{{ visita_examen }}" />
             <input type="hidden" name="paciente_id" id="paciente_id" value="{{ paciente_id }}" />
