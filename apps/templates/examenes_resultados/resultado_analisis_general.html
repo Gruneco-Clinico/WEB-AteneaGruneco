@@ -1,0 +1,282 @@
+{% extends 'layouts/base.html' %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header bg-white border-bottom">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <h3 class="mb-0">
+                                <i class="fas fa-clipboard-list text-success mr-2"></i>
+                                Análisis General - {{ paciente.primer_nombre }} {{ paciente.primer_apellido }}
+                            </h3>
+                            <p class="text-sm text-muted mb-0">
+                                Examen realizado: {{ visita_examen.fecha_completado|date:"d/m/Y H:i" }}
+                            </p>
+                        </div>
+                        <div class="col-auto">
+                            <span class="badge badge-success">
+                                <i class="fas fa-check mr-1"></i>Completado
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    
+                    <!-- Análisis de Historia -->
+                    {% if resultado.analisis_historia %}
+                    <div class="mb-4">
+                        <h5 class="text-primary">
+                            <i class="fas fa-file-medical-alt mr-2"></i>Análisis de Historia Clínica
+                        </h5>
+                        <div class="bg-light p-3 rounded">
+                            <p class="mb-0">{{ resultado.analisis_historia|linebreaks }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Plan de Tratamiento -->
+                    {% if resultado.plan_tratamiento %}
+                    <div class="mb-4">
+                        <h5 class="text-primary">
+                            <i class="fas fa-prescription-bottle-alt mr-2"></i>Plan de Tratamiento
+                        </h5>
+                        <div class="bg-light p-3 rounded">
+                            <p class="mb-0">{{ resultado.plan_tratamiento|linebreaks }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Diagnósticos CIE-10 -->
+                    {% if diagnosticos_cie10 %}
+                    <div class="mb-4">
+                        <h5 class="text-success">
+                            <i class="fas fa-diagnoses mr-2"></i>Diagnósticos CIE-10 ({{ diagnosticos_cie10.count }})
+                        </h5>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th>Código</th>
+                                        <th>Diagnóstico</th>
+                                        <th>Estado</th>
+                                        <th>Orden</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for diag in diagnosticos_cie10 %}
+                                    <tr>
+                                        <td><span class="badge badge-primary">{{ diag.codigo }}</span></td>
+                                        <td>{{ diag.diagnostico }}</td>
+                                        <td>
+                                            {% if diag.confirmado_nuevo %}
+                                                <span class="badge badge-success">Confirmado Nuevo</span>
+                                            {% endif %}
+                                            {% if diag.confirmado_antiguo %}
+                                                <span class="badge badge-info">Confirmado Antiguo</span>
+                                            {% endif %}
+                                            {% if diag.en_estudio %}
+                                                <span class="badge badge-warning">En Estudio</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ diag.orden }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Diagnósticos DSM-V -->
+                    {% if diagnosticos_dsmv %}
+                    <div class="mb-4">
+                        <h5 class="text-info">
+                            <i class="fas fa-brain mr-2"></i>Diagnósticos DSM-V ({{ diagnosticos_dsmv.count }})
+                        </h5>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th>Código</th>
+                                        <th>Diagnóstico</th>
+                                        <th>Estado</th>
+                                        <th>Orden</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for diag in diagnosticos_dsmv %}
+                                    <tr>
+                                        <td><span class="badge badge-info">{{ diag.codigo }}</span></td>
+                                        <td>{{ diag.diagnostico }}</td>
+                                        <td>
+                                            {% if diag.confirmado_nuevo %}
+                                                <span class="badge badge-success">Confirmado Nuevo</span>
+                                            {% endif %}
+                                            {% if diag.confirmado_antiguo %}
+                                                <span class="badge badge-info">Confirmado Antiguo</span>
+                                            {% endif %}
+                                            {% if diag.en_estudio %}
+                                                <span class="badge badge-warning">En Estudio</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ diag.orden }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Diagnósticos ICSD-3 -->
+                    {% if diagnosticos_icsd3 %}
+                    <div class="mb-4">
+                        <h5 class="text-warning">
+                            <i class="fas fa-bed mr-2"></i>Diagnósticos ICSD-3 ({{ diagnosticos_icsd3.count }})
+                        </h5>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th>Código</th>
+                                        <th>Diagnóstico</th>
+                                        <th>Estado</th>
+                                        <th>Orden</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for diag in diagnosticos_icsd3 %}
+                                    <tr>
+                                        <td><span class="badge badge-warning">{{ diag.codigo }}</span></td>
+                                        <td>{{ diag.diagnostico }}</td>
+                                        <td>
+                                            {% if diag.confirmado_nuevo %}
+                                                <span class="badge badge-success">Confirmado Nuevo</span>
+                                            {% endif %}
+                                            {% if diag.confirmado_antiguo %}
+                                                <span class="badge badge-info">Confirmado Antiguo</span>
+                                            {% endif %}
+                                            {% if diag.en_estudio %}
+                                                <span class="badge badge-warning">En Estudio</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ diag.orden }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Diagnósticos No Clasificados -->
+                    {% if diagnosticos_no_clasificados %}
+                    <div class="mb-4">
+                        <h5 class="text-secondary">
+                            <i class="fas fa-question-circle mr-2"></i>Diagnósticos No Clasificados ({{ diagnosticos_no_clasificados.count }})
+                        </h5>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th>Diagnóstico</th>
+                                        <th>Estado</th>
+                                        <th>Orden</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for diag in diagnosticos_no_clasificados %}
+                                    <tr>
+                                        <td>{{ diag.diagnostico }}</td>
+                                        <td>
+                                            {% if diag.confirmado_nuevo %}
+                                                <span class="badge badge-success">Confirmado Nuevo</span>
+                                            {% endif %}
+                                            {% if diag.confirmado_antiguo %}
+                                                <span class="badge badge-info">Confirmado Antiguo</span>
+                                            {% endif %}
+                                            {% if diag.en_estudio %}
+                                                <span class="badge badge-warning">En Estudio</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ diag.orden }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Resumen Estadístico -->
+                    <div class="row mt-4">
+                        <div class="col-md-3">
+                            <div class="card border-success">
+                                <div class="card-body text-center">
+                                    <h3 class="text-success">{{ diagnosticos_cie10.count }}</h3>
+                                    <p class="mb-0">CIE-10</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card border-info">
+                                <div class="card-body text-center">
+                                    <h3 class="text-info">{{ diagnosticos_dsmv.count }}</h3>
+                                    <p class="mb-0">DSM-V</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card border-warning">
+                                <div class="card-body text-center">
+                                    <h3 class="text-warning">{{ diagnosticos_icsd3.count }}</h3>
+                                    <p class="mb-0">ICSD-3</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card border-secondary">
+                                <div class="card-body text-center">
+                                    <h3 class="text-secondary">{{ diagnosticos_no_clasificados.count }}</h3>
+                                    <p class="mb-0">No Clasificados</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sin diagnósticos -->
+                    {% if not diagnosticos_cie10 and not diagnosticos_dsmv and not diagnosticos_icsd3 and not diagnosticos_no_clasificados %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-clipboard-list text-muted" style="font-size: 4rem;"></i>
+                        <h4 class="text-muted mt-3">Sin diagnósticos registrados</h4>
+                        <p class="text-muted">No se han registrado diagnósticos en esta evaluación.</p>
+                    </div>
+                    {% endif %}
+
+                </div>
+
+                <!-- Footer con acciones -->
+                <div class="card-footer bg-light">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <small class="text-muted">
+                                <i class="fas fa-clock mr-1"></i>
+                                Última actualización: {{ visita_examen.fecha_completado|date:"d/m/Y H:i" }}
+                            </small>
+                        </div>
+                        <div class="col-auto">
+                            <a href="{% url 'detalle_paciente' paciente.id %}" class="btn btn-primary">
+                                <i class="fas fa-arrow-left mr-1"></i>Volver al Paciente
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

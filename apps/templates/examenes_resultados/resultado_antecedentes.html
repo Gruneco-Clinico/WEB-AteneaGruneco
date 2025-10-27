@@ -1,0 +1,58 @@
+{% extends 'layouts/base.html' %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Antecedentes Médicos - {{ paciente.primer_nombre }} {{ paciente.primer_apellido }}</h3>
+                    <small class="text-muted">Examen realizado: {{ visita_examen.fecha_completado|date:"d/m/Y H:i" }}</small>
+                </div>
+                <div class="card-body">
+                    
+                    {% if resultado.observaciones_generales %}
+                    <div class="mb-4">
+                        <h5>Observaciones Generales</h5>
+                        <p>{{ resultado.observaciones_generales }}</p>
+                    </div>
+                    {% endif %}
+
+                    <!-- Patológicos -->
+                    {% if patologicos %}
+                    <div class="mb-4">
+                        <h5>Antecedentes Patológicos</h5>
+                        {% for item in patologicos %}
+                        <div class="border p-3 mb-2">
+                            <strong>{{ item.get_tipo_patologia_display }}</strong>
+                            {% if item.descripcion_otros %} - {{ item.descripcion_otros }}{% endif %}
+                            <br>
+                            <small>Fecha inicio: {{ item.fecha_inicio|date:"d/m/Y" }}</small>
+                            {% if item.observaciones %}<br><em>{{ item.observaciones }}</em>{% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <!-- Quirúrgicos -->
+                    {% if quirurgicos %}
+                    <div class="mb-4">
+                        <h5>Antecedentes Quirúrgicos</h5>
+                        {% for item in quirurgicos %}
+                        <div class="border p-3 mb-2">
+                            <strong>{{ item.descripcion }}</strong>
+                            <br>
+                            <small>Fecha intervención: {{ item.fecha_intervencion|date:"d/m/Y" }}</small>
+                            {% if item.observaciones %}<br><em>{{ item.observaciones }}</em>{% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <!-- Continúa con otros tipos... -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

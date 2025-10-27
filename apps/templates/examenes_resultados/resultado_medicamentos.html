@@ -1,0 +1,64 @@
+{% extends 'layouts/base.html' %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Medicamentos - {{ paciente.primer_nombre }} {{ paciente.primer_apellido }}</h3>
+                    <small class="text-muted">Examen realizado: {{ visita_examen.fecha_completado|date:"d/m/Y H:i" }}</small>
+                </div>
+                <div class="card-body">
+
+                    {% if resultado.observaciones_generales %}
+                    <div class="mb-4">
+                        <h5>Observaciones Generales</h5>
+                        <p>{{ resultado.observaciones_generales }}</p>
+                    </div>
+                    {% endif %}
+
+                    {% if medicamentos %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Medicamento</th>
+                                    <th>Presentación</th>
+                                    <th>Dosis</th>
+                                    <th>Frecuencia</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for med in medicamentos %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ med.nombre_comercial }}</strong>
+                                        {% if med.nombre_generico %}<br><small>{{ med.nombre_generico }}</small>{% endif %}
+                                    </td>
+                                    <td>{{ med.presentacion }} {{ med.concentracion }} {{ med.unidad }}</td>
+                                    <td>{{ med.cantidad }}</td>
+                                    <td>{{ med.frecuencia }}</td>
+                                    <td>
+                                        {% if med.activo %}
+                                            <span class="badge badge-success">Activo</span>
+                                        {% else %}
+                                            <span class="badge badge-secondary">Inactivo</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p>No se registraron medicamentos.</p>
+                    {% endif %}
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

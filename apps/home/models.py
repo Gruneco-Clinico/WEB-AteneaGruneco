@@ -151,14 +151,13 @@ class DatosDemograficos(models.Model):
         blank=True,
         null=True,
         unique=True,
-        verbose_name="Código del Paciente"
+        verbose_name="Código del Paciente",
     )
 
     def __str__(self):
         return f"{self.primer_nombre} {self.primer_apellido} ({self.codigo or 'sin código'})"
 
-
-    # Antes estaba esto: 
+    # Antes estaba esto:
     # def __str__(self):
     #     return f"{self.primer_nombre} {self.primer_apellido}"
 
@@ -272,7 +271,7 @@ class Visita(models.Model):
 
     def __str__(self):
         return f"{self.nombre} - {self.proyecto.nombre}"
-    
+
     # Para códigos ANG-XXX consecutivos
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
@@ -301,7 +300,7 @@ class Visita(models.Model):
                     numero = 0
 
                 # Generar nuevo consecutivo
-                nuevo_codigo = f"ANG-{numero+1:03d}"
+                nuevo_codigo = f"ANG-{numero + 1:03d}"
                 paciente.codigo = nuevo_codigo
                 paciente.save()
 
@@ -401,12 +400,13 @@ class VisitaExamen(models.Model):
                 "consentimientoinformadocuidadorresult_resultado",
                 "anamnesiscuidadorresult_resultado",
                 "anamnesisparticipanteresult_resultado",
-                "seguimientointervencionesresult_resultado",
                 "analisisgeneralresult_resultado",  # ✅ ANÁLISIS GENERAL
                 "examenfisicoresult_resultado",  # ✅ EXAMEN FÍSICO
                 "examenneurologicoresult_resultado",  # ✅ EXAMEN NEUROLÓGICO
                 "medicamentosresult_resultado",  # ✅ MEDICAMENTOS
                 "revisionsistemrasresult_resultado",  # ✅ REVISIÓN SISTEMAS
+                # este examen es problemático dejar al final
+                "seguimientointervencionesresult_resultado",
             ]
 
             # 🔧 CORRECCIÓN: Actualizar el bucle para asignar el resultado encontrado
@@ -415,7 +415,9 @@ class VisitaExamen(models.Model):
                     resultado = getattr(self, related_name)
                     if resultado:  # Verificar que el resultado existe
                         self._resultado_cache = resultado
-
+                        print(
+                            f"✅ Encontrado {related_name}: {type(resultado).__name__}"
+                        )
                         break  # 🔧 IMPORTANTE: Salir del bucle cuando encontremos algo
                 except AttributeError:
                     continue
@@ -1799,7 +1801,6 @@ class PuntajeCDRResult(ResultadoExamenBase):
     cdr_global = models.CharField(max_length=10)
     cdr_interpretacion = models.TextField(blank=True, null=True)
 
-
     def __str__(self):
         return f"CDR - {self.visita_examen_id}"
 
@@ -1887,7 +1888,9 @@ class AnamnesisParticipanteResult(ResultadoExamenBase):
 
 class SeguimientoIntervencionesResult(models.Model):
     visita_examen = models.ForeignKey(
-        "VisitaExamen", on_delete=models.CASCADE, related_name="seguimientointervencionesresult_resultado"
+        "VisitaExamen",
+        on_delete=models.CASCADE,
+        related_name="seguimientointervencionesresult_resultado",
     )
     numero_sesion = models.IntegerField()  # 1–18
     nombre_sesion = models.CharField(max_length=200, blank=True, null=True)
@@ -1942,7 +1945,8 @@ class InteractionMetric(models.Model):
 
     def __str__(self):
         return f"{self.event} - {self.timestamp}"
-    
+
+
 class EstadisticasUsuarioResult(models.Model):
     email = models.EmailField()
     ingresos = models.IntegerField(default=0)  # user_values

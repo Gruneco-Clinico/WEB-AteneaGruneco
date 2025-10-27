@@ -1,0 +1,32 @@
+{% extends 'layouts/base.html' %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Revisión por Sistemas - {{ paciente.primer_nombre }} {{ paciente.primer_apellido }}</h3>
+                    <small class="text-muted">Examen realizado: {{ visita_examen.fecha_completado|date:"d/m/Y H:i" }}</small>
+                </div>
+                <div class="card-body">
+                    
+                    {% for sistema, detalles in sistemas_detalles.items %}
+                    <div class="mb-4">
+                        <h5>{{ sistema|title }}</h5>
+                        {% for detalle in detalles %}
+                        <div class="border p-3 mb-2">
+                            <strong>{{ detalle.sintoma }}</strong>
+                            {% if detalle.tiempo %}<br><small>Tiempo: {{ detalle.tiempo }}</small>{% endif %}
+                            {% if detalle.caracteristicas %}<br><em>{{ detalle.caracteristicas }}</em>{% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endfor %}
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

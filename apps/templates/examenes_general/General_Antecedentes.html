@@ -1,4 +1,7 @@
-{% extends 'layouts/base.html' %} {% block content %}
+{% extends 'layouts/base.html' %}
+
+
+{% block content %}
 
 <div class="header bg-primary pb-6">
   <div class="container-fluid">
@@ -66,199 +69,91 @@
             </div>
 
             <!-- Navegación -->
-            <ul
-              class="nav nav-pills nav-fill mb-4"
-              id="antecedentesTabs"
-              role="tablist"
-            >
-              <li class="nav-item">
-                <a
-                  class="nav-link active"
-                  id="patologicos-tab"
-                  data-toggle="tab"
-                  href="#patologicos"
-                  role="tab"
-                >
-                  <i class="fas fa-disease mr-1"></i>Patológicos
-                  <span class="badge badge-light ml-2" id="count-patologicos"
-                    >0</span
-                  >
-                </a>
-              </li>
-              <li class="nav-item">
-                <a
-                  class="nav-link"
-                  id="quirurgicos-tab"
-                  data-toggle="tab"
-                  href="#quirurgicos"
-                  role="tab"
-                >
-                  <i class="fas fa-scalpel mr-1"></i>Quirúrgicos
-                  <span class="badge badge-light ml-2" id="count-quirurgicos"
-                    >0</span
-                  >
-                </a>
-              </li>
-              <li class="nav-item">
-                <a
-                  class="nav-link"
-                  id="farmacologicos-tab"
-                  data-toggle="tab"
-                  href="#farmacologicos"
-                  role="tab"
-                >
-                  <i class="fas fa-pills mr-1"></i>Farmacológicos
-                  <span class="badge badge-light ml-2" id="count-farmacologicos"
-                    >0</span
-                  >
-                </a>
-              </li>
-              <li class="nav-item">
-                <a
-                  class="nav-link"
-                  id="toxicos-tab"
-                  data-toggle="tab"
-                  href="#toxicos"
-                  role="tab"
-                >
-                  <i class="fas fa-smoking mr-1"></i>Tóxicos
-                  <span class="badge badge-light ml-2" id="count-toxicos"
-                    >0</span
-                  >
-                </a>
-              </li>
-              <li class="nav-item">
-                <a
-                  class="nav-link"
-                  id="familiares-tab"
-                  data-toggle="tab"
-                  href="#familiares"
-                  role="tab"
-                >
-                  <i class="fas fa-users mr-1"></i>Familiares
-                  <span class="badge badge-light ml-2" id="count-familiares"
-                    >0</span
-                  >
-                </a>
-              </li>
-              <li class="nav-item">
-                <a
-                  class="nav-link"
-                  id="alergicos-tab"
-                  data-toggle="tab"
-                  href="#alergicos"
-                  role="tab"
-                >
-                  <i class="fas fa-allergies mr-1"></i>Alérgicos
-                  <span class="badge badge-light ml-2" id="count-alergicos"
-                    >0</span
-                  >
-                </a>
-              </li>
-              <li class="nav-item">
-                <a
-                  class="nav-link"
-                  id="traumaticos-tab"
-                  data-toggle="tab"
-                  href="#traumaticos"
-                  role="tab"
-                >
-                  <i class="fas fa-band-aid mr-1"></i>Traumáticos
-                  <span class="badge badge-light ml-2" id="count-traumaticos"
-                    >0</span
-                  >
-                </a>
-              </li>
-              <li class="nav-item">
-                <a
-                  class="nav-link"
-                  id="gineco-tab"
-                  data-toggle="tab"
-                  href="#gineco"
-                  role="tab"
-                >
-                  <i class="fas fa-venus mr-1"></i>Gineco-Obstétricos
-                  <span class="badge badge-light ml-2" id="count-gineco"
-                    >0</span
-                  >
-                </a>
-              </li>
-              <!-- NUEVAS PESTAÑAS -->
-              <li class="nav-item">
-                <a
-                  class="nav-link"
-                  id="epidemiologicos-tab"
-                  data-toggle="tab"
-                  href="#epidemiologicos"
-                  role="tab"
-                >
-                  <i class="fas fa-virus mr-1"></i>Epidemiológicos
-                  <span
-                    class="badge badge-light ml-2"
-                    id="count-epidemiologicos"
-                    >0</span
-                  >
-                </a>
-              </li>
-              <li class="nav-item">
-                <a
-                  class="nav-link"
-                  id="ets-tab"
-                  data-toggle="tab"
-                  href="#ets"
-                  role="tab"
-                >
-                  <i class="fas fa-shield-virus mr-1"></i>ETS
-                  <span class="badge badge-light ml-2" id="count-ets">0</span>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a
-                  class="nav-link"
-                  id="hospitalizaciones-tab"
-                  data-toggle="tab"
-                  href="#hospitalizaciones"
-                  role="tab"
-                >
-                  <i class="fas fa-hospital mr-1"></i>Hospitalizaciones
-                  <span
-                    class="badge badge-light ml-2"
-                    id="count-hospitalizaciones"
-                    >0</span
-                  >
-                </a>
-              </li>
-              <li class="nav-item">
-                <a
-                  class="nav-link"
-                  id="inmunizaciones-tab"
-                  data-toggle="tab"
-                  href="#inmunizaciones"
-                  role="tab"
-                >
-                  <i class="fas fa-syringe mr-1"></i>Inmunizaciones
-                  <span class="badge badge-light ml-2" id="count-inmunizaciones"
-                    >0</span
-                  >
-                </a>
-              </li>
-              <li class="nav-item">
-                <a
-                  class="nav-link"
-                  id="transfusionales-tab"
-                  data-toggle="tab"
-                  href="#transfusionales"
-                  role="tab"
-                >
-                  <i class="fas fa-tint mr-1"></i>Transfusionales
-                  <span
-                    class="badge badge-light ml-2"
-                    id="count-transfusionales"
-                    >0</span
-                  >
-                </a>
-              </li>
-            </ul>
+            <!-- Navegación reorganizada por grupos -->
+<ul class="nav nav-pills nav-fill mb-4" id="antecedentesTabs" role="tablist">
+  <!-- Grupo: Médicos Principales -->
+  <li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button">
+      <i class="fas fa-stethoscope mr-1"></i>Médicos <span class="badge badge-primary ml-2" id="total-medicos">0</span>
+    </a>
+    <div class="dropdown-menu">
+      <a class="dropdown-item" data-toggle="tab" href="#patologicos">
+        <i class="fas fa-disease mr-1"></i>Patológicos <span class="badge badge-light float-right" id="count-patologicos">0</span>
+      </a>
+      <a class="dropdown-item" data-toggle="tab" href="#quirurgicos">
+        <i class="fas fa-cut mr-1"></i>Quirúrgicos <span class="badge badge-light float-right" id="count-quirurgicos">0</span>
+      </a>
+      <a class="dropdown-item" data-toggle="tab" href="#farmacologicos">
+        <i class="fas fa-pills mr-1"></i>Farmacológicos <span class="badge badge-light float-right" id="count-farmacologicos">0</span>
+      </a>
+    </div>
+  </li>
+  
+  <!-- Grupo: Estilo de Vida -->
+  <li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button">
+      <i class="fas fa-user-md mr-1"></i>Estilo Vida <span class="badge badge-warning ml-2" id="total-estilo">0</span>
+    </a>
+    <div class="dropdown-menu">
+      <a class="dropdown-item" data-toggle="tab" href="#toxicos">
+        <i class="fas fa-smoking mr-1"></i>Tóxicos <span class="badge badge-light float-right" id="count-toxicos">0</span>
+      </a>
+      <a class="dropdown-item" data-toggle="tab" href="#alergicos">
+        <i class="fas fa-allergies mr-1"></i>Alérgicos <span class="badge badge-light float-right" id="count-alergicos">0</span>
+      </a>
+    </div>
+  </li>
+  
+  <!-- Grupo: Familiares y Genéticos -->
+  <li class="nav-dropdown">
+     <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button">
+      <i class="fas fa-hospital mr-1"></i>Familiares <span class="badge badge-success ml-2" id="total-especializados">0</span>
+    </a>
+    <div class="dropdown-menu">
+      <a class="dropdown-item" data-toggle="tab" href="#familiares">
+        <i class="fas fa-venus mr-1"></i>Familiares
+      </a>
+      <a class="dropdown-item" data-toggle="tab" href="#traumaticos">
+        <i class="fas fa-hospital mr-1"></i>Traumáticos <span class="badge badge-light float-right" id="count-traumaticos">0</span>
+      </a>
+      
+    </div>
+  </li>
+  
+  <!-- Grupo: Especializados -->
+  <li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button">
+      <i class="fas fa-hospital mr-1"></i>Especializados <span class="badge badge-success ml-2" id="total-especializados">0</span>
+    </a>
+    <div class="dropdown-menu">
+      <a class="dropdown-item" data-toggle="tab" href="#gineco">
+        <i class="fas fa-venus mr-1"></i>Gineco-Obstétricos
+      </a>
+      <a class="dropdown-item" data-toggle="tab" href="#hospitalizaciones">
+        <i class="fas fa-hospital mr-1"></i>Hospitalizaciones <span class="badge badge-light float-right" id="count-hospitalizaciones">0</span>
+      </a>
+      <a class="dropdown-item" data-toggle="tab" href="#inmunizaciones">
+        <i class="fas fa-syringe mr-1"></i>Inmunizaciones <span class="badge badge-light float-right" id="count-inmunizaciones">0</span>
+      </a>
+    </div>
+  </li>
+  <li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button">
+      <i class="fas fa-hospital mr-1"></i>Otros <span class="badge badge-success ml-2" id="total-especializados">0</span>
+    </a>
+    <div class="dropdown-menu">
+      <a class="dropdown-item" data-toggle="tab" href="#transfusionales">
+        <i class="fas fa-venus mr-1"></i>Transfusionales
+      </a>
+      <a class="dropdown-item" data-toggle="tab" href="#ets">
+        <i class="fas fa-hospital mr-1"></i>ETS <span class="badge badge-light float-right" id="count-ets">0</span>
+      </a>
+      <a class="dropdown-item" data-toggle="tab" href="#epidemiologicos">
+        <i class="fas fa-syringe mr-1"></i>Epidemiológicos <span class="badge badge-light float-right" id="count-inmunizaciones">0</span>
+      </a>
+    </div>
+  </li>
+</ul>
 
             <div class="tab-content">
               <!-- PATOLÓGICOS -->
@@ -281,7 +176,7 @@
                       onclick="agregarAntecedente('patologicos')"
                     >
                       <i class="fas fa-plus mr-1"></i>Nuevo Registro
-                    </button>
+                            </button>
                   </div>
                   <div class="card-body bg-white">
                     <div id="contenedor-patologicos">
@@ -2346,3 +2241,5 @@ hospitalizaciones: function (indice) {
 </script>
 
 {% endblock content %}
+
+

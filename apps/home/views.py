@@ -1056,6 +1056,7 @@ def realizar_examen(request, visita_id, examen_id, paciente_id):
             # CASO ESPECIAL: ANTECEDENTES (ID 5) - FUERA DEL IF ANTERIOR
             # ===================================================
             elif int(examen_id) == 5:
+                print("Entrando a antecedentes desde especial")
                 # Para antecedentes, verificar si existe un AntecedentesVisitaLink
                 try:
                     antecedentes_link = AntecedentesVisitaLink.objects.get(
@@ -1388,7 +1389,7 @@ def ver_resultado_examen(request, visita_examen_id):
             context,
         )
 
-    # Caso genérico
+    # Obtener resultado usando el método get_resultado_instance
     resultado = visita_examen.get_resultado_instance()
 
     if not resultado:
@@ -1397,22 +1398,290 @@ def ver_resultado_examen(request, visita_examen_id):
             "detalle_paciente", paciente_id=visita_examen.visita.paciente.id
         )
 
-    datos_resultado = {}
-    for field in resultado._meta.fields:
-        if field.name != "visita_examen":
-            valor = getattr(resultado, field.name)
-            datos_resultado[field.verbose_name or field.name] = valor
+    # ===== CASOS ESPECIALES CON RELACIONES =====
 
-    return render(
-        request,
-        "examenes_resultados/resultado_generico.html",
-        {
+    # CASO: ANAMNESIS DE SUEÑO (ID 10)
+    if visita_examen.examen.id == 10 and isinstance(resultado, SuenoAnamnesisResult):
+        # Para anamnesis de sueño, mostrar template específico con relaciones
+        anamnesis = SuenoAnamnesisResult.objects.prefetch_related(
+            "sustancias",
+            "medicamentos",
+            "pantallas",
+            "actividades_en_cama",
+            "actividades_fisicas",
+            "sintomas_suenos",
+            "sintomas_diurno",
+            "tipos_queja_detalle",
+        ).get(id=resultado.id)
+
+        context = {
+            "visita_examen": visita_examen,
+            "resultado": anamnesis,
+            "paciente": visita_examen.visita.paciente,
+            # Incluir relaciones específicas
+            "sustancias": anamnesis.sustancias.all(),
+            "medicamentos": anamnesis.medicamentos.all(),
+            "pantallas": anamnesis.pantallas.all(),
+            "actividades_en_cama": anamnesis.actividades_en_cama.all(),
+            "actividades_fisicas": anamnesis.actividades_fisicas.all(),
+            "sintomas_suenos": anamnesis.sintomas_suenos.all(),
+            "sintomas_diurnos": anamnesis.sintomas_diurno.all(),
+            "tipos_queja": anamnesis.tipos_queja_detalle.all(),
+        }
+        return render(
+            request, "examenes_resultados/resultado_sueno_anamnesis.html", context
+        )
+
+    # En la función ver_resultado_examen, reemplaza el caso de ANÁLISIS GENERAL (ID 7):
+
+    # CASO: ANÁLISIS GENERAL (ID 7)
+    elif visita_examen.examen.id == 7:
+        # 🔧 CORRECCIÓN: Obtener la instancia correcta del modelo
+        try:
+            # Buscar directamente el resultado por visita_examen
+            analisis_result = AnalisisGeneralResult.objects.get(
+                visita_examen=visita_examen
+            )
+
+            print(f"🔍 AnalisisGeneralResult encontrado: ID {analisis_result.id}")
+
+            # Obtener los diagnósticos relacionados con prefetch para optimización
+            analisis = AnalisisGeneralResult.objects.prefetch_related(
+                "diagnosticos_cie10",
+                "diagnosticos_dsmv",
+                "diagnosticos_icsd3",
+                "diagnosticos_no_clasificados",
+            ).get(id=analisis_result.id)
+
+            print(f"📋 Diagnósticos encontrados:")
+            print(f"   - CIE-10: {analisis.diagnosticos_cie10.count()}")
+            print(f"   - DSM-V: {analisis.diagnosticos_dsmv.count()}")
+            print(f"   - ICSD-3: {analisis.diagnosticos_icsd3.count()}")
+            print(
+                f"   - No clasificados: {analisis.diagnosticos_no_clasificados.count()}"
+            )
+
+            context = {
+                "visita_examen": visita_examen,
+                "resultado": analisis,  # 🔧 Usar la instancia correcta
+                "paciente": visita_examen.visita.paciente,
+                # Incluir diagnósticos específicos
+                "diagnosticos_cie10": analisis.diagnosticos_cie10.all(),
+                "diagnosticos_dsmv": analisis.diagnosticos_dsmv.all(),
+                "diagnosticos_icsd3": analisis.diagnosticos_icsd3.all(),
+                "diagnosticos_no_clasificados": analisis.diagnosticos_no_clasificados.all(),
+            }
+            return render(
+                request, "examenes_resultados/resultado_analisis_general.html", context
+            )
+
+        except AnalisisGeneralResult.DoesNotExist:
+            print(
+                f"❌ No se encontró AnalisisGeneralResult para VisitaExamen {visita_examen.id}"
+            )
+            messages.error(
+                request,
+                "No se encontraron resultados de análisis general para esta visita.",
+            )
+            return redirect(
+                "detalle_paciente", paciente_id=visita_examen.visita.paciente.id
+            )
+
+        except Exception as e:
+            print(f"💥 Error al obtener AnalisisGeneralResult: {str(e)}")
+            messages.error(request, f"Error al cargar el análisis general: {str(e)}")
+            return redirect(
+                "detalle_paciente", paciente_id=visita_examen.visita.paciente.id
+            )
+
+    # CASO: ANTECEDENTES (ID 5)
+    elif visita_examen.examen.id == 5:
+        try:
+            antecedentes_link = AntecedentesVisitaLink.objects.get(
+                visita_examen=visita_examen
+            )
+            antecedentes_result = antecedentes_link.antecedentes_result
+
+            if antecedentes_result:
+                # Cargar antecedentes con todas sus relaciones
+                antecedentes = AntecedentesResult.objects.prefetch_related(
+                    "antecedentes_patologicos",
+                    "antecedentes_quirurgicos",
+                    "antecedentes_farmacologicos",
+                    "antecedentes_toxicos",
+                    "antecedentes_familiares",
+                    "antecedentes_alergicos",
+                    "antecedentes_traumaticos",
+                    "antecedentes_gineco",
+                    "antecedentes_epidemiologicos",
+                    "antecedentes_ets",
+                    "antecedentes_hospitalizaciones",
+                    "antecedentes_inmunizaciones",
+                    "antecedentes_transfusionales",
+                ).get(id=antecedentes_result.id)
+
+                context = {
+                    "visita_examen": visita_examen,
+                    "resultado": antecedentes,
+                    "paciente": visita_examen.visita.paciente,
+                    # Incluir todas las relaciones de antecedentes
+                    "patologicos": antecedentes.antecedentes_patologicos.all(),
+                    "quirurgicos": antecedentes.antecedentes_quirurgicos.all(),
+                    "farmacologicos": antecedentes.antecedentes_farmacologicos.all(),
+                    "toxicos": antecedentes.antecedentes_toxicos.all(),
+                    "familiares": antecedentes.antecedentes_familiares.all(),
+                    "alergicos": antecedentes.antecedentes_alergicos.all(),
+                    "traumaticos": antecedentes.antecedentes_traumaticos.all(),
+                    "gineco_obstetricos": antecedentes.antecedentes_gineco
+                    if hasattr(antecedentes, "antecedentes_gineco")
+                    else None,
+                    "epidemiologicos": antecedentes.antecedentes_epidemiologicos.all(),
+                    "ets": antecedentes.antecedentes_ets.all(),
+                    "hospitalizaciones": antecedentes.antecedentes_hospitalizaciones.all(),
+                    "inmunizaciones": antecedentes.antecedentes_inmunizaciones.all(),
+                    "transfusionales": antecedentes.antecedentes_transfusionales.all(),
+                }
+                return render(
+                    request, "examenes_resultados/resultado_antecedentes.html", context
+                )
+            else:
+                messages.error(
+                    request, "No se encontraron antecedentes para esta visita."
+                )
+                return redirect(
+                    "detalle_paciente", paciente_id=visita_examen.visita.paciente.id
+                )
+
+        except AntecedentesVisitaLink.DoesNotExist:
+            messages.error(request, "No se encontraron antecedentes para esta visita.")
+            return redirect(
+                "detalle_paciente", paciente_id=visita_examen.visita.paciente.id
+            )
+
+    # En la función ver_resultado_examen, reemplaza el caso específico:
+
+    # CASO: REVISIÓN POR SISTEMAS (ID 4)
+    elif visita_examen.examen.id == 4:
+        # 🔧 CORRECCIÓN: Obtener la instancia correcta del modelo
+        try:
+            # Buscar directamente el resultado por visita_examen
+            revision_result = RevisionSistemasResult.objects.get(
+                visita_examen=visita_examen
+            )
+
+            print(f"🔍 RevisionSistemasResult encontrado: ID {revision_result.id}")
+
+            # Obtener los detalles de síntomas relacionados
+            detalles = DetalleRevisionSistemas.objects.filter(
+                revision_sistemas_result=revision_result
+            ).order_by("sistema", "sintoma")
+
+            print(f"📋 Detalles encontrados: {detalles.count()}")
+
+            # Organizar detalles por sistema
+            sistemas_detalles = {}
+            for detalle in detalles:
+                if detalle.sistema not in sistemas_detalles:
+                    sistemas_detalles[detalle.sistema] = []
+                sistemas_detalles[detalle.sistema].append(detalle)
+
+            print(f"📊 Sistemas con detalles: {list(sistemas_detalles.keys())}")
+
+            context = {
+                "visita_examen": visita_examen,
+                "resultado": revision_result,  # 🔧 Usar la instancia correcta
+                "paciente": visita_examen.visita.paciente,
+                "sistemas_detalles": sistemas_detalles,
+            }
+            return render(
+                request, "examenes_resultados/resultado_revision_sistemas.html", context
+            )
+
+        except RevisionSistemasResult.DoesNotExist:
+            print(
+                f"❌ No se encontró RevisionSistemasResult para VisitaExamen {visita_examen.id}"
+            )
+            messages.error(
+                request,
+                "No se encontraron resultados de revisión por sistemas para esta visita.",
+            )
+            return redirect(
+                "detalle_paciente", paciente_id=visita_examen.visita.paciente.id
+            )
+
+        except Exception as e:
+            print(f"💥 Error al obtener RevisionSistemasResult: {str(e)}")
+            messages.error(request, f"Error al cargar los resultados: {str(e)}")
+            return redirect(
+                "detalle_paciente", paciente_id=visita_examen.visita.paciente.id
+            )
+
+    # En la función ver_resultado_examen, reemplaza el caso de MEDICAMENTOS (ID 8):
+
+    # CASO: MEDICAMENTOS (ID 8)
+    elif visita_examen.examen.id == 8:
+        # 🔧 CORRECCIÓN: Obtener la instancia correcta del modelo
+        try:
+            # Buscar directamente el resultado por visita_examen
+            medicamentos_result = MedicamentosResult.objects.get(
+                visita_examen=visita_examen
+            )
+
+            print(f"🔍 MedicamentosResult encontrado: ID {medicamentos_result.id}")
+
+            # Obtener los medicamentos relacionados
+            medicamentos = medicamentos_result.medicamentos.all().order_by(
+                "nombre_comercial"
+            )
+
+            print(f"💊 Medicamentos encontrados: {medicamentos.count()}")
+
+            context = {
+                "visita_examen": visita_examen,
+                "resultado": medicamentos_result,  # 🔧 Usar la instancia correcta
+                "paciente": visita_examen.visita.paciente,
+                "medicamentos": medicamentos,
+            }
+            return render(
+                request, "examenes_resultados/resultado_medicamentos.html", context
+            )
+
+        except MedicamentosResult.DoesNotExist:
+            print(
+                f"❌ No se encontró MedicamentosResult para VisitaExamen {visita_examen.id}"
+            )
+            messages.error(
+                request,
+                "No se encontraron resultados de medicamentos para esta visita.",
+            )
+            return redirect(
+                "detalle_paciente", paciente_id=visita_examen.visita.paciente.id
+            )
+
+        except Exception as e:
+            print(f"💥 Error al obtener MedicamentosResult: {str(e)}")
+            messages.error(request, f"Error al cargar los medicamentos: {str(e)}")
+            return redirect(
+                "detalle_paciente", paciente_id=visita_examen.visita.paciente.id
+            )
+    # ===== CASO GENÉRICO PARA OTROS EXÁMENES =====
+    else:
+        # Para exámenes sin relaciones complejas, usar el caso genérico
+        datos_resultado = {}
+
+        # Iterar sobre los campos del modelo (no sobre RelatedManager)
+        for field in resultado._meta.fields:
+            if field.name != "visita_examen":
+                valor = getattr(resultado, field.name)
+                datos_resultado[field.verbose_name or field.name] = valor
+
+        context = {
             "visita_examen": visita_examen,
             "resultado": resultado,
             "datos_resultado": datos_resultado,
             "paciente": visita_examen.visita.paciente,
-        },
-    )
+        }
+        return render(request, "examenes_resultados/resultado_generico.html", context)
 
 
 # examenes sueno
