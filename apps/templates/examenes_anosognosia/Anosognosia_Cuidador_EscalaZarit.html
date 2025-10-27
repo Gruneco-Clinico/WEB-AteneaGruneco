@@ -331,7 +331,7 @@
                                 {% else %}
                                 <option value="" disabled {% if not datos_examen.grado_carga %}selected{% endif %}>Seleccione una opción</option>
                                 {% endif %}
-                                <option value="1">1. Nunca</option><option value="2">2. Rara vez</option><option value="3">3. Algunas veces</option><option value="4">4. Bastantes veces</option><option value="5">5. Casi siempre</option>
+                                <option value="1">1. Nunca se siente sobrecargado</option><option value="2">2. Rara vez se siente sobrecargado</option><option value="3">3. Algunas vece se siente sobrecargados</option><option value="4">4. Bastantes veces se siente sobrecargado</option><option value="5">5. Casi siempre se siente sobrecargado</option>
                             </select>
                             <input type="hidden" name="grado_carga_texto" value="{{ datos_examen.grado_carga_texto|default:'' }}">
                         </div>

@@ -134,8 +134,15 @@
                   <!-- Resultado Global -->
                   <div class="form-group mt-4">
                     <label for="cdr_global"><strong>CDR Global (calculado automáticamente)</strong></label>
-                    <input type="text" class="form-control" id="cdr_global" name="cdr_global" readonly placeholder="Será calculado automáticamente">
+                    <input type="text" class="form-control" id="cdr_global" name="cdr_global" readonly>
                   </div>
+
+                  <!-- Interpretación -->
+                  <div class="form-group">
+                    <label for="cdr_interpretacion"><strong>Interpretación</strong></label>
+                    <textarea class="form-control" id="cdr_interpretacion" name="cdr_interpretacion" rows="3" readonly></textarea>
+                  </div>
+
 
                   <div class="text-right mt-4">
                     <button type="submit" class="btn btn-primary">Guardar</button>
@@ -172,8 +179,11 @@
       const h = parseFloat(pasatiempos.value || -1);
       const p = parseFloat(cuidado.value || -1);
 
+      const interpretacionTextarea = document.getElementById("cdr_interpretacion");
+
       if ([m, o, j, c, h, p].includes(-1)) {
         globalInput.value = "";
+        if (interpretacionTextarea) interpretacionTextarea.value = "";
         return;
       }
 
@@ -194,31 +204,43 @@
       if (m === 0) {
         const count05oMas = (o >= 0.5 ? 1 : 0) + (j >= 0.5 ? 1 : 0) + (c >= 0.5 ? 1 : 0) + (h >= 0.5 ? 1 : 0) + (p >= 0.5 ? 1 : 0);
         globalInput.value = count05oMas >= 2 ? "0.5" : "0";
-        return;
-      }
-
-      if (m === 0.5) {
+      } else if (m === 0.5) {
         const count1oMas = (o >= 1 ? 1 : 0) + (j >= 1 ? 1 : 0) + (c >= 1 ? 1 : 0) + (h >= 1 ? 1 : 0) + (p >= 1 ? 1 : 0);
         globalInput.value = count1oMas >= 3 ? "1" : "0.5";
-        return;
-      }
-
-      if (iguales >= 3) {
+      } else if (iguales >= 3) {
         globalInput.value = m.toString();
-        return;
-      }
-
-      if (mayores > menores) {
+      } else if (mayores > menores) {
         const mayoresArr = [o, j, c, h, p].filter(x => x > m);
         globalInput.value = moda(mayoresArr).toString();
-        return;
       } else if (menores > mayores) {
         const menoresArr = [o, j, c, h, p].filter(x => x < m);
         globalInput.value = moda(menoresArr).toString();
-        return;
+      } else {
+        globalInput.value = m.toString();
       }
 
-      globalInput.value = m.toString();
+      // ✅ Mostrar la interpretación después del cálculo
+      if (interpretacionTextarea) {
+        interpretacionTextarea.value = interpretarCDR(globalInput.value);
+      }
+    }
+
+
+    function interpretarCDR(valor) {
+      switch (valor) {
+        case "0":
+          return "No hay demencia.";
+        case "0.5":
+          return "Demencia cuestionable o muy leve. Se detectan problemas sutiles en el rendimiento cognitivo o funcional, pero no cumplen los criterios para la demencia leve.";
+        case "1":
+          return "Demencia leve. Hay un deterioro claro en algunos dominios, pero el paciente puede continuar con la mayoría de las actividades diarias.";
+        case "2":
+          return "Demencia moderada. El deterioro es más significativo y se observa en la mayoría de los dominios, requiriendo ayuda para algunas actividades.";
+        case "3":
+          return "Demencia grave. El deterioro es severo y afecta gravemente a la mayoría de los dominios, incluyendo el cuidado personal.";
+        default:
+          return "";
+      }
     }
 
     function moda(arr) {

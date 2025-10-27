@@ -148,7 +148,7 @@
                 <p><em>Instrucciones:</em> El examinador lee una serie de letras a un ritmo de una por segundo, luego de haber dado las instrucciones: “Voy a leerle una serie de letras. Cada vez que diga la letra ‘A’, dé un golpecito con la mano. Cuando diga una letra que no sea la A, no dé ningún golpecito”.</p>
                 <p><em>Puntaje:</em> No se asigna ningún punto si se comete más de un error.</p>
                 <div class="form-check mb-2">
-                  <input class="form-check-input repeticion-check" type="checkbox" value="1" id="frase_1" name="frase_1">
+                  <input class="form-check-input repeticion-check" type="checkbox" value="1" id="frase_1" name="frase_1" {% if datos_examen.frase_1 %}checked{% endif %}>
                   <label class="form-check-label" for="frase_1">
                     F B A C M N A A J K L B A F A K D E A A A J A M O F A A B
                   </label>
@@ -160,23 +160,23 @@
                 <p><em>Puntaje:</em> 0 puntos si ninguna es correcta, 1 punto por una correcta, 2 puntos por 2 o 3 correctas, 3 puntos por 4 o 5 correctas. Se permite un error inicial si las siguientes sustracciones son correctas.</p>
                 
                 <div class="form-check mb-2">
-                  <input class="form-check-input sustraccion-check" type="checkbox" value="1" id="sustr_1" name="sustraccion_7">
+                  <input class="form-check-input sustraccion-check" type="checkbox" value="1" id="sustr_1" name="sustraccion_1" {% if datos_examen.sustraccion_1 %}checked{% endif %}>
                   <label class="form-check-label" for="sustr_1">93</label>
                 </div>
                 <div class="form-check mb-2">
-                  <input class="form-check-input sustraccion-check" type="checkbox" value="1" id="sustr_2" name="sustraccion_7">
+                  <input class="form-check-input sustraccion-check" type="checkbox" value="1" id="sustr_2" name="sustraccion_2" {% if datos_examen.sustraccion_2 %}checked{% endif %}>
                   <label class="form-check-label" for="sustr_2">86</label>
                 </div>
                 <div class="form-check mb-2">
-                  <input class="form-check-input sustraccion-check" type="checkbox" value="1" id="sustr_3" name="sustraccion_7">
+                  <input class="form-check-input sustraccion-check" type="checkbox" value="1" id="sustr_3" name="sustraccion_3" {% if datos_examen.sustraccion_3 %}checked{% endif %}>
                   <label class="form-check-label" for="sustr_3">79</label>
                 </div>
                 <div class="form-check mb-2">
-                  <input class="form-check-input sustraccion-check" type="checkbox" value="1" id="sustr_4" name="sustraccion_7">
+                  <input class="form-check-input sustraccion-check" type="checkbox" value="1" id="sustr_4" name="sustraccion_4" {% if datos_examen.sustraccion_4 %}checked{% endif %}>
                   <label class="form-check-label" for="sustr_4">72</label>
                 </div>
                 <div class="form-check mb-2">
-                  <input class="form-check-input sustraccion-check" type="checkbox" value="1" id="sustr_5" name="sustraccion_7">
+                  <input class="form-check-input sustraccion-check" type="checkbox" value="1" id="sustr_5" name="sustraccion_5" {% if datos_examen.sustraccion_5 %}checked{% endif %}>
                   <label class="form-check-label" for="sustr_5">65</label>
                 </div>
                 
@@ -190,14 +190,14 @@
                 <p>Repetir exactamente las dos frases indicadas. Se otorga 1 punto por cada frase correctamente repetida. Máximo: 2 puntos.</p>
               
                 <div class="form-check mb-2">
-                  <input class="form-check-input repeticion-check" type="checkbox" value="1" id="frase_1" name="frase_1">
+                  <input class="form-check-input repeticion-check" type="checkbox" value="1" id="frase_1" name="frase_1" {% if datos_examen.frase_1 %}checked{% endif %}>
                   <label class="form-check-label" for="frase_1">
                     “El gato se esconde bajo el sofá cuando los perros entran en la sala”.
                   </label>
                 </div>
               
                 <div class="form-check mb-2">
-                  <input class="form-check-input repeticion-check" type="checkbox" value="1" id="frase_2" name="frase_2">
+                  <input class="form-check-input repeticion-check" type="checkbox" value="1" id="frase_2" name="frase_2" {% if datos_examen.frase_2 %}checked{% endif %}>
                   <label class="form-check-label" for="frase_2">
                     "Espero que él le entregue el mensaje una vez que ella se lo pida”.
                   </label>
@@ -245,31 +245,31 @@
                 <div class="form-row mb-3">
                   <div class="col text-center">
                     <div class="form-check form-check-inline">
-                      <input class="form-check-input diferido-check" type="checkbox" value="1" id="palabra_rostro" name="palabra_rostro">
+                      <input class="form-check-input diferido-check" type="checkbox" value="1" id="palabra_rostro" name="palabra_rostro" {% if datos_examen.palabra_rostro %}checked{% endif %}>
                       <label class="form-check-label" for="palabra_rostro">rostro</label>
                     </div>
                   </div>
                   <div class="col text-center">
                     <div class="form-check form-check-inline">
-                      <input class="form-check-input diferido-check" type="checkbox" value="1" id="palabra_seda" name="palabra_seda">
+                      <input class="form-check-input diferido-check" type="checkbox" value="1" id="palabra_seda" name="palabra_seda" {% if datos_examen.palabra_seda %}checked{% endif %}>
                       <label class="form-check-label" for="palabra_seda">seda</label>
                     </div>
                   </div>
                   <div class="col text-center">
                     <div class="form-check form-check-inline">
-                      <input class="form-check-input diferido-check" type="checkbox" value="1" id="palabra_iglesia" name="palabra_iglesia">
+                      <input class="form-check-input diferido-check" type="checkbox" value="1" id="palabra_iglesia" name="palabra_iglesia" {% if datos_examen.palabra_iglesia %}checked{% endif %}>
                       <label class="form-check-label" for="palabra_iglesia">iglesia</label>
                     </div>
                   </div>
                   <div class="col text-center">
                     <div class="form-check form-check-inline">
-                      <input class="form-check-input diferido-check" type="checkbox" value="1" id="palabra_clavel" name="palabra_clavel">
+                      <input class="form-check-input diferido-check" type="checkbox" value="1" id="palabra_clavel" name="palabra_clavel" {% if datos_examen.palabra_clavel %}checked{% endif %}>
                       <label class="form-check-label" for="palabra_clavel">clavel</label>
                     </div>
                   </div>
                   <div class="col text-center">
                     <div class="form-check form-check-inline">
-                      <input class="form-check-input diferido-check" type="checkbox" value="1" id="palabra_rojo" name="palabra_rojo">
+                      <input class="form-check-input diferido-check" type="checkbox" value="1" id="palabra_rojo" name="palabra_rojo" {% if datos_examen.palabra_rojo %}checked{% endif %}>
                       <label class="form-check-label" for="palabra_rojo">rojo</label>
                     </div>
                   </div>
@@ -286,30 +286,30 @@
                 <p>1 punto por cada respuesta correcta. Máximo: 6 puntos</p>
               
                 <div class="form-check mb-2">
-                  <input class="form-check-input orientacion-check" type="checkbox" value="1" id="orientacion_fecha" name="orientacion_fecha">
+                  <input class="form-check-input orientacion-check" type="checkbox" value="1" id="orientacion_fecha" name="orientacion_fecha" {% if datos_examen.orientacion_fecha %}checked{% endif %}>
                   <label class="form-check-label" for="orientacion_fecha">Día del mes (fecha)</label></div>
               
                 <div class="form-check mb-2">
-                  <input class="form-check-input orientacion-check" type="checkbox" value="1" id="orientacion_lugar" name="orientacion_mes">
+                  <input class="form-check-input orientacion-check" type="checkbox" value="1" id="orientacion_lugar" name="orientacion_mes" {% if datos_examen.orientacion_mes %}checked{% endif %}>
                   <label class="form-check-label" for="orientacion_lugar">Mes</label></div>
               
                 <div class="form-check mb-2">
-                  <input class="form-check-input orientacion-check" type="checkbox" value="1" id="orientacion_anio" name="orientacion_anio">
+                  <input class="form-check-input orientacion-check" type="checkbox" value="1" id="orientacion_anio" name="orientacion_anio" {% if datos_examen.orientacion_anio %}checked{% endif %}>
                   <label class="form-check-label" for="orientacion_anio">Año</label>
                 </div>
                 
                 <div class="form-check mb-2">
-                  <input class="form-check-input orientacion-check" type="checkbox" value="1" id="orientacion_dia_semana" name="orientacion_dia_semana">
+                  <input class="form-check-input orientacion-check" type="checkbox" value="1" id="orientacion_dia_semana" name="orientacion_dia_semana" {% if datos_examen.orientacion_dia_semana %}checked{% endif %}>
                   <label class="form-check-label" for="orientacion_dia_semana">Día de la semana</label>
                 </div>
                 
                 <div class="form-check mb-2">
-                  <input class="form-check-input orientacion-check" type="checkbox" value="1" id="orientacion_lugar" name="orientacion_lugar">
+                  <input class="form-check-input orientacion-check" type="checkbox" value="1" id="orientacion_lugar" name="orientacion_lugar" {% if datos_examen.orientacion_lugar %}checked{% endif %}>
                   <label class="form-check-label" for="orientacion_lugar">Lugar</label>
                 </div>
                 
                 <div class="form-check mb-2">
-                  <input class="form-check-input orientacion-check" type="checkbox" value="1" id="orientacion_localidad" name="orientacion_localidad">
+                  <input class="form-check-input orientacion-check" type="checkbox" value="1" id="orientacion_localidad" name="orientacion_localidad" {% if datos_examen.orientacion_localidad %}checked{% endif %}>
                   <label class="form-check-label" for="orientacion_localidad">Localidad</label>
                 </div>
 
@@ -319,7 +319,7 @@
             <div class="form-group">
               <label><strong>¿Tiene 12 años o menos de escolaridad?</strong></label>
               <div class="form-check">
-                <input class="form-check-input" type="checkbox" name="educacion_baja" id="educacion_baja">
+                <input class="form-check-input" type="checkbox" name="educacion_baja" id="educacion_baja" {% if datos_examen.educacion_baja %}checked{% endif %}>
                 <label class="form-check-label" for="educacion_baja">
                   Marque esta casilla si el paciente tiene 12 años o menos de educación formal. Se suma 1 punto al total si este es menor a 30 puntos.
                 </label>

@@ -1567,9 +1567,7 @@ class CDRCuidadorResult(ResultadoExamenBase):
     cosas_que_aun_realiza_pasatiempos = models.TextField(blank=True, null=True)
     actividades_no_realiza_en_hogar = models.TextField(blank=True, null=True)
 
-    habilidad_domestica_dementia_scale = models.DecimalField(
-        max_digits=2, decimal_places=1, blank=True, null=True
-    )
+    habilidad_domestica_dementia_scale = models.TextField(blank=True, null=True)
     descripcion_habilidad_domestica = models.TextField(blank=True, null=True)
     nivel_desempeno_domestico = models.CharField(max_length=50, blank=True, null=True)
     notas_domesticas_pasatiempos = models.TextField(blank=True, null=True)
@@ -1577,10 +1575,10 @@ class CDRCuidadorResult(ResultadoExamenBase):
     # ====================
     # Cuidado personal
     # ====================
-    cuidado_p1 = models.IntegerField(blank=True, null=True)  # Vestirse
-    cuidado_p2 = models.IntegerField(blank=True, null=True)  # Lavado/aseo
-    cuidado_p3 = models.IntegerField(blank=True, null=True)  # Alimentación
-    cuidado_p4 = models.IntegerField(blank=True, null=True)  # Control de esfínteres
+    cuidado_p1 = models.TextField(blank=True, null=True)  # Vestirse
+    cuidado_p2 = models.TextField(blank=True, null=True)  # Lavado/aseo
+    cuidado_p3 = models.TextField(blank=True, null=True)  # Alimentación
+    cuidado_p4 = models.TextField(blank=True, null=True)  # Control de esfínteres
 
     def __str__(self):
         return f"CDR Cuidador - {self.visita_examen_id}"
@@ -1593,14 +1591,10 @@ class CDRParticipanteResult(ResultadoExamenBase):
     memoria_p1 = models.CharField(max_length=5, blank=True, null=True)  # si/no
 
     evento_recuerda_semana = models.TextField(blank=True, null=True)
-    memoria_semana_calificacion = models.DecimalField(
-        max_digits=2, decimal_places=1, blank=True, null=True
-    )
+    memoria_semana_calificacion = models.TextField(blank=True, null=True)
 
     evento_recuerda_mes = models.TextField(blank=True, null=True)
-    memoria_mes_calificacion = models.DecimalField(
-        max_digits=2, decimal_places=1, blank=True, null=True
-    )
+    memoria_mes_calificacion = models.TextField(blank=True, null=True)
 
     # Ensayos (checkboxes del nombre/dirección)
     ensayo1_juan = models.BooleanField(default=False)
@@ -1803,6 +1797,8 @@ class PuntajeCDRResult(ResultadoExamenBase):
     cdr_pasatiempos = models.CharField(max_length=10)
     cdr_cuidado = models.CharField(max_length=10)
     cdr_global = models.CharField(max_length=10)
+    cdr_interpretacion = models.TextField(blank=True, null=True)
+
 
     def __str__(self):
         return f"CDR - {self.visita_examen_id}"
@@ -1893,7 +1889,7 @@ class SeguimientoIntervencionesResult(models.Model):
     visita_examen = models.ForeignKey(
         "VisitaExamen", on_delete=models.CASCADE, related_name="seguimientointervencionesresult_resultado"
     )
-    numero_sesion = models.IntegerField()  # 1–24
+    numero_sesion = models.IntegerField()  # 1–18
     nombre_sesion = models.CharField(max_length=200, blank=True, null=True)
     fecha = models.DateField(blank=True, null=True)
     hora_inicio = models.TimeField(blank=True, null=True)

@@ -45,7 +45,13 @@
                   <div class="form-group">
                     <label>1. ¿Tiene usted problemas con su memoria o pensamiento?</label>
                     <select class="form-control" name="memoria_p1" required>
+                      {% if datos_examen.memoria_p1 %}
+                        <option value="{{ datos_examen.memoria_p1 }}" selected>
+                          {{ datos_examen.memoria_p1 }}
+                        </option>
+                      {% else %}
                       <option value="" disabled selected>Seleccione</option>
+                      {% endif %}
                       <option value="si">Sí</option>
                       <option value="no">No</option>
                     </select>
@@ -63,18 +69,30 @@
                     <!-- Subpreguntas -->
                     <div class="mt-3 ml-3">
                       <label>En el curso de una semana</label>
-                      <textarea class="form-control mb-2" name="evento_recuerda_semana" id="evento_recuerda_semana" rows="3" required></textarea>
+                      <textarea class="form-control mb-2" name="evento_recuerda_semana" id="evento_recuerda_semana" value="{{ datos_examen.evento_recuerda_semana|default_if_none:'' }}" rows="3" required></textarea>
                       <select class="form-control mb-4" name="memoria_semana_calificacion" required>
+                        {% if datos_examen.memoria_semana_calificacion %}
+                        <option value="{{ datos_examen.memoria_semana_calificacion }}" selected>
+                          {{ datos_examen.memoria_semana_calificacion }}
+                        </option>
+                        {% else %}
                         <option value="" disabled selected>Seleccione</option>
+                        {% endif %}
                         <option value="1">1.0: Mayormente correcto</option>
                         <option value="0.5">0.5: Parcialmente correcto</option>
                         <option value="0">0.0: Mayormente incorrecto</option>
                       </select>
 
                       <label>En el curso de un mes</label>
-                      <textarea class="form-control mb-2" name="evento_recuerda_mes" id="evento_recuerda_mes" rows="3" required></textarea>
+                      <textarea class="form-control mb-2" name="evento_recuerda_mes" id="evento_recuerda_mes" value="{{ datos_examen.evento_recuerda_mes|default_if_none:'' }}" rows="3" required></textarea>
                       <select class="form-control" name="memoria_mes_calificacion" required>
+                        {% if datos_examen.memoria_mes_calificacion %}
+                        <option value="{{ datos_examen.memoria_mes_calificacion }}" selected>
+                          {{ datos_examen.memoria_mes_calificacion }}
+                        </option>
+                        {% else %}
                         <option value="" disabled selected>Seleccione</option>
+                        {% endif %}
                         <option value="1">1.0: Mayormente correcto</option>
                         <option value="0.5">0.5: Parcialmente correcto</option>
                         <option value="0">0.0: Mayormente incorrecto</option>
@@ -97,19 +115,19 @@
                       <label><strong>Ensayo 1:</strong></label><br>
                       <div class="form-check form-check-inline">
                         <label class="form-check-label mr-3">
-                          Juan <input class="form-check-input ml-1" type="checkbox" name="ensayo1_juan">
+                          Juan <input class="form-check-input ml-1" type="checkbox" name="ensayo1_juan" {% if datos_examen.ensayo1_juan %}checked{% endif %}>
                         </label>
                         <label class="form-check-label mr-3">
-                          Pérez <input class="form-check-input ml-1" type="checkbox" name="ensayo1_perez">
+                          Pérez <input class="form-check-input ml-1" type="checkbox" name="ensayo1_perez" {% if datos_examen.ensayo1_perez %}checked{% endif %}>
                         </label>
                         <label class="form-check-label mr-3">
-                          Calle 42 <input class="form-check-input ml-1" type="checkbox" name="ensayo1_calle">
+                          Calle 42 <input class="form-check-input ml-1" type="checkbox" name="ensayo1_calle" {% if datos_examen.ensayo1_calle %}checked{% endif %}>
                         </label>
                         <label class="form-check-label mr-3">
-                          Avenida Boyacá <input class="form-check-input ml-1" type="checkbox" name="ensayo1_avenida">
+                          Avenida Boyacá <input class="form-check-input ml-1" type="checkbox" name="ensayo1_avenida" {% if datos_examen.ensayo1_avenida %}checked{% endif %}>
                         </label>
                         <label class="form-check-label">
-                          Cali <input class="form-check-input ml-1" type="checkbox" name="ensayo1_cali">
+                          Cali <input class="form-check-input ml-1" type="checkbox" name="ensayo1_cali" {% if datos_examen.ensayo1_cali %}checked{% endif %}>
                         </label>
                       </div>
                     </div>
@@ -119,19 +137,19 @@
                       <label><strong>Ensayo 2:</strong></label><br>
                       <div class="form-check form-check-inline">
                         <label class="form-check-label mr-3">
-                          Juan <input class="form-check-input ml-1" type="checkbox" name="ensayo2_juan">
+                          Juan <input class="form-check-input ml-1" type="checkbox" name="ensayo2_juan" {% if datos_examen.ensayo2_juan %}checked{% endif %}>
                         </label>
                         <label class="form-check-label mr-3">
-                          Pérez <input class="form-check-input ml-1" type="checkbox" name="ensayo2_perez">
+                          Pérez <input class="form-check-input ml-1" type="checkbox" name="ensayo2_perez" {% if datos_examen.ensayo2_perez %}checked{% endif %}>
                         </label>
                         <label class="form-check-label mr-3">
-                          Calle 42 <input class="form-check-input ml-1" type="checkbox" name="ensayo2_calle">
+                          Calle 42 <input class="form-check-input ml-1" type="checkbox" name="ensayo2_calle" {% if datos_examen.ensayo2_calle %}checked{% endif %}>
                         </label>
                         <label class="form-check-label mr-3">
-                          Avenida Boyacá <input class="form-check-input ml-1" type="checkbox" name="ensayo2_avenida">
+                          Avenida Boyacá <input class="form-check-input ml-1" type="checkbox" name="ensayo2_avenida" {% if datos_examen.ensayo2_avenida %}checked{% endif %}>
                         </label>
                         <label class="form-check-label">
-                          Cali <input class="form-check-input ml-1" type="checkbox" name="ensayo2_cali">
+                          Cali <input class="form-check-input ml-1" type="checkbox" name="ensayo2_cali" {% if datos_examen.ensayo2_cali %}checked{% endif %}>
                         </label>
                       </div>
                     </div>
@@ -141,19 +159,19 @@
                       <label><strong>Ensayo 3:</strong></label><br>
                       <div class="form-check form-check-inline">
                         <label class="form-check-label mr-3">
-                          Juan <input class="form-check-input ml-1" type="checkbox" name="ensayo3_juan">
+                          Juan <input class="form-check-input ml-1" type="checkbox" name="ensayo3_juan" {% if datos_examen.ensayo3_juan %}checked{% endif %}>
                         </label>
                         <label class="form-check-label mr-3">
-                          Pérez <input class="form-check-input ml-1" type="checkbox" name="ensayo3_perez">
+                          Pérez <input class="form-check-input ml-1" type="checkbox" name="ensayo3_perez" {% if datos_examen.ensayo3_perez %}checked{% endif %}>
                         </label>
                         <label class="form-check-label mr-3">
-                          Calle 42 <input class="form-check-input ml-1" type="checkbox" name="ensayo3_calle">
+                          Calle 42 <input class="form-check-input ml-1" type="checkbox" name="ensayo3_calle" {% if datos_examen.ensayo3_calle %}checked{% endif %}>
                         </label>
                         <label class="form-check-label mr-3">
-                          Avenida Boyacá <input class="form-check-input ml-1" type="checkbox" name="ensayo3_avenida">
+                          Avenida Boyacá <input class="form-check-input ml-1" type="checkbox" name="ensayo3_avenida" {% if datos_examen.ensayo3_avenida %}checked{% endif %}>
                         </label>
                         <label class="form-check-label">
-                          Cali <input class="form-check-input ml-1" type="checkbox" name="ensayo3_cali">
+                          Cali <input class="form-check-input ml-1" type="checkbox" name="ensayo3_cali" {% if datos_examen.ensayo3_cali %}checked{% endif %}>
                         </label>
                       </div>
                     </div>
@@ -163,13 +181,13 @@
                   <!-- Pregunta 4 -->
                   <div class="form-group mt-4">
                     <label for="fecha_nacimiento">4. ¿Cuándo nació?</label>
-                    <input type="date" class="form-control" name="fecha_nacimiento" id="fecha_nacimiento" required>
+                    <input type="date" class="form-control" name="fecha_nacimiento" id="fecha_nacimiento" value="{{ datos_examen.fecha_nacimiento|date:'Y-m-d' }}" required>
                   </div>
 
                   <!-- Pregunta 5 -->
                   <div class="form-group">
                     <label for="lugar_nacimiento">5. ¿Dónde nació?</label>
-                    <input type="text" class="form-control" name="lugar_nacimiento" id="lugar_nacimiento" required>
+                    <input type="text" class="form-control" name="lugar_nacimiento" id="lugar_nacimiento" value="{{ datos_examen.lugar_nacimiento|default_if_none:'' }}" required>
                   </div>
 
                   <!-- Pregunta 6 -->
@@ -177,32 +195,32 @@
                     <label>6. ¿Cuál fue el último colegio al que asistió?</label>
                     <div class="ml-3 mt-2">
                       <label for="colegio_nombre">Nombre:</label>
-                      <input type="text" class="form-control mb-2" name="colegio_nombre" required>
+                      <input type="text" class="form-control mb-2" name="colegio_nombre" value="{{ datos_examen.colegio_nombre|default_if_none:'' }}" required>
 
                       <label for="colegio_lugar">Lugar:</label>
-                      <input type="text" class="form-control mb-2" name="colegio_lugar" required>
+                      <input type="text" class="form-control mb-2" name="colegio_lugar" value="{{ datos_examen.colegio_lugar|default_if_none:'' }}" required>
 
                       <label for="colegio_grado">Grado:</label>
-                      <input type="text" class="form-control" name="colegio_grado" required>
+                      <input type="text" class="form-control" name="colegio_grado" value="{{ datos_examen.colegio_grado|default_if_none:'' }}" required>
                     </div>
                   </div>
 
                   <!-- Pregunta 7 -->
                   <div class="form-group">
                     <label for="ocupacion_principal">7. ¿Cuál era su principal ocupación/trabajo o la de su cónyuge, si Ud. no estaba empleado/a?</label>
-                    <input type="text" class="form-control" name="ocupacion_principal" id="ocupacion_principal" required>
+                    <input type="text" class="form-control" name="ocupacion_principal" id="ocupacion_principal"  value="{{ datos_examen.ocupacion_principal|default_if_none:'' }}" required>
                   </div>
 
                   <!-- Pregunta 8 -->
                   <div class="form-group">
                     <label for="ultimo_trabajo">8. ¿Cuál fue su último trabajo importante (o el de su cónyuge, si Ud. no estaba empleado/a)?</label>
-                    <input type="text" class="form-control" name="ultimo_trabajo" id="ultimo_trabajo" required>
+                    <input type="text" class="form-control" name="ultimo_trabajo" id="ultimo_trabajo" value="{{ datos_examen.ultimo_trabajo|default_if_none:'' }}" required>
                   </div>
 
                   <!-- Pregunta 9 -->
                   <div class="form-group">
                     <label for="jubilacion">9. ¿Cuándo se jubiló (o su cónyuge) y por qué?</label>
-                    <textarea class="form-control" name="jubilacion" id="jubilacion" rows="3" required></textarea>
+                    <textarea class="form-control" name="jubilacion" id="jubilacion"  value="{{ datos_examen.jubilacion|default_if_none:'' }}" rows="3" required></textarea>
                   </div>
 
                   <!-- Pregunta 10 -->
@@ -213,19 +231,19 @@
                     <p class="text-muted mb-2">(Seleccionar los elementos repetidos correctamente)</p>
                     <div class="form-check form-check-inline">
                       <label class="form-check-label mr-3">
-                        Juan <input class="form-check-input ml-1" type="checkbox" name="repeticion_juan">
+                        Juan <input class="form-check-input ml-1" type="checkbox" name="repeticion_juan" {% if datos_examen.repeticion_juan %}checked{% endif %}>
                       </label>
                       <label class="form-check-label mr-3">
-                        Pérez <input class="form-check-input ml-1" type="checkbox" name="repeticion_perez">
+                        Pérez <input class="form-check-input ml-1" type="checkbox" name="repeticion_perez" {% if datos_examen.repeticion_perez %}checked{% endif %}>
                       </label>
                       <label class="form-check-label mr-3">
-                        Calle 42 <input class="form-check-input ml-1" type="checkbox" name="repeticion_calle">
+                        Calle 42 <input class="form-check-input ml-1" type="checkbox" name="repeticion_calle" {% if datos_examen.repeticion_calle %}checked{% endif %}>
                       </label>
                       <label class="form-check-label mr-3">
-                        Avenida Boyacá <input class="form-check-input ml-1" type="checkbox" name="repeticion_avenida">
+                        Avenida Boyacá <input class="form-check-input ml-1" type="checkbox" name="repeticion_avenida" {% if datos_examen.repeticion_avenida %}checked{% endif %}>
                       </label>
                       <label class="form-check-label">
-                        Cali <input class="form-check-input ml-1" type="checkbox" name="repeticion_cali">
+                        Cali <input class="form-check-input ml-1" type="checkbox" name="repeticion_cali" {% if datos_examen.repeticion_cali %}checked{% endif %}>
                       </label>
                     </div>
                   </div>
@@ -249,7 +267,13 @@
                   <div class="form-group">
                     <label>1. ¿Qué fecha es hoy?</label>
                     <select class="form-control" name="orientacion_p1"required>
+                      {% if datos_examen.orientacion_p1 %}
+                        <option value="{{ datos_examen.orientacion_p1 }}" selected>
+                          {{ datos_examen.orientacion_p1 }}
+                        </option>
+                      {% else %}
                       <option value="" disabled selected>Seleccione una opción</option>
+                      {% endif %}
                       <option value="Correcto">Correcto</option>
                       <option value="Incorrecto">Incorrecto</option>
                     </select>
@@ -258,7 +282,13 @@
                   <div class="form-group">
                     <label>2. ¿Què día de la semana es hoy?</label>
                     <select class="form-control" name="orientacion_p2"required>
+                      {% if datos_examen.orientacion_p2 %}
+                        <option value="{{ datos_examen.orientacion_p2 }}" selected>
+                          {{ datos_examen.orientacion_p2 }}
+                        </option>
+                      {% else %}
                       <option value="" disabled selected>Seleccione una opción</option>
+                      {% endif %}
                       <option value="Correcto">Correcto</option>
                       <option value="Incorrecto">Incorrecto</option>
                     </select>
@@ -267,7 +297,13 @@
                   <div class="form-group">
                     <label>3. ¿En qué mes estamos?</label>
                     <select class="form-control" name="orientacion_p3" required>
+                      {% if datos_examen.orientacion_p3 %}
+                        <option value="{{ datos_examen.orientacion_p3 }}" selected>
+                          {{ datos_examen.orientacion_p3 }}
+                        </option>
+                      {% else %}
                       <option value="" disabled selected>Seleccione una opción</option>
+                      {% endif %}
                       <option value="Correcto">Correcto</option>
                       <option value="Incorrecto">Incorrecto</option>
                     </select>
@@ -276,7 +312,13 @@
                   <div class="form-group">
                     <label>4. ¿En qué año estamos?</label>
                     <select class="form-control" name="orientacion_p4" required>
+                      {% if datos_examen.orientacion_p4 %}
+                        <option value="{{ datos_examen.orientacion_p4 }}" selected>
+                          {{ datos_examen.orientacion_p4 }}
+                        </option>
+                      {% else %}
                       <option value="" disabled selected>Seleccione una opción</option>
+                      {% endif %}
                       <option value="Correcto">Correcto</option>
                       <option value="Incorrecto">Incorrecto</option>
                     </select>
@@ -285,7 +327,13 @@
                   <div class="form-group">
                     <label>5. ¿Cómo se llama este lugar?</label>
                     <select class="form-control" name="orientacion_p5" required>
+                      {% if datos_examen.orientacion_p5 %}
+                        <option value="{{ datos_examen.orientacion_p5 }}" selected>
+                          {{ datos_examen.orientacion_p5 }}
+                        </option>
+                      {% else %}
                       <option value="" disabled selected>Seleccione una opción</option>
+                      {% endif %}
                       <option value="Correcto">Correcto</option>
                       <option value="Incorrecto">Incorrecto</option>
                     </select>
@@ -294,7 +342,13 @@
                   <div class="form-group">
                     <label>6. ¿En qué pueblo o ciudad estamos?</label>
                     <select class="form-control" name="orientacion_p6" required>
+                      {% if datos_examen.orientacion_p6 %}
+                        <option value="{{ datos_examen.orientacion_p6 }}" selected>
+                          {{ datos_examen.orientacion_p6 }}
+                        </option>
+                      {% else %}
                       <option value="" disabled selected>Seleccione una opción</option>
+                      {% endif %}
                       <option value="Correcto">Correcto</option>
                       <option value="Incorrecto">Incorrecto</option>
                     </select>
@@ -303,7 +357,13 @@
                   <div class="form-group">
                     <label>7. ¿Qué hora es?</label>
                     <select class="form-control" name="orientacion_p7" required>
+                      {% if datos_examen.orientacion_p7 %}
+                        <option value="{{ datos_examen.orientacion_p7 }}" selected>
+                          {{ datos_examen.orientacion_p7 }}
+                        </option>
+                      {% else %}
                       <option value="" disabled selected>Seleccione una opción</option>
+                      {% endif %}
                       <option value="Correcto">Correcto</option>
                       <option value="Incorrecto">Incorrecto</option>
                     </select>
@@ -312,7 +372,13 @@
                   <div class="form-group">
                     <label>8. ¿Sabe el sujeto quién es el informante (según el criterio del entrevistador)? </label>
                     <select class="form-control" name="orientacion_p8" required>
+                      {% if datos_examen.orientacion_p8 %}
+                        <option value="{{ datos_examen.orientacion_p8 }}" selected>
+                          {{ datos_examen.orientacion_p8 }}
+                        </option>
+                      {% else %}
                       <option value="" disabled selected>Seleccione una opción</option>
+                      {% endif %}
                       <option value="Correcto">Correcto</option>
                       <option value="Incorrecto">Incorrecto</option>
                     </select>
@@ -342,9 +408,15 @@
                       1: Alimentos comestibles, cosas que viven, se pueden cocinar, etc<br>
                       2: Respuestas no pertinentes; diferencias, que se compran
                     </p>
-                    <input type="text" class="form-control mb-2" name="juicio_p1_respuesta" required>
+                    <input type="text" class="form-control mb-2" name="juicio_p1_respuesta" value="{{ datos_examen.juicio_p1_respuesta|default_if_none:'' }}"  required>
                     <select class="form-control" name="juicio_p1_puntaje" required>
+                      {% if datos_examen.juicio_p1_puntaje %}
+                        <option value="{{ datos_examen.juicio_p1_puntaje }}" selected>
+                          {{ datos_examen.juicio_p1_puntaje }}
+                        </option>
+                      {% else %}
                       <option value="" disabled selected>Seleccione puntuación</option>
+                      {% endif %}
                       <option value="0">0: Verduras</option>
                       <option value="1">1: Alimentos, cosas vivas, se pueden cocinar</option>
                       <option value="2">2: Respuesta no pertinente, diferencias, que se compran</option>
@@ -359,9 +431,15 @@
                       1: Madera, patas<br>
                       2: Respuestas no pertinentes; diferencias
                     </p>
-                    <input type="text" class="form-control mb-2" name="juicio_p2_respuesta" required>
+                    <input type="text" class="form-control mb-2" name="juicio_p2_respuesta" value="{{ datos_examen.juicio_p2_respuesta|default_if_none:'' }}" required>
                     <select class="form-control" name="juicio_p2_puntaje" required>
+                      {% if datos_examen.juicio_p2_puntaje %}
+                        <option value="{{ datos_examen.juicio_p2_puntaje }}" selected>
+                          {{ datos_examen.juicio_p2_puntaje }}
+                        </option>
+                      {% else %}
                       <option value="" disabled selected>Seleccione puntuación</option>
+                      {% endif %}
                       <option value="0">0: Muebles, sostienen libros</option>
                       <option value="1">1: Hechos de madera, tienen patas</option>
                       <option value="2">2: No pertinente, diferencias</option>
@@ -376,9 +454,15 @@
                       1: Una mala y la otra buena; o explica sólo una<br>
                       2: Cualquier otra cosa; semejanzas
                     </p>
-                    <input type="text" class="form-control mb-2" name="juicio_p3_respuesta" required>
+                    <input type="text" class="form-control mb-2" name="juicio_p3_respuesta" value="{{ datos_examen.juicio_p3_respuesta|default_if_none:'' }}" required>
                     <select class="form-control" name="juicio_p3_puntaje" required>
+                      {% if datos_examen.juicio_p3_puntaje %}
+                        <option value="{{ datos_examen.juicio_p3_puntaje }}" selected>
+                          {{ datos_examen.juicio_p3_puntaje }}
+                        </option>
+                      {% else %}
                       <option value="" disabled selected>Seleccione puntuación</option>
+                      {% endif %}
                       <option value="0">0: Una es deliberada, la otra sin intención</option>
                       <option value="1">1: Una mala y la otra buena, o explica solo una</option>
                       <option value="2">2: Cualquier otra cosa; semejanzas</option>
@@ -392,9 +476,15 @@
                       0: Natural - artificial<br>
                       2: Cualquier otra cosa
                     </p>
-                    <input type="text" class="form-control mb-2" name="juicio_p4_respuesta" required>
+                    <input type="text" class="form-control mb-2" name="juicio_p4_respuesta" value="{{ datos_examen.juicio_p4_respuesta|default_if_none:'' }}"  required>
                     <select class="form-control" name="juicio_p4_puntaje" required>
+                      {% if datos_examen.juicio_p4_puntaje %}
+                        <option value="{{ datos_examen.juicio_p4_puntaje }}" selected>
+                          {{ datos_examen.juicio_p4_puntaje }}
+                        </option>
+                      {% else %}
                       <option value="" disabled selected>Seleccione puntuación</option>
+                      {% endif %}
                       <option value="0">0: natural - artificial</option>
                       <option value="2">2: Cualquier otra cosa</option>
                     </select>
@@ -406,7 +496,7 @@
                     <p class="text-muted" style="margin-bottom: 8px;">Respuesta: En 1 peso hay 100 centavos</p>
                     <div class="form-check">
                       <label class="form-check-label">
-                        <input type="checkbox" class="form-check-input" name="juicio_p5_correcto"> Correcto
+                        <input type="checkbox" class="form-check-input" name="juicio_p5_correcto" {% if datos_examen.juicio_p5_correcto %}checked{% endif %}> Correcto
                       </label>
                     </div>
                   </div>
@@ -417,7 +507,7 @@
                     <p class="text-muted" style="margin-bottom: 8px;">Respuesta: Hay 27 monedas de 50 pesos en $1,350</p>
                     <div class="form-check">
                       <label class="form-check-label">
-                        <input type="checkbox" class="form-check-input" name="juicio_p6_correcto"> Correcto
+                        <input type="checkbox" class="form-check-input" name="juicio_p6_correcto" {% if datos_examen.juicio_p6_correcto %}checked{% endif %}> Correcto
                       </label>
                     </div>
                   </div>
@@ -426,7 +516,7 @@
                   <div class="form-group">
                     <label>7. Restar 3 de 20 y continuar hasta llegar a 2 o 1</label>                    <div class="form-check">
                       <label class="form-check-label">
-                        <input type="checkbox" class="form-check-input" name="juicio_p7_correcto"> Correcto
+                        <input type="checkbox" class="form-check-input" name="juicio_p7_correcto" {% if datos_examen.juicio_p7_correcto %}checked{% endif %}> Correcto
                       </label>
                     </div>
                   </div>
@@ -440,7 +530,13 @@
                       2: No brinda una respuesta clara
                     </p>
                     <select class="form-control" name="juicio_p8_puntaje" required>
+                      {% if datos_examen.juicio_p8_puntaje %}
+                        <option value="{{ datos_examen.juicio_p8_puntaje }}" selected>
+                          {{ datos_examen.juicio_p8_puntaje }}
+                        </option>
+                      {% else %}
                       <option value="" disabled selected>Seleccione puntuación</option>
+                      {% endif %}
                       <option value="0">0: Guía telefónica, internet, amigo común</option>
                       <option value="1">1: Policía, operadora</option>
                       <option value="2">2: No brinda respuesta clara</option>
@@ -453,16 +549,17 @@
                       por qué se encuentra actualmente en el test (estos aspectos pueden ya estar cubiertos pero por favor 
                       dé su opinión personal aquí): </label>
                     <select class="form-control" name="juicio_p9" required>
+                      {% if datos_examen.juicio_p9 %}
+                        <option value="{{ datos_examen.juicio_p9 }}" selected>
+                          {{ datos_examen.juicio_p9 }}
+                        </option>
+                      {% else %}
                       <option value="" disabled selected>Seleccione una opción</option>
+                      {% endif %}
                       <option value="Buena percepción">Buena percepción</option>
                       <option value="Percepción parcial">Percepción parcial</option>
                       <option value="Poca percepción">Poca percepción</option>
                     </select>
-                  </div>
-
-                  <div class="text-right mt-4">
-                    <button type="button" class="btn btn-outline-primary btn-next" data-next="#evaluacion">Siguiente sección</button>
-                    <a href="{% url 'detalle_paciente' paciente_id %}" class="btn btn-secondary">Ver Paciente</a>
                   </div>
                   
                   <div class="text-right mt-4">

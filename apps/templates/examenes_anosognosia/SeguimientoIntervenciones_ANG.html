@@ -32,7 +32,7 @@
                 <option value="">Seleccione una sesión</option>
 
                 {% load exam_filters %}
-                {% for i in 1|to:24 %}
+                {% for i in 1|to:18 %}
                   <option value="{{ i }}">Sesión {{ i }}</option>
                 {% endfor %}
               </select>
@@ -148,7 +148,7 @@
   <!-- Resumen Final de Sesiones -->
   <div id="resumenFinal" style="display:none;" class="card mt-4">
     <div class="card-header bg-light">
-      <strong>📊 Resumen de las 24 Sesiones</strong>
+      <strong>📊 Resumen de las 18 Sesiones</strong>
     </div>
     <div class="card-body">
       <ul>

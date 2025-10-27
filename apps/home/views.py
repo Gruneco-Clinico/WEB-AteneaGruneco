@@ -3791,6 +3791,8 @@ def guardar_evaluacion_clinica_CDR(request):
                 "cdr_pasatiempos": request.POST.get("cdr_pasatiempos", ""),
                 "cdr_cuidado": request.POST.get("cdr_cuidado", ""),
                 "cdr_global": request.POST.get("cdr_global", ""),
+                "cdr_interpretacion": request.POST.get("cdr_interpretacion", ""),
+
             }
 
             # Guardar o actualizar
@@ -3859,6 +3861,7 @@ def guardar_consentimiento_participante(request):
                 "testigo2": request.POST.get("testigo2", ""),
                 "copia_entregada": request.POST.get("copia_entregada"),
                 "hora_finalizacion": request.POST.get("hora_finalizacion"),
+                
             }
 
             # Guardar o actualizar
@@ -3996,7 +3999,7 @@ def guardar_anamnesis_cuidador(request):
                 "lugar_nacimiento": request.POST.get("lugar_nacimiento"),
                 "lugar_procedencia": request.POST.get("lugar_procedencia"),
                 "edad": request.POST.get("edad"),
-                "genero": request.POST.get("genero"),
+                "sexo": request.POST.get("sexo"),
                 "estado_civil": request.POST.get("estado_civil"),
                 "relacion": request.POST.get("relacion"),
                 "tiempo_acompanando": request.POST.get("tiempo_acompanando"),
@@ -4256,7 +4259,7 @@ def guardar_intervenciones(request):
             )
             print(f"🔎 Nombre: {visita_examen.examen.nombre}")
 
-            if total_sesiones >= 24:
+            if total_sesiones >= 18:
                 visita_examen.estado = "completado"
                 visita_examen.fecha_completado = timezone.now()
             else:
@@ -4323,10 +4326,10 @@ def resumen_sesiones(request, visita_id, examen_id):
         visita_examen=visita_examen
     ).order_by("numero_sesion")
 
-    if sesiones.count() < 24:
-        return JsonResponse({"error": "Aún no se han completado las 24 sesiones."})
+    if sesiones.count() < 18:
+        return JsonResponse({"error": "Aún no se han completado las 18 sesiones."})
 
-    total_sesiones = 24
+    total_sesiones = 18
     asistidas = sesiones.filter(asistencia="Sí").count()
 
     porcentaje_asistencia = round((asistidas / total_sesiones) * 100, 2)
