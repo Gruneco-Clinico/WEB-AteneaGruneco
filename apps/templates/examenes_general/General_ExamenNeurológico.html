@@ -799,11 +799,646 @@
                   </div>
                 </div>
 
+                <!-- V Par (Trigémino) -->
+              <div class="neuro-card">
+                <div class="par-craneal-header">
+                  <div class="d-flex align-items-center">
+                    <span class="par-number">V</span>
+                    <div>
+                      <h4 class="mb-0">Par Trigémino</h4>
+                      <small class="opacity-75">Evaluación sensitiva y motora facial</small>
+                    </div>
+                  </div>
+                </div>
+                <div class="card-body bg-white">
+                  <div class="row">
+                    <!-- Tacto superficial -->
+                    <div class="col-md-4">
+                      <div class="form-group-enhanced">
+                        <label class="form-control-label font-weight-bold mb-3">
+                          <i class="fas fa-hand-point-up mr-2 text-info"></i>Tacto Superficial
+                        </label>
+                        <div class="checkbox-grid">
+                          <div class="custom-control custom-switch">
+                            <input type="checkbox" class="custom-control-input" id="tacto_frente_globo" 
+                                  name="tacto_frente_globo" {% if datos_examen.tacto_frente_globo %}checked{% endif %}>
+                            <label class="custom-control-label" for="tacto_frente_globo">Frente y globo ocular</label>
+                          </div>
+                          <div class="custom-control custom-switch">
+                            <input type="checkbox" class="custom-control-input" id="tacto_parpado_labio_sup" 
+                                  name="tacto_parpado_labio_sup" {% if datos_examen.tacto_parpado_labio_sup %}checked{% endif %}>
+                            <label class="custom-control-label" for="tacto_parpado_labio_sup">Párpado inferior / Labio superior</label>
+                          </div>
+                          <div class="custom-control custom-switch">
+                            <input type="checkbox" class="custom-control-input" id="tacto_labio_inf_menton" 
+                                  name="tacto_labio_inf_menton" {% if datos_examen.tacto_labio_inf_menton %}checked{% endif %}>
+                            <label class="custom-control-label" for="tacto_labio_inf_menton">Labio Inferior / Mentón</label>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <!-- Dolor -->
+                    <div class="col-md-4">
+                      <div class="form-group-enhanced">
+                        <label class="form-control-label font-weight-bold mb-3">
+                          <i class="fas fa-exclamation-triangle mr-2 text-danger"></i>Dolor
+                        </label>
+                        <div class="checkbox-grid">
+                          <div class="custom-control custom-switch">
+                            <input type="checkbox" class="custom-control-input" id="dolor_frente_globo" 
+                                  name="dolor_frente_globo" {% if datos_examen.dolor_frente_globo %}checked{% endif %}>
+                            <label class="custom-control-label" for="dolor_frente_globo">Frente y globo ocular</label>
+                          </div>
+                          <div class="custom-control custom-switch">
+                            <input type="checkbox" class="custom-control-input" id="dolor_parpado_labio_sup" 
+                                  name="dolor_parpado_labio_sup" {% if datos_examen.dolor_parpado_labio_sup %}checked{% endif %}>
+                            <label class="custom-control-label" for="dolor_parpado_labio_sup">Párpado inferior / Labio superior</label>
+                          </div>
+                          <div class="custom-control custom-switch">
+                            <input type="checkbox" class="custom-control-input" id="dolor_labio_inf_menton" 
+                                  name="dolor_labio_inf_menton" {% if datos_examen.dolor_labio_inf_menton %}checked{% endif %}>
+                            <label class="custom-control-label" for="dolor_labio_inf_menton">Labio Inferior / Mentón</label>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <!-- Temperatura -->
+                    <div class="col-md-4">
+                      <div class="form-group-enhanced">
+                        <label class="form-control-label font-weight-bold mb-3">
+                          <i class="fas fa-thermometer-half mr-2 text-warning"></i>Temperatura
+                        </label>
+                        <div class="checkbox-grid">
+                          <div class="custom-control custom-switch">
+                            <input type="checkbox" class="custom-control-input" id="temp_frente_globo" 
+                                  name="temp_frente_globo" {% if datos_examen.temp_frente_globo %}checked{% endif %}>
+                            <label class="custom-control-label" for="temp_frente_globo">Frente y globo ocular</label>
+                          </div>
+                          <div class="custom-control custom-switch">
+                            <input type="checkbox" class="custom-control-input" id="temp_parpado_labio_sup" 
+                                  name="temp_parpado_labio_sup" {% if datos_examen.temp_parpado_labio_sup %}checked{% endif %}>
+                            <label class="custom-control-label" for="temp_parpado_labio_sup">Párpado inferior / Labio superior</label>
+                          </div>
+                          <div class="custom-control custom-switch">
+                            <input type="checkbox" class="custom-control-input" id="temp_labio_inf_menton" 
+                                  name="temp_labio_inf_menton" {% if datos_examen.temp_labio_inf_menton %}checked{% endif %}>
+                            <label class="custom-control-label" for="temp_labio_inf_menton">Labio Inferior / Mentón</label>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div class="row">
+                    <!-- Fuerza -->
+                    <div class="col-md-4">
+                      <div class="form-group-enhanced">
+                        <label class="form-control-label font-weight-bold mb-3">
+                          <i class="fas fa-dumbbell mr-2 text-success"></i>Fuerza
+                        </label>
+                        <div class="checkbox-grid">
+                          <div class="custom-control custom-switch">
+                            <input type="checkbox" class="custom-control-input" id="fuerza_maseteros" 
+                                  name="fuerza_maseteros" {% if datos_examen.fuerza_maseteros %}checked{% endif %}>
+                            <label class="custom-control-label" for="fuerza_maseteros">Maseteros</label>
+                          </div>
+                          <div class="custom-control custom-switch">
+                            <input type="checkbox" class="custom-control-input" id="fuerza_temporales" 
+                                  name="fuerza_temporales" {% if datos_examen.fuerza_temporales %}checked{% endif %}>
+                            <label class="custom-control-label" for="fuerza_temporales">Temporales</label>
+                          </div>
+                          <div class="custom-control custom-switch">
+                            <input type="checkbox" class="custom-control-input" id="fuerza_pterigoideos" 
+                                  name="fuerza_pterigoideos" {% if datos_examen.fuerza_pterigoideos %}checked{% endif %}>
+                            <label class="custom-control-label" for="fuerza_pterigoideos">Pterigoideos</label>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <!-- Trofismo -->
+                    <div class="col-md-4">
+                      <div class="form-group-enhanced">
+                        <label class="form-control-label font-weight-bold mb-3">
+                          <i class="fas fa-muscle mr-2 text-primary"></i>Trofismo
+                        </label>
+                        <div class="checkbox-grid">
+                          <div class="custom-control custom-switch">
+                            <input type="checkbox" class="custom-control-input" id="trofismo_maseteros" 
+                                  name="trofismo_maseteros" {% if datos_examen.trofismo_maseteros %}checked{% endif %}>
+                            <label class="custom-control-label" for="trofismo_maseteros">Maseteros</label>
+                          </div>
+                          <div class="custom-control custom-switch">
+                            <input type="checkbox" class="custom-control-input" id="trofismo_temporales" 
+                                  name="trofismo_temporales" {% if datos_examen.trofismo_temporales %}checked{% endif %}>
+                            <label class="custom-control-label" for="trofismo_temporales">Temporales</label>
+                          </div>
+                          <div class="custom-control custom-switch">
+                            <input type="checkbox" class="custom-control-input" id="trofismo_pterigoideos" 
+                                  name="trofismo_pterigoideos" {% if datos_examen.trofismo_pterigoideos %}checked{% endif %}>
+                            <label class="custom-control-label" for="trofismo_pterigoideos">Pterigoideos</label>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <!-- Observaciones V Par -->
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <label class="form-control-label font-weight-bold">
+                          <i class="fas fa-comment-dots mr-2 text-primary"></i>Observaciones V Par
+                        </label>
+                        <textarea class="form-control observations-textarea" name="observaciones_v_par"
+                          placeholder="Observaciones sobre el V Par Craneal...">{{ datos_examen.observaciones_v_par }}</textarea>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+                <!-- VII Par (Facial) -->
+                <div class="neuro-card">
+                  <div class="par-craneal-header">
+                    <div class="d-flex align-items-center">
+                      <span class="par-number">VII</span>
+                      <div>
+                        <h4 class="mb-0">Par Facial</h4>
+                        <small class="opacity-75">Evaluación de la mímica facial y gusto</small>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="card-body bg-white">
+                    <div class="row">
+                      <!-- Mímica facial -->
+                      <div class="col-md-8">
+                        <div class="form-group-enhanced">
+                          <label class="form-control-label font-weight-bold mb-3">
+                            <i class="fas fa-smile mr-2 text-success"></i>Mímica Facial
+                          </label>
+                          <div class="checkbox-grid">
+                            <div class="custom-control custom-switch">
+                              <input type="checkbox" class="custom-control-input" id="mimica_frente" 
+                                    name="mimica_frente" {% if datos_examen.mimica_frente %}checked{% endif %}>
+                              <label class="custom-control-label" for="mimica_frente">Frente</label>
+                            </div>
+                            <div class="custom-control custom-switch">
+                              <input type="checkbox" class="custom-control-input" id="mimica_parpados" 
+                                    name="mimica_parpados" {% if datos_examen.mimica_parpados %}checked{% endif %}>
+                              <label class="custom-control-label" for="mimica_parpados">Párpados</label>
+                            </div>
+                            <div class="custom-control custom-switch">
+                              <input type="checkbox" class="custom-control-input" id="mimica_elevacion_nasal" 
+                                    name="mimica_elevacion_nasal" {% if datos_examen.mimica_elevacion_nasal %}checked{% endif %}>
+                              <label class="custom-control-label" for="mimica_elevacion_nasal">Elevación nasal</label>
+                            </div>
+                            <div class="custom-control custom-switch">
+                              <input type="checkbox" class="custom-control-input" id="mimica_buccinadores" 
+                                    name="mimica_buccinadores" {% if datos_examen.mimica_buccinadores %}checked{% endif %}>
+                              <label class="custom-control-label" for="mimica_buccinadores">Buccinadores</label>
+                            </div>
+                            <div class="custom-control custom-switch">
+                              <input type="checkbox" class="custom-control-input" id="mimica_orbicular_labios" 
+                                    name="mimica_orbicular_labios" {% if datos_examen.mimica_orbicular_labios %}checked{% endif %}>
+                              <label class="custom-control-label" for="mimica_orbicular_labios">Orbicular de los labios</label>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <!-- Gusto -->
+                      <div class="col-md-4">
+                        <div class="form-group-enhanced">
+                          <label class="form-control-label font-weight-bold mb-3">
+                            <i class="fas fa-tongue mr-2 text-info"></i>Gusto en tercios anteriores de la lengua
+                          </label>
+                          <div>
+                            <div class="custom-control custom-radio custom-control-inline">
+                              <input type="radio" id="gusto_anterior_normal" name="gusto_anterior" value="normal"
+                                    class="custom-control-input" {% if datos_examen.gusto_anterior == 'normal' %}checked{% endif %}>
+                              <label class="custom-control-label" for="gusto_anterior_normal">Normal</label>
+                            </div>
+                            <div class="custom-control custom-radio custom-control-inline">
+                              <input type="radio" id="gusto_anterior_anormal" name="gusto_anterior" value="anormal"
+                                    class="custom-control-input" {% if datos_examen.gusto_anterior == 'anormal' %}checked{% endif %}>
+                              <label class="custom-control-label" for="gusto_anterior_anormal">Anormal</label>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- VIII Par (Auditivo) -->
+                <div class="neuro-card">
+                  <div class="par-craneal-header">
+                    <div class="d-flex align-items-center">
+                      <span class="par-number">VIII</span>
+                      <div>
+                        <h4 class="mb-0">Par Auditivo</h4>
+                        <small class="opacity-75">Evaluación auditiva y vestibular</small>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="card-body bg-white">
+                    <div class="row">
+                      <!-- Síntomas auditivos -->
+                      <div class="col-md-4">
+                        <div class="form-group-enhanced">
+                          <label class="form-control-label font-weight-bold mb-3">
+                            <i class="fas fa-ear mr-2 text-primary"></i>Síntomas Auditivos
+                          </label>
+                          <div class="checkbox-grid">
+                            <div class="custom-control custom-switch">
+                              <input type="checkbox" class="custom-control-input" id="hipoacusia" 
+                                    name="hipoacusia" {% if datos_examen.hipoacusia %}checked{% endif %}>
+                              <label class="custom-control-label" for="hipoacusia">Hipoacusia</label>
+                            </div>
+                            <div class="custom-control custom-switch">
+                              <input type="checkbox" class="custom-control-input" id="tinitus" 
+                                    name="tinitus" {% if datos_examen.tinitus %}checked{% endif %}>
+                              <label class="custom-control-label" for="tinitus">Tínitus</label>
+                            </div>
+                            <div class="custom-control custom-switch">
+                              <input type="checkbox" class="custom-control-input" id="acufenos" 
+                                    name="acufenos" {% if datos_examen.acufenos %}checked{% endif %}>
+                              <label class="custom-control-label" for="acufenos">Acúfenos</label>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <!-- Pruebas auditivas -->
+                      <div class="col-md-4">
+                        <div class="form-group-enhanced">
+                          <label class="form-control-label font-weight-bold mb-3">
+                            <i class="fas fa-stethoscope mr-2 text-info"></i>Pruebas Auditivas
+                          </label>
+                          
+                          <div class="form-group">
+                            <label class="form-control-label">Prueba de Weber</label>
+                            <div>
+                              <div class="custom-control custom-radio custom-control-inline">
+                                <input type="radio" id="weber_normal" name="weber" value="normal"
+                                      class="custom-control-input" {% if datos_examen.weber == 'normal' %}checked{% endif %}>
+                                <label class="custom-control-label" for="weber_normal">Normal</label>
+                              </div>
+                              <div class="custom-control custom-radio custom-control-inline">
+                                <input type="radio" id="weber_anormal" name="weber" value="anormal"
+                                      class="custom-control-input" {% if datos_examen.weber == 'anormal' %}checked{% endif %}>
+                                <label class="custom-control-label" for="weber_anormal">Anormal</label>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          <div class="form-group">
+                            <label class="form-control-label">Prueba de Rinne</label>
+                            <div>
+                              <div class="custom-control custom-radio custom-control-inline">
+                                <input type="radio" id="rinne_normal" name="rinne" value="normal"
+                                      class="custom-control-input" {% if datos_examen.rinne == 'normal' %}checked{% endif %}>
+                                <label class="custom-control-label" for="rinne_normal">Normal</label>
+                              </div>
+                              <div class="custom-control custom-radio custom-control-inline">
+                                <input type="radio" id="rinne_anormal" name="rinne" value="anormal"
+                                      class="custom-control-input" {% if datos_examen.rinne == 'anormal' %}checked{% endif %}>
+                                <label class="custom-control-label" for="rinne_anormal">Anormal</label>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <!-- Síntomas vestibulares -->
+                      <div class="col-md-4">
+                        <div class="form-group-enhanced">
+                          <label class="form-control-label font-weight-bold mb-3">
+                            <i class="fas fa-balance-scale mr-2 text-warning"></i>Síntomas Vestibulares
+                          </label>
+                          <div class="checkbox-grid">
+                            <div class="custom-control custom-switch">
+                              <input type="checkbox" class="custom-control-input" id="vertigo" 
+                                    name="vertigo" {% if datos_examen.vertigo %}checked{% endif %}>
+                              <label class="custom-control-label" for="vertigo">Vértigo</label>
+                            </div>
+                            <div class="custom-control custom-switch">
+                              <input type="checkbox" class="custom-control-input" id="mareo" 
+                                    name="mareo" {% if datos_examen.mareo %}checked{% endif %}>
+                              <label class="custom-control-label" for="mareo">Mareo</label>
+                            </div>
+                            <div class="custom-control custom-switch">
+                              <input type="checkbox" class="custom-control-input" id="nistagmus" 
+                                    name="nistagmus" {% if datos_examen.nistagmus %}checked{% endif %}>
+                              <label class="custom-control-label" for="nistagmus">Nistagmus</label>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div class="row">
+                      <div class="col-md-12">
+                        <div class="form-group">
+                          <label class="form-control-label font-weight-bold">
+                            <i class="fas fa-comment-dots mr-2 text-primary"></i>Observaciones VIII Par
+                          </label>
+                          <textarea class="form-control observations-textarea" name="observaciones_viii_par"
+                            placeholder="Observaciones sobre el VIII Par Craneal...">{{ datos_examen.observaciones_viii_par }}</textarea>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- IX-X Par (Glosofaríngeo y Vago) -->
+                <div class="neuro-card">
+                  <div class="par-craneal-header">
+                    <div class="d-flex align-items-center">
+                      <span class="par-number">IX-X</span>
+                      <div>
+                        <h4 class="mb-0">Pares Glosofaríngeo y Vago</h4>
+                        <small class="opacity-75">Evaluación de deglución, fonación y reflejos</small>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="card-body bg-white">
+                    <div class="row">
+                      <!-- Síntomas vocales -->
+                      <div class="col-md-4">
+                        <div class="form-group-enhanced">
+                          <label class="form-control-label font-weight-bold mb-3">
+                            <i class="fas fa-microphone mr-2 text-danger"></i>Síntomas Vocales
+                          </label>
+                          <div class="checkbox-grid">
+                            <div class="custom-control custom-switch">
+                              <input type="checkbox" class="custom-control-input" id="disfonia" 
+                                    name="disfonia" {% if datos_examen.disfonia %}checked{% endif %}>
+                              <label class="custom-control-label" for="disfonia">Disfonía</label>
+                            </div>
+                            <div class="custom-control custom-switch">
+                              <input type="checkbox" class="custom-control-input" id="afonia" 
+                                    name="afonia" {% if datos_examen.afonia %}checked{% endif %}>
+                              <label class="custom-control-label" for="afonia">Afonía</label>
+                            </div>
+                            <div class="custom-control custom-switch">
+                              <input type="checkbox" class="custom-control-input" id="voz_nasal" 
+                                    name="voz_nasal" {% if datos_examen.voz_nasal %}checked{% endif %}>
+                              <label class="custom-control-label" for="voz_nasal">Voz Nasal</label>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <!-- Síntomas deglutorios -->
+                      <div class="col-md-4">
+                        <div class="form-group-enhanced">
+                          <label class="form-control-label font-weight-bold mb-3">
+                            <i class="fas fa-utensils mr-2 text-info"></i>Síntomas Deglutorios
+                          </label>
+                          <div class="checkbox-grid">
+                            <div class="custom-control custom-switch">
+                              <input type="checkbox" class="custom-control-input" id="disfagia" 
+                                    name="disfagia" {% if datos_examen.disfagia %}checked{% endif %}>
+                              <label class="custom-control-label" for="disfagia">Disfagia</label>
+                            </div>
+                            <div class="custom-control custom-switch">
+                              <input type="checkbox" class="custom-control-input" id="sialorrea" 
+                                    name="sialorrea" {% if datos_examen.sialorrea %}checked{% endif %}>
+                              <label class="custom-control-label" for="sialorrea">Sialorrea</label>
+                            </div>
+                            <div class="custom-control custom-switch">
+                              <input type="checkbox" class="custom-control-input" id="dolor_faringe" 
+                                    name="dolor_faringe" {% if datos_examen.dolor_faringe %}checked{% endif %}>
+                              <label class="custom-control-label" for="dolor_faringe">Dolor en faringe</label>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <!-- Exploración física -->
+                      <div class="col-md-4">
+                        <div class="form-group-enhanced">
+                          <label class="form-control-label font-weight-bold mb-3">
+                            <i class="fas fa-search mr-2 text-success"></i>Exploración Física
+                          </label>
+                          
+                          <div class="form-group">
+                            <label class="form-control-label">Reflejo Nauseoso</label>
+                            <div>
+                              <div class="custom-control custom-radio custom-control-inline">
+                                <input type="radio" id="reflejo_nauseoso_normal" name="reflejo_nauseoso" value="normal"
+                                      class="custom-control-input" {% if datos_examen.reflejo_nauseoso == 'normal' %}checked{% endif %}>
+                                <label class="custom-control-label" for="reflejo_nauseoso_normal">Normal</label>
+                              </div>
+                              <div class="custom-control custom-radio custom-control-inline">
+                                <input type="radio" id="reflejo_nauseoso_anormal" name="reflejo_nauseoso" value="anormal"
+                                      class="custom-control-input" {% if datos_examen.reflejo_nauseoso == 'anormal' %}checked{% endif %}>
+                                <label class="custom-control-label" for="reflejo_nauseoso_anormal">Anormal</label>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          <div class="form-group">
+                            <label class="form-control-label">Posición de la úvula</label>
+                            <div>
+                              <div class="custom-control custom-radio custom-control-inline">
+                                <input type="radio" id="uvula_normal" name="uvula" value="normal"
+                                      class="custom-control-input" {% if datos_examen.uvula == 'normal' %}checked{% endif %}>
+                                <label class="custom-control-label" for="uvula_normal">Normal</label>
+                              </div>
+                              <div class="custom-control custom-radio custom-control-inline">
+                                <input type="radio" id="uvula_anormal" name="uvula" value="anormal"
+                                      class="custom-control-input" {% if datos_examen.uvula == 'anormal' %}checked{% endif %}>
+                                <label class="custom-control-label" for="uvula_anormal">Anormal</label>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          <div class="form-group">
+                            <label class="form-control-label">Paladar</label>
+                            <div>
+                              <div class="custom-control custom-radio custom-control-inline">
+                                <input type="radio" id="paladar_normal" name="paladar" value="normal"
+                                      class="custom-control-input" {% if datos_examen.paladar == 'normal' %}checked{% endif %}>
+                                <label class="custom-control-label" for="paladar_normal">Normal</label>
+                              </div>
+                              <div class="custom-control custom-radio custom-control-inline">
+                                <input type="radio" id="paladar_anormal" name="paladar" value="anormal"
+                                      class="custom-control-input" {% if datos_examen.paladar == 'anormal' %}checked{% endif %}>
+                                <label class="custom-control-label" for="paladar_anormal">Anormal</label>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          <div class="form-group">
+                            <label class="form-control-label">Gusto tercio posterior lengua</label>
+                            <div>
+                              <div class="custom-control custom-radio custom-control-inline">
+                                <input type="radio" id="gusto_posterior_normal" name="gusto_posterior" value="normal"
+                                      class="custom-control-input" {% if datos_examen.gusto_posterior == 'normal' %}checked{% endif %}>
+                                <label class="custom-control-label" for="gusto_posterior_normal">Normal</label>
+                              </div>
+                              <div class="custom-control custom-radio custom-control-inline">
+                                <input type="radio" id="gusto_posterior_anormal" name="gusto_posterior" value="anormal"
+                                      class="custom-control-input" {% if datos_examen.gusto_posterior == 'anormal' %}checked{% endif %}>
+                                <label class="custom-control-label" for="gusto_posterior_anormal">Anormal</label>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- XI Par (Espinal Accesorio) -->
+                <div class="neuro-card">
+                  <div class="par-craneal-header">
+                    <div class="d-flex align-items-center">
+                      <span class="par-number">XI</span>
+                      <div>
+                        <h4 class="mb-0">Par Espinal Accesorio</h4>
+                        <small class="opacity-75">Evaluación de movimientos del cuello y hombros</small>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="card-body bg-white">
+                    <div class="row">
+                      <div class="col-md-4">
+                        <div class="form-group-enhanced">
+                          <label class="form-control-label font-weight-bold mb-3">
+                            <i class="fas fa-head-side-mask mr-2 text-primary"></i>Movimientos del cuello
+                          </label>
+                          <div>
+                            <div class="custom-control custom-radio custom-control-inline">
+                              <input type="radio" id="movimientos_cuello_normal" name="movimientos_cuello" value="normal"
+                                    class="custom-control-input" {% if datos_examen.movimientos_cuello == 'normal' %}checked{% endif %}>
+                              <label class="custom-control-label" for="movimientos_cuello_normal">Normal</label>
+                            </div>
+                            <div class="custom-control custom-radio custom-control-inline">
+                              <input type="radio" id="movimientos_cuello_anormal" name="movimientos_cuello" value="anormal"
+                                    class="custom-control-input" {% if datos_examen.movimientos_cuello == 'anormal' %}checked{% endif %}>
+                              <label class="custom-control-label" for="movimientos_cuello_anormal">Anormal</label>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div class="col-md-4">
+                        <div class="form-group-enhanced">
+                          <label class="form-control-label font-weight-bold mb-3">
+                            <i class="fas fa-arrows-alt-v mr-2 text-info"></i>Elevación de los Hombros
+                          </label>
+                          <div>
+                            <div class="custom-control custom-radio custom-control-inline">
+                              <input type="radio" id="elevacion_hombros_normal" name="elevacion_hombros" value="normal"
+                                    class="custom-control-input" {% if datos_examen.elevacion_hombros == 'normal' %}checked{% endif %}>
+                              <label class="custom-control-label" for="elevacion_hombros_normal">Normal</label>
+                            </div>
+                            <div class="custom-control custom-radio custom-control-inline">
+                              <input type="radio" id="elevacion_hombros_anormal" name="elevacion_hombros" value="anormal"
+                                    class="custom-control-input" {% if datos_examen.elevacion_hombros == 'anormal' %}checked{% endif %}>
+                              <label class="custom-control-label" for="elevacion_hombros_anormal">Anormal</label>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div class="col-md-4">
+                        <div class="form-group-enhanced">
+                          <label class="form-control-label font-weight-bold mb-3">
+                            <i class="fas fa-exclamation-triangle mr-2 text-warning"></i>Atrofia lingual
+                          </label>
+                          <div class="custom-control custom-switch">
+                            <input type="checkbox" class="custom-control-input" id="atrofia_lingual" 
+                                  name="atrofia_lingual" {% if datos_examen.atrofia_lingual %}checked{% endif %}>
+                            <label class="custom-control-label" for="atrofia_lingual">Presente</label>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div class="row">
+                      <div class="col-md-12">
+                        <div class="form-group">
+                          <label class="form-control-label font-weight-bold">
+                            <i class="fas fa-comment-dots mr-2 text-primary"></i>Observaciones XI Par
+                          </label>
+                          <textarea class="form-control observations-textarea" name="observaciones_xi_par"
+                            placeholder="Observaciones sobre el XI Par Craneal...">{{ datos_examen.observaciones_xi_par }}</textarea>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- XII Par (Hipogloso) -->
+                <div class="neuro-card">
+                  <div class="par-craneal-header">
+                    <div class="d-flex align-items-center">
+                      <span class="par-number">XII</span>
+                      <div>
+                        <h4 class="mb-0">Par Hipogloso</h4>
+                        <small class="opacity-75">Evaluación de los movimientos linguales</small>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="card-body bg-white">
+                    <div class="row">
+                      <div class="col-md-4">
+                        <div class="form-group-enhanced">
+                          <label class="form-control-label font-weight-bold mb-3">
+                            <i class="fas fa-wave-square mr-2 text-danger"></i>Fasciculaciones linguales
+                          </label>
+                          <div class="custom-control custom-switch">
+                            <input type="checkbox" class="custom-control-input" id="fasciculaciones_linguales" 
+                                  name="fasciculaciones_linguales" {% if datos_examen.fasciculaciones_linguales %}checked{% endif %}>
+                            <label class="custom-control-label" for="fasciculaciones_linguales">Presente</label>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div class="col-md-4">
+                        <div class="form-group-enhanced">
+                          <label class="form-control-label font-weight-bold mb-3">
+                            <i class="fas fa-tongue mr-2 text-primary"></i>Movimientos de la lengua
+                          </label>
+                          <div>
+                            <div class="custom-control custom-radio custom-control-inline">
+                              <input type="radio" id="movimientos_lengua_normal" name="movimientos_lengua" value="normal"
+                                    class="custom-control-input" {% if datos_examen.movimientos_lengua == 'normal' %}checked{% endif %}>
+                              <label class="custom-control-label" for="movimientos_lengua_normal">Normal</label>
+                            </div>
+                            <div class="custom-control custom-radio custom-control-inline">
+                              <input type="radio" id="movimientos_lengua_anormal" name="movimientos_lengua" value="anormal"
+                                    class="custom-control-input" {% if datos_examen.movimientos_lengua == 'anormal' %}checked{% endif %}>
+                              <label class="custom-control-label" for="movimientos_lengua_anormal">Anormal</label>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label class="form-control-label font-weight-bold">
+                            <i class="fas fa-comment-dots mr-2 text-primary"></i>Observaciones XII Par
+                          </label>
+                          <textarea class="form-control observations-textarea" name="observaciones_xii_par"
+                            placeholder="Observaciones sobre el XII Par Craneal...">{{ datos_examen.observaciones_xii_par }}</textarea>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
                 <!-- Continúa con los demás pares craneales... -->
                 <!-- Por brevedad, muestro la estructura. Necesitarías repetir el patrón para V, VII, VIII, IX-X, XI, XII -->
 
               </div>
 
+              <!-- ========================================= -->
               <!-- ========================================= -->
               <!-- TAB 2: SENSIBILIDAD -->
               <!-- ========================================= -->
@@ -819,84 +1454,1993 @@
                     </div>
                   </div>
                   <div class="card-body bg-white">
+                    
+                    <!-- Sensibilidad Básica por Regiones Anatómicas -->
+                    <div class="row mb-4">
+                      <div class="col-12">
+                        <h5 class="text-primary mb-3">
+                          <i class="fas fa-touch mr-2"></i>Sensibilidad Básica por Regiones
+                        </h5>
+                      </div>
+                      
+                      <!-- Dolor al pinchazo -->
+                      <div class="col-md-4">
+                        <div class="form-group-enhanced">
+                          <label class="form-control-label font-weight-bold mb-3">
+                            <i class="fas fa-syringe mr-2 text-danger"></i>Dolor al pinchazo
+                          </label>
+                          <div class="checkbox-grid">
+                            <div class="custom-control custom-switch">
+                              <input type="checkbox" class="custom-control-input" id="dolor_cuello" 
+                                    name="dolor_cuello" {% if datos_examen.dolor_cuello %}checked{% endif %}>
+                              <label class="custom-control-label" for="dolor_cuello">Cuello</label>
+                            </div>
+                            <div class="custom-control custom-switch">
+                              <input type="checkbox" class="custom-control-input" id="dolor_torax" 
+                                    name="dolor_torax" {% if datos_examen.dolor_torax %}checked{% endif %}>
+                              <label class="custom-control-label" for="dolor_torax">Tórax</label>
+                            </div>
+                            <div class="custom-control custom-switch">
+                              <input type="checkbox" class="custom-control-input" id="dolor_miembros_superiores" 
+                                    name="dolor_miembros_superiores" {% if datos_examen.dolor_miembros_superiores %}checked{% endif %}>
+                              <label class="custom-control-label" for="dolor_miembros_superiores">Miembros superiores</label>
+                            </div>
+                            <div class="custom-control custom-switch">
+                              <input type="checkbox" class="custom-control-input" id="dolor_abdomen" 
+                                    name="dolor_abdomen" {% if datos_examen.dolor_abdomen %}checked{% endif %}>
+                              <label class="custom-control-label" for="dolor_abdomen">Abdomen</label>
+                            </div>
+                            <div class="custom-control custom-switch">
+                              <input type="checkbox" class="custom-control-input" id="dolor_miembros_inferiores" 
+                                    name="dolor_miembros_inferiores" {% if datos_examen.dolor_miembros_inferiores %}checked{% endif %}>
+                              <label class="custom-control-label" for="dolor_miembros_inferiores">Miembros Inferiores</label>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <!-- Táctil superficial -->
+                      <div class="col-md-4">
+                        <div class="form-group-enhanced">
+                          <label class="form-control-label font-weight-bold mb-3">
+                            <i class="fas fa-hand-point-up mr-2 text-info"></i>Táctil superficial
+                          </label>
+                          <div class="checkbox-grid">
+                            <div class="custom-control custom-switch">
+                              <input type="checkbox" class="custom-control-input" id="tactil_cuello" 
+                                    name="tactil_cuello" {% if datos_examen.tactil_cuello %}checked{% endif %}>
+                              <label class="custom-control-label" for="tactil_cuello">Cuello</label>
+                            </div>
+                            <div class="custom-control custom-switch">
+                              <input type="checkbox" class="custom-control-input" id="tactil_torax" 
+                                    name="tactil_torax" {% if datos_examen.tactil_torax %}checked{% endif %}>
+                              <label class="custom-control-label" for="tactil_torax">Tórax</label>
+                            </div>
+                            <div class="custom-control custom-switch">
+                              <input type="checkbox" class="custom-control-input" id="tactil_miembros_superiores" 
+                                    name="tactil_miembros_superiores" {% if datos_examen.tactil_miembros_superiores %}checked{% endif %}>
+                              <label class="custom-control-label" for="tactil_miembros_superiores">Miembros superiores</label>
+                            </div>
+                            <div class="custom-control custom-switch">
+                              <input type="checkbox" class="custom-control-input" id="tactil_abdomen" 
+                                    name="tactil_abdomen" {% if datos_examen.tactil_abdomen %}checked{% endif %}>
+                              <label class="custom-control-label" for="tactil_abdomen">Abdomen</label>
+                            </div>
+                            <div class="custom-control custom-switch">
+                              <input type="checkbox" class="custom-control-input" id="tactil_miembros_inferiores" 
+                                    name="tactil_miembros_inferiores" {% if datos_examen.tactil_miembros_inferiores %}checked{% endif %}>
+                              <label class="custom-control-label" for="tactil_miembros_inferiores">Miembros Inferiores</label>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <!-- Discriminación térmica -->
+                      <div class="col-md-4">
+                        <div class="form-group-enhanced">
+                          <label class="form-control-label font-weight-bold mb-3">
+                            <i class="fas fa-thermometer-half mr-2 text-warning"></i>Discriminación térmica
+                          </label>
+                          <div class="checkbox-grid">
+                            <div class="custom-control custom-switch">
+                              <input type="checkbox" class="custom-control-input" id="termica_cuello" 
+                                    name="termica_cuello" {% if datos_examen.termica_cuello %}checked{% endif %}>
+                              <label class="custom-control-label" for="termica_cuello">Cuello</label>
+                            </div>
+                            <div class="custom-control custom-switch">
+                              <input type="checkbox" class="custom-control-input" id="termica_torax" 
+                                    name="termica_torax" {% if datos_examen.termica_torax %}checked{% endif %}>
+                              <label class="custom-control-label" for="termica_torax">Tórax</label>
+                            </div>
+                            <div class="custom-control custom-switch">
+                              <input type="checkbox" class="custom-control-input" id="termica_miembros_superiores" 
+                                    name="termica_miembros_superiores" {% if datos_examen.termica_miembros_superiores %}checked{% endif %}>
+                              <label class="custom-control-label" for="termica_miembros_superiores">Miembros superiores</label>
+                            </div>
+                            <div class="custom-control custom-switch">
+                              <input type="checkbox" class="custom-control-input" id="termica_abdomen" 
+                                    name="termica_abdomen" {% if datos_examen.termica_abdomen %}checked{% endif %}>
+                              <label class="custom-control-label" for="termica_abdomen">Abdomen</label>
+                            </div>
+                            <div class="custom-control custom-switch">
+                              <input type="checkbox" class="custom-control-input" id="termica_miembros_inferiores" 
+                                    name="termica_miembros_inferiores" {% if datos_examen.termica_miembros_inferiores %}checked{% endif %}>
+                              <label class="custom-control-label" for="termica_miembros_inferiores">Miembros Inferiores</label>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Sensibilidad Especializada -->
+                    <div class="row mb-4">
+                      <div class="col-12">
+                        <h5 class="text-success mb-3">
+                          <i class="fas fa-brain mr-2"></i>Sensibilidad Especializada
+                        </h5>
+                      </div>
+                      
+                      <!-- Vibratoria -->
+                      <div class="col-md-3">
+                        <div class="form-group-enhanced">
+                          <label class="form-control-label font-weight-bold mb-3">
+                            <i class="fas fa-wave-square mr-2 text-primary"></i>Vibratoria
+                          </label>
+                          <div>
+                            <div class="custom-control custom-radio custom-control-inline">
+                              <input type="radio" id="vibratoria_normal" name="vibratoria" value="normal"
+                                    class="custom-control-input" {% if datos_examen.vibratoria == 'normal' %}checked{% endif %}>
+                              <label class="custom-control-label" for="vibratoria_normal">Normal</label>
+                            </div>
+                            <div class="custom-control custom-radio custom-control-inline">
+                              <input type="radio" id="vibratoria_anormal" name="vibratoria" value="anormal"
+                                    class="custom-control-input" {% if datos_examen.vibratoria == 'anormal' %}checked{% endif %}>
+                              <label class="custom-control-label" for="vibratoria_anormal">Anormal</label>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <!-- Propiocepción Miembros Superiores -->
+                      <div class="col-md-3">
+                        <div class="form-group-enhanced">
+                          <label class="form-control-label font-weight-bold mb-3">
+                            <i class="fas fa-hands mr-2 text-info"></i>Propiocepción M. Superiores
+                          </label>
+                          <div>
+                            <div class="custom-control custom-radio custom-control-inline">
+                              <input type="radio" id="propiocepcion_superiores_normal" name="propiocepcion_superiores" value="normal"
+                                    class="custom-control-input" {% if datos_examen.propiocepcion_superiores == 'normal' %}checked{% endif %}>
+                              <label class="custom-control-label" for="propiocepcion_superiores_normal">Normal</label>
+                            </div>
+                            <div class="custom-control custom-radio custom-control-inline">
+                              <input type="radio" id="propiocepcion_superiores_anormal" name="propiocepcion_superiores" value="anormal"
+                                    class="custom-control-input" {% if datos_examen.propiocepcion_superiores == 'anormal' %}checked{% endif %}>
+                              <label class="custom-control-label" for="propiocepcion_superiores_anormal">Anormal</label>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <!-- Propiocepción Miembros Inferiores -->
+                      <div class="col-md-3">
+                        <div class="form-group-enhanced">
+                          <label class="form-control-label font-weight-bold mb-3">
+                            <i class="fas fa-walking mr-2 text-success"></i>Propiocepción M. Inferiores
+                          </label>
+                          <div>
+                            <div class="custom-control custom-radio custom-control-inline">
+                              <input type="radio" id="propiocepcion_inferiores_normal" name="propiocepcion_inferiores" value="normal"
+                                    class="custom-control-input" {% if datos_examen.propiocepcion_inferiores == 'normal' %}checked{% endif %}>
+                              <label class="custom-control-label" for="propiocepcion_inferiores_normal">Normal</label>
+                            </div>
+                            <div class="custom-control custom-radio custom-control-inline">
+                              <input type="radio" id="propiocepcion_inferiores_anormal" name="propiocepcion_inferiores" value="anormal"
+                                    class="custom-control-input" {% if datos_examen.propiocepcion_inferiores == 'anormal' %}checked{% endif %}>
+                              <label class="custom-control-label" for="propiocepcion_inferiores_anormal">Anormal</label>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <!-- Reconocimiento de objetos -->
+                      <div class="col-md-3">
+                        <div class="form-group-enhanced">
+                          <label class="form-control-label font-weight-bold mb-3">
+                            <i class="fas fa-cube mr-2 text-warning"></i>Reconocimiento de objetos
+                          </label>
+                          <div>
+                            <div class="custom-control custom-radio custom-control-inline">
+                              <input type="radio" id="reconocimiento_objetos_normal" name="reconocimiento_objetos" value="normal"
+                                    class="custom-control-input" {% if datos_examen.reconocimiento_objetos == 'normal' %}checked{% endif %}>
+                              <label class="custom-control-label" for="reconocimiento_objetos_normal">Normal</label>
+                            </div>
+                            <div class="custom-control custom-radio custom-control-inline">
+                              <input type="radio" id="reconocimiento_objetos_anormal" name="reconocimiento_objetos" value="anormal"
+                                    class="custom-control-input" {% if datos_examen.reconocimiento_objetos == 'anormal' %}checked{% endif %}>
+                              <label class="custom-control-label" for="reconocimiento_objetos_anormal">Anormal</label>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Discriminación de dos puntos -->
+                    <div class="row mb-4">
+                      <div class="col-md-4">
+                        <div class="form-group-enhanced">
+                          <label class="form-control-label font-weight-bold mb-3">
+                            <i class="fas fa-dot-circle mr-2 text-danger"></i>Discriminación de dos puntos
+                          </label>
+                          <div>
+                            <div class="custom-control custom-radio custom-control-inline">
+                              <input type="radio" id="discriminacion_dos_puntos_normal" name="discriminacion_dos_puntos" value="normal"
+                                    class="custom-control-input" {% if datos_examen.discriminacion_dos_puntos == 'normal' %}checked{% endif %}>
+                              <label class="custom-control-label" for="discriminacion_dos_puntos_normal">Normal</label>
+                            </div>
+                            <div class="custom-control custom-radio custom-control-inline">
+                              <input type="radio" id="discriminacion_dos_puntos_anormal" name="discriminacion_dos_puntos" value="anormal"
+                                    class="custom-control-input" {% if datos_examen.discriminacion_dos_puntos == 'anormal' %}checked{% endif %}>
+                              <label class="custom-control-label" for="discriminacion_dos_puntos_anormal">Anormal</label>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <!-- Observaciones Sensibilidad -->
+                      <div class="col-md-8">
+                        <div class="form-group">
+                          <label class="form-control-label font-weight-bold">
+                            <i class="fas fa-comment-dots mr-2 text-primary"></i>Observaciones
+                          </label>
+                          <textarea class="form-control observations-textarea" name="observaciones_sensibilidad"
+                            placeholder="Observaciones sobre la evaluación de sensibilidad...">{{ datos_examen.observaciones_sensibilidad }}</textarea>
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+              <!-- ========================================= -->
+              <!-- TAB 3: REFLEJOS -->
+              <!-- ========================================= -->
+              <div class="tab-pane fade" id="reflejos" role="tabpanel">
+                <div class="neuro-card">
+                  <div class="reflejos-card par-craneal-header">
+                    <div class="d-flex align-items-center">
+                      <i class="fas fa-bolt fa-2x mr-3"></i>
+                      <div>
+                        <h4 class="mb-0">Evaluación de Reflejos</h4>
+                        <small class="opacity-75">Reflejos osteotendinosos, cutáneos y patológicos</small>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="card-body bg-white">
+                    
+                    <!-- Reflejos Osteotendinosos -->
+                    <div class="row mb-4">
+                      <div class="col-12">
+                        <h5 class="text-primary mb-3">
+                          <i class="fas fa-hammer mr-2"></i>Reflejos Osteotendinosos
+                        </h5>
+                      </div>
+                      
+                      <!-- Reflejos Cefálicos -->
+                      <div class="col-12 mb-3">
+                        <h6 class="text-secondary mb-3">
+                          <i class="fas fa-head-side-brain mr-2"></i>Reflejos Cefálicos
+                        </h6>
+                      </div>
+                      
+                      <!-- Maseteriano -->
+                      <div class="col-md-6">
+                        <div class="form-group-enhanced">
+                          <label class="form-control-label font-weight-bold mb-3">
+                            <i class="fas fa-tooth mr-2 text-primary"></i>Reflejo Maseteriano
+                          </label>
+                          <div class="bilateral-container">
+                            <div>
+                              <span class="side-label">Izquierdo</span>
+                              <select class="form-control reflejo-select" name="maseteriano_izquierdo">
+                                <option value="">Seleccionar...</option>
+                                <option value="0" {% if datos_examen.maseteriano_izquierdo == '0' %}selected{% endif %}>0. Sin respuesta (arreflexia)</option>
+                                <option value="1" {% if datos_examen.maseteriano_izquierdo == '1' %}selected{% endif %}>1. Respuesta disminuida (hiporreflexia)</option>
+                                <option value="2" {% if datos_examen.maseteriano_izquierdo == '2' %}selected{% endif %}>2. Respuesta Normal</option>
+                                <option value="3" {% if datos_examen.maseteriano_izquierdo == '3' %}selected{% endif %}>3. Respuesta Aumentada (hiperreflexia)</option>
+                                <option value="4" {% if datos_examen.maseteriano_izquierdo == '4' %}selected{% endif %}>4. Respuesta repetida y rítmica que cesa (clonus agotable)</option>
+                                <option value="5" {% if datos_examen.maseteriano_izquierdo == '5' %}selected{% endif %}>5. Respuesta repetida y rítmica permanente (clonus perm.)</option>
+                              </select>
+                            </div>
+                            <div>
+                              <span class="side-label">Derecho</span>
+                              <select class="form-control reflejo-select" name="maseteriano_derecho">
+                                <option value="">Seleccionar...</option>
+                                <option value="0" {% if datos_examen.maseteriano_derecho == '0' %}selected{% endif %}>0. Sin respuesta (arreflexia)</option>
+                                <option value="1" {% if datos_examen.maseteriano_derecho == '1' %}selected{% endif %}>1. Respuesta disminuida (hiporreflexia)</option>
+                                <option value="2" {% if datos_examen.maseteriano_derecho == '2' %}selected{% endif %}>2. Respuesta Normal</option>
+                                <option value="3" {% if datos_examen.maseteriano_derecho == '3' %}selected{% endif %}>3. Respuesta Aumentada (hiperreflexia)</option>
+                                <option value="4" {% if datos_examen.maseteriano_derecho == '4' %}selected{% endif %}>4. Respuesta repetida y rítmica que cesa (clonus agotable)</option>
+                                <option value="5" {% if datos_examen.maseteriano_derecho == '5' %}selected{% endif %}>5. Respuesta repetida y rítmica permanente (clonus perm.)</option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Reflejos de Miembros Superiores -->
+                    <div class="row mb-4">
+                      <div class="col-12 mb-3">
+                        <h6 class="text-secondary mb-3">
+                          <i class="fas fa-hands mr-2"></i>Reflejos de Miembros Superiores
+                        </h6>
+                      </div>
+                      
+                      <!-- Tricipital -->
+                      <div class="col-md-6">
+                        <div class="form-group-enhanced">
+                          <label class="form-control-label font-weight-bold mb-3">
+                            <i class="fas fa-muscle mr-2 text-success"></i>Reflejo Tricipital
+                          </label>
+                          <div class="bilateral-container">
+                            <div>
+                              <span class="side-label">Izquierdo</span>
+                              <select class="form-control reflejo-select" name="tricipital_izquierdo">
+                                <option value="">Seleccionar...</option>
+                                <option value="0" {% if datos_examen.tricipital_izquierdo == '0' %}selected{% endif %}>0. Sin respuesta (arreflexia)</option>
+                                <option value="1" {% if datos_examen.tricipital_izquierdo == '1' %}selected{% endif %}>1. Respuesta disminuida (hiporreflexia)</option>
+                                <option value="2" {% if datos_examen.tricipital_izquierdo == '2' %}selected{% endif %}>2. Respuesta Normal</option>
+                                <option value="3" {% if datos_examen.tricipital_izquierdo == '3' %}selected{% endif %}>3. Respuesta Aumentada (hiperreflexia)</option>
+                                <option value="4" {% if datos_examen.tricipital_izquierdo == '4' %}selected{% endif %}>4. Respuesta repetida y rítmica que cesa (clonus agotable)</option>
+                                <option value="5" {% if datos_examen.tricipital_izquierdo == '5' %}selected{% endif %}>5. Respuesta repetida y rítmica permanente (clonus perm.)</option>
+                              </select>
+                            </div>
+                            <div>
+                              <span class="side-label">Derecho</span>
+                              <select class="form-control reflejo-select" name="tricipital_derecho">
+                                <option value="">Seleccionar...</option>
+                                <option value="0" {% if datos_examen.tricipital_derecho == '0' %}selected{% endif %}>0. Sin respuesta (arreflexia)</option>
+                                <option value="1" {% if datos_examen.tricipital_derecho == '1' %}selected{% endif %}>1. Respuesta disminuida (hiporreflexia)</option>
+                                <option value="2" {% if datos_examen.tricipital_derecho == '2' %}selected{% endif %}>2. Respuesta Normal</option>
+                                <option value="3" {% if datos_examen.tricipital_derecho == '3' %}selected{% endif %}>3. Respuesta Aumentada (hiperreflexia)</option>
+                                <option value="4" {% if datos_examen.tricipital_derecho == '4' %}selected{% endif %}>4. Respuesta repetida y rítmica que cesa (clonus agotable)</option>
+                                <option value="5" {% if datos_examen.tricipital_derecho == '5' %}selected{% endif %}>5. Respuesta repetida y rítmica permanente (clonus perm.)</option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <!-- Bicipital -->
+                      <div class="col-md-6">
+                        <div class="form-group-enhanced">
+                          <label class="form-control-label font-weight-bold mb-3">
+                            <i class="fas fa-dumbbell mr-2 text-info"></i>Reflejo Bicipital
+                          </label>
+                          <div class="bilateral-container">
+                            <div>
+                              <span class="side-label">Izquierdo</span>
+                              <select class="form-control reflejo-select" name="bicipital_izquierdo">
+                                <option value="">Seleccionar...</option>
+                                <option value="0" {% if datos_examen.bicipital_izquierdo == '0' %}selected{% endif %}>0. Sin respuesta (arreflexia)</option>
+                                <option value="1" {% if datos_examen.bicipital_izquierdo == '1' %}selected{% endif %}>1. Respuesta disminuida (hiporreflexia)</option>
+                                <option value="2" {% if datos_examen.bicipital_izquierdo == '2' %}selected{% endif %}>2. Respuesta Normal</option>
+                                <option value="3" {% if datos_examen.bicipital_izquierdo == '3' %}selected{% endif %}>3. Respuesta Aumentada (hiperreflexia)</option>
+                                <option value="4" {% if datos_examen.bicipital_izquierdo == '4' %}selected{% endif %}>4. Respuesta repetida y rítmica que cesa (clonus agotable)</option>
+                                <option value="5" {% if datos_examen.bicipital_izquierdo == '5' %}selected{% endif %}>5. Respuesta repetida y rítmica permanente (clonus perm.)</option>
+                              </select>
+                            </div>
+                            <div>
+                              <span class="side-label">Derecho</span>
+                              <select class="form-control reflejo-select" name="bicipital_derecho">
+                                <option value="">Seleccionar...</option>
+                                <option value="0" {% if datos_examen.bicipital_derecho == '0' %}selected{% endif %}>0. Sin respuesta (arreflexia)</option>
+                                <option value="1" {% if datos_examen.bicipital_derecho == '1' %}selected{% endif %}>1. Respuesta disminuida (hiporreflexia)</option>
+                                <option value="2" {% if datos_examen.bicipital_derecho == '2' %}selected{% endif %}>2. Respuesta Normal</option>
+                                <option value="3" {% if datos_examen.bicipital_derecho == '3' %}selected{% endif %}>3. Respuesta Aumentada (hiperreflexia)</option>
+                                <option value="4" {% if datos_examen.bicipital_derecho == '4' %}selected{% endif %}>4. Respuesta repetida y rítmica que cesa (clonus agotable)</option>
+                                <option value="5" {% if datos_examen.bicipital_derecho == '5' %}selected{% endif %}>5. Respuesta repetida y rítmica permanente (clonus perm.)</option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <!-- Estilorradial -->
+                      <div class="col-md-6">
+                        <div class="form-group-enhanced">
+                          <label class="form-control-label font-weight-bold mb-3">
+                            <i class="fas fa-hand-rock mr-2 text-warning"></i>Reflejo Estilorradial
+                          </label>
+                          <div class="bilateral-container">
+                            <div>
+                              <span class="side-label">Izquierdo</span>
+                              <select class="form-control reflejo-select" name="estilorradial_izquierdo">
+                                <option value="">Seleccionar...</option>
+                                <option value="0" {% if datos_examen.estilorradial_izquierdo == '0' %}selected{% endif %}>0. Sin respuesta (arreflexia)</option>
+                                <option value="1" {% if datos_examen.estilorradial_izquierdo == '1' %}selected{% endif %}>1. Respuesta disminuida (hiporreflexia)</option>
+                                <option value="2" {% if datos_examen.estilorradial_izquierdo == '2' %}selected{% endif %}>2. Respuesta Normal</option>
+                                <option value="3" {% if datos_examen.estilorradial_izquierdo == '3' %}selected{% endif %}>3. Respuesta Aumentada (hiperreflexia)</option>
+                                <option value="4" {% if datos_examen.estilorradial_izquierdo == '4' %}selected{% endif %}>4. Respuesta repetida y rítmica que cesa (clonus agotable)</option>
+                                <option value="5" {% if datos_examen.estilorradial_izquierdo == '5' %}selected{% endif %}>5. Respuesta repetida y rítmica permanente (clonus perm.)</option>
+                              </select>
+                            </div>
+                            <div>
+                              <span class="side-label">Derecho</span>
+                              <select class="form-control reflejo-select" name="estilorradial_derecho">
+                                <option value="">Seleccionar...</option>
+                                <option value="0" {% if datos_examen.estilorradial_derecho == '0' %}selected{% endif %}>0. Sin respuesta (arreflexia)</option>
+                                <option value="1" {% if datos_examen.estilorradial_derecho == '1' %}selected{% endif %}>1. Respuesta disminuida (hiporreflexia)</option>
+                                <option value="2" {% if datos_examen.estilorradial_derecho == '2' %}selected{% endif %}>2. Respuesta Normal</option>
+                                <option value="3" {% if datos_examen.estilorradial_derecho == '3' %}selected{% endif %}>3. Respuesta Aumentada (hiperreflexia)</option>
+                                <option value="4" {% if datos_examen.estilorradial_derecho == '4' %}selected{% endif %}>4. Respuesta repetida y rítmica que cesa (clonus agotable)</option>
+                                <option value="5" {% if datos_examen.estilorradial_derecho == '5' %}selected{% endif %}>5. Respuesta repetida y rítmica permanente (clonus perm.)</option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <!-- Cubitopronador -->
+                      <div class="col-md-6">
+                        <div class="form-group-enhanced">
+                          <label class="form-control-label font-weight-bold mb-3">
+                            <i class="fas fa-hand-scissors mr-2 text-danger"></i>Reflejo Cubitopronador
+                          </label>
+                          <div class="bilateral-container">
+                            <div>
+                              <span class="side-label">Izquierdo</span>
+                              <select class="form-control reflejo-select" name="cubitopronador_izquierdo">
+                                <option value="">Seleccionar...</option>
+                                <option value="0" {% if datos_examen.cubitopronador_izquierdo == '0' %}selected{% endif %}>0. Sin respuesta (arreflexia)</option>
+                                <option value="1" {% if datos_examen.cubitopronador_izquierdo == '1' %}selected{% endif %}>1. Respuesta disminuida (hiporreflexia)</option>
+                                <option value="2" {% if datos_examen.cubitopronador_izquierdo == '2' %}selected{% endif %}>2. Respuesta Normal</option>
+                                <option value="3" {% if datos_examen.cubitopronador_izquierdo == '3' %}selected{% endif %}>3. Respuesta Aumentada (hiperreflexia)</option>
+                                <option value="4" {% if datos_examen.cubitopronador_izquierdo == '4' %}selected{% endif %}>4. Respuesta repetida y rítmica que cesa (clonus agotable)</option>
+                                <option value="5" {% if datos_examen.cubitopronador_izquierdo == '5' %}selected{% endif %}>5. Respuesta repetida y rítmica permanente (clonus perm.)</option>
+                              </select>
+                            </div>
+                            <div>
+                              <span class="side-label">Derecho</span>
+                              <select class="form-control reflejo-select" name="cubitopronador_derecho">
+                                <option value="">Seleccionar...</option>
+                                <option value="0" {% if datos_examen.cubitopronador_derecho == '0' %}selected{% endif %}>0. Sin respuesta (arreflexia)</option>
+                                <option value="1" {% if datos_examen.cubitopronador_derecho == '1' %}selected{% endif %}>1. Respuesta disminuida (hiporreflexia)</option>
+                                <option value="2" {% if datos_examen.cubitopronador_derecho == '2' %}selected{% endif %}>2. Respuesta Normal</option>
+                                <option value="3" {% if datos_examen.cubitopronador_derecho == '3' %}selected{% endif %}>3. Respuesta Aumentada (hiperreflexia)</option>
+                                <option value="4" {% if datos_examen.cubitopronador_derecho == '4' %}selected{% endif %}>4. Respuesta repetida y rítmica que cesa (clonus agotable)</option>
+                                <option value="5" {% if datos_examen.cubitopronador_derecho == '5' %}selected{% endif %}>5. Respuesta repetida y rítmica permanente (clonus perm.)</option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Reflejos Cutáneos Abdominales -->
+                    <div class="row mb-4">
+                      <div class="col-12 mb-3">
+                        <h6 class="text-secondary mb-3">
+                          <i class="fas fa-circle-dot mr-2"></i>Reflejos Cutáneos
+                        </h6>
+                      </div>
+                      
+                      <!-- Cútaneo Abdominal -->
+                      <div class="col-md-6">
+                        <div class="form-group-enhanced">
+                          <label class="form-control-label font-weight-bold mb-3">
+                            <i class="fas fa-hand-point-right mr-2 text-primary"></i>Reflejo Cútaneo Abdominal
+                          </label>
+                          <div class="bilateral-container">
+                            <div>
+                              <span class="side-label">Izquierdo</span>
+                              <select class="form-control reflejo-select" name="cutaneo_abdominal_izquierdo">
+                                <option value="">Seleccionar...</option>
+                                <option value="0" {% if datos_examen.cutaneo_abdominal_izquierdo == '0' %}selected{% endif %}>0. Sin respuesta (arreflexia)</option>
+                                <option value="1" {% if datos_examen.cutaneo_abdominal_izquierdo == '1' %}selected{% endif %}>1. Respuesta disminuida (hiporreflexia)</option>
+                                <option value="2" {% if datos_examen.cutaneo_abdominal_izquierdo == '2' %}selected{% endif %}>2. Respuesta Normal</option>
+                                <option value="3" {% if datos_examen.cutaneo_abdominal_izquierdo == '3' %}selected{% endif %}>3. Respuesta Aumentada (hiperreflexia)</option>
+                                <option value="4" {% if datos_examen.cutaneo_abdominal_izquierdo == '4' %}selected{% endif %}>4. Respuesta repetida y rítmica que cesa (clonus agotable)</option>
+                                <option value="5" {% if datos_examen.cutaneo_abdominal_izquierdo == '5' %}selected{% endif %}>5. Respuesta repetida y rítmica permanente (clonus perm.)</option>
+                              </select>
+                            </div>
+                            <div>
+                              <span class="side-label">Derecho</span>
+                              <select class="form-control reflejo-select" name="cutaneo_abdominal_derecho">
+                                <option value="">Seleccionar...</option>
+                                <option value="0" {% if datos_examen.cutaneo_abdominal_derecho == '0' %}selected{% endif %}>0. Sin respuesta (arreflexia)</option>
+                                <option value="1" {% if datos_examen.cutaneo_abdominal_derecho == '1' %}selected{% endif %}>1. Respuesta disminuida (hiporreflexia)</option>
+                                <option value="2" {% if datos_examen.cutaneo_abdominal_derecho == '2' %}selected{% endif %}>2. Respuesta Normal</option>
+                                <option value="3" {% if datos_examen.cutaneo_abdominal_derecho == '3' %}selected{% endif %}>3. Respuesta Aumentada (hiperreflexia)</option>
+                                <option value="4" {% if datos_examen.cutaneo_abdominal_derecho == '4' %}selected{% endif %}>4. Respuesta repetida y rítmica que cesa (clonus agotable)</option>
+                                <option value="5" {% if datos_examen.cutaneo_abdominal_derecho == '5' %}selected{% endif %}>5. Respuesta repetida y rítmica permanente (clonus perm.)</option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Reflejos de Miembros Inferiores -->
+                    <div class="row mb-4">
+                      <div class="col-12 mb-3">
+                        <h6 class="text-secondary mb-3">
+                          <i class="fas fa-walking mr-2"></i>Reflejos de Miembros Inferiores
+                        </h6>
+                      </div>
+                      
+                      <!-- Rotuliano -->
+                      <div class="col-md-6">
+                        <div class="form-group-enhanced">
+                          <label class="form-control-label font-weight-bold mb-3">
+                            <i class="fas fa-circle mr-2 text-success"></i>Reflejo Rotuliano
+                          </label>
+                          <div class="bilateral-container">
+                            <div>
+                              <span class="side-label">Izquierdo</span>
+                              <select class="form-control reflejo-select" name="rotuliano_izquierdo">
+                                <option value="">Seleccionar...</option>
+                                <option value="0" {% if datos_examen.rotuliano_izquierdo == '0' %}selected{% endif %}>0. Sin respuesta (arreflexia)</option>
+                                <option value="1" {% if datos_examen.rotuliano_izquierdo == '1' %}selected{% endif %}>1. Respuesta disminuida (hiporreflexia)</option>
+                                <option value="2" {% if datos_examen.rotuliano_izquierdo == '2' %}selected{% endif %}>2. Respuesta Normal</option>
+                                <option value="3" {% if datos_examen.rotuliano_izquierdo == '3' %}selected{% endif %}>3. Respuesta Aumentada (hiperreflexia)</option>
+                                <option value="4" {% if datos_examen.rotuliano_izquierdo == '4' %}selected{% endif %}>4. Respuesta repetida y rítmica que cesa (clonus agotable)</option>
+                                <option value="5" {% if datos_examen.rotuliano_izquierdo == '5' %}selected{% endif %}>5. Respuesta repetida y rítmica permanente (clonus perm.)</option>
+                              </select>
+                            </div>
+                            <div>
+                              <span class="side-label">Derecho</span>
+                              <select class="form-control reflejo-select" name="rotuliano_derecho">
+                                <option value="">Seleccionar...</option>
+                                <option value="0" {% if datos_examen.rotuliano_derecho == '0' %}selected{% endif %}>0. Sin respuesta (arreflexia)</option>
+                                <option value="1" {% if datos_examen.rotuliano_derecho == '1' %}selected{% endif %}>1. Respuesta disminuida (hiporreflexia)</option>
+                                <option value="2" {% if datos_examen.rotuliano_derecho == '2' %}selected{% endif %}>2. Respuesta Normal</option>
+                                <option value="3" {% if datos_examen.rotuliano_derecho == '3' %}selected{% endif %}>3. Respuesta Aumentada (hiperreflexia)</option>
+                                <option value="4" {% if datos_examen.rotuliano_derecho == '4' %}selected{% endif %}>4. Respuesta repetida y rítmica que cesa (clonus agotable)</option>
+                                <option value="5" {% if datos_examen.rotuliano_derecho == '5' %}selected{% endif %}>5. Respuesta repetida y rítmica permanente (clonus perm.)</option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <!-- Aquiliano -->
+                      <div class="col-md-6">
+                        <div class="form-group-enhanced">
+                          <label class="form-control-label font-weight-bold mb-3">
+                            <i class="fas fa-shoe-prints mr-2 text-info"></i>Reflejo Aquiliano
+                          </label>
+                          <div class="bilateral-container">
+                            <div>
+                              <span class="side-label">Izquierdo</span>
+                              <select class="form-control reflejo-select" name="aquiliano_izquierdo">
+                                <option value="">Seleccionar...</option>
+                                <option value="0" {% if datos_examen.aquiliano_izquierdo == '0' %}selected{% endif %}>0. Sin respuesta (arreflexia)</option>
+                                <option value="1" {% if datos_examen.aquiliano_izquierdo == '1' %}selected{% endif %}>1. Respuesta disminuida (hiporreflexia)</option>
+                                <option value="2" {% if datos_examen.aquiliano_izquierdo == '2' %}selected{% endif %}>2. Respuesta Normal</option>
+                                <option value="3" {% if datos_examen.aquiliano_izquierdo == '3' %}selected{% endif %}>3. Respuesta Aumentada (hiperreflexia)</option>
+                                <option value="4" {% if datos_examen.aquiliano_izquierdo == '4' %}selected{% endif %}>4. Respuesta repetida y rítmica que cesa (clonus agotable)</option>
+                                <option value="5" {% if datos_examen.aquiliano_izquierdo == '5' %}selected{% endif %}>5. Respuesta repetida y rítmica permanente (clonus perm.)</option>
+                              </select>
+                            </div>
+                            <div>
+                              <span class="side-label">Derecho</span>
+                              <select class="form-control reflejo-select" name="aquiliano_derecho">
+                                <option value="">Seleccionar...</option>
+                                <option value="0" {% if datos_examen.aquiliano_derecho == '0' %}selected{% endif %}>0. Sin respuesta (arreflexia)</option>
+                                <option value="1" {% if datos_examen.aquiliano_derecho == '1' %}selected{% endif %}>1. Respuesta disminuida (hiporreflexia)</option>
+                                <option value="2" {% if datos_examen.aquiliano_derecho == '2' %}selected{% endif %}>2. Respuesta Normal</option>
+                                <option value="3" {% if datos_examen.aquiliano_derecho == '3' %}selected{% endif %}>3. Respuesta Aumentada (hiperreflexia)</option>
+                                <option value="4" {% if datos_examen.aquiliano_derecho == '4' %}selected{% endif %}>4. Respuesta repetida y rítmica que cesa (clonus agotable)</option>
+                                <option value="5" {% if datos_examen.aquiliano_derecho == '5' %}selected{% endif %}>5. Respuesta repetida y rítmica permanente (clonus perm.)</option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Reflejos Patológicos -->
+                    <div class="row mb-4">
+                      <div class="col-12">
+                        <h5 class="text-danger mb-3">
+                          <i class="fas fa-exclamation-triangle mr-2"></i>Reflejos Patológicos
+                        </h5>
+                      </div>
+                      
+                      <!-- Glabela -->
+                      <div class="col-md-4">
+                        <div class="form-group-enhanced">
+                          <label class="form-control-label font-weight-bold mb-3">
+                            <i class="fas fa-hand-point-up mr-2 text-warning"></i>Glabela
+                          </label>
+                          <div>
+                            <div class="custom-control custom-radio custom-control-inline">
+                              <input type="radio" id="glabela_normal" name="glabela" value="normal"
+                                    class="custom-control-input" {% if datos_examen.glabela == 'normal' %}checked{% endif %}>
+                              <label class="custom-control-label" for="glabela_normal">Normal</label>
+                            </div>
+                            <div class="custom-control custom-radio custom-control-inline">
+                              <input type="radio" id="glabela_anormal" name="glabela" value="anormal"
+                                    class="custom-control-input" {% if datos_examen.glabela == 'anormal' %}checked{% endif %}>
+                              <label class="custom-control-label" for="glabela_anormal">Anormal</label>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <!-- Succión -->
+                      <div class="col-md-4">
+                        <div class="form-group-enhanced">
+                          <label class="form-control-label font-weight-bold mb-3">
+                            <i class="fas fa-lips mr-2 text-danger"></i>Succión
+                          </label>
+                          <div>
+                            <div class="custom-control custom-radio custom-control-inline">
+                              <input type="radio" id="succion_normal" name="succion" value="normal"
+                                    class="custom-control-input" {% if datos_examen.succion == 'normal' %}checked{% endif %}>
+                              <label class="custom-control-label" for="succion_normal">Normal</label>
+                            </div>
+                            <div class="custom-control custom-radio custom-control-inline">
+                              <input type="radio" id="succion_anormal" name="succion" value="anormal"
+                                    class="custom-control-input" {% if datos_examen.succion == 'anormal' %}checked{% endif %}>
+                              <label class="custom-control-label" for="succion_anormal">Anormal</label>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <!-- Palmomentoniano -->
+                      <div class="col-md-4">
+                        <div class="form-group-enhanced">
+                          <label class="form-control-label font-weight-bold mb-3">
+                            <i class="fas fa-hand-paper mr-2 text-primary"></i>Palmomentoniano
+                          </label>
+                          <div>
+                            <div class="custom-control custom-radio custom-control-inline">
+                              <input type="radio" id="palmomentoniano_normal" name="palmomentoniano" value="normal"
+                                    class="custom-control-input" {% if datos_examen.palmomentoniano == 'normal' %}checked{% endif %}>
+                              <label class="custom-control-label" for="palmomentoniano_normal">Normal</label>
+                            </div>
+                            <div class="custom-control custom-radio custom-control-inline">
+                              <input type="radio" id="palmomentoniano_anormal" name="palmomentoniano" value="anormal"
+                                    class="custom-control-input" {% if datos_examen.palmomentoniano == 'anormal' %}checked{% endif %}>
+                              <label class="custom-control-label" for="palmomentoniano_anormal">Anormal</label>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <!-- Hoffman -->
+                      <div class="col-md-4">
+                        <div class="form-group-enhanced">
+                          <label class="form-control-label font-weight-bold mb-3">
+                            <i class="fas fa-hand-rock mr-2 text-info"></i>Hoffman
+                          </label>
+                          <div>
+                            <div class="custom-control custom-radio custom-control-inline">
+                              <input type="radio" id="hoffman_normal" name="hoffman" value="normal"
+                                    class="custom-control-input" {% if datos_examen.hoffman == 'normal' %}checked{% endif %}>
+                              <label class="custom-control-label" for="hoffman_normal">Normal</label>
+                            </div>
+                            <div class="custom-control custom-radio custom-control-inline">
+                              <input type="radio" id="hoffman_anormal" name="hoffman" value="anormal"
+                                    class="custom-control-input" {% if datos_examen.hoffman == 'anormal' %}checked{% endif %}>
+                              <label class="custom-control-label" for="hoffman_anormal">Anormal</label>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <!-- Palmar -->
+                      <div class="col-md-4">
+                        <div class="form-group-enhanced">
+                          <label class="form-control-label font-weight-bold mb-3">
+                            <i class="fas fa-hand-holding mr-2 text-success"></i>Palmar
+                          </label>
+                          <div>
+                            <div class="custom-control custom-radio custom-control-inline">
+                              <input type="radio" id="palmar_normal" name="palmar" value="normal"
+                                    class="custom-control-input" {% if datos_examen.palmar == 'normal' %}checked{% endif %}>
+                              <label class="custom-control-label" for="palmar_normal">Normal</label>
+                            </div>
+                            <div class="custom-control custom-radio custom-control-inline">
+                              <input type="radio" id="palmar_anormal" name="palmar" value="anormal"
+                                    class="custom-control-input" {% if datos_examen.palmar == 'anormal' %}checked{% endif %}>
+                              <label class="custom-control-label" for="palmar_anormal">Anormal</label>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <!-- Marinesco -->
+                      <div class="col-md-4">
+                        <div class="form-group-enhanced">
+                          <label class="form-control-label font-weight-bold mb-3">
+                            <i class="fas fa-fingers-crossed mr-2 text-warning"></i>Marinesco
+                          </label>
+                          <div>
+                            <div class="custom-control custom-radio custom-control-inline">
+                              <input type="radio" id="marinesco_normal" name="marinesco" value="normal"
+                                    class="custom-control-input" {% if datos_examen.marinesco == 'normal' %}checked{% endif %}>
+                              <label class="custom-control-label" for="marinesco_normal">Normal</label>
+                            </div>
+                            <div class="custom-control custom-radio custom-control-inline">
+                              <input type="radio" id="marinesco_anormal" name="marinesco" value="anormal"
+                                    class="custom-control-input" {% if datos_examen.marinesco == 'anormal' %}checked{% endif %}>
+                              <label class="custom-control-label" for="marinesco_anormal">Anormal</label>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <!-- Prensión -->
+                      <div class="col-md-4">
+                        <div class="form-group-enhanced">
+                          <label class="form-control-label font-weight-bold mb-3">
+                            <i class="fas fa-hand-scissors mr-2 text-danger"></i>Prensión
+                          </label>
+                          <div>
+                            <div class="custom-control custom-radio custom-control-inline">
+                              <input type="radio" id="prension_normal" name="prension" value="normal"
+                                    class="custom-control-input" {% if datos_examen.prension == 'normal' %}checked{% endif %}>
+                              <label class="custom-control-label" for="prension_normal">Normal</label>
+                            </div>
+                            <div class="custom-control custom-radio custom-control-inline">
+                              <input type="radio" id="prension_anormal" name="prension" value="anormal"
+                                    class="custom-control-input" {% if datos_examen.prension == 'anormal' %}checked{% endif %}>
+                              <label class="custom-control-label" for="prension_anormal">Anormal</label>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Observaciones -->
                     <div class="row">
-                      <div class="col-md-4">
+                      <div class="col-md-12">
                         <div class="form-group">
-                          <label class="form-control-label">Dolor al pinchazo</label>
-                          <div class="custom-control custom-switch">
-                            <input type="checkbox" class="custom-control-input" id="dolor_cuello" name="dolor_cuello">
-                            <label class="custom-control-label" for="dolor_cuello">Cuello</label>
-                          </div>
-                          <div class="custom-control custom-switch">
-                            <input type="checkbox" class="custom-control-input" id="dolor_torax" name="dolor_torax">
-                            <label class="custom-control-label" for="dolor_torax">Tórax</label>
+                          <label class="form-control-label font-weight-bold">
+                            <i class="fas fa-comment-dots mr-2 text-primary"></i>Observaciones Reflejos
+                          </label>
+                          <textarea class="form-control observations-textarea" name="observaciones_reflejos"
+                            placeholder="Observaciones sobre la evaluación de reflejos...">{{ datos_examen.observaciones_reflejos }}</textarea>
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+
+              <!-- TAB 4: FUERZA -->
+              <!-- ========================================= -->
+              <div class="tab-pane fade" id="fuerza" role="tabpanel">
+                <div class="neuro-card">
+                  <div class="fuerza-card par-craneal-header">
+                    <div class="d-flex align-items-center">
+                      <i class="fas fa-dumbbell fa-2x mr-3"></i>
+                      <div>
+                        <h4 class="mb-0">Evaluación de Fuerza Muscular</h4>
+                        <small class="opacity-75">Escala de 0-5 según criterios de evaluación muscular</small>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="card-body bg-white">
+                    
+                    <!-- Información de la Escala -->
+                    <div class="row mb-4">
+                      <div class="col-12">
+                        <div class="alert alert-info">
+                          <h6><i class="fas fa-info-circle mr-2"></i>Escala de Evaluación de Fuerza Muscular</h6>
+                          <div class="row">
+                            <div class="col-md-6">
+                              <ul class="mb-0">
+                                <li><strong>0:</strong> No contracción</li>
+                                <li><strong>1:</strong> Contracción muscular perceptible sin desplazamiento</li>
+                                <li><strong>2:</strong> Movimiento activo sin vencer la gravedad (plano horizontal)</li>
+                              </ul>
+                            </div>
+                            <div class="col-md-6">
+                              <ul class="mb-0">
+                                <li><strong>3:</strong> Movimiento activo que vence la gravedad (plano vertical)</li>
+                                <li><strong>4:</strong> Movimiento activo que vence resistencia moderada</li>
+                                <li><strong>5:</strong> Movimiento de fuerza normal</li>
+                              </ul>
+                            </div>
                           </div>
                         </div>
                       </div>
-                      <div class="col-md-4">
-                        <div class="form-group">
-                          <label class="form-control-label">Táctil superficial</label>
-                          <div class="custom-control custom-switch">
-                            <input type="checkbox" class="custom-control-input" id="tactil_cuello" name="tactil_cuello">
-                            <label class="custom-control-label" for="tactil_cuello">Cuello</label>
-                          </div>
-                          <div class="custom-control custom-switch">
-                            <input type="checkbox" class="custom-control-input" id="tactil_torax" name="tactil_torax">
-                            <label class="custom-control-label" for="tactil_torax">Tórax</label>
+                    </div>
+
+                    <!-- Miembro Superior - BRAZO -->
+                    <div class="row mb-4">
+                      <div class="col-12">
+                        <h5 class="text-primary mb-3">
+                          <i class="fas fa-hands mr-2"></i>Miembro Superior - Brazo
+                        </h5>
+                      </div>
+                      
+                      <!-- Brazo - Abducción -->
+                      <div class="col-md-6">
+                        <div class="form-group-enhanced">
+                          <label class="form-control-label font-weight-bold mb-3">
+                            <i class="fas fa-arrows-alt-h mr-2 text-primary"></i>Abducción del Brazo
+                          </label>
+                          <div class="bilateral-container">
+                            <div>
+                              <span class="side-label">Izquierdo</span>
+                              <select class="form-control" name="brazo_abduccion_izq">
+                                <option value="">Seleccionar...</option>
+                                <option value="0" {% if datos_examen.brazo_abduccion_izq == '0' %}selected{% endif %}>0. No contracción</option>
+                                <option value="1" {% if datos_examen.brazo_abduccion_izq == '1' %}selected{% endif %}>1. Contracción muscular perceptible sin desplazamiento</option>
+                                <option value="2" {% if datos_examen.brazo_abduccion_izq == '2' %}selected{% endif %}>2. Movimiento activo sin vencer la gravedad (plano horizontal)</option>
+                                <option value="3" {% if datos_examen.brazo_abduccion_izq == '3' %}selected{% endif %}>3. Movimiento activo que vence la gravedad (plano vertical)</option>
+                                <option value="4" {% if datos_examen.brazo_abduccion_izq == '4' %}selected{% endif %}>4. Movimiento activo que vence resistencia moderada</option>
+                                <option value="5" {% if datos_examen.brazo_abduccion_izq == '5' %}selected{% endif %}>5. Movimiento de fuerza normal</option>
+                              </select>
+                            </div>
+                            <div>
+                              <span class="side-label">Derecho</span>
+                              <select class="form-control" name="brazo_abduccion_der">
+                                <option value="">Seleccionar...</option>
+                                <option value="0" {% if datos_examen.brazo_abduccion_der == '0' %}selected{% endif %}>0. No contracción</option>
+                                <option value="1" {% if datos_examen.brazo_abduccion_der == '1' %}selected{% endif %}>1. Contracción muscular perceptible sin desplazamiento</option>
+                                <option value="2" {% if datos_examen.brazo_abduccion_der == '2' %}selected{% endif %}>2. Movimiento activo sin vencer la gravedad (plano horizontal)</option>
+                                <option value="3" {% if datos_examen.brazo_abduccion_der == '3' %}selected{% endif %}>3. Movimiento activo que vence la gravedad (plano vertical)</option>
+                                <option value="4" {% if datos_examen.brazo_abduccion_der == '4' %}selected{% endif %}>4. Movimiento activo que vence resistencia moderada</option>
+                                <option value="5" {% if datos_examen.brazo_abduccion_der == '5' %}selected{% endif %}>5. Movimiento de fuerza normal</option>
+                              </select>
+                            </div>
                           </div>
                         </div>
                       </div>
-                      <div class="col-md-4">
-                        <div class="form-group">
-                          <label class="form-control-label">Térmica</label>
-                          <div class="custom-control custom-switch">
-                            <input type="checkbox" class="custom-control-input" id="termica_cuello"
-                              name="termica_cuello">
-                            <label class="custom-control-label" for="termica_cuello">Cuello</label>
-                          </div>
-                          <div class="custom-control custom-switch">
-                            <input type="checkbox" class="custom-control-input" id="termica_torax" name="termica_torax">
-                            <label class="custom-control-label" for="termica_torax">Tórax</label>
+                      
+                      <!-- Brazo - Antepulsión -->
+                      <div class="col-md-6">
+                        <div class="form-group-enhanced">
+                          <label class="form-control-label font-weight-bold mb-3">
+                            <i class="fas fa-arrow-up mr-2 text-success"></i>Antepulsión del Brazo
+                          </label>
+                          <div class="bilateral-container">
+                            <div>
+                              <span class="side-label">Izquierdo</span>
+                              <select class="form-control" name="brazo_antepulsion_izq">
+                                <option value="">Seleccionar...</option>
+                                <option value="0" {% if datos_examen.brazo_antepulsion_izq == '0' %}selected{% endif %}>0. No contracción</option>
+                                <option value="1" {% if datos_examen.brazo_antepulsion_izq == '1' %}selected{% endif %}>1. Contracción muscular perceptible sin desplazamiento</option>
+                                <option value="2" {% if datos_examen.brazo_antepulsion_izq == '2' %}selected{% endif %}>2. Movimiento activo sin vencer la gravedad (plano horizontal)</option>
+                                <option value="3" {% if datos_examen.brazo_antepulsion_izq == '3' %}selected{% endif %}>3. Movimiento activo que vence la gravedad (plano vertical)</option>
+                                <option value="4" {% if datos_examen.brazo_antepulsion_izq == '4' %}selected{% endif %}>4. Movimiento activo que vence resistencia moderada</option>
+                                <option value="5" {% if datos_examen.brazo_antepulsion_izq == '5' %}selected{% endif %}>5. Movimiento de fuerza normal</option>
+                              </select>
+                            </div>
+                            <div>
+                              <span class="side-label">Derecho</span>
+                              <select class="form-control" name="brazo_antepulsion_der">
+                                <option value="">Seleccionar...</option>
+                                <option value="0" {% if datos_examen.brazo_antepulsion_der == '0' %}selected{% endif %}>0. No contracción</option>
+                                <option value="1" {% if datos_examen.brazo_antepulsion_der == '1' %}selected{% endif %}>1. Contracción muscular perceptible sin desplazamiento</option>
+                                <option value="2" {% if datos_examen.brazo_antepulsion_der == '2' %}selected{% endif %}>2. Movimiento activo sin vencer la gravedad (plano horizontal)</option>
+                                <option value="3" {% if datos_examen.brazo_antepulsion_der == '3' %}selected{% endif %}>3. Movimiento activo que vence la gravedad (plano vertical)</option>
+                                <option value="4" {% if datos_examen.brazo_antepulsion_der == '4' %}selected{% endif %}>4. Movimiento activo que vence resistencia moderada</option>
+                                <option value="5" {% if datos_examen.brazo_antepulsion_der == '5' %}selected{% endif %}>5. Movimiento de fuerza normal</option>
+                              </select>
+                            </div>
                           </div>
                         </div>
+                      </div>
+                      
+                      <!-- Brazo - Rotación interna -->
+                      <div class="col-md-6">
+                        <div class="form-group-enhanced">
+                          <label class="form-control-label font-weight-bold mb-3">
+                            <i class="fas fa-undo mr-2 text-info"></i>Rotación Interna del Brazo
+                          </label>
+                          <div class="bilateral-container">
+                            <div>
+                              <span class="side-label">Izquierdo</span>
+                              <select class="form-control" name="brazo_rotacion_interna_izq">
+                                <option value="">Seleccionar...</option>
+                                <option value="0" {% if datos_examen.brazo_rotacion_interna_izq == '0' %}selected{% endif %}>0. No contracción</option>
+                                <option value="1" {% if datos_examen.brazo_rotacion_interna_izq == '1' %}selected{% endif %}>1. Contracción muscular perceptible sin desplazamiento</option>
+                                <option value="2" {% if datos_examen.brazo_rotacion_interna_izq == '2' %}selected{% endif %}>2. Movimiento activo sin vencer la gravedad (plano horizontal)</option>
+                                <option value="3" {% if datos_examen.brazo_rotacion_interna_izq == '3' %}selected{% endif %}>3. Movimiento activo que vence la gravedad (plano vertical)</option>
+                                <option value="4" {% if datos_examen.brazo_rotacion_interna_izq == '4' %}selected{% endif %}>4. Movimiento activo que vence resistencia moderada</option>
+                                <option value="5" {% if datos_examen.brazo_rotacion_interna_izq == '5' %}selected{% endif %}>5. Movimiento de fuerza normal</option>
+                              </select>
+                            </div>
+                            <div>
+                              <span class="side-label">Derecho</span>
+                              <select class="form-control" name="brazo_rotacion_interna_der">
+                                <option value="">Seleccionar...</option>
+                                <option value="0" {% if datos_examen.brazo_rotacion_interna_der == '0' %}selected{% endif %}>0. No contracción</option>
+                                <option value="1" {% if datos_examen.brazo_rotacion_interna_der == '1' %}selected{% endif %}>1. Contracción muscular perceptible sin desplazamiento</option>
+                                <option value="2" {% if datos_examen.brazo_rotacion_interna_der == '2' %}selected{% endif %}>2. Movimiento activo sin vencer la gravedad (plano horizontal)</option>
+                                <option value="3" {% if datos_examen.brazo_rotacion_interna_der == '3' %}selected{% endif %}>3. Movimiento activo que vence la gravedad (plano vertical)</option>
+                                <option value="4" {% if datos_examen.brazo_rotacion_interna_der == '4' %}selected{% endif %}>4. Movimiento activo que vence resistencia moderada</option>
+                                <option value="5" {% if datos_examen.brazo_rotacion_interna_der == '5' %}selected{% endif %}>5. Movimiento de fuerza normal</option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <!-- Brazo - Rotación externa -->
+                      <div class="col-md-6">
+                        <div class="form-group-enhanced">
+                          <label class="form-control-label font-weight-bold mb-3">
+                            <i class="fas fa-redo mr-2 text-warning"></i>Rotación Externa del Brazo
+                          </label>
+                          <div class="bilateral-container">
+                            <div>
+                              <span class="side-label">Izquierdo</span>
+                              <select class="form-control" name="brazo_rotacion_externa_izq">
+                                <option value="">Seleccionar...</option>
+                                <option value="0" {% if datos_examen.brazo_rotacion_externa_izq == '0' %}selected{% endif %}>0. No contracción</option>
+                                <option value="1" {% if datos_examen.brazo_rotacion_externa_izq == '1' %}selected{% endif %}>1. Contracción muscular perceptible sin desplazamiento</option>
+                                <option value="2" {% if datos_examen.brazo_rotacion_externa_izq == '2' %}selected{% endif %}>2. Movimiento activo sin vencer la gravedad (plano horizontal)</option>
+                                <option value="3" {% if datos_examen.brazo_rotacion_externa_izq == '3' %}selected{% endif %}>3. Movimiento activo que vence la gravedad (plano vertical)</option>
+                                <option value="4" {% if datos_examen.brazo_rotacion_externa_izq == '4' %}selected{% endif %}>4. Movimiento activo que vence resistencia moderada</option>
+                                <option value="5" {% if datos_examen.brazo_rotacion_externa_izq == '5' %}selected{% endif %}>5. Movimiento de fuerza normal</option>
+                              </select>
+                            </div>
+                            <div>
+                              <span class="side-label">Derecho</span>
+                              <select class="form-control" name="brazo_rotacion_externa_der">
+                                <option value="">Seleccionar...</option>
+                                <option value="0" {% if datos_examen.brazo_rotacion_externa_der == '0' %}selected{% endif %}>0. No contracción</option>
+                                <option value="1" {% if datos_examen.brazo_rotacion_externa_der == '1' %}selected{% endif %}>1. Contracción muscular perceptible sin desplazamiento</option>
+                                <option value="2" {% if datos_examen.brazo_rotacion_externa_der == '2' %}selected{% endif %}>2. Movimiento activo sin vencer la gravedad (plano horizontal)</option>
+                                <option value="3" {% if datos_examen.brazo_rotacion_externa_der == '3' %}selected{% endif %}>3. Movimiento activo que vence la gravedad (plano vertical)</option>
+                                <option value="4" {% if datos_examen.brazo_rotacion_externa_der == '4' %}selected{% endif %}>4. Movimiento activo que vence resistencia moderada</option>
+                                <option value="5" {% if datos_examen.brazo_rotacion_externa_der == '5' %}selected{% endif %}>5. Movimiento de fuerza normal</option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Miembro Superior - ANTEBRAZO -->
+                    <div class="row mb-4">
+                      <div class="col-12">
+                        <h5 class="text-success mb-3">
+                          <i class="fas fa-hand-rock mr-2"></i>Miembro Superior - Antebrazo
+                        </h5>
+                      </div>
+                      
+                      <!-- Antebrazo - Flexión -->
+                      <div class="col-md-6">
+                        <div class="form-group-enhanced">
+                          <label class="form-control-label font-weight-bold mb-3">
+                            <i class="fas fa-compress-arrows-alt mr-2 text-primary"></i>Flexión del Antebrazo
+                          </label>
+                          <div class="bilateral-container">
+                            <div>
+                              <span class="side-label">Izquierdo</span>
+                              <select class="form-control" name="antebrazo_flexion_izq">
+                                <option value="">Seleccionar...</option>
+                                <option value="0" {% if datos_examen.antebrazo_flexion_izq == '0' %}selected{% endif %}>0. No contracción</option>
+                                <option value="1" {% if datos_examen.antebrazo_flexion_izq == '1' %}selected{% endif %}>1. Contracción muscular perceptible sin desplazamiento</option>
+                                <option value="2" {% if datos_examen.antebrazo_flexion_izq == '2' %}selected{% endif %}>2. Movimiento activo sin vencer la gravedad (plano horizontal)</option>
+                                <option value="3" {% if datos_examen.antebrazo_flexion_izq == '3' %}selected{% endif %}>3. Movimiento activo que vence la gravedad (plano vertical)</option>
+                                <option value="4" {% if datos_examen.antebrazo_flexion_izq == '4' %}selected{% endif %}>4. Movimiento activo que vence resistencia moderada</option>
+                                <option value="5" {% if datos_examen.antebrazo_flexion_izq == '5' %}selected{% endif %}>5. Movimiento de fuerza normal</option>
+                              </select>
+                            </div>
+                            <div>
+                              <span class="side-label">Derecho</span>
+                              <select class="form-control" name="antebrazo_flexion_der">
+                                <option value="">Seleccionar...</option>
+                                <option value="0" {% if datos_examen.antebrazo_flexion_der == '0' %}selected{% endif %}>0. No contracción</option>
+                                <option value="1" {% if datos_examen.antebrazo_flexion_der == '1' %}selected{% endif %}>1. Contracción muscular perceptible sin desplazamiento</option>
+                                <option value="2" {% if datos_examen.antebrazo_flexion_der == '2' %}selected{% endif %}>2. Movimiento activo sin vencer la gravedad (plano horizontal)</option>
+                                <option value="3" {% if datos_examen.antebrazo_flexion_der == '3' %}selected{% endif %}>3. Movimiento activo que vence la gravedad (plano vertical)</option>
+                                <option value="4" {% if datos_examen.antebrazo_flexion_der == '4' %}selected{% endif %}>4. Movimiento activo que vence resistencia moderada</option>
+                                <option value="5" {% if datos_examen.antebrazo_flexion_der == '5' %}selected{% endif %}>5. Movimiento de fuerza normal</option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <!-- Antebrazo - Extensión -->
+                      <div class="col-md-6">
+                        <div class="form-group-enhanced">
+                          <label class="form-control-label font-weight-bold mb-3">
+                            <i class="fas fa-expand-arrows-alt mr-2 text-success"></i>Extensión del Antebrazo
+                          </label>
+                          <div class="bilateral-container">
+                            <div>
+                              <span class="side-label">Izquierdo</span>
+                              <select class="form-control" name="antebrazo_extension_izq">
+                                <option value="">Seleccionar...</option>
+                                <option value="0" {% if datos_examen.antebrazo_extension_izq == '0' %}selected{% endif %}>0. No contracción</option>
+                                <option value="1" {% if datos_examen.antebrazo_extension_izq == '1' %}selected{% endif %}>1. Contracción muscular perceptible sin desplazamiento</option>
+                                <option value="2" {% if datos_examen.antebrazo_extension_izq == '2' %}selected{% endif %}>2. Movimiento activo sin vencer la gravedad (plano horizontal)</option>
+                                <option value="3" {% if datos_examen.antebrazo_extension_izq == '3' %}selected{% endif %}>3. Movimiento activo que vence la gravedad (plano vertical)</option>
+                                <option value="4" {% if datos_examen.antebrazo_extension_izq == '4' %}selected{% endif %}>4. Movimiento activo que vence resistencia moderada</option>
+                                <option value="5" {% if datos_examen.antebrazo_extension_izq == '5' %}selected{% endif %}>5. Movimiento de fuerza normal</option>
+                              </select>
+                            </div>
+                            <div>
+                              <span class="side-label">Derecho</span>
+                              <select class="form-control" name="antebrazo_extension_der">
+                                <option value="">Seleccionar...</option>
+                                <option value="0" {% if datos_examen.antebrazo_extension_der == '0' %}selected{% endif %}>0. No contracción</option>
+                                <option value="1" {% if datos_examen.antebrazo_extension_der == '1' %}selected{% endif %}>1. Contracción muscular perceptible sin desplazamiento</option>
+                                <option value="2" {% if datos_examen.antebrazo_extension_der == '2' %}selected{% endif %}>2. Movimiento activo sin vencer la gravedad (plano horizontal)</option>
+                                <option value="3" {% if datos_examen.antebrazo_extension_der == '3' %}selected{% endif %}>3. Movimiento activo que vence la gravedad (plano vertical)</option>
+                                <option value="4" {% if datos_examen.antebrazo_extension_der == '4' %}selected{% endif %}>4. Movimiento activo que vence resistencia moderada</option>
+                                <option value="5" {% if datos_examen.antebrazo_extension_der == '5' %}selected{% endif %}>5. Movimiento de fuerza normal</option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Miembro Superior - MANO -->
+                    <div class="row mb-4">
+                      <div class="col-12">
+                        <h5 class="text-info mb-3">
+                          <i class="fas fa-hand-paper mr-2"></i>Miembro Superior - Mano
+                        </h5>
+                      </div>
+                      
+                      <!-- Mano - Flexión -->
+                      <div class="col-md-4">
+                        <div class="form-group-enhanced">
+                          <label class="form-control-label font-weight-bold mb-3">
+                            <i class="fas fa-hand-point-down mr-2 text-primary"></i>Flexión de la Mano
+                          </label>
+                          <div class="bilateral-container">
+                            <div>
+                              <span class="side-label">Izquierdo</span>
+                              <select class="form-control" name="mano_flexion_izq">
+                                <option value="">Seleccionar...</option>
+                                <option value="0" {% if datos_examen.mano_flexion_izq == '0' %}selected{% endif %}>0. No contracción</option>
+                                <option value="1" {% if datos_examen.mano_flexion_izq == '1' %}selected{% endif %}>1. Contracción muscular perceptible sin desplazamiento</option>
+                                <option value="2" {% if datos_examen.mano_flexion_izq == '2' %}selected{% endif %}>2. Movimiento activo sin vencer la gravedad (plano horizontal)</option>
+                                <option value="3" {% if datos_examen.mano_flexion_izq == '3' %}selected{% endif %}>3. Movimiento activo que vence la gravedad (plano vertical)</option>
+                                <option value="4" {% if datos_examen.mano_flexion_izq == '4' %}selected{% endif %}>4. Movimiento activo que vence resistencia moderada</option>
+                                <option value="5" {% if datos_examen.mano_flexion_izq == '5' %}selected{% endif %}>5. Movimiento de fuerza normal</option>
+                              </select>
+                            </div>
+                            <div>
+                              <span class="side-label">Derecho</span>
+                              <select class="form-control" name="mano_flexion_der">
+                                <option value="">Seleccionar...</option>
+                                <option value="0" {% if datos_examen.mano_flexion_der == '0' %}selected{% endif %}>0. No contracción</option>
+                                <option value="1" {% if datos_examen.mano_flexion_der == '1' %}selected{% endif %}>1. Contracción muscular perceptible sin desplazamiento</option>
+                                <option value="2" {% if datos_examen.mano_flexion_der == '2' %}selected{% endif %}>2. Movimiento activo sin vencer la gravedad (plano horizontal)</option>
+                                <option value="3" {% if datos_examen.mano_flexion_der == '3' %}selected{% endif %}>3. Movimiento activo que vence la gravedad (plano vertical)</option>
+                                <option value="4" {% if datos_examen.mano_flexion_der == '4' %}selected{% endif %}>4. Movimiento activo que vence resistencia moderada</option>
+                                <option value="5" {% if datos_examen.mano_flexion_der == '5' %}selected{% endif %}>5. Movimiento de fuerza normal</option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <!-- Mano - Extensión -->
+                      <div class="col-md-4">
+                        <div class="form-group-enhanced">
+                          <label class="form-control-label font-weight-bold mb-3">
+                            <i class="fas fa-hand-point-up mr-2 text-success"></i>Extensión de la Mano
+                          </label>
+                          <div class="bilateral-container">
+                            <div>
+                              <span class="side-label">Izquierdo</span>
+                              <select class="form-control" name="mano_extension_izq">
+                                <option value="">Seleccionar...</option>
+                                <option value="0" {% if datos_examen.mano_extension_izq == '0' %}selected{% endif %}>0. No contracción</option>
+                                <option value="1" {% if datos_examen.mano_extension_izq == '1' %}selected{% endif %}>1. Contracción muscular perceptible sin desplazamiento</option>
+                                <option value="2" {% if datos_examen.mano_extension_izq == '2' %}selected{% endif %}>2. Movimiento activo sin vencer la gravedad (plano horizontal)</option>
+                                <option value="3" {% if datos_examen.mano_extension_izq == '3' %}selected{% endif %}>3. Movimiento activo que vence la gravedad (plano vertical)</option>
+                                <option value="4" {% if datos_examen.mano_extension_izq == '4' %}selected{% endif %}>4. Movimiento activo que vence resistencia moderada</option>
+                                <option value="5" {% if datos_examen.mano_extension_izq == '5' %}selected{% endif %}>5. Movimiento de fuerza normal</option>
+                              </select>
+                            </div>
+                            <div>
+                              <span class="side-label">Derecho</span>
+                              <select class="form-control" name="mano_extension_der">
+                                <option value="">Seleccionar...</option>
+                                <option value="0" {% if datos_examen.mano_extension_der == '0' %}selected{% endif %}>0. No contracción</option>
+                                <option value="1" {% if datos_examen.mano_extension_der == '1' %}selected{% endif %}>1. Contracción muscular perceptible sin desplazamiento</option>
+                                <option value="2" {% if datos_examen.mano_extension_der == '2' %}selected{% endif %}>2. Movimiento activo sin vencer la gravedad (plano horizontal)</option>
+                                <option value="3" {% if datos_examen.mano_extension_der == '3' %}selected{% endif %}>3. Movimiento activo que vence la gravedad (plano vertical)</option>
+                                <option value="4" {% if datos_examen.mano_extension_der == '4' %}selected{% endif %}>4. Movimiento activo que vence resistencia moderada</option>
+                                <option value="5" {% if datos_examen.mano_extension_der == '5' %}selected{% endif %}>5. Movimiento de fuerza normal</option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <!-- Mano - Prensión -->
+                      <div class="col-md-4">
+                        <div class="form-group-enhanced">
+                          <label class="form-control-label font-weight-bold mb-3">
+                            <i class="fas fa-hand-rock mr-2 text-warning"></i>Prensión de la Mano
+                          </label>
+                          <div class="bilateral-container">
+                            <div>
+                              <span class="side-label">Izquierdo</span>
+                              <select class="form-control" name="mano_prension_izq">
+                                <option value="">Seleccionar...</option>
+                                <option value="0" {% if datos_examen.mano_prension_izq == '0' %}selected{% endif %}>0. No contracción</option>
+                                <option value="1" {% if datos_examen.mano_prension_izq == '1' %}selected{% endif %}>1. Contracción muscular perceptible sin desplazamiento</option>
+                                <option value="2" {% if datos_examen.mano_prension_izq == '2' %}selected{% endif %}>2. Movimiento activo sin vencer la gravedad (plano horizontal)</option>
+                                <option value="3" {% if datos_examen.mano_prension_izq == '3' %}selected{% endif %}>3. Movimiento activo que vence la gravedad (plano vertical)</option>
+                                <option value="4" {% if datos_examen.mano_prension_izq == '4' %}selected{% endif %}>4. Movimiento activo que vence resistencia moderada</option>
+                                <option value="5" {% if datos_examen.mano_prension_izq == '5' %}selected{% endif %}>5. Movimiento de fuerza normal</option>
+                              </select>
+                            </div>
+                            <div>
+                              <span class="side-label">Derecho</span>
+                              <select class="form-control" name="mano_prension_der">
+                                <option value="">Seleccionar...</option>
+                                <option value="0" {% if datos_examen.mano_prension_der == '0' %}selected{% endif %}>0. No contracción</option>
+                                <option value="1" {% if datos_examen.mano_prension_der == '1' %}selected{% endif %}>1. Contracción muscular perceptible sin desplazamiento</option>
+                                <option value="2" {% if datos_examen.mano_prension_der == '2' %}selected{% endif %}>2. Movimiento activo sin vencer la gravedad (plano horizontal)</option>
+                                <option value="3" {% if datos_examen.mano_prension_der == '3' %}selected{% endif %}>3. Movimiento activo que vence la gravedad (plano vertical)</option>
+                                <option value="4" {% if datos_examen.mano_prension_der == '4' %}selected{% endif %}>4. Movimiento activo que vence resistencia moderada</option>
+                                <option value="5" {% if datos_examen.mano_prension_der == '5' %}selected{% endif %}>5. Movimiento de fuerza normal</option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Miembro Inferior - MUSLO -->
+                    <div class="row mb-4">
+                      <div class="col-12">
+                        <h5 class="text-warning mb-3">
+                          <i class="fas fa-walking mr-2"></i>Miembro Inferior - Muslo
+                        </h5>
+                      </div>
+                      
+                      <!-- Muslo - Flexión -->
+                      <div class="col-md-4">
+                        <div class="form-group-enhanced">
+                          <label class="form-control-label font-weight-bold mb-3">
+                            <i class="fas fa-compress-arrows-alt mr-2 text-primary"></i>Flexión del Muslo
+                          </label>
+                          <div class="bilateral-container">
+                            <div>
+                              <span class="side-label">Izquierdo</span>
+                              <select class="form-control" name="muslo_flexion_izq">
+                                <option value="">Seleccionar...</option>
+                                <option value="0" {% if datos_examen.muslo_flexion_izq == '0' %}selected{% endif %}>0. No contracción</option>
+                                <option value="1" {% if datos_examen.muslo_flexion_izq == '1' %}selected{% endif %}>1. Contracción muscular perceptible sin desplazamiento</option>
+                                <option value="2" {% if datos_examen.muslo_flexion_izq == '2' %}selected{% endif %}>2. Movimiento activo sin vencer la gravedad (plano horizontal)</option>
+                                <option value="3" {% if datos_examen.muslo_flexion_izq == '3' %}selected{% endif %}>3. Movimiento activo que vence la gravedad (plano vertical)</option>
+                                <option value="4" {% if datos_examen.muslo_flexion_izq == '4' %}selected{% endif %}>4. Movimiento activo que vence resistencia moderada</option>
+                                <option value="5" {% if datos_examen.muslo_flexion_izq == '5' %}selected{% endif %}>5. Movimiento de fuerza normal</option>
+                              </select>
+                            </div>
+                            <div>
+                              <span class="side-label">Derecho</span>
+                              <select class="form-control" name="muslo_flexion_der">
+                                <option value="">Seleccionar...</option>
+                                <option value="0" {% if datos_examen.muslo_flexion_der == '0' %}selected{% endif %}>0. No contracción</option>
+                                <option value="1" {% if datos_examen.muslo_flexion_der == '1' %}selected{% endif %}>1. Contracción muscular perceptible sin desplazamiento</option>
+                                <option value="2" {% if datos_examen.muslo_flexion_der == '2' %}selected{% endif %}>2. Movimiento activo sin vencer la gravedad (plano horizontal)</option>
+                                <option value="3" {% if datos_examen.muslo_flexion_der == '3' %}selected{% endif %}>3. Movimiento activo que vence la gravedad (plano vertical)</option>
+                                <option value="4" {% if datos_examen.muslo_flexion_der == '4' %}selected{% endif %}>4. Movimiento activo que vence resistencia moderada</option>
+                                <option value="5" {% if datos_examen.muslo_flexion_der == '5' %}selected{% endif %}>5. Movimiento de fuerza normal</option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <!-- Muslo - Abducción -->
+                      <div class="col-md-4">
+                        <div class="form-group-enhanced">
+                          <label class="form-control-label font-weight-bold mb-3">
+                            <i class="fas fa-arrows-alt-h mr-2 text-success"></i>Abducción del Muslo
+                          </label>
+                          <div class="bilateral-container">
+                            <div>
+                              <span class="side-label">Izquierdo</span>
+                              <select class="form-control" name="muslo_abduccion_izq">
+                                <option value="">Seleccionar...</option>
+                                <option value="0" {% if datos_examen.muslo_abduccion_izq == '0' %}selected{% endif %}>0. No contracción</option>
+                                <option value="1" {% if datos_examen.muslo_abduccion_izq == '1' %}selected{% endif %}>1. Contracción muscular perceptible sin desplazamiento</option>
+                                <option value="2" {% if datos_examen.muslo_abduccion_izq == '2' %}selected{% endif %}>2. Movimiento activo sin vencer la gravedad (plano horizontal)</option>
+                                <option value="3" {% if datos_examen.muslo_abduccion_izq == '3' %}selected{% endif %}>3. Movimiento activo que vence la gravedad (plano vertical)</option>
+                                <option value="4" {% if datos_examen.muslo_abduccion_izq == '4' %}selected{% endif %}>4. Movimiento activo que vence resistencia moderada</option>
+                                <option value="5" {% if datos_examen.muslo_abduccion_izq == '5' %}selected{% endif %}>5. Movimiento de fuerza normal</option>
+                              </select>
+                            </div>
+                            <div>
+                              <span class="side-label">Derecho</span>
+                              <select class="form-control" name="muslo_abduccion_der">
+                                <option value="">Seleccionar...</option>
+                                <option value="0" {% if datos_examen.muslo_abduccion_der == '0' %}selected{% endif %}>0. No contracción</option>
+                                <option value="1" {% if datos_examen.muslo_abduccion_der == '1' %}selected{% endif %}>1. Contracción muscular perceptible sin desplazamiento</option>
+                                <option value="2" {% if datos_examen.muslo_abduccion_der == '2' %}selected{% endif %}>2. Movimiento activo sin vencer la gravedad (plano horizontal)</option>
+                                <option value="3" {% if datos_examen.muslo_abduccion_der == '3' %}selected{% endif %}>3. Movimiento activo que vence la gravedad (plano vertical)</option>
+                                <option value="4" {% if datos_examen.muslo_abduccion_der == '4' %}selected{% endif %}>4. Movimiento activo que vence resistencia moderada</option>
+                                <option value="5" {% if datos_examen.muslo_abduccion_der == '5' %}selected{% endif %}>5. Movimiento de fuerza normal</option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <!-- Muslo - Aducción -->
+                      <div class="col-md-4">
+                        <div class="form-group-enhanced">
+                          <label class="form-control-label font-weight-bold mb-3">
+                            <i class="fas fa-compress-alt mr-2 text-info"></i>Aducción del Muslo
+                          </label>
+                          <div class="bilateral-container">
+                            <div>
+                              <span class="side-label">Izquierdo</span>
+                              <select class="form-control" name="muslo_aduccion_izq">
+                                <option value="">Seleccionar...</option>
+                                <option value="0" {% if datos_examen.muslo_aduccion_izq == '0' %}selected{% endif %}>0. No contracción</option>
+                                <option value="1" {% if datos_examen.muslo_aduccion_izq == '1' %}selected{% endif %}>1. Contracción muscular perceptible sin desplazamiento</option>
+                                <option value="2" {% if datos_examen.muslo_aduccion_izq == '2' %}selected{% endif %}>2. Movimiento activo sin vencer la gravedad (plano horizontal)</option>
+                                <option value="3" {% if datos_examen.muslo_aduccion_izq == '3' %}selected{% endif %}>3. Movimiento activo que vence la gravedad (plano vertical)</option>
+                                <option value="4" {% if datos_examen.muslo_aduccion_izq == '4' %}selected{% endif %}>4. Movimiento activo que vence resistencia moderada</option>
+                                <option value="5" {% if datos_examen.muslo_aduccion_izq == '5' %}selected{% endif %}>5. Movimiento de fuerza normal</option>
+                              </select>
+                            </div>
+                            <div>
+                              <span class="side-label">Derecho</span>
+                              <select class="form-control" name="muslo_aduccion_der">
+                                <option value="">Seleccionar...</option>
+                                <option value="0" {% if datos_examen.muslo_aduccion_der == '0' %}selected{% endif %}>0. No contracción</option>
+                                <option value="1" {% if datos_examen.muslo_aduccion_der == '1' %}selected{% endif %}>1. Contracción muscular perceptible sin desplazamiento</option>
+                                <option value="2" {% if datos_examen.muslo_aduccion_der == '2' %}selected{% endif %}>2. Movimiento activo sin vencer la gravedad (plano horizontal)</option>
+                                <option value="3" {% if datos_examen.muslo_aduccion_der == '3' %}selected{% endif %}>3. Movimiento activo que vence la gravedad (plano vertical)</option>
+                                <option value="4" {% if datos_examen.muslo_aduccion_der == '4' %}selected{% endif %}>4. Movimiento activo que vence resistencia moderada</option>
+                                <option value="5" {% if datos_examen.muslo_aduccion_der == '5' %}selected{% endif %}>5. Movimiento de fuerza normal</option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Miembro Inferior - PIERNA -->
+                    <div class="row mb-4">
+                      <div class="col-12">
+                        <h5 class="text-danger mb-3">
+                          <i class="fas fa-shoe-prints mr-2"></i>Miembro Inferior - Pierna
+                        </h5>
+                      </div>
+                      
+                      <!-- Pierna - Flexión -->
+                      <div class="col-md-6">
+                        <div class="form-group-enhanced">
+                          <label class="form-control-label font-weight-bold mb-3">
+                            <i class="fas fa-compress-arrows-alt mr-2 text-primary"></i>Flexión de la Pierna
+                          </label>
+                          <div class="bilateral-container">
+                            <div>
+                              <span class="side-label">Izquierdo</span>
+                              <select class="form-control" name="pierna_flexion_izq">
+                                <option value="">Seleccionar...</option>
+                                <option value="0" {% if datos_examen.pierna_flexion_izq == '0' %}selected{% endif %}>0. No contracción</option>
+                                <option value="1" {% if datos_examen.pierna_flexion_izq == '1' %}selected{% endif %}>1. Contracción muscular perceptible sin desplazamiento</option>
+                                <option value="2" {% if datos_examen.pierna_flexion_izq == '2' %}selected{% endif %}>2. Movimiento activo sin vencer la gravedad (plano horizontal)</option>
+                                <option value="3" {% if datos_examen.pierna_flexion_izq == '3' %}selected{% endif %}>3. Movimiento activo que vence la gravedad (plano vertical)</option>
+                                <option value="4" {% if datos_examen.pierna_flexion_izq == '4' %}selected{% endif %}>4. Movimiento activo que vence resistencia moderada</option>
+                                <option value="5" {% if datos_examen.pierna_flexion_izq == '5' %}selected{% endif %}>5. Movimiento de fuerza normal</option>
+                              </select>
+                            </div>
+                            <div>
+                              <span class="side-label">Derecho</span>
+                              <select class="form-control" name="pierna_flexion_der">
+                                <option value="">Seleccionar...</option>
+                                <option value="0" {% if datos_examen.pierna_flexion_der == '0' %}selected{% endif %}>0. No contracción</option>
+                                <option value="1" {% if datos_examen.pierna_flexion_der == '1' %}selected{% endif %}>1. Contracción muscular perceptible sin desplazamiento</option>
+                                <option value="2" {% if datos_examen.pierna_flexion_der == '2' %}selected{% endif %}>2. Movimiento activo sin vencer la gravedad (plano horizontal)</option>
+                                <option value="3" {% if datos_examen.pierna_flexion_der == '3' %}selected{% endif %}>3. Movimiento activo que vence la gravedad (plano vertical)</option>
+                                <option value="4" {% if datos_examen.pierna_flexion_der == '4' %}selected{% endif %}>4. Movimiento activo que vence resistencia moderada</option>
+                                <option value="5" {% if datos_examen.pierna_flexion_der == '5' %}selected{% endif %}>5. Movimiento de fuerza normal</option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <!-- Pierna - Extensión -->
+                      <div class="col-md-6">
+                        <div class="form-group-enhanced">
+                          <label class="form-control-label font-weight-bold mb-3">
+                            <i class="fas fa-expand-arrows-alt mr-2 text-success"></i>Extensión de la Pierna
+                          </label>
+                          <div class="bilateral-container">
+                            <div>
+                              <span class="side-label">Izquierdo</span>
+                              <select class="form-control" name="pierna_extension_izq">
+                                <option value="">Seleccionar...</option>
+                                <option value="0" {% if datos_examen.pierna_extension_izq == '0' %}selected{% endif %}>0. No contracción</option>
+                                <option value="1" {% if datos_examen.pierna_extension_izq == '1' %}selected{% endif %}>1. Contracción muscular perceptible sin desplazamiento</option>
+                                <option value="2" {% if datos_examen.pierna_extension_izq == '2' %}selected{% endif %}>2. Movimiento activo sin vencer la gravedad (plano horizontal)</option>
+                                <option value="3" {% if datos_examen.pierna_extension_izq == '3' %}selected{% endif %}>3. Movimiento activo que vence la gravedad (plano vertical)</option>
+                                <option value="4" {% if datos_examen.pierna_extension_izq == '4' %}selected{% endif %}>4. Movimiento activo que vence resistencia moderada</option>
+                                <option value="5" {% if datos_examen.pierna_extension_izq == '5' %}selected{% endif %}>5. Movimiento de fuerza normal</option>
+                              </select>
+                            </div>
+                            <div>
+                              <span class="side-label">Derecho</span>
+                              <select class="form-control" name="pierna_extension_der">
+                                <option value="">Seleccionar...</option>
+                                <option value="0" {% if datos_examen.pierna_extension_der == '0' %}selected{% endif %}>0. No contracción</option>
+                                <option value="1" {% if datos_examen.pierna_extension_der == '1' %}selected{% endif %}>1. Contracción muscular perceptible sin desplazamiento</option>
+                                <option value="2" {% if datos_examen.pierna_extension_der == '2' %}selected{% endif %}>2. Movimiento activo sin vencer la gravedad (plano horizontal)</option>
+                                <option value="3" {% if datos_examen.pierna_extension_der == '3' %}selected{% endif %}>3. Movimiento activo que vence la gravedad (plano vertical)</option>
+                                <option value="4" {% if datos_examen.pierna_extension_der == '4' %}selected{% endif %}>4. Movimiento activo que vence resistencia moderada</option>
+                                <option value="5" {% if datos_examen.pierna_extension_der == '5' %}selected{% endif %}>5. Movimiento de fuerza normal</option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Miembro Inferior - PIE -->
+                    <!-- Miembro Inferior - PIE -->
+              <div class="row mb-4">
+                <div class="col-12">
+                  <h5 class="text-secondary mb-3">
+                    <i class="fas fa-socks mr-2"></i>Miembro Inferior - Pie
+                  </h5>
+                </div>
+                
+                <!-- Pie - Flexión -->
+                <div class="col-md-6">
+                  <div class="form-group-enhanced">
+                    <label class="form-control-label font-weight-bold mb-3">
+                      <i class="fas fa-angle-down mr-2 text-primary"></i>Flexión del Pie
+                    </label>
+                    <div class="bilateral-container">
+                      <div>
+                        <span class="side-label">Izquierdo</span>
+                        <select class="form-control" name="pie_flexion_izq">
+                          <option value="">Seleccionar...</option>
+                          <option value="0" {% if datos_examen.pie_flexion_izq == '0' %}selected{% endif %}>0. No contracción</option>
+                          <option value="1" {% if datos_examen.pie_flexion_izq == '1' %}selected{% endif %}>1. Contracción muscular perceptible sin desplazamiento</option>
+                          <option value="2" {% if datos_examen.pie_flexion_izq == '2' %}selected{% endif %}>2. Movimiento activo sin vencer la gravedad (plano horizontal)</option>
+                          <option value="3" {% if datos_examen.pie_flexion_izq == '3' %}selected{% endif %}>3. Movimiento activo que vence la gravedad (plano vertical)</option>
+                          <option value="4" {% if datos_examen.pie_flexion_izq == '4' %}selected{% endif %}>4. Movimiento activo que vence resistencia moderada</option>
+                          <option value="5" {% if datos_examen.pie_flexion_izq == '5' %}selected{% endif %}>5. Movimiento de fuerza normal</option>
+                        </select>
+                      </div>
+                      <div>
+                        <span class="side-label">Derecho</span>
+                        <select class="form-control" name="pie_flexion_der">
+                          <option value="">Seleccionar...</option>
+                          <option value="0" {% if datos_examen.pie_flexion_der == '0' %}selected{% endif %}>0. No contracción</option>
+                          <option value="1" {% if datos_examen.pie_flexion_der == '1' %}selected{% endif %}>1. Contracción muscular perceptible sin desplazamiento</option>
+                          <option value="2" {% if datos_examen.pie_flexion_der == '2' %}selected{% endif %}>2. Movimiento activo sin vencer la gravedad (plano horizontal)</option>
+                          <option value="3" {% if datos_examen.pie_flexion_der == '3' %}selected{% endif %}>3. Movimiento activo que vence la gravedad (plano vertical)</option>
+                          <option value="4" {% if datos_examen.pie_flexion_der == '4' %}selected{% endif %}>4. Movimiento activo que vence resistencia moderada</option>
+                          <option value="5" {% if datos_examen.pie_flexion_der == '5' %}selected{% endif %}>5. Movimiento de fuerza normal</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Pie - Extensión -->
+                <div class="col-md-6">
+                  <div class="form-group-enhanced">
+                    <label class="form-control-label font-weight-bold mb-3">
+                      <i class="fas fa-angle-up mr-2 text-success"></i>Extensión del Pie
+                    </label>
+                    <div class="bilateral-container">
+                      <div>
+                        <span class="side-label">Izquierdo</span>
+                        <select class="form-control" name="pie_extension_izq">
+                          <option value="">Seleccionar...</option>
+                          <option value="0" {% if datos_examen.pie_extension_izq == '0' %}selected{% endif %}>0. No contracción</option>
+                          <option value="1" {% if datos_examen.pie_extension_izq == '1' %}selected{% endif %}>1. Contracción muscular perceptible sin desplazamiento</option>
+                          <option value="2" {% if datos_examen.pie_extension_izq == '2' %}selected{% endif %}>2. Movimiento activo sin vencer la gravedad (plano horizontal)</option>
+                          <option value="3" {% if datos_examen.pie_extension_izq == '3' %}selected{% endif %}>3. Movimiento activo que vence la gravedad (plano vertical)</option>
+                          <option value="4" {% if datos_examen.pie_extension_izq == '4' %}selected{% endif %}>4. Movimiento activo que vence resistencia moderada</option>
+                          <option value="5" {% if datos_examen.pie_extension_izq == '5' %}selected{% endif %}>5. Movimiento de fuerza normal</option>
+                        </select>
+                      </div>
+                      <div>
+                        <span class="side-label">Derecho</span>
+                        <select class="form-control" name="pie_extension_der">
+                          <option value="">Seleccionar...</option>
+                          <option value="0" {% if datos_examen.pie_extension_der == '0' %}selected{% endif %}>0. No contracción</option>
+                          <option value="1" {% if datos_examen.pie_extension_der == '1' %}selected{% endif %}>1. Contracción muscular perceptible sin desplazamiento</option>
+                          <option value="2" {% if datos_examen.pie_extension_der == '2' %}selected{% endif %}>2. Movimiento activo sin vencer la gravedad (plano horizontal)</option>
+                          <option value="3" {% if datos_examen.pie_extension_der == '3' %}selected{% endif %}>3. Movimiento activo que vence la gravedad (plano vertical)</option>
+                          <option value="4" {% if datos_examen.pie_extension_der == '4' %}selected{% endif %}>4. Movimiento activo que vence resistencia moderada</option>
+                          <option value="5" {% if datos_examen.pie_extension_der == '5' %}selected{% endif %}>5. Movimiento de fuerza normal</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Pie - Eversión -->
+                <div class="col-md-6">
+                  <div class="form-group-enhanced">
+                    <label class="form-control-label font-weight-bold mb-3">
+                      <i class="fas fa-arrow-right mr-2 text-info"></i>Eversión del Pie
+                    </label>
+                    <div class="bilateral-container">
+                      <div>
+                        <span class="side-label">Izquierdo</span>
+                        <select class="form-control" name="pie_eversion_izq">
+                          <option value="">Seleccionar...</option>
+                          <option value="0" {% if datos_examen.pie_eversion_izq == '0' %}selected{% endif %}>0. No contracción</option>
+                          <option value="1" {% if datos_examen.pie_eversion_izq == '1' %}selected{% endif %}>1. Contracción muscular perceptible sin desplazamiento</option>
+                          <option value="2" {% if datos_examen.pie_eversion_izq == '2' %}selected{% endif %}>2. Movimiento activo sin vencer la gravedad (plano horizontal)</option>
+                          <option value="3" {% if datos_examen.pie_eversion_izq == '3' %}selected{% endif %}>3. Movimiento activo que vence la gravedad (plano vertical)</option>
+                          <option value="4" {% if datos_examen.pie_eversion_izq == '4' %}selected{% endif %}>4. Movimiento activo que vence resistencia moderada</option>
+                          <option value="5" {% if datos_examen.pie_eversion_izq == '5' %}selected{% endif %}>5. Movimiento de fuerza normal</option>
+                        </select>
+                      </div>
+                      <div>
+                        <span class="side-label">Derecho</span>
+                        <select class="form-control" name="pie_eversion_der">
+                          <option value="">Seleccionar...</option>
+                          <option value="0" {% if datos_examen.pie_eversion_der == '0' %}selected{% endif %}>0. No contracción</option>
+                          <option value="1" {% if datos_examen.pie_eversion_der == '1' %}selected{% endif %}>1. Contracción muscular perceptible sin desplazamiento</option>
+                          <option value="2" {% if datos_examen.pie_eversion_der == '2' %}selected{% endif %}>2. Movimiento activo sin vencer la gravedad (plano horizontal)</option>
+                          <option value="3" {% if datos_examen.pie_eversion_der == '3' %}selected{% endif %}>3. Movimiento activo que vence la gravedad (plano vertical)</option>
+                          <option value="4" {% if datos_examen.pie_eversion_der == '4' %}selected{% endif %}>4. Movimiento activo que vence resistencia moderada</option>
+                          <option value="5" {% if datos_examen.pie_eversion_der == '5' %}selected{% endif %}>5. Movimiento de fuerza normal</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Pie - Inversión -->
+                <div class="col-md-6">
+                  <div class="form-group-enhanced">
+                    <label class="form-control-label font-weight-bold mb-3">
+                      <i class="fas fa-arrow-left mr-2 text-warning"></i>Inversión del Pie
+                    </label>
+                    <div class="bilateral-container">
+                      <div>
+                        <span class="side-label">Izquierdo</span>
+                        <select class="form-control" name="pie_inversion_izq">
+                          <option value="">Seleccionar...</option>
+                          <option value="0" {% if datos_examen.pie_inversion_izq == '0' %}selected{% endif %}>0. No contracción</option>
+                          <option value="1" {% if datos_examen.pie_inversion_izq == '1' %}selected{% endif %}>1. Contracción muscular perceptible sin desplazamiento</option>
+                          <option value="2" {% if datos_examen.pie_inversion_izq == '2' %}selected{% endif %}>2. Movimiento activo sin vencer la gravedad (plano horizontal)</option>
+                          <option value="3" {% if datos_examen.pie_inversion_izq == '3' %}selected{% endif %}>3. Movimiento activo que vence la gravedad (plano vertical)</option>
+                          <option value="4" {% if datos_examen.pie_inversion_izq == '4' %}selected{% endif %}>4. Movimiento activo que vence resistencia moderada</option>
+                          <option value="5" {% if datos_examen.pie_inversion_izq == '5' %}selected{% endif %}>5. Movimiento de fuerza normal</option>
+                        </select>
+                      </div>
+                      <div>
+                        <span class="side-label">Derecho</span>
+                        <select class="form-control" name="pie_inversion_der">
+                          <option value="">Seleccionar...</option>
+                          <option value="0" {% if datos_examen.pie_inversion_der == '0' %}selected{% endif %}>0. No contracción</option>
+                          <option value="1" {% if datos_examen.pie_inversion_der == '1' %}selected{% endif %}>1. Contracción muscular perceptible sin desplazamiento</option>
+                          <option value="2" {% if datos_examen.pie_inversion_der == '2' %}selected{% endif %}>2. Movimiento activo sin vencer la gravedad (plano horizontal)</option>
+                          <option value="3" {% if datos_examen.pie_inversion_der == '3' %}selected{% endif %}>3. Movimiento activo que vence la gravedad (plano vertical)</option>
+                          <option value="4" {% if datos_examen.pie_inversion_der == '4' %}selected{% endif %}>4. Movimiento activo que vence resistencia moderada</option>
+                          <option value="5" {% if datos_examen.pie_inversion_der == '5' %}selected{% endif %}>5. Movimiento de fuerza normal</option>
+                        </select>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
-
-              <!-- Continúa con las demás tabs... -->
-
-            </div>
-
-            <!-- Botones de acción -->
-            <div class="row mt-5">
-              <div class="col-12">
-                <div class="d-flex justify-content-between align-items-center">
-                  <div>
-                    <a href="{% url 'detalle_paciente' paciente_id %}" class="btn btn-outline-secondary">
-                      <i class="fas fa-arrow-left mr-2"></i>Volver al Paciente
-                    </a>
-                  </div>
-                  <div>
-                    <button type="button" class="btn btn-outline-primary mr-2" id="preview-btn">
-                      <i class="fas fa-eye mr-2"></i>Vista Previa
-                    </button>
-                    <button type="submit" class="btn btn-primary btn-lg">
-                      <i class="fas fa-save mr-2"></i>
-                      {% if modo_edicion %}Actualizar Examen{% else %}Guardar Examen{% endif %}
-                    </button>
+              <!-- Observaciones de Fuerza -->
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="form-group">
+                    <label class="form-control-label font-weight-bold">
+                      <i class="fas fa-comment-dots mr-2 text-primary"></i>Observaciones de Fuerza Muscular
+                    </label>
+                    <textarea class="form-control observations-textarea" name="observaciones_fuerza"
+                      placeholder="Observaciones sobre la evaluación de fuerza muscular...">{{ datos_examen.observaciones_fuerza }}</textarea>
                   </div>
                 </div>
               </div>
+              </div>
+              <!-- ========================================= -->
+              </div>
+   
+            
+          </div>
+          <!-- TAB 5: OTROS (Coordinación, Marcha y Movimientos Anormales) -->
+<!-- ========================================= -->
+<div class="tab-pane fade" id="otros" role="tabpanel">
+  
+  <!-- COORDINACIÓN -->
+  <div class="neuro-card">
+    <div class="coordinacion-card par-craneal-header">
+      <div class="d-flex align-items-center">
+        <i class="fas fa-crosshairs fa-2x mr-3"></i>
+        <div>
+          <h4 class="mb-0">Evaluación de Coordinación</h4>
+          <small class="opacity-75">Pruebas de coordinación motora y equilibrio</small>
+        </div>
+      </div>
+    </div>
+    <div class="card-body bg-white">
+      <div class="row">
+        <!-- Coordinación dedo-nariz -->
+        <div class="col-md-3">
+          <div class="form-group-enhanced">
+            <label class="form-control-label font-weight-bold mb-3">
+              <i class="fas fa-hand-point-right mr-2 text-primary"></i>Coordinación dedo - nariz
+            </label>
+            <div>
+              <div class="custom-control custom-radio custom-control-inline">
+                <input type="radio" id="coordinacion_dedo_nariz_normal" name="coordinacion_dedo_nariz" value="normal"
+                       class="custom-control-input" {% if datos_examen.coordinacion_dedo_nariz == 'normal' %}checked{% endif %}>
+                <label class="custom-control-label" for="coordinacion_dedo_nariz_normal">Normal</label>
+              </div>
+              <div class="custom-control custom-radio custom-control-inline">
+                <input type="radio" id="coordinacion_dedo_nariz_anormal" name="coordinacion_dedo_nariz" value="anormal"
+                       class="custom-control-input" {% if datos_examen.coordinacion_dedo_nariz == 'anormal' %}checked{% endif %}>
+                <label class="custom-control-label" for="coordinacion_dedo_nariz_anormal">Anormal</label>
+              </div>
             </div>
           </div>
-        </form>
+        </div>
+        
+        <!-- Romberg -->
+        <div class="col-md-3">
+          <div class="form-group-enhanced">
+            <label class="form-control-label font-weight-bold mb-3">
+              <i class="fas fa-balance-scale mr-2 text-success"></i>Romberg
+            </label>
+            <div>
+              <div class="custom-control custom-radio custom-control-inline">
+                <input type="radio" id="romberg_normal" name="romberg" value="normal"
+                       class="custom-control-input" {% if datos_examen.romberg == 'normal' %}checked{% endif %}>
+                <label class="custom-control-label" for="romberg_normal">Normal</label>
+              </div>
+              <div class="custom-control custom-radio custom-control-inline">
+                <input type="radio" id="romberg_anormal" name="romberg" value="anormal"
+                       class="custom-control-input" {% if datos_examen.romberg == 'anormal' %}checked{% endif %}>
+                <label class="custom-control-label" for="romberg_anormal">Anormal</label>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Talón-Rodilla -->
+        <div class="col-md-3">
+          <div class="form-group-enhanced">
+            <label class="form-control-label font-weight-bold mb-3">
+              <i class="fas fa-walking mr-2 text-info"></i>Talón - Rodilla
+            </label>
+            <div>
+              <div class="custom-control custom-radio custom-control-inline">
+                <input type="radio" id="talon_rodilla_normal" name="talon_rodilla" value="normal"
+                       class="custom-control-input" {% if datos_examen.talon_rodilla == 'normal' %}checked{% endif %}>
+                <label class="custom-control-label" for="talon_rodilla_normal">Normal</label>
+              </div>
+              <div class="custom-control custom-radio custom-control-inline">
+                <input type="radio" id="talon_rodilla_anormal" name="talon_rodilla" value="anormal"
+                       class="custom-control-input" {% if datos_examen.talon_rodilla == 'anormal' %}checked{% endif %}>
+                <label class="custom-control-label" for="talon_rodilla_anormal">Anormal</label>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Pronación-Supinación -->
+        <div class="col-md-3">
+          <div class="form-group-enhanced">
+            <label class="form-control-label font-weight-bold mb-3">
+              <i class="fas fa-redo-alt mr-2 text-warning"></i>Pronación - supinación manos
+            </label>
+            <div>
+              <div class="custom-control custom-radio custom-control-inline">
+                <input type="radio" id="pronacion_supinacion_normal" name="pronacion_supinacion" value="normal"
+                       class="custom-control-input" {% if datos_examen.pronacion_supinacion == 'normal' %}checked{% endif %}>
+                <label class="custom-control-label" for="pronacion_supinacion_normal">Normal</label>
+              </div>
+              <div class="custom-control custom-radio custom-control-inline">
+                <input type="radio" id="pronacion_supinacion_anormal" name="pronacion_supinacion" value="anormal"
+                       class="custom-control-input" {% if datos_examen.pronacion_supinacion == 'anormal' %}checked{% endif %}>
+                <label class="custom-control-label" for="pronacion_supinacion_anormal">Anormal</label>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
+  <!-- MARCHA -->
+  <div class="neuro-card">
+    <div class="marcha-card par-craneal-header">
+      <div class="d-flex align-items-center">
+        <i class="fas fa-walking fa-2x mr-3"></i>
+        <div>
+          <h4 class="mb-0">Evaluación de la Marcha</h4>
+          <small class="opacity-75">Postura y patrones de marcha normales y patológicos</small>
+        </div>
+      </div>
+    </div>
+    <div class="card-body bg-white">
+      
+      <!-- Evaluación Básica -->
+      <div class="row mb-4">
+        <div class="col-12">
+          <h5 class="text-primary mb-3">
+            <i class="fas fa-search mr-2"></i>Evaluación Básica de la Marcha
+          </h5>
+        </div>
+        
+        <!-- Postura -->
+        <div class="col-md-3">
+          <div class="form-group-enhanced">
+            <label class="form-control-label font-weight-bold mb-3">
+              <i class="fas fa-male mr-2 text-primary"></i>Postura
+            </label>
+            <div>
+              <div class="custom-control custom-radio custom-control-inline">
+                <input type="radio" id="postura_normal" name="postura" value="normal"
+                       class="custom-control-input" {% if datos_examen.postura == 'normal' %}checked{% endif %}>
+                <label class="custom-control-label" for="postura_normal">Normal</label>
+              </div>
+              <div class="custom-control custom-radio custom-control-inline">
+                <input type="radio" id="postura_anormal" name="postura" value="anormal"
+                       class="custom-control-input" {% if datos_examen.postura == 'anormal' %}checked{% endif %}>
+                <label class="custom-control-label" for="postura_anormal">Anormal</label>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Marcha Lineal -->
+        <div class="col-md-3">
+          <div class="form-group-enhanced">
+            <label class="form-control-label font-weight-bold mb-3">
+              <i class="fas fa-arrows-alt-h mr-2 text-success"></i>Marcha Lineal
+            </label>
+            <div>
+              <div class="custom-control custom-radio custom-control-inline">
+                <input type="radio" id="marcha_lineal_normal" name="marcha_lineal" value="normal"
+                       class="custom-control-input" {% if datos_examen.marcha_lineal == 'normal' %}checked{% endif %}>
+                <label class="custom-control-label" for="marcha_lineal_normal">Normal</label>
+              </div>
+              <div class="custom-control custom-radio custom-control-inline">
+                <input type="radio" id="marcha_lineal_anormal" name="marcha_lineal" value="anormal"
+                       class="custom-control-input" {% if datos_examen.marcha_lineal == 'anormal' %}checked{% endif %}>
+                <label class="custom-control-label" for="marcha_lineal_anormal">Anormal</label>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Marcha en puntillas -->
+        <div class="col-md-3">
+          <div class="form-group-enhanced">
+            <label class="form-control-label font-weight-bold mb-3">
+              <i class="fas fa-angle-up mr-2 text-info"></i>Marcha en puntillas
+            </label>
+            <div>
+              <div class="custom-control custom-radio custom-control-inline">
+                <input type="radio" id="marcha_puntillas_normal" name="marcha_puntillas" value="normal"
+                       class="custom-control-input" {% if datos_examen.marcha_puntillas == 'normal' %}checked{% endif %}>
+                <label class="custom-control-label" for="marcha_puntillas_normal">Normal</label>
+              </div>
+              <div class="custom-control custom-radio custom-control-inline">
+                <input type="radio" id="marcha_puntillas_anormal" name="marcha_puntillas" value="anormal"
+                       class="custom-control-input" {% if datos_examen.marcha_puntillas == 'anormal' %}checked{% endif %}>
+                <label class="custom-control-label" for="marcha_puntillas_anormal">Anormal</label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Patrones Patológicos -->
+      <div class="row mb-4">
+        <div class="col-12">
+          <h5 class="text-danger mb-3">
+            <i class="fas fa-exclamation-triangle mr-2"></i>Patrones Patológicos de Marcha
+          </h5>
+        </div>
+        
+        <!-- Marcha Hemipléjica -->
+        <div class="col-md-4">
+          <div class="form-group-enhanced">
+            <label class="form-control-label font-weight-bold mb-3">
+              <i class="fas fa-user-injured mr-2 text-danger"></i>Marcha Hemipléjica
+            </label>
+            <div class="custom-control custom-switch">
+              <input type="checkbox" class="custom-control-input" id="marcha_hemiplejica" 
+                     name="marcha_hemiplejica" {% if datos_examen.marcha_hemiplejica %}checked{% endif %}>
+              <label class="custom-control-label" for="marcha_hemiplejica">Presente</label>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Marcha Parkinsoniana -->
+        <div class="col-md-4">
+          <div class="form-group-enhanced">
+            <label class="form-control-label font-weight-bold mb-3">
+              <i class="fas fa-user-clock mr-2 text-warning"></i>Marcha Parkinsoniana
+            </label>
+            <div class="custom-control custom-switch">
+              <input type="checkbox" class="custom-control-input" id="marcha_parkinsoniana" 
+                     name="marcha_parkinsoniana" {% if datos_examen.marcha_parkinsoniana %}checked{% endif %}>
+              <label class="custom-control-label" for="marcha_parkinsoniana">Presente</label>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Marcha espástica -->
+        <div class="col-md-4">
+          <div class="form-group-enhanced">
+            <label class="form-control-label font-weight-bold mb-3">
+              <i class="fas fa-exclamation mr-2 text-primary"></i>Marcha espástica
+            </label>
+            <div class="custom-control custom-switch">
+              <input type="checkbox" class="custom-control-input" id="marcha_espastica" 
+                     name="marcha_espastica" {% if datos_examen.marcha_espastica %}checked{% endif %}>
+              <label class="custom-control-label" for="marcha_espastica">Presente</label>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Marcha Polineurítica -->
+        <div class="col-md-4">
+          <div class="form-group-enhanced">
+            <label class="form-control-label font-weight-bold mb-3">
+              <i class="fas fa-project-diagram mr-2 text-success"></i>Marcha Polineurítica
+            </label>
+            <div class="custom-control custom-switch">
+              <input type="checkbox" class="custom-control-input" id="marcha_polineuritica" 
+                     name="marcha_polineuritica" {% if datos_examen.marcha_polineuritica %}checked{% endif %}>
+              <label class="custom-control-label" for="marcha_polineuritica">Presente</label>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Marcha Atáxica -->
+        <div class="col-md-4">
+          <div class="form-group-enhanced">
+            <label class="form-control-label font-weight-bold mb-3">
+              <i class="fas fa-dizzy mr-2 text-info"></i>Marcha Atáxica
+            </label>
+            <div class="custom-control custom-switch">
+              <input type="checkbox" class="custom-control-input" id="marcha_ataxica" 
+                     name="marcha_ataxica" {% if datos_examen.marcha_ataxica %}checked{% endif %}>
+              <label class="custom-control-label" for="marcha_ataxica">Presente</label>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Marcha Miopática -->
+        <div class="col-md-4">
+          <div class="form-group-enhanced">
+            <label class="form-control-label font-weight-bold mb-3">
+              <i class="fas fa-muscle mr-2 text-secondary"></i>Marcha Miopática
+            </label>
+            <div class="custom-control custom-switch">
+              <input type="checkbox" class="custom-control-input" id="marcha_miopatica" 
+                     name="marcha_miopatica" {% if datos_examen.marcha_miopatica %}checked{% endif %}>
+              <label class="custom-control-label" for="marcha_miopatica">Presente</label>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Marcha en Steppage -->
+        <div class="col-md-4">
+          <div class="form-group-enhanced">
+            <label class="form-control-label font-weight-bold mb-3">
+              <i class="fas fa-step-forward mr-2 text-dark"></i>Marcha en Steppage
+            </label>
+            <div class="custom-control custom-switch">
+              <input type="checkbox" class="custom-control-input" id="marcha_steppage" 
+                     name="marcha_steppage" {% if datos_examen.marcha_steppage %}checked{% endif %}>
+              <label class="custom-control-label" for="marcha_steppage">Presente</label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Observaciones Marcha -->
+      <div class="row">
+        <div class="col-md-12">
+          <div class="form-group">
+            <label class="form-control-label font-weight-bold">
+              <i class="fas fa-comment-dots mr-2 text-primary"></i>Observaciones Marcha
+            </label>
+            <textarea class="form-control observations-textarea" name="observaciones_marcha"
+              placeholder="Observaciones sobre la evaluación de la marcha...">{{ datos_examen.observaciones_marcha }}</textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MOVIMIENTOS ANORMALES -->
+  <div class="neuro-card">
+    <div class="movimientos-card par-craneal-header">
+      <div class="d-flex align-items-center">
+        <i class="fas fa-wave-square fa-2x mr-3"></i>
+        <div>
+          <h4 class="mb-0">Movimientos Anormales</h4>
+          <small class="opacity-75">Identificación de movimientos involuntarios y patológicos</small>
+        </div>
+      </div>
+    </div>
+    <div class="card-body bg-white">
+      <div class="row">
+        <!-- Convulsiones -->
+        <div class="col-md-4">
+          <div class="form-group-enhanced">
+            <label class="form-control-label font-weight-bold mb-3">
+              <i class="fas fa-bolt mr-2 text-danger"></i>Convulsiones
+            </label>
+            <div class="custom-control custom-switch">
+              <input type="checkbox" class="custom-control-input" id="convulsiones" 
+                     name="convulsiones" {% if datos_examen.convulsiones %}checked{% endif %}>
+              <label class="custom-control-label" for="convulsiones">Presente</label>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Fasciculaciones -->
+        <div class="col-md-4">
+          <div class="form-group-enhanced">
+            <label class="form-control-label font-weight-bold mb-3">
+              <i class="fas fa-stream mr-2 text-warning"></i>Fasciculaciones
+            </label>
+            <div class="custom-control custom-switch">
+              <input type="checkbox" class="custom-control-input" id="fasciculaciones" 
+                     name="fasciculaciones" {% if datos_examen.fasciculaciones %}checked{% endif %}>
+              <label class="custom-control-label" for="fasciculaciones">Presente</label>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Mioclonías -->
+        <div class="col-md-4">
+          <div class="form-group-enhanced">
+            <label class="form-control-label font-weight-bold mb-3">
+              <i class="fas fa-flash mr-2 text-primary"></i>Mioclonías
+            </label>
+            <div class="custom-control custom-switch">
+              <input type="checkbox" class="custom-control-input" id="mioclonias" 
+                     name="mioclonias" {% if datos_examen.mioclonias %}checked{% endif %}>
+              <label class="custom-control-label" for="mioclonias">Presente</label>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Temblores -->
+        <div class="col-md-4">
+          <div class="form-group-enhanced">
+            <label class="form-control-label font-weight-bold mb-3">
+              <i class="fas fa-wave-square mr-2 text-info"></i>Temblores
+            </label>
+            <div class="custom-control custom-switch">
+              <input type="checkbox" class="custom-control-input" id="temblores" 
+                     name="temblores" {% if datos_examen.temblores %}checked{% endif %}>
+              <label class="custom-control-label" for="temblores">Presente</label>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Corea -->
+        <div class="col-md-4">
+          <div class="form-group-enhanced">
+            <label class="form-control-label font-weight-bold mb-3">
+              <i class="fas fa-random mr-2 text-success"></i>Corea
+            </label>
+            <div class="custom-control custom-switch">
+              <input type="checkbox" class="custom-control-input" id="corea" 
+                     name="corea" {% if datos_examen.corea %}checked{% endif %}>
+              <label class="custom-control-label" for="corea">Presente</label>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Espasmos -->
+        <div class="col-md-4">
+          <div class="form-group-enhanced">
+            <label class="form-control-label font-weight-bold mb-3">
+              <i class="fas fa-compress mr-2 text-secondary"></i>Espasmos
+            </label>
+            <div class="custom-control custom-switch">
+              <input type="checkbox" class="custom-control-input" id="espasmos" 
+                     name="espasmos" {% if datos_examen.espasmos %}checked{% endif %}>
+              <label class="custom-control-label" for="espasmos">Presente</label>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Balismos -->
+        <div class="col-md-4">
+          <div class="form-group-enhanced">
+            <label class="form-control-label font-weight-bold mb-3">
+              <i class="fas fa-arrows-alt mr-2 text-dark"></i>Balismos
+            </label>
+            <div class="custom-control custom-switch">
+              <input type="checkbox" class="custom-control-input" id="balismos" 
+                     name="balismos" {% if datos_examen.balismos %}checked{% endif %}>
+              <label class="custom-control-label" for="balismos">Presente</label>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Calambres -->
+        <div class="col-md-4">
+          <div class="form-group-enhanced">
+            <label class="form-control-label font-weight-bold mb-3">
+              <i class="fas fa-exclamation-circle mr-2 text-warning"></i>Calambres
+            </label>
+            <div class="custom-control custom-switch">
+              <input type="checkbox" class="custom-control-input" id="calambres" 
+                     name="calambres" {% if datos_examen.calambres %}checked{% endif %}>
+              <label class="custom-control-label" for="calambres">Presente</label>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Tics -->
+        <div class="col-md-4">
+          <div class="form-group-enhanced">
+            <label class="form-control-label font-weight-bold mb-3">
+              <i class="fas fa-eye mr-2 text-primary"></i>Tics
+            </label>
+            <div class="custom-control custom-switch">
+              <input type="checkbox" class="custom-control-input" id="tics" 
+                     name="tics" {% if datos_examen.tics %}checked{% endif %}>
+              <label class="custom-control-label" for="tics">Presente</label>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Distonías -->
+        <div class="col-md-4">
+          <div class="form-group-enhanced">
+            <label class="form-control-label font-weight-bold mb-3">
+              <i class="fas fa-sync-alt mr-2 text-info"></i>Distonías
+            </label>
+            <div class="custom-control custom-switch">
+              <input type="checkbox" class="custom-control-input" id="distonias" 
+                     name="distonias" {% if datos_examen.distonias %}checked{% endif %}>
+              <label class="custom-control-label" for="distonias">Presente</label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Botones de Acción -->
+  <div class="row mt-4">
+    <div class="col-12 text-center">
+      <button type="submit" class="btn btn-success btn-lg mr-3">
+        <i class="fas fa-save mr-2"></i>
+        {% if modo_edicion %}Actualizar{% else %}Guardar{% endif %} Examen Neurológico
+      </button>
+      <a href="{% url 'detalle_paciente' paciente_id %}" class="btn btn-secondary btn-lg">
+        <i class="fas fa-times mr-2"></i>Cancelar
+      </a>
+    </div>
+  </div>
+
+</div>
+         
+          </div>
+</div>
+</div>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // ===================================================
