@@ -3201,9 +3201,89 @@ class ExamenNeurologicoResult(ResultadoExamenBase):
         default=False, verbose_name="Café - Fosa nasal derecha"
     )
 
+    # Canela
+    canela_izquierdo = models.BooleanField(
+        default=False, verbose_name="Canela - Fosa nasal izquierda"
+    )
+    canela_derecho = models.BooleanField(
+        default=False, verbose_name="Canela - Fosa nasal derecha"
+    )
+
+    # Alcohol
+    alcohol_izquierdo = models.BooleanField(
+        default=False, verbose_name="Alcohol - Fosa nasal izquierda"
+    )
+    alcohol_derecho = models.BooleanField(
+        default=False, verbose_name="Alcohol - Fosa nasal derecha"
+    )
+
     # ===== II PAR CRANEAL (ÓPTICO) =====
-    agudeza_visual_alterada = models.BooleanField(
+    NORMAL_ANORMAL_CHOICES = [
+        ("normal", "Normal"),
+        ("anormal", "Anormal"),
+    ]
+
+    # Síntomas visuales
+    amaurosis = models.BooleanField(default=False, verbose_name="Amaurosis presente")
+    oscurecimientos = models.BooleanField(
+        default=False, verbose_name="Oscurecimientos presentes"
+    )
+    fotopsias = models.BooleanField(default=False, verbose_name="Fotopsias presentes")
+    escotomas = models.BooleanField(default=False, verbose_name="Escotomas presentes")
+    agudeza_visual = models.BooleanField(
         default=False, verbose_name="Agudeza Visual Alterada"
+    )
+
+    # Fundoscopia
+    hemorragias = models.BooleanField(
+        default=False, verbose_name="Hemorragias presentes"
+    )
+    exudados = models.BooleanField(default=False, verbose_name="Exudados presentes")
+    fundoscopia = models.CharField(
+        max_length=10,
+        choices=NORMAL_ANORMAL_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Fundoscopia",
+    )
+
+    # Evaluación detallada
+    color_disco = models.CharField(
+        max_length=10,
+        choices=NORMAL_ANORMAL_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Color del Disco",
+    )
+    bordes = models.CharField(
+        max_length=10,
+        choices=NORMAL_ANORMAL_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Bordes",
+    )
+
+    # Pupilas y reflejos
+    pupilas = models.CharField(
+        max_length=10,
+        choices=NORMAL_ANORMAL_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Pupilas",
+    )
+    reflejo_fotomotor = models.CharField(
+        max_length=10,
+        choices=NORMAL_ANORMAL_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Reflejo Fotomotor",
+    )
+    vision_colores = models.CharField(
+        max_length=10,
+        choices=NORMAL_ANORMAL_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Visión de Colores",
     )
 
     CAMPIMETRIA_CHOICES = [
@@ -3227,50 +3307,90 @@ class ExamenNeurologicoResult(ResultadoExamenBase):
         verbose_name="Campimetría",
     )
 
-    FUNDOSCOPIA_CHOICES = [
-        ("normal", "Normal"),
-        ("anormal", "Anormal"),
-    ]
-
-    fundoscopia = models.CharField(
-        max_length=10,
-        choices=FUNDOSCOPIA_CHOICES,
-        blank=True,
-        null=True,
-        verbose_name="Fundoscopia",
+    observaciones_ii_par = models.TextField(
+        blank=True, null=True, verbose_name="Observaciones II Par"
     )
 
     # ===== III, IV y VI PAR CRANEAL (OCULOMOTORES) =====
+    # Síntomas
     diplopia = models.BooleanField(default=False, verbose_name="Diplopía presente")
-
     ptosis_palpebral = models.BooleanField(
         default=False, verbose_name="Ptosis palpebral presente"
     )
+    desviaciones_oculares = models.BooleanField(
+        default=False, verbose_name="Desviaciones oculares presentes"
+    )
 
-    MOVIMIENTOS_CHOICES = [
-        ("normal", "Normal"),
-        ("anormal", "Anormal"),
-    ]
-
+    # Funciones motoras
+    elevacion_parpado = models.CharField(
+        max_length=10,
+        choices=NORMAL_ANORMAL_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Elevación párpado superior",
+    )
     movimientos_oculares = models.CharField(
         max_length=10,
-        choices=MOVIMIENTOS_CHOICES,
+        choices=NORMAL_ANORMAL_CHOICES,
         blank=True,
         null=True,
         verbose_name="Movimientos Oculares",
     )
 
+    # Coordinación
+    mirada_conjugada = models.CharField(
+        max_length=10,
+        choices=NORMAL_ANORMAL_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Mirada conjugada",
+    )
+    movimientos_seguimiento = models.CharField(
+        max_length=10,
+        choices=NORMAL_ANORMAL_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Movimientos seguimiento",
+    )
+
+    observaciones_oculomotores = models.TextField(
+        blank=True, null=True, verbose_name="Observaciones Pares Oculomotores"
+    )
+
     # ===== V PAR CRANEAL (TRIGÉMINO) =====
     # Tacto superficial
-    tacto_frente = models.BooleanField(
+    tacto_frente_globo = models.BooleanField(
         default=False, verbose_name="Tacto superficial - Frente/globo ocular alterado"
     )
-    tacto_parpado = models.BooleanField(
+    tacto_parpado_labio_sup = models.BooleanField(
         default=False,
         verbose_name="Tacto superficial - Párpado inferior/labio superior alterado",
     )
-    tacto_labio = models.BooleanField(
+    tacto_labio_inf_menton = models.BooleanField(
         default=False, verbose_name="Tacto superficial - Labio inferior/mentón alterado"
+    )
+
+    # Dolor
+    dolor_frente_globo = models.BooleanField(
+        default=False, verbose_name="Dolor - Frente/globo ocular alterado"
+    )
+    dolor_parpado_labio_sup = models.BooleanField(
+        default=False, verbose_name="Dolor - Párpado inferior/labio superior alterado"
+    )
+    dolor_labio_inf_menton = models.BooleanField(
+        default=False, verbose_name="Dolor - Labio inferior/mentón alterado"
+    )
+
+    # Temperatura
+    temp_frente_globo = models.BooleanField(
+        default=False, verbose_name="Temperatura - Frente/globo ocular alterado"
+    )
+    temp_parpado_labio_sup = models.BooleanField(
+        default=False,
+        verbose_name="Temperatura - Párpado inferior/labio superior alterado",
+    )
+    temp_labio_inf_menton = models.BooleanField(
+        default=False, verbose_name="Temperatura - Labio inferior/mentón alterado"
     )
 
     # Fuerza muscular
@@ -3284,6 +3404,21 @@ class ExamenNeurologicoResult(ResultadoExamenBase):
         default=False, verbose_name="Fuerza muscular - Pterigoideos alterada"
     )
 
+    # Trofismo
+    trofismo_maseteros = models.BooleanField(
+        default=False, verbose_name="Trofismo - Maseteros alterado"
+    )
+    trofismo_temporales = models.BooleanField(
+        default=False, verbose_name="Trofismo - Temporales alterado"
+    )
+    trofismo_pterigoideos = models.BooleanField(
+        default=False, verbose_name="Trofismo - Pterigoideos alterado"
+    )
+
+    observaciones_v_par = models.TextField(
+        blank=True, null=True, verbose_name="Observaciones V Par"
+    )
+
     # ===== VII PAR CRANEAL (FACIAL) =====
     # Mímica facial
     mimica_frente = models.BooleanField(
@@ -3292,70 +3427,136 @@ class ExamenNeurologicoResult(ResultadoExamenBase):
     mimica_parpados = models.BooleanField(
         default=False, verbose_name="Mímica facial - Párpados alterada"
     )
-    mimica_nasal = models.BooleanField(
+    mimica_elevacion_nasal = models.BooleanField(
         default=False, verbose_name="Mímica facial - Elevación nasal alterada"
     )
+    mimica_buccinadores = models.BooleanField(
+        default=False, verbose_name="Mímica facial - Buccinadores alterada"
+    )
+    mimica_orbicular_labios = models.BooleanField(
+        default=False, verbose_name="Mímica facial - Orbicular labios alterada"
+    )
 
-    gusto_tercio_anterior = models.CharField(
+    # Gusto
+    gusto_anterior = models.CharField(
         max_length=10,
-        choices=MOVIMIENTOS_CHOICES,
+        choices=NORMAL_ANORMAL_CHOICES,
         blank=True,
         null=True,
         verbose_name="Gusto tercio anterior de la lengua",
     )
 
     # ===== VIII PAR CRANEAL (AUDITIVO) =====
+    # Síntomas auditivos
+    hipoacusia = models.BooleanField(default=False, verbose_name="Hipoacusia presente")
+    tinitus = models.BooleanField(default=False, verbose_name="Tínitus presente")
+    acufenos = models.BooleanField(default=False, verbose_name="Acúfenos presentes")
+
+    # Pruebas auditivas
     weber = models.CharField(
         max_length=10,
-        choices=MOVIMIENTOS_CHOICES,
+        choices=NORMAL_ANORMAL_CHOICES,
         blank=True,
         null=True,
         verbose_name="Prueba de Weber",
     )
-
     rinne = models.CharField(
         max_length=10,
-        choices=MOVIMIENTOS_CHOICES,
+        choices=NORMAL_ANORMAL_CHOICES,
         blank=True,
         null=True,
         verbose_name="Prueba de Rinne",
     )
 
+    # Síntomas vestibulares
+    vertigo = models.BooleanField(default=False, verbose_name="Vértigo presente")
+    mareo = models.BooleanField(default=False, verbose_name="Mareo presente")
     nistagmus = models.BooleanField(default=False, verbose_name="Nistagmus presente")
 
+    observaciones_viii_par = models.TextField(
+        blank=True, null=True, verbose_name="Observaciones VIII Par"
+    )
+
     # ===== IX y X PAR CRANEAL (GLOSOFARÍNGEO Y VAGO) =====
+    # Síntomas vocales
+    disfonia = models.BooleanField(default=False, verbose_name="Disfonía presente")
+    afonia = models.BooleanField(default=False, verbose_name="Afonía presente")
+    voz_nasal = models.BooleanField(default=False, verbose_name="Voz nasal presente")
+
+    # Síntomas deglutorios
+    disfagia = models.BooleanField(default=False, verbose_name="Disfagia presente")
+    sialorrea = models.BooleanField(default=False, verbose_name="Sialorrea presente")
+    dolor_faringe = models.BooleanField(
+        default=False, verbose_name="Dolor en faringe presente"
+    )
+
+    # Exploración física
     reflejo_nauseoso = models.CharField(
         max_length=10,
-        choices=MOVIMIENTOS_CHOICES,
+        choices=NORMAL_ANORMAL_CHOICES,
         blank=True,
         null=True,
         verbose_name="Reflejo nauseoso",
     )
-
-    posicion_uvula = models.CharField(
+    uvula = models.CharField(
         max_length=10,
-        choices=MOVIMIENTOS_CHOICES,
+        choices=NORMAL_ANORMAL_CHOICES,
         blank=True,
         null=True,
         verbose_name="Posición de la úvula",
     )
+    paladar = models.CharField(
+        max_length=10,
+        choices=NORMAL_ANORMAL_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Paladar",
+    )
+    gusto_posterior = models.CharField(
+        max_length=10,
+        choices=NORMAL_ANORMAL_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Gusto tercio posterior lengua",
+    )
 
     # ===== XI PAR CRANEAL (ESPINAL ACCESORIO) =====
+    movimientos_cuello = models.CharField(
+        max_length=10,
+        choices=NORMAL_ANORMAL_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Movimientos del cuello",
+    )
     elevacion_hombros = models.CharField(
         max_length=10,
-        choices=MOVIMIENTOS_CHOICES,
+        choices=NORMAL_ANORMAL_CHOICES,
         blank=True,
         null=True,
         verbose_name="Elevación de hombros",
     )
+    atrofia_lingual = models.BooleanField(
+        default=False, verbose_name="Atrofia lingual presente"
+    )
+
+    observaciones_xi_par = models.TextField(
+        blank=True, null=True, verbose_name="Observaciones XI Par"
+    )
 
     # ===== XII PAR CRANEAL (HIPOGLOSO) =====
+    fasciculaciones_linguales = models.BooleanField(
+        default=False, verbose_name="Fasciculaciones linguales presentes"
+    )
     movimientos_lengua = models.CharField(
         max_length=10,
-        choices=MOVIMIENTOS_CHOICES,
+        choices=NORMAL_ANORMAL_CHOICES,
         blank=True,
         null=True,
         verbose_name="Movimientos de la lengua",
+    )
+
+    observaciones_xii_par = models.TextField(
+        blank=True, null=True, verbose_name="Observaciones XII Par"
     )
 
     # ===== SENSIBILIDAD =====
@@ -3366,17 +3567,14 @@ class ExamenNeurologicoResult(ResultadoExamenBase):
     dolor_torax = models.BooleanField(
         default=False, verbose_name="Dolor al pinchazo - Tórax alterado"
     )
-    dolor_brazo_izquierdo = models.BooleanField(
-        default=False, verbose_name="Dolor al pinchazo - Brazo izquierdo alterado"
+    dolor_miembros_superiores = models.BooleanField(
+        default=False, verbose_name="Dolor al pinchazo - Miembros superiores alterado"
     )
-    dolor_brazo_derecho = models.BooleanField(
-        default=False, verbose_name="Dolor al pinchazo - Brazo derecho alterado"
+    dolor_abdomen = models.BooleanField(
+        default=False, verbose_name="Dolor al pinchazo - Abdomen alterado"
     )
-    dolor_pierna_izquierda = models.BooleanField(
-        default=False, verbose_name="Dolor al pinchazo - Pierna izquierda alterada"
-    )
-    dolor_pierna_derecha = models.BooleanField(
-        default=False, verbose_name="Dolor al pinchazo - Pierna derecha alterada"
+    dolor_miembros_inferiores = models.BooleanField(
+        default=False, verbose_name="Dolor al pinchazo - Miembros inferiores alterado"
     )
 
     # Táctil superficial
@@ -3386,145 +3584,640 @@ class ExamenNeurologicoResult(ResultadoExamenBase):
     tactil_torax = models.BooleanField(
         default=False, verbose_name="Táctil superficial - Tórax alterado"
     )
-    tactil_brazo_izquierdo = models.BooleanField(
-        default=False, verbose_name="Táctil superficial - Brazo izquierdo alterado"
+    tactil_miembros_superiores = models.BooleanField(
+        default=False, verbose_name="Táctil superficial - Miembros superiores alterado"
     )
-    tactil_brazo_derecho = models.BooleanField(
-        default=False, verbose_name="Táctil superficial - Brazo derecho alterado"
+    tactil_abdomen = models.BooleanField(
+        default=False, verbose_name="Táctil superficial - Abdomen alterado"
     )
-    tactil_pierna_izquierda = models.BooleanField(
-        default=False, verbose_name="Táctil superficial - Pierna izquierda alterada"
-    )
-    tactil_pierna_derecha = models.BooleanField(
-        default=False, verbose_name="Táctil superficial - Pierna derecha alterada"
+    tactil_miembros_inferiores = models.BooleanField(
+        default=False, verbose_name="Táctil superficial - Miembros inferiores alterado"
     )
 
-    # Térmica
+    # Discriminación térmica
     termica_cuello = models.BooleanField(
         default=False, verbose_name="Sensibilidad térmica - Cuello alterada"
     )
     termica_torax = models.BooleanField(
         default=False, verbose_name="Sensibilidad térmica - Tórax alterado"
     )
-    termica_brazo_izquierdo = models.BooleanField(
-        default=False, verbose_name="Sensibilidad térmica - Brazo izquierdo alterada"
+    termica_miembros_superiores = models.BooleanField(
+        default=False,
+        verbose_name="Sensibilidad térmica - Miembros superiores alterada",
     )
-    termica_brazo_derecho = models.BooleanField(
-        default=False, verbose_name="Sensibilidad térmica - Brazo derecho alterada"
+    termica_abdomen = models.BooleanField(
+        default=False, verbose_name="Sensibilidad térmica - Abdomen alterado"
     )
-    termica_pierna_izquierda = models.BooleanField(
-        default=False, verbose_name="Sensibilidad térmica - Pierna izquierda alterada"
-    )
-    termica_pierna_derecha = models.BooleanField(
-        default=False, verbose_name="Sensibilidad térmica - Pierna derecha alterada"
-    )
-
-    # ===== REFLEJOS =====
-    REFLEJO_CHOICES = [
-        ("0", "0. Sin respuesta"),
-        ("1", "1. Disminuido"),
-        ("2", "2. Normal"),
-        ("3", "3. Aumentado"),
-        ("4", "4. Clonus agotable"),
-        ("5", "5. Clonus permanente"),
-    ]
-
-    # Maseteriano
-    maseteriano_izquierdo = models.CharField(
-        max_length=1,
-        choices=REFLEJO_CHOICES,
-        default="2",
-        verbose_name="Reflejo maseteriano izquierdo",
-    )
-    maseteriano_derecho = models.CharField(
-        max_length=1,
-        choices=REFLEJO_CHOICES,
-        default="2",
-        verbose_name="Reflejo maseteriano derecho",
+    termica_miembros_inferiores = models.BooleanField(
+        default=False,
+        verbose_name="Sensibilidad térmica - Miembros inferiores alterada",
     )
 
-    # Bicipital
-    bicipital_izquierdo = models.CharField(
-        max_length=1,
-        choices=REFLEJO_CHOICES,
-        default="2",
-        verbose_name="Reflejo bicipital izquierdo",
+    # Sensibilidad especializada
+    vibratoria = models.CharField(
+        max_length=10,
+        choices=NORMAL_ANORMAL_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Sensibilidad vibratoria",
     )
-    bicipital_derecho = models.CharField(
-        max_length=1,
-        choices=REFLEJO_CHOICES,
-        default="2",
-        verbose_name="Reflejo bicipital derecho",
+    propiocepcion_superiores = models.CharField(
+        max_length=10,
+        choices=NORMAL_ANORMAL_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Propiocepción miembros superiores",
     )
-
-    # Tricipital
-    tricipital_izquierdo = models.CharField(
-        max_length=1,
-        choices=REFLEJO_CHOICES,
-        default="2",
-        verbose_name="Reflejo tricipital izquierdo",
+    propiocepcion_inferiores = models.CharField(
+        max_length=10,
+        choices=NORMAL_ANORMAL_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Propiocepción miembros inferiores",
     )
-    tricipital_derecho = models.CharField(
-        max_length=1,
-        choices=REFLEJO_CHOICES,
-        default="2",
-        verbose_name="Reflejo tricipital derecho",
+    reconocimiento_objetos = models.CharField(
+        max_length=10,
+        choices=NORMAL_ANORMAL_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Reconocimiento de objetos",
     )
-
-    # Estiloradial
-    estiloradial_izquierdo = models.CharField(
-        max_length=1,
-        choices=REFLEJO_CHOICES,
-        default="2",
-        verbose_name="Reflejo estiloradial izquierdo",
-    )
-    estiloradial_derecho = models.CharField(
-        max_length=1,
-        choices=REFLEJO_CHOICES,
-        default="2",
-        verbose_name="Reflejo estiloradial derecho",
-    )
-
-    # Rotuliano
-    rotuliano_izquierdo = models.CharField(
-        max_length=1,
-        choices=REFLEJO_CHOICES,
-        default="2",
-        verbose_name="Reflejo rotuliano izquierdo",
-    )
-    rotuliano_derecho = models.CharField(
-        max_length=1,
-        choices=REFLEJO_CHOICES,
-        default="2",
-        verbose_name="Reflejo rotuliano derecho",
-    )
-
-    # Aquiliano
-    aquiliano_izquierdo = models.CharField(
-        max_length=1,
-        choices=REFLEJO_CHOICES,
-        default="2",
-        verbose_name="Reflejo aquiliano izquierdo",
-    )
-    aquiliano_derecho = models.CharField(
-        max_length=1,
-        choices=REFLEJO_CHOICES,
-        default="2",
-        verbose_name="Reflejo aquiliano derecho",
-    )
-
-    # ===== OBSERVACIONES GENERALES =====
-    observaciones_pares_craneales = models.TextField(
-        blank=True, null=True, verbose_name="Observaciones Pares Craneales"
+    discriminacion_dos_puntos = models.CharField(
+        max_length=10,
+        choices=NORMAL_ANORMAL_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Discriminación de dos puntos",
     )
 
     observaciones_sensibilidad = models.TextField(
         blank=True, null=True, verbose_name="Observaciones Sensibilidad"
     )
 
+    # ===== REFLEJOS =====
+    REFLEJO_CHOICES = [
+        ("0", "0. Sin respuesta (arreflexia)"),
+        ("1", "1. Respuesta disminuida (hiporreflexia)"),
+        ("2", "2. Respuesta Normal"),
+        ("3", "3. Respuesta Aumentada (hiperreflexia)"),
+        ("4", "4. Respuesta repetida y rítmica que cesa (clonus agotable)"),
+        ("5", "5. Respuesta repetida y rítmica permanente (clonus perm.)"),
+    ]
+
+    # Reflejos osteotendinosos
+    # Maseteriano
+    maseteriano_izquierdo = models.CharField(
+        max_length=1,
+        choices=REFLEJO_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Reflejo maseteriano izquierdo",
+    )
+    maseteriano_derecho = models.CharField(
+        max_length=1,
+        choices=REFLEJO_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Reflejo maseteriano derecho",
+    )
+
+    # Miembros superiores
+    tricipital_izquierdo = models.CharField(
+        max_length=1,
+        choices=REFLEJO_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Reflejo tricipital izquierdo",
+    )
+    tricipital_derecho = models.CharField(
+        max_length=1,
+        choices=REFLEJO_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Reflejo tricipital derecho",
+    )
+
+    bicipital_izquierdo = models.CharField(
+        max_length=1,
+        choices=REFLEJO_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Reflejo bicipital izquierdo",
+    )
+    bicipital_derecho = models.CharField(
+        max_length=1,
+        choices=REFLEJO_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Reflejo bicipital derecho",
+    )
+
+    estilorradial_izquierdo = models.CharField(
+        max_length=1,
+        choices=REFLEJO_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Reflejo estilorradial izquierdo",
+    )
+    estilorradial_derecho = models.CharField(
+        max_length=1,
+        choices=REFLEJO_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Reflejo estilorradial derecho",
+    )
+
+    cubitopronador_izquierdo = models.CharField(
+        max_length=1,
+        choices=REFLEJO_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Reflejo cubitopronador izquierdo",
+    )
+    cubitopronador_derecho = models.CharField(
+        max_length=1,
+        choices=REFLEJO_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Reflejo cubitopronador derecho",
+    )
+
+    # Reflejos cutáneos
+    cutaneo_abdominal_izquierdo = models.CharField(
+        max_length=1,
+        choices=REFLEJO_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Reflejo cutáneo abdominal izquierdo",
+    )
+    cutaneo_abdominal_derecho = models.CharField(
+        max_length=1,
+        choices=REFLEJO_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Reflejo cutáneo abdominal derecho",
+    )
+
+    # Miembros inferiores
+    rotuliano_izquierdo = models.CharField(
+        max_length=1,
+        choices=REFLEJO_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Reflejo rotuliano izquierdo",
+    )
+    rotuliano_derecho = models.CharField(
+        max_length=1,
+        choices=REFLEJO_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Reflejo rotuliano derecho",
+    )
+
+    aquiliano_izquierdo = models.CharField(
+        max_length=1,
+        choices=REFLEJO_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Reflejo aquiliano izquierdo",
+    )
+    aquiliano_derecho = models.CharField(
+        max_length=1,
+        choices=REFLEJO_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Reflejo aquiliano derecho",
+    )
+
+    # Reflejos patológicos
+    glabela = models.CharField(
+        max_length=10,
+        choices=NORMAL_ANORMAL_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Reflejo glabela",
+    )
+    succion = models.CharField(
+        max_length=10,
+        choices=NORMAL_ANORMAL_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Reflejo succión",
+    )
+    palmomentoniano = models.CharField(
+        max_length=10,
+        choices=NORMAL_ANORMAL_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Reflejo palmomentoniano",
+    )
+    hoffman = models.CharField(
+        max_length=10,
+        choices=NORMAL_ANORMAL_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Reflejo Hoffman",
+    )
+    palmar = models.CharField(
+        max_length=10,
+        choices=NORMAL_ANORMAL_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Reflejo palmar",
+    )
+    marinesco = models.CharField(
+        max_length=10,
+        choices=NORMAL_ANORMAL_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Reflejo Marinesco",
+    )
+    prension = models.CharField(
+        max_length=10,
+        choices=NORMAL_ANORMAL_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Reflejo prensión",
+    )
+
     observaciones_reflejos = models.TextField(
         blank=True, null=True, verbose_name="Observaciones Reflejos"
     )
+
+    # ===== FUERZA MUSCULAR =====
+    FUERZA_CHOICES = [
+        ("0", "0. No contracción"),
+        ("1", "1. Contracción muscular perceptible sin desplazamiento"),
+        ("2", "2. Movimiento activo sin vencer la gravedad (plano horizontal)"),
+        ("3", "3. Movimiento activo que vence la gravedad (plano vertical)"),
+        ("4", "4. Movimiento activo que vence resistencia moderada"),
+        ("5", "5. Movimiento de fuerza normal"),
+    ]
+
+    # Miembro Superior - Brazo
+    brazo_abduccion_izq = models.CharField(
+        max_length=1,
+        choices=FUERZA_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Abducción brazo izquierdo",
+    )
+    brazo_abduccion_der = models.CharField(
+        max_length=1,
+        choices=FUERZA_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Abducción brazo derecho",
+    )
+    brazo_antepulsion_izq = models.CharField(
+        max_length=1,
+        choices=FUERZA_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Antepulsión brazo izquierdo",
+    )
+    brazo_antepulsion_der = models.CharField(
+        max_length=1,
+        choices=FUERZA_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Antepulsión brazo derecho",
+    )
+    brazo_rotacion_interna_izq = models.CharField(
+        max_length=1,
+        choices=FUERZA_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Rotación interna brazo izquierdo",
+    )
+    brazo_rotacion_interna_der = models.CharField(
+        max_length=1,
+        choices=FUERZA_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Rotación interna brazo derecho",
+    )
+    brazo_rotacion_externa_izq = models.CharField(
+        max_length=1,
+        choices=FUERZA_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Rotación externa brazo izquierdo",
+    )
+    brazo_rotacion_externa_der = models.CharField(
+        max_length=1,
+        choices=FUERZA_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Rotación externa brazo derecho",
+    )
+
+    # Miembro Superior - Antebrazo
+    antebrazo_flexion_izq = models.CharField(
+        max_length=1,
+        choices=FUERZA_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Flexión antebrazo izquierdo",
+    )
+    antebrazo_flexion_der = models.CharField(
+        max_length=1,
+        choices=FUERZA_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Flexión antebrazo derecho",
+    )
+    antebrazo_extension_izq = models.CharField(
+        max_length=1,
+        choices=FUERZA_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Extensión antebrazo izquierdo",
+    )
+    antebrazo_extension_der = models.CharField(
+        max_length=1,
+        choices=FUERZA_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Extensión antebrazo derecho",
+    )
+
+    # Miembro Superior - Mano
+    mano_flexion_izq = models.CharField(
+        max_length=1,
+        choices=FUERZA_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Flexión mano izquierda",
+    )
+    mano_flexion_der = models.CharField(
+        max_length=1,
+        choices=FUERZA_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Flexión mano derecha",
+    )
+    mano_extension_izq = models.CharField(
+        max_length=1,
+        choices=FUERZA_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Extensión mano izquierda",
+    )
+    mano_extension_der = models.CharField(
+        max_length=1,
+        choices=FUERZA_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Extensión mano derecha",
+    )
+    mano_prension_izq = models.CharField(
+        max_length=1,
+        choices=FUERZA_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Prensión mano izquierda",
+    )
+    mano_prension_der = models.CharField(
+        max_length=1,
+        choices=FUERZA_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Prensión mano derecha",
+    )
+
+    # Miembro Inferior - Muslo
+    muslo_flexion_izq = models.CharField(
+        max_length=1,
+        choices=FUERZA_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Flexión muslo izquierdo",
+    )
+    muslo_flexion_der = models.CharField(
+        max_length=1,
+        choices=FUERZA_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Flexión muslo derecho",
+    )
+    muslo_abduccion_izq = models.CharField(
+        max_length=1,
+        choices=FUERZA_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Abducción muslo izquierdo",
+    )
+    muslo_abduccion_der = models.CharField(
+        max_length=1,
+        choices=FUERZA_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Abducción muslo derecho",
+    )
+    muslo_aduccion_izq = models.CharField(
+        max_length=1,
+        choices=FUERZA_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Aducción muslo izquierdo",
+    )
+    muslo_aduccion_der = models.CharField(
+        max_length=1,
+        choices=FUERZA_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Aducción muslo derecho",
+    )
+
+    # Miembro Inferior - Pierna
+    pierna_flexion_izq = models.CharField(
+        max_length=1,
+        choices=FUERZA_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Flexión pierna izquierda",
+    )
+    pierna_flexion_der = models.CharField(
+        max_length=1,
+        choices=FUERZA_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Flexión pierna derecha",
+    )
+    pierna_extension_izq = models.CharField(
+        max_length=1,
+        choices=FUERZA_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Extensión pierna izquierda",
+    )
+    pierna_extension_der = models.CharField(
+        max_length=1,
+        choices=FUERZA_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Extensión pierna derecha",
+    )
+
+    # Miembro Inferior - Pie
+    pie_flexion_izq = models.CharField(
+        max_length=1,
+        choices=FUERZA_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Flexión pie izquierdo",
+    )
+    pie_flexion_der = models.CharField(
+        max_length=1,
+        choices=FUERZA_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Flexión pie derecho",
+    )
+    pie_extension_izq = models.CharField(
+        max_length=1,
+        choices=FUERZA_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Extensión pie izquierdo",
+    )
+    pie_extension_der = models.CharField(
+        max_length=1,
+        choices=FUERZA_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Extensión pie derecho",
+    )
+    pie_eversion_izq = models.CharField(
+        max_length=1,
+        choices=FUERZA_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Eversión pie izquierdo",
+    )
+    pie_eversion_der = models.CharField(
+        max_length=1,
+        choices=FUERZA_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Eversión pie derecho",
+    )
+    pie_inversion_izq = models.CharField(
+        max_length=1,
+        choices=FUERZA_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Inversión pie izquierdo",
+    )
+    pie_inversion_der = models.CharField(
+        max_length=1,
+        choices=FUERZA_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Inversión pie derecho",
+    )
+
+    observaciones_fuerza = models.TextField(
+        blank=True, null=True, verbose_name="Observaciones Fuerza Muscular"
+    )
+
+    # ===== COORDINACIÓN =====
+    coordinacion_dedo_nariz = models.CharField(
+        max_length=10,
+        choices=NORMAL_ANORMAL_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Coordinación dedo-nariz",
+    )
+    romberg = models.CharField(
+        max_length=10,
+        choices=NORMAL_ANORMAL_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Romberg",
+    )
+    talon_rodilla = models.CharField(
+        max_length=10,
+        choices=NORMAL_ANORMAL_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Talón-Rodilla",
+    )
+    pronacion_supinacion = models.CharField(
+        max_length=10,
+        choices=NORMAL_ANORMAL_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Pronación-supinación manos",
+    )
+
+    # ===== MARCHA =====
+    # Evaluación básica
+    postura = models.CharField(
+        max_length=10,
+        choices=NORMAL_ANORMAL_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Postura",
+    )
+    marcha_lineal = models.CharField(
+        max_length=10,
+        choices=NORMAL_ANORMAL_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Marcha lineal",
+    )
+    marcha_puntillas = models.CharField(
+        max_length=10,
+        choices=NORMAL_ANORMAL_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Marcha en puntillas",
+    )
+
+    # Patrones patológicos
+    marcha_hemiplejica = models.BooleanField(
+        default=False, verbose_name="Marcha hemipléjica presente"
+    )
+    marcha_parkinsoniana = models.BooleanField(
+        default=False, verbose_name="Marcha parkinsoniana presente"
+    )
+    marcha_espastica = models.BooleanField(
+        default=False, verbose_name="Marcha espástica presente"
+    )
+    marcha_polineuritica = models.BooleanField(
+        default=False, verbose_name="Marcha polineurítica presente"
+    )
+    marcha_ataxica = models.BooleanField(
+        default=False, verbose_name="Marcha atáxica presente"
+    )
+    marcha_miopatica = models.BooleanField(
+        default=False, verbose_name="Marcha miopática presente"
+    )
+    marcha_steppage = models.BooleanField(
+        default=False, verbose_name="Marcha en steppage presente"
+    )
+
+    observaciones_marcha = models.TextField(
+        blank=True, null=True, verbose_name="Observaciones Marcha"
+    )
+
+    # ===== MOVIMIENTOS ANORMALES =====
+    convulsiones = models.BooleanField(
+        default=False, verbose_name="Convulsiones presentes"
+    )
+    fasciculaciones = models.BooleanField(
+        default=False, verbose_name="Fasciculaciones presentes"
+    )
+    mioclonias = models.BooleanField(default=False, verbose_name="Mioclonías presentes")
+    temblores = models.BooleanField(default=False, verbose_name="Temblores presentes")
+    corea = models.BooleanField(default=False, verbose_name="Corea presente")
+    espasmos = models.BooleanField(default=False, verbose_name="Espasmos presentes")
+    balismos = models.BooleanField(default=False, verbose_name="Balismos presentes")
+    calambres = models.BooleanField(default=False, verbose_name="Calambres presentes")
+    tics = models.BooleanField(default=False, verbose_name="Tics presentes")
+    distonias = models.BooleanField(default=False, verbose_name="Distonías presentes")
 
     # ===== MÉTODOS AUXILIARES =====
     def get_alteraciones_pares_craneales(self):
