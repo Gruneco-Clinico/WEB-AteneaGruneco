@@ -1,0 +1,92 @@
+{% extends 'layouts/base_public.html' %}
+
+{% block content %}
+<div class="header bg-gradient-success pb-6">
+  <div class="container-fluid">
+    <div class="header-body">
+      <div class="row align-items-center py-4">
+        <div class="col-lg-6 col-7">
+          <h6 class="h2 text-white d-inline-block mb-0">
+            <i class="fas fa-check-circle mr-2"></i>
+            ¡Registro Exitoso!
+          </h6>
+          <p class="text-white-50 mb-0 mt-1">
+            Su información ha sido registrada correctamente
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid mt--6">
+  <div class="row justify-content-center">
+    <div class="col-xl-8">
+      <div class="card">
+        <div class="card-header bg-transparent">
+          <div class="row align-items-center">
+            <div class="col">
+              <h3 class="mb-0">Confirmación de Registro</h3>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="text-center mb-4">
+            <i class="fas fa-check-circle text-success" style="font-size: 4rem;"></i>
+            <h2 class="mt-3">¡Gracias por registrarse!</h2>
+          </div>
+
+          <div class="row">
+            <div class="col-md-8 offset-md-2">
+              <div class="card bg-gradient-primary text-white">
+                <div class="card-body">
+                  <h5 class="card-title">
+                    <i class="fas fa-user mr-2"></i>
+                    Información Registrada
+                  </h5>
+                  <div class="row mt-3">
+                    <div class="col-sm-6">
+                      <strong>Nombre:</strong><br>
+                      {{ datos.nombre }}
+                    </div>
+                    <div class="col-sm-6">
+                      <strong>Documento:</strong><br>
+                      {{ datos.documento }}
+                    </div>
+                  </div>
+                  <div class="row mt-3">
+                    <div class="col-sm-6">
+                      <strong>Correo:</strong><br>
+                      {{ datos.correo }}
+                    </div>
+                    <div class="col-sm-6">
+                      <strong>Código:</strong><br>
+                      <code class="text-white">{{ datos.codigo }}</code>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="alert alert-info mt-4">
+            <i class="fas fa-info-circle mr-2"></i>
+            <strong>Información importante:</strong> 
+            Su registro ha sido completado exitosamente. Nos pondremos en contacto con usted pronto 
+            a través de los datos de contacto proporcionados. Guarde su código de confirmación para futuras referencias.
+          </div>
+
+          <div class="text-center mt-4">
+            <p class="text-muted">
+              <small>
+                <i class="fas fa-shield-alt mr-1"></i>
+                Gracias por confiar en Gruneco
+              </small>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}

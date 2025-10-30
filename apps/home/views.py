@@ -354,6 +354,126 @@ def detalle_paciente(request, paciente_id):
     )
 
 
+#######################################################
+# registro externo datos demograficos
+
+
+def formulario_demografico_externo(request):
+    """Permite el registro de datos demográficos desde enlace público"""
+    if request.method == "POST":
+        try:
+            # Validar campos obligatorios
+            campos_requeridos = [
+                "primer_nombre",
+                "primer_apellido",
+                "numero_documento",
+                "fecha_nacimiento",
+                "edad",
+                "correo",
+                "celular",
+                "tipo_documento",
+            ]
+
+            for campo in campos_requeridos:
+                if not request.POST.get(campo):
+                    raise ValueError(
+                        f"El campo {campo.replace('_', ' ')} es obligatorio"
+                    )
+
+            # Verificar si ya existe un paciente con el mismo documento
+            if DatosDemograficos.objects.filter(
+                numero_documento=request.POST["numero_documento"]
+            ).exists():
+                messages.warning(
+                    request, "Ya existe un registro con este número de documento."
+                )
+                return render(request, "info_paciente/formulario_externo.html")
+
+            # Crear registro
+            paciente_nuevo = DatosDemograficos(
+                primer_nombre=request.POST["primer_nombre"].strip(),
+                primer_apellido=request.POST["primer_apellido"].strip(),
+                numero_documento=request.POST["numero_documento"].strip(),
+                fecha_nacimiento=request.POST["fecha_nacimiento"],
+                edad=request.POST["edad"],
+                correo=request.POST["correo"].strip().lower(),
+                celular=request.POST["celular"].strip(),
+                regimen=request.POST.get("regimen", "Contributivo"),
+                tipo_documento=request.POST["tipo_documento"],
+                # Campos opcionales
+                segundo_nombre=request.POST.get("segundo_nombre", "").strip(),
+                segundo_apellido=request.POST.get("segundo_apellido", "").strip(),
+                genero=request.POST.get("genero", ""),
+                escolaridad=request.POST.get("escolaridad", ""),
+                lateralidad=request.POST.get("lateralidad", ""),
+                estado_civil=request.POST.get("estado_civil", ""),
+                ocupacion=request.POST.get("ocupacion", "").strip(),
+                eps=request.POST.get("eps", "").strip(),
+                direccion=request.POST.get("direccion", "").strip(),
+                municipio_residencia=request.POST.get(
+                    "municipio_residencia", ""
+                ).strip(),
+                departamento_residencia=request.POST.get(
+                    "departamento_residencia", ""
+                ).strip(),
+                pais_residencia=request.POST.get("pais_residencia", "Colombia"),
+                municipio_nacimiento=request.POST.get(
+                    "municipio_nacimiento", ""
+                ).strip(),
+                departamento_nacimiento=request.POST.get(
+                    "departamento_nacimiento", ""
+                ).strip(),
+                pais_nacimiento=request.POST.get("pais_nacimiento", "Colombia"),
+                grupo_sanguineo=request.POST.get("grupo_sanguineo", ""),
+                religion=request.POST.get("religion", "").strip(),
+            )
+
+            paciente_nuevo.save()
+
+            # Generar código de confirmación único
+            from datetime import datetime
+
+            codigo_confirmacion = (
+                f"ATG-{paciente_nuevo.id:05d}-{datetime.now().strftime('%Y%m')}"
+            )
+
+            # Almacenar datos para la confirmación
+            request.session["registro_completado"] = {
+                "codigo": codigo_confirmacion,
+                "nombre": f"{paciente_nuevo.primer_nombre} {paciente_nuevo.primer_apellido}",
+                "documento": paciente_nuevo.numero_documento,
+                "correo": paciente_nuevo.correo,
+            }
+
+            return redirect("confirmacion_registro_externo")
+
+        except ValueError as ve:
+            messages.error(request, str(ve))
+        except Exception as e:
+            messages.error(
+                request, f"Ocurrió un error al procesar su registro: {str(e)}"
+            )
+
+        return render(request, "info_paciente/sleepFormRegister.html")
+
+    # Método GET - mostrar formulario
+    return render(request, "info_paciente/sleepFormRegister.html")
+
+
+def confirmacion_registro_externo(request):
+    """Muestra la confirmación del registro exitoso"""
+    datos_sesion = request.session.get("registro_completado")
+    if not datos_sesion:
+        return redirect("formulario_demografico_externo")
+
+    context = {"datos": datos_sesion}
+
+    # Limpiar sesión después de mostrar
+    del request.session["registro_completado"]
+
+    return render(request, "info_paciente/successfullyRegistered.html", context)
+
+
 # visitas del paciente
 @login_required
 def crear_visita(request, paciente_id):

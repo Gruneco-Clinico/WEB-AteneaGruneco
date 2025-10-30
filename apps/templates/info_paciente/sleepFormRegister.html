@@ -1,0 +1,371 @@
+{% extends 'layouts/base_public.html' %}
+
+{% block content %}
+<!-- ESTRUCTURA ORIGINAL SIN CAMBIOS -->
+<div class="header bg-primary pb-6">
+  <div class="container-fluid">
+    <div class="header-body">
+      <!-- Breadcrumb Row -->
+      <div class="row align-items-center py-3">
+        <div class="col-lg-12">
+          <nav aria-label="breadcrumb" class="d-none d-md-inline-block">
+            <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
+              <li class="breadcrumb-item">
+                <a href="#"><i class="fas fa-home"></i></a>
+              </li>
+              <li class="breadcrumb-item">
+                <a href="#" onclick="return false;">Registro Público</a>
+              </li>
+            </ol>
+          </nav>
+        </div>
+      </div>
+
+      <!-- Title and Controls Row - REORGANIZADO -->
+      <div class="row align-items-center py-4">
+        <div class="col-lg-6 col-md-6">
+          <h6 class="h2 text-white d-inline-block mb-0">Registro de Paciente</h6>
+          <p class="text-white-50 mb-0 mt-1">
+           Registro de Información Demográfica - Atenea Gruneco
+          </p>
+        </div>
+        <div class="col-lg-6 col-md-6 text-right">
+          <span class="text-white-50">
+            <i class="fas fa-user-plus"></i> Formulario Público
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Page content -->
+<div class="container-fluid mt--6">
+  <div class="row">
+    <div class="col-xl-12">
+      <div class="card">
+        <div class="card-header">
+          <div class="row align-items-center">
+            <div class="col-8">
+              <h3 class="mb-0">Formulario de Registro Demográfico</h3>
+              <p class="text-muted mb-0">Complete la información solicitada para registrarse en nuestro sistema</p>
+            </div>
+            <div class="col-4 text-right">
+              <span class="badge badge-primary badge-lg">
+                <i class="fas fa-shield-alt"></i> Información Confidencial
+              </span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card-body">
+          <!-- Mostrar mensajes -->
+          {% if messages %}
+            {% for message in messages %}
+              <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {% if message.tags == 'success' %}
+                  <i class="fas fa-check-circle me-2"></i>
+                {% elif message.tags == 'error' %}
+                  <i class="fas fa-exclamation-triangle me-2"></i>
+                {% elif message.tags == 'warning' %}
+                  <i class="fas fa-exclamation-circle me-2"></i>
+                {% else %}
+                  <i class="fas fa-info-circle me-2"></i>
+                {% endif %}
+                <strong>
+                  {% if message.tags == 'success' %}¡Éxito!{% endif %}
+                  {% if message.tags == 'error' %}Error:{% endif %}
+                  {% if message.tags == 'warning' %}Atención:{% endif %}
+                  {% if message.tags == 'info' %}Información:{% endif %}
+                </strong>
+                {{ message }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+            {% endfor %}
+          {% endif %}
+
+          <!-- Panel informativo inicial -->
+          <div class="alert alert-info border-left-info">
+            <div class="row align-items-center">
+              <div class="col">
+                <i class="fas fa-info-circle text-info"></i>
+                <strong>Información importante:</strong> Sus datos serán tratados de forma confidencial y utilizados únicamente para fines de investigación.
+                Los campos marcados con <span class="text-danger">*</span> son obligatorios.
+              </div>
+            </div>
+          </div>
+
+          <!-- FORMULARIO REUTILIZADO DE pacientForm.html -->
+          <form method="POST" action="{% url 'formulario_demografico_externo' %}" id="formularioRegistro">
+            {% csrf_token %}
+
+            <!-- Información Personal -->
+            <h6 class="heading-small text-muted mb-4">
+              <i class="fas fa-user"></i> Información Personal
+            </h6>
+            <div class="pl-lg-4">
+              <div class="row">
+                <div class="col-lg-3">
+                  <label for="primer_nombre">Primer Nombre <span class="text-danger">*</span></label>
+                  <input type="text" id="primer_nombre" name="primer_nombre" class="form-control" required maxlength="50" value="{{ request.POST.primer_nombre|default:'' }}">
+                </div>
+                <div class="col-lg-3">
+                  <label for="segundo_nombre">Segundo Nombre</label>
+                  <input type="text" id="segundo_nombre" name="segundo_nombre" class="form-control" maxlength="50" value="{{ request.POST.segundo_nombre|default:'' }}">
+                </div>
+                <div class="col-lg-3">
+                  <label for="primer_apellido">Primer Apellido <span class="text-danger">*</span></label>
+                  <input type="text" id="primer_apellido" name="primer_apellido" class="form-control" required maxlength="50" value="{{ request.POST.primer_apellido|default:'' }}">
+                </div>
+                <div class="col-lg-3">
+                  <label for="segundo_apellido">Segundo Apellido</label>
+                  <input type="text" id="segundo_apellido" name="segundo_apellido" class="form-control" maxlength="50" value="{{ request.POST.segundo_apellido|default:'' }}">
+                </div>
+              </div>
+              <hr class="my-3">
+
+              <div class="row mt-3">
+                <div class="col-lg-3">
+                  <label for="tipo_documento">Tipo Documento <span class="text-danger">*</span></label>
+                  <select class="form-control" id="tipo_documento" name="tipo_documento" required>
+                    <option value="">Seleccione...</option>
+                    <option value="CC" {% if request.POST.tipo_documento == 'CC' %}selected{% endif %}>Cédula de Ciudadanía</option>
+                    <option value="TI" {% if request.POST.tipo_documento == 'TI' %}selected{% endif %}>Tarjeta de Identidad</option>
+                    <option value="NUIP" {% if request.POST.tipo_documento == 'NUIP' %}selected{% endif %}>NUIP</option>
+                    <option value="CE" {% if request.POST.tipo_documento == 'CE' %}selected{% endif %}>Cédula de Extranjería</option>
+                    <option value="PS" {% if request.POST.tipo_documento == 'PS' %}selected{% endif %}>Pasaporte</option>
+                  </select>
+                </div>
+                <div class="col-lg-3">
+                  <label for="numero_documento">Número de Documento <span class="text-danger">*</span></label>
+                  <input type="text" id="numero_documento" name="numero_documento" class="form-control" required maxlength="20" value="{{ request.POST.numero_documento|default:'' }}">
+                </div>
+                <div class="col-lg-3">
+                  <label for="fecha_nacimiento">Fecha de Nacimiento <span class="text-danger">*</span></label>
+                  <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" class="form-control" oninput="calcularEdad()" required value="{{ request.POST.fecha_nacimiento|default:'' }}">
+                </div>
+                <div class="col-lg-3">
+                  <label for="edad">Edad</label>
+                  <input type="number" id="edad" name="edad" class="form-control" readonly required style="background-color: #f8f9fa;" value="{{ request.POST.edad|default:'' }}">
+                </div>
+              </div>
+              <hr class="my-3">
+              <div class="row mt-3">
+                <div class="col-lg-3">
+                  <label for="genero">Género <span class="text-danger">*</span></label>
+                  <select class="form-control" id="genero" name="genero" required>
+                    <option value="">Seleccione...</option>
+                    <option value="F" {% if request.POST.genero == 'F' %}selected{% endif %}>Femenino</option>
+                    <option value="M" {% if request.POST.genero == 'M' %}selected{% endif %}>Masculino</option>
+                    <option value="O" {% if request.POST.genero == 'O' %}selected{% endif %}>Otro</option>
+                  </select>
+                </div>
+                <div class="col-lg-3">
+                  <label for="municipio_nacimiento">Municipio de Nacimiento</label>
+                  <input type="text" id="municipio_nacimiento" name="municipio_nacimiento" class="form-control" value="{{ request.POST.municipio_nacimiento|default:'' }}">
+                </div>
+                <div class="col-lg-3">
+                  <label for="departamento_nacimiento">Departamento</label>
+                  <input type="text" id="departamento_nacimiento" name="departamento_nacimiento" class="form-control" value="{{ request.POST.departamento_nacimiento|default:'' }}">
+                </div>
+                <div class="col-lg-3">
+                  <label for="pais_nacimiento">País de Nacimiento</label>
+                  <input type="text" id="pais_nacimiento" name="pais_nacimiento" class="form-control" value="{{ request.POST.pais_nacimiento|default:'Colombia' }}">
+                </div>
+              </div>
+              <hr class="my-3">
+
+            <h6 class="heading-small text-muted mb-4">
+              <i class="fas fa-phone"></i> Información de contacto
+            </h6>
+            <div class="row mt-3">
+              <div class="col-lg-3">
+                <label for="direccion">Dirección</label>
+                <input type="text" id="direccion" name="direccion" class="form-control" value="{{ request.POST.direccion|default:'' }}">
+              </div>
+              <div class="col-lg-3">
+                <label for="municipio_residencia">Municipio de Residencia</label>
+                <input type="text" id="municipio_residencia" name="municipio_residencia" class="form-control" value="{{ request.POST.municipio_residencia|default:'' }}">
+              </div>
+              <div class="col-lg-3">
+                <label for="departamento_residencia">Departamento</label>
+                <input type="text" id="departamento_residencia" name="departamento_residencia" class="form-control" value="{{ request.POST.departamento_residencia|default:'' }}">
+              </div>
+              <div class="col-lg-3">
+                <label for="pais_residencia">País de Residencia</label>
+                <input type="text" id="pais_residencia" name="pais_residencia" class="form-control" value="{{ request.POST.pais_residencia|default:'Colombia' }}">
+              </div>
+            </div>
+            <hr class="my-3">
+            <div class="row mt-3">
+              <div class="col-lg-6">
+                <label for="celular">Celular <span class="text-danger">*</span></label>
+                <input type="tel" id="celular" name="celular" class="form-control" required maxlength="15" placeholder="Ej: 3001234567" value="{{ request.POST.celular|default:'' }}">
+              </div>
+              <div class="col-lg-6">
+                <label for="correo">Correo Electrónico <span class="text-danger">*</span></label>
+                <input type="email" id="correo" name="correo" class="form-control" required maxlength="100" placeholder="ejemplo@correo.com" value="{{ request.POST.correo|default:'' }}">
+              </div>
+            </div>
+
+            <hr class="my-3">
+            <h6 class="heading-small text-muted mb-4">
+              <i class="fas fa-info-circle"></i> Información adicional
+            </h6>
+            <div class="row mt-3">
+              <div class="col-lg-3">
+                <label for="grupo_sanguineo">Grupo Sanguíneo</label>
+                <select class="form-control" id="grupo_sanguineo" name="grupo_sanguineo">
+                  <option value="">Seleccione...</option>
+                  <option value="O+" {% if request.POST.grupo_sanguineo == 'O+' %}selected{% endif %}>O+</option>
+                  <option value="O-" {% if request.POST.grupo_sanguineo == 'O-' %}selected{% endif %}>O-</option>
+                  <option value="A+" {% if request.POST.grupo_sanguineo == 'A+' %}selected{% endif %}>A+</option>
+                  <option value="A-" {% if request.POST.grupo_sanguineo == 'A-' %}selected{% endif %}>A-</option>
+                  <option value="B+" {% if request.POST.grupo_sanguineo == 'B+' %}selected{% endif %}>B+</option>
+                  <option value="B-" {% if request.POST.grupo_sanguineo == 'B-' %}selected{% endif %}>B-</option>
+                  <option value="AB+" {% if request.POST.grupo_sanguineo == 'AB+' %}selected{% endif %}>AB+</option>
+                  <option value="AB-" {% if request.POST.grupo_sanguineo == 'AB-' %}selected{% endif %}>AB-</option>
+                </select>
+              </div>
+              <div class="col-lg-3">
+                <label for="lateralidad">Lateralidad</label>
+                <select class="form-control" id="lateralidad" name="lateralidad">
+                  <option value="">Seleccione...</option>
+                  <option value="Diestro" {% if request.POST.lateralidad == 'Diestro' %}selected{% endif %}>Diestro</option>
+                  <option value="Zurdo" {% if request.POST.lateralidad == 'Zurdo' %}selected{% endif %}>Zurdo</option>
+                  <option value="Ambidiestro" {% if request.POST.lateralidad == 'Ambidiestro' %}selected{% endif %}>Ambidiestro</option>
+                </select>
+              </div>
+              <div class="col-lg-3">
+                <label for="religion">Religión</label>
+                <input type="text" id="religion" name="religion" class="form-control" value="{{ request.POST.religion|default:'' }}">
+              </div>
+              <div class="col-lg-3">
+                <label for="eps">EPS</label>
+                <input type="text" id="eps" name="eps" class="form-control" value="{{ request.POST.eps|default:'' }}">
+              </div>
+            </div>
+            <hr class="my-3">
+            <div class="row mt-3">
+              <div class="col-lg-3">
+                <label for="estado_civil">Estado Civil</label>
+                <select class="form-control" id="estado_civil" name="estado_civil">
+                  <option value="">Seleccione...</option>
+                  <option value="Soltero" {% if request.POST.estado_civil == 'Soltero' %}selected{% endif %}>Soltero(a)</option>
+                  <option value="Casado" {% if request.POST.estado_civil == 'Casado' %}selected{% endif %}>Casado(a)</option>
+                  <option value="UnionLibre" {% if request.POST.estado_civil == 'UnionLibre' %}selected{% endif %}>Unión libre</option>
+                  <option value="Viudo" {% if request.POST.estado_civil == 'Viudo' %}selected{% endif %}>Viudo(a)</option>
+                  <option value="Divorciado" {% if request.POST.estado_civil == 'Divorciado' %}selected{% endif %}>Divorciado(a)</option>
+                </select>
+              </div>
+              <div class="col-lg-3">
+                <label for="escolaridad">Escolaridad</label>
+                <select class="form-control" id="escolaridad" name="escolaridad">
+                  <option value="">Seleccione...</option>
+                  <option value="primario" {% if request.POST.escolaridad == 'primario' %}selected{% endif %}>Primario</option>
+                  <option value="bachiller" {% if request.POST.escolaridad == 'bachiller' %}selected{% endif %}>Bachiller</option>
+                  <option value="universidad" {% if request.POST.escolaridad == 'universidad' %}selected{% endif %}>Universidad</option>
+                  <option value="maestria" {% if request.POST.escolaridad == 'maestria' %}selected{% endif %}>Maestría</option>
+                  <option value="doctorado" {% if request.POST.escolaridad == 'doctorado' %}selected{% endif %}>Doctorado</option>
+                  <option value="especializacion" {% if request.POST.escolaridad == 'especializacion' %}selected{% endif %}>Especialización</option>
+                </select>
+              </div>
+              <div class="col-lg-3">
+                <label for="ocupacion">Ocupación</label>
+                <input type="text" id="ocupacion" name="ocupacion" class="form-control" value="{{ request.POST.ocupacion|default:'' }}">
+              </div>
+              <div class="col-lg-3">
+                <label for="regimen">Régimen</label>
+                <select class="form-control" id="regimen" name="regimen">
+                  <option value="Contributivo" {% if request.POST.regimen == 'Contributivo' %}selected{% endif %}>Contributivo</option>
+                  <option value="Subsidiado" {% if request.POST.regimen == 'Subsidiado' %}selected{% endif %}>Subsidiado</option>
+                  <option value="Vinculado" {% if request.POST.regimen == 'Vinculado' %}selected{% endif %}>Vinculado</option>
+                </select>
+              </div>
+            </div>
+            </div>
+            
+            <!-- Área de consentimiento -->
+            <div class="alert alert-light border mt-4">
+              <div class="custom-control custom-checkbox">
+                <input type="checkbox" class="custom-control-input" id="consentimiento" required>
+                <label class="custom-control-label" for="consentimiento">
+                  <strong>Acepto</strong> que mis datos sean utilizados para fines de investigación médica, 
+                  bajo estricta confidencialidad y cumplimiento de las normas de protección de datos personales.
+                </label>
+              </div>
+            </div>
+
+            <hr class="my-4" />
+            <div class="text-center">
+              <button type="submit" class="btn btn-primary btn-lg px-5">
+                <i class="fas fa-paper-plane mr-2"></i>
+                Registrar Información
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+{% block javascripts %}
+<script>
+  function calcularEdad() {
+    // Obtener la fecha de nacimiento del campo de entrada
+    const fechaNacimiento = document.getElementById('fecha_nacimiento').value;
+
+    // Verificar si se ha seleccionado una fecha
+    if (fechaNacimiento) {
+      // Convertir la fecha de nacimiento a un objeto Date
+      const fechaNac = new Date(fechaNacimiento);
+      const hoy = new Date(); // Fecha actual
+
+      // Calcular la diferencia en milisegundos
+      const diferencia = hoy - fechaNac;
+
+      // Convertir la diferencia a años
+      const edad = Math.floor(diferencia / (1000 * 60 * 60 * 24 * 365.25));
+
+      // Mostrar la edad en el campo correspondiente si es válida
+      document.getElementById('edad').value = edad >= 0 ? edad : '';
+    } else {
+      // Si no hay fecha, limpiar el campo de edad
+      document.getElementById('edad').value = '';
+    }
+  }
+
+  // Asignar el evento oninput al campo de fecha de nacimiento
+  document.getElementById('fecha_nacimiento').addEventListener('input', calcularEdad);
+
+  // Validación adicional del formulario
+  document.getElementById('formularioRegistro').addEventListener('submit', function(e) {
+    const camposRequeridos = ['primer_nombre', 'primer_apellido', 'numero_documento', 'fecha_nacimiento', 'correo', 'celular', 'tipo_documento', 'genero'];
+    let formularioValido = true;
+
+    camposRequeridos.forEach(function(campo) {
+      const elemento = document.getElementById(campo);
+      if (!elemento.value.trim()) {
+        elemento.classList.add('is-invalid');
+        formularioValido = false;
+      } else {
+        elemento.classList.remove('is-invalid');
+      }
+    });
+
+    if (!formularioValido) {
+      e.preventDefault();
+      alert('Por favor, complete todos los campos obligatorios marcados con *');
+    }
+  });
+
+  // Calcular edad al cargar la página si ya hay una fecha
+  document.addEventListener('DOMContentLoaded', function() {
+    calcularEdad();
+  });
+</script>
+{% endblock javascripts %}

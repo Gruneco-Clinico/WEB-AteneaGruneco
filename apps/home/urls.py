@@ -44,6 +44,17 @@ urlpatterns = [
         views.editar_paciente,
         name="editar_paciente",
     ),
+    # URLs públicas (sin autenticación)
+    path(
+        "registro-demografico/",
+        views.formulario_demografico_externo,
+        name="formulario_demografico_externo",
+    ),
+    path(
+        "registro-exitoso/",
+        views.confirmacion_registro_externo,
+        name="confirmacion_registro_externo",
+    ),
     path("proyectos/", views.proyectos, name="proyectos"),
     path(
         "proyecto/<int:id>/eliminar/", views.eliminar_proyecto, name="eliminar_proyecto"
