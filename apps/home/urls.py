@@ -23,9 +23,9 @@ urlpatterns = [
     path("login/", login_view, name="login"),
     path("logout/", views.logout_view, name="logout"),
     path("profile/", profile_view, name="profile"),  # Perfil de usuario
-    path(
-        "contrasena/", views.cambiar_contrasena, name="cambiar_contrasena"
-    ),  # Perfil de usuario
+    path("contrasena/", views.cambiar_contrasena, name="cambiar_contrasena"),
+    # Perfil de usuario
+    path("usuarios/", views.administrar_usuarios, name="administrar_usuarios"),
     # Resgistro de pacientes
     path(
         "registro_demografico/", views.registro_demografico, name="registro_demografico"
@@ -55,6 +55,18 @@ urlpatterns = [
         views.confirmacion_registro_externo,
         name="confirmacion_registro_externo",
     ),
+    # URLs públicas para exámenes
+    path(
+        "guardar-examen-publico-epworth/",
+        views.guardar_examen_publico_epworth,
+        name="guardar_examen_publico_epworth",
+    ),
+    path(
+        "guardar-examen-publico-mew/",
+        views.guardar_examen_publico_mew,
+        name="guardar_examen_publico_mew",
+    ),
+    # PROYECTOS
     path("proyectos/", views.proyectos, name="proyectos"),
     path(
         "proyecto/<int:id>/eliminar/", views.eliminar_proyecto, name="eliminar_proyecto"

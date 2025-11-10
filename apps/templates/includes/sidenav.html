@@ -80,7 +80,7 @@
               class="nav-link {% if 'estadisticas' in segment %} active {% endif %}"
               href="/estadisticas/"
             >
-              <i class="ni ni-chart-bar-32 text-blue"></i>
+              <i class="ni ni-chart-bar-32 text-orange"></i>
               <img src="{% static 'assets/img/theme/RecuerdaMe.png' %}" 
                   alt="Logo" 
                   style="height: 30px;" 
@@ -104,6 +104,15 @@
             >
               <i class="ni ni-single-copy-04 text-red"></i>
               <span class="nav-link-text">Proyectos</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a
+              class="nav-link {% if 'administrar_usuarios' in segment %} active {% endif %}"
+              href="/usuarios/"
+            >
+              <i class="ni ni-circle-08 text-blue"></i>
+              <span class="nav-link-text">Usuarios</span>
             </a>
           </li>
         </ul>

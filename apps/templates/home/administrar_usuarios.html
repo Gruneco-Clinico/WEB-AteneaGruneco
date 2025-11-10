@@ -1,0 +1,520 @@
+{% extends 'layouts/base.html' %}
+
+{% block stylesheets %}
+<style>
+  /* Manteniendo el mismo estilo de tables.html */
+  .header .h2 {
+    font-weight: 600 !important;
+    letter-spacing: 0.5px;
+  }
+
+  .input-group .form-control {
+    border-radius: 6px 0 0 6px !important;
+    transition: all 0.2s ease;
+  }
+
+  .card {
+    border-radius: 12px !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08) !important;
+    transition: all 0.3s ease;
+  }
+
+  .card-header h3 {
+    font-weight: 600 !important;
+    font-size: 1.4rem !important;
+  }
+
+  .table .btn-sm {
+    padding: 0.5rem 1rem !important;
+    margin: 0 0.15rem !important;
+    border-radius: 6px !important;
+    font-weight: 500 !important;
+    font-size: 0.8rem !important;
+    transition: all 0.2s ease !important;
+  }
+
+  .table .btn-sm:hover {
+    transform: translateY(-1px) !important;
+  }
+
+  .alert {
+    border-radius: 8px !important;
+    font-weight: 500 !important;
+    padding: 1.25rem !important;
+    animation: slideInAlert 0.3s ease-out;
+  }
+
+  @keyframes slideInAlert {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .form-control:focus {
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25) !important;
+  }
+
+  .modal-content {
+    border-radius: 12px !important;
+  }
+
+  .badge-pill {
+    padding: 0.5rem 1rem !important;
+    font-weight: 500 !important;
+    font-size: 0.8rem !important;
+  }
+</style>
+{% endblock stylesheets %}
+
+{% block content %}
+
+<div class="header bg-primary pb-6">
+  <div class="container-fluid">
+    <div class="header-body">
+      <!-- Breadcrumb -->
+      <div class="row align-items-center py-3">
+        <div class="col-lg-12">
+          <nav aria-label="breadcrumb" class="d-none d-md-inline-block">
+            <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
+              <li class="breadcrumb-item">
+                <a href="#"><i class="fas fa-home"></i></a>
+              </li>
+              <li class="breadcrumb-item">
+                <a href="{% url 'administrar_usuarios' %}">Administración de Usuarios</a>
+              </li>
+            </ol>
+          </nav>
+        </div>
+      </div>
+
+      <!-- Título y Controles -->
+      <div class="row align-items-center py-4">
+        <div class="col-lg-6 col-md-6">
+          <h2 class="text-white mb-0">Gestión de Usuarios</h2>
+          <p class="text-white-50 mb-0 mt-1">
+            Administra usuarios del sistema
+          </p>
+        </div>
+
+        <div class="col-lg-6 col-md-6">
+          <div class="d-flex justify-content-end align-items-center">
+            <!-- Búsqueda -->
+            <div class="input-group mr-3" style="max-width: 300px;">
+              <input type="text" class="form-control" id="searchUser" placeholder="Buscar usuario...">
+              <div class="input-group-append">
+                <button class="btn btn-outline-light" type="button" onclick="searchTable()">
+                  <i class="fas fa-search"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Botón Nuevo Usuario -->
+            <button class="btn btn-neutral" data-toggle="modal" data-target="#modalNuevoUsuario">
+              <span class="btn-inner--icon">
+                <i class="fas fa-user-plus"></i>
+              </span>
+              <span class="btn-inner--text">Nuevo Usuario</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Page content -->
+<div class="container-fluid mt--6">
+  {% if messages %}
+  <div class="row mb-3">
+    <div class="col">
+      {% for message in messages %}
+      <div class="alert alert-{% if 'Error' in message %}danger{% else %}success{% endif %} alert-dismissible fade show">
+        <span class="alert-icon"><i class="fas fa-{% if 'Error' in message %}exclamation-circle{% else %}check-circle{% endif %}"></i></span>
+        <span class="alert-text">{{ message }}</span>
+        <button type="button" class="close" data-dismiss="alert">
+          <span>&times;</span>
+        </button>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="row">
+    <div class="col">
+      <div class="card">
+        <!-- Card header -->
+        <div class="card-header border-0">
+          <div class="row align-items-center">
+            <div class="col">
+              <h3 class="mb-0">
+                <i class="fas fa-users mr-2"></i>
+                Listado de Usuarios
+              </h3>
+            </div>
+            <div class="col-auto">
+              <span class="badge badge-primary badge-pill">{{ total_usuarios }} usuarios</span>
+              <span class="badge badge-success badge-pill">{{ usuarios_activos }} activos</span>
+              <span class="badge badge-info badge-pill">{{ administradores }} admins</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabla -->
+        <div class="table-responsive">
+          <table id="userTable" class="table align-items-center table-flush">
+            <thead class="thead-light">
+              <tr>
+                <th scope="col" class="sort" data-sort="username">Usuario</th>
+                <th scope="col" class="sort" data-sort="name">Nombre Completo</th>
+                <th scope="col" class="sort" data-sort="email">Email</th>
+                <th scope="col" class="sort" data-sort="status">Estado</th>
+                <th scope="col" class="sort" data-sort="permissions">Permisos</th>
+                <th scope="col" class="sort" data-sort="date">Fecha Registro</th>
+                <th scope="col">Acciones</th>
+              </tr>
+            </thead>
+            <tbody class="list">
+              {% for usuario in usuarios %}
+              <tr>
+                <td>
+                  <strong>{{ usuario.username }}</strong>
+                </td>
+                <td>
+                  {{ usuario.first_name }} {{ usuario.last_name }}
+                  {% if usuario.first_name == '' and usuario.last_name == '' %}
+                    <span class="text-muted">Sin nombre</span>
+                  {% endif %}
+                </td>
+                <td>{{ usuario.email }}</td>
+                <td>
+                  {% if usuario.is_active %}
+                    <span class="badge badge-success badge-pill">Activo</span>
+                  {% else %}
+                    <span class="badge badge-secondary badge-pill">Inactivo</span>
+                  {% endif %}
+                </td>
+                <td>
+                  {% if usuario.is_superuser %}
+                    <span class="badge badge-danger badge-pill">Admin</span>
+                  {% elif usuario.is_staff %}
+                    <span class="badge badge-warning badge-pill">Staff</span>
+                  {% else %}
+                    <span class="badge badge-light badge-pill">Usuario</span>
+                  {% endif %}
+                </td>
+                <td>{{ usuario.date_joined|date:"d/m/Y" }}</td>
+                <td>
+                  <button class="btn btn-sm btn-neutral" 
+                          onclick="editarUsuario({{ usuario.id }}, '{{ usuario.username }}', '{{ usuario.email }}', '{{ usuario.first_name }}', '{{ usuario.last_name }}', {{ usuario.is_superuser|yesno:'true,false' }}, {{ usuario.is_staff|yesno:'true,false' }}, {{ usuario.is_active|yesno:'true,false' }})"
+                          title="Editar usuario">
+                    <i class="fas fa-edit"></i> Editar
+                  </button>
+                  
+                  {% if usuario.id != request.user.id %}
+                  <button class="btn btn-sm btn-danger" 
+                          onclick="eliminarUsuario({{ usuario.id }}, '{{ usuario.username }}')"
+                          title="Eliminar usuario">
+                    <i class="fas fa-trash"></i> Eliminar
+                  </button>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Nuevo Usuario -->
+<div class="modal fade" id="modalNuevoUsuario" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title">
+          <i class="fas fa-user-plus mr-2"></i>
+          Crear Nuevo Usuario
+        </h5>
+        <button type="button" class="close text-white" data-dismiss="modal">
+          <span>&times;</span>
+        </button>
+      </div>
+      <form method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="accion_usuario" value="registrar">
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="form-control-label">Usuario <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" name="username_nuevo" required>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="form-control-label">Email <span class="text-danger">*</span></label>
+                <input type="email" class="form-control" name="email_nuevo" required>
+              </div>
+            </div>
+          </div>
+          
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="form-control-label">Nombre</label>
+                <input type="text" class="form-control" name="nombre_usuario">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="form-control-label">Apellido</label>
+                <input type="text" class="form-control" name="apellido_usuario">
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="form-control-label">Contraseña <span class="text-danger">*</span></label>
+                <input type="password" class="form-control" name="password_nuevo" required>
+                <small class="text-muted">Mínimo 8 caracteres</small>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="form-control-label">Confirmar Contraseña <span class="text-danger">*</span></label>
+                <input type="password" class="form-control" name="confirmar_password" required>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+  <label class="form-control-label">Permisos</label>
+  <div class="form-check-stacked">
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" name="activo_estado" id="activo_estado" checked>
+      <label class="form-check-label" for="activo_estado">
+        Usuario Activo
+      </label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" name="staff_permisos" id="staff_permisos">
+      <label class="form-check-label" for="staff_permisos">
+        Personal del Sistema
+      </label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" name="admin_permisos" id="admin_permisos">
+      <label class="form-check-label" for="admin_permisos">
+        Administrador
+      </label>
+    </div>
+  </div>
+</div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save mr-1"></i>Crear Usuario
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Editar Usuario -->
+<div class="modal fade" id="modalEditarUsuario" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-warning text-white">
+        <h5 class="modal-title">
+          <i class="fas fa-user-edit mr-2"></i>
+          Editar Usuario
+        </h5>
+        <button type="button" class="close text-white" data-dismiss="modal">
+          <span>&times;</span>
+        </button>
+      </div>
+      <form method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="accion_usuario" value="modificar">
+        <input type="hidden" name="usuario_id" id="edit_user_id">
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="form-control-label">Usuario <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" name="username_modificar" id="edit_username" required>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="form-control-label">Email <span class="text-danger">*</span></label>
+                <input type="email" class="form-control" name="email_modificar" id="edit_email" required>
+              </div>
+            </div>
+          </div>
+          
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="form-control-label">Nombre</label>
+                <input type="text" class="form-control" name="nombre_modificar" id="edit_first_name">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="form-control-label">Apellido</label>
+                <input type="text" class="form-control" name="apellido_modificar" id="edit_last_name">
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="form-control-label">Nueva Contraseña</label>
+                <input type="password" class="form-control" name="nueva_password_modificar">
+                <small class="text-muted">Dejar vacío para mantener actual</small>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="form-control-label">Confirmar Nueva Contraseña</label>
+                <input type="password" class="form-control" name="confirmar_nueva_modificar">
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-control-label">Permisos</label>
+            <div class="custom-controls-stacked">
+              <label class="custom-control custom-checkbox">
+                <input type="checkbox" class="custom-control-input" name="activo_modificar" id="edit_is_active">
+                <span class="custom-control-indicator"></span>
+                <span class="custom-control-description">Usuario Activo</span>
+              </label>
+              <label class="custom-control custom-checkbox">
+                <input type="checkbox" class="custom-control-input" name="staff_modificar" id="edit_is_staff">
+                <span class="custom-control-indicator"></span>
+                <span class="custom-control-description">Personal del Sistema</span>
+              </label>
+              <label class="custom-control custom-checkbox">
+                <input type="checkbox" class="custom-control-input" name="admin_modificar" id="edit_is_superuser">
+                <span class="custom-control-indicator"></span>
+                <span class="custom-control-description">Administrador</span>
+              </label>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-warning">
+            <i class="fas fa-save mr-1"></i>Actualizar Usuario
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Formulario oculto para eliminar -->
+<form id="deleteForm" method="POST" style="display: none;">
+  {% csrf_token %}
+  <input type="hidden" name="accion_usuario" value="eliminar">
+  <input type="hidden" name="usuario_id" id="delete_user_id">
+</form>
+
+{% endblock content %}
+
+{% block javascripts %}
+<script>
+// Búsqueda en tabla
+function searchTable() {
+  const searchTerm = document.getElementById("searchUser").value.toLowerCase().trim();
+  const tableBody = document.querySelector("#userTable tbody");
+  const rows = tableBody.getElementsByTagName("tr");
+
+  for (let i = 0; i < rows.length; i++) {
+    let row = rows[i];
+    let cells = row.getElementsByTagName("td");
+    let match = false;
+    let rowText = "";
+
+    for (let j = 0; j < cells.length - 1; j++) {
+      rowText += cells[j].innerText.toLowerCase() + " ";
+    }
+
+    if (searchTerm === "" || rowText.includes(searchTerm)) {
+      match = true;
+    }
+
+    row.style.display = match ? "" : "none";
+  }
+}
+
+// Editar usuario
+function editarUsuario(id, username, email, firstName, lastName, isSuperuser, isStaff, isActive) {
+  document.getElementById('edit_user_id').value = id;
+  document.getElementById('edit_username').value = username;
+  document.getElementById('edit_email').value = email;
+  document.getElementById('edit_first_name').value = firstName;
+  document.getElementById('edit_last_name').value = lastName;
+  document.getElementById('edit_is_superuser').checked = isSuperuser;
+  document.getElementById('edit_is_staff').checked = isStaff;
+  document.getElementById('edit_is_active').checked = isActive;
+  
+  $('#modalEditarUsuario').modal('show');
+}
+
+// Eliminar usuario
+function eliminarUsuario(id, username) {
+  if (confirm(`⚠️ ¿Confirmas la eliminación del usuario "${username}"?\n\nEsta acción no se puede deshacer.`)) {
+    document.getElementById('delete_user_id').value = id;
+    document.getElementById('deleteForm').submit();
+  }
+}
+
+// Inicialización
+document.addEventListener('DOMContentLoaded', function() {
+  // Búsqueda en tiempo real
+  const searchInput = document.getElementById('searchUser');
+  if (searchInput) {
+    searchInput.addEventListener('input', function() {
+      clearTimeout(this.searchTimeout);
+      this.searchTimeout = setTimeout(() => {
+        searchTable();
+      }, 200);
+    });
+  }
+
+  // Auto-hide alerts
+  const alerts = document.querySelectorAll('.alert');
+  alerts.forEach(alert => {
+    setTimeout(() => {
+      alert.style.opacity = '0';
+      setTimeout(() => alert.remove(), 300);
+    }, 5000);
+  });
+
+  // Validación de contraseñas
+  const forms = document.querySelectorAll('form');
+  forms.forEach(form => {
+    form.addEventListener('submit', function(e) {
+      const password = form.querySelector('input[name*="password"]');
+      const confirmPassword = form.querySelector('input[name*="confirmar"]');
+      
+      if (password && confirmPassword && password.value !== confirmPassword.value) {
+        e.preventDefault();
+        alert('Las contraseñas no coinciden');
+        return false;
+      }
+    });
+  });
+});
+</script>
+{% endblock javascripts %}

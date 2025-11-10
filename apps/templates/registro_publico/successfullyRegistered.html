@@ -1,0 +1,127 @@
+{% extends 'layouts/base_public.html' %}
+
+{% block content %}
+<div class="header bg-gradient-success pb-6">
+  <div class="container-fluid">
+    <div class="header-body">
+      <div class="row align-items-center py-4">
+        <div class="col-lg-6 col-7">
+          <h6 class="h2 text-white d-inline-block mb-0">
+            <i class="fas fa-check-circle mr-2"></i>
+            ¡Registro Exitoso!
+          </h6>
+          <p class="text-white-50 mb-0 mt-1">
+            Su información ha sido registrada correctamente
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid mt--6">
+  <div class="row justify-content-center">
+    <div class="col-xl-8">
+      <div class="card">
+        <div class="card-header bg-transparent">
+          <div class="row align-items-center">
+            <div class="col">
+              <h3 class="mb-0">Confirmación de Registro</h3>
+            </div>
+          </div>
+        </div>
+        <!-- Busca la sección donde se generan los enlaces a los exámenes y actualízala así: -->
+
+<div class="card-body">
+    <div class="alert alert-success" role="alert">
+        <h4 class="alert-heading">¡Registro Completado Exitosamente!</h4>
+        <p><strong>Estimado/a {{ datos.nombre }},</strong></p>
+        <hr>
+        <p>Su registro ha sido completado correctamente. A continuación puede acceder a los exámenes disponibles:</p>
+    </div>
+
+    <!-- INFORMACIÓN DEL REGISTRO -->
+    <div class="card mb-4">
+        <div class="card-header bg-info text-white">
+            <h5><i class="fas fa-user-check"></i> Información de su Registro</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Nombre:</strong> {{ datos.nombre }}</p>
+                    <p><strong>Documento:</strong> {{ datos.documento }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Correo:</strong> {{ datos.correo }}</p>
+                    <p><strong>Código de registro:</strong> {{ datos.codigo }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ACCESO A EXÁMENES -->
+    <div class="card mb-4">
+        <div class="card-header bg-success text-white">
+            <h5><i class="fas fa-clipboard-check"></i> Exámenes Disponibles</h5>
+        </div>
+        <div class="card-body">
+            <p class="mb-3">Puede completar los siguientes exámenes haciendo clic en los enlaces:</p>
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <div class="card h-100 border-primary">
+                        <div class="card-body text-center">
+                            <i class="fas fa-bed text-primary mb-3" style="font-size: 2rem;"></i>
+                            <h6 class="card-title">Escala de Somnolencia de Epworth</h6>
+                            <p class="card-text small">Evalúa la tendencia a quedarse dormido en situaciones cotidianas.</p>
+                            <!-- 🔧 ENLACE CORREGIDO SIN CÓDIGO -->
+                            <a href="{% url 'guardar_examen_publico_epworth' %}?paciente_id={{ datos.paciente_id }}" 
+                               class="btn btn-primary btn-sm">
+                                <i class="fas fa-play-circle"></i> Comenzar Examen
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <div class="card h-100 border-info">
+                        <div class="card-body text-center">
+                            <i class="fas fa-clock text-info mb-3" style="font-size: 2rem;"></i>
+                            <h6 class="card-title">Cuestionario MEW (Matutinidad-Vespertinidad)</h6>
+                            <p class="card-text small">Determina si es una persona matutina o vespertina.</p>
+                            <!-- 🔧 ENLACE CORREGIDO SIN CÓDIGO -->
+                            <a href="{% url 'guardar_examen_publico_mew' %}?paciente_id={{ datos.paciente_id }}" 
+                               class="btn btn-info btn-sm">
+                                <i class="fas fa-play-circle"></i> Comenzar Examen
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- INFORMACIÓN IMPORTANTE -->
+    <div class="alert alert-warning" role="alert">
+        <h6><i class="fas fa-exclamation-triangle"></i> Información Importante</h6>
+        <ul class="mb-0">
+            <li>Guarde este código de registro: <strong>{{ datos.codigo }}</strong></li>
+            <li>Puede realizar los exámenes en cualquier momento</li>
+            <li>Los exámenes se guardan automáticamente al completarlos</li>
+            <li>Si tiene dudas, contacte con el equipo de investigación</li>
+        </ul>
+    </div>
+
+    <!-- BOTONES DE ACCIÓN -->
+    <div class="text-center mt-4">
+        <a href="{% url 'formulario_demografico_externo' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Volver al Inicio
+        </a>
+    </div>
+</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
