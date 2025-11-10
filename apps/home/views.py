@@ -30,6 +30,230 @@ from django.contrib.auth.models import User
 from django.contrib.auth import update_session_auth_hash
 
 
+@login_required
+def gestionar_disponibilidad(request):
+    salas = Sala.objects.filter(activa=True)
+
+    # Disponibilidades del usuario actual
+    disponibilidades = DisponibilidadUsuario.objects.filter(
+        usuario=request.user, activa=True
+    ).select_related("sala")
+
+    # 🔧 NUEVO: Obtener TODAS las disponibilidades para mostrar ocupación
+    disponibilidades_todas = (
+        DisponibilidadUsuario.objects.filter(activa=True)
+        .select_related("sala", "usuario")
+        .order_by("sala__nombre", "dia_semana", "hora_inicio")
+    )
+
+    if request.method == "POST":
+        accion = request.POST.get("accion")
+
+        if accion == "agregar_disponibilidad":
+            return agregar_disponibilidad(request)
+        elif accion == "eliminar_disponibilidad":
+            return eliminar_disponibilidad(request)
+        elif accion == "bloquear_fecha":
+            return bloquear_fecha(request)
+
+    # 🔧 NUEVO: Preparar datos JSON incluyendo todas las disponibilidades
+    disponibilidades_json = []
+    for disp in disponibilidades_todas:  # Cambio: usar todas las disponibilidades
+        disponibilidades_json.append(
+            {
+                "id": disp.id,
+                "sala_id": disp.sala.id,
+                "sala_nombre": disp.sala.nombre,
+                "usuario_id": disp.usuario.id,
+                "usuario_nombre": disp.usuario.get_full_name() or disp.usuario.username,
+                "es_usuario_actual": disp.usuario == request.user,
+                "dia_semana": disp.dia_semana,
+                "dia_nombre": disp.get_dia_semana_display(),
+                "hora_inicio": disp.hora_inicio.strftime("%H:%M"),
+                "hora_fin": disp.hora_fin.strftime("%H:%M"),
+                "fecha_inicio": disp.fecha_inicio.strftime("%Y-%m-%d"),
+                "fecha_fin": disp.fecha_fin.strftime("%Y-%m-%d")
+                if disp.fecha_fin
+                else None,
+            }
+        )
+
+    context = {
+        "salas": salas,
+        "disponibilidades": disponibilidades,
+        "disponibilidades_todas": disponibilidades_todas,  # 🔧 NUEVO
+        "disponibilidades_json": json.dumps(disponibilidades_json),
+        "dias_semana": DisponibilidadUsuario.DIAS_SEMANA,
+        "segment": "disponibilidad",
+    }
+
+    return render(request, "scheduling/gestionar_disponibilidad.html", context)
+
+
+def validar_conflictos_disponibilidad(
+    usuario,
+    sala,
+    dia_semana,
+    hora_inicio,
+    hora_fin,
+    fecha_inicio,
+    fecha_fin=None,
+    disponibilidad_id=None,
+):
+    """
+    Valida conflictos de disponibilidad para una sala específica
+    Retorna mensaje de error si hay conflicto, None si no hay problemas
+    """
+    from datetime import datetime, date, time
+
+    # Convertir strings a objetos datetime si es necesario
+    if isinstance(hora_inicio, str):
+        hora_inicio = datetime.strptime(hora_inicio, "%H:%M").time()
+    if isinstance(hora_fin, str):
+        hora_fin = datetime.strptime(hora_fin, "%H:%M").time()
+    if isinstance(fecha_inicio, str):
+        fecha_inicio = datetime.strptime(fecha_inicio, "%Y-%m-%d").date()
+    if fecha_fin and isinstance(fecha_fin, str):
+        fecha_fin = datetime.strptime(fecha_fin, "%Y-%m-%d").date()
+
+    # 🔧 NUEVA VALIDACIÓN: Buscar TODOS los conflictos en la sala (no solo del usuario actual)
+    conflictos = DisponibilidadUsuario.objects.filter(
+        sala=sala,  # ✅ Misma sala
+        dia_semana=dia_semana,  # ✅ Mismo día
+        activa=True,
+    )
+
+    # Excluir la disponibilidad actual si se está editando
+    if disponibilidad_id:
+        conflictos = conflictos.exclude(pk=disponibilidad_id)
+
+    fecha_fin_actual = fecha_fin or date(2099, 12, 31)
+
+    for disponibilidad in conflictos:
+        # Verificar solapamiento de horarios
+        if (
+            hora_inicio < disponibilidad.hora_fin
+            and hora_fin > disponibilidad.hora_inicio
+        ):
+            # Verificar solapamiento de fechas
+            fecha_fin_existente = disponibilidad.fecha_fin or date(2099, 12, 31)
+
+            if (
+                fecha_inicio <= fecha_fin_existente
+                and fecha_fin_actual >= disponibilidad.fecha_inicio
+            ):
+                # 🔧 MEJORADO: Mostrar información del usuario que ya ocupa el horario
+                usuario_ocupante = (
+                    disponibilidad.usuario.get_full_name()
+                    or disponibilidad.usuario.username
+                )
+
+                if disponibilidad.usuario == usuario:
+                    return (
+                        f"Ya tienes disponibilidad para {dict(DisponibilidadUsuario.DIAS_SEMANA)[dia_semana]} "
+                        f"de {disponibilidad.hora_inicio.strftime('%H:%M')} a {disponibilidad.hora_fin.strftime('%H:%M')} "
+                        f"en {sala.nombre}"
+                    )
+                else:
+                    return (
+                        f"Conflicto: {usuario_ocupante} ya tiene disponibilidad para {dict(DisponibilidadUsuario.DIAS_SEMANA)[dia_semana]} "
+                        f"de {disponibilidad.hora_inicio.strftime('%H:%M')} a {disponibilidad.hora_fin.strftime('%H:%M')} "
+                        f"en {sala.nombre}"
+                    )
+
+    return None
+
+
+def agregar_disponibilidad(request):
+    try:
+        sala_id = request.POST.get("sala")
+        dia_semana = int(request.POST.get("dia_semana"))
+        hora_inicio = request.POST.get("hora_inicio")
+        hora_fin = request.POST.get("hora_fin")
+        fecha_inicio = request.POST.get("fecha_inicio")
+        fecha_fin = request.POST.get("fecha_fin") or None
+
+        sala = get_object_or_404(Sala, id=sala_id, activa=True)
+
+        # 🔧 USAR LA VALIDACIÓN MEJORADA
+        conflictos = validar_conflictos_disponibilidad(
+            usuario=request.user,
+            sala=sala,
+            dia_semana=dia_semana,
+            hora_inicio=hora_inicio,
+            hora_fin=hora_fin,
+            fecha_inicio=fecha_inicio,
+            fecha_fin=fecha_fin,
+        )
+
+        if conflictos:
+            messages.error(request, f"❌ {conflictos}")
+            return redirect("gestionar_disponibilidad")
+
+        disponibilidad = DisponibilidadUsuario.objects.create(
+            usuario=request.user,
+            sala=sala,
+            dia_semana=dia_semana,
+            hora_inicio=hora_inicio,
+            hora_fin=hora_fin,
+            fecha_inicio=fecha_inicio,
+            fecha_fin=fecha_fin,
+        )
+
+        messages.success(request, "✅ Disponibilidad agregada correctamente.")
+
+    except Exception as e:
+        messages.error(request, f"❌ Error al agregar disponibilidad: {str(e)}")
+
+    return redirect("gestionar_disponibilidad")
+
+
+def eliminar_disponibilidad(request):
+    try:
+        disponibilidad_id = request.POST.get("disponibilidad_id")
+        disponibilidad = get_object_or_404(
+            DisponibilidadUsuario, id=disponibilidad_id, usuario=request.user
+        )
+
+        disponibilidad.activa = False
+        disponibilidad.save()
+
+        messages.success(request, "Disponibilidad eliminada correctamente.")
+
+    except Exception as e:
+        messages.error(request, f"Error al eliminar disponibilidad: {str(e)}")
+
+    return redirect("gestionar_disponibilidad")
+
+
+def bloquear_fecha(request):
+    try:
+        disponibilidad_id = request.POST.get("disponibilidad_id")
+        fecha = request.POST.get("fecha")
+        hora_inicio = request.POST.get("hora_inicio_bloqueo")
+        hora_fin = request.POST.get("hora_fin_bloqueo")
+        motivo = request.POST.get("motivo", "")
+
+        disponibilidad = get_object_or_404(
+            DisponibilidadUsuario, id=disponibilidad_id, usuario=request.user
+        )
+
+        BloqueoDisponibilidad.objects.create(
+            disponibilidad=disponibilidad,
+            fecha=fecha,
+            hora_inicio=hora_inicio,
+            hora_fin=hora_fin,
+            motivo=motivo,
+        )
+
+        messages.success(request, "Bloqueo de fecha creado correctamente.")
+
+    except Exception as e:
+        messages.error(request, f"Error al crear bloqueo: {str(e)}")
+
+    return redirect("gestionar_disponibilidad")
+
+
 def is_superuser(user):
     return user.is_superuser
 

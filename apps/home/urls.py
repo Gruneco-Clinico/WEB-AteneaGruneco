@@ -26,6 +26,12 @@ urlpatterns = [
     path("contrasena/", views.cambiar_contrasena, name="cambiar_contrasena"),
     # Perfil de usuario
     path("usuarios/", views.administrar_usuarios, name="administrar_usuarios"),
+    # disponibilidad
+    path(
+        "disponibilidad/",
+        views.gestionar_disponibilidad,
+        name="gestionar_disponibilidad",
+    ),
     # Resgistro de pacientes
     path(
         "registro_demografico/", views.registro_demografico, name="registro_demografico"

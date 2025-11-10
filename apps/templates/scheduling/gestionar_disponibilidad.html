@@ -1,0 +1,462 @@
+{% extends 'layouts/base.html' %}
+
+{% block stylesheets %}
+<style>
+  .disponibilidad-card {
+    border-left: 4px solid #007bff;
+    transition: all 0.3s ease;
+  }
+  
+  .disponibilidad-card:hover {
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    transform: translateY(-2px);
+  }
+  
+  .calendar-view {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 12px;
+    color: white;
+  }
+  
+  .time-slot {
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+  }
+  
+  .time-slot:hover {
+    border-color: #007bff;
+    background-color: #f8f9fa;
+  }
+</style>
+{% endblock stylesheets %}
+
+{% block content %}
+<div class="header bg-primary pb-6">
+  <div class="container-fluid">
+    <div class="header-body">
+      <div class="row align-items-center py-4">
+        <div class="col-lg-6">
+          <h2 class="text-white mb-0">Mi Disponibilidad</h2>
+          <p class="text-white-50 mb-0 mt-1">
+            Gestiona tus horarios de atención por sala
+          </p>
+        </div>
+        <div class="col-lg-6">
+          <div class="d-flex justify-content-end">
+            <button class="btn btn-neutral" data-toggle="modal" data-target="#modalNuevaDisponibilidad">
+              <i class="fas fa-plus mr-2"></i>
+              Nueva Disponibilidad
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid mt--6">
+  {% if messages %}
+  <div class="row mb-3">
+    <div class="col">
+      {% for message in messages %}
+      <div class="alert alert-{% if 'Error' in message %}danger{% else %}success{% endif %} alert-dismissible fade show">
+        <span class="alert-text">{{ message }}</span>
+        <button type="button" class="close" data-dismiss="alert">
+          <span>&times;</span>
+        </button>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Vista por salas -->
+  <!-- ...existing code... -->
+<div class="row">
+  {% for sala in salas %}
+  <div class="col-lg-6 mb-4">
+    <div class="card disponibilidad-card">
+      <div class="card-header">
+        <h5 class="mb-0">
+          <i class="fas fa-door-open mr-2 text-primary"></i>
+          {{ sala.nombre }}
+          <!-- 🔧 NUEVO: Mostrar estado de ocupación -->
+          <span class="badge badge-info ml-2" id="badge-sala-{{ sala.id }}">
+            <i class="fas fa-users"></i> <span id="usuarios-sala-{{ sala.id }}">0</span> usuario(s)
+          </span>
+        </h5>
+        {% if sala.descripcion %}
+        <small class="text-muted">{{ sala.descripcion }}</small>
+        {% endif %}
+      </div>
+      <div class="card-body">
+        <!-- 🔧 NUEVO: Mostrar todos los usuarios con disponibilidad en esta sala -->
+        <div class="mb-3">
+          <h6 class="text-primary">
+            <i class="fas fa-calendar-check mr-1"></i>
+            Disponibilidades en esta sala:
+          </h6>
+          <div id="todas-disponibilidades-sala-{{ sala.id }}">
+            {% for disponibilidad in disponibilidades_todas %}
+              {% if disponibilidad.sala.id == sala.id %}
+              <div class="d-flex justify-content-between align-items-center p-2 mb-1 
+                          {% if disponibilidad.usuario == request.user %}bg-success text-white
+                          {% else %}bg-light{% endif %} rounded">
+                <div class="flex-grow-1">
+                  <strong>{{ disponibilidad.get_dia_semana_display }}</strong>
+                  - {{ disponibilidad.hora_inicio|time:"H:i" }} a {{ disponibilidad.hora_fin|time:"H:i" }}
+                  <br>
+                  <small>
+                    {% if disponibilidad.usuario == request.user %}
+                      <i class="fas fa-user-check"></i> Tu disponibilidad
+                    {% else %}
+                      <i class="fas fa-user"></i> 
+                      {{ disponibilidad.usuario.get_full_name|default:disponibilidad.usuario.username }}
+                    {% endif %}
+                  </small>
+                </div>
+                {% if disponibilidad.usuario == request.user %}
+                <div class="btn-group">
+                  <button class="btn btn-sm btn-warning" 
+                          onclick="bloquearFecha({{ disponibilidad.id }})"
+                          title="Bloquear fecha específica">
+                    <i class="fas fa-ban"></i>
+                  </button>
+                  <button class="btn btn-sm btn-danger" 
+                          onclick="eliminarDisponibilidad({{ disponibilidad.id }})"
+                          title="Eliminar disponibilidad">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+                {% endif %}
+              </div>
+              {% endif %}
+            {% empty %}
+            <div class="text-center text-muted py-2">
+              <i class="fas fa-calendar-times fa-2x mb-2"></i>
+              <p>No hay disponibilidades configuradas para esta sala</p>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- Botón para agregar disponibilidad -->
+        <div class="text-center">
+          <button class="btn btn-primary btn-sm" 
+                  onclick="abrirModalParaSala({{ sala.id }}, '{{ sala.nombre }}')">
+            <i class="fas fa-plus"></i> Agregar Mi Disponibilidad
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+<!-- ...existing code... -->
+</div>
+
+<!-- Modal Nueva Disponibilidad -->
+<div class="modal fade" id="modalNuevaDisponibilidad" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title">
+          <i class="fas fa-calendar-plus mr-2"></i>
+          Nueva Disponibilidad
+        </h5>
+        <button type="button" class="close text-white" data-dismiss="modal">
+          <span>&times;</span>
+        </button>
+      </div>
+      <form method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="accion" value="agregar_disponibilidad">
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="form-control-label">Sala <span class="text-danger">*</span></label>
+                <select class="form-control" name="sala" required>
+                  <option value="">Seleccionar sala...</option>
+                  {% for sala in salas %}
+                  <option value="{{ sala.id }}">{{ sala.nombre }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="form-control-label">Día de la semana <span class="text-danger">*</span></label>
+                <select class="form-control" name="dia_semana" required>
+                  <option value="">Seleccionar día...</option>
+                  {% for dia in dias_semana %}
+                  <option value="{{ dia.0 }}">{{ dia.1 }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+          </div>
+          
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="form-control-label">Hora de inicio <span class="text-danger">*</span></label>
+                <input type="time" class="form-control" name="hora_inicio" required>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="form-control-label">Hora de fin <span class="text-danger">*</span></label>
+                <input type="time" class="form-control" name="hora_fin" required>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="form-control-label">Fecha de inicio <span class="text-danger">*</span></label>
+                <input type="date" class="form-control" name="fecha_inicio" required>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="form-control-label">Fecha de fin</label>
+                <input type="date" class="form-control" name="fecha_fin">
+                <small class="text-muted">Opcional: dejar vacío para disponibilidad indefinida</small>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save mr-1"></i>Guardar Disponibilidad
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Bloquear Fecha -->
+<div class="modal fade" id="modalBloquearFecha" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-warning text-white">
+        <h5 class="modal-title">
+          <i class="fas fa-ban mr-2"></i>
+          Bloquear Fecha
+        </h5>
+        <button type="button" class="close text-white" data-dismiss="modal">
+          <span>&times;</span>
+        </button>
+      </div>
+      <form method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="accion" value="bloquear_fecha">
+        <input type="hidden" name="disponibilidad_id" id="bloqueo_disponibilidad_id">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-control-label">Fecha a bloquear <span class="text-danger">*</span></label>
+            <input type="date" class="form-control" name="fecha" required>
+          </div>
+          
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="form-control-label">Hora inicio bloqueo</label>
+                <input type="time" class="form-control" name="hora_inicio_bloqueo">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="form-control-label">Hora fin bloqueo</label>
+                <input type="time" class="form-control" name="hora_fin_bloqueo">
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-control-label">Motivo (opcional)</label>
+            <textarea class="form-control" name="motivo" rows="3" 
+                     placeholder="Ej: Reunión, vacaciones, etc."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-warning">
+            <i class="fas fa-ban mr-1"></i>Bloquear
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Formularios ocultos -->
+<form id="eliminarForm" method="POST" style="display: none;">
+  {% csrf_token %}
+  <input type="hidden" name="accion" value="eliminar_disponibilidad">
+  <input type="hidden" name="disponibilidad_id" id="eliminar_disponibilidad_id">
+</form>
+
+{% endblock content %}
+
+{% block javascripts %}
+<script>
+// 🔧 NUEVA FUNCIÓN: Validar conflictos considerando todos los usuarios
+function validarConflictosHorarios() {
+    const sala = document.querySelector('select[name="sala"]').value;
+    const diaSemana = document.querySelector('select[name="dia_semana"]').value;
+    const horaInicio = document.querySelector('input[name="hora_inicio"]').value;
+    const horaFin = document.querySelector('input[name="hora_fin"]').value;
+    const fechaInicio = document.querySelector('input[name="fecha_inicio"]').value;
+    const fechaFin = document.querySelector('input[name="fecha_fin"]').value;
+    
+    // Validaciones básicas
+    if (!sala || !diaSemana || !horaInicio || !horaFin || !fechaInicio) {
+        return true; // Permitir validación del servidor
+    }
+    
+    // Validar que hora inicio < hora fin
+    if (horaInicio >= horaFin) {
+        mostrarError('La hora de inicio debe ser anterior a la hora de fin');
+        return false;
+    }
+    
+    // Validar fechas si ambas están presentes
+    if (fechaFin && fechaInicio > fechaFin) {
+        mostrarError('La fecha de inicio debe ser anterior a la fecha de fin');
+        return false;
+    }
+    
+    // 🔧 NUEVA VALIDACIÓN: Verificar conflictos con TODAS las disponibilidades
+    const disponibilidadesExistentes = JSON.parse('{{ disponibilidades_json|default:"[]"|safe }}');
+    
+    for (let disponibilidad of disponibilidadesExistentes) {
+        if (disponibilidad.sala_id == sala && 
+            disponibilidad.dia_semana == diaSemana) {
+            
+            // Verificar solapamiento de horarios
+            if (horaInicio < disponibilidad.hora_fin && horaFin > disponibilidad.hora_inicio) {
+                
+                // Verificar solapamiento de fechas
+                const fechaFinActual = fechaFin || '2099-12-31';
+                const fechaFinExistente = disponibilidad.fecha_fin || '2099-12-31';
+                
+                if (fechaInicio <= fechaFinExistente && fechaFinActual >= disponibilidad.fecha_inicio) {
+                    let mensaje;
+                    if (disponibilidad.es_usuario_actual) {
+                        mensaje = `Ya tienes disponibilidad el ${disponibilidad.dia_nombre} ` +
+                                `de ${disponibilidad.hora_inicio} a ${disponibilidad.hora_fin} ` +
+                                `en ${disponibilidad.sala_nombre}`;
+                    } else {
+                        mensaje = `Conflicto: ${disponibilidad.usuario_nombre} ya tiene disponibilidad ` +
+                                `el ${disponibilidad.dia_nombre} ` +
+                                `de ${disponibilidad.hora_inicio} a ${disponibilidad.hora_fin} ` +
+                                `en ${disponibilidad.sala_nombre}`;
+                    }
+                    mostrarError(mensaje);
+                    return false;
+                }
+            }
+        }
+    }
+    
+    return true;
+}
+
+function mostrarError(mensaje) {
+    // Crear o actualizar mensaje de error
+    let errorDiv = document.getElementById('error-conflictos');
+    if (!errorDiv) {
+        errorDiv = document.createElement('div');
+        errorDiv.id = 'error-conflictos';
+        errorDiv.className = 'alert alert-danger mt-2';
+        document.querySelector('.modal-body').appendChild(errorDiv);
+    }
+    errorDiv.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${mensaje}`;
+    errorDiv.style.display = 'block';
+}
+
+function limpiarErrores() {
+    const errorDiv = document.getElementById('error-conflictos');
+    if (errorDiv) {
+        errorDiv.style.display = 'none';
+    }
+}
+
+// 🔧 NUEVA FUNCIÓN: Actualizar contador de usuarios por sala
+function actualizarContadoresSala() {
+    const disponibilidades = JSON.parse('{{ disponibilidades_json|default:"[]"|safe }}');
+    const contadorPorSala = {};
+    
+    // Contar usuarios únicos por sala
+    disponibilidades.forEach(disp => {
+        if (!contadorPorSala[disp.sala_id]) {
+            contadorPorSala[disp.sala_id] = new Set();
+        }
+        contadorPorSala[disp.sala_id].add(disp.usuario_id);
+    });
+    
+    // Actualizar badges
+    Object.keys(contadorPorSala).forEach(salaId => {
+        const badge = document.getElementById(`usuarios-sala-${salaId}`);
+        if (badge) {
+            badge.textContent = contadorPorSala[salaId].size;
+        }
+    });
+}
+
+// Validar antes de enviar el formulario
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('#modalNuevaDisponibilidad form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            limpiarErrores();
+            if (!validarConflictosHorarios()) {
+                e.preventDefault();
+                return false;
+            }
+        });
+    }
+    
+    // Validar en tiempo real cuando cambien los campos
+    const campos = ['select[name="sala"]', 'select[name="dia_semana"]', 
+                   'input[name="hora_inicio"]', 'input[name="hora_fin"]',
+                   'input[name="fecha_inicio"]', 'input[name="fecha_fin"]'];
+    
+    campos.forEach(selector => {
+        const campo = document.querySelector(selector);
+        if (campo) {
+            campo.addEventListener('change', function() {
+                setTimeout(limpiarErrores, 100);
+            });
+        }
+    });
+    
+    // 🔧 NUEVO: Actualizar contadores al cargar la página
+    actualizarContadoresSala();
+});
+
+function abrirModalParaSala(salaId, salaNombre) {
+    const modal = $('#modalNuevaDisponibilidad');
+    modal.find('select[name="sala"]').val(salaId);
+    modal.modal('show');
+}
+
+function eliminarDisponibilidad(disponibilidadId) {
+    if (confirm('¿Estás seguro de que deseas eliminar esta disponibilidad?')) {
+        document.getElementById('eliminar_disponibilidad_id').value = disponibilidadId;
+        document.getElementById('eliminarForm').submit();
+    }
+}
+
+function bloquearFecha(disponibilidadId) {
+    document.getElementById('bloqueo_disponibilidad_id').value = disponibilidadId;
+    $('#modalBloquearFecha').modal('show');
+}
+</script>
+{% endblock javascripts %}

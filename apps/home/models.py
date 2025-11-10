@@ -6,6 +6,88 @@ Copyright (c) 2019 - present AppSeed.us
 from django.db import models
 from django.contrib.auth.models import AbstractUser, Group, Permission
 from django.urls import reverse, NoReverseMatch
+from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
+from django.utils import timezone
+import datetime
+
+
+class Sala(models.Model):
+    nombre = models.CharField(max_length=100, unique=True)
+    descripcion = models.TextField(blank=True)
+    capacidad = models.PositiveIntegerField(default=1)
+    activa = models.BooleanField(default=True)
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Sala"
+        verbose_name_plural = "Salas"
+        ordering = ["nombre"]
+
+    def __str__(self):
+        return self.nombre
+
+
+class DisponibilidadUsuario(models.Model):
+    DIAS_SEMANA = [
+        (0, "Lunes"),
+        (1, "Martes"),
+        (2, "Miércoles"),
+        (3, "Jueves"),
+        (4, "Viernes"),
+        (5, "Sábado"),
+        (6, "Domingo"),
+    ]
+
+    usuario = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="disponibilidades"
+    )
+    sala = models.ForeignKey(
+        Sala, on_delete=models.CASCADE, related_name="disponibilidades"
+    )
+    dia_semana = models.IntegerField(choices=DIAS_SEMANA)
+    hora_inicio = models.TimeField()
+    hora_fin = models.TimeField()
+    fecha_inicio = models.DateField()
+    fecha_fin = models.DateField(null=True, blank=True)
+    activa = models.BooleanField(default=True)
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Disponibilidad de Usuario"
+        verbose_name_plural = "Disponibilidades de Usuarios"
+        unique_together = ["usuario", "sala", "dia_semana", "hora_inicio"]
+        ordering = ["dia_semana", "hora_inicio"]
+
+    def clean(self):
+        if self.hora_inicio >= self.hora_fin:
+            raise ValidationError("La hora de inicio debe ser menor que la hora de fin")
+
+        if self.fecha_fin and self.fecha_inicio > self.fecha_fin:
+            raise ValidationError(
+                "La fecha de inicio debe ser menor que la fecha de fin"
+            )
+
+    def __str__(self):
+        return f"{self.usuario.get_full_name() or self.usuario.username} - {self.sala.nombre} - {self.get_dia_semana_display()} ({self.hora_inicio}-{self.hora_fin})"
+
+
+class BloqueoDisponibilidad(models.Model):
+    disponibilidad = models.ForeignKey(
+        DisponibilidadUsuario, on_delete=models.CASCADE, related_name="bloqueos"
+    )
+    fecha = models.DateField()
+    hora_inicio = models.TimeField()
+    hora_fin = models.TimeField()
+    motivo = models.CharField(max_length=200, blank=True)
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Bloqueo de Disponibilidad"
+        verbose_name_plural = "Bloqueos de Disponibilidad"
+
+    def __str__(self):
+        return f"Bloqueo: {self.disponibilidad} - {self.fecha}"
 
 
 class CustomUser(AbstractUser):
