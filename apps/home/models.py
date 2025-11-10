@@ -8,8 +8,6 @@ from django.contrib.auth.models import AbstractUser, Group, Permission
 from django.urls import reverse, NoReverseMatch
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
-from django.utils import timezone
-import datetime
 
 
 class Sala(models.Model):
