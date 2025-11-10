@@ -4,15 +4,21 @@
 <!-- FullCalendar CSS -->
 <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css' rel='stylesheet' />
 <style>
+/* Reutilizar estilos de tables.html */
+.header .h2 {
+    font-weight: 600 !important;
+    letter-spacing: 0.5px;
+}
+
+.card {
+    border-radius: 12px !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08) !important;
+    transition: all 0.3s ease;
+}
+
 .fc-event {
     cursor: pointer;
     font-size: 0.85rem;
-}
-
-.calendario-container {
-    background: white;
-    border-radius: 0.375rem;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.12);
 }
 
 .leyenda-item {
@@ -27,6 +33,17 @@
     border-radius: 2px;
     margin-right: 0.5rem;
 }
+
+.alert {
+    border-radius: 8px !important;
+    font-weight: 500 !important;
+    animation: slideInAlert 0.3s ease-out;
+}
+
+@keyframes slideInAlert {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
 </style>
 {% endblock %}
 
@@ -34,18 +51,44 @@
 <div class="header bg-primary pb-6">
     <div class="container-fluid">
         <div class="header-body">
+            <!-- Breadcrumb -->
+            <div class="row align-items-center py-3">
+                <div class="col-lg-12">
+                    <nav aria-label="breadcrumb" class="d-none d-md-inline-block">
+                        <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
+                            <li class="breadcrumb-item">
+                                <a href="{% url 'index' %}"><i class="fas fa-home"></i></a>
+                            </li>
+                            <li class="breadcrumb-item active">
+                                Gestión de Disponibilidad
+                            </li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- Título y Controles -->
             <div class="row align-items-center py-4">
-                <div class="col-lg-6">
+                <div class="col-lg-6 col-md-6">
                     <h2 class="text-white mb-0">
                         <i class="fas fa-calendar-alt mr-2"></i>
-                        Calendario de Disponibilidad
+                        Gestión de Disponibilidad
                     </h2>
-                    <p class="text-white-50 mb-0">Vista de calendario para gestionar horarios</p>
+                    <p class="text-white-50 mb-0 mt-1">
+                        Administra tu calendario y disponibilidad
+                    </p>
                 </div>
-                <div class="col-lg-6 text-right">
-                    <button class="btn btn-neutral" data-toggle="modal" data-target="#modalNuevaDisponibilidad">
-                        <i class="fas fa-plus mr-2"></i>Nueva Disponibilidad
-                    </button>
+
+                <div class="col-lg-6 col-md-6">
+                    <div class="d-flex justify-content-end align-items-center">
+                        <!-- Botón Nueva Disponibilidad -->
+                        <button class="btn btn-neutral" data-toggle="modal" data-target="#modalNuevaDisponibilidad">
+                            <span class="btn-inner--icon">
+                                <i class="fas fa-plus"></i>
+                            </span>
+                            <span class="btn-inner--text">Nueva Disponibilidad</span>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -53,6 +96,7 @@
 </div>
 
 <div class="container-fluid mt--6">
+    <!-- Mensajes -->
     {% if messages %}
     <div class="row mb-3">
         <div class="col">
@@ -93,19 +137,84 @@
         </div>
     </div>
     
-    <!-- Calendario -->
+    <!-- Calendario Principal -->
     <div class="row">
         <div class="col">
-            <div class="card calendario-container">
+            <div class="card">
+                <div class="card-header border-0">
+                    <h3 class="mb-0">
+                        <i class="fas fa-calendar mr-2"></i>
+                        Calendario de Disponibilidad
+                    </h3>
+                </div>
                 <div class="card-body">
                     <div id="calendario-disponibilidad"></div>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Lista de Mis Disponibilidades -->
+    <div class="row mt-4">
+        <div class="col">
+            <div class="card">
+                <div class="card-header border-0">
+                    <h3 class="mb-0">
+                        <i class="fas fa-list mr-2"></i>
+                        Mis Disponibilidades Registradas
+                    </h3>
+                </div>
+                <div class="table-responsive">
+                    <table class="table align-items-center table-flush">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>Sala</th>
+                                <th>Día</th>
+                                <th>Horario</th>
+                                <th>Período</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for disp in disponibilidades_usuario %}
+                            <tr>
+                                <td><strong>{{ disp.sala.nombre }}</strong></td>
+                                <td>{{ disp.get_dia_semana_display }}</td>
+                                <td>{{ disp.hora_inicio|time:"H:i" }} - {{ disp.hora_fin|time:"H:i" }}</td>
+                                <td>
+                                    {{ disp.fecha_inicio|date:"d/m/Y" }} 
+                                    {% if disp.fecha_fin %}
+                                        - {{ disp.fecha_fin|date:"d/m/Y" }}
+                                    {% else %}
+                                        - <span class="text-muted">Indefinido</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-danger" 
+                                            onclick="eliminarDisponibilidad({{ disp.id }})"
+                                            title="Eliminar disponibilidad">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center text-muted py-4">
+                                    <i class="fas fa-calendar-plus fa-2x mb-3"></i><br>
+                                    No tienes disponibilidades registradas.<br>
+                                    <small>Haz clic en "Nueva Disponibilidad" para agregar una.</small>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
-<!-- Modal para Nueva Disponibilidad -->
+<!-- Modal Nueva Disponibilidad -->
 <div class="modal fade" id="modalNuevaDisponibilidad" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -117,7 +226,7 @@
                     <span>&times;</span>
                 </button>
             </div>
-            <form method="POST" id="formNuevaDisponibilidad">
+            <form method="POST">
                 {% csrf_token %}
                 <input type="hidden" name="accion" value="agregar_disponibilidad">
                 <div class="modal-body">
@@ -187,7 +296,7 @@
     </div>
 </div>
 
-<!-- Modal para Ver Detalles -->
+<!-- Modal Ver Detalles -->
 <div class="modal fade" id="modalDetalleDisponibilidad" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -208,6 +317,14 @@
         </div>
     </div>
 </div>
+
+<!-- Formulario oculto para eliminar -->
+<form id="eliminarForm" method="POST" style="display: none;">
+    {% csrf_token %}
+    <input type="hidden" name="accion" value="eliminar_disponibilidad">
+    <input type="hidden" name="disponibilidad_id" id="eliminar_disponibilidad_id">
+</form>
+
 {% endblock %}
 
 {% block javascripts %}
@@ -337,17 +454,17 @@ function mostrarDetalleDisponibilidad(evento) {
 
 function eliminarDisponibilidad(disponibilidadId) {
     if (confirm('¿Estás seguro de eliminar esta disponibilidad?')) {
-        // Crear formulario para eliminar
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.innerHTML = `
-            {% csrf_token %}
-            <input type="hidden" name="accion" value="eliminar_disponibilidad">
-            <input type="hidden" name="disponibilidad_id" value="${disponibilidadId}">
-        `;
-        document.body.appendChild(form);
-        form.submit();
+        document.getElementById('eliminar_disponibilidad_id').value = disponibilidadId;
+        document.getElementById('eliminarForm').submit();
     }
 }
+
+// Auto-hide alerts
+setTimeout(() => {
+    document.querySelectorAll('.alert').forEach(alert => {
+        alert.style.opacity = '0';
+        setTimeout(() => alert.remove(), 300);
+    });
+}, 5000);
 </script>
 {% endblock %}

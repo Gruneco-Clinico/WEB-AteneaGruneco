@@ -12,13 +12,9 @@ from django.shortcuts import redirect
 from django.contrib import messages
 from django.utils import timezone
 from django.http import JsonResponse
-from .posthog_service import (
-    get_posthog_events,
-    get_insight_data,
-)  # Integración RecuérdaMe
 from django.conf import settings  # Integración RecuérdaMe
 from django.http import JsonResponse, HttpResponseServerError  # Integración RecuérdaMe
-from datetime import datetime, date
+from datetime import datetime, timedelta
 from .models import *
 from .forms import ProyectoForm, RegistroDemograficoForm
 import json
@@ -32,20 +28,8 @@ from django.contrib.auth import update_session_auth_hash
 
 @login_required
 def gestionar_disponibilidad(request):
-    salas = Sala.objects.filter(activa=True)
-
-    # Disponibilidades del usuario actual
-    disponibilidades = DisponibilidadUsuario.objects.filter(
-        usuario=request.user, activa=True
-    ).select_related("sala")
-
-    # 🔧 NUEVO: Obtener TODAS las disponibilidades para mostrar ocupación
-    disponibilidades_todas = (
-        DisponibilidadUsuario.objects.filter(activa=True)
-        .select_related("sala", "usuario")
-        .order_by("sala__nombre", "dia_semana", "hora_inicio")
-    )
-
+    """Vista principal del calendario de disponibilidad"""
+    # Procesar formularios si es POST
     if request.method == "POST":
         accion = request.POST.get("accion")
 
@@ -53,41 +37,71 @@ def gestionar_disponibilidad(request):
             return agregar_disponibilidad(request)
         elif accion == "eliminar_disponibilidad":
             return eliminar_disponibilidad(request)
-        elif accion == "bloquear_fecha":
-            return bloquear_fecha(request)
 
-    # 🔧 NUEVO: Preparar datos JSON incluyendo todas las disponibilidades
-    disponibilidades_json = []
-    for disp in disponibilidades_todas:  # Cambio: usar todas las disponibilidades
-        disponibilidades_json.append(
-            {
-                "id": disp.id,
-                "sala_id": disp.sala.id,
-                "sala_nombre": disp.sala.nombre,
-                "usuario_id": disp.usuario.id,
-                "usuario_nombre": disp.usuario.get_full_name() or disp.usuario.username,
-                "es_usuario_actual": disp.usuario == request.user,
-                "dia_semana": disp.dia_semana,
-                "dia_nombre": disp.get_dia_semana_display(),
-                "hora_inicio": disp.hora_inicio.strftime("%H:%M"),
-                "hora_fin": disp.hora_fin.strftime("%H:%M"),
-                "fecha_inicio": disp.fecha_inicio.strftime("%Y-%m-%d"),
-                "fecha_fin": disp.fecha_fin.strftime("%Y-%m-%d")
-                if disp.fecha_fin
-                else None,
-            }
-        )
+    # Datos para el contexto
+    salas = Sala.objects.filter(activa=True)
+    disponibilidades_usuario = DisponibilidadUsuario.objects.filter(
+        usuario=request.user, activa=True
+    ).select_related("sala")
 
     context = {
         "salas": salas,
-        "disponibilidades": disponibilidades,
-        "disponibilidades_todas": disponibilidades_todas,  # 🔧 NUEVO
-        "disponibilidades_json": json.dumps(disponibilidades_json),
+        "disponibilidades_usuario": disponibilidades_usuario,
         "dias_semana": DisponibilidadUsuario.DIAS_SEMANA,
-        "segment": "disponibilidad",
+        "segment": "calendario_disponibilidad",
     }
 
-    return render(request, "scheduling/gestionar_disponibilidad.html", context)
+    return render(request, "scheduling/calendario_disponibilidad.html", context)
+
+
+@login_required
+def api_eventos_disponibilidad(request):
+    """API endpoint para obtener eventos de disponibilidad"""
+    try:
+        disponibilidades = DisponibilidadUsuario.objects.filter(
+            activa=True
+        ).select_related("usuario", "sala")
+
+        eventos = []
+        fecha_inicio = timezone.now().date()
+
+        for disp in disponibilidades:
+            # Generar eventos para las próximas 12 semanas
+            for semana in range(12):
+                fecha_base = fecha_inicio + timedelta(weeks=semana)
+
+                # Encontrar el día correcto de la semana
+                dias_diferencia = (disp.dia_semana - fecha_base.weekday()) % 7
+                fecha_evento = fecha_base + timedelta(days=dias_diferencia)
+
+                # Verificar rango de fechas
+                if fecha_evento >= disp.fecha_inicio:
+                    if not disp.fecha_fin or fecha_evento <= disp.fecha_fin:
+                        eventos.append(
+                            {
+                                "id": f"disp_{disp.id}_{fecha_evento.strftime('%Y%m%d')}",
+                                "title": f"{disp.usuario.get_full_name() or disp.usuario.username}",
+                                "start": f"{fecha_evento}T{disp.hora_inicio}",
+                                "end": f"{fecha_evento}T{disp.hora_fin}",
+                                "backgroundColor": "#007bff"
+                                if disp.usuario == request.user
+                                else "#28a745",
+                                "borderColor": "#007bff"
+                                if disp.usuario == request.user
+                                else "#28a745",
+                                "extendedProps": {
+                                    "sala": disp.sala.nombre,
+                                    "usuario_id": disp.usuario.id,
+                                    "disponibilidad_id": disp.id,
+                                    "es_mio": disp.usuario == request.user,
+                                },
+                            }
+                        )
+
+        return JsonResponse(eventos, safe=False)
+
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
 
 
 def validar_conflictos_disponibilidad(
@@ -101,10 +115,9 @@ def validar_conflictos_disponibilidad(
     disponibilidad_id=None,
 ):
     """
-    Valida conflictos de disponibilidad para una sala específica
-    Retorna mensaje de error si hay conflicto, None si no hay problemas
+    Valida conflictos de disponibilidad por fechas específicas
     """
-    from datetime import datetime, date, time
+    from datetime import datetime, date, time, timedelta
 
     # Convertir strings a objetos datetime si es necesario
     if isinstance(hora_inicio, str):
@@ -116,12 +129,8 @@ def validar_conflictos_disponibilidad(
     if fecha_fin and isinstance(fecha_fin, str):
         fecha_fin = datetime.strptime(fecha_fin, "%Y-%m-%d").date()
 
-    # 🔧 NUEVA VALIDACIÓN: Buscar TODOS los conflictos en la sala (no solo del usuario actual)
-    conflictos = DisponibilidadUsuario.objects.filter(
-        sala=sala,  # ✅ Misma sala
-        dia_semana=dia_semana,  # ✅ Mismo día
-        activa=True,
-    )
+    # Buscar disponibilidades en la misma sala
+    conflictos = DisponibilidadUsuario.objects.filter(sala=sala, activa=True)
 
     # Excluir la disponibilidad actual si se está editando
     if disponibilidad_id:
@@ -129,39 +138,102 @@ def validar_conflictos_disponibilidad(
 
     fecha_fin_actual = fecha_fin or date(2099, 12, 31)
 
+    # 🔧 NUEVA LÓGICA: Validar por fechas específicas
     for disponibilidad in conflictos:
         # Verificar solapamiento de horarios
-        if (
+        if not (
             hora_inicio < disponibilidad.hora_fin
             and hora_fin > disponibilidad.hora_inicio
         ):
-            # Verificar solapamiento de fechas
-            fecha_fin_existente = disponibilidad.fecha_fin or date(2099, 12, 31)
+            continue  # Sin solapamiento de horarios, continuar
 
-            if (
-                fecha_inicio <= fecha_fin_existente
-                and fecha_fin_actual >= disponibilidad.fecha_inicio
-            ):
-                # 🔧 MEJORADO: Mostrar información del usuario que ya ocupa el horario
-                usuario_ocupante = (
-                    disponibilidad.usuario.get_full_name()
-                    or disponibilidad.usuario.username
+        # Verificar solapamiento de rangos de fechas
+        fecha_fin_existente = disponibilidad.fecha_fin or date(2099, 12, 31)
+
+        if not (
+            fecha_inicio <= fecha_fin_existente
+            and fecha_fin_actual >= disponibilidad.fecha_inicio
+        ):
+            continue  # Sin solapamiento de fechas, continuar
+
+        # 🔧 NUEVA VALIDACIÓN: Generar fechas específicas que coinciden
+        fechas_conflicto = obtener_fechas_conflicto_python(
+            fecha_inicio,
+            fecha_fin_actual,
+            dia_semana,
+            disponibilidad.fecha_inicio,
+            fecha_fin_existente,
+            disponibilidad.dia_semana,
+        )
+
+        if fechas_conflicto:
+            usuario_ocupante = (
+                disponibilidad.usuario.get_full_name()
+                or disponibilidad.usuario.username
+            )
+            fechas_texto = ", ".join(
+                [f.strftime("%d/%m/%Y") for f in fechas_conflicto[:3]]
+            )
+            mas_fechas = (
+                f" y {len(fechas_conflicto) - 3} fecha(s) más"
+                if len(fechas_conflicto) > 3
+                else ""
+            )
+
+            if disponibilidad.usuario == usuario:
+                return (
+                    f"Ya tienes disponibilidad en las siguientes fechas: {fechas_texto}{mas_fechas} "
+                    f"de {disponibilidad.hora_inicio.strftime('%H:%M')} a {disponibilidad.hora_fin.strftime('%H:%M')} "
+                    f"en {sala.nombre}"
+                )
+            else:
+                return (
+                    f"Conflicto: {usuario_ocupante} ya tiene disponibilidad "
+                    f"en las siguientes fechas: {fechas_texto}{mas_fechas} "
+                    f"de {disponibilidad.hora_inicio.strftime('%H:%M')} a {disponibilidad.hora_fin.strftime('%H:%M')} "
+                    f"en {sala.nombre}"
                 )
 
-                if disponibilidad.usuario == usuario:
-                    return (
-                        f"Ya tienes disponibilidad para {dict(DisponibilidadUsuario.DIAS_SEMANA)[dia_semana]} "
-                        f"de {disponibilidad.hora_inicio.strftime('%H:%M')} a {disponibilidad.hora_fin.strftime('%H:%M')} "
-                        f"en {sala.nombre}"
-                    )
-                else:
-                    return (
-                        f"Conflicto: {usuario_ocupante} ya tiene disponibilidad para {dict(DisponibilidadUsuario.DIAS_SEMANA)[dia_semana]} "
-                        f"de {disponibilidad.hora_inicio.strftime('%H:%M')} a {disponibilidad.hora_fin.strftime('%H:%M')} "
-                        f"en {sala.nombre}"
-                    )
-
     return None
+
+
+def obtener_fechas_conflicto_python(
+    fecha_inicio_1, fecha_fin_1, dia_semana_1, fecha_inicio_2, fecha_fin_2, dia_semana_2
+):
+    """
+    Obtiene las fechas específicas que tienen conflicto entre dos disponibilidades
+    """
+    from datetime import timedelta
+
+    def generar_fechas_por_dia_semana(fecha_inicio, fecha_fin, dia_semana):
+        fechas = []
+        fecha_actual = fecha_inicio
+
+        # Encontrar la primera fecha que coincida con el día de la semana
+        while fecha_actual.weekday() != dia_semana and fecha_actual <= fecha_fin:
+            fecha_actual += timedelta(days=1)
+
+        # Generar todas las fechas que coincidan
+        while fecha_actual <= fecha_fin:
+            if fecha_actual.weekday() == dia_semana:
+                fechas.append(fecha_actual)
+                fecha_actual += timedelta(days=7)  # Siguiente semana
+            else:
+                fecha_actual += timedelta(days=1)
+
+        return fechas
+
+    # Generar fechas para ambas disponibilidades
+    fechas_1 = generar_fechas_por_dia_semana(fecha_inicio_1, fecha_fin_1, dia_semana_1)
+    fechas_2 = generar_fechas_por_dia_semana(fecha_inicio_2, fecha_fin_2, dia_semana_2)
+
+    # Encontrar fechas que coinciden
+    fechas_conflicto = []
+    for fecha1 in fechas_1:
+        if fecha1 in fechas_2:
+            fechas_conflicto.append(fecha1)
+
+    return fechas_conflicto
 
 
 def agregar_disponibilidad(request):

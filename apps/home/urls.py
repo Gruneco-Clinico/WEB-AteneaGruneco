@@ -32,6 +32,11 @@ urlpatterns = [
         views.gestionar_disponibilidad,
         name="gestionar_disponibilidad",
     ),
+    path(
+        "api/eventos-disponibilidad/",
+        views.api_eventos_disponibilidad,
+        name="api_eventos_disponibilidad",
+    ),
     # Resgistro de pacientes
     path(
         "registro_demografico/", views.registro_demografico, name="registro_demografico"
