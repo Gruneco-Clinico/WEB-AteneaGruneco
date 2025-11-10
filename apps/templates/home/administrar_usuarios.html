@@ -229,91 +229,91 @@
 </div>
 
 <!-- Modal Nuevo Usuario -->
-<div class="modal fade" id="modalNuevoUsuario" tabindex="-1">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header bg-primary text-white">
-        <h5 class="modal-title">
-          <i class="fas fa-user-plus mr-2"></i>
-          Crear Nuevo Usuario
-        </h5>
-        <button type="button" class="close text-white" data-dismiss="modal">
-          <span>&times;</span>
-        </button>
-      </div>
-      <form method="POST">
-        {% csrf_token %}
-        <input type="hidden" name="accion_usuario" value="registrar">
-        <div class="modal-body">
-          <div class="row">
-            <div class="col-md-6">
-              <div class="form-group">
-                <label class="form-control-label">Usuario <span class="text-danger">*</span></label>
-                <input type="text" class="form-control" name="username_nuevo" required>
+        <div class="modal fade" id="modalNuevoUsuario" tabindex="-1">
+          <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+              <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">
+                  <i class="fas fa-user-plus mr-2"></i>
+                  Crear Nuevo Usuario
+                </h5>
+                <button type="button" class="close text-white" data-dismiss="modal">
+                  <span>&times;</span>
+                </button>
               </div>
-            </div>
-            <div class="col-md-6">
-              <div class="form-group">
-                <label class="form-control-label">Email <span class="text-danger">*</span></label>
-                <input type="email" class="form-control" name="email_nuevo" required>
-              </div>
-            </div>
-          </div>
-          
-          <div class="row">
-            <div class="col-md-6">
-              <div class="form-group">
-                <label class="form-control-label">Nombre</label>
-                <input type="text" class="form-control" name="nombre_usuario">
-              </div>
-            </div>
-            <div class="col-md-6">
-              <div class="form-group">
-                <label class="form-control-label">Apellido</label>
-                <input type="text" class="form-control" name="apellido_usuario">
-              </div>
-            </div>
-          </div>
+              <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="accion_usuario" value="registrar">
+                <div class="modal-body">
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label class="form-control-label">Usuario <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="username_nuevo" required>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label class="form-control-label">Email <span class="text-danger">*</span></label>
+                        <input type="email" class="form-control" name="email_nuevo" required>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label class="form-control-label">Nombre</label>
+                        <input type="text" class="form-control" name="nombre_usuario">
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label class="form-control-label">Apellido</label>
+                        <input type="text" class="form-control" name="apellido_usuario">
+                      </div>
+                    </div>
+                  </div>
 
-          <div class="row">
-            <div class="col-md-6">
-              <div class="form-group">
-                <label class="form-control-label">Contraseña <span class="text-danger">*</span></label>
-                <input type="password" class="form-control" name="password_nuevo" required>
-                <small class="text-muted">Mínimo 8 caracteres</small>
-              </div>
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label class="form-control-label">Contraseña <span class="text-danger">*</span></label>
+                        <input type="password" class="form-control" name="password_nuevo" required>
+                        <small class="text-muted">Mínimo 8 caracteres</small>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label class="form-control-label">Confirmar Contraseña <span class="text-danger">*</span></label>
+                        <input type="password" class="form-control" name="confirmar_password" required>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+          <label class="form-control-label">Permisos</label>
+          <div class="form-check-stacked">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" name="activo_estado" id="activo_estado" checked>
+              <label class="form-check-label" for="activo_estado">
+                Usuario Activo
+              </label>
             </div>
-            <div class="col-md-6">
-              <div class="form-group">
-                <label class="form-control-label">Confirmar Contraseña <span class="text-danger">*</span></label>
-                <input type="password" class="form-control" name="confirmar_password" required>
-              </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" name="staff_permisos" id="staff_permisos">
+              <label class="form-check-label" for="staff_permisos">
+                Personal del Sistema
+              </label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" name="admin_permisos" id="admin_permisos">
+              <label class="form-check-label" for="admin_permisos">
+                Administrador
+              </label>
             </div>
           </div>
-
-          <div class="form-group">
-  <label class="form-control-label">Permisos</label>
-  <div class="form-check-stacked">
-    <div class="form-check">
-      <input class="form-check-input" type="checkbox" name="activo_estado" id="activo_estado" checked>
-      <label class="form-check-label" for="activo_estado">
-        Usuario Activo
-      </label>
-    </div>
-    <div class="form-check">
-      <input class="form-check-input" type="checkbox" name="staff_permisos" id="staff_permisos">
-      <label class="form-check-label" for="staff_permisos">
-        Personal del Sistema
-      </label>
-    </div>
-    <div class="form-check">
-      <input class="form-check-input" type="checkbox" name="admin_permisos" id="admin_permisos">
-      <label class="form-check-label" for="admin_permisos">
-        Administrador
-      </label>
-    </div>
-  </div>
-</div>
+        </div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
@@ -392,27 +392,30 @@
 
           <div class="form-group">
             <label class="form-control-label">Permisos</label>
-            <div class="custom-controls-stacked">
-              <label class="custom-control custom-checkbox">
-                <input type="checkbox" class="custom-control-input" name="activo_modificar" id="edit_is_active">
-                <span class="custom-control-indicator"></span>
-                <span class="custom-control-description">Usuario Activo</span>
+             <div class="form-check-stacked">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" name="activo_modificar" id="activo_modificar" checked>
+              <label class="form-check-label" for="activo_modificar">
+                Usuario Activo
               </label>
-              <label class="custom-control custom-checkbox">
-                <input type="checkbox" class="custom-control-input" name="staff_modificar" id="edit_is_staff">
-                <span class="custom-control-indicator"></span>
-                <span class="custom-control-description">Personal del Sistema</span>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" name="staff_modificar" id="staff_modificar">
+              <label class="form-check-label" for="staff_modificar">
+                Personal del Sistema
               </label>
-              <label class="custom-control custom-checkbox">
-                <input type="checkbox" class="custom-control-input" name="admin_modificar" id="edit_is_superuser">
-                <span class="custom-control-indicator"></span>
-                <span class="custom-control-description">Administrador</span>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" name="admin_modificar" id="admin_modificar">
+              <label class="form-check-label" for="admin_modificar">
+                Administrador
               </label>
             </div>
           </div>
+          </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="cerrarModal('modalEditarUsuario')">Cancelar</button>
           <button type="submit" class="btn btn-warning">
             <i class="fas fa-save mr-1"></i>Actualizar Usuario
           </button>
@@ -464,9 +467,9 @@ function editarUsuario(id, username, email, firstName, lastName, isSuperuser, is
   document.getElementById('edit_email').value = email;
   document.getElementById('edit_first_name').value = firstName;
   document.getElementById('edit_last_name').value = lastName;
-  document.getElementById('edit_is_superuser').checked = isSuperuser;
-  document.getElementById('edit_is_staff').checked = isStaff;
-  document.getElementById('edit_is_active').checked = isActive;
+  document.getElementById('admin_modificar').checked = isSuperuser;
+  document.getElementById('staff_modificar').checked = isStaff;
+  document.getElementById('activo_modificar').checked = isActive;
   
   $('#modalEditarUsuario').modal('show');
 }
@@ -477,6 +480,11 @@ function eliminarUsuario(id, username) {
     document.getElementById('delete_user_id').value = id;
     document.getElementById('deleteForm').submit();
   }
+}
+
+// Agregar esta función en tu sección de JavaScript
+function cerrarModal(modalId) {
+  $('#' + modalId).modal('hide');
 }
 
 // Inicialización
