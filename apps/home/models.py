@@ -322,7 +322,9 @@ class Visita(models.Model):
         blank=True,
     )
     fecha = models.DateField(blank=True, null=True)
-    evaluador = models.CharField(max_length=50, null=True, blank=True)
+    evaluador = models.ForeignKey(
+        User, on_delete=models.SET_NULL, null=True, blank=True
+    )
 
     # NUEVO CAMPO: Estado de la visita
     estado_visita = models.CharField(

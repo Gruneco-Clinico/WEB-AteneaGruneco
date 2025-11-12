@@ -1473,7 +1473,7 @@ def crear_visita(request, paciente_id):
     if request.method == "POST":
         tipo_visita_id = request.POST.get("tipo_visita")
         fecha = request.POST.get("fecha")
-        evaluador = request.POST.get("evaluador")
+        evaluador = request.user
         nombre = request.POST.get("nombre")
 
         # Capturar datos del acompañante

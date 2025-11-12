@@ -133,7 +133,7 @@
           <!-- TARJETA DE PROYECTO -->
           <div class="card shadow-sm mb-4 border-left-primary">
             <!-- Header del Proyecto -->
-            <div class="card-header bg-gradient-primary text-white">
+            <div class="card-header bg-success text-white">
               <div class="row align-items-center">
                 <div class="col-md-8">
                   <h4 class="mb-1 text-white">
@@ -394,8 +394,8 @@
           </div>
 
           <div class="form-group">
-            <label for="evaluador">Evaluador</label>
-            <input type="text" class="form-control" name="evaluador">
+            <label>Evaluador:</label>
+            <input type="text" class="form-control" value="{{ request.user.get_full_name }}" readonly>
           </div>
 
           <hr>
