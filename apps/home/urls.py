@@ -26,6 +26,18 @@ urlpatterns = [
     path("contrasena/", views.cambiar_contrasena, name="cambiar_contrasena"),
     # Perfil de usuario
     path("usuarios/", views.administrar_usuarios, name="administrar_usuarios"),
+    # URLs públicas para agendamiento de citas
+    path(
+        "citas/agendar/",
+        views.AgendarCitaPublicaView.as_view(),
+        name="agendar_cita_publica",
+    ),
+    path(
+        "api/disponibilidad-publica/",
+        views.api_eventos_disponibilidad_publica,
+        name="api_eventos_disponibilidad_publica",
+    ),
+    path("api/agendar-cita/", views.agendar_cita_ajax, name="agendar_cita_ajax"),
     # disponibilidad
     path(
         "disponibilidad/",

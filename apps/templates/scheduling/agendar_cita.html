@@ -1,0 +1,559 @@
+{% extends 'layouts/base_public.html' %}
+
+{% block stylesheets %}
+<!-- FullCalendar CSS -->
+<link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css' rel='stylesheet' />
+<style>
+.header .h2 {
+    font-weight: 600 !important;
+    letter-spacing: 0.5px;
+}
+
+.card {
+    border-radius: 12px !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08) !important;
+    transition: all 0.3s ease;
+}
+
+.fc-event {
+    cursor: pointer;
+    font-size: 0.85rem;
+}
+
+.fc-event-disponible {
+    background-color: #28a745 !important;
+    border-color: #28a745 !important;
+    color: white !important;
+}
+
+.fc-event-disponible:hover {
+    background-color: #218838 !important;
+    transform: scale(1.02);
+    transition: all 0.2s ease;
+}
+
+.alert {
+    border-radius: 8px !important;
+    font-weight: 500 !important;
+}
+
+/* Estilos para el formulario de agendamiento */
+.form-control:focus {
+    border-color: #28a745;
+    box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+}
+
+.btn-agendar {
+    background: linear-gradient(87deg, #2dce89 0, #2dcecc 100%);
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.btn-agendar:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(45, 206, 137, 0.3);
+}
+
+.loading-spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid #ffffff;
+    border-radius: 50%;
+    border-top-color: transparent;
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.alert-success {
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+    color: #155724;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+{% csrf_token %}
+
+<div class="header bg-primary pb-6">
+    <div class="container-fluid">
+        <div class="header-body">
+            <div class="row align-items-center py-4">
+                <div class="col-lg-8 col-md-8">
+                    <h2 class="text-white mb-0">
+                        <i class="fas fa-calendar-check mr-2"></i>
+                        Disponibilidad para Citas
+                    </h2>
+                    <p class="text-white-50 mb-0 mt-1">
+                        Consulta los horarios disponibles y agenda tu cita médica
+                    </p>
+                </div>
+                <div class="col-lg-4 col-md-4">
+                    <div class="d-flex justify-content-end align-items-center">
+                        <select class="form-control bg-white" id="filtroProfesional" onchange="aplicarFiltros()">
+                            <option value="">Todos los profesionales</option>
+                            {% for profesional in profesionales %}
+                            <option value="{{ profesional.id }}">
+                                Dr(a). {{ profesional.get_full_name|default:profesional.username }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid mt--6">
+    <!-- Contenedor para alertas -->
+    <div id="alertas-container"></div>
+
+    <!-- Leyenda -->
+    <div class="row mb-3">
+        <div class="col">
+            <div class="card">
+                <div class="card-body py-3">
+                    <div class="d-flex align-items-center flex-wrap">
+                        <strong class="mr-3">Leyenda:</strong>
+                        <div class="d-inline-flex align-items-center mr-3">
+                            <div style="width: 12px; height: 12px; background-color: #28a745; border-radius: 2px; margin-right: 0.5rem;"></div>
+                            <span>Horarios disponibles para citas</span>
+                        </div>
+                        <div class="text-muted">
+                            <i class="fas fa-info-circle mr-1"></i>
+                            <span>Haz clic en un horario disponible para agendar tu cita</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Calendario Principal -->
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <div class="card-header border-0">
+                    <h3 class="mb-0">
+                        <i class="fas fa-calendar mr-2"></i>
+                        Calendario de Disponibilidad
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div id="calendario-disponibilidad"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Agendar Cita -->
+<div class="modal fade" id="modalAgendarCita" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-calendar-plus mr-2"></i>
+                    Agendar Cita Médica
+                </h5>
+                <button type="button" class="close text-white" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Información del horario seleccionado -->
+                <div class="card bg-light mb-4">
+                    <div class="card-body py-3">
+                        <h6 class="mb-3"><i class="fas fa-info-circle mr-2 text-primary"></i>Horario Seleccionado</h6>
+                        <div class="row" id="infoHorarioSeleccionado">
+                            <!-- Contenido dinámico -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Formulario de agendamiento -->
+                <form id="formAgendarCita">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-control-label">
+                                    <i class="fas fa-envelope mr-2 text-primary"></i>
+                                    Correo electrónico *
+                                </label>
+                                <input type="email" 
+                                       class="form-control" 
+                                       id="email_paciente" 
+                                       name="email_paciente"
+                                       required 
+                                       placeholder="ejemplo@correo.com">
+                                <small class="form-text text-muted">
+                                    Recibirás la confirmación de tu cita en este correo
+                                </small>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-control-label">
+                                    <i class="fas fa-user mr-2 text-info"></i>
+                                    Nombre completo *
+                                </label>
+                                <input type="text" 
+                                       class="form-control" 
+                                       id="nombre_paciente" 
+                                       name="nombre_paciente"
+                                       required 
+                                       placeholder="Nombre y apellidos completos">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-control-label">
+                                    <i class="fas fa-phone mr-2 text-warning"></i>
+                                    Teléfono de contacto
+                                </label>
+                                <input type="tel" 
+                                       class="form-control" 
+                                       id="telefono_paciente" 
+                                       name="telefono_paciente"
+                                       placeholder="Número de contacto">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-control-label">
+                                    <i class="fas fa-notes-medical mr-2 text-success"></i>
+                                    Motivo de consulta
+                                </label>
+                                <textarea class="form-control" 
+                                          id="motivo_consulta" 
+                                          name="motivo_consulta"
+                                          rows="3" 
+                                          placeholder="Breve descripción del motivo de su consulta (opcional)"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Políticas y consentimiento -->
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" 
+                                       class="custom-control-input" 
+                                       id="aceptarPoliticas" 
+                                       required>
+                                <label class="custom-control-label" for="aceptarPoliticas">
+                                    Acepto las <a href="#" target="_blank">políticas de privacidad</a> y 
+                                    el tratamiento de mis datos personales para el agendamiento de la cita médica. *
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+                <!-- Información adicional -->
+                <div class="alert alert-info mt-3">
+                    <h6><i class="fas fa-exclamation-triangle mr-2"></i>Información Importante</h6>
+                    <ul class="mb-0">
+                        <li>Recibirás un email de confirmación con los detalles de tu cita</li>
+                        <li>Por favor llega 15 minutos antes de tu cita</li>
+                        <li>Si necesitas cancelar o reprogramar, contacta con anticipación</li>
+                        <li>Trae documento de identificación y carnet de salud si tienes</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                    <i class="fas fa-times mr-1"></i>Cancelar
+                </button>
+                <button type="button" class="btn btn-success btn-agendar" onclick="confirmarAgendamiento()">
+                    <i class="fas fa-calendar-check mr-1"></i>
+                    <span id="btnTexto">Confirmar Cita</span>
+                    <span id="btnSpinner" class="loading-spinner d-none"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<!-- FullCalendar JS -->
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js'></script>
+
+<script>
+let calendar;
+let eventoSeleccionado;
+
+document.addEventListener('DOMContentLoaded', function() {
+    const calendarEl = document.getElementById('calendario-disponibilidad');
+    
+    calendar = new FullCalendar.Calendar(calendarEl, {
+        locale: 'es',
+        initialView: 'timeGridWeek',
+        headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek,timeGridDay'
+        },
+        
+        // Configuración de horario
+        slotMinTime: '08:00:00',
+        slotMaxTime: '18:00:00',
+        slotDuration: '01:00:00',
+        
+        height: 'auto',
+        selectable: false,
+        hiddenDays: [0], // Ocultar domingo
+        
+        // Cargar eventos desde la API - TEMPORALMENTE USAR URL ABSOLUTA
+        events: {
+            url: '/api/disponibilidad-publica/',
+            extraParams: {
+                'publico': true
+            },
+            failure: function(error) {
+                console.error('Error al cargar eventos:', error);
+                mostrarAlerta('Error al cargar la disponibilidad', 'danger');
+            }
+        },
+        
+        // Manejar clic en eventos disponibles
+        eventClick: function(info) {
+            console.log('Evento clickeado:', info.event.extendedProps);
+            if (info.event.extendedProps.disponible) {
+                abrirModalAgendamiento(info.event);
+            }
+        },
+        
+        // Personalizar renderizado de eventos
+        eventDidMount: function(info) {
+            if (info.event.extendedProps.disponible) {
+                info.el.classList.add('fc-event-disponible');
+                info.el.setAttribute('title', 
+                    `${info.event.title}\nSala: ${info.event.extendedProps.sala}\n` +
+                    `${info.event.start.toLocaleTimeString('es-ES', {hour: '2-digit', minute:'2-digit'})} - ` +
+                    `${info.event.end.toLocaleTimeString('es-ES', {hour: '2-digit', minute:'2-digit'})}\n` +
+                    `Haz clic para agendar esta cita`
+                );
+            }
+        }
+    });
+    
+    calendar.render();
+});
+
+function aplicarFiltros() {
+    const filtro = document.getElementById('filtroProfesional').value;
+    
+    calendar.removeAllEventSources();
+    calendar.addEventSource({
+        url: '/api/disponibilidad-publica/',
+        extraParams: {
+            'publico': true,
+            'profesional': filtro
+        },
+        failure: function() {
+            mostrarAlerta('Error al aplicar filtros', 'danger');
+        }
+    });
+    
+    mostrarAlerta('Filtros aplicados correctamente', 'info');
+}
+
+function abrirModalAgendamiento(evento) {
+    console.log('Abriendo modal para evento:', evento);
+    eventoSeleccionado = evento;
+    const props = evento.extendedProps;
+    
+    if (!props.disponible) {
+        mostrarAlerta('Este horario no está disponible para citas', 'warning');
+        return;
+    }
+    
+    // Limpiar formulario
+    document.getElementById('formAgendarCita').reset();
+    
+    // Mostrar información del horario seleccionado
+    const infoHtml = `
+        <div class="col-md-4">
+            <strong><i class="fas fa-user-md mr-2"></i>Profesional:</strong>
+            <br>${evento.title}
+        </div>
+        <div class="col-md-4">
+            <strong><i class="fas fa-calendar mr-2"></i>Fecha:</strong>
+            <br>${evento.start.toLocaleDateString('es-ES', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            })}
+        </div>
+        <div class="col-md-4">
+            <strong><i class="fas fa-clock mr-2"></i>Horario:</strong>
+            <br>${evento.start.toLocaleTimeString('es-ES', {hour: '2-digit', minute:'2-digit'})} - 
+            ${evento.end.toLocaleTimeString('es-ES', {hour: '2-digit', minute:'2-digit'})}
+        </div>
+        <div class="col-md-12 mt-2">
+            <strong><i class="fas fa-map-marker-alt mr-2"></i>Sala:</strong>
+            ${props.sala || 'No especificada'}
+        </div>
+    `;
+    
+    document.getElementById('infoHorarioSeleccionado').innerHTML = infoHtml;
+    
+    // Mostrar modal
+    $('#modalAgendarCita').modal('show');
+}
+
+function confirmarAgendamiento() {
+    console.log('Confirmando agendamiento...');
+    
+    if (!eventoSeleccionado) {
+        mostrarAlerta('Error: No hay evento seleccionado', 'danger');
+        return;
+    }
+    
+    const form = document.getElementById('formAgendarCita');
+    
+    // Validar campos requeridos
+    const email = document.getElementById('email_paciente').value.trim();
+    const nombre = document.getElementById('nombre_paciente').value.trim();
+    const aceptaPoliticas = document.getElementById('aceptarPoliticas').checked;
+    
+    console.log('Datos del formulario:', { email, nombre, aceptaPoliticas });
+    
+    if (!email || !nombre) {
+        mostrarAlerta('Por favor completa todos los campos obligatorios (email y nombre)', 'warning');
+        return;
+    }
+    
+    if (!aceptaPoliticas) {
+        mostrarAlerta('Debes aceptar las políticas de privacidad para continuar', 'warning');
+        return;
+    }
+    
+    // Validar formato de email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        mostrarAlerta('Por favor ingresa un correo electrónico válido', 'warning');
+        return;
+    }
+    
+    // Mostrar estado de carga
+    const btnTexto = document.getElementById('btnTexto');
+    const btnSpinner = document.getElementById('btnSpinner');
+    const btnAgendar = document.querySelector('.btn-agendar');
+    
+    btnTexto.classList.add('d-none');
+    btnSpinner.classList.remove('d-none');
+    btnAgendar.disabled = true;
+    
+    // Preparar datos
+    const data = {
+        disponibilidad_id: eventoSeleccionado.extendedProps.disponibilidad_id,
+        fecha_cita: eventoSeleccionado.extendedProps.fecha_cita,
+        email_paciente: email,
+        nombre_paciente: nombre,
+        telefono_paciente: document.getElementById('telefono_paciente').value.trim(),
+        motivo_consulta: document.getElementById('motivo_consulta').value.trim()
+    };
+    
+    console.log('Enviando datos:', data);
+    
+    // Enviar solicitud - TEMPORALMENTE USAR URL ABSOLUTA
+    fetch('/api/agendar-cita/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || ''
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => {
+        console.log('Respuesta del servidor:', response);
+        return response.json();
+    })
+    .then(data => {
+        console.log('Datos recibidos:', data);
+        
+        // Restaurar botón
+        btnTexto.classList.remove('d-none');
+        btnSpinner.classList.add('d-none');
+        btnAgendar.disabled = false;
+        
+        if (data.success) {
+            mostrarAlerta(data.message, 'success');
+            $('#modalAgendarCita').modal('hide');
+            
+            // Recargar calendario para actualizar disponibilidad
+            calendar.refetchEvents();
+        } else {
+            mostrarAlerta(data.message, 'danger');
+        }
+    })
+    .catch(error => {
+        console.error('Error completo:', error);
+        
+        // Restaurar botón
+        btnTexto.classList.remove('d-none');
+        btnSpinner.classList.add('d-none');
+        btnAgendar.disabled = false;
+        
+        mostrarAlerta('Error al procesar la solicitud. Inténtalo nuevamente.', 'danger');
+    });
+}
+
+function mostrarAlerta(mensaje, tipo = 'info') {
+    const iconos = {
+        'info': 'fas fa-info-circle',
+        'success': 'fas fa-check-circle',
+        'warning': 'fas fa-exclamation-triangle',
+        'danger': 'fas fa-times-circle'
+    };
+    
+    const alertHtml = `
+        <div class="alert alert-${tipo} alert-dismissible fade show" role="alert">
+            <span class="alert-icon"><i class="${iconos[tipo]} mr-2"></i></span>
+            <span class="alert-text">${mensaje}</span>
+            <button type="button" class="close" data-dismiss="alert">
+                <span>&times;</span>
+            </button>
+        </div>
+    `;
+    
+    const container = document.getElementById('alertas-container');
+    container.innerHTML = alertHtml;
+    
+    // Auto-hide después de 8 segundos para mensajes de éxito
+    if (tipo === 'success') {
+        setTimeout(() => {
+            const alert = container.querySelector('.alert');
+            if (alert) {
+                alert.style.opacity = '0';
+                setTimeout(() => alert.remove(), 300);
+            }
+        }, 8000);
+    } else {
+        // Auto-hide después de 5 segundos para otros tipos
+        setTimeout(() => {
+            const alert = container.querySelector('.alert');
+            if (alert) {
+                alert.style.opacity = '0';
+                setTimeout(() => alert.remove(), 300);
+            }
+        }, 5000);
+    }
+}
+</script>
+
+{% endblock %}
