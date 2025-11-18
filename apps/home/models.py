@@ -1879,7 +1879,6 @@ class PuntajeCDRResult(ResultadoExamenBase):
     cdr_pasatiempos = models.CharField(max_length=10)
     cdr_cuidado = models.CharField(max_length=10)
     cdr_global = models.CharField(max_length=10)
-    cdr_interpretacion = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return f"CDR - {self.visita_examen_id}"

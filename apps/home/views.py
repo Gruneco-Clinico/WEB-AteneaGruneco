@@ -5163,6 +5163,7 @@ def guardar_evaluacion_clinica_CDR(request):
                 "cdr_cuidado": request.POST.get("cdr_cuidado", ""),
                 "cdr_global": request.POST.get("cdr_global", ""),
                 "cdr_interpretacion": request.POST.get("cdr_interpretacion", ""),
+
             }
 
             # Guardar o actualizar
@@ -5231,6 +5232,7 @@ def guardar_consentimiento_participante(request):
                 "testigo2": request.POST.get("testigo2", ""),
                 "copia_entregada": request.POST.get("copia_entregada"),
                 "hora_finalizacion": request.POST.get("hora_finalizacion"),
+                
             }
 
             # Guardar o actualizar
