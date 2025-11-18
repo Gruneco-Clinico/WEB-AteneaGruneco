@@ -439,7 +439,10 @@ function mostrarDetalleDisponibilidad(evento) {
     
     if (props.es_mio) {
         footer = `
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+    Cancelar
+</button>
+
             <button type="button" class="btn btn-danger" onclick="eliminarDisponibilidad(${props.disponibilidad_id})">
                 <i class="fas fa-trash mr-1"></i>Eliminar
             </button>

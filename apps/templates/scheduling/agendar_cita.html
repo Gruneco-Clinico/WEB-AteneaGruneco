@@ -182,9 +182,8 @@
                     <i class="fas fa-calendar-plus mr-2"></i>
                     Agendar Cita Médica
                 </h5>
-                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+
             </div>
             <div class="modal-body">
                 <!-- Información del horario seleccionado -->
@@ -296,9 +295,10 @@
             </div>
             
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">
-                    <i class="fas fa-times mr-1"></i>Cancelar
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    Cancelar
                 </button>
+
                 <button type="button" class="btn btn-success btn-agendar" onclick="confirmarAgendamiento()">
                     <i class="fas fa-calendar-check mr-1"></i>
                     <span id="btnTexto">Confirmar Cita</span>
