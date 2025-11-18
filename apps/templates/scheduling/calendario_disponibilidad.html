@@ -335,9 +335,18 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const calendarEl = document.getElementById('calendario-disponibilidad');
-    
+   
+
     const calendar = new FullCalendar.Calendar(calendarEl, {
         locale: 'es',
+        buttonText: {
+        today: 'Hoy',
+        month: 'Mes',
+        week: 'Semana',
+        day: 'Día',
+        list: 'Lista'
+        },
+        
         initialView: 'timeGridWeek',
         headerToolbar: {
             left: 'prev,next today',
@@ -468,5 +477,7 @@ setTimeout(() => {
         setTimeout(() => alert.remove(), 300);
     });
 }, 5000);
+
+
 </script>
 {% endblock %}

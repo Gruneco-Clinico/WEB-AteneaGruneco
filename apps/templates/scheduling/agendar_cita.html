@@ -327,6 +327,13 @@ document.addEventListener('DOMContentLoaded', function() {
     
     calendar = new FullCalendar.Calendar(calendarEl, {
         locale: 'es',
+        buttonText: {
+        today: 'Hoy',
+        month: 'Mes',
+        week: 'Semana',
+        day: 'Día',
+        list: 'Lista'
+        },
         initialView: 'timeGridWeek',
         headerToolbar: {
             left: 'prev,next today',
