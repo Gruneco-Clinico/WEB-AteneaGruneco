@@ -73,6 +73,26 @@
     border-color: #c3e6cb;
     color: #155724;
 }
+.custom-control-label {
+    white-space: normal !important;
+    line-height: 1.4 !important;
+    padding-left: 0.5rem !important;
+    font-size: 0.9rem;
+    display: block !important;
+}
+
+.custom-control-label::before,
+.custom-control-label::after {
+    top: 0.1rem !important;
+}
+.modal-body {
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+.modal-dialog {
+    margin: 1.75rem auto;
+}
 </style>
 {% endblock %}
 
@@ -154,16 +174,16 @@
 </div>
 
 <!-- Modal Agendar Cita -->
-<div class="modal fade" id="modalAgendarCita" tabindex="-1">
-    <div class="modal-dialog modal-lg">
+<div class="modal fade" id="modalAgendarCita" tabindex="-1" role="dialog" aria-labelledby="modalAgendarCitaLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header bg-success text-white">
-                <h5 class="modal-title">
+                <h5 class="modal-title" id="modalAgendarCitaLabel">
                     <i class="fas fa-calendar-plus mr-2"></i>
                     Agendar Cita Médica
                 </h5>
-                <button type="button" class="close text-white" data-dismiss="modal">
-                    <span>&times;</span>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
@@ -243,17 +263,22 @@
                     </div>
 
                     <!-- Políticas y consentimiento -->
-                    <div class="row">
+                    <div class="row mt-3">
                         <div class="col-12">
-                            <div class="custom-control custom-checkbox">
-                                <input type="checkbox" 
-                                       class="custom-control-input" 
-                                       id="aceptarPoliticas" 
-                                       required>
-                                <label class="custom-control-label" for="aceptarPoliticas">
-                                    Acepto las <a href="#" target="_blank">políticas de privacidad</a> y 
-                                    el tratamiento de mis datos personales para el agendamiento de la cita médica. *
-                                </label>
+                            <div class="form-group">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" 
+                                           class="custom-control-input" 
+                                           id="aceptarPoliticas" 
+                                           required>
+                                    <label class="custom-control-label" for="aceptarPoliticas">
+                                        <strong>Autorización de datos personales:</strong><br>
+                                        Autorizo a GRUNECO y a la Universidad de Antioquia para el tratamiento 
+                                        de mis datos personales con fines exclusivamente científicos y 
+                                        académicos, conforme a la Ley 1581 de 2012 y a la política institucional 
+                                        de protección de datos.
+                                    </label>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -265,8 +290,7 @@
                     <ul class="mb-0">
                         <li>Recibirás un email de confirmación con los detalles de tu cita</li>
                         <li>Por favor llega 15 minutos antes de tu cita</li>
-                        <li>Si necesitas cancelar o reprogramar, contacta con anticipación</li>
-                        <li>Trae documento de identificación y carnet de salud si tienes</li>
+                        <li>Si necesitas cancelar o reprogramar, contacta con anticipación a gruponeuropsicologia@udea.edu.co</li>
                     </ul>
                 </div>
             </div>
@@ -287,6 +311,10 @@
 {% endblock %}
 
 {% block javascripts %}
+<!-- jQuery (necesario para Bootstrap) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
 <!-- FullCalendar JS -->
 <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js'></script>
 
@@ -315,7 +343,7 @@ document.addEventListener('DOMContentLoaded', function() {
         selectable: false,
         hiddenDays: [0], // Ocultar domingo
         
-        // Cargar eventos desde la API - TEMPORALMENTE USAR URL ABSOLUTA
+        // Cargar eventos desde la API
         events: {
             url: '/api/disponibilidad-publica/',
             extraParams: {
@@ -411,7 +439,7 @@ function abrirModalAgendamiento(evento) {
     
     document.getElementById('infoHorarioSeleccionado').innerHTML = infoHtml;
     
-    // Mostrar modal
+    // Mostrar modal usando jQuery
     $('#modalAgendarCita').modal('show');
 }
 
@@ -422,8 +450,6 @@ function confirmarAgendamiento() {
         mostrarAlerta('Error: No hay evento seleccionado', 'danger');
         return;
     }
-    
-    const form = document.getElementById('formAgendarCita');
     
     // Validar campos requeridos
     const email = document.getElementById('email_paciente').value.trim();
@@ -470,7 +496,7 @@ function confirmarAgendamiento() {
     
     console.log('Enviando datos:', data);
     
-    // Enviar solicitud - TEMPORALMENTE USAR URL ABSOLUTA
+    // Enviar solicitud
     fetch('/api/agendar-cita/', {
         method: 'POST',
         headers: {
@@ -555,5 +581,4 @@ function mostrarAlerta(mensaje, tipo = 'info') {
     }
 }
 </script>
-
 {% endblock %}

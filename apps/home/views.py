@@ -306,13 +306,13 @@ def agendar_cita_ajax(request):
                 print(f"❌ Error al enviar correo al paciente: {str(e)}")
                 correo_enviado = False
 
-            # Enviar notificación al profesional (opcional)
-            try:
-                if cita_data.get("profesional_email"):
-                    enviar_notificacion_profesional(cita_data)
-                    print(f"📧 Notificación al profesional: ✅ Enviada")
-            except Exception as e:
-                print(f"❌ Error al notificar al profesional: {str(e)}")
+            ## Enviar notificación al profesional (opcional)
+            # try:
+            #    if cita_data.get("profesional_email"):
+            #        enviar_notificacion_profesional(cita_data)
+            #        print(f"📧 Notificación al profesional: ✅ Enviada")
+            # except Exception as e:
+            #    print(f"❌ Error al notificar al profesional: {str(e)}")
 
             # Mensaje de respuesta
             mensaje_base = (
@@ -389,19 +389,25 @@ DETALLES DE LA CITA:
 - Fecha: {cita_data["fecha_cita"]}
 - Hora: {cita_data["hora_inicio"]} - {cita_data["hora_fin"]}
 - Profesional: {cita_data["profesional"]}
-- Consultorio: {cita_data["sala"]}
+- Consultorio: {cita_data["sala"]} Laboratorio de Neuropsicología y Conducta – GRUNECO
 - Código de cita: #{cita_data["cita_id"]}
 
-RECORDATORIOS IMPORTANTES:
-- Llegue 15 minutos antes de su cita
-- Traiga documento de identificación
-- Si tiene EPS, traiga su carnet
-- Para cancelar o reprogramar, comuníquese con anticipación
+
+ Duerme de manera habitual la noche anterior y llega 10 minutos antes de tu hora programada.
+
+ Esta cita no requiere dormir durante la sesión.
+
+ Se generará una constancia de asistencia al finalizar la evaluación. La constancia no constituye excusa válida para ausencias académicas.
+
+ 
+ 
+RECORDATORIO IMPORTANTE:
+- Para cancelar o reprogramar, comuníquese con anticipación a gruponeuropsicologia@udea.edu.co
 
 Gracias por confiar en nosotros.
 
 Saludos cordiales,
-Equipo Médico Atenea Gruneco
+GRUNECO
         """
 
         # Enviar correo simple
@@ -420,51 +426,6 @@ Equipo Médico Atenea Gruneco
         logger.error(
             f"❌ Error al enviar correo a {cita_data.get('email_paciente', 'unknown')}: {str(e)}"
         )
-        return False
-
-
-def enviar_notificacion_profesional(cita_data):
-    """
-    Envía notificación simple al profesional sobre nueva cita agendada
-    """
-    try:
-        # Solo si el profesional tiene email configurado
-        profesional_email = cita_data.get("profesional_email")
-        if not profesional_email:
-            return False
-
-        mensaje = f"""
-Estimado/a Dr(a). {cita_data["profesional"]},
-
-Se ha agendado una nueva cita en su consulta:
-
-DATOS DEL PACIENTE:
-- Nombre: {cita_data["nombre_paciente"]}
-- Fecha: {cita_data["fecha_cita"]}
-- Hora: {cita_data["hora_inicio"]} - {cita_data["hora_fin"]}
-- Consultorio: {cita_data["sala"]}
-- Teléfono: {cita_data.get("telefono_paciente", "No proporcionado")}
-- Motivo: {cita_data.get("motivo_consulta", "No especificado")}
-- Código: #{cita_data["cita_id"]}
-
-El paciente recibirá confirmación automáticamente.
-
-Sistema de Citas Médicas
-        """
-
-        send_mail(
-            subject=f"Nueva Cita Agendada - {cita_data['fecha_cita']}",
-            message=mensaje.strip(),
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[profesional_email],
-            fail_silently=True,
-        )
-
-        logger.info(f"✅ Notificación enviada al profesional: {profesional_email}")
-        return True
-
-    except Exception as e:
-        logger.error(f"❌ Error al notificar al profesional: {str(e)}")
         return False
 
 
