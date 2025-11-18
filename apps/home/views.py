@@ -21,9 +21,416 @@ import json
 from django.forms.models import model_to_dict
 import requests  # Integración RecuérdaMe
 from django.contrib.auth.models import User
-
-# from weasyprint import HTML
+from django.views.decorators.csrf import csrf_exempt
+from django.views.generic import TemplateView
 from django.contrib.auth import update_session_auth_hash
+from django.core.mail import send_mail
+import logging
+
+# AGENDAMIENTO PUBLICO
+
+
+class AgendarCitaPublicaView(TemplateView):
+    """
+    Vista pública para que los pacientes vean disponibilidad y agenden citas
+    """
+
+    template_name = "scheduling/agendar_cita.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Obtener profesionales que tienen disponibilidades activas
+        profesionales_con_disponibilidad = User.objects.filter(
+            disponibilidades__activa=True, is_active=True
+        ).distinct()
+
+        context.update(
+            {
+                "profesionales": profesionales_con_disponibilidad,
+                "titulo": "Reservar Cita Médica",
+            }
+        )
+
+        return context
+
+
+def api_eventos_disponibilidad_publica(request):
+    """
+    API endpoint para obtener disponibilidades públicas (solo para agendar citas)
+    """
+    try:
+        # Obtener parámetros de filtro
+        publico = request.GET.get("publico", False)
+        profesional_filtro = request.GET.get("profesional", "")
+
+        if not publico:
+            return JsonResponse({"error": "Acceso no autorizado"}, status=403)
+
+        # Filtrar solo disponibilidades futuras y activas
+        disponibilidades = DisponibilidadUsuario.objects.filter(
+            activa=True,
+            usuario__is_active=True,
+        ).select_related("usuario", "sala")
+
+        # Filtrar por fecha_fin si existe, o permitir indefinidas
+        fecha_actual = datetime.now().date()
+        disponibilidades = disponibilidades.filter(
+            models.Q(fecha_fin__isnull=True) | models.Q(fecha_fin__gte=fecha_actual),
+            fecha_inicio__lte=fecha_actual + timedelta(weeks=8),  # Máximo 8 semanas
+        )
+
+        # Aplicar filtro de profesional si se proporciona
+        if profesional_filtro:
+            disponibilidades = disponibilidades.filter(usuario_id=profesional_filtro)
+
+        eventos = []
+
+        for disponibilidad in disponibilidades:
+            # Generar eventos para las próximas 8 semanas
+            fecha_limite = disponibilidad.fecha_fin or (
+                fecha_actual + timedelta(weeks=8)
+            )
+            fecha_limite = min(fecha_limite, fecha_actual + timedelta(weeks=8))
+
+            # Generar fechas que coinciden con el día de la semana
+            fechas_a_revisar = []
+            current_date = max(fecha_actual, disponibilidad.fecha_inicio)
+
+            while current_date <= fecha_limite:
+                if current_date.weekday() == disponibilidad.dia_semana:
+                    fechas_a_revisar.append(current_date)
+                current_date += timedelta(days=1)
+
+            # Para cada fecha válida, generar slots de tiempo
+            for fecha in fechas_a_revisar:
+                # Generar slots de 1 hora dentro del horario disponible
+                hora_actual = disponibilidad.hora_inicio
+
+                while hora_actual < disponibilidad.hora_fin:
+                    # Calcular hora de fin del slot (1 hora)
+                    datetime_actual = datetime.combine(fecha, hora_actual)
+                    datetime_fin_slot = datetime_actual + timedelta(hours=1)
+                    hora_fin_slot = datetime_fin_slot.time()
+
+                    if hora_fin_slot <= disponibilidad.hora_fin:
+                        # 🔧 VERIFICAR SI YA HAY UNA CITA AGENDADA
+                        cita_existente = CitaMedica.objects.filter(
+                            disponibilidad=disponibilidad,
+                            fecha_cita=fecha,
+                            estado__in=["agendada", "confirmada"],
+                        ).first()
+
+                        # Solo mostrar como disponible si no hay cita agendada
+                        if not cita_existente:
+                            evento = {
+                                "id": f"{disponibilidad.id}_{fecha}_{hora_actual}",
+                                "title": f"Dr(a). {disponibilidad.usuario.get_full_name() or disponibilidad.usuario.username}",
+                                "start": f"{fecha}T{hora_actual}",
+                                "end": f"{fecha}T{hora_fin_slot}",
+                                "backgroundColor": "#28a745",
+                                "borderColor": "#28a745",
+                                "textColor": "#ffffff",
+                                "extendedProps": {
+                                    "disponibilidad_id": disponibilidad.id,
+                                    "profesional_id": disponibilidad.usuario.id,
+                                    "sala": disponibilidad.sala.nombre,
+                                    "especialidad": "Medicina General",
+                                    "disponible": True,
+                                    "es_mio": False,
+                                    "tipo": "cita_disponible",
+                                    "fecha_cita": fecha.strftime("%Y-%m-%d"),
+                                    "hora_inicio": hora_actual.strftime("%H:%M"),
+                                    "hora_fin": hora_fin_slot.strftime("%H:%M"),
+                                },
+                            }
+                            eventos.append(evento)
+                        else:
+                            # 📅 OPCIONAL: Mostrar citas ocupadas (solo para información)
+                            evento_ocupado = {
+                                "id": f"ocupado_{disponibilidad.id}_{fecha}_{hora_actual}",
+                                "title": f"🔒 Ocupado - Dr(a). {disponibilidad.usuario.get_full_name()}",
+                                "start": f"{fecha}T{hora_actual}",
+                                "end": f"{fecha}T{hora_fin_slot}",
+                                "backgroundColor": "#dc3545",
+                                "borderColor": "#dc3545",
+                                "textColor": "#ffffff",
+                                "extendedProps": {
+                                    "disponible": False,
+                                    "ocupado": True,
+                                    "tipo": "cita_ocupada",
+                                    "paciente": cita_existente.nombre_paciente,
+                                },
+                                "display": "background",  # Mostrar como fondo
+                            }
+                            # eventos.append(evento_ocupado)  # Descomenta si quieres mostrar ocupados
+
+                    # Avanzar al siguiente slot (1 hora)
+                    hora_actual = hora_fin_slot
+
+        return JsonResponse(eventos, safe=False)
+
+    except Exception as e:
+        print(f"Error en API disponibilidad pública: {str(e)}")
+        import traceback
+
+        traceback.print_exc()
+        return JsonResponse({"error": str(e)}, status=500)
+
+
+@csrf_exempt
+def agendar_cita_ajax(request):
+    """
+    Vista para agendar una cita médica desde la agenda pública
+    """
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+
+            # Obtener datos del formulario
+            disponibilidad_id = data.get("disponibilidad_id")
+            fecha_cita_str = data.get("fecha_cita")
+            email_paciente = data.get("email_paciente")
+            nombre_paciente = data.get("nombre_paciente")
+            telefono_paciente = data.get("telefono_paciente", "")
+            motivo_consulta = data.get("motivo_consulta", "")
+
+            # Validaciones básicas
+            if not all(
+                [disponibilidad_id, fecha_cita_str, email_paciente, nombre_paciente]
+            ):
+                return JsonResponse(
+                    {
+                        "success": False,
+                        "message": "Faltan datos obligatorios: disponibilidad, fecha, email y nombre son requeridos.",
+                    }
+                )
+
+            # Obtener la disponibilidad
+            try:
+                disponibilidad = DisponibilidadUsuario.objects.get(
+                    id=disponibilidad_id, activa=True
+                )
+            except DisponibilidadUsuario.DoesNotExist:
+                return JsonResponse(
+                    {
+                        "success": False,
+                        "message": "La disponibilidad seleccionada no existe o no está activa.",
+                    }
+                )
+
+            # Convertir fecha
+            try:
+                fecha_cita = datetime.strptime(fecha_cita_str, "%Y-%m-%d").date()
+            except ValueError:
+                return JsonResponse(
+                    {
+                        "success": False,
+                        "message": "Formato de fecha inválido. Use YYYY-MM-DD.",
+                    }
+                )
+
+            # Validar que la fecha sea futura
+            if fecha_cita < datetime.now().date():
+                return JsonResponse(
+                    {
+                        "success": False,
+                        "message": "No se pueden agendar citas en fechas pasadas.",
+                    }
+                )
+
+            # Validar que la fecha coincida con el día de semana de la disponibilidad
+            if fecha_cita.weekday() != disponibilidad.dia_semana:
+                return JsonResponse(
+                    {
+                        "success": False,
+                        "message": "La fecha seleccionada no coincide con el día de disponibilidad del profesional.",
+                    }
+                )
+
+            # Verificar si ya existe una cita para esa fecha y disponibilidad
+            cita_existente = CitaMedica.objects.filter(
+                disponibilidad=disponibilidad,
+                fecha_cita=fecha_cita,
+                estado__in=["agendada", "confirmada"],
+            ).first()
+
+            if cita_existente:
+                return JsonResponse(
+                    {
+                        "success": False,
+                        "message": "Este horario ya está ocupado para la fecha seleccionada.",
+                    }
+                )
+
+            # Crear la nueva cita
+            nueva_cita = CitaMedica.objects.create(
+                disponibilidad=disponibilidad,
+                fecha_cita=fecha_cita,
+                email_paciente=email_paciente.lower().strip(),
+                nombre_paciente=nombre_paciente.strip(),
+                telefono_paciente=telefono_paciente.strip(),
+                motivo_consulta=motivo_consulta.strip(),
+                estado="agendada",
+            )
+
+            # Formatear información para la respuesta
+            hora_inicio = disponibilidad.hora_inicio.strftime("%H:%M")
+            hora_fin = disponibilidad.hora_fin.strftime("%H:%M")
+            fecha_formateada = fecha_cita.strftime("%d/%m/%Y")
+
+            # Preparar datos para envío de correo
+            cita_data = {
+                "email_paciente": email_paciente.lower().strip(),
+                "nombre_paciente": nombre_paciente.strip(),
+                "fecha_cita": fecha_formateada,
+                "hora_inicio": hora_inicio,
+                "hora_fin": hora_fin,
+                "profesional": disponibilidad.usuario.get_full_name()
+                or disponibilidad.usuario.username,
+                "sala": disponibilidad.sala.nombre,
+                "cita_id": nueva_cita.id,
+                "telefono_paciente": telefono_paciente.strip(),
+                "motivo_consulta": motivo_consulta.strip(),
+                "profesional_email": getattr(disponibilidad.usuario, "email", None),
+            }
+
+            # Enviar correo de confirmación al paciente
+            correo_enviado = False
+            try:
+                correo_enviado = enviar_correo_confirmacion_cita(cita_data)
+                print(
+                    f"📧 Correo al paciente: {'✅ Enviado' if correo_enviado else '❌ Falló'}"
+                )
+            except Exception as e:
+                print(f"❌ Error al enviar correo al paciente: {str(e)}")
+                correo_enviado = False
+
+            ## Enviar notificación al profesional (opcional)
+            # try:
+            #    if cita_data.get("profesional_email"):
+            #        enviar_notificacion_profesional(cita_data)
+            #        print(f"📧 Notificación al profesional: ✅ Enviada")
+            # except Exception as e:
+            #    print(f"❌ Error al notificar al profesional: {str(e)}")
+
+            # Mensaje de respuesta
+            mensaje_base = (
+                f"¡Cita agendada exitosamente!\n"
+                f"📅 Fecha: {fecha_formateada}\n"
+                f"🕒 Horario: {hora_inicio} - {hora_fin}\n"
+                f"👨‍⚕️ Profesional: Dr(a). {disponibilidad.usuario.get_full_name()}\n"
+                f"🏥 Sala: {disponibilidad.sala.nombre}\n"
+            )
+
+            if correo_enviado:
+                mensaje_final = (
+                    mensaje_base + f"📧 Confirmación enviada a: {email_paciente}"
+                )
+            else:
+                mensaje_final = mensaje_base + f"⚠️ Cita agendada correctamente"
+
+            return JsonResponse(
+                {
+                    "success": True,
+                    "message": f"¡Cita agendada exitosamente!\n"
+                    f"📅 Fecha: {fecha_formateada}\n"
+                    f"🕒 Horario: {hora_inicio} - {hora_fin}\n"
+                    f"👨‍⚕️ Profesional: Dr(a). {disponibilidad.usuario.get_full_name()}\n"
+                    f"🏥 Sala: {disponibilidad.sala.nombre}\n"
+                    f"📧 Se enviará confirmación a: {email_paciente}",
+                    "cita_id": nueva_cita.id,
+                    "fecha_cita": fecha_cita.strftime("%Y-%m-%d"),
+                    "hora_inicio": hora_inicio,
+                    "hora_fin": hora_fin,
+                    "profesional": disponibilidad.usuario.get_full_name()
+                    or disponibilidad.usuario.username,
+                    "sala": disponibilidad.sala.nombre,
+                }
+            )
+
+        except json.JSONDecodeError:
+            return JsonResponse(
+                {
+                    "success": False,
+                    "message": "Error en el formato de los datos enviados.",
+                }
+            )
+        except Exception as e:
+            print(f"Error al agendar cita: {str(e)}")
+            import traceback
+
+            traceback.print_exc()
+            return JsonResponse(
+                {
+                    "success": False,
+                    "message": "Error interno del servidor. Inténtelo nuevamente.",
+                }
+            )
+
+    return JsonResponse({"success": False, "message": "Método no permitido. Use POST."})
+
+
+logger = logging.getLogger(__name__)
+
+
+def enviar_correo_confirmacion_cita(cita_data):
+    """
+    Envía correo de confirmación de cita médica - Versión simple texto plano
+    """
+    try:
+        # Crear mensaje de texto simple
+        mensaje = f"""
+Estimado/a {cita_data["nombre_paciente"]},
+
+Su cita médica ha sido agendada exitosamente.
+
+DETALLES DE LA CITA:
+- Fecha: {cita_data["fecha_cita"]}
+- Hora: {cita_data["hora_inicio"]} - {cita_data["hora_fin"]}
+- Profesional: {cita_data["profesional"]}
+- Consultorio: {cita_data["sala"]} Laboratorio de Neuropsicología y Conducta – GRUNECO
+- Código de cita: #{cita_data["cita_id"]}
+
+
+ Duerme de manera habitual la noche anterior y llega 10 minutos antes de tu hora programada.
+
+ Esta cita no requiere dormir durante la sesión.
+
+ Se generará una constancia de asistencia al finalizar la evaluación. La constancia no constituye excusa válida para ausencias académicas.
+
+ 
+ 
+RECORDATORIO IMPORTANTE:
+- ingrese sus datos posterior a la cita en el siguiente enlace: https://www.gruneco.com.co/registro-demografico/
+- Para cancelar o reprogramar, comuníquese con anticipación a gruponeuropsicologia@udea.edu.co
+
+Gracias por confiar en nosotros.
+
+Saludos cordiales,
+GRUNECO
+        """
+
+        # Enviar correo simple
+        send_mail(
+            subject=f"Confirmación de Cita Médica - {cita_data['fecha_cita']}",
+            message=mensaje.strip(),
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[cita_data["email_paciente"]],
+            fail_silently=False,
+        )
+
+        logger.info(f"✅ Correo enviado exitosamente a {cita_data['email_paciente']}")
+        return True
+
+    except Exception as e:
+        logger.error(
+            f"❌ Error al enviar correo a {cita_data.get('email_paciente', 'unknown')}: {str(e)}"
+        )
+        return False
+
+
+# DISPONIBILIDAD USUARIO
 
 
 @login_required
@@ -283,17 +690,25 @@ def agregar_disponibilidad(request):
 def eliminar_disponibilidad(request):
     try:
         disponibilidad_id = request.POST.get("disponibilidad_id")
+        print(f"🔍 Intentando eliminar disponibilidad ID: {disponibilidad_id}")
+
         disponibilidad = get_object_or_404(
             DisponibilidadUsuario, id=disponibilidad_id, usuario=request.user
         )
 
-        disponibilidad.activa = False
-        disponibilidad.save()
+        print(
+            f"📋 Disponibilidad encontrada: {disponibilidad.sala.nombre}, activa: {disponibilidad.activa}"
+        )
 
-        messages.success(request, "Disponibilidad eliminada correctamente.")
+        # Eliminar completamente
+        disponibilidad.delete()
+        print(f"✅ Disponibilidad eliminada de la base de datos")
+
+        messages.success(request, "✅ Disponibilidad eliminada correctamente.")
 
     except Exception as e:
-        messages.error(request, f"Error al eliminar disponibilidad: {str(e)}")
+        print(f"💥 Error al eliminar: {str(e)}")
+        messages.error(request, f"❌ Error al eliminar disponibilidad: {str(e)}")
 
     return redirect("gestionar_disponibilidad")
 
@@ -1473,7 +1888,7 @@ def crear_visita(request, paciente_id):
     if request.method == "POST":
         tipo_visita_id = request.POST.get("tipo_visita")
         fecha = request.POST.get("fecha")
-        evaluador = request.POST.get("evaluador")
+        evaluador = request.user
         nombre = request.POST.get("nombre")
 
         # Capturar datos del acompañante

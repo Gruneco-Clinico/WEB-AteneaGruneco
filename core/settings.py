@@ -159,3 +159,17 @@ POSTHOG_VIEWS_PER_PAGE = "3552640"
 POSTHOG_PAGES_VIEWS_PER_USER = "3553192"
 POSTHOG_DAU_PER_USER_ID = "3600057"
 POSTHOG_AUTOCAPTURE_PER_USER_ID = "3600226"
+
+
+# Configuración del correo electrónico usando Gmail SMTP
+
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+
+EMAIL_HOST_USER = "ateneagruneco@gmail.com"
+EMAIL_HOST_PASSWORD = "kbkznkhskatrpidk"
+
+DEFAULT_FROM_EMAIL = "Atenea Gruneco <ateneagruneco@gmail.com>"
