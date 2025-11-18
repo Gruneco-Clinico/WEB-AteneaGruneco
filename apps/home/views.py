@@ -402,6 +402,7 @@ DETALLES DE LA CITA:
  
  
 RECORDATORIO IMPORTANTE:
+- ingrese sus datos posterior a la cita en el siguiente enlace: https://www.gruneco.com.co/registro-demografico/
 - Para cancelar o reprogramar, comuníquese con anticipación a gruponeuropsicologia@udea.edu.co
 
 Gracias por confiar en nosotros.
