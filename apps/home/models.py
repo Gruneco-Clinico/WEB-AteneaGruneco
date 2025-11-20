@@ -1957,7 +1957,7 @@ class PuntajeCDRResult(ResultadoExamenBase):
         return f"CDR - {self.visita_examen_id}"
 
 
-class ConsentimientoInformadoParticipanteResult(ResultadoExamenBase):
+class ConsentimientoInfrmadoParticipanteResult(ResultadoExamenBase):
     fecha = models.DateField()
     hora_inicio = models.TimeField()
     investigador = models.CharField(max_length=255)
@@ -1974,7 +1974,7 @@ class ConsentimientoInformadoParticipanteResult(ResultadoExamenBase):
 
     def __str__(self):
         return f"Consentimiento Informado - {self.visita_examen_id}"
-
+o
 
 class ConsentimientoInformadoCuidadorResult(ResultadoExamenBase):
     fecha = models.DateField()
