@@ -1466,11 +1466,6 @@ def formulario_demografico_externo(request):
                     nombre="VISITA EPWORTH/MEW",
                     Tipo_visita=tipo_visita_automatico,
                     fecha=timezone.now().date(),
-                    evaluador="Sistema Automático",
-                    acompanante_nombre="",
-                    acompanante_relacion="",
-                    acompanante_correo="",
-                    acompanante_telefono="",
                 )
 
                 # Crear los exámenes asociados automáticamente según el tipo de visita
@@ -1709,6 +1704,12 @@ def guardar_examen_publico_mew(request):
     """Cargar y guardar examen MEW desde enlace público"""
 
     # Función auxiliar para validar acceso
+    print(
+        "DEBUG paciente_id:",
+        request.GET.get("paciente_id"),
+        request.POST.get("paciente_id"),
+    )
+
     def validar_acceso():
         if request.method == "GET":
             paciente_id = request.GET.get("paciente_id")
@@ -1785,12 +1786,14 @@ def guardar_examen_publico_mew(request):
             return redirect("formulario_demografico_externo")
 
     elif request.method == "POST":
-        # GUARDAR RESULTADOS MEW
         try:
+            # Recuperar paciente otra vez
+            paciente_id = request.POST.get("paciente_id")
+            paciente = get_object_or_404(DatosDemograficos, id=paciente_id)
+
             visita_id = request.POST.get("visita_id")
             examen_id = 16  # ID fijo para MEW
 
-            # Obtener la instancia de VisitaExamen
             visita_examen = get_object_or_404(
                 VisitaExamen, visita_id=visita_id, examen_id=examen_id
             )
