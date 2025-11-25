@@ -212,6 +212,53 @@
             </div>
         </div>
     </div>
+
+    <!-- Lista de Mis Citas -->
+    <div class="row mt-4">
+        <div class="col">
+            <div class="card">
+                <div class="card-header border-0">
+                    <h3 class="mb-0">
+                        <i class="fas fa-calendar-check mr-2"></i>
+                        Mis Citas Agendadas
+                    </h3>
+                </div>
+                <div class="table-responsive">
+                    <table class="table align-items-center table-flush">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>Paciente</th>
+                                <th>Sala</th>
+                                <th>Fecha</th>
+                                <th>Horario</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for cita in citas_usuario %}
+                            <tr>
+                                <td>{{ cita.nombre_paciente }}</td>
+                                <td>{{ cita.sala.nombre }}</td>
+                                <td>{{ cita.fecha_cita|date:"d/m/Y" }}</td>
+                                <td>{{ cita.hora_inicio|time:"H:i" }} - {{ cita.hora_fin|time:"H:i" }}</td>
+                                <td>{{ cita.get_estado_display }}</td>
+                                
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center text-muted py-4">
+                                    <i class="fas fa-calendar-minus fa-2x mb-3"></i><br>
+                                    No tienes citas agendadas.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
 
 <!-- Modal Nueva Disponibilidad -->
@@ -304,9 +351,7 @@
                 <h5 class="modal-title">
                     <i class="fas fa-info-circle mr-2"></i>Detalle de Disponibilidad
                 </h5>
-                <button type="button" class="close text-white" data-dismiss="modal">
-                    <span>&times;</span>
-                </button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body" id="detalleDisponibilidadContent">
                 <!-- Contenido dinámico -->
@@ -444,7 +489,7 @@ function mostrarDetalleDisponibilidad(evento) {
         </div>
     `;
     
-    let footer = '<button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>';
+    let footer = '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal"> Cancelar </button>';
     
     if (props.es_mio) {
         footer = `
@@ -468,6 +513,17 @@ function eliminarDisponibilidad(disponibilidadId) {
         document.getElementById('eliminar_disponibilidad_id').value = disponibilidadId;
         document.getElementById('eliminarForm').submit();
     }
+}
+
+function abrirModalCita(event) {
+    const data = event.extendedProps;
+
+    document.getElementById("modalCitaPaciente").innerText = data.paciente;
+    document.getElementById("modalCitaSala").innerText = data.sala;
+    document.getElementById("modalCitaEmail").innerText = data.email;
+    document.getElementById("modalCitaMotivo").innerText = data.motivo;
+
+    $("#modalCita").modal("show");
 }
 
 // Auto-hide alerts

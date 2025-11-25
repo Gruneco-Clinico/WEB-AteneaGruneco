@@ -423,7 +423,10 @@ class Visita(models.Model):
     )
 
     def __str__(self):
-        return f"{self.nombre} - {self.proyecto.nombre}"
+        try:
+            return f"{self.nombre} - {self.Tipo_visita.proyecto.nombre}"
+        except:
+            return self.nombre
 
     # Para códigos ANG-XXX consecutivos
     def save(self, *args, **kwargs):
@@ -493,6 +496,7 @@ class VisitaExamen(models.Model):
     evaluador = models.CharField(
         max_length=100, blank=True, null=True, verbose_name="Evaluador"
     )
+
     tiempo_duracion = models.DurationField(
         null=True, blank=True, verbose_name="Tiempo de Duración"
     )

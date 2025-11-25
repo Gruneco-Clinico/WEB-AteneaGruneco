@@ -306,13 +306,13 @@ def agendar_cita_ajax(request):
                 print(f"❌ Error al enviar correo al paciente: {str(e)}")
                 correo_enviado = False
 
-            ## Enviar notificación al profesional (opcional)
-            # try:
-            #    if cita_data.get("profesional_email"):
-            #        enviar_notificacion_profesional(cita_data)
-            #        print(f"📧 Notificación al profesional: ✅ Enviada")
-            # except Exception as e:
-            #    print(f"❌ Error al notificar al profesional: {str(e)}")
+            # Enviar notificación al profesional (opcional)
+            try:
+                if cita_data.get("profesional_email"):
+                    enviar_notificacion_profesional(cita_data)
+                    print(f"📧 Notificación al profesional: ✅ Enviada")
+            except Exception as e:
+                print(f"❌ Error al notificar al profesional: {str(e)}")
 
             # Mensaje de respuesta
             mensaje_base = (
@@ -375,48 +375,52 @@ logger = logging.getLogger(__name__)
 
 
 def enviar_correo_confirmacion_cita(cita_data):
-    """
-    Envía correo de confirmación de cita médica - Versión simple texto plano
-    """
     try:
-        # Crear mensaje de texto simple
         mensaje = f"""
-Estimado/a {cita_data["nombre_paciente"]},
+        <p>Estimado/a {cita_data["nombre_paciente"]},</p>
 
-Su cita médica ha sido agendada exitosamente.
+        <p>Su cita médica ha sido agendada exitosamente.</p>
 
-DETALLES DE LA CITA:
-- Fecha: {cita_data["fecha_cita"]}
-- Hora: {cita_data["hora_inicio"]} - {cita_data["hora_fin"]}
-- Profesional: {cita_data["profesional"]}
-- Consultorio: {cita_data["sala"]} Laboratorio de Neuropsicología y Conducta – GRUNECO
-- Código de cita: #{cita_data["cita_id"]}
+        <h4>DETALLES DE LA CITA:</h4>
+        <ul>
+            <li><strong>Fecha:</strong> {cita_data["fecha_cita"]}</li>
+            <li><strong>Hora:</strong> {cita_data["hora_inicio"]} - {cita_data["hora_fin"]}</li>
+            <li><strong>Profesional:</strong> {cita_data["profesional"]}</li>
+            <li><strong>Consultorio:</strong> {cita_data["sala"]} Laboratorio de Neuropsicología y Conducta – GRUNECO</li>
+            <li><strong>Código de cita:</strong> #{cita_data["cita_id"]}</li>
+        </ul>
 
+        <p><strong>Antes de asistir a su cita, por favor registre sus datos en el siguiente enlace:</strong></p>
 
- Duerme de manera habitual la noche anterior y llega 10 minutos antes de tu hora programada.
+        <p style="font-size: 18px;">
+            <a href="https://www.gruneco.com.co/registro-demografico/" 
+            style="font-weight: bold; color: #004aad;">
+            https://www.gruneco.com.co/registro-demografico/
+            </a>
+        </p>
 
- Esta cita no requiere dormir durante la sesión.
+        <p>Duerma de manera habitual la noche anterior y llegue 10 minutos antes de su hora programada.</p>
+        <p>Esta cita no requiere dormir durante la sesión.</p>
 
- Se generará una constancia de asistencia al finalizar la evaluación. La constancia no constituye excusa válida para ausencias académicas.
+        <p>Se generará una constancia de asistencia al finalizar la evaluación.
+        La constancia no constituye excusa válida para ausencias académicas.</p>
 
- 
- 
-RECORDATORIO IMPORTANTE:
-- ingrese sus datos posterior a la cita en el siguiente enlace: https://www.gruneco.com.co/registro-demografico/
-- Para cancelar o reprogramar, comuníquese con anticipación a gruponeuropsicologia@udea.edu.co
+        <p>Para cancelar o reprogramar, comuníquese con anticipación a 
+        <strong>gruponeuropsicologia@udea.edu.co</strong></p>
 
-Gracias por confiar en nosotros.
+        <p>Gracias por confiar en nosotros.</p>
 
-Saludos cordiales,
-GRUNECO
+        <p>Saludos cordiales,<br>GRUNECO</p>
         """
 
         # Enviar correo simple
         send_mail(
             subject=f"Confirmación de Cita Médica - {cita_data['fecha_cita']}",
-            message=mensaje.strip(),
+            message="",  # puede quedar vacío
             from_email=settings.DEFAULT_FROM_EMAIL,
             recipient_list=[cita_data["email_paciente"]],
+            # 👇 ESTA LÍNEA ES LA IMPORTANTE
+            html_message=mensaje,
             fail_silently=False,
         )
 
@@ -427,6 +431,47 @@ GRUNECO
         logger.error(
             f"❌ Error al enviar correo a {cita_data.get('email_paciente', 'unknown')}: {str(e)}"
         )
+        return False
+
+
+def enviar_notificacion_profesional(cita_data):
+    try:
+        mensaje = f"""
+        <p><strong>Se ha agendado una nueva cita.</strong></p>
+
+        <h4>DETALLES DE LA CITA:</h4>
+        <ul>
+            <li><strong>Paciente:</strong> {cita_data["nombre_paciente"]}</li>
+            <li><strong>Email del paciente:</strong> {cita_data["email_paciente"]}</li>
+            <li><strong>Teléfono:</strong> {cita_data["telefono_paciente"] or "No registrado"}</li>
+            <li><strong>Motivo de consulta:</strong> {cita_data["motivo_consulta"] or "No especificado"}</li>
+            <li><strong>Fecha:</strong> {cita_data["fecha_cita"]}</li>
+            <li><strong>Hora:</strong> {cita_data["hora_inicio"]} - {cita_data["hora_fin"]}</li>
+            <li><strong>Sala:</strong> {cita_data["sala"]}</li>
+            <li><strong>Código de cita:</strong> #{cita_data["cita_id"]}</li>
+        </ul>
+
+        <p>Por favor revise su agenda en la plataforma.</p>
+
+        <p>Saludos,<br>Sistema de Gestión de Citas GRUNECO</p>
+        """
+
+        send_mail(
+            subject=f"📢 Nueva cita agendada - {cita_data['fecha_cita']}",
+            message="",  # solo HTML
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[cita_data["profesional_email"]],
+            html_message=mensaje,
+            fail_silently=False,
+        )
+
+        logger.info(
+            f"📨 Notificación enviada al profesional {cita_data['profesional_email']}"
+        )
+        return True
+
+    except Exception as e:
+        logger.error(f"❌ Error al notificar al profesional: {str(e)}")
         return False
 
 
@@ -451,9 +496,12 @@ def gestionar_disponibilidad(request):
         usuario=request.user, activa=True
     ).select_related("sala")
 
+    citas_usuario = CitaMedica.objects.filter(disponibilidad__usuario=request.user)
+
     context = {
         "salas": salas,
         "disponibilidades_usuario": disponibilidades_usuario,
+        "citas_usuario": citas_usuario,
         "dias_semana": DisponibilidadUsuario.DIAS_SEMANA,
         "segment": "calendario_disponibilidad",
     }
@@ -463,7 +511,6 @@ def gestionar_disponibilidad(request):
 
 @login_required
 def api_eventos_disponibilidad(request):
-    """API endpoint para obtener eventos de disponibilidad"""
     try:
         disponibilidades = DisponibilidadUsuario.objects.filter(
             activa=True
@@ -472,38 +519,61 @@ def api_eventos_disponibilidad(request):
         eventos = []
         fecha_inicio = timezone.now().date()
 
+        # ================================
+        # 1️⃣ EVENTOS DE DISPONIBILIDAD
+        # ================================
         for disp in disponibilidades:
-            # Generar eventos para las próximas 12 semanas
             for semana in range(12):
                 fecha_base = fecha_inicio + timedelta(weeks=semana)
-
-                # Encontrar el día correcto de la semana
                 dias_diferencia = (disp.dia_semana - fecha_base.weekday()) % 7
                 fecha_evento = fecha_base + timedelta(days=dias_diferencia)
 
-                # Verificar rango de fechas
                 if fecha_evento >= disp.fecha_inicio:
                     if not disp.fecha_fin or fecha_evento <= disp.fecha_fin:
                         eventos.append(
                             {
                                 "id": f"disp_{disp.id}_{fecha_evento.strftime('%Y%m%d')}",
-                                "title": f"{disp.usuario.get_full_name() or disp.usuario.username}",
+                                "title": f"Disponible - {disp.sala.nombre}",
                                 "start": f"{fecha_evento}T{disp.hora_inicio}",
                                 "end": f"{fecha_evento}T{disp.hora_fin}",
-                                "backgroundColor": "#007bff"
-                                if disp.usuario == request.user
-                                else "#28a745",
-                                "borderColor": "#007bff"
-                                if disp.usuario == request.user
-                                else "#28a745",
+                                "backgroundColor": "#007bff",
+                                "borderColor": "#007bff",
                                 "extendedProps": {
+                                    "tipo": "disponibilidad",
                                     "sala": disp.sala.nombre,
-                                    "usuario_id": disp.usuario.id,
+                                    "usuario": disp.usuario.get_full_name(),
                                     "disponibilidad_id": disp.id,
-                                    "es_mio": disp.usuario == request.user,
                                 },
                             }
                         )
+
+        # ================================
+        # 2️⃣ EVENTOS DE CITAS
+        # ================================
+        citas = CitaMedica.objects.filter(
+            estado__in=["agendada", "confirmada"]
+        ).select_related("disponibilidad", "disponibilidad__sala")
+
+        for cita in citas:
+            eventos.append(
+                {
+                    "id": f"cita_{cita.id}",
+                    "title": f"Cita: {cita.nombre_paciente}",
+                    "start": f"{cita.fecha_cita}T{cita.disponibilidad.hora_inicio}",
+                    "end": f"{cita.fecha_cita}T{cita.disponibilidad.hora_fin}",
+                    "backgroundColor": "#dc3545",
+                    "borderColor": "#dc3545",
+                    "extendedProps": {
+                        "tipo": "cita",
+                        "cita_id": cita.id,
+                        "paciente": cita.nombre_paciente,
+                        "email": cita.email_paciente,
+                        "sala": cita.disponibilidad.sala.nombre,
+                        "profesional": cita.disponibilidad.usuario.get_full_name(),
+                        "motivo": cita.motivo_consulta,
+                    },
+                }
+            )
 
         return JsonResponse(eventos, safe=False)
 
@@ -5578,7 +5648,6 @@ def guardar_evaluacion_clinica_CDR(request):
                 "cdr_cuidado": request.POST.get("cdr_cuidado", ""),
                 "cdr_global": request.POST.get("cdr_global", ""),
                 "cdr_interpretacion": request.POST.get("cdr_interpretacion", ""),
-
             }
 
             # Guardar o actualizar
@@ -5647,7 +5716,6 @@ def guardar_consentimiento_participante(request):
                 "testigo2": request.POST.get("testigo2", ""),
                 "copia_entregada": request.POST.get("copia_entregada"),
                 "hora_finalizacion": request.POST.get("hora_finalizacion"),
-                
             }
 
             # Guardar o actualizar
