@@ -1978,7 +1978,7 @@ class ConsentimientoInfrmadoParticipanteResult(ResultadoExamenBase):
 
     def __str__(self):
         return f"Consentimiento Informado - {self.visita_examen_id}"
-o
+
 
 class ConsentimientoInformadoCuidadorResult(ResultadoExamenBase):
     fecha = models.DateField()
