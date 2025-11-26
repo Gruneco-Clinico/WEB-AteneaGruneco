@@ -1,0 +1,49 @@
+{% extends 'layouts/base_public.html' %}
+
+{% block content %}
+<div class="header bg-gradient-success pb-6">
+  <div class="container-fluid">
+    <div class="header-body">
+      <div class="row align-items-center py-4">
+        <div class="col-lg-6 col-7">
+          <h6 class="h2 text-white d-inline-block mb-0">
+            <i class="fas fa-clipboard-check mr-2"></i>
+            ¡Examen Completado!
+          </h6>
+          <p class="text-white-50 mb-0 mt-1">
+            Gracias por completar el formulario
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid mt--6">
+  <div class="row justify-content-center">
+    <div class="col-xl-7">
+      <div class="card shadow">
+        <div class="card-body text-center">
+
+          <i class="fas fa-check-circle text-success" style="font-size: 5rem;"></i>
+          <h2 class="mt-3 text-success">¡Gracias por completar el examen!</h2>
+
+          <p class="mt-3 mb-4 text-muted">
+            Sus respuestas han sido registradas correctamente.  
+            El equipo de investigación revisará la información antes de su cita.
+          </p>
+
+          <hr>
+
+          <div class="mt-4">
+            <a href="{% url 'formulario_demografico_externo' %}" class="btn btn-secondary btn-lg">
+              <i class="fas fa-home"></i> Volver al inicio
+            </a>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
