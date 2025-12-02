@@ -18,6 +18,10 @@
             </ol>
           </nav>
         </div>
+        <button class="btn btn-info" data-toggle="modal" data-target="#modalConsulta">
+            Consultar exámenes pendientes
+        </button>
+
       </div>
 
       <!-- Title and Controls Row - REORGANIZADO -->
@@ -305,6 +309,40 @@
               </button>
             </div>
           </form>
+
+          <div class="modal fade" id="modalConsulta" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            
+            <div class="modal-header">
+                <h5 class="modal-title">Consulta de Exámenes</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+
+                <label><strong>Ingrese su número de documento:</strong></label>
+                <input type="text" id="docConsulta" class="form-control" placeholder="Cédula">
+
+                <div id="resultadoConsulta" class="mt-3"></div>
+
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="consultarExamenes()">
+                    Consultar
+                </button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                    Cerrar
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
         </div>
       </div>
     </div>
@@ -366,5 +404,72 @@
   document.addEventListener('DOMContentLoaded', function() {
     calcularEdad();
   });
+
+  function consultarExamenes() {
+    const doc = document.getElementById("docConsulta").value;
+    const resultado = document.getElementById("resultadoConsulta");
+
+    if (!doc.trim()) {
+        resultado.innerHTML = `
+            <div class="alert alert-warning">
+                Por favor ingrese su número de documento.
+            </div>`;
+        return;
+    }
+
+    fetch(`/consulta-examenes/?documento=${doc}`)
+        .then(response => response.json())
+        .then(data => {
+            resultado.innerHTML = "";
+
+            if (!data.demograficos_completos) {
+                resultado.innerHTML = `
+                    <div class="alert alert-danger">
+                        No has registrado tus datos demográficos.<br>
+                        Por favor completa el formulario de registro antes de consultar exámenes pendientes.
+                    </div>
+                `;
+                return;
+            }
+
+            if (data.examenes.length === 0) {
+                resultado.innerHTML = `
+                    <div class="alert alert-success">
+                        ✔ No tienes exámenes pendientes.
+                    </div>
+                `;
+                return;
+            }
+
+            // Si tiene exámenes pendientes
+            let html = `
+                <div class="alert alert-warning">
+                    Tienes ${data.examenes.length} examen(es) pendiente(s):
+                </div>
+            `;
+
+            data.examenes.forEach(ex => {
+                html += `
+                    <div class="card mb-2">
+                        <div class="card-body">
+                            <strong>${ex.nombre}</strong><br>
+                            <a href="${ex.url}" class="btn btn-primary btn-sm mt-2">
+                                Realizar examen
+                            </a>
+                        </div>
+                    </div>
+                `;
+            });
+
+            resultado.innerHTML = html;
+        })
+        .catch(error => {
+            resultado.innerHTML = `
+                <div class="alert alert-danger">
+                    Ocurrió un error al consultar la información.
+                </div>`;
+            console.error(error);
+        });
+  }
 </script>
 {% endblock javascripts %}

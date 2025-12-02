@@ -26,7 +26,8 @@ from django.views.generic import TemplateView
 from django.contrib.auth import update_session_auth_hash
 from django.core.mail import send_mail
 import logging
-
+import os
+from django.core.mail import EmailMessage
 # AGENDAMIENTO PUBLICO
 
 
@@ -381,16 +382,18 @@ def enviar_correo_confirmacion_cita(cita_data):
 
         <p>Su cita médica ha sido agendada exitosamente.</p>
 
-        <h4>DETALLES DE LA CITA:</h4>
+        <h3>🔹 DETALLES DE LA CITA</h3>
         <ul>
             <li><strong>Fecha:</strong> {cita_data["fecha_cita"]}</li>
             <li><strong>Hora:</strong> {cita_data["hora_inicio"]} - {cita_data["hora_fin"]}</li>
             <li><strong>Profesional:</strong> {cita_data["profesional"]}</li>
-            <li><strong>Consultorio:</strong> {cita_data["sala"]} Laboratorio de Neuropsicología y Conducta – GRUNECO</li>
+            <li><strong>Consultorio:</strong> {cita_data["sala"]} — Laboratorio de Neuropsicología y Conducta – GRUNECO</li>
             <li><strong>Código de cita:</strong> #{cita_data["cita_id"]}</li>
         </ul>
 
-        <p><strong>Antes de asistir a su cita, por favor registre sus datos en el siguiente enlace:</strong></p>
+        <h3>📝 ACCIÓN IMPORTANTE ANTES DE SU CITA</h3>
+
+        <p><strong>Por favor registre sus datos demográficos en el siguiente enlace:</strong></p>
 
         <p style="font-size: 18px;">
             <a href="https://www.gruneco.com.co/registro-demografico/" 
@@ -399,6 +402,12 @@ def enviar_correo_confirmacion_cita(cita_data):
             </a>
         </p>
 
+        <p>➡ <strong>Después de registrar sus datos demográficos, aparecerá un botón para completar sus exámenes pendientes.</strong></p>
+
+        <h3>📄 CONSENTIMIENTO INFORMADO</h3>
+        <p>Adjunto encontrará el consentimiento informado del Proyecto Sueño. Por favor léalo antes de asistir a su cita.</p>
+
+        <h3>📌 RECORDATORIO</h3>
         <p>Duerma de manera habitual la noche anterior y llegue 10 minutos antes de su hora programada.</p>
         <p>Esta cita no requiere dormir durante la sesión.</p>
 
@@ -410,19 +419,37 @@ def enviar_correo_confirmacion_cita(cita_data):
 
         <p>Gracias por confiar en nosotros.</p>
 
-        <p>Saludos cordiales,<br>GRUNECO</p>
+        <p>Saludos cordiales,<br><strong>GRUNECO</strong></p>
         """
 
-        # Enviar correo simple
-        send_mail(
+        # Construir el correo con adjunto
+        correo = EmailMessage(
             subject=f"Confirmación de Cita Médica - {cita_data['fecha_cita']}",
-            message="",  # puede quedar vacío
+            body=mensaje,
             from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[cita_data["email_paciente"]],
-            # 👇 ESTA LÍNEA ES LA IMPORTANTE
-            html_message=mensaje,
-            fail_silently=False,
+            to=[cita_data["email_paciente"]],
         )
+
+        correo.content_subtype = "html"
+
+        # -------------------------------
+        # 📎 ADJUNTAR EL PDF DEL CONSENTIMIENTO
+        # -------------------------------
+        static_root_path = settings.STATICFILES_DIRS[0]  # apps/static
+        pdf_path = os.path.join(
+            static_root_path,
+            "assets",
+            "pdfs",
+            "CI_ProyectoSueno.pdf",
+        )
+
+        if os.path.exists(pdf_path):
+            correo.attach_file(pdf_path)
+            logger.info(f"📎 PDF adjuntado: {pdf_path}")
+        else:
+            logger.warning(f"⚠️ No se encontró el PDF: {pdf_path}")
+
+        correo.send(fail_silently=False)
 
         logger.info(f"✅ Correo enviado exitosamente a {cita_data['email_paciente']}")
         return True
@@ -770,11 +797,56 @@ def eliminar_disponibilidad(request):
             f"📋 Disponibilidad encontrada: {disponibilidad.sala.nombre}, activa: {disponibilidad.activa}"
         )
 
-        # Eliminar completamente
+        # ---------------------------------------------------------------------
+        # 1️⃣ CANCELAR TODAS LAS CITAS ASOCIADAS A ESTA DISPONIBILIDAD
+        # ---------------------------------------------------------------------
+        citas = CitaMedica.objects.filter(
+            disponibilidad=disponibilidad, estado="Agendada"
+        )
+
+        for cita in citas:
+            paciente_email = cita.email_paciente
+
+            # Cambiar estado de la cita
+            cita.estado = "Cancelada"
+            cita.save()
+
+            # Enviar correo de cancelación
+            if paciente_email:
+                try:
+                    send_mail(
+                        subject="Cancelación de cita médica",
+                        message=(
+                            f"Hola {cita.nombre_paciente},\n\n"
+                            "Te informamos que tu cita ha sido CANCELADA debido a cambios "
+                            "en la disponibilidad del profesional.\n\n"
+                            f"Fecha de la cita: {cita.fecha_cita}\n"
+                            f"Hora: {cita.hora_inicio.strftime('%H:%M')} - {cita.hora_fin.strftime('%H:%M')}\n"
+                            f"Sala: {cita.sala.nombre}\n\n"
+                            "Por favor ingresa nuevamente al sistema para reprogramar tu cita.\n\n"
+                            "Gracias por tu comprensión."
+                        ),
+                        from_email=settings.DEFAULT_FROM_EMAIL,
+                        recipient_list=[cita.email_paciente],
+                        fail_silently=False,
+                    )
+                except Exception as e:
+                    print(f"⚠️ Error enviando correo a {paciente_email}: {e}")
+
+        print(
+            f"📌 {citas.count()} citas canceladas por la eliminación de disponibilidad."
+        )
+
+        # ---------------------------------------------------------------------
+        # 2️⃣ ELIMINAR LA DISPONIBILIDAD
+        # ---------------------------------------------------------------------
         disponibilidad.delete()
         print(f"✅ Disponibilidad eliminada de la base de datos")
 
-        messages.success(request, "✅ Disponibilidad eliminada correctamente.")
+        messages.success(
+            request,
+            "✅ Disponibilidad eliminada. Las citas fueron canceladas y se enviaron los correos.",
+        )
 
     except Exception as e:
         print(f"💥 Error al eliminar: {str(e)}")
@@ -1536,6 +1608,64 @@ def formulario_demografico_externo(request):
 
     # Método GET - mostrar formulario
     return render(request, "registro_publico/sleepFormRegister.html")
+
+
+def consulta_examenes(request):
+    documento = request.GET.get("documento")
+
+    # 1. Verificar si existe un paciente con ese documento
+    paciente = DatosDemograficos.objects.filter(numero_documento=documento).first()
+
+    if not paciente:
+        return JsonResponse({"demograficos_completos": False, "examenes": []})
+
+    # 2. Buscar su visita (puede haber varias, tomamos la más reciente)
+    visita = Visita.objects.filter(paciente=paciente).order_by("-id").first()
+
+    if not visita:
+        return JsonResponse({"demograficos_completos": True, "examenes": []})
+
+    # 3. Buscar exámenes pendientes en esa visita
+    examenes_pendientes = VisitaExamen.objects.filter(visita=visita, estado="pendiente")
+
+    examenes_data = []
+
+    for ve in examenes_pendientes:
+        # ======================
+        # EPWORTH (id = 14)
+        # ======================
+        if ve.examen_id == 14:
+            examenes_data.append(
+                {
+                    "nombre": ve.examen.nombre,
+                    "url": f"/guardar-examen-publico-epworth/?paciente_id={paciente.id}",
+                }
+            )
+            continue
+
+        # ======================
+        # MEW (id = 16)
+        # ======================
+        if ve.examen_id == 16:
+            examenes_data.append(
+                {
+                    "nombre": ve.examen.nombre,
+                    "url": f"/guardar-examen-publico-mew/?paciente_id={paciente.id}",
+                }
+            )
+            continue
+
+        # ======================
+        # OTROS EXÁMENES (mostrar ruta normal)
+        # ======================
+        examenes_data.append(
+            {
+                "nombre": ve.examen.nombre,
+                "url": f"/examen/{ve.id}/",
+            }
+        )
+
+    return JsonResponse({"demograficos_completos": True, "examenes": examenes_data})
 
 
 # ===== EXÁMENES PÚBLICOS =====

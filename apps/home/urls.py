@@ -78,6 +78,7 @@ urlpatterns = [
         views.confirmacion_registro_externo,
         name="confirmacion_registro_externo",
     ),
+    path("consulta-examenes/", views.consulta_examenes, name="consulta_examenes"),
     # URLs públicas para exámenes
     path(
         "guardar-examen-publico-epworth/",
