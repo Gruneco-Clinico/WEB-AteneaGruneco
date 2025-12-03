@@ -525,7 +525,7 @@ class VisitaExamen(models.Model):
                     if antecedentes_link and antecedentes_link.antecedentes_result:
                         self._resultado_cache = antecedentes_link.antecedentes_result
                 except AttributeError:
-                    print(f"❌ No antecedentes_link para {self.examen.nombre}")
+                    pass
                 return self._resultado_cache
 
             # Lista de related_names que Django generará automáticamente
@@ -580,27 +580,22 @@ class VisitaExamen(models.Model):
                             resultado_instance = manager.get()
                             if resultado_instance:
                                 self._resultado_cache = resultado_instance
-                                print(
-                                    f"✅ Encontrado {related_name}: {type(resultado_instance).__name__} ID:{resultado_instance.id}"
-                                )
+
                                 break
                         except manager.model.DoesNotExist:
-                            print(f"❌ No existe instancia para {related_name}")
                             continue
                         except Exception as e:
-                            print(f"❌ Error obteniendo instancia {related_name}: {e}")
                             continue
                     # Si no es un manager, manejar como antes
                     elif manager:
                         self._resultado_cache = manager
-                        print(f"✅ Encontrado {related_name}: {type(manager).__name__}")
+
                         break
 
                 except AttributeError:
                     # El related_name no existe en este modelo
                     continue
                 except Exception as e:
-                    print(f"❌ Error general en {related_name}: {e}")
                     continue
 
             # DEBUG: Si no encontró nada
@@ -609,7 +604,6 @@ class VisitaExamen(models.Model):
                 available_related = [
                     attr for attr in dir(self) if attr.endswith("_resultado")
                 ]
-                print(f"❌ No se encontró resultado. Available: {available_related}")
 
         return self._resultado_cache
 

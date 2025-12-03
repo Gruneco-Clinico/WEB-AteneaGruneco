@@ -435,31 +435,53 @@
             if (data.examenes.length === 0) {
                 resultado.innerHTML = `
                     <div class="alert alert-success">
-                        ✔ No tienes exámenes pendientes.
+                        ✔ No tienes exámenes pendientes ni en proceso.
                     </div>
                 `;
                 return;
             }
 
-            // Si tiene exámenes pendientes
-            let html = `
-                <div class="alert alert-warning">
-                    Tienes ${data.examenes.length} examen(es) pendiente(s):
-                </div>
-            `;
+            // Separar por estado
+            const pendientes = data.examenes.filter(ex => ex.estado === "pendiente");
+            const enProceso = data.examenes.filter(ex => ex.estado === "en_progreso");
 
-            data.examenes.forEach(ex => {
+            let html = "";
+
+            if (pendientes.length > 0) {
                 html += `
-                    <div class="card mb-2">
-                        <div class="card-body">
-                            <strong>${ex.nombre}</strong><br>
-                            <a href="${ex.url}" class="btn btn-primary btn-sm mt-2">
-                                Realizar examen
-                            </a>
-                        </div>
+                    <div class="alert alert-warning">
+                        Tienes ${pendientes.length} examen(es) pendiente(s):
                     </div>
                 `;
-            });
+                pendientes.forEach(ex => {
+                    html += `
+                        <div class="card mb-2 border-warning">
+                            <div class="card-body">
+                                <strong>${ex.nombre}</strong> <span class="badge bg-warning text-dark">Pendiente</span><br>
+                                <a href="${ex.url}" class="btn btn-primary btn-sm mt-2">Realizar examen</a>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            if (enProceso.length > 0) {
+                html += `
+                    <div class="alert alert-info mt-3">
+                        Tienes ${enProceso.length} examen(es) en proceso:
+                    </div>
+                `;
+                enProceso.forEach(ex => {
+                    html += `
+                        <div class="card mb-2 border-info">
+                            <div class="card-body">
+                                <strong>${ex.nombre}</strong> <span class="badge bg-info text-dark">En proceso</span><br>
+                                <a href="${ex.url}" class="btn btn-primary btn-sm mt-2">Continuar examen</a>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
 
             resultado.innerHTML = html;
         })
@@ -471,5 +493,6 @@
             console.error(error);
         });
   }
+
 </script>
 {% endblock javascripts %}

@@ -172,10 +172,8 @@ def api_eventos_disponibilidad_publica(request):
         return JsonResponse(eventos, safe=False)
 
     except Exception as e:
-        print(f"Error en API disponibilidad pública: {str(e)}")
         import traceback
 
-        traceback.print_exc()
         return JsonResponse({"error": str(e)}, status=500)
 
 
@@ -300,20 +298,16 @@ def agendar_cita_ajax(request):
             correo_enviado = False
             try:
                 correo_enviado = enviar_correo_confirmacion_cita(cita_data)
-                print(
-                    f"📧 Correo al paciente: {'✅ Enviado' if correo_enviado else '❌ Falló'}"
-                )
+
             except Exception as e:
-                print(f"❌ Error al enviar correo al paciente: {str(e)}")
                 correo_enviado = False
 
             # Enviar notificación al profesional (opcional)
             try:
                 if cita_data.get("profesional_email"):
                     enviar_notificacion_profesional(cita_data)
-                    print(f"📧 Notificación al profesional: ✅ Enviada")
             except Exception as e:
-                print(f"❌ Error al notificar al profesional: {str(e)}")
+                logger.error(f"❌ Error al notificar al profesional: {str(e)}")
 
             # Mensaje de respuesta
             mensaje_base = (
@@ -358,10 +352,8 @@ def agendar_cita_ajax(request):
                 }
             )
         except Exception as e:
-            print(f"Error al agendar cita: {str(e)}")
             import traceback
 
-            traceback.print_exc()
             return JsonResponse(
                 {
                     "success": False,
@@ -787,14 +779,9 @@ def agregar_disponibilidad(request):
 def eliminar_disponibilidad(request):
     try:
         disponibilidad_id = request.POST.get("disponibilidad_id")
-        print(f"🔍 Intentando eliminar disponibilidad ID: {disponibilidad_id}")
 
         disponibilidad = get_object_or_404(
             DisponibilidadUsuario, id=disponibilidad_id, usuario=request.user
-        )
-
-        print(
-            f"📋 Disponibilidad encontrada: {disponibilidad.sala.nombre}, activa: {disponibilidad.activa}"
         )
 
         # ---------------------------------------------------------------------
@@ -831,17 +818,12 @@ def eliminar_disponibilidad(request):
                         fail_silently=False,
                     )
                 except Exception as e:
-                    print(f"⚠️ Error enviando correo a {paciente_email}: {e}")
-
-        print(
-            f"📌 {citas.count()} citas canceladas por la eliminación de disponibilidad."
-        )
+                    logger.error(f"⚠️ Error enviando correo a {paciente_email}: {e}")
 
         # ---------------------------------------------------------------------
         # 2️⃣ ELIMINAR LA DISPONIBILIDAD
         # ---------------------------------------------------------------------
         disponibilidad.delete()
-        print(f"✅ Disponibilidad eliminada de la base de datos")
 
         messages.success(
             request,
@@ -849,7 +831,6 @@ def eliminar_disponibilidad(request):
         )
 
     except Exception as e:
-        print(f"💥 Error al eliminar: {str(e)}")
         messages.error(request, f"❌ Error al eliminar disponibilidad: {str(e)}")
 
     return redirect("gestionar_disponibilidad")
@@ -1516,9 +1497,7 @@ def formulario_demografico_externo(request):
                 proyecto_automatico = Proyecto.objects.get(id=8)
                 proyecto_automatico.pacientes.add(paciente_nuevo)
                 proyecto_automatico.save()
-                print(
-                    f"✅ Paciente {paciente_nuevo.id} vinculado automáticamente al proyecto '{proyecto_automatico.nombre}'"
-                )
+
             except Proyecto.DoesNotExist:
                 print(
                     f"⚠️ El proyecto con ID 8 no existe. Paciente {paciente_nuevo.id} registrado sin vinculación automática."
@@ -1555,19 +1534,13 @@ def formulario_demografico_externo(request):
                                 examen=examen,
                                 estado="pendiente",
                             )
-                            print(
-                                f"✅ Examen '{examen.nombre}' asociado a la visita automática"
-                            )
+
                         except Examen.DoesNotExist:
                             print(f"⚠️ Examen con ID {examen_data['id']} no existe")
                         except Exception as e:
                             print(
                                 f"❌ Error al asociar examen {examen_data['id']}: {str(e)}"
                             )
-
-                print(
-                    f"✅ Visita automática '{visita_automatica.nombre}' creada para el paciente {paciente_nuevo.id}"
-                )
 
             except TipoVisita.DoesNotExist:
                 print(
@@ -1619,18 +1592,23 @@ def consulta_examenes(request):
     if not paciente:
         return JsonResponse({"demograficos_completos": False, "examenes": []})
 
-    # 2. Buscar su visita (puede haber varias, tomamos la más reciente)
+    # 2. Buscar su visita más reciente
     visita = Visita.objects.filter(paciente=paciente).order_by("-id").first()
 
     if not visita:
         return JsonResponse({"demograficos_completos": True, "examenes": []})
 
-    # 3. Buscar exámenes pendientes en esa visita
-    examenes_pendientes = VisitaExamen.objects.filter(visita=visita, estado="pendiente")
+    # 3. Buscar exámenes pendientes Y exámenes en proceso
+    examenes = VisitaExamen.objects.filter(
+        visita=visita, estado__in=["pendiente", "en_progreso"]
+    )
 
     examenes_data = []
 
-    for ve in examenes_pendientes:
+    for ve in examenes:
+        # Detectar el estado para enviarlo al frontend
+        estado = ve.estado  # pendiente | en_proceso
+
         # ======================
         # EPWORTH (id = 14)
         # ======================
@@ -1638,6 +1616,7 @@ def consulta_examenes(request):
             examenes_data.append(
                 {
                     "nombre": ve.examen.nombre,
+                    "estado": estado,
                     "url": f"/guardar-examen-publico-epworth/?paciente_id={paciente.id}",
                 }
             )
@@ -1650,17 +1629,19 @@ def consulta_examenes(request):
             examenes_data.append(
                 {
                     "nombre": ve.examen.nombre,
+                    "estado": estado,
                     "url": f"/guardar-examen-publico-mew/?paciente_id={paciente.id}",
                 }
             )
             continue
 
         # ======================
-        # OTROS EXÁMENES (mostrar ruta normal)
+        # OTROS
         # ======================
         examenes_data.append(
             {
                 "nombre": ve.examen.nombre,
+                "estado": estado,
                 "url": f"/examen/{ve.id}/",
             }
         )
@@ -1832,13 +1813,6 @@ def guardar_examen_publico_epworth(request):
 
 def guardar_examen_publico_mew(request):
     """Cargar y guardar examen MEW desde enlace público"""
-
-    # Función auxiliar para validar acceso
-    print(
-        "DEBUG paciente_id:",
-        request.GET.get("paciente_id"),
-        request.POST.get("paciente_id"),
-    )
 
     def validar_acceso():
         if request.method == "GET":
@@ -2780,7 +2754,6 @@ def realizar_examen(request, visita_id, examen_id, paciente_id):
             # CASO ESPECIAL: ANTECEDENTES (ID 5) - FUERA DEL IF ANTERIOR
             # ===================================================
             elif int(examen_id) == 5:
-                print("Entrando a antecedentes desde especial")
                 # Para antecedentes, verificar si existe un AntecedentesVisitaLink
                 try:
                     antecedentes_link = AntecedentesVisitaLink.objects.get(
@@ -2985,10 +2958,6 @@ def realizar_examen(request, visita_id, examen_id, paciente_id):
             # CASO ESPECIAL: REVISIÓN POR SISTEMAS (ID 4)
             # ===================================================
             elif int(examen_id) == 4 and isinstance(resultado, RevisionSistemasResult):
-                print(
-                    f"🔍 Cargando datos de Revisión por Sistemas para edición: ID {resultado.id}"
-                )
-
                 # Obtener datos básicos del modelo principal
                 datos_examen = model_to_dict(resultado)
                 datos_examen.pop("id", None)
@@ -3015,15 +2984,6 @@ def realizar_examen(request, visita_id, examen_id, paciente_id):
 
                 datos_examen["sistemas_detalles"] = sistemas_detalles
 
-                print(f"📋 Datos cargados:")
-                print(
-                    f"   - Campos de control: {[k for k, v in datos_examen.items() if k.startswith('sintoma_') and v == 'si']}"
-                )
-                print(f"   - Sistemas con detalles: {list(sistemas_detalles.keys())}")
-                print(
-                    f"   - Total síntomas: {sum(len(sintomas) for sintomas in sistemas_detalles.values())}"
-                )
-
                 modo_edicion = True
 
             # En la vista realizar_examen, agregar después de los otros casos especiales:
@@ -3032,10 +2992,6 @@ def realizar_examen(request, visita_id, examen_id, paciente_id):
             # CASO ESPECIAL: EXAMEN NEUROLÓGICO (ID 5)
             # ===================================================
             elif int(examen_id) == 5 and isinstance(resultado, ExamenNeurologicoResult):
-                print(
-                    f"🧠 Cargando datos de Examen Neurológico para edición: ID {resultado.id}"
-                )
-
                 # Obtener datos básicos del modelo
                 datos_examen = model_to_dict(resultado)
                 datos_examen.pop("id", None)
@@ -3055,14 +3011,6 @@ def realizar_examen(request, visita_id, examen_id, paciente_id):
                 alteraciones_pares = resultado.get_alteraciones_pares_craneales()
                 alteraciones_sensibilidad = resultado.get_alteraciones_sensibilidad()
                 reflejos_alterados = resultado.get_reflejos_alterados()
-
-                print(f"📋 Datos cargados:")
-                print(f"   - Examen normal: {resumen['examen_normal']}")
-                print(f"   - Pares craneales alterados: {len(alteraciones_pares)}")
-                print(
-                    f"   - Regiones sensibilidad alteradas: {len(alteraciones_sensibilidad)}"
-                )
-                print(f"   - Reflejos alterados: {len(reflejos_alterados)}")
 
                 modo_edicion = True
 
@@ -3086,23 +3034,9 @@ def realizar_examen(request, visita_id, examen_id, paciente_id):
 
 @login_required
 def ver_resultado_examen(request, visita_examen_id):
-    print(f"🔍 DEBUG: visita_examen_id={visita_examen_id}")
-
     visita_examen = get_object_or_404(VisitaExamen, id=visita_examen_id)
-    print(
-        f"🔍 DEBUG: examen_id={visita_examen.examen.id}, examen_nombre={visita_examen.examen.nombre}"
-    )
-
-    # ===== NUEVOS PRINTS DE DEBUG =====
-    print(f"🔍 DEBUG ESPECÍFICO ID 20:")
-    print(f"   - visita_examen.examen.id: {visita_examen.examen.id}")
-    print(f"   - Tipo de examen.id: {type(visita_examen.examen.id)}")
-    print(f"   - ¿Es igual a 20?: {visita_examen.examen.id == 20}")
-    print(f"   - ¿Es igual a int(20)?: {visita_examen.examen.id == int(20)}")
-    print(f"   - ¿Es igual a str('20')?: {str(visita_examen.examen.id) == '20'}")
 
     if not visita_examen.esta_realizado:
-        print("❌ DEBUG: Examen no realizado")
         messages.error(request, "Este examen aún no ha sido completado.")
         return redirect(
             "detalle_paciente", paciente_id=visita_examen.visita.paciente.id
@@ -3110,7 +3044,6 @@ def ver_resultado_examen(request, visita_examen_id):
 
     # SeguimientoIntervenciones - es diferente al resto
     if visita_examen.examen.nombre == "SeguimientoIntervencionesParticipantes_ANG":
-        print("🔍 DEBUG: Examen de Seguimiento de Intervenciones ANG")
         sesiones = SeguimientoIntervencionesResult.objects.filter(
             visita_examen=visita_examen
         ).order_by("numero_sesion")
@@ -3130,30 +3063,6 @@ def ver_resultado_examen(request, visita_examen_id):
 
     # Obtener resultado usando el método get_resultado_instance
     resultado = visita_examen.get_resultado_instance()
-    print(f"🔍 DEBUG: resultado={resultado}, tipo={type(resultado)}")
-
-    # ===========================
-    # DEBUG PROFUNDO DEL RESULTADO
-    # ===========================
-    print("\n===== DEBUG DETALLADO RESULTADO =====")
-
-    # 1. Atributos básicos
-    try:
-        print("ID resultado:", resultado.id)
-    except Exception as e:
-        print("❌ ERROR obteniendo resultado.id:", e)
-
-    # 2. Verificar relación visita_examen
-    try:
-        print("Visita examen ID:", resultado.visita_examen.id)
-    except Exception as e:
-        print("❌ ERROR obteniendo resultado.visita_examen:", e)
-
-    # 3. Verificar relación paciente
-    try:
-        print("Paciente:", resultado.visita_examen.visita.paciente.nombres)
-    except Exception as e:
-        print("❌ ERROR accediendo a paciente:", e)
 
     # 4. Verificar relaciones ManyToMany posibles
     for field in [
@@ -3165,16 +3074,12 @@ def ver_resultado_examen(request, visita_examen_id):
     ]:
         try:
             rel = getattr(resultado, field)
-            print(f"{field} → OK, total: {rel.count()}")
         except AttributeError:
-            print(f"{field} → ⚠️ NO EXISTE en este modelo")
+            pass
         except Exception as e:
-            print(f"{field} → ❌ ERROR:", e)
-
-    print("===== FIN DEBUG RESULTADO =====\n")
+            pass
 
     if not resultado:
-        print("❌ DEBUG: No hay resultado")
         messages.error(request, "No se encontraron resultados para este examen.")
         return redirect(
             "detalle_paciente", paciente_id=visita_examen.visita.paciente.id
@@ -3216,17 +3121,11 @@ def ver_resultado_examen(request, visita_examen_id):
 
     # CASO: COGNITIVO ANAMNESIS (ID 20) - CORRECCIÓN PRINCIPAL
     elif visita_examen.examen.id == 20:  # ✅ QUITA el isinstance(), solo verifica ID
-        print("✔️ Entrando al caso COGNITIVO ANAMNESIS - ID 20")
-
         try:
             # Obtener el resultado directamente desde la relación
             cognitivo_anamnesis = visita_examen.cognitivo_anamnesis_resultado
 
             if cognitivo_anamnesis:
-                print(
-                    f"✔️ CognitivoAnamnesisResult obtenido: ID {cognitivo_anamnesis.id}"
-                )
-
                 # Pre-cargar las relaciones
                 cognitivo_anamnesis = CognitivoAnamnesisResult.objects.prefetch_related(
                     "actitudes",
@@ -3247,24 +3146,12 @@ def ver_resultado_examen(request, visita_examen_id):
                     "actividades_complejas": cognitivo_anamnesis.actividades_complejas.all(),
                 }
 
-                print(f"📊 Datos del contexto:")
-                print(f"   - Actitudes: {context['actitudes'].count()}")
-                print(f"   - Atenciones: {context['atenciones'].count()}")
-                print(f"   - Errores lenguaje: {context['errores_lenguaje'].count()}")
-                print(
-                    f"   - Actividades vida diaria: {context['actividades_vida_diaria'].count()}"
-                )
-                print(
-                    f"   - Actividades complejas: {context['actividades_complejas'].count()}"
-                )
-
                 return render(
                     request,
                     "examenes_resultados/resultado_cognitivo_Anamnesis.html",
                     context,
                 )
             else:
-                print("❌ No se encontró resultado cognitivo para esta visita")
                 messages.error(
                     request,
                     "No se encontraron resultados del examen cognitivo para esta visita.",
@@ -3274,9 +3161,6 @@ def ver_resultado_examen(request, visita_examen_id):
                 )
 
         except CognitivoAnamnesisResult.DoesNotExist:
-            print(
-                f"❌ No se encontró CognitivoAnamnesisResult para VisitaExamen {visita_examen.id}"
-            )
             messages.error(
                 request,
                 "No se encontraron resultados del examen cognitivo para esta visita.",
@@ -3286,10 +3170,6 @@ def ver_resultado_examen(request, visita_examen_id):
             )
 
         except Exception as e:
-            print(f"💥 ERROR al obtener CognitivoAnamnesisResult: {str(e)}")
-            import traceback
-
-            traceback.print_exc()
             messages.error(request, f"Error al cargar el examen cognitivo: {str(e)}")
             return redirect(
                 "detalle_paciente", paciente_id=visita_examen.visita.paciente.id
@@ -3304,8 +3184,6 @@ def ver_resultado_examen(request, visita_examen_id):
                 visita_examen=visita_examen
             )
 
-            print(f"🔍 AnalisisGeneralResult encontrado: ID {analisis_result.id}")
-
             # Obtener los diagnósticos relacionados con prefetch para optimización
             analisis = AnalisisGeneralResult.objects.prefetch_related(
                 "diagnosticos_cie10",
@@ -3313,14 +3191,6 @@ def ver_resultado_examen(request, visita_examen_id):
                 "diagnosticos_icsd3",
                 "diagnosticos_no_clasificados",
             ).get(id=analisis_result.id)
-
-            print(f"📋 Diagnósticos encontrados:")
-            print(f"   - CIE-10: {analisis.diagnosticos_cie10.count()}")
-            print(f"   - DSM-V: {analisis.diagnosticos_dsmv.count()}")
-            print(f"   - ICSD-3: {analisis.diagnosticos_icsd3.count()}")
-            print(
-                f"   - No clasificados: {analisis.diagnosticos_no_clasificados.count()}"
-            )
 
             context = {
                 "visita_examen": visita_examen,
@@ -3337,9 +3207,6 @@ def ver_resultado_examen(request, visita_examen_id):
             )
 
         except AnalisisGeneralResult.DoesNotExist:
-            print(
-                f"❌ No se encontró AnalisisGeneralResult para VisitaExamen {visita_examen.id}"
-            )
             messages.error(
                 request,
                 "No se encontraron resultados de análisis general para esta visita.",
@@ -3349,7 +3216,6 @@ def ver_resultado_examen(request, visita_examen_id):
             )
 
         except Exception as e:
-            print(f"💥 Error al obtener AnalisisGeneralResult: {str(e)}")
             messages.error(request, f"Error al cargar el análisis general: {str(e)}")
             return redirect(
                 "detalle_paciente", paciente_id=visita_examen.visita.paciente.id
@@ -3428,14 +3294,10 @@ def ver_resultado_examen(request, visita_examen_id):
                 visita_examen=visita_examen
             )
 
-            print(f"🔍 RevisionSistemasResult encontrado: ID {revision_result.id}")
-
             # Obtener los detalles de síntomas relacionados
             detalles = DetalleRevisionSistemas.objects.filter(
                 revision_sistemas_result=revision_result
             ).order_by("sistema", "sintoma")
-
-            print(f"📋 Detalles encontrados: {detalles.count()}")
 
             # Organizar detalles por sistema
             sistemas_detalles = {}
@@ -3443,8 +3305,6 @@ def ver_resultado_examen(request, visita_examen_id):
                 if detalle.sistema not in sistemas_detalles:
                     sistemas_detalles[detalle.sistema] = []
                 sistemas_detalles[detalle.sistema].append(detalle)
-
-            print(f"📊 Sistemas con detalles: {list(sistemas_detalles.keys())}")
 
             context = {
                 "visita_examen": visita_examen,
@@ -3457,9 +3317,6 @@ def ver_resultado_examen(request, visita_examen_id):
             )
 
         except RevisionSistemasResult.DoesNotExist:
-            print(
-                f"❌ No se encontró RevisionSistemasResult para VisitaExamen {visita_examen.id}"
-            )
             messages.error(
                 request,
                 "No se encontraron resultados de revisión por sistemas para esta visita.",
@@ -3469,7 +3326,6 @@ def ver_resultado_examen(request, visita_examen_id):
             )
 
         except Exception as e:
-            print(f"💥 Error al obtener RevisionSistemasResult: {str(e)}")
             messages.error(request, f"Error al cargar los resultados: {str(e)}")
             return redirect(
                 "detalle_paciente", paciente_id=visita_examen.visita.paciente.id
@@ -3486,14 +3342,10 @@ def ver_resultado_examen(request, visita_examen_id):
                 visita_examen=visita_examen
             )
 
-            print(f"🔍 MedicamentosResult encontrado: ID {medicamentos_result.id}")
-
             # Obtener los medicamentos relacionados
             medicamentos = medicamentos_result.medicamentos.all().order_by(
                 "nombre_comercial"
             )
-
-            print(f"💊 Medicamentos encontrados: {medicamentos.count()}")
 
             context = {
                 "visita_examen": visita_examen,
@@ -3506,9 +3358,6 @@ def ver_resultado_examen(request, visita_examen_id):
             )
 
         except MedicamentosResult.DoesNotExist:
-            print(
-                f"❌ No se encontró MedicamentosResult para VisitaExamen {visita_examen.id}"
-            )
             messages.error(
                 request,
                 "No se encontraron resultados de medicamentos para esta visita.",
@@ -3518,7 +3367,6 @@ def ver_resultado_examen(request, visita_examen_id):
             )
 
         except Exception as e:
-            print(f"💥 Error al obtener MedicamentosResult: {str(e)}")
             messages.error(request, f"Error al cargar los medicamentos: {str(e)}")
             return redirect(
                 "detalle_paciente", paciente_id=visita_examen.visita.paciente.id
@@ -3551,10 +3399,6 @@ def guardar_examen_cognitivo_anamnesis(request):
             visita_id = request.POST.get("visita_id")
             paciente_id = request.POST.get("paciente_id")
             examen_id = request.POST.get("examen_id")
-
-            print(
-                f"🔄 Guardando Cognitivo Anamnesis - Visita: {visita_id}, Examen: {examen_id}, Paciente: {paciente_id}"
-            )
 
             # Obtener la instancia de VisitaExamen
             visita_examen = get_object_or_404(
@@ -6692,11 +6536,6 @@ def guardar_intervenciones(request):
                 visita_examen=visita_examen
             ).count()
 
-            print(
-                f"🔎 Total de sesiones guardadas para {visita_examen.id}: {total_sesiones}"
-            )
-            print(f"🔎 Nombre: {visita_examen.examen.nombre}")
-
             if total_sesiones >= 18:
                 visita_examen.estado = "completado"
                 visita_examen.fecha_completado = timezone.now()
@@ -6949,10 +6788,6 @@ def estadisticas(request):
         r.raise_for_status()
         data = r.json()
 
-        # DEBUG opcional
-        # print("=== RAW DATA (Vistas por página) ===")
-        # print(json.dumps(data, indent=2)[:20000])
-
         results = []
 
         if isinstance(data, dict):
@@ -6966,11 +6801,6 @@ def estadisticas(request):
             results = data
 
         if results:
-            # print("=== KEYS EN RESULTS ===")
-            # for idx, serie in enumerate(results):
-            #     print(f"Serie {idx}: keys={list(serie.keys())}")
-            #     print(" Sample:", json.dumps(serie, indent=2)[:500])
-
             for idx, serie in enumerate(results):
                 # Nombre de la sección
                 section = serie.get("order")
@@ -6984,8 +6814,6 @@ def estadisticas(request):
                     total = serie["aggregated_value"]
 
                 total = int(total or 0)
-
-                # print(f"Sección: {section} → {total}")  # DEBUG
 
                 views_labels.append(section)
                 views_values.append(total)
@@ -7544,7 +7372,6 @@ def guardar_examen_analisis(request):
 def guardar_examen_antecedentes(request):
     if request.method == "POST":
         try:
-            print("=== REQUEST.POST ===")
             visita_id = request.POST.get("visita_id")
             paciente_id = request.POST.get("paciente_id")
             examen_id = request.POST.get("examen_id")
@@ -7591,7 +7418,6 @@ def guardar_examen_antecedentes(request):
             # Obtener datos de antecedentes dinámicos (desde JavaScript)
             patologicos_data = request.POST.get("patologicos_data")
             quirurgicos_data = request.POST.get("quirurgicos_data")
-            print("Quirúrgicos data:", quirurgicos_data)  # DEBUG
             farmacologicos_data = request.POST.get("farmacologicos_data")
             toxicos_data = request.POST.get("toxicos_data")
             familiares_data = request.POST.get("familiares_data")
@@ -7601,7 +7427,6 @@ def guardar_examen_antecedentes(request):
             epidemiologicos_data = request.POST.get("epidemiologicos_data")
             ets_data = request.POST.get("ets_data")
             hospitalizaciones_data = request.POST.get("hospitalizaciones_data")
-            print("Hospitalizaciones data:", hospitalizaciones_data)  # DEBUG
             inmunizaciones_data = request.POST.get("inmunizaciones_data")
             transfusionales_data = request.POST.get("transfusionales_data")
 
@@ -7718,12 +7543,10 @@ def guardar_examen_antecedentes(request):
             # ===== PROCESAR TÓXICOS =====
             if toxicos_data:
                 toxicos_list = json.loads(toxicos_data)
-                print("Tóxicos list:", toxicos_list)  # DEBUG
                 antecedentes_result.antecedentes_toxicos.all().delete()
 
                 for item in toxicos_list:
                     if item.get("tipos_toxico"):
-                        print("Procesando tóxico:", item)  # DEBUG
                         tiene_antecedentes = True
                         AntecedenteToxico.objects.create(
                             antecedente_result=antecedentes_result,
@@ -7938,7 +7761,6 @@ def guardar_examen_antecedentes(request):
             # ...existing code...
             if hospitalizaciones_data:
                 hospitalizaciones_list = json.loads(hospitalizaciones_data)
-                print("Hospitalizaciones list:", hospitalizaciones_list)  # DEBUG
                 antecedentes_result.antecedentes_hospitalizaciones.all().delete()
 
                 for item in hospitalizaciones_list:
@@ -8112,7 +7934,6 @@ def guardar_examen_medicamentos(request):
                 medicamentos_result = MedicamentosResult.objects.get(
                     visita_examen=visita_examen
                 )
-                print("📋 MedicamentosResult encontrado - Modo edición")
             except MedicamentosResult.DoesNotExist:
                 medicamentos_result = MedicamentosResult.objects.create(
                     visita_examen=visita_examen
@@ -8159,8 +7980,6 @@ def guardar_examen_medicamentos(request):
                     else ""
                 )
 
-                print(f"🔍 Procesando medicamento {i + 1}: {nombre_comercial}")
-
                 # Validar que al menos el nombre comercial esté presente
                 if nombre_comercial:
                     # Manejar fechas de forma segura
@@ -8171,7 +7990,6 @@ def guardar_examen_medicamentos(request):
                                 fechas_inicio[i], "%Y-%m-%d"
                             ).date()
                         except (ValueError, TypeError) as e:
-                            print(f"⚠️ Error en fecha_inicio {i}: {e}")
                             fecha_inicio = None
 
                     fecha_finalizacion = None
@@ -8181,7 +7999,6 @@ def guardar_examen_medicamentos(request):
                                 fechas_finalizacion[i], "%Y-%m-%d"
                             ).date()
                         except (ValueError, TypeError) as e:
-                            print(f"⚠️ Error en fecha_finalizacion {i}: {e}")
                             fecha_finalizacion = None
 
                     # Manejar efectos adversos
@@ -8254,18 +8071,12 @@ def guardar_examen_medicamentos(request):
                             activo=True,  # Por defecto activo
                         )
                         medicamentos_guardados += 1
-                        print(
-                            f"✅ Medicamento guardado: {medicamento.nombre_comercial}"
-                        )
 
                     except Exception as e:
-                        print(f"❌ Error al crear medicamento {i + 1}: {str(e)}")
                         # Continuar con el siguiente medicamento
                         continue
                 else:
                     print(f"⚠️ Medicamento {i + 1} omitido - sin nombre comercial")
-
-            print(f"📊 Total medicamentos guardados: {medicamentos_guardados}")
 
             # Marcar el examen como completado solo si se guardó al menos un medicamento
             if medicamentos_guardados > 0:
@@ -8315,10 +8126,6 @@ def guardar_examen_fisico(request):
             paciente_id = request.POST.get("paciente_id")
             examen_id = request.POST.get("examen_id")
 
-            print(
-                f"📝 Datos recibidos: visita_id={visita_id}, paciente_id={paciente_id}, examen_id={examen_id}"
-            )
-
             # Validar datos requeridos
             if not visita_id or not paciente_id or not examen_id:
                 raise ValueError("Faltan datos requeridos")
@@ -8333,14 +8140,11 @@ def guardar_examen_fisico(request):
                 VisitaExamen, visita_id=visita_id, examen_id=examen_id
             )
 
-            print(f"✅ VisitaExamen encontrada: {visita_examen}")
-
             # Marcar como iniciado si está pendiente
             if visita_examen.estado == "pendiente":
                 visita_examen.estado = "en_progreso"
                 visita_examen.fecha_inicio = timezone.now()
                 visita_examen.save()
-                print("🔄 Estado cambiado a 'en_progreso'")
 
             # Crear o actualizar el resultado del examen físico
             examen_fisico, created = ExamenFisicoResult.objects.get_or_create(
@@ -8473,8 +8277,6 @@ def guardar_examen_fisico(request):
 
             # Si no es nuevo, actualizar los campos
             if not created:
-                print("📝 Actualizando examen existente")
-
                 # === SIGNOS VITALES ===
                 examen_fisico.talla = safe_float_required(
                     request.POST.get("talla"), 0.0
@@ -8639,16 +8441,13 @@ def guardar_examen_fisico(request):
             if examen_fisico.talla > 0 and examen_fisico.peso > 0:
                 talla_metros = examen_fisico.talla / 100
                 examen_fisico.imc = round(examen_fisico.peso / (talla_metros**2), 2)
-                print(f"📊 IMC calculado: {examen_fisico.imc}")
             else:
                 examen_fisico.imc = 0.0
 
             # Guardar los cambios
             try:
                 examen_fisico.save()
-                print("💾 ExamenFisicoResult guardado exitosamente")
             except Exception as save_error:
-                print(f"💥 Error al guardar ExamenFisicoResult: {str(save_error)}")
                 raise save_error
 
             # Marcar el examen como completado
@@ -8656,15 +8455,12 @@ def guardar_examen_fisico(request):
             visita_examen.fecha_completado = timezone.now()
             visita_examen.save()
 
-            print(f"✅ VisitaExamen marcado como completado")
-
             messages.success(
                 request, "✅ Examen físico general guardado correctamente."
             )
             return redirect("detalle_paciente", paciente_id=paciente_id)
 
         except ValueError as ve:
-            print(f"💥 Error de validación: {str(ve)}")
             # Revertir estado si hubo error
             try:
                 if "visita_examen" in locals():
@@ -8679,7 +8475,6 @@ def guardar_examen_fisico(request):
             )
 
         except Exception as e:
-            print(f"💥 Error general en guardar_examen_fisico: {str(e)}")
             # Revertir estado si hubo error
             try:
                 if "visita_examen" in locals():
@@ -8737,10 +8532,6 @@ def guardar_revision_sistemas(request):
         paciente_id = request.POST.get("paciente_id")
         examen_id = request.POST.get("examen_id")
 
-        print(
-            f"🔄 Guardando Revisión por Sistemas - Visita: {visita_id}, Examen: {examen_id}, Paciente: {paciente_id}"
-        )
-
         try:
             # ===================================================
             # 1. OBTENER OBJETOS PRINCIPALES
@@ -8754,10 +8545,6 @@ def guardar_revision_sistemas(request):
                 visita=visita, examen=examen, defaults={"estado": "pendiente"}
             )
 
-            print(
-                f"✅ VisitaExamen {'creado' if created else 'obtenido'}: ID {visita_examen.id}"
-            )
-
             # ===================================================
             # 2. OBTENER O CREAR EL RESULTADO PRINCIPAL
             # ===================================================
@@ -8766,7 +8553,6 @@ def guardar_revision_sistemas(request):
             )
 
             accion = "creado" if resultado_created else "actualizado"
-            print(f"✅ RevisionSistemasResult {accion}: ID {resultado.id}")
 
             # ===================================================
             # 3. ACTUALIZAR CAMPOS DE CONTROL DE SISTEMAS
@@ -8793,12 +8579,8 @@ def guardar_revision_sistemas(request):
 
                 if valor_sintoma == "si":
                     sistemas_activados.append(sistema)
-                    print(f"🔵 Sistema activado: {sistema}")
 
             resultado.save()
-            print(
-                f"💾 Campos de control guardados: {len(sistemas_activados)} sistemas activos"
-            )
 
             # ===================================================
             # 4. PROCESAR SÍNTOMAS DETALLADOS
@@ -8807,7 +8589,6 @@ def guardar_revision_sistemas(request):
             DetalleRevisionSistemas.objects.filter(
                 revision_sistemas_result=resultado
             ).delete()
-            print("🗑️ Detalles de síntomas previos eliminados")
 
             total_sintomas_guardados = 0
 
@@ -8818,11 +8599,6 @@ def guardar_revision_sistemas(request):
                 caracteristicas_list = request.POST.getlist(
                     f"{sistema}_caracteristicas[]"
                 )
-
-                print(f"📋 Sistema {sistema}:")
-                print(f"   - Síntomas: {len(sintomas)}")
-                print(f"   - Tiempos: {len(tiempos)}")
-                print(f"   - Características: {len(caracteristicas_list)}")
 
                 # Crear detalles para cada síntoma del sistema
                 for i in range(len(sintomas)):
@@ -8844,9 +8620,6 @@ def guardar_revision_sistemas(request):
                             caracteristicas=caracteristica,
                         )
                         total_sintomas_guardados += 1
-                        print(
-                            f"   ✅ Síntoma guardado: '{sintoma}' - Tiempo: '{tiempo}' - Características: '{caracteristica}'"
-                        )
 
             # ===================================================
             # 5. ACTUALIZAR ESTADO DE LA VISITA-EXAMEN
@@ -8854,10 +8627,6 @@ def guardar_revision_sistemas(request):
             visita_examen.estado = "completado"
             visita_examen.fecha_completado = timezone.now()
             visita_examen.save()
-
-            print(
-                f"🎯 VisitaExamen actualizada: estado=completado, fecha={visita_examen.fecha_completado}"
-            )
 
             # ===================================================
             # 6. MENSAJE DE ÉXITO Y REDIRECCIÓN
@@ -8869,15 +8638,10 @@ def guardar_revision_sistemas(request):
             )
 
             messages.success(request, mensaje_resumen)
-            print(f"✅ {mensaje_resumen}")
 
             return redirect("detalle_paciente", paciente_id=paciente_id)
 
         except Exception as e:
-            print(f"💥 Error en guardar_revision_sistemas: {str(e)}")
-            import traceback
-
-            traceback.print_exc()
             messages.error(
                 request, f"Error al procesar Revisión por Sistemas: {str(e)}"
             )
@@ -8912,7 +8676,6 @@ def guardar_examen_neurologico(request):
             )
 
             accion = "creado" if created else "actualizado"
-            print(f"✅ ExamenNeurologicoResult {accion}: ID {resultado.id}")
 
             # ===================================================
             # 3. PROCESAR CAMPOS I PAR CRANEAL (OLFATORIO)
@@ -9416,7 +9179,6 @@ def guardar_examen_neurologico(request):
             # 18. GUARDAR RESULTADO
             # ===================================================
             resultado.save()
-            print(f"💾 ExamenNeurologicoResult guardado correctamente")
 
             # ===================================================
             # 19. ACTUALIZAR ESTADO DE LA VISITA-EXAMEN
@@ -9424,10 +9186,6 @@ def guardar_examen_neurologico(request):
             visita_examen.estado = "completado"
             visita_examen.fecha_completado = timezone.now()
             visita_examen.save()
-
-            print(
-                f"🎯 VisitaExamen actualizada: estado=completado, fecha={visita_examen.fecha_completado}"
-            )
 
             # ===================================================
             # 20. GENERAR RESUMEN PARA EL MENSAJE
@@ -9542,15 +9300,12 @@ def guardar_examen_neurologico(request):
             )
 
             messages.success(request, mensaje_resumen)
-            print(f"✅ {mensaje_resumen}")
 
             return redirect("detalle_paciente", paciente_id=paciente_id)
 
         except Exception as e:
-            print(f"💥 Error en guardar_examen_neurologico: {str(e)}")
             import traceback
 
-            traceback.print_exc()
             messages.error(request, f"Error al procesar Examen Neurológico: {str(e)}")
             return redirect("detalle_paciente", paciente_id=paciente_id)
 
