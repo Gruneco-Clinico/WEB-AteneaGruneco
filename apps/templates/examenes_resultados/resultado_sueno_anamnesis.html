@@ -1,0 +1,650 @@
+{% extends 'layouts/base.html' %}
+
+{% block content %}
+
+<div class="container-fluid py-4">
+  <div class="row">
+    <div class="col">
+      <div class="card shadow">
+        <!-- Card header -->
+        <div class="card-header border-0">
+          <div class="row align-items-center">
+            <div class="col">
+              <h3 class="mb-0">Resultado: Anamnesis de Sueño</h3>
+              <p class="text-muted mb-0">
+                <strong>Paciente:</strong> {{ paciente.primer_nombre }} {{ paciente.primer_apellido }}
+                <span class="mx-2">|</span>
+                <strong>Documento:</strong> {{ paciente.numero_documento }}
+              </p>
+            </div>
+            <div class="col text-right">
+              <span class="text-muted">{{ visita_examen.fecha_completado|date:"d/m/Y H:i" }}</span>
+              <br><span class="badge badge-success">Completado</span>
+              <div class="mt-2">
+                <a href="{% url 'realizar_examen' visita_examen.visita.id visita_examen.examen.id paciente.id %}" 
+                   class="btn btn-primary btn-sm">
+                  <i class="fas fa-edit"></i> Editar
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card body -->
+        <div class="card-body">
+          
+          <!-- Información General -->
+          {% if resultado.motivo_consulta or resultado.enfermedad_actual %}
+          <div class="mb-4">
+            <h4 class="text-primary mb-3"><i class="fas fa-clipboard-list"></i> Información General</h4>
+            <div class="row">
+              {% if resultado.motivo_consulta %}
+              <div class="col-md-6 mb-3">
+                <label class="font-weight-bold">Motivo de consulta:</label>
+                <div class="p-3 bg-light border rounded">{{ resultado.motivo_consulta|linebreaks }}</div>
+              </div>
+              {% endif %}
+              {% if resultado.enfermedad_actual %}
+              <div class="col-md-6 mb-3">
+                <label class="font-weight-bold">Enfermedad actual:</label>
+                <div class="p-3 bg-light border rounded">{{ resultado.enfermedad_actual|linebreaks }}</div>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+          {% endif %}
+
+          <!-- Quejas de Sueño -->
+          <div class="mb-4">
+            <h4 class="text-primary mb-3"><i class="fas fa-exclamation-circle"></i> Quejas de Sueño</h4>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="font-weight-bold">¿Presenta queja de sueño?</label>
+                <div>
+                  <span class="badge {% if resultado.presenta_queja == 'si' %}badge-warning{% else %}badge-success{% endif %}">
+                    {{ resultado.presenta_queja|default:"No especificado"|capfirst }}
+                  </span>
+                </div>
+              </div>
+              
+              {% if tipos_queja %}
+              <div class="col-md-6 mb-3">
+                <label class="font-weight-bold">Tipos de quejas:</label>
+                <div>
+                  {% for queja in tipos_queja %}
+                    <div class="mb-2 p-2 border-left border-warning">
+                      <strong>{{ queja.nombre }}</strong>
+                      {% if queja.inicio %}<br><small>Inicio: {{ queja.inicio }}</small>{% endif %}
+                      {% if queja.evolucion %}<br><small>Evolución: {{ queja.evolucion }}</small>{% endif %}
+                      {% if queja.frecuencia %}<br><small>Frecuencia: {{ queja.frecuencia }}</small>{% endif %}
+                      {% if queja.gravedad %}<br><small>Gravedad: {{ queja.gravedad }}</small>{% endif %}
+                    </div>
+                  {% endfor %}
+                </div>
+              </div>
+              {% endif %}
+            </div>
+
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="font-weight-bold">¿Existe alguna causa conocida?</label>
+                <div>
+                  <span class="badge {% if resultado.causa_conocida == 'Si' %}badge-warning{% else %}badge-success{% endif %}">
+                    {{ resultado.causa_conocida|default:"No especificado" }}
+                  </span>
+                </div>
+              </div>
+              {% if resultado.causa_conocida == "Si" and resultado.especificacion_causa %}
+              <div class="col-md-6 mb-3">
+                <label class="font-weight-bold">Especificación de causas:</label>
+                <div class="p-3 bg-light border rounded">{{ resultado.especificacion_causa|linebreaks }}</div>
+              </div>
+              {% endif %}
+            </div>
+
+            {% if resultado.observaciones_queja %}
+            <div class="row">
+              <div class="col-md-12">
+                <label class="font-weight-bold">Observaciones de quejas:</label>
+                <div class="p-3 bg-light border rounded">{{ resultado.observaciones_queja|linebreaks }}</div>
+              </div>
+            </div>
+            {% endif %}
+          </div>
+
+          <!-- Horarios de Sueño -->
+          <div class="mb-4">
+            <h4 class="text-primary mb-3"><i class="fas fa-clock"></i> Horarios de Sueño</h4>
+            
+            <!-- Rutina -->
+            {% if resultado.rutina_dormir == "si" %}
+            <div class="alert alert-info mb-3">
+              <strong><i class="fas fa-moon"></i> Rutina antes de dormir:</strong><br>
+              {{ resultado.describa_rutina|default:"No especificada" }}
+            </div>
+            {% endif %}
+
+            <!-- Jornadas laborales -->
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label class="font-weight-bold">Jornada laboral (Lunes a Viernes):</label>
+                <div class="ml-3">
+                  {{ resultado.jornada_laboral|default:"No especificada" }}
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label class="font-weight-bold">Jornada fines de semana:</label>
+                <div class="ml-3">
+                  {{ resultado.jornada_fds|default:"No especificada" }}
+                </div>
+              </div>
+            </div>
+
+            <!-- Horarios por período -->
+            <div class="row">
+              <!-- Días laborales -->
+              <div class="col-lg-4">
+                <div class="card h-100">
+                  <div class="card-header bg-primary text-white">
+                    <h6 class="mb-0"><i class="fas fa-briefcase"></i> Días Laborales</h6>
+                  </div>
+                  <div class="card-body">
+                    {% if resultado.hora_acostarse_laboral %}
+                      <p><strong>Hora de acostarse:</strong> {{ resultado.hora_acostarse_laboral }}</p>
+                    {% endif %}
+                    {% if resultado.hora_intencion_dormir_laboral %}
+                      <p><strong>Intención de dormir:</strong> {{ resultado.hora_intencion_dormir_laboral }}</p>
+                    {% endif %}
+                    {% if resultado.tiempo_dormirse_laboral %}
+                      <p><strong>Tiempo para dormirse:</strong> {{ resultado.tiempo_dormirse_laboral }} min</p>
+                    {% endif %}
+                    {% if resultado.hora_despertar_laboral %}
+                      <p><strong>Hora de despertar:</strong> {{ resultado.hora_despertar_laboral }}</p>
+                    {% endif %}
+                    {% if resultado.tiempo_salir_cama_laboral %}
+                      <p><strong>Tiempo para salir de cama:</strong> {{ resultado.tiempo_salir_cama_laboral }} min</p>
+                    {% endif %}
+                    {% if resultado.sueno_reparador_laboral %}
+                      <p><strong>Sueño reparador:</strong> 
+                        <span class="badge {% if resultado.sueno_reparador_laboral == 'Si' %}badge-success{% else %}badge-warning{% endif %}">
+                          {{ resultado.sueno_reparador_laboral }}
+                        </span>
+                      </p>
+                    {% endif %}
+                    {% if resultado.companero_cama_laboral %}
+                      <p><strong>Compañero de cama:</strong> 
+                        <span class="badge badge-info">{{ resultado.companero_cama_laboral }}</span>
+                      </p>
+                    {% endif %}
+                    {% if resultado.despertador_laboral %}
+                      <p><strong>Usa despertador:</strong> 
+                        <span class="badge {% if resultado.despertador_laboral == 'Si' %}badge-warning{% else %}badge-success{% endif %}">
+                          {{ resultado.despertador_laboral }}
+                        </span>
+                      </p>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+
+              <!-- Fines de semana -->
+              <div class="col-lg-4">
+                <div class="card h-100">
+                  <div class="card-header bg-info text-white">
+                    <h6 class="mb-0"><i class="fas fa-calendar-weekend"></i> Fines de Semana</h6>
+                  </div>
+                  <div class="card-body">
+                    {% if resultado.hora_acostarse_fds %}
+                      <p><strong>Hora de acostarse:</strong> {{ resultado.hora_acostarse_fds }}</p>
+                    {% endif %}
+                    {% if resultado.hora_intencion_dormir_fds %}
+                      <p><strong>Intención de dormir:</strong> {{ resultado.hora_intencion_dormir_fds }}</p>
+                    {% endif %}
+                    {% if resultado.tiempo_dormirse_fds %}
+                      <p><strong>Tiempo para dormirse:</strong> {{ resultado.tiempo_dormirse_fds }} min</p>
+                    {% endif %}
+                    {% if resultado.hora_despertar_fds %}
+                      <p><strong>Hora de despertar:</strong> {{ resultado.hora_despertar_fds }}</p>
+                    {% endif %}
+                    {% if resultado.tiempo_salir_cama_fds %}
+                      <p><strong>Tiempo para salir de cama:</strong> {{ resultado.tiempo_salir_cama_fds }} min</p>
+                    {% endif %}
+                    {% if resultado.sueno_reparador_fds %}
+                      <p><strong>Sueño reparador:</strong> 
+                        <span class="badge {% if resultado.sueno_reparador_fds == 'Si' %}badge-success{% else %}badge-warning{% endif %}">
+                          {{ resultado.sueno_reparador_fds }}
+                        </span>
+                      </p>
+                    {% endif %}
+                    {% if resultado.companero_cama_fds %}
+                      <p><strong>Compañero de cama:</strong> 
+                        <span class="badge badge-info">{{ resultado.companero_cama_fds }}</span>
+                      </p>
+                    {% endif %}
+                    {% if resultado.despertador_fds %}
+                      <p><strong>Usa despertador:</strong> 
+                        <span class="badge {% if resultado.despertador_fds == 'Si' %}badge-warning{% else %}badge-success{% endif %}">
+                          {{ resultado.despertador_fds }}
+                        </span>
+                      </p>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+
+              <!-- Vacaciones -->
+              <div class="col-lg-4">
+                <div class="card h-100">
+                  <div class="card-header bg-success text-white">
+                    <h6 class="mb-0"><i class="fas fa-umbrella-beach"></i> Vacaciones</h6>
+                  </div>
+                  <div class="card-body">
+                    {% if resultado.hora_acostarse_vacaciones %}
+                      <p><strong>Hora de acostarse:</strong> {{ resultado.hora_acostarse_vacaciones }}</p>
+                    {% endif %}
+                    {% if resultado.hora_intencion_dormir_vacaciones %}
+                      <p><strong>Intención de dormir:</strong> {{ resultado.hora_intencion_dormir_vacaciones }}</p>
+                    {% endif %}
+                    {% if resultado.tiempo_dormirse_vacaciones %}
+                      <p><strong>Tiempo para dormirse:</strong> {{ resultado.tiempo_dormirse_vacaciones }} min</p>
+                    {% endif %}
+                    {% if resultado.hora_despertar_vacaciones %}
+                      <p><strong>Hora de despertar:</strong> {{ resultado.hora_despertar_vacaciones }}</p>
+                    {% endif %}
+                    {% if resultado.tiempo_salir_cama_vacaciones %}
+                      <p><strong>Tiempo para salir de cama:</strong> {{ resultado.tiempo_salir_cama_vacaciones }} min</p>
+                    {% endif %}
+                    {% if resultado.sueno_reparador_vacaciones %}
+                      <p><strong>Sueño reparador:</strong> 
+                        <span class="badge {% if resultado.sueno_reparador_vacaciones == 'Si' %}badge-success{% else %}badge-warning{% endif %}">
+                          {{ resultado.sueno_reparador_vacaciones }}
+                        </span>
+                      </p>
+                    {% endif %}
+                    {% if resultado.companero_cama_vacaciones %}
+                      <p><strong>Compañero de cama:</strong> 
+                        <span class="badge badge-info">{{ resultado.companero_cama_vacaciones }}</span>
+                      </p>
+                    {% endif %}
+                    {% if resultado.despertador_vacaciones %}
+                      <p><strong>Usa despertador:</strong> 
+                        <span class="badge {% if resultado.despertador_vacaciones == 'Si' %}badge-warning{% else %}badge-success{% endif %}">
+                          {{ resultado.despertador_vacaciones }}
+                        </span>
+                      </p>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Higiene de Sueño -->
+          <div class="mb-4">
+            <h4 class="text-primary mb-3"><i class="fas fa-bed"></i> Higiene de Sueño</h4>
+            
+            <div class="row">
+              <!-- Siestas -->
+              <div class="col-md-6 mb-3">
+                <div class="card">
+                  <div class="card-header">
+                    <h6 class="mb-0"><i class="fas fa-moon"></i> Hábitos de Siesta</h6>
+                  </div>
+                  <div class="card-body">
+                    <p><strong>Realiza siestas:</strong> 
+                      <span class="badge {% if resultado.realiza_siestas == 'Si' %}badge-warning{% else %}badge-success{% endif %}">
+                        {{ resultado.realiza_siestas|default:"No especificado"|capfirst }}
+                      </span>
+                    </p>
+                    {% if resultado.realiza_siestas == "Si" %}
+                      {% if resultado.numero_siestas %}<p><strong>Número por día:</strong> {{ resultado.numero_siestas }}</p>{% endif %}
+                      {% if resultado.duracion_siestas %}<p><strong>Duración:</strong> {{ resultado.duracion_siestas }} min</p>{% endif %}
+                      {% if resultado.siesta_frecuencia %}<p><strong>Frecuencia semanal:</strong> {{ resultado.siesta_frecuencia }}</p>{% endif %}
+                      {% if resultado.siesta_reparadora %}<p><strong>Es reparadora:</strong> 
+                        <span class="badge {% if resultado.siesta_reparadora == 'Si' %}badge-success{% else %}badge-warning{% endif %}">
+                          {{ resultado.siesta_reparadora }}
+                        </span>
+                      </p>{% endif %}
+                      {% if resultado.periodo_siestas %}<p><strong>Período:</strong> {{ resultado.periodo_siestas }}</p>{% endif %}
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+
+              <!-- Entorno -->
+              <div class="col-md-6 mb-3">
+                <div class="card">
+                  <div class="card-header">
+                    <h6 class="mb-0"><i class="fas fa-home"></i> Entorno de Descanso</h6>
+                  </div>
+                  <div class="card-body">
+                    {% if resultado.iluminacion %}
+                      <p><strong>Iluminación:</strong> 
+                        <span class="badge badge-info">{{ resultado.iluminacion }}</span>
+                      </p>
+                    {% endif %}
+                    {% if resultado.comodidad %}
+                      <p><strong>Comodidad:</strong> 
+                        <span class="badge badge-info">{{ resultado.comodidad }}</span>
+                      </p>
+                    {% endif %}
+                    {% if resultado.ruido %}
+                      <p><strong>Ruido:</strong> 
+                        <span class="badge badge-info">{{ resultado.ruido }}</span>
+                      </p>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Hábitos previos al sueño -->
+            <div class="row">
+              <div class="col-md-12">
+                <div class="card">
+                  <div class="card-header">
+                    <h6 class="mb-0"><i class="fas fa-utensils"></i> Hábitos Previos al Sueño</h6>
+                  </div>
+                  <div class="card-body">
+                    <div class="row">
+                      <div class="col-md-3">
+                        <p><strong>Consume comidas/bebidas:</strong> 
+                          <span class="badge {% if resultado.consume == 'si' %}badge-warning{% else %}badge-success{% endif %}">
+                            {{ resultado.consume|default:"No"|capfirst }}
+                          </span>
+                        </p>
+                      </div>
+                      <div class="col-md-3">
+                        <p><strong>Usa pantallas:</strong> 
+                          <span class="badge {% if resultado.usa_pantallas == 'Si' %}badge-warning{% else %}badge-success{% endif %}">
+                            {{ resultado.usa_pantallas|default:"No" }}
+                          </span>
+                        </p>
+                      </div>
+                      <div class="col-md-3">
+                        <p><strong>Actividades en cama:</strong> 
+                          <span class="badge {% if resultado.cama_actividades %}badge-warning{% else %}badge-success{% endif %}">
+                            {% if resultado.cama_actividades %}Sí{% else %}No{% endif %}
+                          </span>
+                        </p>
+                      </div>
+                      <div class="col-md-3">
+                        <p><strong>Actividad física:</strong> 
+                          <span class="badge {% if resultado.actividad_fisica %}badge-success{% else %}badge-secondary{% endif %}">
+                            {% if resultado.actividad_fisica %}Sí{% else %}No{% endif %}
+                          </span>
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sustancias y Medicamentos -->
+          {% if sustancias or medicamentos %}
+          <div class="mb-4">
+            <h4 class="text-primary mb-3"><i class="fas fa-pills"></i> Sustancias y Medicamentos</h4>
+            
+            <div class="row">
+              {% if sustancias %}
+              <div class="col-md-6">
+                <div class="card">
+                  <div class="card-header">
+                    <h6 class="mb-0"><i class="fas fa-wine-glass"></i> Sustancias Consumidas</h6>
+                  </div>
+                  <div class="card-body">
+                    {% for sustancia in sustancias %}
+                    <div class="mb-3 p-3 border-left border-warning bg-light">
+                      <h6 class="font-weight-bold text-warning">{{ sustancia.tipo }}</h6>
+                      {% if sustancia.cantidad %}<p class="mb-1"><small><strong>Cantidad:</strong> {{ sustancia.cantidad }}</small></p>{% endif %}
+                      {% if sustancia.frecuencia %}<p class="mb-1"><small><strong>Frecuencia:</strong> {{ sustancia.frecuencia }}</small></p>{% endif %}
+                      {% if sustancia.tiempo %}<p class="mb-1"><small><strong>Tiempo antes de dormir:</strong> {{ sustancia.tiempo }}</small></p>{% endif %}
+                      {% if sustancia.observaciones %}<p class="mb-0"><small><strong>Observaciones:</strong> {{ sustancia.observaciones }}</small></p>{% endif %}
+                    </div>
+                    {% endfor %}
+                  </div>
+                </div>
+              </div>
+              {% endif %}
+
+              {% if medicamentos %}
+              <div class="col-md-6">
+                <div class="card">
+                  <div class="card-header">
+                    <h6 class="mb-0"><i class="fas fa-prescription-bottle-alt"></i> Medicamentos</h6>
+                  </div>
+                  <div class="card-body">
+                    {% for medicamento in medicamentos %}
+                    <div class="mb-3 p-3 border-left border-info bg-light">
+                      <h6 class="font-weight-bold text-info">{{ medicamento.nombre }}</h6>
+                      {% if medicamento.dosis %}<p class="mb-1"><small><strong>Dosis:</strong> {{ medicamento.dosis }}</small></p>{% endif %}
+                      {% if medicamento.presentacion %}<p class="mb-1"><small><strong>Presentación:</strong> {{ medicamento.presentacion }}</small></p>{% endif %}
+                      {% if medicamento.veces_dia %}<p class="mb-1"><small><strong>Veces al día:</strong> {{ medicamento.veces_dia }}</small></p>{% endif %}
+                      {% if medicamento.frecuencia %}<p class="mb-1"><small><strong>Frecuencia:</strong> {{ medicamento.frecuencia }}</small></p>{% endif %}
+                      {% if medicamento.tiempo %}<p class="mb-1"><small><strong>Tiempo antes de dormir:</strong> {{ medicamento.tiempo }}</small></p>{% endif %}
+                      {% if medicamento.observaciones %}<p class="mb-0"><small><strong>Observaciones:</strong> {{ medicamento.observaciones }}</small></p>{% endif %}
+                    </div>
+                    {% endfor %}
+                  </div>
+                </div>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+          {% endif %}
+
+          <!-- Pantallas -->
+          {% if pantallas %}
+          <div class="mb-4">
+            <h4 class="text-primary mb-3"><i class="fas fa-tv"></i> Uso de Pantallas</h4>
+            <div class="card">
+              <div class="card-body">
+                <div class="row">
+                  {% for pantalla in pantallas %}
+                  <div class="col-md-4 mb-3">
+                    <div class="p-3 border-left border-primary bg-light">
+                      <h6 class="font-weight-bold text-primary">{{ pantalla.tipo }}</h6>
+                      {% if pantalla.frecuencia %}<p class="mb-1"><small><strong>Frecuencia:</strong> {{ pantalla.frecuencia }}</small></p>{% endif %}
+                      {% if pantalla.tiempo_antes_dormir %}<p class="mb-0"><small><strong>Tiempo antes de dormir:</strong> {{ pantalla.tiempo_antes_dormir }}</small></p>{% endif %}
+                    </div>
+                  </div>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endif %}
+
+          <!-- Actividades -->
+          {% if actividades_fisicas or actividades_en_cama %}
+          <div class="mb-4">
+            <h4 class="text-primary mb-3"><i class="fas fa-running"></i> Actividades</h4>
+            
+            <div class="row">
+              {% if actividades_fisicas %}
+              <div class="col-md-6">
+                <div class="card">
+                  <div class="card-header">
+                    <h6 class="mb-0"><i class="fas fa-dumbbell"></i> Actividad Física</h6>
+                  </div>
+                  <div class="card-body">
+                    {% for actividad in actividades_fisicas %}
+                    <div class="mb-3 p-3 border-left border-success bg-light">
+                      <h6 class="font-weight-bold text-success">
+                        {{ actividad.tipo }}
+                        {% if actividad.otro_texto and actividad.tipo == "Otros" %}
+                          - {{ actividad.otro_texto }}
+                        {% endif %}
+                      </h6>
+                      {% if actividad.intensidad %}<p class="mb-1"><small><strong>Intensidad:</strong> {{ actividad.intensidad }}</small></p>{% endif %}
+                      {% if actividad.frecuencia %}<p class="mb-1"><small><strong>Frecuencia:</strong> {{ actividad.frecuencia }}</small></p>{% endif %}
+                      {% if actividad.observaciones %}<p class="mb-0"><small><strong>Observaciones:</strong> {{ actividad.observaciones }}</small></p>{% endif %}
+                    </div>
+                    {% endfor %}
+                  </div>
+                </div>
+              </div>
+              {% endif %}
+
+              {% if actividades_en_cama %}
+              <div class="col-md-6">
+                <div class="card">
+                  <div class="card-header">
+                    <h6 class="mb-0"><i class="fas fa-bed"></i> Actividades en Cama</h6>
+                  </div>
+                  <div class="card-body">
+                    {% for actividad in actividades_en_cama %}
+                    <div class="mb-3 p-3 border-left border-danger bg-light">
+                      <h6 class="font-weight-bold text-danger">{{ actividad.tipo }}</h6>
+                      {% if actividad.frecuencia %}<p class="mb-1"><small><strong>Frecuencia:</strong> {{ actividad.frecuencia }}</small></p>{% endif %}
+                      {% if actividad.observaciones %}<p class="mb-0"><small><strong>Observaciones:</strong> {{ actividad.observaciones }}</small></p>{% endif %}
+                    </div>
+                    {% endfor %}
+                  </div>
+                </div>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+          {% endif %}
+
+          <!-- Síntomas -->
+          {% if sintomas_suenos or sintomas_diurnos %}
+          <div class="mb-4">
+            <h4 class="text-primary mb-3"><i class="fas fa-notes-medical"></i> Síntomas Asociados</h4>
+            
+            <div class="row">
+              {% if sintomas_suenos %}
+              <div class="col-md-6">
+                <div class="card">
+                  <div class="card-header">
+                    <h6 class="mb-0"><i class="fas fa-moon"></i> Síntomas de Sueño</h6>
+                  </div>
+                  <div class="card-body">
+                    {% for sintoma in sintomas_suenos %}
+                    <div class="mb-3 p-3 bg-light rounded border">
+                      <h6 class="font-weight-bold text-dark">{{ sintoma.tipo }}</h6>
+                      {% if sintoma.cuando_inicio %}<p class="mb-1"><small><strong>Inicio:</strong> {{ sintoma.cuando_inicio }}</small></p>{% endif %}
+                      {% if sintoma.evolucion %}<p class="mb-1"><small><strong>Evolución:</strong> {{ sintoma.evolucion }}</small></p>{% endif %}
+                      {% if sintoma.frecuencia %}<p class="mb-1"><small><strong>Frecuencia:</strong> {{ sintoma.frecuencia }}</small></p>{% endif %}
+                      {% if sintoma.gravedad %}<p class="mb-1"><small><strong>Gravedad:</strong> {{ sintoma.gravedad }}</small></p>{% endif %}
+                      {% if sintoma.observaciones %}<p class="mb-0"><small><strong>Observaciones:</strong> {{ sintoma.observaciones }}</small></p>{% endif %}
+                    </div>
+                    {% endfor %}
+                  </div>
+                </div>
+              </div>
+              {% endif %}
+
+              {% if sintomas_diurnos %}
+              <div class="col-md-6">
+                <div class="card">
+                  <div class="card-header">
+                    <h6 class="mb-0"><i class="fas fa-sun"></i> Síntomas Diurnos</h6>
+                  </div>
+                  <div class="card-body">
+                    {% for sintoma in sintomas_diurnos %}
+                    <div class="mb-3 p-3 bg-light rounded border">
+                      <h6 class="font-weight-bold text-dark">{{ sintoma.tipo }}</h6>
+                      {% if sintoma.cuando_inicio %}<p class="mb-1"><small><strong>Inicio:</strong> {{ sintoma.cuando_inicio }}</small></p>{% endif %}
+                      {% if sintoma.evolucion %}<p class="mb-1"><small><strong>Evolución:</strong> {{ sintoma.evolucion }}</small></p>{% endif %}
+                      {% if sintoma.frecuencia %}<p class="mb-1"><small><strong>Frecuencia:</strong> {{ sintoma.frecuencia }}</small></p>{% endif %}
+                      {% if sintoma.gravedad %}<p class="mb-1"><small><strong>Gravedad:</strong> {{ sintoma.gravedad }}</small></p>{% endif %}
+                      {% if sintoma.observaciones %}<p class="mb-0"><small><strong>Observaciones:</strong> {{ sintoma.observaciones }}</small></p>{% endif %}
+                    </div>
+                    {% endfor %}
+                  </div>
+                </div>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+          {% endif %}
+
+          <!-- Observaciones Generales -->
+          {% if resultado.observaciones %}
+          <div class="mb-4">
+            <h4 class="text-primary mb-3"><i class="fas fa-comment"></i> Observaciones Generales</h4>
+            <div class="card">
+              <div class="card-body">
+                <div class="p-3 bg-light border rounded">
+                  {{ resultado.observaciones|linebreaks }}
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endif %}
+
+       
+
+        </div>
+      </div>
+    </div>
+  </div>
+   <div class="card-footer bg-light">
+    <div class="row align-items-center">
+        <div class="col">
+            <small class="text-muted">
+                <i class="fas fa-clock mr-1"></i>
+                Última actualización: {{ visita_examen.fecha_completado|date:"d/m/Y H:i" }}
+            </small>
+        </div>
+        <div class="col-auto">
+            <a href="{% url 'detalle_paciente' paciente.id %}" class="btn btn-primary">
+                <i class="fas fa-arrow-left mr-1"></i>Volver al Paciente
+            </a>
+        </div>
+    </div>
+</div>
+</div>
+
+<!-- Estilos para impresión -->
+<style>
+@media print {
+  .btn, .badge { 
+    display: none !important; 
+  }
+  .card {
+    border: 1px solid #dee2e6 !important;
+    box-shadow: none !important;
+    break-inside: avoid;
+  }
+  .card-header {
+    background-color: #f8f9fa !important;
+    color: #000 !important;
+  }
+  body {
+    font-size: 12px;
+  }
+  .container-fluid {
+    max-width: none;
+    padding: 0;
+  }
+  .alert {
+    border: 1px solid #ccc !important;
+  }
+}
+</style>
+{% endblock %}
+<!-- Estilos para impresión -->
+<style>
+@media print {
+  .btn, .badge { 
+    display: none !important; 
+  }
+  .card {
+    border: 1px solid #dee2e6 !important;
+    box-shadow: none !important;
+    break-inside: avoid;
+  }
+  .card-header {
+    background-color: #f8f9fa !important;
+    color: #000 !important;
+  }
+  body {
+    font-size: 12px;
+  }
+}
+</style>

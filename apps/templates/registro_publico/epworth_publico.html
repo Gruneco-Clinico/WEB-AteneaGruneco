@@ -71,7 +71,10 @@
                             <div class="card-body bg-white">
                                 <div class="alert alert-info">
                                     <strong>Instrucciones:</strong> Indique qué probabilidad hay de que se quede dormido
-                                    en las siguientes situaciones, aun cuando no se sienta cansado.
+                                    en las siguientes situaciones, aun cuando no se sienta cansado. 
+                                </div>
+                                <div class="alert alert-warning">
+                                    <strong>Con que frecuencia se queda dormido?</strong> 
                                 </div>
 
                                 <!-- Sección de preguntas -->
@@ -157,7 +160,7 @@
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label>En coche, como pasajero en un viaje de una hora</label>
+                                            <label>En coche, como piloto de un viaje de una hora</label>
                                             <select class="form-control epworth-select" name="epworth_pasajero"
                                                 required>
                                                 {% if datos_examen.pasajero_coche %}
@@ -265,7 +268,7 @@
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label>En su coche, cuando se para debido al tráfico</label>
+                                            <label>En su coche, cuando se para durante algunos minutos debido al trafico</label>
                                             <select class="form-control epworth-select" name="epworth_trafico" required>
                                                 {% if datos_examen.trafico %}
                                                 <option value="{{ datos_examen.trafico }}" selected>

@@ -2507,6 +2507,10 @@ def realizar_examen(request, visita_id, examen_id, paciente_id):
         17: {"template": "examenes_sueno/sueno_Berlín.html", "model": BerlinResult},
         18: {"template": "examenes_sueno/sueno_atenas.html", "model": AtenasResult},
         19: {"template": "examenes_sueno/sueno_ISI.html", "model": ISIResult},
+        20: {
+            "template": "examenes_general/cognitivo_Anamnesis.html",
+            "model": CognitivoAnamnesisResult,
+        },
         21: {
             "template": "examenes_anosognosia/Anosognosia_Participante_EuroQoL.html",
             "model": EuroQol5D5LResult,
@@ -3082,9 +3086,23 @@ def realizar_examen(request, visita_id, examen_id, paciente_id):
 
 @login_required
 def ver_resultado_examen(request, visita_examen_id):
+    print(f"🔍 DEBUG: visita_examen_id={visita_examen_id}")
+
     visita_examen = get_object_or_404(VisitaExamen, id=visita_examen_id)
+    print(
+        f"🔍 DEBUG: examen_id={visita_examen.examen.id}, examen_nombre={visita_examen.examen.nombre}"
+    )
+
+    # ===== NUEVOS PRINTS DE DEBUG =====
+    print(f"🔍 DEBUG ESPECÍFICO ID 20:")
+    print(f"   - visita_examen.examen.id: {visita_examen.examen.id}")
+    print(f"   - Tipo de examen.id: {type(visita_examen.examen.id)}")
+    print(f"   - ¿Es igual a 20?: {visita_examen.examen.id == 20}")
+    print(f"   - ¿Es igual a int(20)?: {visita_examen.examen.id == int(20)}")
+    print(f"   - ¿Es igual a str('20')?: {str(visita_examen.examen.id) == '20'}")
 
     if not visita_examen.esta_realizado:
+        print("❌ DEBUG: Examen no realizado")
         messages.error(request, "Este examen aún no ha sido completado.")
         return redirect(
             "detalle_paciente", paciente_id=visita_examen.visita.paciente.id
@@ -3092,6 +3110,7 @@ def ver_resultado_examen(request, visita_examen_id):
 
     # SeguimientoIntervenciones - es diferente al resto
     if visita_examen.examen.nombre == "SeguimientoIntervencionesParticipantes_ANG":
+        print("🔍 DEBUG: Examen de Seguimiento de Intervenciones ANG")
         sesiones = SeguimientoIntervencionesResult.objects.filter(
             visita_examen=visita_examen
         ).order_by("numero_sesion")
@@ -3111,8 +3130,51 @@ def ver_resultado_examen(request, visita_examen_id):
 
     # Obtener resultado usando el método get_resultado_instance
     resultado = visita_examen.get_resultado_instance()
+    print(f"🔍 DEBUG: resultado={resultado}, tipo={type(resultado)}")
+
+    # ===========================
+    # DEBUG PROFUNDO DEL RESULTADO
+    # ===========================
+    print("\n===== DEBUG DETALLADO RESULTADO =====")
+
+    # 1. Atributos básicos
+    try:
+        print("ID resultado:", resultado.id)
+    except Exception as e:
+        print("❌ ERROR obteniendo resultado.id:", e)
+
+    # 2. Verificar relación visita_examen
+    try:
+        print("Visita examen ID:", resultado.visita_examen.id)
+    except Exception as e:
+        print("❌ ERROR obteniendo resultado.visita_examen:", e)
+
+    # 3. Verificar relación paciente
+    try:
+        print("Paciente:", resultado.visita_examen.visita.paciente.nombres)
+    except Exception as e:
+        print("❌ ERROR accediendo a paciente:", e)
+
+    # 4. Verificar relaciones ManyToMany posibles
+    for field in [
+        "actitudes",
+        "atenciones",
+        "errores_lenguaje",
+        "actividades_vida_diaria",
+        "actividades_complejas",
+    ]:
+        try:
+            rel = getattr(resultado, field)
+            print(f"{field} → OK, total: {rel.count()}")
+        except AttributeError:
+            print(f"{field} → ⚠️ NO EXISTE en este modelo")
+        except Exception as e:
+            print(f"{field} → ❌ ERROR:", e)
+
+    print("===== FIN DEBUG RESULTADO =====\n")
 
     if not resultado:
+        print("❌ DEBUG: No hay resultado")
         messages.error(request, "No se encontraron resultados para este examen.")
         return redirect(
             "detalle_paciente", paciente_id=visita_examen.visita.paciente.id
@@ -3152,7 +3214,86 @@ def ver_resultado_examen(request, visita_examen_id):
             request, "examenes_resultados/resultado_sueno_anamnesis.html", context
         )
 
-    # En la función ver_resultado_examen, reemplaza el caso de ANÁLISIS GENERAL (ID 7):
+    # CASO: COGNITIVO ANAMNESIS (ID 20) - CORRECCIÓN PRINCIPAL
+    elif visita_examen.examen.id == 20:  # ✅ QUITA el isinstance(), solo verifica ID
+        print("✔️ Entrando al caso COGNITIVO ANAMNESIS - ID 20")
+
+        try:
+            # Obtener el resultado directamente desde la relación
+            cognitivo_anamnesis = visita_examen.cognitivo_anamnesis_resultado
+
+            if cognitivo_anamnesis:
+                print(
+                    f"✔️ CognitivoAnamnesisResult obtenido: ID {cognitivo_anamnesis.id}"
+                )
+
+                # Pre-cargar las relaciones
+                cognitivo_anamnesis = CognitivoAnamnesisResult.objects.prefetch_related(
+                    "actitudes",
+                    "atenciones",
+                    "errores_lenguaje",
+                    "actividades_vida_diaria",
+                    "actividades_complejas",
+                ).get(id=cognitivo_anamnesis.id)
+
+                context = {
+                    "visita_examen": visita_examen,
+                    "resultado": cognitivo_anamnesis,
+                    "paciente": visita_examen.visita.paciente,
+                    "actitudes": cognitivo_anamnesis.actitudes.all(),
+                    "atenciones": cognitivo_anamnesis.atenciones.all(),
+                    "errores_lenguaje": cognitivo_anamnesis.errores_lenguaje.all(),
+                    "actividades_vida_diaria": cognitivo_anamnesis.actividades_vida_diaria.all(),
+                    "actividades_complejas": cognitivo_anamnesis.actividades_complejas.all(),
+                }
+
+                print(f"📊 Datos del contexto:")
+                print(f"   - Actitudes: {context['actitudes'].count()}")
+                print(f"   - Atenciones: {context['atenciones'].count()}")
+                print(f"   - Errores lenguaje: {context['errores_lenguaje'].count()}")
+                print(
+                    f"   - Actividades vida diaria: {context['actividades_vida_diaria'].count()}"
+                )
+                print(
+                    f"   - Actividades complejas: {context['actividades_complejas'].count()}"
+                )
+
+                return render(
+                    request,
+                    "examenes_resultados/resultado_cognitivo_Anamnesis.html",
+                    context,
+                )
+            else:
+                print("❌ No se encontró resultado cognitivo para esta visita")
+                messages.error(
+                    request,
+                    "No se encontraron resultados del examen cognitivo para esta visita.",
+                )
+                return redirect(
+                    "detalle_paciente", paciente_id=visita_examen.visita.paciente.id
+                )
+
+        except CognitivoAnamnesisResult.DoesNotExist:
+            print(
+                f"❌ No se encontró CognitivoAnamnesisResult para VisitaExamen {visita_examen.id}"
+            )
+            messages.error(
+                request,
+                "No se encontraron resultados del examen cognitivo para esta visita.",
+            )
+            return redirect(
+                "detalle_paciente", paciente_id=visita_examen.visita.paciente.id
+            )
+
+        except Exception as e:
+            print(f"💥 ERROR al obtener CognitivoAnamnesisResult: {str(e)}")
+            import traceback
+
+            traceback.print_exc()
+            messages.error(request, f"Error al cargar el examen cognitivo: {str(e)}")
+            return redirect(
+                "detalle_paciente", paciente_id=visita_examen.visita.paciente.id
+            )
 
     # CASO: ANÁLISIS GENERAL (ID 7)
     elif visita_examen.examen.id == 7:
@@ -3278,8 +3419,6 @@ def ver_resultado_examen(request, visita_examen_id):
                 "detalle_paciente", paciente_id=visita_examen.visita.paciente.id
             )
 
-    # En la función ver_resultado_examen, reemplaza el caso específico:
-
     # CASO: REVISIÓN POR SISTEMAS (ID 4)
     elif visita_examen.examen.id == 4:
         # 🔧 CORRECCIÓN: Obtener la instancia correcta del modelo
@@ -3402,6 +3541,318 @@ def ver_resultado_examen(request, visita_examen_id):
             "paciente": visita_examen.visita.paciente,
         }
         return render(request, "examenes_resultados/resultado_generico.html", context)
+
+
+@login_required
+def guardar_examen_cognitivo_anamnesis(request):
+    """Vista específica para guardar el examen cognitivo anamnesis"""
+    if request.method == "POST":
+        try:
+            visita_id = request.POST.get("visita_id")
+            paciente_id = request.POST.get("paciente_id")
+            examen_id = request.POST.get("examen_id")
+
+            print(
+                f"🔄 Guardando Cognitivo Anamnesis - Visita: {visita_id}, Examen: {examen_id}, Paciente: {paciente_id}"
+            )
+
+            # Obtener la instancia de VisitaExamen
+            visita_examen = get_object_or_404(
+                VisitaExamen, visita_id=visita_id, examen_id=examen_id
+            )
+
+            # Marcar como iniciado si está pendiente
+            if visita_examen.estado == "pendiente":
+                visita_examen.estado = "en_progreso"
+                visita_examen.fecha_inicio = timezone.now()
+                visita_examen.save()
+
+            # Crear o actualizar el resultado principal
+            cognitivo_anamnesis, created = (
+                CognitivoAnamnesisResult.objects.update_or_create(
+                    visita_examen=visita_examen,
+                    defaults={
+                        # ========== ANAMNESIS ==========
+                        "motivo_consulta": request.POST.get("motivo_consulta", ""),
+                        "descripcion_general": request.POST.get(
+                            "descripcion_general", ""
+                        ),
+                        # ========== APARIENCIA/ACTITUD ==========
+                        "apariencia_descripcion": request.POST.get(
+                            "apariencia_descripcion", ""
+                        ),
+                        "apariencia_estado": request.POST.get("apariencia_estado", ""),
+                        "actitud_descripcion": request.POST.get(
+                            "actitud_descripcion", ""
+                        ),
+                        # ========== ESTADO DE ALERTA/ORIENTACIÓN ==========
+                        "estado_alerta_descripcion": request.POST.get(
+                            "estado_alerta_descripcion", ""
+                        ),
+                        "estado_alerta_seleccion": request.POST.get(
+                            "estado_alerta_seleccion", ""
+                        ),
+                        "orientacion_descripcion": request.POST.get(
+                            "orientacion_descripcion", ""
+                        ),
+                        "orientacion_seleccion": request.POST.get(
+                            "orientacion_seleccion", ""
+                        ),
+                        # ========== ATENCIÓN ==========
+                        "atencion_descripcion": request.POST.get(
+                            "atencion_descripcion", ""
+                        ),
+                        # ========== MEMORIA ==========
+                        "memoria_descripcion": request.POST.get(
+                            "memoria_descripcion", ""
+                        ),
+                        "memoria_lopera_vida": safe_int_optional(
+                            request.POST.get("memoria_lopera_vida")
+                        ),
+                        "memoria_lopera_actual": safe_int_optional(
+                            request.POST.get("memoria_lopera_actual")
+                        ),
+                        "memoria_quejas": request.POST.get("memoria_quejas", ""),
+                        "memoria_edad_inicio": safe_int_optional(
+                            request.POST.get("memoria_edad_inicio")
+                        ),
+                        "memoria_progresivas": request.POST.get(
+                            "memoria_progresivas", ""
+                        ),
+                        "memoria_cambio_previo": request.POST.get(
+                            "memoria_cambio_previo", ""
+                        ),
+                        "memoria_compromete_basicas": request.POST.get(
+                            "memoria_compromete_basicas", ""
+                        ),
+                        "memoria_compromete_complejas": request.POST.get(
+                            "memoria_compromete_complejas", ""
+                        ),
+                        "memoria_compromete_cotidiana": request.POST.get(
+                            "memoria_compromete_cotidiana", ""
+                        ),
+                        # ========== LENGUAJE ==========
+                        "lenguaje_descripcion": request.POST.get(
+                            "lenguaje_descripcion", ""
+                        ),
+                        "lenguaje_cantidad": request.POST.get("lenguaje_cantidad", ""),
+                        "lenguaje_fluido": request.POST.get("lenguaje_fluido", ""),
+                        "lenguaje_tono": request.POST.get("lenguaje_tono", ""),
+                        "lenguaje_articulacion": request.POST.get(
+                            "lenguaje_articulacion", ""
+                        ),
+                        "lenguaje_comprension": request.POST.get(
+                            "lenguaje_comprension", ""
+                        ),
+                        "lenguaje_escritura": request.POST.get(
+                            "lenguaje_escritura", ""
+                        ),
+                        "lenguaje_lectura": request.POST.get("lenguaje_lectura", ""),
+                        "lenguaje_repeticion": request.POST.get(
+                            "lenguaje_repeticion", ""
+                        ),
+                        # ========== PENSAMIENTO ==========
+                        "pensamiento_descripcion": request.POST.get(
+                            "pensamiento_descripcion", ""
+                        ),
+                        "pensamiento_forma": request.POST.get("pensamiento_forma", ""),
+                        "pensamiento_contenido": request.POST.get(
+                            "pensamiento_contenido", ""
+                        ),
+                        "pensamiento_juicio": request.POST.get(
+                            "pensamiento_juicio", ""
+                        ),
+                        "pensamiento_introspeccion": request.POST.get(
+                            "pensamiento_introspeccion", ""
+                        ),
+                        "pensamiento_prospeccion": request.POST.get(
+                            "pensamiento_prospeccion", ""
+                        ),
+                        # ========== SENSOPERCEPCIÓN ==========
+                        "sensopercepcion_descripcion": request.POST.get(
+                            "sensopercepcion_descripcion", ""
+                        ),
+                        "sensopercepcion_alteraciones": request.POST.get(
+                            "sensopercepcion_alteraciones", ""
+                        ),
+                        # ========== FUNCIÓN EJECUTIVA ==========
+                        "funcion_ejecutiva_descripcion": request.POST.get(
+                            "funcion_ejecutiva_descripcion", ""
+                        ),
+                        "funcion_ejecutiva_comportamientos": request.POST.get(
+                            "funcion_ejecutiva_comportamientos", ""
+                        ),
+                        "comportamiento_edad_inicio": request.POST.get(
+                            "comportamiento_edad_inicio", ""
+                        ),
+                        "comportamiento_caracteristicas": request.POST.get(
+                            "comportamiento_caracteristicas", ""
+                        ),
+                        "funcion_ejecutiva_sintomas": request.POST.get(
+                            "funcion_ejecutiva_sintomas", ""
+                        ),
+                        "sintomas_edad_inicio": request.POST.get(
+                            "sintomas_edad_inicio", ""
+                        ),
+                        "sintomas_caracteristicas": request.POST.get(
+                            "sintomas_caracteristicas", ""
+                        ),
+                        # ========== ESTADO DE ÁNIMO/AFECTO ==========
+                        "estado_animo_descripcion": request.POST.get(
+                            "estado_animo_descripcion", ""
+                        ),
+                        "estado_animo_cualidades": request.POST.get(
+                            "estado_animo_cualidades", ""
+                        ),
+                        "estado_animo_expresiones": request.POST.get(
+                            "estado_animo_expresiones", ""
+                        ),
+                        # ========== APETITO ==========
+                        "apetito_descripcion": request.POST.get(
+                            "apetito_descripcion", ""
+                        ),
+                        "apetito_cambios": request.POST.get("apetito_cambios", ""),
+                        "apetito_edad_inicio": request.POST.get(
+                            "apetito_edad_inicio", ""
+                        ),
+                        "apetito_caracteristicas": request.POST.get(
+                            "apetito_caracteristicas", ""
+                        ),
+                        # ========== FUNCIONALIDAD ==========
+                        "funcionalidad_descripcion": request.POST.get(
+                            "funcionalidad_descripcion", ""
+                        ),
+                        "independencia_vida_diaria": request.POST.get(
+                            "independencia_vida_diaria", "no"
+                        ),
+                        "independencia_actividades_complejas": request.POST.get(
+                            "independencia_actividades_complejas", "no"
+                        ),
+                        # ========== CONDUCTA MOTORA ==========
+                        "conducta_motora_descripcion": request.POST.get(
+                            "conducta_motora_descripcion", ""
+                        ),
+                        "trastornos_cuantitativos": request.POST.get(
+                            "trastornos_cuantitativos", ""
+                        ),
+                        "trastornos_cualitativos": request.POST.get(
+                            "trastornos_cualitativos", ""
+                        ),
+                    },
+                )
+            )
+
+            # ==============================
+            # Procesar relaciones hijas
+            # ==============================
+
+            # Limpiar relaciones existentes
+            cognitivo_anamnesis.actitudes.all().delete()
+            cognitivo_anamnesis.atenciones.all().delete()
+            cognitivo_anamnesis.errores_lenguaje.all().delete()
+            cognitivo_anamnesis.actividades_vida_diaria.all().delete()
+            cognitivo_anamnesis.actividades_complejas.all().delete()
+
+            # Procesar actitudes
+            actitudes_seleccionadas = request.POST.getlist("actitud_tipo[]")
+            for actitud in actitudes_seleccionadas:
+                if actitud:
+                    ActitudCognitiva.objects.create(
+                        anamnesis=cognitivo_anamnesis, tipo=actitud
+                    )
+
+            # Procesar problemas de atención
+            atencion_tipos = request.POST.getlist("atencion_tipo[]")
+            atencion_edades = request.POST.getlist("atencion_edad_inicio[]")
+            atencion_caracteristicas = request.POST.getlist(
+                "atencion_caracteristicas[]"
+            )
+
+            for i, tipo in enumerate(atencion_tipos):
+                if tipo:
+                    AtencionCognitiva.objects.create(
+                        anamnesis=cognitivo_anamnesis,
+                        tipo=tipo,
+                        edad_inicio=atencion_edades[i]
+                        if i < len(atencion_edades)
+                        else "",
+                        caracteristicas=atencion_caracteristicas[i]
+                        if i < len(atencion_caracteristicas)
+                        else "",
+                    )
+
+            # Procesar errores de lenguaje
+            errores_lenguaje = request.POST.getlist("error_lenguaje[]")
+            for error in errores_lenguaje:
+                if error:
+                    ErrorLenguajeCognitivo.objects.create(
+                        anamnesis=cognitivo_anamnesis, tipo=error
+                    )
+
+            # Procesar actividades de vida diaria
+            actividades_vida_diaria = request.POST.getlist("actividad_vida_diaria[]")
+            for actividad in actividades_vida_diaria:
+                if actividad:
+                    ActividadVidaDiaria.objects.create(
+                        anamnesis=cognitivo_anamnesis, tipo=actividad
+                    )
+
+            # Procesar actividades complejas
+            actividades_complejas = request.POST.getlist("actividad_compleja[]")
+            for actividad in actividades_complejas:
+                if actividad:
+                    ActividadCompleja.objects.create(
+                        anamnesis=cognitivo_anamnesis, tipo=actividad
+                    )
+
+            # Marcar el examen como completado
+            visita_examen.estado = "completado"
+            visita_examen.fecha_completado = timezone.now()
+            visita_examen.save()
+
+            # Contar elementos guardados
+            total_actitudes = cognitivo_anamnesis.actitudes.count()
+            total_atencion = cognitivo_anamnesis.atenciones.count()
+            total_errores = cognitivo_anamnesis.errores_lenguaje.count()
+            total_vida_diaria = cognitivo_anamnesis.actividades_vida_diaria.count()
+            total_complejas = cognitivo_anamnesis.actividades_complejas.count()
+
+            messages.success(
+                request,
+                f"✅ Examen Cognitivo Anamnesis guardado exitosamente.\n"
+                f"📋 Actitudes: {total_actitudes}, Atención: {total_atencion}, "
+                f"Errores lenguaje: {total_errores}, Actividades: {total_vida_diaria + total_complejas}",
+            )
+            return redirect("detalle_paciente", paciente_id=paciente_id)
+
+        except Exception as e:
+            # Revertir estado si hubo error
+            try:
+                if "visita_examen" in locals():
+                    visita_examen.estado = "pendiente"
+                    visita_examen.save()
+            except:
+                pass
+
+            messages.error(
+                request, f"❌ Error al guardar el examen cognitivo: {str(e)}"
+            )
+            return redirect("detalle_paciente", paciente_id=paciente_id or 1)
+
+    else:
+        messages.error(request, "❌ Método no permitido.")
+        return redirect("index")
+
+
+# Función auxiliar para enteros opcionales
+def safe_int_optional(value):
+    """Convierte a int o retorna None si no hay valor"""
+    if value is None or value == "":
+        return None
+    try:
+        return int(value)
+    except (ValueError, TypeError):
+        return None
 
 
 # examenes sueno

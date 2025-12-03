@@ -8,6 +8,7 @@ from django.contrib.auth.models import AbstractUser, Group, Permission
 from django.urls import reverse, NoReverseMatch
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 
 class Sala(models.Model):
@@ -562,23 +563,44 @@ class VisitaExamen(models.Model):
                 "examenneurologicoresult_resultado",  # ✅ EXAMEN NEUROLÓGICO
                 "medicamentosresult_resultado",  # ✅ MEDICAMENTOS
                 "revisionsistemrasresult_resultado",  # ✅ REVISIÓN SISTEMAS
+                "cognitivo_anamnesis_resultado",  # ✅ COGNITIVO ANAMNESIS
                 # este examen es problemático dejar al final
                 "seguimientointervencionesresult_resultado",
             ]
 
-            # 🔧 CORRECCIÓN: Actualizar el bucle para asignar el resultado encontrado
+            # 🔧 CORRECCIÓN PRINCIPAL: Manejar el RelatedManager correctamente
             for related_name in possible_related_names:
                 try:
-                    resultado = getattr(self, related_name)
-                    if resultado:  # Verificar que el resultado existe
-                        self._resultado_cache = resultado
-                        print(
-                            f"✅ Encontrado {related_name}: {type(resultado).__name__}"
-                        )
-                        break  # 🔧 IMPORTANTE: Salir del bucle cuando encontremos algo
+                    # Obtener el manager relacionado
+                    manager = getattr(self, related_name)
+
+                    # 🔧 NUEVO: Si es un manager, obtener la instancia con .get()
+                    if hasattr(manager, "get"):
+                        try:
+                            resultado_instance = manager.get()
+                            if resultado_instance:
+                                self._resultado_cache = resultado_instance
+                                print(
+                                    f"✅ Encontrado {related_name}: {type(resultado_instance).__name__} ID:{resultado_instance.id}"
+                                )
+                                break
+                        except manager.model.DoesNotExist:
+                            print(f"❌ No existe instancia para {related_name}")
+                            continue
+                        except Exception as e:
+                            print(f"❌ Error obteniendo instancia {related_name}: {e}")
+                            continue
+                    # Si no es un manager, manejar como antes
+                    elif manager:
+                        self._resultado_cache = manager
+                        print(f"✅ Encontrado {related_name}: {type(manager).__name__}")
+                        break
+
                 except AttributeError:
+                    # El related_name no existe en este modelo
                     continue
                 except Exception as e:
+                    print(f"❌ Error general en {related_name}: {e}")
                     continue
 
             # DEBUG: Si no encontró nada
@@ -587,6 +609,7 @@ class VisitaExamen(models.Model):
                 available_related = [
                     attr for attr in dir(self) if attr.endswith("_resultado")
                 ]
+                print(f"❌ No se encontró resultado. Available: {available_related}")
 
         return self._resultado_cache
 
@@ -660,6 +683,7 @@ class VisitaExamen(models.Model):
             "examenneurologico": "realizar_examen_neurologico",
             "medicamentos": "realizar_medicamentos",
             "revisionsistemas": "realizar_revision_sistemas",
+            "cognitivoanamnesis": "realizar_cognitivo_anamnesis",
         }
 
         url_name = url_mapping.get(examen_nombre)
@@ -717,6 +741,7 @@ class VisitaExamen(models.Model):
             "examenneurologico": "ver_examen_neurologico",
             "medicamentos": "ver_medicamentos",
             "revisionsistemas": "ver_revision_sistemas",
+            "cognitivoanamnesis": "ver_cognitivo_anamnesis",
         }
 
         url_name = url_mapping.get(examen_nombre)
@@ -775,6 +800,7 @@ class VisitaExamen(models.Model):
             "examenneurologico": "editar_examen_neurologico",
             "medicamentos": "editar_medicamentos",
             "revisionsistemas": "editar_revision_sistemas",
+            "cognitivoanamnesis": "editar_cognitivo_anamnesis",
         }
 
         url_name = url_mapping.get(examen_nombre)
@@ -4894,3 +4920,434 @@ class DetalleRevisionSistemas(models.Model):
 
     def __str__(self):
         return f"{self.sistema}: {self.sintoma}"
+
+
+class CognitivoAnamnesisResult(models.Model):
+    visita_examen = models.OneToOneField(
+        "VisitaExamen",
+        on_delete=models.CASCADE,
+        related_name="cognitivo_anamnesis_resultado",
+    )
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    fecha_actualizacion = models.DateTimeField(auto_now=True)
+
+    # ========== ANAMNESIS ==========
+    motivo_consulta = models.TextField(blank=True, null=True)
+    descripcion_general = models.TextField(blank=True, null=True)
+
+    # ========== APARIENCIA/ACTITUD ==========
+    apariencia_descripcion = models.TextField(blank=True, null=True)
+    apariencia_estado = models.CharField(
+        max_length=50,
+        choices=[("Adecuada", "Adecuada"), ("Inadecuada", "Inadecuada")],
+        blank=True,
+        null=True,
+    )
+    actitud_descripcion = models.TextField(blank=True, null=True)
+
+    # ========== ESTADO DE ALERTA/ORIENTACIÓN ==========
+    estado_alerta_descripcion = models.TextField(blank=True, null=True)
+    estado_alerta_seleccion = models.CharField(
+        max_length=50,
+        choices=[
+            ("Alerta", "Alerta"),
+            ("Somnolencia", "Somnolencia"),
+            ("Obnubilación", "Obnubilación"),
+            ("Estupor", "Estupor"),
+            ("Coma", "Coma"),
+        ],
+        blank=True,
+        null=True,
+    )
+
+    orientacion_descripcion = models.TextField(blank=True, null=True)
+    orientacion_seleccion = models.CharField(
+        max_length=50,
+        choices=[
+            ("Desorientación temporal", "Desorientación temporal"),
+            ("Desorientación espacial", "Desorientación espacial"),
+            ("Desorientación en persona", "Desorientación en persona"),
+        ],
+        blank=True,
+        null=True,
+    )
+
+    # ========== ATENCIÓN ==========
+    atencion_descripcion = models.TextField(blank=True, null=True)
+
+    # ========== MEMORIA ==========
+    memoria_descripcion = models.TextField(blank=True, null=True)
+    memoria_lopera_vida = models.IntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(10)], blank=True, null=True
+    )
+    memoria_lopera_actual = models.IntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(10)], blank=True, null=True
+    )
+    memoria_quejas = models.CharField(
+        max_length=2, choices=[("Si", "Sí"), ("No", "No")], blank=True, null=True
+    )
+    memoria_edad_inicio = models.IntegerField(blank=True, null=True)
+    memoria_progresivas = models.CharField(
+        max_length=2, choices=[("Si", "Sí"), ("No", "No")], blank=True, null=True
+    )
+    memoria_cambio_previo = models.CharField(
+        max_length=2, choices=[("Si", "Sí"), ("No", "No")], blank=True, null=True
+    )
+    memoria_compromete_basicas = models.CharField(
+        max_length=2, choices=[("Si", "Sí"), ("No", "No")], blank=True, null=True
+    )
+    memoria_compromete_complejas = models.CharField(
+        max_length=2, choices=[("Si", "Sí"), ("No", "No")], blank=True, null=True
+    )
+    memoria_compromete_cotidiana = models.CharField(
+        max_length=2, choices=[("Si", "Sí"), ("No", "No")], blank=True, null=True
+    )
+
+    # ========== LENGUAJE ==========
+    lenguaje_descripcion = models.TextField(blank=True, null=True)
+    lenguaje_cantidad = models.CharField(
+        max_length=50,
+        choices=[
+            ("Normal", "Normal"),
+            ("Logorrea", "Logorrea"),
+            ("Locuacidad", "Locuacidad"),
+            ("Laconismo", "Laconismo"),
+            ("Concretismo", "Concretismo"),
+        ],
+        blank=True,
+        null=True,
+    )
+    lenguaje_fluido = models.CharField(
+        max_length=2, choices=[("Si", "Sí"), ("No", "No")], blank=True, null=True
+    )
+    lenguaje_tono = models.CharField(
+        max_length=50,
+        choices=[
+            ("Normal", "Normal"),
+            ("Altisonante", "Altisonante"),
+            ("Musitación", "Musitación"),
+            ("Aprosodia", "Aprosodia"),
+        ],
+        blank=True,
+        null=True,
+    )
+    lenguaje_articulacion = models.CharField(
+        max_length=50,
+        choices=[("Normal", "Normal"), ("Anormal", "Anormal")],
+        blank=True,
+        null=True,
+    )
+    lenguaje_comprension = models.CharField(
+        max_length=50,
+        choices=[("Normal", "Normal"), ("Anormal", "Anormal")],
+        blank=True,
+        null=True,
+    )
+    lenguaje_escritura = models.CharField(
+        max_length=50,
+        choices=[("Normal", "Normal"), ("Anormal", "Anormal")],
+        blank=True,
+        null=True,
+    )
+    lenguaje_lectura = models.CharField(
+        max_length=50,
+        choices=[("Normal", "Normal"), ("Anormal", "Anormal")],
+        blank=True,
+        null=True,
+    )
+    lenguaje_repeticion = models.CharField(
+        max_length=50,
+        choices=[("Normal", "Normal"), ("Anormal", "Anormal")],
+        blank=True,
+        null=True,
+    )
+
+    # ========== PENSAMIENTO ==========
+    pensamiento_descripcion = models.TextField(blank=True, null=True)
+    pensamiento_forma = models.CharField(
+        max_length=100,
+        choices=[
+            ("Velocidad", "Velocidad"),
+            ("Coherencia", "Coherencia"),
+            ("Lógica", "Lógica"),
+            ("Organización", "Organización"),
+            ("Fuga de ideas", "Fuga de ideas"),
+            ("Ensalada de palabras", "Ensalada de palabras"),
+            ("Perseverancia", "Perseverancia"),
+            ("Circunstancialidad", "Circunstancialidad"),
+            ("Tangencialidad", "Tangencialidad"),
+            ("Soliloquio", "Soliloquio"),
+        ],
+        blank=True,
+        null=True,
+    )
+    pensamiento_contenido = models.CharField(
+        max_length=100,
+        choices=[
+            ("Ideas delirantes", "Ideas delirantes"),
+            ("Ideas sobrevaloradas", "Ideas sobrevaloradas"),
+            ("Ideas obsesivas", "Ideas obsesivas"),
+            ("Ideas fantasiosas", "Ideas fantasiosas"),
+        ],
+        blank=True,
+        null=True,
+    )
+    pensamiento_juicio = models.CharField(
+        max_length=50,
+        choices=[
+            ("En construcción", "En construcción"),
+            ("Conservado", "Conservado"),
+            ("Distorsionado", "Distorsionado"),
+            ("Debilitado", "Debilitado"),
+            ("Nulo", "Nulo"),
+        ],
+        blank=True,
+        null=True,
+    )
+    pensamiento_introspeccion = models.CharField(
+        max_length=50,
+        choices=[
+            ("Adecuada", "Adecuada"),
+            ("Aceptable", "Aceptable"),
+            ("Pobre", "Pobre"),
+            ("Precaria", "Precaria"),
+            ("Nula", "Nula"),
+        ],
+        blank=True,
+        null=True,
+    )
+    pensamiento_prospeccion = models.CharField(
+        max_length=50,
+        choices=[
+            ("Conservada", "Conservada"),
+            ("Grandiosidad", "Grandiosidad"),
+            ("Delirante", "Delirante"),
+            ("Desesperanzadora", "Desesperanzadora"),
+            ("Nula", "Nula"),
+        ],
+        blank=True,
+        null=True,
+    )
+
+    # ========== SENSOPERCEPCIÓN ==========
+    sensopercepcion_descripcion = models.TextField(blank=True, null=True)
+    sensopercepcion_alteraciones = models.CharField(
+        max_length=100,
+        choices=[
+            ("Alucinaciones", "Alucinaciones"),
+            ("Pseudoalucinaciones", "Pseudoalucinaciones"),
+            ("Alucinosis", "Alucinosis"),
+            ("Ilusiones", "Ilusiones"),
+            ("Anomalías en integración", "Anomalías en integración"),
+        ],
+        blank=True,
+        null=True,
+    )
+
+    # ========== FUNCIÓN EJECUTIVA ==========
+    funcion_ejecutiva_descripcion = models.TextField(blank=True, null=True)
+    funcion_ejecutiva_comportamientos = models.CharField(
+        max_length=200, blank=True, null=True
+    )
+    comportamiento_edad_inicio = models.CharField(max_length=50, blank=True, null=True)
+    comportamiento_caracteristicas = models.TextField(blank=True, null=True)
+
+    funcion_ejecutiva_sintomas = models.CharField(max_length=200, blank=True, null=True)
+    sintomas_edad_inicio = models.CharField(max_length=50, blank=True, null=True)
+    sintomas_caracteristicas = models.TextField(blank=True, null=True)
+
+    # ========== ESTADO DE ÁNIMO/AFECTO ==========
+    estado_animo_descripcion = models.TextField(blank=True, null=True)
+    estado_animo_cualidades = models.CharField(max_length=100, blank=True, null=True)
+    estado_animo_expresiones = models.CharField(max_length=100, blank=True, null=True)
+
+    # ========== APETITO ==========
+    apetito_descripcion = models.TextField(blank=True, null=True)
+    apetito_cambios = models.CharField(max_length=200, blank=True, null=True)
+    apetito_edad_inicio = models.CharField(max_length=50, blank=True, null=True)
+    apetito_caracteristicas = models.TextField(blank=True, null=True)
+
+    # ========== FUNCIONALIDAD ==========
+    funcionalidad_descripcion = models.TextField(blank=True, null=True)
+    independencia_vida_diaria = models.CharField(
+        max_length=2, choices=[("si", "Sí"), ("no", "No")], default="no"
+    )
+    independencia_actividades_complejas = models.CharField(
+        max_length=2, choices=[("si", "Sí"), ("no", "No")], default="no"
+    )
+
+    # ========== CONDUCTA MOTORA ==========
+    conducta_motora_descripcion = models.TextField(blank=True, null=True)
+    trastornos_cuantitativos = models.CharField(
+        max_length=100,
+        choices=[
+            ("hiperactividad", "Hiperactividad"),
+            ("inquietud", "Inquietud"),
+            ("agitacion", "Agitación"),
+            ("retardo_psicomotor", "Retardo psicomotor"),
+            ("hipoactividad", "Hipoactividad"),
+        ],
+        blank=True,
+        null=True,
+    )
+    trastornos_cualitativos = models.CharField(
+        max_length=100,
+        choices=[
+            ("catatonia", "Catatonía"),
+            ("estereotipias", "Estereotipias"),
+            ("manierismos", "Manierismos"),
+            ("mimica_gestualidad", "Alteraciones de la mímica y gestualidad"),
+            ("ambitendencia", "Ambitendencia"),
+            ("perseveracion", "Perseveración"),
+        ],
+        blank=True,
+        null=True,
+    )
+
+    class Meta:
+        verbose_name = "Resultado Examen Cognitivo Anamnesis"
+        verbose_name_plural = "Resultados Exámenes Cognitivo Anamnesis"
+        ordering = ["fecha_creacion"]
+
+    def __str__(self):
+        return f"Cognitivo Anamnesis - {self.visita_examen.visita.paciente.nombres} {self.visita_examen.visita.paciente.apellidos}"
+
+
+# ========== MODELOS RELACIONADOS ==========
+
+
+class ActitudCognitiva(models.Model):
+    anamnesis = models.ForeignKey(
+        CognitivoAnamnesisResult, on_delete=models.CASCADE, related_name="actitudes"
+    )
+    tipo = models.CharField(
+        max_length=50,
+        choices=[
+            ("Colaborador", "Colaborador"),
+            ("Desinteresado", "Desinteresado"),
+            ("Hostil", "Hostil"),
+            ("Intrusivo", "Intrusivo"),
+            ("Evasivo", "Evasivo"),
+            ("Seductor", "Seductor"),
+            ("Suspicaz", "Suspicaz"),
+            ("Hiperfamiliar", "Hiperfamiliar"),
+            ("Complaciente", "Complaciente"),
+            ("Pueril", "Pueril"),
+            ("Amable", "Amable"),
+            ("Agresivo", "Agresivo"),
+            ("Negativista", "Negativista"),
+        ],
+    )
+
+    class Meta:
+        verbose_name = "Actitud Cognitiva"
+        verbose_name_plural = "Actitudes Cognitivas"
+        ordering = ["tipo"]
+
+
+class AtencionCognitiva(models.Model):
+    anamnesis = models.ForeignKey(
+        CognitivoAnamnesisResult, on_delete=models.CASCADE, related_name="atenciones"
+    )
+    tipo = models.CharField(
+        max_length=100,
+        choices=[
+            ("Quejas atencionales", "Quejas atencionales"),
+            ("Alteración atención sostenida", "Alteración atención sostenida"),
+            ("Alteración atención dividida", "Alteración atención dividida"),
+            ("Incapacidad para quedarse quieto", "Incapacidad para quedarse quieto"),
+            (
+                "Dificultad para finalizar una tarea",
+                "Dificultad para finalizar una tarea",
+            ),
+            (
+                "Dificultad para seguir instrucciones",
+                "Dificultad para seguir instrucciones",
+            ),
+            (
+                "Distracción con estímulos irrelevantes",
+                "Distracción con estímulos irrelevantes",
+            ),
+        ],
+    )
+    edad_inicio = models.CharField(max_length=50, blank=True, null=True)
+    caracteristicas = models.TextField(blank=True, null=True)
+
+    class Meta:
+        verbose_name = "Atención Cognitiva"
+        verbose_name_plural = "Atenciones Cognitivas"
+        ordering = ["tipo"]
+
+
+class ErrorLenguajeCognitivo(models.Model):
+    anamnesis = models.ForeignKey(
+        CognitivoAnamnesisResult,
+        on_delete=models.CASCADE,
+        related_name="errores_lenguaje",
+    )
+    tipo = models.CharField(
+        max_length=50,
+        choices=[
+            ("Errores sintácticos", "Errores sintácticos"),
+            ("Errores fonéticos", "Errores fonéticos"),
+            ("Errores semánticos", "Errores semánticos"),
+        ],
+    )
+
+    class Meta:
+        verbose_name = "Error Lenguaje Cognitivo"
+        verbose_name_plural = "Errores de Lenguaje Cognitivo"
+        ordering = ["tipo"]
+
+
+class ActividadVidaDiaria(models.Model):
+    anamnesis = models.ForeignKey(
+        CognitivoAnamnesisResult,
+        on_delete=models.CASCADE,
+        related_name="actividades_vida_diaria",
+    )
+    tipo = models.CharField(
+        max_length=50,
+        choices=[
+            ("comer", "Comer"),
+            ("asearse", "Asearse"),
+            ("vestirse", "Vestirse"),
+            ("desplazarse", "Desplazarse"),
+            ("comunicarse", "Comunicarse"),
+            ("control_esfinteres", "Control de esfínteres"),
+        ],
+    )
+
+    class Meta:
+        verbose_name = "Actividad de Vida Diaria"
+        verbose_name_plural = "Actividades de Vida Diaria"
+        ordering = ["tipo"]
+
+
+class ActividadCompleja(models.Model):
+    anamnesis = models.ForeignKey(
+        CognitivoAnamnesisResult,
+        on_delete=models.CASCADE,
+        related_name="actividades_complejas",
+    )
+    tipo = models.CharField(
+        max_length=50,
+        choices=[
+            ("telefono", "Teléfono"),
+            ("compras", "Compras"),
+            ("cocinar", "Cocinar"),
+            ("cuidado_hogar", "Cuidado del hogar"),
+            ("lavar_ropa", "Lavar ropa"),
+            ("transporte", "Transporte"),
+            ("medicacion", "Manejo de medicación"),
+            ("asuntos_economicos", "Asuntos económicos"),
+        ],
+    )
+
+    class Meta:
+        verbose_name = "Actividad Compleja"
+        verbose_name_plural = "Actividades Complejas"
+        ordering = ["tipo"]
+
+
+# ...existing code...

@@ -1,0 +1,671 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Resultado - Examen Cognitivo Anamnesis{% endblock %}
+
+{% block content %}
+<style>
+    .section-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 12px 20px;
+        margin-bottom: 20px;
+        border-radius: 8px;
+        font-weight: 600;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .result-card {
+        border: 1px solid #e3e6f0;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        overflow: hidden;
+    }
+    
+    .result-item {
+        padding: 12px 20px;
+        border-bottom: 1px solid #f8f9fc;
+        display: flex;
+        align-items: center;
+    }
+    
+    .result-item:last-child {
+        border-bottom: none;
+    }
+    
+    .result-label {
+        font-weight: 600;
+        color: #5a5c69;
+        min-width: 200px;
+        margin-right: 20px;
+    }
+    
+    .result-value {
+        color: #3a3b45;
+        flex: 1;
+    }
+    
+    .badge-selected {
+        background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+        color: white;
+        padding: 4px 8px;
+        border-radius: 15px;
+        font-size: 0.8em;
+        margin: 2px;
+        display: inline-block;
+    }
+    
+    .print-btn {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        z-index: 1000;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+    
+    .no-data {
+        color: #858796;
+        font-style: italic;
+        text-align: center;
+        padding: 20px;
+    }
+    
+    .scale-result {
+        font-size: 1.2em;
+        font-weight: bold;
+        color: #e74a3b;
+    }
+    
+    @media print {
+        .print-btn, .sidebar, .topnav { display: none !important; }
+        .main-content { margin-left: 0 !important; }
+    }
+</style>
+
+<!-- Header -->
+<div class="header bg-primary pb-6">
+    <div class="container-fluid">
+        <div class="header-body">
+            <div class="row align-items-center py-4">
+                <div class="col-lg-6 col-7">
+                    <h6 class="h2 text-white d-inline-block mb-0">
+                        <i class="fas fa-brain"></i> Resultado Examen Cognitivo Anamnesis
+                    </h6>
+                </div>
+               
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Page content -->
+<div class="container-fluid mt--6">
+    <div class="row">
+        <div class="col-12">
+            {% if resultado %}
+            <!-- Información del paciente -->
+            <div class="card mb-4">
+                <div class="card-header bg-gradient-info">
+                    <h3 class="card-title text-white mb-0">
+                        <i class="fas fa-user-circle"></i> Información del Examen
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Paciente:</strong> {{ resultado.visita_examen.visita.paciente.nombres }} {{ resultado.visita_examen.visita.paciente.apellidos }}</p>
+                            <p><strong>Documento:</strong> {{ resultado.visita_examen.visita.paciente.numero_documento }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Fecha del examen:</strong> {{ resultado.fecha_creacion|date:"d/m/Y H:i" }}</p>
+                            <p><strong>Profesional:</strong> {{ resultado.visita_examen.visita.profesional.get_full_name }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ANAMNESIS -->
+            {% if resultado.motivo_consulta or resultado.descripcion_general %}
+            <div class="result-card">
+                <div class="section-header">
+                    <i class="fas fa-clipboard-list"></i> Anamnesis
+                </div>
+                {% if resultado.motivo_consulta %}
+                <div class="result-item">
+                    <div class="result-label">Motivo de consulta:</div>
+                    <div class="result-value">{{ resultado.motivo_consulta }}</div>
+                </div>
+                {% endif %}
+                {% if resultado.descripcion_general %}
+                <div class="result-item">
+                    <div class="result-label">Descripción general:</div>
+                    <div class="result-value">{{ resultado.descripcion_general }}</div>
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            <!-- APARIENCIA Y ACTITUD -->
+            {% if resultado.apariencia_descripcion or resultado.apariencia_estado or resultado.actitud_descripcion or resultado.actitudes.all %}
+            <div class="result-card">
+                <div class="section-header">
+                    <i class="fas fa-eye"></i> Apariencia y Actitud
+                </div>
+                {% if resultado.apariencia_descripcion %}
+                <div class="result-item">
+                    <div class="result-label">Descripción apariencia:</div>
+                    <div class="result-value">{{ resultado.apariencia_descripcion }}</div>
+                </div>
+                {% endif %}
+                {% if resultado.apariencia_estado %}
+                <div class="result-item">
+                    <div class="result-label">Estado apariencia:</div>
+                    <div class="result-value">{{ resultado.apariencia_estado }}</div>
+                </div>
+                {% endif %}
+                {% if resultado.actitud_descripcion %}
+                <div class="result-item">
+                    <div class="result-label">Descripción actitud:</div>
+                    <div class="result-value">{{ resultado.actitud_descripcion }}</div>
+                </div>
+                {% endif %}
+                {% if resultado.actitudes.all %}
+                <div class="result-item">
+                    <div class="result-label">Tipos de actitud:</div>
+                    <div class="result-value">
+                        {% for actitud in resultado.actitudes.all %}
+                            <span class="badge-selected">{{ actitud.tipo }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            <!-- ESTADO DE ALERTA Y ORIENTACIÓN -->
+            {% if resultado.estado_alerta_descripcion or resultado.estado_alerta_seleccion or resultado.orientacion_descripcion or resultado.orientacion_seleccion %}
+            <div class="result-card">
+                <div class="section-header">
+                    <i class="fas fa-lightbulb"></i> Estado de Alerta y Orientación
+                </div>
+                {% if resultado.estado_alerta_descripcion %}
+                <div class="result-item">
+                    <div class="result-label">Descripción estado alerta:</div>
+                    <div class="result-value">{{ resultado.estado_alerta_descripcion }}</div>
+                </div>
+                {% endif %}
+                {% if resultado.estado_alerta_seleccion %}
+                <div class="result-item">
+                    <div class="result-label">Estado de alerta:</div>
+                    <div class="result-value">{{ resultado.estado_alerta_seleccion }}</div>
+                </div>
+                {% endif %}
+                {% if resultado.orientacion_descripcion %}
+                <div class="result-item">
+                    <div class="result-label">Descripción orientación:</div>
+                    <div class="result-value">{{ resultado.orientacion_descripcion }}</div>
+                </div>
+                {% endif %}
+                {% if resultado.orientacion_seleccion %}
+                <div class="result-item">
+                    <div class="result-label">Alteración orientación:</div>
+                    <div class="result-value">{{ resultado.orientacion_seleccion }}</div>
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            <!-- ATENCIÓN -->
+            {% if resultado.atencion_descripcion or resultado.atenciones.all %}
+            <div class="result-card">
+                <div class="section-header">
+                    <i class="fas fa-bullseye"></i> Atención
+                </div>
+                {% if resultado.atencion_descripcion %}
+                <div class="result-item">
+                    <div class="result-label">Descripción:</div>
+                    <div class="result-value">{{ resultado.atencion_descripcion }}</div>
+                </div>
+                {% endif %}
+                {% if resultado.atenciones.all %}
+                    {% for atencion in resultado.atenciones.all %}
+                    <div class="result-item">
+                        <div class="result-label">{{ atencion.tipo }}:</div>
+                        <div class="result-value">
+                            {% if atencion.edad_inicio %}Inicio: {{ atencion.edad_inicio }}. {% endif %}
+                            {{ atencion.caracteristicas }}
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+            {% endif %}
+
+            <!-- MEMORIA -->
+            {% if resultado.memoria_descripcion or resultado.memoria_lopera_vida or resultado.memoria_lopera_actual or resultado.memoria_quejas %}
+            <div class="result-card">
+                <div class="section-header">
+                    <i class="fas fa-memory"></i> Memoria
+                </div>
+                {% if resultado.memoria_descripcion %}
+                <div class="result-item">
+                    <div class="result-label">Descripción:</div>
+                    <div class="result-value">{{ resultado.memoria_descripcion }}</div>
+                </div>
+                {% endif %}
+                {% if resultado.memoria_lopera_vida %}
+                <div class="result-item">
+                    <div class="result-label">Escala Lopera - Vida:</div>
+                    <div class="result-value scale-result">{{ resultado.memoria_lopera_vida }}/10</div>
+                </div>
+                {% endif %}
+                {% if resultado.memoria_lopera_actual %}
+                <div class="result-item">
+                    <div class="result-label">Escala Lopera - Actual:</div>
+                    <div class="result-value scale-result">{{ resultado.memoria_lopera_actual }}/10</div>
+                </div>
+                {% endif %}
+                {% if resultado.memoria_quejas %}
+                <div class="result-item">
+                    <div class="result-label">Quejas de memoria:</div>
+                    <div class="result-value">{{ resultado.memoria_quejas }}</div>
+                </div>
+                {% endif %}
+                {% if resultado.memoria_quejas == "Si" %}
+                    {% if resultado.memoria_edad_inicio %}
+                    <div class="result-item">
+                        <div class="result-label">Edad de inicio:</div>
+                        <div class="result-value">{{ resultado.memoria_edad_inicio }} años</div>
+                    </div>
+                    {% endif %}
+                    {% if resultado.memoria_progresivas %}
+                    <div class="result-item">
+                        <div class="result-label">Son progresivas:</div>
+                        <div class="result-value">{{ resultado.memoria_progresivas }}</div>
+                    </div>
+                    {% endif %}
+                    {% if resultado.memoria_cambio_previo %}
+                    <div class="result-item">
+                        <div class="result-label">Cambio previo:</div>
+                        <div class="result-value">{{ resultado.memoria_cambio_previo }}</div>
+                    </div>
+                    {% endif %}
+                    {% if resultado.memoria_compromete_basicas %}
+                    <div class="result-item">
+                        <div class="result-label">Compromete actividades básicas:</div>
+                        <div class="result-value">{{ resultado.memoria_compromete_basicas }}</div>
+                    </div>
+                    {% endif %}
+                    {% if resultado.memoria_compromete_complejas %}
+                    <div class="result-item">
+                        <div class="result-label">Compromete actividades complejas:</div>
+                        <div class="result-value">{{ resultado.memoria_compromete_complejas }}</div>
+                    </div>
+                    {% endif %}
+                    {% if resultado.memoria_compromete_cotidiana %}
+                    <div class="result-item">
+                        <div class="result-label">Compromete vida cotidiana:</div>
+                        <div class="result-value">{{ resultado.memoria_compromete_cotidiana }}</div>
+                    </div>
+                    {% endif %}
+                {% endif %}
+            </div>
+            {% endif %}
+
+            <!-- LENGUAJE -->
+            {% if resultado.lenguaje_descripcion or resultado.lenguaje_cantidad or resultado.errores_lenguaje.all %}
+            <div class="result-card">
+                <div class="section-header">
+                    <i class="fas fa-comment"></i> Lenguaje
+                </div>
+                {% if resultado.lenguaje_descripcion %}
+                <div class="result-item">
+                    <div class="result-label">Descripción:</div>
+                    <div class="result-value">{{ resultado.lenguaje_descripcion }}</div>
+                </div>
+                {% endif %}
+                {% if resultado.lenguaje_cantidad %}
+                <div class="result-item">
+                    <div class="result-label">Cantidad:</div>
+                    <div class="result-value">{{ resultado.lenguaje_cantidad }}</div>
+                </div>
+                {% endif %}
+                {% if resultado.lenguaje_fluido %}
+                <div class="result-item">
+                    <div class="result-label">Fluido:</div>
+                    <div class="result-value">{{ resultado.lenguaje_fluido }}</div>
+                </div>
+                {% endif %}
+                {% if resultado.lenguaje_tono %}
+                <div class="result-item">
+                    <div class="result-label">Tono:</div>
+                    <div class="result-value">{{ resultado.lenguaje_tono }}</div>
+                </div>
+                {% endif %}
+                {% if resultado.lenguaje_articulacion %}
+                <div class="result-item">
+                    <div class="result-label">Articulación:</div>
+                    <div class="result-value">{{ resultado.lenguaje_articulacion }}</div>
+                </div>
+                {% endif %}
+                {% if resultado.lenguaje_comprension %}
+                <div class="result-item">
+                    <div class="result-label">Comprensión:</div>
+                    <div class="result-value">{{ resultado.lenguaje_comprension }}</div>
+                </div>
+                {% endif %}
+                {% if resultado.lenguaje_escritura %}
+                <div class="result-item">
+                    <div class="result-label">Escritura:</div>
+                    <div class="result-value">{{ resultado.lenguaje_escritura }}</div>
+                </div>
+                {% endif %}
+                {% if resultado.lenguaje_lectura %}
+                <div class="result-item">
+                    <div class="result-label">Lectura:</div>
+                    <div class="result-value">{{ resultado.lenguaje_lectura }}</div>
+                </div>
+                {% endif %}
+                {% if resultado.lenguaje_repeticion %}
+                <div class="result-item">
+                    <div class="result-label">Repetición:</div>
+                    <div class="result-value">{{ resultado.lenguaje_repeticion }}</div>
+                </div>
+                {% endif %}
+                {% if resultado.errores_lenguaje.all %}
+                <div class="result-item">
+                    <div class="result-label">Errores de lenguaje:</div>
+                    <div class="result-value">
+                        {% for error in resultado.errores_lenguaje.all %}
+                            <span class="badge-selected">{{ error.tipo }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            <!-- PENSAMIENTO -->
+            {% if resultado.pensamiento_descripcion or resultado.pensamiento_forma %}
+            <div class="result-card">
+                <div class="section-header">
+                    <i class="fas fa-brain"></i> Pensamiento
+                </div>
+                {% if resultado.pensamiento_descripcion %}
+                <div class="result-item">
+                    <div class="result-label">Descripción:</div>
+                    <div class="result-value">{{ resultado.pensamiento_descripcion }}</div>
+                </div>
+                {% endif %}
+                {% if resultado.pensamiento_forma %}
+                <div class="result-item">
+                    <div class="result-label">Forma:</div>
+                    <div class="result-value">{{ resultado.pensamiento_forma }}</div>
+                </div>
+                {% endif %}
+                {% if resultado.pensamiento_contenido %}
+                <div class="result-item">
+                    <div class="result-label">Contenido:</div>
+                    <div class="result-value">{{ resultado.pensamiento_contenido }}</div>
+                </div>
+                {% endif %}
+                {% if resultado.pensamiento_juicio %}
+                <div class="result-item">
+                    <div class="result-label">Juicio:</div>
+                    <div class="result-value">{{ resultado.pensamiento_juicio }}</div>
+                </div>
+                {% endif %}
+                {% if resultado.pensamiento_introspeccion %}
+                <div class="result-item">
+                    <div class="result-label">Introspección:</div>
+                    <div class="result-value">{{ resultado.pensamiento_introspeccion }}</div>
+                </div>
+                {% endif %}
+                {% if resultado.pensamiento_prospeccion %}
+                <div class="result-item">
+                    <div class="result-label">Prospección:</div>
+                    <div class="result-value">{{ resultado.pensamiento_prospeccion }}</div>
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            <!-- SENSOPERCEPCIÓN -->
+            {% if resultado.sensopercepcion_descripcion or resultado.sensopercepcion_alteraciones %}
+            <div class="result-card">
+                <div class="section-header">
+                    <i class="fas fa-eye"></i> Sensopercepción
+                </div>
+                {% if resultado.sensopercepcion_descripcion %}
+                <div class="result-item">
+                    <div class="result-label">Descripción:</div>
+                    <div class="result-value">{{ resultado.sensopercepcion_descripcion }}</div>
+                </div>
+                {% endif %}
+                {% if resultado.sensopercepcion_alteraciones %}
+                <div class="result-item">
+                    <div class="result-label">Alteraciones:</div>
+                    <div class="result-value">{{ resultado.sensopercepcion_alteraciones }}</div>
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            <!-- FUNCIÓN EJECUTIVA -->
+            {% if resultado.funcion_ejecutiva_descripcion or resultado.funcion_ejecutiva_comportamientos or resultado.funcion_ejecutiva_sintomas %}
+            <div class="result-card">
+                <div class="section-header">
+                    <i class="fas fa-cogs"></i> Función Ejecutiva
+                </div>
+                {% if resultado.funcion_ejecutiva_descripcion %}
+                <div class="result-item">
+                    <div class="result-label">Descripción:</div>
+                    <div class="result-value">{{ resultado.funcion_ejecutiva_descripcion }}</div>
+                </div>
+                {% endif %}
+                {% if resultado.funcion_ejecutiva_comportamientos %}
+                <div class="result-item">
+                    <div class="result-label">Comportamientos:</div>
+                    <div class="result-value">{{ resultado.funcion_ejecutiva_comportamientos }}</div>
+                </div>
+                {% endif %}
+                {% if resultado.comportamiento_edad_inicio %}
+                <div class="result-item">
+                    <div class="result-label">Edad inicio comportamientos:</div>
+                    <div class="result-value">{{ resultado.comportamiento_edad_inicio }}</div>
+                </div>
+                {% endif %}
+                {% if resultado.comportamiento_caracteristicas %}
+                <div class="result-item">
+                    <div class="result-label">Características comportamientos:</div>
+                    <div class="result-value">{{ resultado.comportamiento_caracteristicas }}</div>
+                </div>
+                {% endif %}
+                {% if resultado.funcion_ejecutiva_sintomas %}
+                <div class="result-item">
+                    <div class="result-label">Síntomas ejecutivos:</div>
+                    <div class="result-value">{{ resultado.funcion_ejecutiva_sintomas }}</div>
+                </div>
+                {% endif %}
+                {% if resultado.sintomas_edad_inicio %}
+                <div class="result-item">
+                    <div class="result-label">Edad inicio síntomas:</div>
+                    <div class="result-value">{{ resultado.sintomas_edad_inicio }}</div>
+                </div>
+                {% endif %}
+                {% if resultado.sintomas_caracteristicas %}
+                <div class="result-item">
+                    <div class="result-label">Características síntomas:</div>
+                    <div class="result-value">{{ resultado.sintomas_caracteristicas }}</div>
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            <!-- ESTADO DE ÁNIMO -->
+            {% if resultado.estado_animo_descripcion or resultado.estado_animo_cualidades or resultado.estado_animo_expresiones %}
+            <div class="result-card">
+                <div class="section-header">
+                    <i class="fas fa-smile"></i> Estado de Ánimo y Afecto
+                </div>
+                {% if resultado.estado_animo_descripcion %}
+                <div class="result-item">
+                    <div class="result-label">Descripción:</div>
+                    <div class="result-value">{{ resultado.estado_animo_descripcion }}</div>
+                </div>
+                {% endif %}
+                {% if resultado.estado_animo_cualidades %}
+                <div class="result-item">
+                    <div class="result-label">Cualidades:</div>
+                    <div class="result-value">{{ resultado.estado_animo_cualidades }}</div>
+                </div>
+                {% endif %}
+                {% if resultado.estado_animo_expresiones %}
+                <div class="result-item">
+                    <div class="result-label">Expresiones:</div>
+                    <div class="result-value">{{ resultado.estado_animo_expresiones }}</div>
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            <!-- APETITO -->
+            {% if resultado.apetito_descripcion or resultado.apetito_cambios %}
+            <div class="result-card">
+                <div class="section-header">
+                    <i class="fas fa-utensils"></i> Apetito
+                </div>
+                {% if resultado.apetito_descripcion %}
+                <div class="result-item">
+                    <div class="result-label">Descripción:</div>
+                    <div class="result-value">{{ resultado.apetito_descripcion }}</div>
+                </div>
+                {% endif %}
+                {% if resultado.apetito_cambios %}
+                <div class="result-item">
+                    <div class="result-label">Cambios:</div>
+                    <div class="result-value">{{ resultado.apetito_cambios }}</div>
+                </div>
+                {% endif %}
+                {% if resultado.apetito_edad_inicio %}
+                <div class="result-item">
+                    <div class="result-label">Edad de inicio:</div>
+                    <div class="result-value">{{ resultado.apetito_edad_inicio }}</div>
+                </div>
+                {% endif %}
+                {% if resultado.apetito_caracteristicas %}
+                <div class="result-item">
+                    <div class="result-label">Características:</div>
+                    <div class="result-value">{{ resultado.apetito_caracteristicas }}</div>
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            <!-- FUNCIONALIDAD -->
+            {% if resultado.funcionalidad_descripcion or resultado.independencia_vida_diaria or resultado.actividades_vida_diaria.all or resultado.actividades_complejas.all %}
+            <div class="result-card">
+                <div class="section-header">
+                    <i class="fas fa-tasks"></i> Funcionalidad
+                </div>
+                {% if resultado.funcionalidad_descripcion %}
+                <div class="result-item">
+                    <div class="result-label">Descripción:</div>
+                    <div class="result-value">{{ resultado.funcionalidad_descripcion }}</div>
+                </div>
+                {% endif %}
+                {% if resultado.independencia_vida_diaria %}
+                <div class="result-item">
+                    <div class="result-label">Independencia vida diaria:</div>
+                    <div class="result-value">{{ resultado.independencia_vida_diaria|capfirst }}</div>
+                </div>
+                {% endif %}
+                {% if resultado.actividades_vida_diaria.all %}
+                <div class="result-item">
+                    <div class="result-label">Actividades vida diaria afectadas:</div>
+                    <div class="result-value">
+                        {% for actividad in resultado.actividades_vida_diaria.all %}
+                            <span class="badge-selected">{{ actividad.get_tipo_display }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+                {% if resultado.independencia_actividades_complejas %}
+                <div class="result-item">
+                    <div class="result-label">Independencia actividades complejas:</div>
+                    <div class="result-value">{{ resultado.independencia_actividades_complejas|capfirst }}</div>
+                </div>
+                {% endif %}
+                {% if resultado.actividades_complejas.all %}
+                <div class="result-item">
+                    <div class="result-label">Actividades complejas afectadas:</div>
+                    <div class="result-value">
+                        {% for actividad in resultado.actividades_complejas.all %}
+                            <span class="badge-selected">{{ actividad.get_tipo_display }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            <!-- CONDUCTA MOTORA -->
+            {% if resultado.conducta_motora_descripcion or resultado.trastornos_cuantitativos or resultado.trastornos_cualitativos %}
+            <div class="result-card">
+                <div class="section-header">
+                    <i class="fas fa-running"></i> Conducta Motora
+                </div>
+                {% if resultado.conducta_motora_descripcion %}
+                <div class="result-item">
+                    <div class="result-label">Descripción:</div>
+                    <div class="result-value">{{ resultado.conducta_motora_descripcion }}</div>
+                </div>
+                {% endif %}
+                {% if resultado.trastornos_cuantitativos %}
+                <div class="result-item">
+                    <div class="result-label">Trastornos cuantitativos:</div>
+                    <div class="result-value">{{ resultado.trastornos_cuantitativos }}</div>
+                </div>
+                {% endif %}
+                {% if resultado.trastornos_cualitativos %}
+                <div class="result-item">
+                    <div class="result-label">Trastornos cualitativos:</div>
+                    <div class="result-value">{{ resultado.trastornos_cualitativos }}</div>
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            {% else %}
+            <!-- No hay resultado -->
+            <div class="card">
+                <div class="card-body">
+                    <div class="no-data">
+                        <i class="fas fa-exclamation-triangle fa-3x mb-3"></i>
+                        <h4>No se encontraron resultados</h4>
+                        <p>No hay datos disponibles para este examen cognitivo.</p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+        </div>
+    </div>
+</div>
+
+<!-- Botón de imprimir -->
+<button onclick="window.print()" class="btn btn-primary btn-lg print-btn">
+    <i class="fas fa-print"></i> Imprimir
+</button>
+
+<script>
+// Mostrar mensaje de carga mientras se imprime
+document.querySelector('.print-btn').addEventListener('click', function() {
+    this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Preparando...';
+    setTimeout(() => {
+        this.innerHTML = '<i class="fas fa-print"></i> Imprimir';
+    }, 2000);
+});
+</script>
+
+{% endblock content %}
