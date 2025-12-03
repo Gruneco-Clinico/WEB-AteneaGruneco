@@ -1636,6 +1636,19 @@ def consulta_examenes(request):
             continue
 
         # ======================
+        # PITTSBURGH (id = 13)
+        # ======================
+        if ve.examen_id == 13:
+            examenes_data.append(
+                {
+                    "nombre": ve.examen.nombre,
+                    "estado": estado,
+                    "url": f"/guardar-examen-publico-pitsburg/?paciente_id={paciente.id}",
+                }
+            )
+            continue
+
+        # ======================
         # OTROS
         # ======================
         examenes_data.append(
@@ -1984,6 +1997,224 @@ def guardar_examen_publico_mew(request):
                     "paciente": paciente,
                     "puntaje": puntuacion_calculada,
                     "interpretacion": tipo_persona_calculado,
+                },
+            )
+
+        except Exception as e:
+            messages.error(request, f"❌ Error al guardar el examen: {str(e)}")
+            return redirect("formulario_demografico_externo")
+
+    else:
+        messages.error(request, "❌ Método no permitido.")
+        return redirect("formulario_demografico_externo")
+
+
+def guardar_examen_publico_pitsburg(request):
+    """Cargar y guardar examen Pittsburgh desde enlace público"""
+
+    # Función auxiliar para validar acceso
+    def validar_acceso():
+        if request.method == "GET":
+            paciente_id = request.GET.get("paciente_id")
+        else:
+            paciente_id = request.POST.get("paciente_id")
+
+        if not paciente_id:
+            return None, "❌ Datos de acceso incompletos."
+
+        try:
+            paciente = get_object_or_404(DatosDemograficos, id=paciente_id)
+            return paciente, None
+        except Exception as e:
+            return None, f"❌ Error al validar acceso: {str(e)}"
+
+    # Validar acceso
+    paciente, error = validar_acceso()
+    if error:
+        messages.error(request, error)
+        return redirect("formulario_demografico_externo")
+
+    if request.method == "GET":
+        # MOSTRAR FORMULARIO
+        try:
+            # Buscar visita automática
+            visita = Visita.objects.filter(
+                paciente=paciente, nombre="VISITA EPWORTH/MEW", Tipo_visita_id=7
+            ).first()
+
+            if not visita:
+                messages.error(request, "❌ No se encontró la visita asociada.")
+                return redirect("formulario_demografico_externo")
+
+            # Buscar o crear VisitaExamen para Pittsburgh
+            visita_examen = VisitaExamen.objects.filter(
+                visita=visita,
+                examen_id=13,  # ID del examen Pittsburgh
+            ).first()
+
+            if not visita_examen:
+                # Crear el VisitaExamen si no existe
+                examen_pitsburg = Examen.objects.get(id=13)
+                visita_examen = VisitaExamen.objects.create(
+                    visita=visita, examen=examen_pitsburg, estado="pendiente"
+                )
+
+            # Verificar si ya fue completado
+            if visita_examen.estado == "completado":
+                messages.info(
+                    request, "ℹ️ Este examen ya ha sido completado anteriormente."
+                )
+                return render(
+                    request,
+                    "registro_publico/examen_completado.html",
+                    {"examen_tipo": "Cuestionario de Pittsburgh", "paciente": paciente},
+                )
+
+            # Marcar como iniciado
+            if visita_examen.estado == "pendiente":
+                visita_examen.estado = "en_progreso"
+                visita_examen.fecha_inicio = timezone.now()
+                visita_examen.save()
+
+            # Buscar datos existentes si los hay
+            datos_examen = None
+            try:
+                resultado_existente = PittsburghResult.objects.get(
+                    visita_examen=visita_examen
+                )
+                datos_examen = model_to_dict(resultado_existente)
+                datos_examen.pop("id", None)
+                datos_examen.pop("visita_examen", None)
+            except PittsburghResult.DoesNotExist:
+                datos_examen = None
+
+            context = {
+                "paciente": paciente,
+                "visita": visita,
+                "visita_examen": visita_examen,
+                "datos_examen": datos_examen,
+                "paciente_id": paciente.id,
+                "examen_id": 13,
+            }
+
+            return render(request, "registro_publico/Pitsburg_publico.html", context)
+
+        except Exception as e:
+            messages.error(request, f"❌ Error al cargar el examen: {str(e)}")
+            return redirect("formulario_demografico_externo")
+
+    elif request.method == "POST":
+        print("POST DATA:", request.POST)
+        # GUARDAR RESULTADOS
+        try:
+            visita_id = request.POST.get("visita_id")
+            examen_id = 13  # ID fijo para Pittsburgh
+
+            visita_examen = get_object_or_404(
+                VisitaExamen, visita_id=visita_id, examen_id=examen_id
+            )
+
+            # Obtener los campos según los NOMBRES EXACTOS del modelo PittsburghResult
+            hora_acostarse = request.POST.get("hora_acostarse", "")
+            hora_levantarse = request.POST.get("hora_levantarse", "")
+            latencia_sueno = request.POST.get("latencia_sueno", "0")
+            horas_dormidas = request.POST.get("horas_sueno_real", "0")
+
+            # Problemas durante el sueño
+            conciliar_sueno = request.POST.get("conciliar_sueno", "")
+            despertarse_sueno = request.POST.get("despertarse_sueno", "")
+            levantarse_servicio_sueno = request.POST.get(
+                "levantarse_servicio_sueno", ""
+            )
+            respirar = request.POST.get("respirar", "")
+            toser_roncar_sueno = request.POST.get("toser_roncar_sueno", "")
+            sentir_frio_sueno = request.POST.get("sentir_frio_sueno", "")
+            calor_sueno = request.POST.get("calor_sueno", "")
+            pesadillas_sueno = request.POST.get("pesadillas_sueno", "")
+            dolores_sueno = request.POST.get("dolores_sueno", "")
+            otras_razones = request.POST.get("otras_razones", "")
+            otras_sueno = request.POST.get("otras_sueno", "")
+
+            # Evaluación general
+            calidad_sueno = request.POST.get("calidad_sueno", "")
+            medicinas_sueno = request.POST.get("medicinas_sueno", "")
+            somnolencia_sueno = request.POST.get("somnolencia_sueno", "")
+            problemas_animos_sueno = request.POST.get("problemas_animos_sueno", "")
+
+            # Información de compañía
+            duerme_acompanado = request.POST.get("duerme_acompanado", "")
+            ronquidos_ruidosos = request.POST.get("ronquidos_ruidosos", "")
+            pausas_respiracion = request.POST.get("pausas_respiracion", "")
+            sacudidas_piernas = request.POST.get("sacudidas_piernas", "")
+            desorientacion_confusion = request.POST.get("desorientacion_confusion", "")
+            descripcion_inconvenientes = request.POST.get(
+                "descripcion_inconvenientes", ""
+            )
+            otros_inconvenientes = request.POST.get("otros_inconvenientes", "")
+
+            # Convertir valores numéricos
+            try:
+                latencia_sueno_num = float(latencia_sueno) if latencia_sueno else 0
+                horas_sueno_real_num = float(horas_dormidas) if horas_dormidas else 0
+            except ValueError:
+                latencia_sueno_num = 0
+                horas_sueno_real_num = 0
+
+            # Crear o actualizar el resultado Pittsburgh
+            pitsburg_result, created = PittsburghResult.objects.update_or_create(
+                visita_examen=visita_examen,
+                defaults={
+                    # Campos de tiempo
+                    "hora_acostarse": hora_acostarse,
+                    "hora_levantarse": hora_levantarse,
+                    "latencia_sueno": latencia_sueno_num,
+                    "horas_dormidas": horas_sueno_real_num,
+                    # Problemas durante el sueño
+                    "conciliar_sueno": conciliar_sueno,
+                    "despertarse_sueno": despertarse_sueno,
+                    "levantarse_servicio_sueno": levantarse_servicio_sueno,
+                    "respirar": respirar,
+                    "toser_roncar_sueno": toser_roncar_sueno,
+                    "sentir_frio_sueno": sentir_frio_sueno,
+                    "calor_sueno": calor_sueno,
+                    "pesadillas_sueno": pesadillas_sueno,
+                    "dolores_sueno": dolores_sueno,
+                    "otras_razones": otras_razones,
+                    "otras_sueno": otras_sueno,
+                    # Evaluación general
+                    "calidad_sueno": calidad_sueno,
+                    "medicinas_sueno": medicinas_sueno,
+                    "somnolencia_sueno": somnolencia_sueno,
+                    "problemas_animos_sueno": problemas_animos_sueno,
+                    # Información de compañía
+                    "duerme_acompanado": duerme_acompanado,
+                    "ronquidos_ruidosos": ronquidos_ruidosos,
+                    "pausas_respiracion": pausas_respiracion,
+                    "sacudidas_piernas": sacudidas_piernas,
+                    "desorientacion_confusion": desorientacion_confusion,
+                    "descripcion_inconvenientes": descripcion_inconvenientes,
+                    "otros_inconvenientes": otros_inconvenientes,
+                },
+            )
+
+            # Marcar el examen como completado
+            visita_examen.estado = "completado"
+            visita_examen.fecha_completado = timezone.now()
+            visita_examen.save()
+
+            # Mensaje de éxito y redirección a página pública
+            messages.success(
+                request,
+                f"✅ Cuestionario de Pittsburgh completado exitosamente.",
+            )
+
+            return render(
+                request,
+                "registro_publico/examen_completado_exitoso.html",
+                {
+                    "examen_tipo": "Cuestionario de Calidad de Sueño de Pittsburgh",
+                    "paciente": paciente,
+                    "interpretacion": f"Calidad de sueño reportada: {calidad_sueno}",
                 },
             )
 

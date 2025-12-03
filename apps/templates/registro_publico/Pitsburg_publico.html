@@ -1,0 +1,576 @@
+{% extends 'layouts/base_public.html' %}
+
+{% block content %}
+<div class="header bg-primary pb-6">
+    <div class="container-fluid">
+        <div class="header-body">
+            <div class="row align-items-center py-4">
+                <div class="col-lg-6 col-5">
+                    <h6 class="h2 text-white d-inline-block mb-0">Información del Paciente</h6>
+                    <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
+                        <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
+                            <li class="breadcrumb-item"><a href="#"><i class="fas fa-home"></i></a></li>
+                            <li class="breadcrumb-item"><a href="/pacientes/">Pacientes</a></li>
+                            <li class="breadcrumb-item"><a href="/pacientes/">Volver</a></li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid mt--6">
+    <div class="row">
+        <div class="col">
+            <div class="card shadow">
+                <form method="post" action="{% url 'guardar_examen_publico_pitsburg' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="visita_id" id="visita_id" value="{{ visita.id }}" />
+                    <input type="hidden" name="paciente_id" id="paciente_id" value="{{ paciente.id }}" />
+                  
+
+
+                    <!-- Card Header -->
+                    <div class="card-header border-0">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <h3 class="mb-0">Cuestionario de Pittsburgh</h3>
+                            </div>
+                            <div class="col text-right">
+                                <span class="text-muted">Fecha: {% now "d/m/Y" %}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card Body -->
+                    <div class="card-body">
+                        <div class="card bg-gradient-default shadow-sm mb-4">
+                            <div class="card-header bg-transparent">
+                                <h4 class="text-white mb-0">Hábitos de Sueño</h4>
+                            </div>
+                            <div class="card-body bg-white">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label>Hora de acostarse durante el último mes</label>
+                                            <input type="time" name="hora_acostarse"
+                                                value="{% if datos_examen.hora_acostarse %}{{ datos_examen.hora_acostarse }}{% endif %}"
+                                                class="form-control" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label>Hora de levantarse durante el último mes</label>
+                                            <input type="time" name="hora_levantarse"
+                                                value="{% if datos_examen.hora_levantarse %}{{ datos_examen.hora_levantarse }}{% endif %}"
+                                                class="form-control" required>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label>Latencia de inicio de sueño (minutos)</label>
+                                            <input type="number" name="latencia_sueno"
+                                                value="{% if datos_examen.latencia_sueno %}{{ datos_examen.latencia_sueno|floatformat:0.1|cut:',' }}{% endif %}"
+                                                class="form-control" min="0" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label>Horas de sueño real cada noche (último mes)</label>
+                                            <input type="number" name="horas_sueno_real"
+                                                value="{% if datos_examen.horas_dormidas %}{{ datos_examen.horas_dormidas|floatformat:0.1|cut:',' }}{% endif %}"
+                                                class="form-control" step="0.1" min="0" required>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card bg-gradient-default shadow-sm mb-4">
+                            <div class="card-header bg-transparent">
+                                <h4 class="text-white mb-0">Problemas durante el sueño</h4>
+                            </div>
+                            <div class="card-body bg-white">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label>No poder conciliar el sueño</label>
+                                            <select name="conciliar_sueno" class="form-control" required>
+                                                {% if datos_examen and datos_examen.conciliar_sueno %}
+                                                <option value="{{ datos_examen.conciliar_sueno }}" selected>
+                                                    {{datos_examen.conciliar_sueno }}</option>
+                                                {% else %}
+                                                <option value="" selected disabled>Seleccione frecuencia</option>
+                                                {% endif %}
+                                                <option value="Ninguna vez">Ninguna vez</option>
+                                                <option value="Menos de una vez a la semana">Menos de una vez a la
+                                                    semana</option>
+                                                <option value="Una o dos veces a la semana">Una o dos veces a la semana
+                                                </option>
+                                                <option value="Tres o más veces a la semana">Tres o más veces a la
+                                                    semana</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label>Despertarse durante la noche o de madrugada</label>
+                                            <select name="despertarse_sueno" class="form-control" required>
+                                                {% if datos_examen and datos_examen.despertarse_sueno %}
+                                                <option value="{{ datos_examen.despertarse_sueno }}" selected>
+                                                    {{datos_examen.despertarse_sueno }}</option>
+                                                {% else %}
+                                                <option value="" selected disabled>Seleccione frecuencia</option>
+                                                {% endif %}
+                                                <option value="Ninguna vez">Ninguna vez</option>
+                                                <option value="Menos de una vez a la semana">Menos de una vez a la
+                                                    semana</option>
+                                                <option value="Una o dos veces a la semana">Una o dos veces a la semana
+                                                </option>
+                                                <option value="Tres o más veces a la semana">Tres o más veces a la
+                                                    semana</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label>Tener que levantarse para ir al servicio</label>
+                                            <select name="levantarse_servicio_sueno" class="form-control" required>
+                                                {% if datos_examen and datos_examen.levantarse_servicio_sueno %}
+                                                <option value="{{ datos_examen.levantarse_servicio_sueno }}" selected>
+                                                    {{datos_examen.levantarse_servicio_sueno }}</option>
+                                                {% else %}
+                                                <option value="" selected disabled>Seleccione frecuencia</option>
+                                                {% endif %}
+                                                <option value="Ninguna vez">Ninguna vez</option>
+                                                <option value="Menos de una vez a la semana">Menos de una vez a la
+                                                    semana</option>
+                                                <option value="Una o dos veces a la semana">Una o dos veces a la semana
+                                                </option>
+                                                <option value="Tres o más veces a la semana">Tres o más veces a la
+                                                    semana</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label>No poder respirar bien</label>
+                                            <select name="respirar" class="form-control" required>
+                                                {% if datos_examen and datos_examen.respirar %}
+                                                <option value="{{ datos_examen.respirar }}" selected>
+                                                    {{datos_examen.respirar }}</option>
+                                                {% else %}
+                                                <option value="" selected disabled>Seleccione frecuencia</option>
+                                                {% endif %}
+                                                <option value="Ninguna vez">Ninguna vez</option>
+                                                <option value="Menos de una vez a la semana">Menos de una vez a la
+                                                    semana</option>
+                                                <option value="Una o dos veces a la semana">Una o dos veces a la semana
+                                                </option>
+                                                <option value="Tres o más veces a la semana">Tres o más veces a la
+                                                    semana</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label>Toser o roncar ruidosamente</label>
+                                            <select name="toser_roncar_sueno" class="form-control" required>
+                                                {% if datos_examen and datos_examen.toser_roncar_sueno %}
+                                                <option value="{{ datos_examen.toser_roncar_sueno }}" selected>
+                                                    {{datos_examen.toser_roncar_sueno }}</option>
+                                                {% else %}
+                                                <option value="" selected disabled>Seleccione frecuencia</option>
+                                                {% endif %}
+                                                <option value="Ninguna vez">Ninguna vez</option>
+                                                <option value="Menos de una vez a la semana">Menos de una vez a la
+                                                    semana</option>
+                                                <option value="Una o dos veces a la semana">Una o dos veces a la semana
+                                                </option>
+                                                <option value="Tres o más veces a la semana">Tres o más veces a la
+                                                    semana</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label>Sentir frío</label>
+                                            <select name="sentir_frio_sueno" class="form-control" required>
+                                                {% if datos_examen and datos_examen.sentir_frio_sueno %}
+                                                <option value="{{ datos_examen.sentir_frio_sueno }}" selected>
+                                                    {{datos_examen.sentir_frio_sueno }}</option>
+                                                {% else %}
+                                                <option value="" selected disabled>Seleccione frecuencia</option>
+                                                {% endif %}
+                                                <option value="Ninguna vez">Ninguna vez</option>
+                                                <option value="Menos de una vez a la semana">Menos de una vez a la
+                                                    semana</option>
+                                                <option value="Una o dos veces a la semana">Una o dos veces a la semana
+                                                </option>
+                                                <option value="Tres o más veces a la semana">Tres o más veces a la
+                                                    semana</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label>Sentir demasiado calor</label>
+                                            <select name="calor_sueno" class="form-control" required>
+                                                {% if datos_examen and datos_examen.calor_sueno %}
+                                                <option value="{{ datos_examen.calor_sueno }}" selected>
+                                                    {{datos_examen.calor_sueno }}</option>
+                                                {% else %}
+                                                <option value="" selected disabled>Seleccione frecuencia</option>
+                                                {% endif %}
+                                                <option value="Ninguna vez">Ninguna vez</option>
+                                                <option value="Menos de una vez a la semana">Menos de una vez a la
+                                                    semana</option>
+                                                <option value="Una o dos veces a la semana">Una o dos veces a la semana
+                                                </option>
+                                                <option value="Tres o más veces a la semana">Tres o más veces a la
+                                                    semana</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label>Tener pesadillas o "malos sueños"</label>
+                                            <select name="pesadillas_sueno" class="form-control" required>
+                                                {% if datos_examen and datos_examen.pesadillas_sueno %}
+                                                <option value="{{ datos_examen.pesadillas_sueno }}" selected>
+                                                    {{datos_examen.pesadillas_sueno }}</option>
+                                                {% else %}
+                                                <option value="" selected disabled>Seleccione frecuencia</option>
+                                                {% endif %}
+                                                <option value="Ninguna vez">Ninguna vez</option>
+                                                <option value="Menos de una vez a la semana">Menos de una vez a la
+                                                    semana</option>
+                                                <option value="Una o dos veces a la semana">Una o dos veces a la semana
+                                                </option>
+                                                <option value="Tres o más veces a la semana">Tres o más veces a la
+                                                    semana</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label>Sufrir dolores</label>
+                                            <select name="dolores_sueno" class="form-control" required>
+                                                {% if datos_examen and datos_examen.dolores_sueno %}
+                                                <option value="{{ datos_examen.dolores_sueno }}" selected>
+                                                    {{datos_examen.dolores_sueno }}</option>
+                                                {% else %}
+                                                <option value="" selected disabled>Seleccione frecuencia</option>
+                                                {% endif %}
+                                                <option value="Ninguna vez">Ninguna vez</option>
+                                                <option value="Menos de una vez a la semana">Menos de una vez a la
+                                                    semana</option>
+                                                <option value="Una o dos veces a la semana">Una o dos veces a la semana
+                                                </option>
+                                                <option value="Tres o más veces a la semana">Tres o más veces a la
+                                                    semana</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label>Otras razones (describir)</label>
+                                            <input type="text" name="otras_razones"
+                                                value="{% if datos_examen.otras_razones %}{{ datos_examen.otras_razones }}{% endif %}"
+                                                class="form-control">
+                                            <select name="otras_sueno" class="form-control mt-2">
+                                                {% if datos_examen and datos_examen.otras_sueno %}
+                                                <option value="{{ datos_examen.otras_sueno }}" selected>
+                                                    {{datos_examen.otras_sueno }}</option>
+                                                {% else %}
+                                                <option value="" selected disabled>Seleccione frecuencia</option>
+                                                {% endif %}
+                                                <option value="Ninguna vez">Ninguna vez</option>
+                                                <option value="Menos de una vez a la semana">Menos de una vez a la
+                                                    semana</option>
+                                                <option value="Una o dos veces a la semana">Una o dos veces a la semana
+                                                </option>
+                                                <option value="Tres o más veces a la semana">Tres o más veces a la
+                                                    semana</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card bg-gradient-default shadow-sm mb-4">
+                            <div class="card-header bg-transparent">
+                                <h4 class="text-white mb-0">Evaluación General</h4>
+                            </div>
+                            <div class="card-body bg-white">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label>¿Cómo valoraría en conjunto su calidad de sueño?</label>
+                                            <select name="calidad_sueno" class="form-control" required>
+                                                {% if datos_examen and datos_examen.calidad_sueno %}
+                                                <option value="{{ datos_examen.calidad_sueno }}" selected>
+                                                    {{datos_examen.calidad_sueno }}</option>
+                                                {% else %}
+                                                <option value="" selected disabled>Seleccione una opción</option>
+                                                {% endif %}
+                                                <option value="Buena">Buena</option>
+                                                <option value="Bastante buena">Bastante buena</option>
+                                                <option value="Mala">Mala</option>
+                                                <option value="Bastante mala">Bastante mala</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label>¿Ha tomado medicinas para dormir?</label>
+                                            <select name="medicinas_sueno" class="form-control" required>
+                                                {% if datos_examen and datos_examen.medicinas_sueno %}
+                                                <option value="{{ datos_examen.medicinas_sueno }}" selected>
+                                                    {{datos_examen.medicinas_sueno }}</option>
+                                                {% else %}
+                                                <option value="" selected disabled>Seleccione una opción</option>
+                                                {% endif %}
+                                                <option value="Ninguna vez">Ninguna vez</option>
+                                                <option value="Menos de una vez a la semana">Menos de una vez a la
+                                                    semana</option>
+                                                <option value="Una o dos veces a la semana">Una o dos veces a la semana
+                                                </option>
+                                                <option value="Tres o más veces a la semana">Tres o más veces a la
+                                                    semana</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label>¿Ha sentido somnolencia durante actividades?</label>
+                                            <select name="somnolencia_sueno" class="form-control" required>
+                                                {% if datos_examen and datos_examen.somnolencia_sueno %}
+                                                <option value="{{ datos_examen.somnolencia_sueno }}" selected>
+                                                    {{datos_examen.somnolencia_sueno }}</option>
+                                                {% else %}
+                                                <option value="" selected disabled>Seleccione una opción</option>
+                                                {% endif %}
+                                                <option value="Ninguna vez">Ninguna vez</option>
+                                                <option value="Menos de una vez a la semana">Menos de una vez a la
+                                                    semana</option>
+                                                <option value="Una o dos veces a la semana">Una o dos veces a la semana
+                                                </option>
+                                                <option value="Tres o más veces a la semana">Tres o más veces a la
+                                                    semana</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label>¿Problemas de ánimo para realizar actividades?</label>
+                                            <select name="problemas_animos_sueno" class="form-control" required>
+                                                {% if datos_examen and datos_examen.problemas_animos_sueno %}
+                                                <option value="{{ datos_examen.problemas_animos_sueno }}" selected>
+                                                    {{datos_examen.problemas_animos_sueno }}</option>
+                                                {% else %}
+                                                <option value="" selected disabled>Seleccione una opción</option>
+                                                {% endif %}
+                                                <option value="Ningun problema">Ningun problema
+                                                </option>
+                                                <option value="Solo un leve problema"> Solo un leve problema
+                                                </option>
+                                                <option value="Un problema"> Un problema
+                                                </option>
+                                                <option value="Un grave problema">Un grave problema</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card bg-gradient-default shadow-sm mb-4">
+                            <div class="card-header bg-transparent">
+                                <h4 class="text-white mb-0">Información de Compañía</h4>
+                            </div>
+                            <div class="card-body bg-white">
+                                <div class="form-group">
+                                    <label>¿Duerme solo o acompañado?</label>
+                                    <select id="duerme_acompanado" name="duerme_acompanado" class="form-control"
+                                        onchange="toggleFields()" required>
+                                        {% if datos_examen and datos_examen.duerme_acompanado %}
+                                        <option value="{{ datos_examen.duerme_acompanado }}" selected>
+                                            {{datos_examen.duerme_acompanado }}</option>
+                                        {% else %}
+                                        <option value="" selected disabled>Seleccione una opción</option>
+                                        {% endif %}
+                                        <option value="Solo">Solo</option>
+                                        <option value="Con alguien en otra habitación">Con alguien en otra habitación
+                                        </option>
+                                        <option value="Otra cama">Otra cama</option>
+                                        <option value="En la misma cama">En la misma cama</option>
+                                    </select>
+                                </div>
+
+                                <div id="acompanado_fields" style="display: none;">
+                                    <hr>
+                                    <h5 class="mb-3">Información adicional (si duerme acompañado)</h5>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label>Ronquidos ruidosos</label>
+                                                <select name="ronquidos_ruidosos" class="form-control">
+                                                    {% if datos_examen and datos_examen.ronquidos_ruidosos %}
+                                                    <option value="{{ datos_examen.ronquidos_ruidosos }}" selected>
+                                                        {{datos_examen.ronquidos_ruidosos }}</option>
+                                                    {% else %}
+                                                    <option value="" selected disabled>Seleccione frecuencia</option>
+                                                    {% endif %}
+                                                    <option value="Ninguna vez en el último mes">Ninguna vez en el
+                                                        último mes</option>
+                                                    <option value="Menos de una vez a la semana">Menos de una vez a la
+                                                        semana</option>
+                                                    <option value="Una o dos veces a la semana">Una o dos veces a la
+                                                        semana</option>
+                                                    <option value="Tres o más veces a la semana">Tres o más veces a la
+                                                        semana</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label>Grandes pausas entre respiraciones</label>
+                                                <select name="pausas_respiracion" class="form-control">
+                                                    {% if datos_examen and datos_examen.pausas_respiracion %}
+                                                    <option value="{{ datos_examen.pausas_respiracion }}" selected>
+                                                        {{datos_examen.pausas_respiracion }}</option>
+                                                    {% else %}
+                                                    <option value="" selected disabled>Seleccione frecuencia</option>
+                                                    {% endif %}
+                                                    <option value="Ninguna vez en el último mes">Ninguna vez en el
+                                                        último mes</option>
+                                                    <option value="Menos de una vez a la semana">Menos de una vez a la
+                                                        semana</option>
+                                                    <option value="Una o dos veces a la semana">Una o dos veces a la
+                                                        semana</option>
+                                                    <option value="Tres o más veces a la semana">Tres o más veces a la
+                                                        semana</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label>Sacudidas o espasmos de piernas</label>
+                                                <select name="sacudidas_piernas" class="form-control">
+                                                    {% if datos_examen and datos_examen.sacudidas_piernas %}
+                                                    <option value="{{ datos_examen.sacudidas_piernas }}" selected>
+                                                        {{datos_examen.sacudidas_piernas }}</option>
+                                                    {% else %}
+                                                    <option value="" selected disabled>Seleccione frecuencia</option>
+                                                    {% endif %}
+                                                    <option value="Ninguna vez en el último mes">Ninguna vez en el
+                                                        último mes</option>
+                                                    <option value="Menos de una vez a la semana">Menos de una vez a la
+                                                        semana</option>
+                                                    <option value="Una o dos veces a la semana">Una o dos veces a la
+                                                        semana</option>
+                                                    <option value="Tres o más veces a la semana">Tres o más veces a la
+                                                        semana</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label>Episodios de desorientación o confusión</label>
+                                                <select name="desorientacion_confusion" class="form-control">
+                                                    {% if datos_examen and datos_examen.desorientacion_confusion %}
+                                                    <option value="{{ datos_examen.desorientacion_confusion }}"
+                                                        selected>
+                                                        {{datos_examen.desorientacion_confusion }}</option>
+                                                    {% else %}
+                                                    <option value="" selected disabled>Seleccione frecuencia</option>
+                                                    {% endif %}
+                                                    <option value="Ninguna vez en el último mes">Ninguna vez en el
+                                                        último mes</option>
+                                                    <option value="Menos de una vez a la semana">Menos de una vez a la
+                                                        semana</option>
+                                                    <option value="Una o dos veces a la semana">Una o dos veces a la
+                                                        semana</option>
+                                                    <option value="Tres o más veces a la semana">Tres o más veces a la
+                                                        semana</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Otros inconvenientes mientras duerme</label>
+                                        <textarea name="descripcion_inconvenientes" class="form-control"
+                                            placeholder="Describa otros inconvenientes">{{ datos_examen.descripcion_inconvenientes }}</textarea>
+                                        <select name="otros_inconvenientes" class="form-control mt-2">
+                                            {% if datos_examen and datos_examen.otros_inconvenientes %}
+                                            <option value="{{ datos_examen.otros_inconvenientes }}" selected>
+                                                {{datos_examen.otros_inconvenientes }}</option>
+                                            {% else %}
+                                            <option value="" selected disabled>Seleccione frecuencia</option>
+                                            {% endif %}
+                                            <option value="Ninguna vez en el último mes">Ninguna vez en el último mes
+                                            </option>
+                                            <option value="Menos de una vez a la semana">Menos de una vez a la semana
+                                            </option>
+                                            <option value="Una o dos veces a la semana">Una o dos veces a la semana
+                                            </option>
+                                            <option value="Tres o más veces a la semana">Tres o más veces a la semana
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Botones de acción -->
+                        <div class="row mt-4">
+                            <div class="col-12 text-right">
+                                <button type="submit" class="btn btn-primary">Guardar Examen</button>
+                                <a href="{% url 'detalle_paciente' paciente_id %}" class="btn btn-secondary">Ver
+                                    Paciente</a>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleFields() {
+        var select = document.getElementById("duerme_acompanado");
+        var fields = document.getElementById("acompanado_fields");
+
+        // Mostrar campos si no es "Solo"
+        if (select.value !== "Solo" && select.value !== "") {
+            fields.style.display = "block";
+        } else {
+            fields.style.display = "none";
+        }
+    }
+
+    // Ejecutar al cargar la página para establecer el estado inicial
+    document.addEventListener("DOMContentLoaded", function () {
+        toggleFields();
+    });
+</script>
+
+{% endblock %}

@@ -90,6 +90,12 @@ urlpatterns = [
         views.guardar_examen_publico_mew,
         name="guardar_examen_publico_mew",
     ),
+    # En tu archivo urls.py, añade esta línea junto con las otras URLs:
+    path(
+        "guardar-examen-publico-pitsburg/",
+        views.guardar_examen_publico_pitsburg,
+        name="guardar_examen_publico_pitsburg",
+    ),
     # PROYECTOS
     path("proyectos/", views.proyectos, name="proyectos"),
     path(
