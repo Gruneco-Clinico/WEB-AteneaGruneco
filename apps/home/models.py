@@ -900,25 +900,44 @@ class EpworthResult(ResultadoExamenBase):
 
 
 class MEWResult(ResultadoExamenBase):
-    hora_levantarse = models.CharField(max_length=150)
-    hora_acostarse = models.CharField(max_length=150)
-    uso_despertador = models.CharField(max_length=150)
-    facilidad_levantarse = models.CharField(max_length=150)
-    alerta_manana = models.CharField(max_length=150)
-    apetito_manana = models.CharField(max_length=150)
-    descanso_manana = models.CharField(max_length=150)
-    hora_acostarse_libre = models.CharField(max_length=150)
-    ejercicio_fisico = models.CharField(max_length=150)
-    hora_cansancio_noche = models.CharField(max_length=150)
-    nivel_cansancia_11 = models.CharField(max_length=150)
-    hora_despertarse_si_tarde = models.CharField(max_length=150)
-    guardia_nocturna = models.CharField(max_length=150)
-    horario_trabajo_fisico = models.CharField(max_length=150)
-    ejercicio_nocturno = models.CharField(max_length=150)
-    horario_trabajo = models.CharField(max_length=150)
-    maximo_bienestar = models.CharField(max_length=150)
-    tipo_persona = models.CharField(max_length=150)
+    hora_levantarse = models.CharField(max_length=150, blank=True, null=True)
+    hora_acostarse = models.CharField(max_length=150, blank=True, null=True)
+    uso_despertador = models.CharField(max_length=150, blank=True, null=True)
+    facilidad_levantarse = models.CharField(max_length=150, blank=True, null=True)
+    alerta_manana = models.CharField(max_length=150, blank=True, null=True)
+    apetito_manana = models.CharField(max_length=150, blank=True, null=True)
+    descanso_manana = models.CharField(max_length=150, blank=True, null=True)
+    hora_acostarse_libre = models.CharField(max_length=150, blank=True, null=True)
+
+    # Pregunta 9: Ejercicio de mañana (7:00-8:00 AM)
+    ejercicio_manana = models.CharField(max_length=150, blank=True, null=True)
+
+    ejercicio_fisico = models.CharField(max_length=150, blank=True, null=True)
+    hora_cansancio_noche = models.CharField(max_length=150, blank=True, null=True)
+    nivel_cansancia_11 = models.CharField(max_length=150, blank=True, null=True)
+    prueba_mental = models.CharField(max_length=150, blank=True, null=True)
+
+    # Pregunta 12: Cansancio a las 11 PM
+    cansancio_11pm = models.CharField(max_length=150, blank=True, null=True)
+
+    # Pregunta 13: Despertar tarde
+    despertar_tarde = models.CharField(max_length=150, blank=True, null=True)
+
+    hora_despertarse_si_tarde = models.CharField(max_length=150, blank=True, null=True)
+    guardia_nocturna = models.CharField(max_length=150, blank=True, null=True)
+    horario_trabajo_fisico = models.CharField(max_length=150, blank=True, null=True)
+
+    # Pregunta 15: Trabajo físico
+    trabajo_fisico = models.CharField(max_length=150, blank=True, null=True)
+
+    ejercicio_nocturno = models.CharField(max_length=150, blank=True, null=True)
+    horario_trabajo = models.CharField(max_length=150, blank=True, null=True)
+    maximo_bienestar = models.CharField(max_length=150, blank=True, null=True)
+    tipo_persona = models.CharField(max_length=150, blank=True, null=True)
     puntuacion = models.IntegerField()
+
+    def __str__(self):
+        return f"MEQ - {self.visita_examen_id}"
 
 
 class BerlinResult(ResultadoExamenBase):

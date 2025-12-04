@@ -20,9 +20,9 @@
     </div>
 </div>
 
-<div class="container-fluid mt--6">
+<div class="container-fluid pb-6">
     <div class="row">
-        <div class="col">
+       
             <div class="card shadow">
                 <form method="post" action="{% url 'guardar_examen_MEW' %}">
                     {% csrf_token %}
@@ -46,7 +46,7 @@
                     <div class="card-body">
                         <div class="row">
                             <!-- Columna 1: Hábitos de Sueño -->
-                            <div class="col-md-6">
+                            <div class="col-md-12">
                                 <div class="card bg-gradient-default shadow-sm mb-4">
                                     <div class="card-header bg-transparent">
                                         <h4 class="text-white mb-0">Hábitos de Sueño</h4>
@@ -54,7 +54,7 @@
                                     <div class="card-body bg-white">
                                         <!-- Pregunta 1 -->
                                         <div class="form-group">
-                                            <label>1. ¿A qué hora te levantarías?</label>
+                                            <label>1. ¿A qué hora te levantarías si tuvieras total libertad para planificar tu día?</label>
                                             <select class="form-control" name="hora_levantarse_meq" required>
                                                 {% if datos_examen and datos_examen.hora_levantarse %}
                                                 <option value="{{ datos_examen.hora_levantarse }}" selected>
@@ -71,7 +71,7 @@
                                         </div>
                                         <!-- Pregunta 2 -->
                                         <div class="form-group">
-                                            <label>2. ¿A qué hora te acostarías?</label>
+                                            <label>2. ¿A qué hora te irías a dormir si tuvieras total libertad para planificar tu noche?</label>
                                             <select class="form-control" name="hora_acostarse_meq" required>
                                                 {% if datos_examen and datos_examen.hora_acostarse %}
                                                 <option value="{{ datos_examen.hora_acostarse }}" selected>
@@ -92,7 +92,7 @@
                                         </div>
                                         <!-- Pregunta 3 -->
                                         <div class="form-group">
-                                            <label>3. ¿Hasta qué punto necesitas despertador?</label>
+                                            <label>3. Si hay una hora específica a la que tienes que levantarte por la mañana, ¿en qué medida dependes de que te despierte un despertador?</label>
                                             <select class="form-control" name="uso_despertador_meq" required>
                                                 {% if datos_examen and datos_examen.uso_despertador %}
                                                 <option value="{{ datos_examen.uso_despertador }}" selected>
@@ -108,7 +108,7 @@
                                         </div>
                                         <!-- Pregunta 4 -->
                                         <div class="form-group">
-                                            <label>4. ¿Te resulta fácil levantarte por las mañanas?</label>
+                                            <label>4. ¿Qué tan fácil te resulta levantarte por la mañana (cuando no te despiertan inesperadamente)?</label>
                                             <select class="form-control" name="facilidad_levantarse_meq" required>
                                                 <option value="" selected disabled>Seleccione una opción</option>
                                                 {% if datos_examen and datos_examen.facilidad_levantarse %}
@@ -125,7 +125,7 @@
                                         </div>
                                         <!-- Pregunta 5 -->
                                         <div class="form-group">
-                                            <label>5. ¿Qué tal te encuentras durante la primera media hora?</label>
+                                            <label>5. ¿Qué tan alerta te sientes durante la primera media hora después de despertarte por la mañana?</label>
                                             <select class="form-control" name="alerta_manana_meq" required>
 
                                                 {% if datos_examen and datos_examen.alerta_manana %}
@@ -142,7 +142,7 @@
                                         </div>
                                         <!-- Pregunta 6 -->
                                         <div class="form-group">
-                                            <label>6. ¿Cómo es tu apetito durante la primera media hora?</label>
+                                            <label>6. Una vez levantado por las mañanas. ¿Cómo es tu apetito durante la primera media hora?</label>
                                             <select class="form-control" name="apetito_manana_meq" required>
                                                 <option value="" selected disabled>Seleccione una opción</option>
                                                 {% if datos_examen and datos_examen.apetito_manana %}
@@ -159,7 +159,7 @@
                                         </div>
                                         <!-- Pregunta 7 -->
                                         <div class="form-group">
-                                            <label>7. ¿Qué tal te sientes durante la primera media hora?</label>
+                                            <label>7. Durante la primera media hora después de despertarte por la mañana, ¿qué tan cansado te sientes?</label>
                                             <select class="form-control" name="descanso_manana_meq" required>
                                                 {% if datos_examen and datos_examen.descanso_manana %}
                                                 <option value="{{ datos_examen.descanso_manana }}" selected>
@@ -175,7 +175,7 @@
                                         </div>
                                         <!-- Pregunta 8 -->
                                         <div class="form-group">
-                                            <label>8. ¿A qué hora te acuestas cuando eres libre?</label>
+                                            <label>8. Si no tuvieras compromisos al día siguiente, ¿a qué hora te irías a dormir en comparación con tu hora habitual?</label>
                                             <select class="form-control" name="hora_acostarse_libre_meq" required>
                                                 <option value="" selected disabled>Seleccione una opción</option>
                                                 {% if datos_examen and datos_examen.hora_acostarse_libre %}
@@ -195,230 +195,202 @@
                                                 </option>
                                             </select>
                                         </div>
-                                        <!-- Pregunta 9 -->
-                                        <div class="form-group">
-                                            <label>9. ¿A qué hora necesitas dormir por cansancio?</label>
-                                            <select class="form-control" name="hora_cansancio_noche_meq" required>
-                                                <option value="" selected disabled>Seleccione una opción</option>
-                                                {% if datos_examen and datos_examen.hora_cansancio_noche %}
-                                                <option value="{{ datos_examen.hora_cansancio_noche }}" selected>
-                                                    {{ datos_examen.hora_cansancio_noche }}</option>
-                                                {% else %}
-                                                <option value="" selected disabled>Seleccione una opción</option>
-                                                {% endif %}
-                                                <option value="20:00 - 21:00">20:00 - 21:00</option>
-                                                <option value="21:00 - 22:15">21:00 - 22:15</option>
-                                                <option value="22:15 - 00:45">22:15 - 00:45</option>
-                                                <option value="00:45 - 02:00">00:45 - 02:00</option>
-                                                <option value="02:00 - 03:00">02:00 - 03:00</option>
-                                            </select>
-                                        </div>
-                                        <!-- Pregunta 10 -->
-                                        <div class="form-group">
-                                            <label>10. Si te acostaras a las 11 PM, ¿qué nivel de cansancio
-                                                notarías?</label>
-                                            <select class="form-control" name="nivel_cansancia_11" required>
+                                                                <!-- Pregunta 9 - CORREGIR COMPLETAMENTE -->
+                        <div class="form-group">
+                            <label>9. Has decidido hacer ejercicio. Un amigo te sugiere que lo hagas una hora dos veces por semana, y el mejor momento para él es entre las 7:00 y las 8:00 a. m. Teniendo en cuenta solo tu reloj interno, ¿cómo crees que te desempeñarías?</label>
+                            <select class="form-control" name="ejercicio_manana_meq" required>
+                                {% if datos_examen and datos_examen.ejercicio_manana %}
+                                <option value="{{ datos_examen.ejercicio_manana }}" selected>
+                                    {{ datos_examen.ejercicio_manana }}</option>
+                                {% else %}
+                                <option value="" selected disabled>Seleccione una opción</option>
+                                {% endif %}
+                                <option value="Estaría en buena forma">Estaría en buena forma</option>
+                                <option value="Estaría en una forma aceptable">Estaría en una forma aceptable</option>
+                                <option value="Me resultaría difícil">Me resultaría difícil</option>
+                                <option value="Me resultaría muy difícil">Me resultaría muy difícil</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Pregunta 10 - CORREGIR COMPLETAMENTE -->
+                        <div class="form-group">
+                            <label>10. ¿A qué hora aproximada de la noche te sientes cansado y como consecuencia necesitas dormir?</label>
+                            <select class="form-control" name="hora_cansancio_noche_meq" required>
+                                {% if datos_examen and datos_examen.hora_cansancio_noche %}
+                                <option value="{{ datos_examen.hora_cansancio_noche }}" selected>
+                                    {{ datos_examen.hora_cansancio_noche }}</option>
+                                {% else %}
+                                <option value="" selected disabled>Seleccione una opción</option>
+                                {% endif %}
+                                <option value="20:00 - 21:00">20:00 - 21:00</option>
+                                <option value="21:00 - 22:15">21:00 - 22:15</option>
+                                <option value="22:15 - 00:45">22:15 - 00:45</option>
+                                <option value="00:45 - 02:00">00:45 - 02:00</option>
+                                <option value="02:00 - 03:00">02:00 - 03:00</option>
+                            </select>
+                        </div>
 
-                                                {% if datos_examen and datos_examen.nivel_cansancia_11 %}
-                                                <option value="{{ datos_examen.nivel_cansancia_11 }}" selected>
-                                                    {{ datos_examen.nivel_cansancia_11 }}</option>
-                                                {% else %}
-                                                <option value="" selected disabled>Seleccione una opción</option>
-                                                {% endif %}
-                                                <option value="Ningún cansancio">Ningún cansancio</option>
-                                                <option value="Algún cansancio">Algún cansancio</option>
-                                                <option value="Bastante cansancio">Bastante cansancio</option>
-                                                <option value="Mucho cansancio">Mucho cansancio</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- Columna 2: Actividades y Rendimiento -->
-                            <div class="col-md-6">
-                                <div class="card bg-gradient-default shadow-sm mb-4">
-                                    <div class="card-header bg-transparent">
-                                        <h4 class="text-white mb-0">Actividades y Rendimiento</h4>
-                                    </div>
-                                    <div class="card-body bg-white">
-                                        <!-- Pregunta 11 -->
-                                        <div class="form-group">
-                                            <label>11. Ejercicio físico de 7 a 8 AM. ¿Cómo te encontrarías?</label>
-                                            <select class="form-control" name="ejercicio_fisico_meq" required>
-                                                {% if datos_examen and datos_examen.ejercicio_fisico %}
-                                                <option value="{{ datos_examen.ejercicio_fisico }}" selected>
-                                                    {{ datos_examen.ejercicio_fisico }}</option>
-                                                {% else %}
-                                                <option value="" selected disabled>Seleccione una opción</option>
-                                                {% endif %}
-                                                <option value="Estaría en buena forma">Estaría en buena forma</option>
-                                                <option value="Estaría en una forma aceptable">Estaría en una forma
-                                                    aceptable
-                                                </option>
-                                                <option value="Me resultaría difícil">Me resultaría difícil</option>
-                                                <option value="Me resultaría muy difícil">Me resultaría muy difícil
-                                                </option>
-                                            </select>
-                                        </div>
-                                        <!-- Pregunta 12 -->
-                                        <div class="form-group">
-                                            <label>12. ¿Cuándo te despertarías tras acostarte tarde?</label>
-                                            <select class="form-control" name="hora_despertarse_si_tarde" required>
-                                                <option value="" selected disabled>Seleccione una opción</option>
-                                                {% if datos_examen and datos_examen.hora_despertarse_si_tarde %}
-                                                <option value="{{ datos_examen.hora_despertarse_si_tarde }}" selected>
-                                                    {{ datos_examen.hora_despertarse_si_tarde }}</option>
-                                                {% else %}
-                                                <option value="" selected disabled>Seleccione una opción</option>
-                                                {% endif %}
-                                                <option value="A la hora habitual y ya no dormiría más">A la hora
-                                                    habitual y ya no dormiría más
-                                                </option>
-                                                <option value="A la hora habitual y dormiría un poco más">A la hora
-                                                    habitual y dormiría un poco más
-                                                </option>
-                                                <option value="Me despertaría más tarde de lo habitual">Me despertaría
-                                                    más tarde de lo habitual
-                                                </option>
-                                                <option value="Dormiría mucho más de lo habitual">Dormiría mucho más de
-                                                    lo habitual
-                                                </option>
-                                            </select>
-                                        </div>
-                                        <!-- Pregunta 13 -->
-                                        <div class="form-group">
-                                            <label>13. Si tienes que permanecer despierto de 4 a 6 AM, ¿qué
-                                                preferirías?</label>
-                                            <select class="form-control" name="guardia_nocturna" required>
-                                                {% if datos_examen and datos_examen.guardia_nocturna %}
-                                                <option value="{{ datos_examen.guardia_nocturna }}" selected>
-                                                    {{ datos_examen.guardia_nocturna }}</option>
-                                                {% else %}
-                                                <option value="" selected disabled>Seleccione una opción</option>
-                                                {% endif %}
-                                                <option value="No acostarme hasta pasada la guardia">No acostarme hasta
-                                                    pasada la guardia
-                                                </option>
-                                                <option value="Echar una siesta antes y dormir después">Echar una siesta
-                                                    antes y dormir después
-                                                </option>
-                                                <option value="Echar un buen sueño antes y una siesta después">Echar un
-                                                    buen sueño antes y una siesta después
-                                                </option>
-                                                <option value="Sólo dormir antes de la guardia">Sólo dormir antes de
-                                                    la guardia
-                                                </option>
-                                            </select>
-                                        </div>
-                                        <!-- Pregunta 14 -->
-                                        <div class="form-group">
-                                            <label>14. ¿Qué horario escogerías para trabajo físico pesado?</label>
-                                            <select class="form-control" name="horario_trabajo_fisico" required>
-                                                {% if datos_examen and datos_examen.horario_trabajo_fisico %}
-                                                <option value="{{ datos_examen.horario_trabajo_fisico }}" selected>
-                                                    {{ datos_examen.horario_trabajo_fisico }}</option>
-                                                {% else %}
-                                                <option value="" selected disabled>Seleccione una opción</option>
-                                                {% endif %}
-                                                <option value="De 08:00 (8 AM) a 10:00 (10 AM)">08:00 - 10:00</option>
-                                                <option value="De 11:00 (11 AM) a 13:00 (1 PM)">11:00 - 13:00</option>
-                                                <option value="De 13:00 (1 PM) a 17:00 (5 PM)">13:00 - 17:00</option>
-                                                <option value="De 19:00 (7 PM) a 21:00 (9 PM)">19:00 - 21:00</option>
-                                            </select>
-                                        </div>
-                                        <!-- Pregunta 15 -->
-                                        <div class="form-group">
-                                            <label>15. Ejercicio físico intenso a las 10-11 PM. ¿Cómo te
-                                                sentaría?</label>
-                                            <select class="form-control" name="ejercicio_nocturno" required>
-                                                {% if datos_examen and datos_examen.ejercicio_nocturno %}
-                                                <option value="{{ datos_examen.ejercicio_nocturno }}" selected>
-                                                    {{ datos_examen.ejercicio_nocturno }}</option>
-                                                {% else %}
-                                                <option value="" selected disabled>Seleccione una opción</option>
-                                                {% endif %}
-                                                <option value="Estaría en buena forma">Estaría en buena forma</option>
-                                                <option value="Estaría en una forma aceptable">Estaría en una forma
-                                                    aceptable
-                                                </option>
-                                                <option value="Me resultaría difícil">Me resultaría difícil</option>
-                                                <option value="Me resultaría muy difícil">Me resultaría muy difícil
-                                                </option>
-                                            </select>
-                                        </div>
-                                        <!-- Pregunta 16 -->
-                                        <div class="form-group">
-                                            <label>16. ¿Qué horario seleccionarías para trabajar 5 horas al día?</label>
-                                            <select class="form-control" name="horario_trabajo" required>
-                                                {% if datos_examen and datos_examen.horario_trabajo %}
-                                                <option value="{{ datos_examen.horario_trabajo }}" selected>
-                                                    {{ datos_examen.horario_trabajo }}</option>
-                                                {% else %}
-                                                <option value="" selected disabled>Seleccione una opción</option>
-                                                {% endif %}
-                                                <option value="Entre las 04:00 (4 AM) y las 08:00 (8 AM)">04:00 - 08:00
-                                                </option>
-                                                <option value="Entre las 08:00 (8 AM) y las 09:00 (9 AM)">08:00 - 09:00
-                                                </option>
-                                                <option value="Entre las 09:00 (9 AM) y las 14:00 (2 PM)">09:00 - 14:00
-                                                </option>
-                                                <option value="Entre las 14:00 (2 PM) y las 17:00 (5 PM)">14:00 - 17:00
-                                                </option>
-                                                <option value="Entre las 17:00 (5 PM) y las 04:00 (4 AM)">17:00 - 04:00
-                                                </option>
-                                            </select>
-                                        </div>
-                                        <!-- Pregunta 17 -->
-                                        <div class="form-group">
-                                            <label>17. ¿A qué hora alcanzas tu máximo bienestar?</label>
-                                            <select class="form-control" name="maximo_bienestar" required>
-                                                {% if datos_examen and datos_examen.maximo_bienestar %}
-                                                <option value="{{ datos_examen.maximo_bienestar }}" selected>
-                                                    {{ datos_examen.maximo_bienestar }}</option>
-                                                {% else %}
-                                                <option value="" selected disabled>Seleccione una opción</option>
-                                                {% endif %}
-                                                <option value="Entre las 05:00 (5 AM) y las 08:00 (8 AM)">05:00 - 08:00
-                                                </option>
-                                                <option value="Entre las 08:00 (8 AM) y las 10:00 (10 AM)">08:00 - 10:00
-                                                </option>
-                                                <option value="Entre las 10:00 (10 AM) y las 17:00 (5 PM)">10:00 - 17:00
-                                                </option>
-                                                <option value="Entre las 17:00 (5 PM) y las 22:00 (10 PM)">17:00 - 22:00
-                                                </option>
-                                                <option value="Entre las 22:00 (10 PM) y las 05:00 (5 AM)">22:00 - 05:00
-                                                </option>
-                                            </select>
-                                        </div>
-                                        <!-- Pregunta 18 -->
-                                        <div class="form-group">
-                                            <label>18. ¿Te consideras una persona de tipo matutino o vespertino?</label>
-                                            <select class="form-control" name="tipo_persona" required>
-                                                {% if datos_examen and datos_examen.tipo_persona %}
-                                                <option value="{{ datos_examen.tipo_persona }}" selected>
-                                                    {{ datos_examen.tipo_persona }}</option>
-                                                {% else %}
-                                                <option value="" selected disabled>Seleccione una opción</option>
-                                                {% endif %}
-                                                <option value="Un tipo claramente matutino">Claramente matutino</option>
-                                                <option value="Un tipo más matutino que vespertino">Más matutino que
-                                                    vespertino
-                                                </option>
-                                                <option value="Un tipo más vespertino que matutino">Más vespertino que
-                                                    matutino
-                                                </option>
-                                                <option value="Un tipo claramente vespertino">Claramente vespertino
-                                                </option>
-                                            </select>
-                                        </div>
-                                        <!-- Pregunta 19 -->
-                                        <div class="form-group">
-                                            <label>19. Puntuación MEQ (se calculará automáticamente)</label>
-                                            <input type="number" class="form-control" name="puntuacion" min="16"
-                                                max="86" readonly>
-                                            <small class="form-text text-muted">La puntuación se calculará al enviar el
-                                                formulario.</small>
-                                        </div>
+                        <!-- Pregunta 11 - CORREGIR COMPLETAMENTE -->
+                        <div class="form-group">
+                            <label>11. Quieres estar en tu punto máximo de rendimiento para una prueba de dos horas que va a ser mentalmente agotadora. Siendo totalmente libre de planificar el día y pensando sólo en cuando te sentirías mejor. ¿Qué horario elegirías?</label>
+                            <select class="form-control" name="prueba_mental_meq" required>
+                                {% if datos_examen and datos_examen.prueba_mental %}
+                                <option value="{{ datos_examen.prueba_mental }}" selected>
+                                    {{ datos_examen.prueba_mental }}</option>
+                                {% else %}
+                                <option value="" selected disabled>Seleccione una opción</option>
+                                {% endif %}
+                                <option value="De 08:00 (8 AM) a 10:00 (10 AM)">08:00 - 10:00</option>
+                                <option value="De 11:00 (11 AM) a 13:00 (1 PM)">11:00 - 13:00</option>
+                                <option value="De 13:00 (1 PM) a 17:00 (5 PM)">13:00 - 17:00</option>
+                                <option value="De 19:00 (7 PM) a 21:00 (9 PM)">19:00 - 21:00</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Pregunta 12 - CORREGIR COMPLETAMENTE -->
+                        <div class="form-group">
+                            <label>12. Si te fueras a la cama a las 11:00 p.m., ¿qué tan cansado estarías?</label>
+                            <select class="form-control" name="cansancio_11pm_meq" required>
+                                {% if datos_examen and datos_examen.cansancio_11pm %}
+                                <option value="{{ datos_examen.cansancio_11pm }}" selected>
+                                    {{ datos_examen.cansancio_11pm }}</option>
+                                {% else %}
+                                <option value="" selected disabled>Seleccione una opción</option>
+                                {% endif %}
+                                <option value="Ningún cansancio">Ningún cansancio</option>
+                                <option value="Algún cansancio">Algún cansancio</option>
+                                <option value="Bastante cansancio">Bastante cansancio</option>
+                                <option value="Mucho cansancio">Mucho cansancio</option>
+                            </select>
+                        </div>
+
+                        <!-- Pregunta 13 - CORREGIR COMPLETAMENTE -->
+                        <div class="form-group">
+                            <label>13. Por algún motivo te has acostado varias horas más tarde de lo habitual, aunque al día siguiente no has de levantarte a ninguna hora en particular. ¿Cuándo crees que te despertarías?</label>
+                            <select class="form-control" name="despertar_tarde_meq" required>
+                                {% if datos_examen and datos_examen.despertar_tarde %}
+                                <option value="{{ datos_examen.despertar_tarde }}" selected>
+                                    {{ datos_examen.despertar_tarde }}</option>
+                                {% else %}
+                                <option value="" selected disabled>Seleccione una opción</option>
+                                {% endif %}
+                                <option value="A la hora habitual y ya no dormiría más">A la hora habitual y ya no dormiría más</option>
+                                <option value="A la hora habitual y luego dormitaría">A la hora habitual y luego dormitaría</option>
+                                <option value="A la hora habitual y volvería a dormirme">A la hora habitual y volvería a dormirme</option>
+                                <option value="Más tarde de lo habitual">Más tarde de lo habitual</option>
+                            </select>
+                        </div>
+
+                        <!-- Pregunta 14 - CORREGIR COMPLETAMENTE -->
+                        <div class="form-group">
+                            <label>14. Una noche tienes que permanecer despierto de 4 a 6 de la madrugada debido a una guardia nocturna. Sin tener ningún compromiso al día siguiente, ¿qué preferirías?</label>
+                            <select class="form-control" name="guardia_nocturna_meq" required>
+                                {% if datos_examen and datos_examen.guardia_nocturna %}
+                                <option value="{{ datos_examen.guardia_nocturna }}" selected>
+                                    {{ datos_examen.guardia_nocturna }}</option>
+                                {% else %}
+                                <option value="" selected disabled>Seleccione una opción</option>
+                                {% endif %}
+                                <option value="No acostarme hasta pasada la guardia">No acostarme hasta pasada la guardia</option>
+                                <option value="Echar una siesta antes y dormir después">Echar una siesta antes y dormir después</option>
+                                <option value="Echar un buen sueño antes y una siesta después">Echar un buen sueño antes y una siesta después</option>
+                                <option value="Sólo dormirías antes de la guardia">Sólo dormirías antes de la guardia</option>
+                            </select>
+                        </div>
+
+                        <!-- Pregunta 15 - CORREGIR COMPLETAMENTE -->
+                        <div class="form-group">
+                            <label>15. Tienes que hacer dos horas de trabajo físico pesado. Eres totalmente libre para planificarte el día. Pensando sólo en cuando te sentirías mejor, ¿qué horario escogerías?</label>
+                            <select class="form-control" name="trabajo_fisico_meq" required>
+                                {% if datos_examen and datos_examen.trabajo_fisico %}
+                                <option value="{{ datos_examen.trabajo_fisico }}" selected>
+                                    {{ datos_examen.trabajo_fisico }}</option>
+                                {% else %}
+                                <option value="" selected disabled>Seleccione una opción</option>
+                                {% endif %}
+                                <option value="De 08:00 (8 AM) a 10:00 (10 AM)">08:00 - 10:00</option>
+                                <option value="De 11:00 (11 AM) a 13:00 (1 PM)">11:00 - 13:00</option>
+                                <option value="De 13:00 (1 PM) a 17:00 (5 PM)">13:00 - 17:00</option>
+                                <option value="De 19:00 (7 PM) a 21:00 (9 PM)">19:00 - 21:00</option>
+                            </select>
+                        </div>
+
+                        <!-- Pregunta 16 - CORREGIR COMPLETAMENTE -->
+                        <div class="form-group">
+                            <label>16. Has decidido hacer ejercicio físico intenso. Un amigo te sugiere practicar una hora dos veces por semana de 10 a 11 de la noche. Pensando sólo en cuando te sentirías mejor, ¿Cómo crees que te sentaría?</label>
+                            <select class="form-control" name="ejercicio_nocturno_meq" required>
+                                {% if datos_examen and datos_examen.ejercicio_nocturno %}
+                                <option value="{{ datos_examen.ejercicio_nocturno }}" selected>
+                                    {{ datos_examen.ejercicio_nocturno }}</option>
+                                {% else %}
+                                <option value="" selected disabled>Seleccione una opción</option>
+                                {% endif %}
+                                <option value="Estaría en buena forma">Estaría en buena forma</option>
+                                <option value="Estaría en una forma aceptable">Estaría en una forma aceptable</option>
+                                <option value="Me resultaría difícil">Me resultaría difícil</option>
+                                <option value="Me resultaría muy difícil">Me resultaría muy difícil</option>
+                            </select>
+                        </div>
+
+                        <!-- Pregunta 17 - CORREGIR COMPLETAMENTE -->
+                        <div class="form-group">
+                            <label>17. Imagínate que puedes escoger tu horario de trabajo. Supón que tu jornada es de CINCO horas al día (incluyendo los descansos) y que tu actividad es interesante y remunerada según tu rendimiento. ¿Qué CINCO HORAS CONSECUTIVAS seleccionarías?</label>
+                            <select class="form-control" name="horario_trabajo_meq" required>
+                                {% if datos_examen and datos_examen.horario_trabajo %}
+                                <option value="{{ datos_examen.horario_trabajo }}" selected>
+                                    {{ datos_examen.horario_trabajo }}</option>
+                                {% else %}
+                                <option value="" selected disabled>Seleccione una opción</option>
+                                {% endif %}
+                                <option value="Entre las 4 AM y las 9 AM">Entre las 4 AM y las 9 AM</option>
+                                <option value="Entre las 9 AM y las 2 PM">Entre las 9 AM y las 2 PM</option>
+                                <option value="Entre las 2 PM y las 7 PM">Entre las 2 PM y las 7 PM</option>
+                                <option value="Entre las 7 PM y las 12 AM">Entre las 7 PM y las 12 AM</option>
+                                <option value="Entre las 12 AM y las 4 AM">Entre las 12 AM y las 4 AM</option>
+                            </select>
+                        </div>
+
+                        <!-- Pregunta 18 - CORREGIR COMPLETAMENTE -->
+                        <div class="form-group">
+                            <label>18. ¿A qué hora del día crees que alcanzas tu máximo bienestar?</label>
+                            <select class="form-control" name="maximo_bienestar_meq" required>
+                                {% if datos_examen and datos_examen.maximo_bienestar %}
+                                <option value="{{ datos_examen.maximo_bienestar }}" selected>
+                                    {{ datos_examen.maximo_bienestar }}</option>
+                                {% else %}
+                                <option value="" selected disabled>Seleccione una opción</option>
+                                {% endif %}
+                                <option value="Entre las 05:00 (5 AM) y las 08:00 (8 AM)">05:00 - 08:00</option>
+                                <option value="Entre las 08:00 (8 AM) y las 10:00 (10 AM)">08:00 - 10:00</option>
+                                <option value="Entre las 10:00 (10 AM) y las 17:00 (5 PM)">10:00 - 17:00</option>
+                                <option value="Entre las 17:00 (5 PM) y las 22:00 (10 PM)">17:00 - 22:00</option>
+                                <option value="Entre las 22:00 (10 PM) y las 05:00 (5 AM)">22:00 - 05:00</option>
+                            </select>
+                        </div>
+
+                        <!-- Pregunta 19 - CORREGIR COMPLETAMENTE -->
+                        <div class="form-group">
+                            <label>19. Se habla de personas de tipo matutino y vespertino. ¿Cuál de estos tipos te consideras ser?</label>
+                            <select class="form-control" name="tipo_persona_meq" required>
+                                {% if datos_examen and datos_examen.tipo_persona %}
+                                <option value="{{ datos_examen.tipo_persona }}" selected>
+                                    {{ datos_examen.tipo_persona }}</option>
+                                {% else %}
+                                <option value="" selected disabled>Seleccione una opción</option>
+                                {% endif %}
+                                <option value="Un tipo claramente matutino">Claramente matutino</option>
+                                <option value="Un tipo más matutino que vespertino">Más matutino que vespertino</option>
+                                <option value="Un tipo más vespertino que matutino">Más vespertino que matutino</option>
+                                <option value="Un tipo claramente vespertino">Claramente vespertino</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Puntuación -->
+                        <div class="form-group">
+                            <label>Puntuación Total MEQ:</label>
+                            <input type="number" class="form-control" name="puntuacion" min="16" max="86" readonly>
+                            <small class="form-text text-muted">La puntuación se calculará automáticamente al completar todas las preguntas.</small>
+                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -434,7 +406,7 @@
                     </div>
                 </form>
             </div>
-        </div>
+ 
     </div>
 </div>
 
@@ -496,6 +468,12 @@
                 'De 1 a 2 horas más tarde': 2,
                 'Más de 2 horas más tarde': 1
             },
+            'ejercicio_manana_meq': {
+                'Estaría en buena forma': 4,
+                'Estaría en una forma aceptable': 3,
+                'Me resultaría difícil': 2,
+                'Me resultaría muy difícil': 1
+            },
             'hora_cansancio_noche_meq': {
                 '20:00 - 21:00': 5,
                 '21:00 - 22:15': 4,
@@ -503,57 +481,57 @@
                 '00:45 - 02:00': 2,
                 '02:00 - 03:00': 1
             },
-            'nivel_cansancia_11': {
+            'prueba_mental_meq': {
+                'De 08:00 (8 AM) a 10:00 (10 AM)': 6,
+                'De 11:00 (11 AM) a 13:00 (1 PM)': 4,
+                'De 13:00 (1 PM) a 17:00 (5 PM)': 2,
+                'De 19:00 (7 PM) a 21:00 (9 PM)': 0
+            },
+            'cansancio_11pm_meq': {
                 'Ningún cansancio': 0,
                 'Algún cansancio': 2,
                 'Bastante cansancio': 3,
                 'Mucho cansancio': 5
             },
-            'ejercicio_fisico_meq': {
-                'Estaría en buena forma': 4,
-                'Estaría en una forma aceptable': 3,
-                'Me resultaría difícil': 2,
-                'Me resultaría muy difícil': 1
-            },
-            'hora_despertarse_si_tarde': {
+            'despertar_tarde_meq': {
                 'A la hora habitual y ya no dormiría más': 4,
-                'A la hora habitual y dormiría un poco más': 3,
-                'Me despertaría más tarde de lo habitual': 2,
-                'Dormiría mucho más de lo habitual': 1
+                'A la hora habitual y luego dormitaría': 3,
+                'A la hora habitual y volvería a dormirme': 2,
+                'Más tarde de lo habitual': 1
             },
-            'guardia_nocturna': {
+            'guardia_nocturna_meq': {
                 'No acostarme hasta pasada la guardia': 1,
                 'Echar una siesta antes y dormir después': 2,
                 'Echar un buen sueño antes y una siesta después': 3,
-                'Sólo dormir antes de la guardia': 4
+                'Sólo dormirías antes de la guardia': 4
             },
-            'horario_trabajo_fisico': {
+            'trabajo_fisico_meq': {
                 'De 08:00 (8 AM) a 10:00 (10 AM)': 4,
                 'De 11:00 (11 AM) a 13:00 (1 PM)': 3,
                 'De 13:00 (1 PM) a 17:00 (5 PM)': 2,
                 'De 19:00 (7 PM) a 21:00 (9 PM)': 1
             },
-            'ejercicio_nocturno': {
+            'ejercicio_nocturno_meq': {
                 'Estaría en buena forma': 1,
                 'Estaría en una forma aceptable': 2,
                 'Me resultaría difícil': 3,
                 'Me resultaría muy difícil': 4
             },
-            'horario_trabajo': {
-                'Entre las 04:00 (4 AM) y las 08:00 (8 AM)': 5,
-                'Entre las 08:00 (8 AM) y las 09:00 (9 AM)': 4,
-                'Entre las 09:00 (9 AM) y las 14:00 (2 PM)': 3,
-                'Entre las 14:00 (2 PM) y las 17:00 (5 PM)': 2,
-                'Entre las 17:00 (5 PM) y las 04:00 (4 AM)': 1
+            'horario_trabajo_meq': {
+                'Entre las 4 AM y las 9 AM': 5,
+                'Entre las 9 AM y las 2 PM': 4,
+                'Entre las 2 PM y las 7 PM': 3,
+                'Entre las 7 PM y las 12 AM': 2,
+                'Entre las 12 AM y las 4 AM': 1
             },
-            'maximo_bienestar': {
+            'maximo_bienestar_meq': {
                 'Entre las 05:00 (5 AM) y las 08:00 (8 AM)': 5,
                 'Entre las 08:00 (8 AM) y las 10:00 (10 AM)': 4,
                 'Entre las 10:00 (10 AM) y las 17:00 (5 PM)': 3,
                 'Entre las 17:00 (5 PM) y las 22:00 (10 PM)': 2,
                 'Entre las 22:00 (10 PM) y las 05:00 (5 AM)': 1
             },
-            'tipo_persona': {
+            'tipo_persona_meq': {
                 'Un tipo claramente matutino': 6,
                 'Un tipo más matutino que vespertino': 4,
                 'Un tipo más vespertino que matutino': 2,
@@ -571,36 +549,99 @@
                     if (puntuaciones[select.name] && puntuaciones[select.name].hasOwnProperty(valor)) {
                         puntuacionTotal += puntuaciones[select.name][valor];
                         preguntasRespondidas++;
+                        console.log(`${select.name}: ${valor} = ${puntuaciones[select.name][valor]} puntos`);
+                    } else {
+                        console.warn(`No se encontró puntuación para ${select.name}: ${valor}`);
                     }
                 }
             });
 
             // Mostrar la puntuación actual siempre
             puntuacionInput.value = puntuacionTotal;
+            console.log(`Puntuación total: ${puntuacionTotal} (${preguntasRespondidas}/19 preguntas)`);
 
-            // Cambiar el placeholder según el progreso
-            if (preguntasRespondidas < 18) {
-                puntuacionInput.placeholder = `Puntuación parcial (${preguntasRespondidas}/18 preguntas)`;
+            // Cambiar el color del campo según el rango MEQ
+            if (preguntasRespondidas === 19) {
+                if (puntuacionTotal >= 70) {
+                    puntuacionInput.style.backgroundColor = '#d4edda'; // Verde claro - Matutino definido
+                } else if (puntuacionTotal >= 59) {
+                    puntuacionInput.style.backgroundColor = '#f8f9fa'; // Gris claro - Moderadamente matutino
+                } else if (puntuacionTotal >= 42) {
+                    puntuacionInput.style.backgroundColor = '#fff3cd'; // Amarillo claro - Intermedio
+                } else if (puntuacionTotal >= 31) {
+                    puntuacionInput.style.backgroundColor = '#ffeaa7'; // Naranja claro - Moderadamente vespertino
+                } else {
+                    puntuacionInput.style.backgroundColor = '#f8d7da'; // Rojo claro - Vespertino definido
+                }
             } else {
-                puntuacionInput.placeholder = 'Puntuación final';
+                puntuacionInput.style.backgroundColor = '#ffffff'; // Blanco para incompleto
+            }
+
+            // Mostrar información del progreso
+            const infoText = preguntasRespondidas === 19 ? 
+                `Puntuación final: ${puntuacionTotal}/86` : 
+                `Puntuación parcial: ${puntuacionTotal} (${preguntasRespondidas}/19 preguntas completadas)`;
+            
+            puntuacionInput.title = infoText;
+        }
+
+        // Agregar indicador visual de progreso
+        function actualizarProgreso() {
+            const preguntasCompletas = Array.from(selects).filter(select => 
+                select.name !== 'puntuacion' && select.value && select.value !== ''
+            ).length;
+            
+            const porcentaje = (preguntasCompletas / 19) * 100;
+            
+            // Crear o actualizar barra de progreso
+            let barraProgreso = document.querySelector('#progreso-meq');
+            if (!barraProgreso) {
+                barraProgreso = document.createElement('div');
+                barraProgreso.id = 'progreso-meq';
+                barraProgreso.innerHTML = `
+                    <div style="background-color: #e9ecef; border-radius: 4px; height: 6px; margin: 10px 0;">
+                        <div id="barra-progreso-meq" style="background-color: #007bff; height: 100%; border-radius: 4px; transition: width 0.3s ease; width: ${porcentaje}%;"></div>
+                    </div>
+                    <small class="text-muted">Progreso: ${preguntasCompletas}/19 preguntas completadas</small>
+                `;
+                puntuacionInput.parentNode.insertBefore(barraProgreso, puntuacionInput);
+            } else {
+                const barra = document.querySelector('#barra-progreso-meq');
+                barra.style.width = porcentaje + '%';
+                barraProgreso.querySelector('small').textContent = `Progreso: ${preguntasCompletas}/19 preguntas completadas`;
             }
         }
 
         // Calcula la puntuación cada vez que cambie una pregunta
         selects.forEach(select => {
             if (select.name !== 'puntuacion') {
-                select.addEventListener('change', calcularPuntuacion);
+                select.addEventListener('change', function() {
+                    calcularPuntuacion();
+                    actualizarProgreso();
+                });
             }
         });
 
         // Calcular puntuación inicial si hay datos precargados
         calcularPuntuacion();
+        actualizarProgreso();
 
-        // También calcula antes de enviar por seguridad
+        // Validación antes de enviar
         form.addEventListener('submit', function (e) {
             calcularPuntuacion();
-            if (!puntuacionInput.value) {
-                alert('Por favor, responda todas las preguntas antes de enviar el formulario.');
+            
+            const preguntasCompletas = Array.from(selects).filter(select => 
+                select.name !== 'puntuacion' && select.value && select.value !== ''
+            ).length;
+            
+            if (preguntasCompletas < 19) {
+                alert(`Por favor, responda todas las preguntas antes de enviar el formulario. Faltan ${19 - preguntasCompletas} preguntas.`);
+                e.preventDefault();
+                return false;
+            }
+            
+            if (!puntuacionInput.value || puntuacionInput.value < 16 || puntuacionInput.value > 86) {
+                alert('Error en el cálculo de la puntuación. Por favor, revise sus respuestas.');
                 e.preventDefault();
                 return false;
             }

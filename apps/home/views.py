@@ -1890,10 +1890,21 @@ def guardar_examen_publico_mew(request):
                 visita_examen.fecha_inicio = timezone.now()
                 visita_examen.save()
 
+            # Buscar datos existentes si los hay
+            datos_examen = None
+            try:
+                resultado_existente = MEWResult.objects.get(visita_examen=visita_examen)
+                datos_examen = model_to_dict(resultado_existente)
+                datos_examen.pop("id", None)
+                datos_examen.pop("visita_examen", None)
+            except MEWResult.DoesNotExist:
+                datos_examen = None
+
             context = {
                 "paciente": paciente,
                 "visita": visita,
                 "visita_examen": visita_examen,
+                "datos_examen": datos_examen,
             }
 
             return render(request, "registro_publico/mew_publico.html", context)
@@ -1915,7 +1926,24 @@ def guardar_examen_publico_mew(request):
                 VisitaExamen, visita_id=visita_id, examen_id=examen_id
             )
 
-            # Obtener campos del formulario MEW
+            # Obtener la puntuación calculada en el frontend
+            puntuacion_frontend = request.POST.get("puntuacion", "0")
+            try:
+                puntuacion_calculada = int(puntuacion_frontend)
+            except (ValueError, TypeError):
+                puntuacion_calculada = 0
+
+            # Validar que la puntuación esté en rango válido
+            if puntuacion_calculada < 16 or puntuacion_calculada > 86:
+                messages.error(
+                    request, "❌ Error: Puntuación MEQ fuera del rango válido (16-86)."
+                )
+                return redirect(
+                    f"/guardar-examen-publico-mew/?paciente_id={paciente.id}"
+                )
+
+            # Obtener campos del formulario MEW (usando nombres del formulario HTML)
+            # Mapear nombres del formulario a nombres del modelo
             hora_levantarse = request.POST.get("hora_levantarse_meq", "")
             hora_acostarse = request.POST.get("hora_acostarse_meq", "")
             uso_despertador = request.POST.get("uso_despertador_meq", "")
@@ -1924,38 +1952,43 @@ def guardar_examen_publico_mew(request):
             apetito_manana = request.POST.get("apetito_manana_meq", "")
             descanso_manana = request.POST.get("descanso_manana_meq", "")
             hora_acostarse_libre = request.POST.get("hora_acostarse_libre_meq", "")
-            ejercicio_fisico = request.POST.get("ejercicio_fisico_meq", "")
+            ejercicio_manana = request.POST.get("ejercicio_manana_meq", "")
             hora_cansancio_noche = request.POST.get("hora_cansancio_noche_meq", "")
+            prueba_mental = request.POST.get("prueba_mental_meq", "")
+            cansancio_11pm = request.POST.get("cansancio_11pm_meq", "")
+            despertar_tarde = request.POST.get("despertar_tarde_meq", "")
+            guardia_nocturna = request.POST.get("guardia_nocturna_meq", "")
+            trabajo_fisico = request.POST.get("trabajo_fisico_meq", "")
+            ejercicio_nocturno = request.POST.get("ejercicio_nocturno_meq", "")
+            horario_trabajo = request.POST.get("horario_trabajo_meq", "")
+            maximo_bienestar = request.POST.get("maximo_bienestar_meq", "")
+            tipo_persona = request.POST.get("tipo_persona_meq", "")
+
+            # Los campos que se mantienen del modelo anterior
+            ejercicio_fisico = request.POST.get("ejercicio_fisico_meq", "")
             nivel_cansancia_11 = request.POST.get("nivel_cansancia_11", "")
             hora_despertarse_si_tarde = request.POST.get(
                 "hora_despertarse_si_tarde", ""
             )
-            guardia_nocturna = request.POST.get("guardia_nocturna", "")
             horario_trabajo_fisico = request.POST.get("horario_trabajo_fisico", "")
-            ejercicio_nocturno = request.POST.get("ejercicio_nocturno", "")
-            horario_trabajo = request.POST.get("horario_trabajo", "")
-            maximo_bienestar = request.POST.get("maximo_bienestar", "")
-            tipo_persona = request.POST.get("tipo_persona", "")
 
-            # Calcular puntuación MEW
-            puntuacion_calculada = calcular_puntuacion_mew_publico(request.POST)
-
-            # Determinar cronotipo
+            # Determinar cronotipo basado en la puntuación
             if puntuacion_calculada >= 70:
-                tipo_persona_calculado = "Definitivamente matutino"
+                tipo_persona_calculado = "Matutino Definido"
             elif puntuacion_calculada >= 59:
-                tipo_persona_calculado = "Moderadamente matutino"
+                tipo_persona_calculado = "Moderadamente Matutino"
             elif puntuacion_calculada >= 42:
-                tipo_persona_calculado = "Ni matutino ni vespertino"
+                tipo_persona_calculado = "Intermedio"
             elif puntuacion_calculada >= 31:
-                tipo_persona_calculado = "Moderadamente vespertino"
+                tipo_persona_calculado = "Moderadamente Vespertino"
             else:
-                tipo_persona_calculado = "Definitivamente vespertino"
+                tipo_persona_calculado = "Vespertino Definido"
 
-            # Crear o actualizar el resultado con TODOS los campos
+            # Crear o actualizar el resultado usando los nombres EXACTOS del modelo
             mew_result, created = MEWResult.objects.update_or_create(
                 visita_examen=visita_examen,
                 defaults={
+                    # Nombres exactos del modelo (sin sufijo _meq)
                     "hora_levantarse": hora_levantarse,
                     "hora_acostarse": hora_acostarse,
                     "uso_despertador": uso_despertador,
@@ -1964,12 +1997,17 @@ def guardar_examen_publico_mew(request):
                     "apetito_manana": apetito_manana,
                     "descanso_manana": descanso_manana,
                     "hora_acostarse_libre": hora_acostarse_libre,
+                    "ejercicio_manana": ejercicio_manana,
                     "ejercicio_fisico": ejercicio_fisico,
                     "hora_cansancio_noche": hora_cansancio_noche,
                     "nivel_cansancia_11": nivel_cansancia_11,
+                    "prueba_mental": prueba_mental,
+                    "cansancio_11pm": cansancio_11pm,
+                    "despertar_tarde": despertar_tarde,
                     "hora_despertarse_si_tarde": hora_despertarse_si_tarde,
                     "guardia_nocturna": guardia_nocturna,
                     "horario_trabajo_fisico": horario_trabajo_fisico,
+                    "trabajo_fisico": trabajo_fisico,
                     "ejercicio_nocturno": ejercicio_nocturno,
                     "horario_trabajo": horario_trabajo,
                     "maximo_bienestar": maximo_bienestar,
@@ -1986,17 +2024,21 @@ def guardar_examen_publico_mew(request):
             # Mensaje de éxito y redirección a página pública
             messages.success(
                 request,
-                f"✅ Examen MEW completado exitosamente. Cronotipo: {tipo_persona_calculado}",
+                f"✅ Examen MEQ completado exitosamente. Puntuación: {puntuacion_calculada}/86 - {tipo_persona_calculado}",
             )
 
             return render(
                 request,
                 "registro_publico/examen_completado_exitoso.html",
                 {
-                    "examen_tipo": "Cuestionario de Matutinidad-Vespertinidad (MEW)",
+                    "examen_tipo": "Cuestionario de Matutinidad-Vespertinidad (MEQ)",
                     "paciente": paciente,
                     "puntaje": puntuacion_calculada,
                     "interpretacion": tipo_persona_calculado,
+                    "rango_puntuacion": "16-86 puntos",
+                    "descripcion_resultado": obtener_descripcion_cronotipo(
+                        puntuacion_calculada
+                    ),
                 },
             )
 
@@ -2007,6 +2049,20 @@ def guardar_examen_publico_mew(request):
     else:
         messages.error(request, "❌ Método no permitido.")
         return redirect("formulario_demografico_externo")
+
+
+def obtener_descripcion_cronotipo(puntuacion):
+    """Devuelve una descripción detallada del cronotipo según la puntuación MEQ"""
+    if puntuacion >= 70:
+        return "Persona claramente matutina: Prefiere levantarse y acostarse temprano, con mayor energía en las mañanas."
+    elif puntuacion >= 59:
+        return "Persona moderadamente matutina: Tendencia a ser más activo en las mañanas que en las noches."
+    elif puntuacion >= 42:
+        return "Persona intermedia: No muestra una preferencia marcada por las mañanas o las noches."
+    elif puntuacion >= 31:
+        return "Persona moderadamente vespertina: Tendencia a ser más activo en las noches que en las mañanas."
+    else:
+        return "Persona claramente vespertina: Prefiere acostarse y levantarse tarde, con mayor energía en las noches."
 
 
 def guardar_examen_publico_pitsburg(request):
@@ -4706,7 +4762,7 @@ def guardar_examen_MEW(request):
                 visita_examen.fecha_inicio = timezone.now()
                 visita_examen.save()
 
-            # Obtener los campos según tu modelo MEWResult
+            # Obtener los campos del formulario
             hora_levantarse = request.POST.get("hora_levantarse_meq", "")
             hora_acostarse = request.POST.get("hora_acostarse_meq", "")
             uso_despertador = request.POST.get("uso_despertador_meq", "")
@@ -4715,99 +4771,37 @@ def guardar_examen_MEW(request):
             apetito_manana = request.POST.get("apetito_manana_meq", "")
             descanso_manana = request.POST.get("descanso_manana_meq", "")
             hora_acostarse_libre = request.POST.get("hora_acostarse_libre_meq", "")
+
+            # Nuevos campos agregados
+            ejercicio_manana = request.POST.get("ejercicio_manana_meq", "")
             ejercicio_fisico = request.POST.get("ejercicio_fisico_meq", "")
             hora_cansancio_noche = request.POST.get("hora_cansancio_noche_meq", "")
+            prueba_mental = request.POST.get("prueba_mental_meq", "")
+            cansancio_11pm = request.POST.get("cansancio_11pm_meq", "")
+            despertar_tarde = request.POST.get("despertar_tarde_meq", "")
+
+            # Campos existentes
             nivel_cansancia_11 = request.POST.get("nivel_cansancia_11", "")
             hora_despertarse_si_tarde = request.POST.get(
                 "hora_despertarse_si_tarde", ""
             )
-            guardia_nocturna = request.POST.get("guardia_nocturna", "")
+            guardia_nocturna = request.POST.get("guardia_nocturna_meq", "")
+            trabajo_fisico = request.POST.get("trabajo_fisico_meq", "")
             horario_trabajo_fisico = request.POST.get("horario_trabajo_fisico", "")
-            ejercicio_nocturno = request.POST.get("ejercicio_nocturno", "")
-            horario_trabajo = request.POST.get("horario_trabajo", "")
-            maximo_bienestar = request.POST.get("maximo_bienestar", "")
-            tipo_persona = request.POST.get("tipo_persona", "")
+            ejercicio_nocturno = request.POST.get("ejercicio_nocturno_meq", "")
+            horario_trabajo = request.POST.get("horario_trabajo_meq", "")
+            maximo_bienestar = request.POST.get("maximo_bienestar_meq", "")
+            tipo_persona = request.POST.get("tipo_persona_meq", "")
 
-            # Función para calcular la puntuación MEW
-            def calcular_puntuacion_mew(respuestas_dict):
-                """Calcula la puntuación del cuestionario MEW (Morningness-Eveningness)"""
-                puntuacion = 0
-
-                # Pregunta 1: Hora de levantarse (5-25, 4-30, 3-45, 2-60)
-                hora_lev = respuestas_dict.get("hora_levantarse", "")
-                if "5:00-6:30" in hora_lev or "5:00" in hora_lev or "6:30" in hora_lev:
-                    puntuacion += 5
-                elif "6:30-7:45" in hora_lev or "7:45" in hora_lev:
-                    puntuacion += 4
-                elif "7:45-9:45" in hora_lev or "9:45" in hora_lev:
-                    puntuacion += 3
-                elif "9:45-11:00" in hora_lev or "11:00" in hora_lev:
-                    puntuacion += 2
-                elif "11:00" in hora_lev:
-                    puntuacion += 1
-
-                # Pregunta 2: Hora de acostarse
-                hora_acos = respuestas_dict.get("hora_acostarse", "")
-                if "8:00-9:00" in hora_acos:
-                    puntuacion += 5
-                elif "9:00-10:15" in hora_acos:
-                    puntuacion += 4
-                elif "10:15-12:30" in hora_acos:
-                    puntuacion += 3
-                elif "12:30-1:45" in hora_acos:
-                    puntuacion += 2
-                elif "1:45-3:00" in hora_acos:
-                    puntuacion += 1
-
-                # Pregunta 3: Uso de despertador
-                despertador = respuestas_dict.get("uso_despertador", "")
-                if "Completamente" in despertador or "completamente" in despertador:
-                    puntuacion += 4
-                elif "Moderadamente" in despertador or "moderadamente" in despertador:
-                    puntuacion += 3
-                elif "Ligeramente" in despertador or "ligeramente" in despertador:
-                    puntuacion += 2
-                elif "Para nada" in despertador or "nada" in despertador:
-                    puntuacion += 1
-
-                # Continuar con el resto de preguntas...
-                # (Simplificado para el ejemplo)
-
-                return puntuacion
-
-            # Calcular puntuación
-            respuestas = {
-                "hora_levantarse": hora_levantarse,
-                "hora_acostarse": hora_acostarse,
-                "uso_despertador": uso_despertador,
-                "facilidad_levantarse": facilidad_levantarse,
-                "alerta_manana": alerta_manana,
-                "apetito_manana": apetito_manana,
-                "descanso_manana": descanso_manana,
-                "hora_acostarse_libre": hora_acostarse_libre,
-                "ejercicio_fisico": ejercicio_fisico,
-                "hora_cansancio_noche": hora_cansancio_noche,
-                "nivel_cansancia_11": nivel_cansancia_11,
-                "hora_despertarse_si_tarde": hora_despertarse_si_tarde,
-                "guardia_nocturna": guardia_nocturna,
-                "horario_trabajo_fisico": horario_trabajo_fisico,
-                "ejercicio_nocturno": ejercicio_nocturno,
-                "horario_trabajo": horario_trabajo,
-                "maximo_bienestar": maximo_bienestar,
-                "tipo_persona": tipo_persona,
-            }
-
-            puntuacion_calculada = calcular_puntuacion_mew(respuestas)
-            puntuacion_form = request.POST.get("puntuacion", str(puntuacion_calculada))
+            # OBTENER LA PUNTUACIÓN CALCULADA EN EL FRONTEND
+            puntuacion_calculada = request.POST.get("puntuacion", "0")
 
             try:
                 puntuacion_final = (
-                    int(puntuacion_form)
-                    if puntuacion_form.isdigit()
-                    else puntuacion_calculada
+                    int(puntuacion_calculada) if puntuacion_calculada.isdigit() else 0
                 )
-            except:
-                puntuacion_final = puntuacion_calculada
+            except (ValueError, TypeError):
+                puntuacion_final = 0
 
             # Determinar cronotipo según puntuación MEW
             if puntuacion_final >= 70:
@@ -4821,11 +4815,11 @@ def guardar_examen_MEW(request):
             else:
                 tipo_persona_calculado = "Definitivamente vespertino"
 
-            # Crear o actualizar el resultado MEW usando los campos exactos del modelo
+            # Crear o actualizar el resultado MEW
             mew_result, created = MEWResult.objects.update_or_create(
                 visita_examen=visita_examen,
                 defaults={
-                    # Campos exactos según tu modelo MEWResult
+                    # Campos del modelo MEWResult
                     "hora_levantarse": hora_levantarse,
                     "hora_acostarse": hora_acostarse,
                     "uso_despertador": uso_despertador,
@@ -4834,6 +4828,13 @@ def guardar_examen_MEW(request):
                     "apetito_manana": apetito_manana,
                     "descanso_manana": descanso_manana,
                     "hora_acostarse_libre": hora_acostarse_libre,
+                    # Nuevos campos agregados al modelo
+                    "ejercicio_manana": ejercicio_manana,
+                    "prueba_mental": prueba_mental,
+                    "cansancio_11pm": cansancio_11pm,
+                    "despertar_tarde": despertar_tarde,
+                    "trabajo_fisico": trabajo_fisico,
+                    # Campos existentes en el modelo
                     "ejercicio_fisico": ejercicio_fisico,
                     "hora_cansancio_noche": hora_cansancio_noche,
                     "nivel_cansancia_11": nivel_cansancia_11,
