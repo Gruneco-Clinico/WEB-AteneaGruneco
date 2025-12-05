@@ -2962,6 +2962,16 @@ def realizar_examen(request, visita_id, examen_id, paciente_id):
                         )
                     )
 
+                    # AGREGAR ESTAS LÍNEAS PARA PASAR AL CONTEXTO DEL TEMPLATE:
+                    tipos_queja = datos_examen["tipos_queja"]
+                    sustancias = datos_examen["sustancias"]
+                    medicamentos = datos_examen["medicamentos"]
+                    pantallas = datos_examen["pantallas"]
+                    actividades_en_cama = datos_examen["actividades_en_cama"]
+                    actividades_fisicas = datos_examen["actividades_fisicas"]
+                    sintomas_suenos = datos_examen["sintomas_suenos"]
+                    sintomas_diurnos = datos_examen["sintomas_diurnos"]
+
                     modo_edicion = True
 
                 # ===================================================
@@ -3305,18 +3315,31 @@ def realizar_examen(request, visita_id, examen_id, paciente_id):
         messages.error(request, "Visita-examen no encontrada")
         return redirect("detalle_paciente", paciente_id=paciente_id)
 
-    return render(
-        request,
-        config["template"],
-        {
-            "visita_examen": visita_id,
-            "paciente_id": paciente_id,
-            "examen_id": examen_id,
-            "datos_examen": datos_examen,
-            "modo_edicion": modo_edicion,
-            "visita_examen_obj": visita_examen_obj,
-        },
-    )
+    context = {
+        "visita_examen": visita_id,
+        "paciente_id": paciente_id,
+        "examen_id": examen_id,
+        "datos_examen": datos_examen,
+        "modo_edicion": modo_edicion,
+        "visita_examen_obj": visita_examen_obj,
+    }
+
+    # Si es anamnesis de sueño, agregar datos adicionales
+    if int(examen_id) == 10 and datos_examen and "tipos_queja" in datos_examen:
+        context.update(
+            {
+                "tipos_queja": datos_examen["tipos_queja"],
+                "sustancias": datos_examen["sustancias"],
+                "medicamentos": datos_examen["medicamentos"],
+                "pantallas": datos_examen["pantallas"],
+                "actividades_en_cama": datos_examen["actividades_en_cama"],
+                "actividades_fisicas": datos_examen["actividades_fisicas"],
+                "sintomas_suenos": datos_examen["sintomas_suenos"],
+                "sintomas_diurnos": datos_examen["sintomas_diurnos"],
+            }
+        )
+
+    return render(request, config["template"], context)
 
 
 @login_required
@@ -4225,6 +4248,7 @@ def guardar_sueno_anamnesis(request):
                 "duracion_siestas",
                 "siesta_frecuencia",
                 "siesta_reparadora",
+                "momento_dia_siesta",
                 "periodo_siestas",
                 "iluminacion",
                 "comodidad",
@@ -4252,7 +4276,7 @@ def guardar_sueno_anamnesis(request):
             anamnesis.tipos_queja_detalle.all().delete()
             nombres_quejas = request.POST.getlist("tipo_queja[]")
             for nombre in nombres_quejas:
-                quejaId = nombre.replace(" ", "_").lower()
+                quejaId = nombre.lower().replace(" ", "_")
                 TipoQuejaSueno.objects.create(
                     anamnesis=anamnesis,
                     nombre=nombre,

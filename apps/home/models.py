@@ -1019,6 +1019,7 @@ class SuenoAnamnesisResult(ResultadoExamenBase):
     siesta_frecuencia = models.CharField(max_length=100, blank=True, null=True)
     siesta_reparadora = models.CharField(max_length=10, blank=True, null=True)
     periodo_siestas = models.CharField(max_length=100, blank=True, null=True)
+    momento_dia_siesta = models.CharField(max_length=50, blank=True, null=True)
 
     # Ambiente
     iluminacion = models.CharField(max_length=255, blank=True, null=True)

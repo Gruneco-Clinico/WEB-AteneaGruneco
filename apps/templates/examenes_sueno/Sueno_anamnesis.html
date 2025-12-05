@@ -213,208 +213,251 @@
         </div>
 
         <!-- ...existing code... -->
-<div id="campos-queja-container" {% if datos_examen.presenta_queja != "si" %}style="display: none"{% endif %}>
-  <div class="form-group">
-    <label class="form-control-label">Tipo de queja de sueño</label>
-    <div class="d-flex flex-wrap">
-      <!-- Lista de checkboxes para tipos de quejas -->
-      <div class="custom-control custom-checkbox mr-3 mb-2">
-        <input
-          class="custom-control-input queja-checkbox"
-          type="checkbox"
-          name="tipo_queja[]"
-          value="Dificultad de conciliación"
-          id="dificultad_conciliacion"
-          {% for queja in tipos_queja %}{% if queja.nombre == "Dificultad de conciliación" %}checked{% endif %}{% endfor %}
-        />
-        <label class="custom-control-label" for="dificultad_conciliacion">
-          Dificultad de conciliación
-        </label>
-      </div>
-      
-      <div class="custom-control custom-checkbox mr-3 mb-2">
-        <input
-          class="custom-control-input queja-checkbox"
-          type="checkbox"
-          name="tipo_queja[]"
-          value="Dificultad de mantenimiento"
-          id="dificultad_mantenimiento"
-          {% for queja in tipos_queja %}{% if queja.nombre == "Dificultad de mantenimiento" %}checked{% endif %}{% endfor %}
-        />
-        <label class="custom-control-label" for="dificultad_mantenimiento">
-          Dificultad de mantenimiento
-        </label>
-      </div>
-      
-      <div class="custom-control custom-checkbox mr-3 mb-2">
-        <input
-          class="custom-control-input queja-checkbox"
-          type="checkbox"
-          name="tipo_queja[]"
-          value="Trastornos de conducta del sueño"
-          id="trastornos_conducta"
-          {% for queja in tipos_queja %}{% if queja.nombre == "Trastornos de conducta del sueño" %}checked{% endif %}{% endfor %}
-        />
-        <label class="custom-control-label" for="trastornos_conducta">
-          Trastornos de conducta del sueño
-        </label>
-      </div>
-      
-      <div class="custom-control custom-checkbox mr-3 mb-2">
-        <input
-          class="custom-control-input queja-checkbox"
-          type="checkbox"
-          name="tipo_queja[]"
-          value="Apnea"
-          id="apnea"
-          {% for queja in tipos_queja %}{% if queja.nombre == "Apnea" %}checked{% endif %}{% endfor %}
-        />
-        <label class="custom-control-label" for="apnea">Apnea</label>
-      </div>
-      
-      <div class="custom-control custom-checkbox mr-3 mb-2">
-        <input
-          class="custom-control-input queja-checkbox"
-          type="checkbox"
-          name="tipo_queja[]"
-          value="Ronquido"
-          id="ronquido"
-          {% for queja in tipos_queja %}{% if queja.nombre == "Ronquido" %}checked{% endif %}{% endfor %}
-        />
-        <label class="custom-control-label" for="ronquido">Ronquido</label>
-      </div>
-      
-      <div class="custom-control custom-checkbox mr-3 mb-2">
-        <input
-          class="custom-control-input queja-checkbox"
-          type="checkbox"
-          name="tipo_queja[]"
-          value="Somnolencia diurna"
-          id="somnolencia_diurna"
-          {% for queja in tipos_queja %}{% if queja.nombre == "Somnolencia diurna" %}checked{% endif %}{% endfor %}
-        />
-        <label class="custom-control-label" for="somnolencia_diurna">
-          Somnolencia diurna
-        </label>
-      </div>
-      
-      <div class="custom-control custom-checkbox mr-3 mb-2">
-        <input
-          class="custom-control-input queja-checkbox"
-          type="checkbox"
-          name="tipo_queja[]"
-          value="Narcolepsia"
-          id="narcolepsia"
-          {% for queja in tipos_queja %}{% if queja.nombre == "Narcolepsia" %}checked{% endif %}{% endfor %}
-        />
-        <label class="custom-control-label" for="narcolepsia">Narcolepsia</label>
-      </div>
-      
-      <div class="custom-control custom-checkbox mr-3 mb-2">
-        <input
-          class="custom-control-input queja-checkbox"
-          type="checkbox"
-          name="tipo_queja[]"
-          value="Hipersomnolencia"
-          id="hipersomnolencia"
-          {% for queja in tipos_queja %}{% if queja.nombre == "Hipersomnolencia" %}checked{% endif %}{% endfor %}
-        />
-        <label class="custom-control-label" for="hipersomnolencia">
-          Hipersomnolencia
-        </label>
-      </div>
-      
-      <div class="custom-control custom-checkbox mr-3 mb-2">
-        <input
-          class="custom-control-input queja-checkbox"
-          type="checkbox"
-          name="tipo_queja[]"
-          value="Despertares nocturnos"
-          id="despertares_nocturnos"
-          {% for queja in tipos_queja %}{% if queja.nombre == "Despertares nocturnos" %}checked{% endif %}{% endfor %}
-        />
-        <label class="custom-control-label" for="despertares_nocturnos">
-          Despertares nocturnos
-        </label>
-      </div>
-      
-      <div class="custom-control custom-checkbox mr-3 mb-2">
-        <input
-          class="custom-control-input queja-checkbox"
-          type="checkbox"
-          name="tipo_queja[]"
-          value="Trastorno de conducta del sueño"
-          id="trastorno_sueno"
-          {% for queja in tipos_queja %}{% if queja.nombre == "Trastorno de conducta del sueño" %}checked{% endif %}{% endfor %}
-        />
-        <label class="custom-control-label" for="trastorno_sueno">
-          Trastorno de conducta del sueño
-        </label>
-      </div>
-    </div>
-  </div>
-
-  <!-- Contenedor para campos dinámicos de cada queja -->
-  <div id="quejas-container" class="col-12">
-    <!-- Los campos dinámicos se cargarán aquí via JavaScript -->
-  </div>
-
-  <!-- Sección de causas (solo visible si queja_sueno es "Sí") -->
-  <div id="seccion-causas" {% if datos_examen.presenta_queja != "si" %}style="display: none"{% endif %}>
-    <div class="form-group">
-      <label class="form-control-label">
-        Existe alguna causa conocida o a la que le atribuya el problema
-      </label>
-      <div class="custom-control custom-radio">
-        <input
-          class="custom-control-input"
-          type="radio"
-          name="causa_conocida"
-          id="causa_conocida_si"
-          value="Si"
-          {% if datos_examen.causa_conocida == "Si" %}checked{% endif %}
-        />
-        <label class="custom-control-label" for="causa_conocida_si">Sí</label>
-      </div>
-      <div class="custom-control custom-radio">
-        <input
-          class="custom-control-input"
-          type="radio"
-          name="causa_conocida"
-          id="causa_conocida_no"
-          value="No"
-          {% if datos_examen.causa_conocida == "No" or not datos_examen.causa_conocida %}checked{% endif %}
-        />
-        <label class="custom-control-label" for="causa_conocida_no">No</label>
-      </div>
-    </div>
-
-    <div
-      id="causas-container"
-      class="col-md-12"
-      {% if datos_examen.causa_conocida != "Si" %}style="display: none"{% endif %}
-    >
+    <div id="campos-queja-container" {% if datos_examen.presenta_queja != "si" %}style="display: none"{% endif %}>
       <div class="form-group">
-        <label class="form-control-label">Especifique cuál o cuáles causas</label>
-        <textarea
-          class="form-control"
-          name="especificacion_causa"
-          id="especifique_causas"
-        >{{ datos_examen.especificacion_causa|default:"" }}</textarea>
+        <label class="form-control-label">Tipo de queja de sueño</label>
+        <div class="d-flex flex-wrap">
+          <!-- Lista de checkboxes para tipos de quejas -->
+<!-- ...existing code... -->
+
+<!-- Lista de checkboxes para tipos de quejas -->
+    <div class="custom-control custom-checkbox mr-3 mb-2">
+      <input
+        class="custom-control-input queja-checkbox"
+        type="checkbox"
+        name="tipo_queja[]"
+        value="Dificultad de conciliación"
+        id="dificultad_conciliacion"
+        {% if datos_examen.tipos_queja %}
+          {% for queja in datos_examen.tipos_queja %}
+            {% if queja.nombre == "Dificultad de conciliación" %}checked{% endif %}
+          {% endfor %}
+        {% endif %}
+      />
+      <label class="custom-control-label" for="dificultad_conciliacion">
+        Dificultad de conciliación
+      </label>
+    </div>
+
+    <div class="custom-control custom-checkbox mr-3 mb-2">
+      <input
+        class="custom-control-input queja-checkbox"
+        type="checkbox"
+        name="tipo_queja[]"
+        value="Dificultad de mantenimiento"
+        id="dificultad_mantenimiento"
+        {% if datos_examen.tipos_queja %}
+          {% for queja in datos_examen.tipos_queja %}
+            {% if queja.nombre == "Dificultad de mantenimiento" %}checked{% endif %}
+          {% endfor %}
+        {% endif %}
+      />
+      <label class="custom-control-label" for="dificultad_mantenimiento">
+        Dificultad de mantenimiento
+      </label>
+    </div>
+
+    <div class="custom-control custom-checkbox mr-3 mb-2">
+      <input
+        class="custom-control-input queja-checkbox"
+        type="checkbox"
+        name="tipo_queja[]"
+        value="Trastornos de conducta del sueño"
+        id="trastornos_conducta"
+        {% if datos_examen.tipos_queja %}
+          {% for queja in datos_examen.tipos_queja %}
+            {% if queja.nombre == "Trastornos de conducta del sueño" %}checked{% endif %}
+          {% endfor %}
+        {% endif %}
+      />
+      <label class="custom-control-label" for="trastornos_conducta">
+        Trastornos de conducta del sueño
+      </label>
+    </div>
+
+    <div class="custom-control custom-checkbox mr-3 mb-2">
+      <input
+        class="custom-control-input queja-checkbox"
+        type="checkbox"
+        name="tipo_queja[]"
+        value="Apnea"
+        id="apnea"
+        {% if datos_examen.tipos_queja %}
+          {% for queja in datos_examen.tipos_queja %}
+            {% if queja.nombre == "Apnea" %}checked{% endif %}
+          {% endfor %}
+        {% endif %}
+      />
+      <label class="custom-control-label" for="apnea">Apnea</label>
+    </div>
+
+    <div class="custom-control custom-checkbox mr-3 mb-2">
+      <input
+        class="custom-control-input queja-checkbox"
+        type="checkbox"
+        name="tipo_queja[]"
+        value="Ronquido"
+        id="ronquido"
+        {% if datos_examen.tipos_queja %}
+          {% for queja in datos_examen.tipos_queja %}
+            {% if queja.nombre == "Ronquido" %}checked{% endif %}
+          {% endfor %}
+        {% endif %}
+      />
+      <label class="custom-control-label" for="ronquido">Ronquido</label>
+    </div>
+
+    <div class="custom-control custom-checkbox mr-3 mb-2">
+      <input
+        class="custom-control-input queja-checkbox"
+        type="checkbox"
+        name="tipo_queja[]"
+        value="Somnolencia diurna"
+        id="somnolencia_diurna"
+        {% if datos_examen.tipos_queja %}
+          {% for queja in datos_examen.tipos_queja %}
+            {% if queja.nombre == "Somnolencia diurna" %}checked{% endif %}
+          {% endfor %}
+        {% endif %}
+      />
+      <label class="custom-control-label" for="somnolencia_diurna">
+        Somnolencia diurna
+      </label>
+    </div>
+
+    <div class="custom-control custom-checkbox mr-3 mb-2">
+      <input
+        class="custom-control-input queja-checkbox"
+        type="checkbox"
+        name="tipo_queja[]"
+        value="Narcolepsia"
+        id="narcolepsia"
+        {% if datos_examen.tipos_queja %}
+          {% for queja in datos_examen.tipos_queja %}
+            {% if queja.nombre == "Narcolepsia" %}checked{% endif %}
+          {% endfor %}
+        {% endif %}
+      />
+      <label class="custom-control-label" for="narcolepsia">Narcolepsia</label>
+    </div>
+
+    <div class="custom-control custom-checkbox mr-3 mb-2">
+      <input
+        class="custom-control-input queja-checkbox"
+        type="checkbox"
+        name="tipo_queja[]"
+        value="Hipersomnolencia"
+        id="hipersomnolencia"
+        {% if datos_examen.tipos_queja %}
+          {% for queja in datos_examen.tipos_queja %}
+            {% if queja.nombre == "Hipersomnolencia" %}checked{% endif %}
+          {% endfor %}
+        {% endif %}
+      />
+      <label class="custom-control-label" for="hipersomnolencia">
+        Hipersomnolencia
+      </label>
+    </div>
+
+    <div class="custom-control custom-checkbox mr-3 mb-2">
+      <input
+        class="custom-control-input queja-checkbox"
+        type="checkbox"
+        name="tipo_queja[]"
+        value="Despertares nocturnos"
+        id="despertares_nocturnos"
+        {% if datos_examen.tipos_queja %}
+          {% for queja in datos_examen.tipos_queja %}
+            {% if queja.nombre == "Despertares nocturnos" %}checked{% endif %}
+          {% endfor %}
+        {% endif %}
+      />
+      <label class="custom-control-label" for="despertares_nocturnos">
+        Despertares nocturnos
+      </label>
+    </div>
+
+    <div class="custom-control custom-checkbox mr-3 mb-2">
+      <input
+        class="custom-control-input queja-checkbox"
+        type="checkbox"
+        name="tipo_queja[]"
+        value="Trastorno de conducta del sueño"
+        id="trastorno_sueno"
+        {% if datos_examen.tipos_queja %}
+          {% for queja in datos_examen.tipos_queja %}
+            {% if queja.nombre == "Trastorno de conducta del sueño" %}checked{% endif %}
+          {% endfor %}
+        {% endif %}
+      />
+      <label class="custom-control-label" for="trastorno_sueno">
+        Trastorno de conducta del sueño
+      </label>
+    </div>
+        </div>
       </div>
-      <div class="col-md-12">
+
+      <!-- Contenedor para campos dinámicos de cada queja -->
+      <div id="quejas-container" class="col-12">
+        <!-- Los campos dinámicos se cargarán aquí via JavaScript -->
+      </div>
+
+      <!-- Sección de causas (solo visible si queja_sueno es "Sí") -->
+      <div id="seccion-causas" {% if datos_examen.presenta_queja != "si" %}style="display: none"{% endif %}>
         <div class="form-group">
-          <label class="form-control-label">Observaciones</label>
-          <textarea
-            class="form-control"
-            name="observaciones_queja"
-            id="observaciones_queja"
-          >{{ datos_examen.observaciones_queja|default:"" }}</textarea>
+          <label class="form-control-label">
+            Existe alguna causa conocida o a la que le atribuya el problema
+          </label>
+          <div class="custom-control custom-radio">
+            <input
+              class="custom-control-input"
+              type="radio"
+              name="causa_conocida"
+              id="causa_conocida_si"
+              value="Si"
+              {% if datos_examen.causa_conocida == "Si" %}checked{% endif %}
+            />
+            <label class="custom-control-label" for="causa_conocida_si">Sí</label>
+          </div>
+          <div class="custom-control custom-radio">
+            <input
+              class="custom-control-input"
+              type="radio"
+              name="causa_conocida"
+              id="causa_conocida_no"
+              value="No"
+              {% if datos_examen.causa_conocida == "No" or not datos_examen.causa_conocida %}checked{% endif %}
+            />
+            <label class="custom-control-label" for="causa_conocida_no">No</label>
+          </div>
+        </div>
+
+        <div
+          id="causas-container"
+          class="col-md-12"
+          {% if datos_examen.causa_conocida != "Si" %}style="display: none"{% endif %}
+        >
+          <div class="form-group">
+            <label class="form-control-label">Especifique cuál o cuáles causas</label>
+            <textarea
+              class="form-control"
+              name="especificacion_causa"
+              id="especifique_causas"
+            >{{ datos_examen.especificacion_causa|default:"" }}</textarea>
+          </div>
+          <div class="col-md-12">
+            <div class="form-group">
+              <label class="form-control-label">Observaciones</label>
+              <textarea
+                class="form-control"
+                name="observaciones_queja"
+                id="observaciones_queja"
+              >{{ datos_examen.observaciones_queja|default:"" }}</textarea>
+            </div>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-</div>
 <!-- ...existing code... -->
       </div>
     </div>
@@ -1024,51 +1067,55 @@
                     </div>
                   </div>
 
+                
+
                   <div class="form-group">
                     <label>Momento del día en que realiza siestas</label>
-                    <div class="custom-control custom-checkbox">
-                      <input
-                        type="checkbox"
-                        class="custom-control-input"
-                        id="manana"
-                        name="momento_dia[]"
-                        value="Mañana"
-                        {% if 'Mañana' in datos_examen.periodo_siestas %}checked{% endif %}
-                      />
-                      <label class="custom-control-label" for="manana">Mañana</label>
-                    </div>
-                    <div class="custom-control custom-checkbox">
-                      <input
-                        type="checkbox"
-                        class="custom-control-input"
-                        id="tarde"
-                        name="momento_dia[]"
-                        value="Tarde"
-                        {% if 'Tarde' in datos_examen.periodo_siestas %}checked{% endif %}
-                      />
-                      <label class="custom-control-label" for="tarde">Tarde</label>
-                    </div>
-                    <div class="custom-control custom-checkbox">
-                      <input
-                        type="checkbox"
-                        class="custom-control-input"
-                        id="noche"
-                        name="momento_dia[]"
-                        value="Noche"
-                        {% if 'Noche' in datos_examen.periodo_siestas %}checked{% endif %}
-                      />
-                      <label class="custom-control-label" for="noche">Noche</label>
-                    </div>
-                    <div class="custom-control custom-checkbox">
-                      <input
-                        type="checkbox"
-                        class="custom-control-input"
-                        id="variable"
-                        name="momento_dia[]"
-                        value="Variable"
-                        {% if 'Variable' in datos_examen.periodo_siestas %}checked{% endif %}
-                      />
-                      <label class="custom-control-label" for="variable">Variable</label>
+                    <div class="ml-3">
+                      <div class="custom-control custom-radio">
+                        <input
+                          type="radio"
+                          class="custom-control-input"
+                          id="momento_dia_manana"
+                          name="momento_dia_siesta"
+                          value="Mañana"
+                          {% if datos_examen.momento_dia_siesta == "Mañana" %}checked{% endif %}
+                        />
+                        <label class="custom-control-label" for="momento_dia_manana">Mañana</label>
+                      </div>
+                      <div class="custom-control custom-radio">
+                        <input
+                          type="radio"
+                          class="custom-control-input"
+                          id="momento_dia_tarde"
+                          name="momento_dia_siesta"
+                          value="Tarde"
+                          {% if datos_examen.momento_dia_siesta == "Tarde" %}checked{% endif %}
+                        />
+                        <label class="custom-control-label" for="momento_dia_tarde">Tarde</label>
+                      </div>
+                      <div class="custom-control custom-radio">
+                        <input
+                          type="radio"
+                          class="custom-control-input"
+                          id="momento_dia_noche"
+                          name="momento_dia_siesta"
+                          value="Noche"
+                          {% if datos_examen.momento_dia_siesta == "Noche" %}checked{% endif %}
+                        />
+                        <label class="custom-control-label" for="momento_dia_noche">Noche</label>
+                      </div>
+                      <div class="custom-control custom-radio">
+                        <input
+                          type="radio"
+                          class="custom-control-input"
+                          id="momento_dia_variable"
+                          name="momento_dia_siesta"
+                          value="Variable"
+                          {% if datos_examen.momento_dia_siesta == "Variable" %}checked{% endif %}
+                        />
+                        <label class="custom-control-label" for="momento_dia_variable">Variable</label>
+                      </div>
                     </div>
                   </div>
 
@@ -1586,6 +1633,7 @@
 {% block javascripts %}
 
 <script>
+
   let contador = 0;
   
   document.addEventListener("DOMContentLoaded", function () {
@@ -2390,188 +2438,348 @@
 document.addEventListener("DOMContentLoaded", function () {
   // Función para inicializar datos existentes
   function inicializarDatosExistentes() {
+    console.log('Inicializando datos existentes...');
+    
+    // Datos de tipos de queja pasados desde Django
+    const tiposQuejaData = [
+      {% if tipos_queja %}
+        {% for queja in tipos_queja %}
+        {
+          nombre: "{{ queja.nombre|escapejs }}",
+          inicio: "{{ queja.inicio|escapejs }}",
+          evolucion: "{{ queja.evolucion|escapejs }}",
+          frecuencia: "{{ queja.frecuencia|escapejs }}",
+          gravedad: "{{ queja.gravedad|escapejs }}"
+        }{% if not forloop.last %},{% endif %}
+        {% endfor %}
+      {% endif %}
+    ];
+
+    console.log('Tipos de queja encontrados:', tiposQuejaData);
+
+    if (tiposQuejaData.length > 0) {
+      // 1. Primero marcar los checkboxes
+      tiposQuejaData.forEach((queja, index) => {
+        const checkbox = document.querySelector(`input[value="${queja.nombre}"]`);
+        if (checkbox) {
+          console.log(`Marcando checkbox para: ${queja.nombre}`);
+          checkbox.checked = true;
+        } else {
+          console.log(`No se encontró checkbox para: ${queja.nombre}`);
+        }
+      });
+
+      // 2. Esperar y disparar eventos para generar campos dinámicos
+      setTimeout(() => {
+        console.log('Disparando eventos change para generar campos...');
+        tiposQuejaData.forEach((queja) => {
+          const checkbox = document.querySelector(`input[value="${queja.nombre}"]`);
+          if (checkbox && checkbox.checked) {
+            console.log(`Disparando evento change para: ${queja.nombre}`);
+            checkbox.dispatchEvent(new Event('change'));
+          }
+        });
+
+        // 3. Esperar a que se generen los campos y luego cargar datos
+        setTimeout(() => {
+          console.log('Cargando datos en los campos generados...');
+          tiposQuejaData.forEach((queja) => {
+            const quejaId = queja.nombre.replace(/\s+/g, "_").toLowerCase();
+            
+            console.log(`Buscando campos para quejaId: ${quejaId}`);
+            
+            const inicioField = document.querySelector(`input[name="${quejaId}_inicio"]`);
+            const evolucionField = document.querySelector(`textarea[name="${quejaId}_evolucion"]`);
+            const frecuenciaField = document.querySelector(`select[name="${quejaId}_frecuencia"]`);
+            const gravedadField = document.querySelector(`select[name="${quejaId}_gravedad"]`);
+
+            if (inicioField) {
+              inicioField.value = queja.inicio;
+              console.log(`Cargado inicio para ${quejaId}: ${queja.inicio}`);
+            } else {
+              console.log(`Campo inicio no encontrado para: ${quejaId}`);
+            }
+
+            if (evolucionField) {
+              evolucionField.value = queja.evolucion;
+              console.log(`Cargada evolución para ${quejaId}: ${queja.evolucion}`);
+            } else {
+              console.log(`Campo evolución no encontrado para: ${quejaId}`);
+            }
+
+            if (frecuenciaField) {
+              frecuenciaField.value = queja.frecuencia;
+              console.log(`Cargada frecuencia para ${quejaId}: ${queja.frecuencia}`);
+            } else {
+              console.log(`Campo frecuencia no encontrado para: ${quejaId}`);
+            }
+
+            if (gravedadField) {
+              gravedadField.value = queja.gravedad;
+              console.log(`Cargada gravedad para ${quejaId}: ${queja.gravedad}`);
+            } else {
+              console.log(`Campo gravedad no encontrado para: ${quejaId}`);
+            }
+          });
+        }, 300); // Aumentado el tiempo para asegurar que se generen los campos
+      }, 200);
+    } else {
+      console.log('No hay tipos de queja para inicializar');
+    }
+
+    // Inicializar otros datos existentes
+    inicializarOtrosDatosExistentes();
+  }
+
+  // Función para inicializar otros tipos de datos existentes
+    // Función para inicializar otros tipos de datos existentes
+  function inicializarOtrosDatosExistentes() {
+    console.log('Inicializando otros datos existentes...');
     
     // Inicializar sustancias existentes
     {% if sustancias %}
+    console.log('Inicializando sustancias existentes...');
+    const consumeSi = document.getElementById("consume-si");
+    if (consumeSi && !consumeSi.checked) {
+      consumeSi.checked = true;
+      consumeSi.dispatchEvent(new Event('change'));
+    }
+
+    setTimeout(() => {
       {% for sustancia in sustancias %}
-        if (typeof agregarSustancia === 'function') {
-          agregarSustancia();
-          const ultimaSustancia = document.querySelector('.sustancia-item:last-child');
-          if (ultimaSustancia) {
-            ultimaSustancia.querySelector('input[name="sustancias_tipo[]"]').value = "{{ sustancia.tipo|escapejs }}";
-            ultimaSustancia.querySelector('input[name="sustancias_cantidad[]"]').value = "{{ sustancia.cantidad|escapejs }}";
-            ultimaSustancia.querySelector('select[name="sustancias_frecuencia[]"]').value = "{{ sustancia.frecuencia|escapejs }}";
-            ultimaSustancia.querySelector('select[name="sustancias_tiempo[]"]').value = "{{ sustancia.tiempo|escapejs }}";
-            const observaciones = ultimaSustancia.querySelector('textarea[name="sustancias_observaciones[]"]');
-            if (observaciones) observaciones.value = "{{ sustancia.observaciones|escapejs }}";
-          }
+      console.log('Agregando sustancia: {{ sustancia.tipo|escapejs }}');
+      if (typeof agregarSustancia === 'function') {
+        agregarSustancia();
+        const ultimaSustancia = document.querySelector('#contenedor-sustancias .sustancia-item:last-child');
+        if (ultimaSustancia) {
+          const tipoInput = ultimaSustancia.querySelector('input[name="sustancias_tipo[]"]');
+          const cantidadInput = ultimaSustancia.querySelector('input[name="sustancias_cantidad[]"]');
+          const frecuenciaSelect = ultimaSustancia.querySelector('select[name="sustancias_frecuencia[]"]');
+          const tiempoSelect = ultimaSustancia.querySelector('select[name="sustancias_tiempo[]"]');
+          const observacionesTextarea = ultimaSustancia.querySelector('textarea[name="sustancias_observaciones[]"]');
+          
+          if (tipoInput) tipoInput.value = "{{ sustancia.tipo|escapejs }}";
+          if (cantidadInput) cantidadInput.value = "{{ sustancia.cantidad|escapejs }}";
+          if (frecuenciaSelect) frecuenciaSelect.value = "{{ sustancia.frecuencia|escapejs }}";
+          if (tiempoSelect) tiempoSelect.value = "{{ sustancia.tiempo|escapejs }}";
+          if (observacionesTextarea) observacionesTextarea.value = "{{ sustancia.observaciones|escapejs }}";
         }
+      }
       {% endfor %}
+    }, 500);
     {% endif %}
 
     // Inicializar pantallas existentes
     {% if pantallas %}
+    console.log('Inicializando pantallas existentes...');
+    const pantallasSi = document.getElementById("pantallas_si");
+    if (pantallasSi && !pantallasSi.checked) {
+      pantallasSi.checked = true;
+      pantallasSi.dispatchEvent(new Event('change'));
+    }
+
+    setTimeout(() => {
       {% for pantalla in pantallas %}
-        if (typeof agregarPantalla === 'function') {
-          agregarPantalla();
-          const ultimaPantalla = document.querySelector('#contenedor-pantallas .border:last-child');
-          if (ultimaPantalla) {
-            ultimaPantalla.querySelector('select[name="tipo_pantalla[]"]').value = "{{ pantalla.tipo|escapejs }}";
-            ultimaPantalla.querySelector('select[name="pantalla_frecuencia[]"]').value = "{{ pantalla.frecuencia|escapejs }}";
-            ultimaPantalla.querySelector('select[name="pantalla_tiempo_dormir[]"]').value = "{{ pantalla.tiempo_antes_dormir|escapejs }}";
-          }
+      console.log('Agregando pantalla: {{ pantalla.tipo|escapejs }}');
+      if (typeof agregarPantalla === 'function') {
+        agregarPantalla();
+        const ultimaPantalla = document.querySelector('#contenedor-pantallas div.border:last-child');
+        if (ultimaPantalla) {
+          const tipoSelect = ultimaPantalla.querySelector('select[name="tipo_pantalla[]"]');
+          const frecuenciaSelect = ultimaPantalla.querySelector('select[name="pantalla_frecuencia[]"]');
+          const tiempoSelect = ultimaPantalla.querySelector('select[name="pantalla_tiempo_dormir[]"]');
+          
+          if (tipoSelect) tipoSelect.value = "{{ pantalla.tipo|escapejs }}";
+          if (frecuenciaSelect) frecuenciaSelect.value = "{{ pantalla.frecuencia|escapejs }}";
+          if (tiempoSelect) tiempoSelect.value = "{{ pantalla.tiempo_antes_dormir|escapejs }}";
         }
+      }
       {% endfor %}
-    {% endif %}
-
-    // Inicializar actividades físicas existentes
-    {% if actividades_fisicas %}
-      {% for actividad in actividades_fisicas %}
-        if (typeof agregarActividadFisica === 'function') {
-          agregarActividadFisica();
-          const ultimaActividad = document.querySelector('#contenedor-actividades-fisicas .border:last-child');
-          if (ultimaActividad) {
-            const selectTipo = ultimaActividad.querySelector('select[name="tipo_actividad_fisica[]"]');
-            const inputOtro = ultimaActividad.querySelector('input[name="tipo_actividad_otro_texto[]"]');
-            
-            selectTipo.value = "{{ actividad.tipo|escapejs }}";
-            if (selectTipo.value === "otro" && inputOtro) {
-              inputOtro.style.display = "block";
-              inputOtro.value = "{{ actividad.otro_texto|escapejs }}";
-            }
-            
-            ultimaActividad.querySelector('input[name="intensidad_fisica[]"]').value = "{{ actividad.intensidad|escapejs }}";
-            ultimaActividad.querySelector('select[name="frecuencia_fisica[]"]').value = "{{ actividad.frecuencia|escapejs }}";
-            const observaciones = ultimaActividad.querySelector('textarea[name="observaciones_actividad_fisica[]"]');
-            if (observaciones) observaciones.value = "{{ actividad.observaciones|escapejs }}";
-          }
-        }
-      {% endfor %}
-    {% endif %}
-
-    // Inicializar medicamentos existentes
-    {% if medicamentos %}
-      {% for medicamento in medicamentos %}
-        if (typeof agregarMedicamento === 'function') {
-          agregarMedicamento();
-          const ultimoMedicamento = document.querySelector('#contenedor-medicamentos .border:last-child');
-          if (ultimoMedicamento) {
-            ultimoMedicamento.querySelector('input[name="nombre_medicamento[]"]').value = "{{ medicamento.nombre|escapejs }}";
-            ultimoMedicamento.querySelector('input[name="dosis_medicamento[]"]').value = "{{ medicamento.dosis|escapejs }}";
-            ultimoMedicamento.querySelector('select[name="presentacion[]"]').value = "{{ medicamento.presentacion|escapejs }}";
-            ultimoMedicamento.querySelector('input[name="veces_dia[]"]').value = "{{ medicamento.veces_dia|escapejs }}";
-            ultimoMedicamento.querySelector('select[name="frecuencia_medicamentos[]"]').value = "{{ medicamento.frecuencia|escapejs }}";
-            ultimoMedicamento.querySelector('select[name="tiempo_antes_dormir[]"]').value = "{{ medicamento.tiempo|escapejs }}";
-            const observaciones = ultimoMedicamento.querySelector('textarea[name="observaciones_medicamento[]"]');
-            if (observaciones) observaciones.value = "{{ medicamento.observaciones|escapejs }}";
-          }
-        }
-      {% endfor %}
+    }, 600);
     {% endif %}
 
     // Inicializar actividades en cama existentes
     {% if actividades_en_cama %}
+    console.log('Inicializando actividades en cama existentes...');
+    const camaActividadesSi = document.getElementById("cama_actividades_si");
+    if (camaActividadesSi && !camaActividadesSi.checked) {
+      camaActividadesSi.checked = true;
+      camaActividadesSi.dispatchEvent(new Event('change'));
+    }
+
+    setTimeout(() => {
       {% for actividad in actividades_en_cama %}
-        if (typeof agregarActividad === 'function') {
-          agregarActividad();
-          const ultimaActividad = document.querySelector('#contenedor-actividades .border:last-child');
-          if (ultimaActividad) {
-            const select = ultimaActividad.querySelector('select[name="tipo_actividad[]"]');
-            if (select) {
-              // Para selects múltiples, marcar las opciones correspondientes
-              Array.from(select.options).forEach(option => {
-                if (option.value === "{{ actividad.tipo|escapejs }}") {
-                  option.selected = true;
-                }
-              });
-            }
-            ultimaActividad.querySelector('select[name="frecuencia_actividad[]"]').value = "{{ actividad.frecuencia|escapejs }}";
-            const observaciones = ultimaActividad.querySelector('textarea[name="observaciones_actividades[]"]');
-            if (observaciones) observaciones.value = "{{ actividad.observaciones|escapejs }}";
-          }
+      console.log('Agregando actividad en cama: {{ actividad.tipo|escapejs }}');
+      if (typeof agregarActividad === 'function') {
+        agregarActividad();
+        const ultimaActividad = document.querySelector('#contenedor-actividades div.border:last-child');
+        if (ultimaActividad) {
+          const tipoSelect = ultimaActividad.querySelector('select[name="tipo_actividad[]"]');
+          const frecuenciaSelect = ultimaActividad.querySelector('select[name="frecuencia_actividad[]"]');
+          const observacionesTextarea = ultimaActividad.querySelector('textarea[name="observaciones_actividades[]"]');
+          
+          if (tipoSelect) tipoSelect.value = "{{ actividad.tipo|escapejs }}";
+          if (frecuenciaSelect) frecuenciaSelect.value = "{{ actividad.frecuencia|escapejs }}";
+          if (observacionesTextarea) observacionesTextarea.value = "{{ actividad.observaciones|escapejs }}";
         }
+      }
       {% endfor %}
+    }, 650);
+    {% endif %}
+
+    // Inicializar actividades físicas existentes
+    {% if actividades_fisicas %}
+    console.log('Inicializando actividades físicas existentes...');
+    const actividadFisicaSi = document.getElementById("actividad_fisica_si");
+    if (actividadFisicaSi && !actividadFisicaSi.checked) {
+      actividadFisicaSi.checked = true;
+      actividadFisicaSi.dispatchEvent(new Event('change'));
+    }
+
+    setTimeout(() => {
+      {% for actividad_fisica in actividades_fisicas %}
+      console.log('Agregando actividad física: {{ actividad_fisica.tipo|escapejs }}');
+      if (typeof agregarActividadFisica === 'function') {
+        agregarActividadFisica();
+        const ultimaActividadFisica = document.querySelector('#contenedor-actividades-fisicas div.border:last-child');
+        if (ultimaActividadFisica) {
+          const tipoSelect = ultimaActividadFisica.querySelector('select[name="tipo_actividad_fisica[]"]');
+          const otroInput = ultimaActividadFisica.querySelector('input[name="tipo_actividad_otro_texto[]"]');
+          const intensidadInput = ultimaActividadFisica.querySelector('input[name="intensidad_fisica[]"]');
+          const frecuenciaSelect = ultimaActividadFisica.querySelector('select[name="frecuencia_fisica[]"]');
+          const observacionesTextarea = ultimaActividadFisica.querySelector('textarea[name="observaciones_actividad_fisica[]"]');
+          
+          if (tipoSelect) {
+            tipoSelect.value = "{{ actividad_fisica.tipo|escapejs }}";
+            // Mostrar campo "otro" si es necesario
+            if (tipoSelect.value === "otro" && otroInput) {
+              otroInput.style.display = "block";
+              otroInput.value = "{{ actividad_fisica.otro_texto|escapejs }}";
+            }
+          }
+          if (intensidadInput) intensidadInput.value = "{{ actividad_fisica.intensidad|escapejs }}";
+          if (frecuenciaSelect) frecuenciaSelect.value = "{{ actividad_fisica.frecuencia|escapejs }}";
+          if (observacionesTextarea) observacionesTextarea.value = "{{ actividad_fisica.observaciones|escapejs }}";
+        }
+      }
+      {% endfor %}
+    }, 700);
+    {% endif %}
+
+    // Inicializar medicamentos existentes
+    {% if medicamentos %}
+    console.log('Inicializando medicamentos existentes...');
+    const consumeMedSi = document.getElementById("consume_si");
+    if (consumeMedSi && !consumeMedSi.checked) {
+      consumeMedSi.checked = true;
+      consumeMedSi.dispatchEvent(new Event('change'));
+    }
+
+    setTimeout(() => {
+      {% for medicamento in medicamentos %}
+      console.log('Agregando medicamento: {{ medicamento.nombre|escapejs }}');
+      if (typeof agregarMedicamento === 'function') {
+        agregarMedicamento();
+        const ultimoMedicamento = document.querySelector('#contenedor-medicamentos div.border:last-child');
+        if (ultimoMedicamento) {
+          const nombreInput = ultimoMedicamento.querySelector('input[name="nombre_medicamento[]"]');
+          const dosisInput = ultimoMedicamento.querySelector('input[name="dosis_medicamento[]"]');
+          const presentacionSelect = ultimoMedicamento.querySelector('select[name="presentacion[]"]');
+          const vecesInput = ultimoMedicamento.querySelector('input[name="veces_dia[]"]');
+          const frecuenciaSelect = ultimoMedicamento.querySelector('select[name="frecuencia_medicamentos[]"]');
+          const tiempoSelect = ultimoMedicamento.querySelector('select[name="tiempo_antes_dormir[]"]');
+          const observacionesTextarea = ultimoMedicamento.querySelector('textarea[name="observaciones_medicamento[]"]');
+          
+          if (nombreInput) nombreInput.value = "{{ medicamento.nombre|escapejs }}";
+          if (dosisInput) dosisInput.value = "{{ medicamento.dosis|escapejs }}";
+          if (presentacionSelect) presentacionSelect.value = "{{ medicamento.presentacion|escapejs }}";
+          if (vecesInput) vecesInput.value = "{{ medicamento.veces_dia|escapejs }}";
+          if (frecuenciaSelect) frecuenciaSelect.value = "{{ medicamento.frecuencia|escapejs }}";
+          if (tiempoSelect) tiempoSelect.value = "{{ medicamento.tiempo|escapejs }}";
+          if (observacionesTextarea) observacionesTextarea.value = "{{ medicamento.observaciones|escapejs }}";
+        }
+      }
+      {% endfor %}
+    }, 750);
     {% endif %}
 
     // Inicializar síntomas de sueño existentes
     {% if sintomas_suenos %}
+    console.log('Inicializando síntomas de sueño existentes...');
+    const sintomasSuenoSi = document.getElementById("sintomas_sueno_si");
+    if (sintomasSuenoSi && !sintomasSuenoSi.checked) {
+      sintomasSuenoSi.checked = true;
+      sintomasSuenoSi.dispatchEvent(new Event('change'));
+    }
+
+    setTimeout(() => {
       {% for sintoma in sintomas_suenos %}
-        if (typeof agregarSintoma === 'function') {
-          agregarSintoma();
-          const ultimoSintoma = document.querySelector('#contenedor-sintomas .border:last-child');
-          if (ultimoSintoma) {
-            ultimoSintoma.querySelector('select[name="tipo_sintoma[]"]').value = "{{ sintoma.tipo|escapejs }}";
-            ultimoSintoma.querySelector('input[name="cuando_inicio[]"]').value = "{{ sintoma.cuando_inicio|escapejs }}";
-            ultimoSintoma.querySelector('input[name="evolucion[]"]').value = "{{ sintoma.evolucion|escapejs }}";
-            ultimoSintoma.querySelector('select[name="frecuencia[]"]').value = "{{ sintoma.frecuencia|escapejs }}";
-            ultimoSintoma.querySelector('select[name="gravedad[]"]').value = "{{ sintoma.gravedad|escapejs }}";
-            const observaciones = ultimoSintoma.querySelector('textarea[name="observaciones_sintoma[]"]');
-            if (observaciones) observaciones.value = "{{ sintoma.observaciones|escapejs }}";
-          }
+      console.log('Agregando síntoma de sueño: {{ sintoma.tipo|escapejs }}');
+      if (typeof agregarSintoma === 'function') {
+        agregarSintoma();
+        const ultimoSintoma = document.querySelector('#contenedor-sintomas div.border:last-child');
+        if (ultimoSintoma) {
+          const tipoSelect = ultimoSintoma.querySelector('select[name="tipo_sintoma[]"]');
+          const inicioInput = ultimoSintoma.querySelector('input[name="cuando_inicio[]"]');
+          const evolucionInput = ultimoSintoma.querySelector('input[name="evolucion[]"]');
+          const frecuenciaSelect = ultimoSintoma.querySelector('select[name="frecuencia[]"]');
+          const gravedadSelect = ultimoSintoma.querySelector('select[name="gravedad[]"]');
+          const observacionesTextarea = ultimoSintoma.querySelector('textarea[name="observaciones_sintoma[]"]');
+          
+          if (tipoSelect) tipoSelect.value = "{{ sintoma.tipo|escapejs }}";
+          if (inicioInput) inicioInput.value = "{{ sintoma.cuando_inicio|escapejs }}";
+          if (evolucionInput) evolucionInput.value = "{{ sintoma.evolucion|escapejs }}";
+          if (frecuenciaSelect) frecuenciaSelect.value = "{{ sintoma.frecuencia|escapejs }}";
+          if (gravedadSelect) gravedadSelect.value = "{{ sintoma.gravedad|escapejs }}";
+          if (observacionesTextarea) observacionesTextarea.value = "{{ sintoma.observaciones|escapejs }}";
         }
+      }
       {% endfor %}
+    }, 800);
     {% endif %}
 
     // Inicializar síntomas diurnos existentes
     {% if sintomas_diurnos %}
-      {% for sintoma in sintomas_diurnos %}
-        if (typeof agregarSintomaDiurno === 'function') {
-          agregarSintomaDiurno();
-          const ultimoSintoma = document.querySelector('#contenedor-sintomas-diurnos .border:last-child');
-          if (ultimoSintoma) {
-            ultimoSintoma.querySelector('select[name="tipo_sintoma_diurno[]"]').value = "{{ sintoma.tipo|escapejs }}";
-            ultimoSintoma.querySelector('input[name="cuando_inicio_diurno[]"]').value = "{{ sintoma.cuando_inicio|escapejs }}";
-            ultimoSintoma.querySelector('input[name="evolucion_diurno[]"]').value = "{{ sintoma.evolucion|escapejs }}";
-            ultimoSintoma.querySelector('select[name="frecuencia_diurno[]"]').value = "{{ sintoma.frecuencia|escapejs }}";
-            ultimoSintoma.querySelector('select[name="gravedad_diurno[]"]').value = "{{ sintoma.gravedad|escapejs }}";
-            const observaciones = ultimoSintoma.querySelector('textarea[name="observaciones_sintoma_diurno[]"]');
-            if (observaciones) observaciones.value = "{{ sintoma.observaciones|escapejs }}";
-          }
-        }
-      {% endfor %}
-    {% endif %}
+    console.log('Inicializando síntomas diurnos existentes...');
+    const sintomasDiurnosSi = document.getElementById("sintomas_diurnos_si");
+    if (sintomasDiurnosSi && !sintomasDiurnosSi.checked) {
+      sintomasDiurnosSi.checked = true;
+      sintomasDiurnosSi.dispatchEvent(new Event('change'));
+    }
 
-    // Inicializar tipos de queja existentes
-    {% if tipos_queja %}
-    // Primero marcar los checkboxes
-    {% for queja in tipos_queja %}
-      const checkbox{{ forloop.counter }} = document.querySelector('input[value="{{ queja.nombre|escapejs }}"]');
-      if (checkbox{{ forloop.counter }}) {
-        checkbox{{ forloop.counter }}.checked = true;
-      }
-    {% endfor %}
-    
-    // Luego generar campos dinámicos con un pequeño delay
     setTimeout(() => {
-      {% for queja in tipos_queja %}
-        const checkbox{{ forloop.counter }} = document.querySelector('input[value="{{ queja.nombre|escapejs }}"]');
-        if (checkbox{{ forloop.counter }} && checkbox{{ forloop.counter }}.checked) {
-          // Disparar evento para crear campos dinámicos
-          checkbox{{ forloop.counter }}.dispatchEvent(new Event('change'));
-        }
-      {% endfor %}
-      
-      // Cargar datos después de crear los campos
-      setTimeout(() => {
-        {% for queja in tipos_queja %}
-          const quejaId = "{{ queja.nombre|escapejs }}".replace(/\s+/g, "_").toLowerCase();
-          const inicioField = document.querySelector(`input[name="${quejaId}_inicio"]`);
-          const evolucionField = document.querySelector(`textarea[name="${quejaId}_evolucion"]`);
-          const frecuenciaField = document.querySelector(`select[name="${quejaId}_frecuencia"]`);
-          const gravedadField = document.querySelector(`select[name="${quejaId}_gravedad"]`);
+      {% for sintoma_diurno in sintomas_diurnos %}
+      console.log('Agregando síntoma diurno: {{ sintoma_diurno.tipo|escapejs }}');
+      if (typeof agregarSintomaDiurno === 'function') {
+        agregarSintomaDiurno();
+        const ultimoSintomaDiurno = document.querySelector('#contenedor-sintomas-diurnos div.border:last-child');
+        if (ultimoSintomaDiurno) {
+          const tipoSelect = ultimoSintomaDiurno.querySelector('select[name="tipo_sintoma_diurno[]"]');
+          const inicioInput = ultimoSintomaDiurno.querySelector('input[name="cuando_inicio_diurno[]"]');
+          const evolucionInput = ultimoSintomaDiurno.querySelector('input[name="evolucion_diurno[]"]');
+          const frecuenciaSelect = ultimoSintomaDiurno.querySelector('select[name="frecuencia_diurno[]"]');
+          const gravedadSelect = ultimoSintomaDiurno.querySelector('select[name="gravedad_diurno[]"]');
+          const observacionesTextarea = ultimoSintomaDiurno.querySelector('textarea[name="observaciones_sintoma_diurno[]"]');
           
-          if (inicioField) inicioField.value = "{{ queja.inicio|escapejs }}";
-          if (evolucionField) evolucionField.value = "{{ queja.evolucion|escapejs }}";
-          if (frecuenciaField) frecuenciaField.value = "{{ queja.frecuencia|escapejs }}";
-          if (gravedadField) gravedadField.value = "{{ queja.gravedad|escapejs }}";
-        {% endfor %}
-      }, 200);
-    }, 100);
-  {% endif %}
+          if (tipoSelect) tipoSelect.value = "{{ sintoma_diurno.tipo|escapejs }}";
+          if (inicioInput) inicioInput.value = "{{ sintoma_diurno.cuando_inicio|escapejs }}";
+          if (evolucionInput) evolucionInput.value = "{{ sintoma_diurno.evolucion|escapejs }}";
+          if (frecuenciaSelect) frecuenciaSelect.value = "{{ sintoma_diurno.frecuencia|escapejs }}";
+          if (gravedadSelect) gravedadSelect.value = "{{ sintoma_diurno.gravedad|escapejs }}";
+          if (observacionesTextarea) observacionesTextarea.value = "{{ sintoma_diurno.observaciones|escapejs }}";
+        }
+      }
+      {% endfor %}
+    }, 850);
+    {% endif %}
   }
 
-  // Llamar a la inicialización después de que se carguen las funciones
-  setTimeout(inicializarDatosExistentes, 500);
+  // Esperar a que todas las funciones se hayan definido antes de inicializar
+  setTimeout(() => {
+    console.log('Iniciando inicialización de datos existentes...');
+    inicializarDatosExistentes();
+    inicializarOtrosDatosExistentes(); // Agregar esta línea
+  }, 1000);
 });
 // ...existing code...
 
