@@ -537,6 +537,14 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="form-group mt-4">
+                            <label><strong>Puntuación Total del Pittsburgh</strong></label>
+                            <input type="number" class="form-control" id="puntuacion_total" name="puntuacion_total"
+                                    readonly placeholder="La puntuación se calcula automáticamente">
+                            </div>
+
+
+
 
                         <!-- Botones de acción -->
                         <div class="row mt-4">
@@ -554,11 +562,16 @@
 </div>
 
 <script>
-    function toggleFields() {
-        var select = document.getElementById("duerme_acompanado");
-        var fields = document.getElementById("acompanado_fields");
+document.addEventListener("DOMContentLoaded", function() {
 
-        // Mostrar campos si no es "Solo"
+
+    /* ---------------------------
+       1. Mostrar/Ocultar campos
+    ----------------------------*/
+    function toggleFields() {
+        const select = document.getElementById("duerme_acompanado");
+        const fields = document.getElementById("acompanado_fields");
+
         if (select.value !== "Solo" && select.value !== "") {
             fields.style.display = "block";
         } else {
@@ -566,10 +579,126 @@
         }
     }
 
-    // Ejecutar al cargar la página para establecer el estado inicial
-    document.addEventListener("DOMContentLoaded", function () {
-        toggleFields();
+    // Activar cambio y estado inicial
+    document.getElementById("duerme_acompanado").addEventListener("change", toggleFields);
+    toggleFields();
+
+
+
+    // -----------------------------
+    // MAPEO DE RESPUESTAS → PUNTOS
+    // -----------------------------
+
+    const MAP_LATENCIA = {
+        "≤ 15 minutes": 0,
+        "≤ 15 minutos": 0,
+        "16-30 minutes": 1,
+        "16-30 minutos": 1,
+        "31-60 minutes": 2,
+        "31-60 minutos": 2,
+        "> 60 minutes": 3,
+        "> 60 minutos": 3
+    };
+
+    const MAP_DURACION = {
+        "> 7 hours": 0,
+        "> 7 horas": 0,
+        "6-7 hours": 1,
+        "6-7 horas": 1,
+        "5-6 hours": 2,
+        "5-6 horas": 2,
+        "< 5 hours": 3,
+        "< 5 horas": 3
+    };
+
+    // Frecuencia de problemas (muchas preguntas)
+    const MAP_FRECUENCIA = {
+        "Ninguna vez en el ultimo mes": 0,
+        "Menos de una vez a la semana": 1,
+        "Una o dos veces a la semana": 2,
+        "Tres o mas veces a la semana": 3
+    };
+
+    const MAP_CALIDAD_SUENO = {
+        "Bastante buena": 0,
+        "Buena": 1,
+        "Mala": 2,
+        "Bastante mala": 3
+    };
+
+    const MAP_SOMNOLENCIA = {
+        "Ninguna vez en el ultimo mes": 0,
+        "Menos de una vez a la semana": 1,
+        "Una o dos veces a la semana": 2,
+        "Tres o mas veces a la semana": 3
+    };
+
+    const MAP_MEDICACION = MAP_SOMNOLENCIA; // mismo patrón
+
+
+    // -----------------------------
+    // FUNCIÓN GENERAL DE PUNTAJE
+    // -----------------------------
+
+    function mapearValor(name, value) {
+        if (!value) return 0;
+
+        value = value.trim();
+
+        if (name.includes("latencia")) return MAP_LATENCIA[value] ?? 0;
+        if (name.includes("duracion_sueno")) return MAP_DURACION[value] ?? 0;
+        if (name.includes("calidad_sueno")) return MAP_CALIDAD_SUENO[value] ?? 0;
+        if (name.includes("medicacion_sueno")) return MAP_MEDICACION[value] ?? 0;
+
+        // Todas las de frecuencia/dificultades
+        if (MAP_FRECUENCIA[value] !== undefined) return MAP_FRECUENCIA[value];
+
+        // Si no coincide con nada
+        return 0;
+    }
+
+
+    // ----------------------------------------
+    // IDENTIFICAR CAMPOS QUE SE DEBEN SUMAR
+    // ----------------------------------------
+
+    const campos = [
+        "latencia_sueno[]",
+        "duracion_sueno[]",
+        "eficiencia_sueno[]",
+        "calidad_sueno[]",
+        "medicacion_sueno[]"
+        // agrega aquí TODOS los names reales de tu formulario
+    ];
+
+
+    // ----------------------------------------
+    // CALCULAR PUNTUACIÓN TOTAL
+    // ----------------------------------------
+
+    function calcularPuntuacion() {
+        let total = 0;
+
+        campos.forEach(nombre => {
+            document.getElementsByName(nombre).forEach(input => {
+                total += mapearValor(nombre, input.value);
+            });
+        });
+
+        document.getElementById("puntuacion_total").value = total;
+    }
+
+    // Escuchar cambios
+    campos.forEach(nombre => {
+        document.getElementsByName(nombre).forEach(input => {
+            input.addEventListener("change", calcularPuntuacion);
+            input.addEventListener("input", calcularPuntuacion);
+        });
     });
+
+});
 </script>
+
+
 
 {% endblock %}

@@ -5939,6 +5939,12 @@ def guardar_examen_Participante_MoCA(request):
 @login_required
 def guardar_examen_Cuidador_CDR(request):
     if request.method == "POST":
+        print(">>> NIVEL:", request.POST.get("nivel_desempeno_domestico"))
+        print(
+            ">>> LONGITUD:",
+            len(request.POST.get("nivel_desempeno_domestico") or ""),
+        )
+
         try:
             visita_id = request.POST.get("visita_id")
             paciente_id = request.POST.get("paciente_id")

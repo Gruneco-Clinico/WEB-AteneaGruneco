@@ -885,6 +885,7 @@ class PittsburghResult(ResultadoExamenBase):
     desorientacion_confusion = models.CharField(max_length=100, blank=True, null=True)
     otros_inconvenientes = models.CharField(max_length=100, blank=True, null=True)
     descripcion_inconvenientes = models.CharField(max_length=100, blank=True, null=True)
+    puntuacion_total = models.IntegerField(default=0, blank=True, null=True)
 
 
 class EpworthResult(ResultadoExamenBase):
@@ -1671,19 +1672,19 @@ class CDRCuidadorResult(ResultadoExamenBase):
     # ====================
     # Dominio: Memoria
     # ====================
-    memoria_p1 = models.CharField(max_length=10, blank=True, null=True)  # sí/no
+    memoria_p1 = models.CharField(max_length=100, blank=True, null=True)  # sí/no
     memoria_p1_1 = models.CharField(
         max_length=10, blank=True, null=True
     )  # sí/no, subpregunta
     memoria_p2 = models.CharField(
         max_length=20, blank=True, null=True
     )  # generalmente/a_veces/raramente
-    memoria_p3 = models.CharField(max_length=20, blank=True, null=True)
-    memoria_p4 = models.CharField(max_length=10, blank=True, null=True)  # sí/no
-    memoria_p5 = models.CharField(max_length=10, blank=True, null=True)  # sí/no
-    memoria_p6 = models.CharField(max_length=20, blank=True, null=True)
-    memoria_p7 = models.CharField(max_length=20, blank=True, null=True)
-    memoria_p8 = models.CharField(max_length=20, blank=True, null=True)
+    memoria_p3 = models.CharField(max_length=200, blank=True, null=True)
+    memoria_p4 = models.CharField(max_length=100, blank=True, null=True)  # sí/no
+    memoria_p5 = models.CharField(max_length=100, blank=True, null=True)  # sí/no
+    memoria_p6 = models.CharField(max_length=200, blank=True, null=True)
+    memoria_p7 = models.CharField(max_length=200, blank=True, null=True)
+    memoria_p8 = models.CharField(max_length=200, blank=True, null=True)
 
     # Evento reciente (respuestas abiertas)
     evento_recuerda_semana = models.TextField(blank=True, null=True)
@@ -1702,14 +1703,14 @@ class CDRCuidadorResult(ResultadoExamenBase):
     # ====================
     # Dominio: Orientación
     # ====================
-    orientacion_p1 = models.CharField(max_length=20, blank=True, null=True)
-    orientacion_p2 = models.CharField(max_length=20, blank=True, null=True)
-    orientacion_p3 = models.CharField(max_length=20, blank=True, null=True)
-    orientacion_p4 = models.CharField(max_length=20, blank=True, null=True)
-    orientacion_p5 = models.CharField(max_length=20, blank=True, null=True)
-    orientacion_p6 = models.CharField(max_length=20, blank=True, null=True)
-    orientacion_p7 = models.CharField(max_length=20, blank=True, null=True)
-    orientacion_p8 = models.CharField(max_length=20, blank=True, null=True)
+    orientacion_p1 = models.CharField(max_length=200, blank=True, null=True)
+    orientacion_p2 = models.CharField(max_length=200, blank=True, null=True)
+    orientacion_p3 = models.CharField(max_length=200, blank=True, null=True)
+    orientacion_p4 = models.CharField(max_length=200, blank=True, null=True)
+    orientacion_p5 = models.CharField(max_length=200, blank=True, null=True)
+    orientacion_p6 = models.CharField(max_length=200, blank=True, null=True)
+    orientacion_p7 = models.CharField(max_length=200, blank=True, null=True)
+    orientacion_p8 = models.CharField(max_length=200, blank=True, null=True)
 
     # ====================
     # Dominio: Juicio y resolución de problemas
@@ -1718,28 +1719,30 @@ class CDRCuidadorResult(ResultadoExamenBase):
     juicio_p2 = models.CharField(max_length=100, blank=True, null=True)
     juicio_p3 = models.CharField(max_length=100, blank=True, null=True)
     juicio_p4 = models.CharField(max_length=150, blank=True, null=True)
-    juicio_p5 = models.CharField(max_length=50, blank=True, null=True)
-    juicio_p6 = models.CharField(max_length=50, blank=True, null=True)
+    juicio_p5 = models.CharField(max_length=500, blank=True, null=True)
+    juicio_p6 = models.CharField(max_length=500, blank=True, null=True)
 
     # ====================
     # Actividades comunitarias
     # ====================
     trabaja_actualmente = models.CharField(
-        max_length=10, blank=True, null=True
+        max_length=100, blank=True, null=True
     )  # na/si/no
     memoria_causa_jubilacion = models.CharField(
-        max_length=10, blank=True, null=True
+        max_length=100, blank=True, null=True
     )  # si/no/nose
     dificultades_trabajo_memoria = models.CharField(
-        max_length=20, blank=True, null=True
+        max_length=100, blank=True, null=True
     )
 
-    condujo_alguna_vez = models.CharField(max_length=5, blank=True, null=True)  # si/no
-    conduce_actualmente = models.CharField(max_length=5, blank=True, null=True)  # si/no
+    condujo_alguna_vez = models.CharField(max_length=50, blank=True, null=True)  # si/no
+    conduce_actualmente = models.CharField(
+        max_length=50, blank=True, null=True
+    )  # si/no
     dejo_de_conducir_por_memoria = models.CharField(
         max_length=5, blank=True, null=True
     )  # si/no
-    riesgos_conduccion = models.CharField(max_length=5, blank=True, null=True)  # si/no
+    riesgos_conduccion = models.CharField(max_length=50, blank=True, null=True)  # si/no
 
     compras_independientes = models.CharField(max_length=50, blank=True, null=True)
     actividades_fuera_hogar = models.CharField(max_length=50, blank=True, null=True)
@@ -1750,10 +1753,10 @@ class CDRCuidadorResult(ResultadoExamenBase):
 
     parece_enfermo = models.CharField(max_length=5, blank=True, null=True)  # si/no
     participa_hogar_geriatrico = models.CharField(
-        max_length=5, blank=True, null=True
+        max_length=50, blank=True, null=True
     )  # si/no
     info_suficiente_comunitarias = models.CharField(
-        max_length=5, blank=True, null=True
+        max_length=50, blank=True, null=True
     )  # si/no
     notas_comunitarias = models.TextField(blank=True, null=True)
 
@@ -1768,7 +1771,7 @@ class CDRCuidadorResult(ResultadoExamenBase):
 
     habilidad_domestica_dementia_scale = models.TextField(blank=True, null=True)
     descripcion_habilidad_domestica = models.TextField(blank=True, null=True)
-    nivel_desempeno_domestico = models.CharField(max_length=50, blank=True, null=True)
+    nivel_desempeno_domestico = models.CharField(max_length=2000, blank=True, null=True)
     notas_domesticas_pasatiempos = models.TextField(blank=True, null=True)
 
     # ====================
@@ -1819,7 +1822,7 @@ class CDRParticipanteResult(ResultadoExamenBase):
 
     colegio_nombre = models.CharField(max_length=100, blank=True, null=True)
     colegio_lugar = models.CharField(max_length=100, blank=True, null=True)
-    colegio_grado = models.CharField(max_length=50, blank=True, null=True)
+    colegio_grado = models.CharField(max_length=200, blank=True, null=True)
 
     ocupacion_principal = models.CharField(max_length=150, blank=True, null=True)
     ultimo_trabajo = models.CharField(max_length=150, blank=True, null=True)
@@ -1838,13 +1841,13 @@ class CDRParticipanteResult(ResultadoExamenBase):
     orientacion_p1 = models.CharField(
         max_length=15, blank=True, null=True
     )  # correcto/incorrecto
-    orientacion_p2 = models.CharField(max_length=15, blank=True, null=True)
-    orientacion_p3 = models.CharField(max_length=15, blank=True, null=True)
-    orientacion_p4 = models.CharField(max_length=15, blank=True, null=True)
-    orientacion_p5 = models.CharField(max_length=50, blank=True, null=True)
-    orientacion_p6 = models.CharField(max_length=50, blank=True, null=True)
-    orientacion_p7 = models.CharField(max_length=15, blank=True, null=True)
-    orientacion_p8 = models.CharField(max_length=15, blank=True, null=True)
+    orientacion_p2 = models.CharField(max_length=150, blank=True, null=True)
+    orientacion_p3 = models.CharField(max_length=150, blank=True, null=True)
+    orientacion_p4 = models.CharField(max_length=150, blank=True, null=True)
+    orientacion_p5 = models.CharField(max_length=500, blank=True, null=True)
+    orientacion_p6 = models.CharField(max_length=500, blank=True, null=True)
+    orientacion_p7 = models.CharField(max_length=150, blank=True, null=True)
+    orientacion_p8 = models.CharField(max_length=150, blank=True, null=True)
 
     # ====================
     # Dominio: Juicio y resolución de problemas
