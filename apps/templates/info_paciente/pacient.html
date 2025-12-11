@@ -399,7 +399,7 @@
 
           <div class="form-group">
             <label for="fecha">Fecha</label>
-            <input type="date" class="form-control" name="fecha" required>
+            <input type="date" class="form-control" name="fecha" id="fecha" required>
           </div>
 
           <div class="form-group">
@@ -611,6 +611,8 @@
       }
     }
   });
+  const today = new Date().toISOString().split('T')[0]; // "YYYY-MM-DD"
+  document.getElementById('fecha').value = today;
 </script>
 
 {% endblock %}

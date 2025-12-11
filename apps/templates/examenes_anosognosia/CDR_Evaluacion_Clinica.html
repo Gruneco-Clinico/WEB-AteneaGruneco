@@ -24,6 +24,8 @@
           <input type="hidden" name="examen_id" value="{{ examen_id }}">
           
           <div class="card-body">
+
+              <button class="btn btn-outline-secondary btn-ver-referencia" type="button">Ver referencia</button>
                   <!-- Memoria -->
                   <div class="form-group">
                     <label for="cdr_memoria">1. Memoria</label>
@@ -159,114 +161,119 @@
   </div>
 </div>
 
+<div class="modal fade" id="modalReferencia" tabindex="-1" role="dialog" aria-labelledby="modalReferenciaLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalReferenciaLabel">Referencia CDR</h5>
+        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Cerrar">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body text-center">
+        <img id="imagenReferencia" src="/static/assets/img/help_icons/CDR.png" class="img-fluid" alt="Referencia CDR">
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
-  document.addEventListener("DOMContentLoaded", function () {
-    
-    // --- CÁLCULO DEL CDR GLOBAL ---
-    const memoria = document.querySelector('[name="cdr_memoria"]');
-    const orientacion = document.querySelector('[name="cdr_orientacion"]');
-    const juicio = document.querySelector('[name="cdr_juicio"]');
-    const comunitarias = document.querySelector('[name="cdr_comunitarias"]');
-    const pasatiempos = document.querySelector('[name="cdr_pasatiempos"]');
-    const cuidado = document.querySelector('[name="cdr_cuidado"]');
-    const globalInput = document.getElementById("cdr_global");
+document.addEventListener("DOMContentLoaded", function () {
+  // --- ELEMENTOS DEL FORMULARIO ---
+  const campos = [
+    "cdr_memoria",
+    "cdr_orientacion",
+    "cdr_juicio",
+    "cdr_comunitarias",
+    "cdr_pasatiempos",
+    "cdr_cuidado"
+  ];
 
-    function calcularCDRGlobal() {
-      const m = parseFloat(memoria.value || -1);
-      const o = parseFloat(orientacion.value || -1);
-      const j = parseFloat(juicio.value || -1);
-      const c = parseFloat(comunitarias.value || -1);
-      const h = parseFloat(pasatiempos.value || -1);
-      const p = parseFloat(cuidado.value || -1);
+  const globalInput = document.getElementById("cdr_global");
+  const interpretacionTextarea = document.getElementById("cdr_interpretacion");
 
-      const interpretacionTextarea = document.getElementById("cdr_interpretacion");
-
-      if ([m, o, j, c, h, p].includes(-1)) {
-        globalInput.value = "";
-        if (interpretacionTextarea) interpretacionTextarea.value = "";
-        return;
-      }
-
-      let iguales = 0, mayores = 0, menores = 0;
-
-      if (o === m) iguales++;
-      if (j === m) iguales++;
-      if (c === m) iguales++;
-      if (h === m) iguales++;
-      if (p === m) iguales++;
-
-      if (o > m) mayores++; else if (o < m) menores++;
-      if (j > m) mayores++; else if (j < m) menores++;
-      if (c > m) mayores++; else if (c < m) menores++;
-      if (h > m) mayores++; else if (h < m) menores++;
-      if (p > m) mayores++; else if (p < m) menores++;
-
-      if (m === 0) {
-        const count05oMas = (o >= 0.5 ? 1 : 0) + (j >= 0.5 ? 1 : 0) + (c >= 0.5 ? 1 : 0) + (h >= 0.5 ? 1 : 0) + (p >= 0.5 ? 1 : 0);
-        globalInput.value = count05oMas >= 2 ? "0.5" : "0";
-      } else if (m === 0.5) {
-        const count1oMas = (o >= 1 ? 1 : 0) + (j >= 1 ? 1 : 0) + (c >= 1 ? 1 : 0) + (h >= 1 ? 1 : 0) + (p >= 1 ? 1 : 0);
-        globalInput.value = count1oMas >= 3 ? "1" : "0.5";
-      } else if (iguales >= 3) {
-        globalInput.value = m.toString();
-      } else if (mayores > menores) {
-        const mayoresArr = [o, j, c, h, p].filter(x => x > m);
-        globalInput.value = moda(mayoresArr).toString();
-      } else if (menores > mayores) {
-        const menoresArr = [o, j, c, h, p].filter(x => x < m);
-        globalInput.value = moda(menoresArr).toString();
-      } else {
-        globalInput.value = m.toString();
-      }
-
-      // ✅ Mostrar la interpretación después del cálculo
-      if (interpretacionTextarea) {
-        interpretacionTextarea.value = interpretarCDR(globalInput.value);
-      }
+  // --- CÁLCULO DEL CDR GLOBAL ---
+  function calcularCDRGlobal() {
+    const valores = campos.map(id => parseFloat(document.getElementById(id).value || -1));
+    if (valores.includes(-1)) {
+      globalInput.value = "";
+      interpretacionTextarea.value = "";
+      return;
     }
 
+    const [m, o, j, c, h, p] = valores;
+    let iguales = 0, mayores = 0, menores = 0;
 
-    function interpretarCDR(valor) {
-      switch (valor) {
-        case "0":
-          return "No hay demencia.";
-        case "0.5":
-          return "Demencia cuestionable o muy leve. Se detectan problemas sutiles en el rendimiento cognitivo o funcional, pero no cumplen los criterios para la demencia leve.";
-        case "1":
-          return "Demencia leve. Hay un deterioro claro en algunos dominios, pero el paciente puede continuar con la mayoría de las actividades diarias.";
-        case "2":
-          return "Demencia moderada. El deterioro es más significativo y se observa en la mayoría de los dominios, requiriendo ayuda para algunas actividades.";
-        case "3":
-          return "Demencia grave. El deterioro es severo y afecta gravemente a la mayoría de los dominios, incluyendo el cuidado personal.";
-        default:
-          return "";
-      }
+    [o, j, c, h, p].forEach(v => {
+      if (v === m) iguales++;
+      else if (v > m) mayores++;
+      else if (v < m) menores++;
+    });
+
+    let global = m;
+
+    if (m === 0) {
+      const count05oMas = [o, j, c, h, p].filter(v => v >= 0.5).length;
+      global = count05oMas >= 2 ? 0.5 : 0;
+    } else if (m === 0.5) {
+      const count1oMas = [o, j, c, h, p].filter(v => v >= 1).length;
+      global = count1oMas >= 3 ? 1 : 0.5;
+    } else if (iguales >= 3) {
+      global = m;
+    } else if (mayores > menores) {
+      const mayoresArr = [o, j, c, h, p].filter(v => v > m);
+      global = moda(mayoresArr);
+    } else if (menores > mayores) {
+      const menoresArr = [o, j, c, h, p].filter(v => v < m);
+      global = moda(menoresArr);
     }
 
-    function moda(arr) {
-      let counts = {};
-      arr.forEach(n => counts[n] = (counts[n] || 0) + 1);
-      let max = Math.max(...Object.values(counts));
-      return parseFloat(Object.keys(counts).find(k => counts[k] === max));
+    globalInput.value = global.toString();
+    interpretacionTextarea.value = interpretarCDR(globalInput.value);
+  }
+
+  function interpretarCDR(valor) {
+    switch (valor) {
+      case "0": return "No hay demencia.";
+      case "0.5": return "Demencia cuestionable o muy leve. Se detectan problemas sutiles en el rendimiento cognitivo o funcional, pero no cumplen los criterios para la demencia leve.";
+      case "1": return "Demencia leve. Hay un deterioro claro en algunos dominios, pero el paciente puede continuar con la mayoría de las actividades diarias.";
+      case "2": return "Demencia moderada. El deterioro es más significativo y se observa en la mayoría de los dominios, requiriendo ayuda para algunas actividades.";
+      case "3": return "Demencia grave. El deterioro es severo y afecta gravemente a la mayoría de los dominios, incluyendo el cuidado personal.";
+      default: return "";
     }
+  }
 
-    // Escuchar cambios en cada campo del CDR y mostrar descripción textual
-    [memoria, orientacion, juicio, comunitarias, pasatiempos, cuidado].forEach(select => {
-      select.addEventListener("change", function () {
-        calcularCDRGlobal();
+  function moda(arr) {
+    let counts = {};
+    arr.forEach(n => counts[n] = (counts[n] || 0) + 1);
+    let max = Math.max(...Object.values(counts));
+    return parseFloat(Object.keys(counts).find(k => counts[k] === max));
+  }
 
-        const selectedOption = this.options[this.selectedIndex];
-        const description = selectedOption.getAttribute('data-description');
-        const descDiv = document.getElementById("desc_" + this.name); // debe existir en el HTML
+  // --- MOSTRAR DESCRIPCIÓN Y CALCULAR GLOBAL ---
+  campos.forEach(id => {
+    const select = document.getElementById(id);
+    select.addEventListener("change", function () {
+      // Descripción
+      const selectedOption = select.options[select.selectedIndex];
+      const description = selectedOption.getAttribute('data-description');
+      const descDiv = document.getElementById("desc_" + id);
+      if (descDiv && description) descDiv.textContent = description;
+      else if (descDiv) descDiv.textContent = "";
 
-        if (descDiv && description) {
-          descDiv.textContent = description;
-        } else if (descDiv) {
-          descDiv.textContent = "";
-        }
-      });
+      // Cálculo CDR Global
+      calcularCDRGlobal();
     });
   });
+
+  // --- MODAL DE REFERENCIA ---
+  document.querySelectorAll(".btn-ver-referencia").forEach(btn => {
+    btn.addEventListener("click", function() {
+      const modal = new bootstrap.Modal(document.getElementById('modalReferencia'));
+      modal.show();
+    });
+  });
+});
 </script>
 
 {% endblock %}
