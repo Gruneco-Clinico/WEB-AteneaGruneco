@@ -2173,7 +2173,7 @@ def guardar_examen_publico_pitsburg(request):
             # Obtener los campos según los NOMBRES EXACTOS del modelo PittsburghResult
             hora_acostarse = request.POST.get("hora_acostarse", "")
             hora_levantarse = request.POST.get("hora_levantarse", "")
-            latencia_sueno = request.POST.get("latencia_sueno", "0")
+            latencia_sueno = request.POST.get("latencia_sueno", "")
             horas_dormidas = request.POST.get("horas_sueno_real", "0")
 
             # Problemas durante el sueño
@@ -2208,14 +2208,6 @@ def guardar_examen_publico_pitsburg(request):
             )
             otros_inconvenientes = request.POST.get("otros_inconvenientes", "")
 
-            # Convertir valores numéricos
-            try:
-                latencia_sueno_num = float(latencia_sueno) if latencia_sueno else 0
-                horas_sueno_real_num = float(horas_dormidas) if horas_dormidas else 0
-            except ValueError:
-                latencia_sueno_num = 0
-                horas_sueno_real_num = 0
-
             # Crear o actualizar el resultado Pittsburgh
             pitsburg_result, created = PittsburghResult.objects.update_or_create(
                 visita_examen=visita_examen,
@@ -2223,8 +2215,8 @@ def guardar_examen_publico_pitsburg(request):
                     # Campos de tiempo
                     "hora_acostarse": hora_acostarse,
                     "hora_levantarse": hora_levantarse,
-                    "latencia_sueno": latencia_sueno_num,
-                    "horas_dormidas": horas_sueno_real_num,
+                    "latencia_sueno": latencia_sueno,
+                    "horas_dormidas": horas_dormidas,
                     # Problemas durante el sueño
                     "conciliar_sueno": conciliar_sueno,
                     "despertarse_sueno": despertarse_sueno,
@@ -4926,7 +4918,7 @@ def guardar_examen_Pitsburg(request):
             # Obtener los campos según los NOMBRES EXACTOS del modelo PittsburghResult
             hora_acostarse = request.POST.get("hora_acostarse", "")
             hora_levantarse = request.POST.get("hora_levantarse", "")
-            latencia_sueno = request.POST.get("latencia_sueno", "0")
+            latencia_sueno = request.POST.get("latencia_sueno", "")
             horas_dormidas = request.POST.get(
                 "horas_sueno_real", "0"
             )  # ✅ CAMPO CORRECTO DEL MODELO
@@ -4966,15 +4958,6 @@ def guardar_examen_Pitsburg(request):
                 "descripcion_inconvenientes", ""
             )
             otros_inconvenientes = request.POST.get("otros_inconvenientes", "")
-            # Convertir valores numéricos
-            try:
-                latencia_sueno_num = float(latencia_sueno) if latencia_sueno else 0
-                horas_sueno_real_num = (
-                    float(horas_dormidas) if horas_dormidas else 0
-                )  # ✅ VARIABLE CORRECTA
-            except ValueError:
-                latencia_sueno_num = 0
-                horas_sueno_real_num = 0
 
             # Crear o actualizar el resultado Pittsburgh usando los CAMPOS EXACTOS del modelo
             pitsburg_result, created = PittsburghResult.objects.update_or_create(
@@ -4983,9 +4966,8 @@ def guardar_examen_Pitsburg(request):
                     # Campos de tiempo - NOMBRES EXACTOS DEL MODELO
                     "hora_acostarse": hora_acostarse,
                     "hora_levantarse": hora_levantarse,
-                    "latencia_sueno": latencia_sueno_num,
-                    "horas_dormidas": horas_sueno_real_num,  # ✅ CAMPO CORRECTO DEL MODELO
-                    # Problemas durante el sueño - NOMBRES EXACTOS DEL MODELO
+                    "latencia_sueno": latencia_sueno,
+                    "horas_dormidas": horas_dormidas,
                     "conciliar_sueno": conciliar_sueno,
                     "despertarse_sueno": despertarse_sueno,
                     "levantarse_servicio_sueno": levantarse_servicio_sueno,
@@ -5022,8 +5004,7 @@ def guardar_examen_Pitsburg(request):
                 request,
                 f"✅ Cuestionario de Pittsburgh guardado exitosamente.\n"
                 f"📊 Hora acostarse: {hora_acostarse} | Hora levantarse: {hora_levantarse}\n"
-                f"🛏️ Calidad de sueño: {calidad_sueno}\n"
-                f"⏰ Horas de sueño: {horas_sueno_real_num}",
+                f"🛏️ Calidad de sueño: {calidad_sueno}\n",
             )
             return redirect("detalle_paciente", paciente_id=paciente_id)
 

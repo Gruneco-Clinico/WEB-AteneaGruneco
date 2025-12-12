@@ -82,9 +82,14 @@
 
             <!-- Fecha de firma -->
             <div class="form-group">
-              <label for="fecha_firma">Fecha de firma</label>
-              <input type="date" class="form-control" name="fecha_firma" id="fecha_firma" value="{{ datos_examen.fecha_firma|date:'Y-m-d' }}">
-            </div>
+            <label for="fecha_firma">Fecha de firma</label>
+            <input 
+                type="date" 
+                class="form-control" 
+                name="fecha_firma" 
+                id="fecha_firma"
+                value="{{ datos_examen.fecha_firma }}">
+          </div>
 
             <!-- Nombre Testigo 1 -->
             <div class="form-group">
@@ -125,5 +130,14 @@
     </div>
   </div>
 </div>
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+      const input = document.getElementById('fecha');
+      if (input && !input.value) {
+          const today = new Date().toISOString().split('T')[0];
+          input.value = today;
+      }
+  });
+</script>
 
 {% endblock %}

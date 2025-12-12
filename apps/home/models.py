@@ -860,7 +860,7 @@ class ResultadoExamenBase(models.Model):
 
 class PittsburghResult(ResultadoExamenBase):
     hora_acostarse = models.CharField(max_length=10)
-    latencia_sueno = models.IntegerField()
+    latencia_sueno = models.CharField(max_length=100)
     hora_levantarse = models.CharField(max_length=10)
     horas_dormidas = models.FloatField()
     conciliar_sueno = models.CharField(max_length=100)

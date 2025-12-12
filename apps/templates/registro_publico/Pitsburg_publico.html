@@ -71,10 +71,22 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label>Latencia de inicio de sueño (minutos)</label>
-                                            <input type="number" name="latencia_sueno"
-                                                value="{% if datos_examen.latencia_sueno %}{{ datos_examen.latencia_sueno|floatformat:0.1|cut:',' }}{% endif %}"
-                                                class="form-control" min="0" required>
+                                            <label>¿Cuánto tiempo habrá tardado en dormirse, normalmente, las noches del último mes?</label>
+                                            <select name="latencia_sueno" class="form-control" required>
+                                                
+                                                {% if datos_examen and datos_examen.latencia_sueno %}
+                                                    <option value="{{ datos_examen.latencia_sueno }}" selected>
+                                                        {{ datos_examen.latencia_sueno }}
+                                                    </option>
+                                                {% else %}
+                                                    <option value="" selected disabled>Elegir uno</option>
+                                                {% endif %}
+
+                                                <option value="≤ 15 minutos — 0">≤ 15 minutos — 0</option>
+                                                <option value="16–30 minutos — 1">16–30 minutos — 1</option>
+                                                <option value="31–60 minutos — 2">31–60 minutos — 2</option>
+                                                <option value="> 60 minutos — 3"> > 60 minutos — 3</option>
+                                            </select>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
