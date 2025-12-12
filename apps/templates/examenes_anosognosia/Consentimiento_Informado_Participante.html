@@ -52,7 +52,10 @@
             <!-- Descripción del proceso -->
             <div class="form-group">
               <label for="descripcion_proceso">Descripción del proceso de consentimiento</label>
-              <textarea class="form-control" name="descripcion_proceso" id="descripcion_proceso" rows="10" required>{{ datos_examen.descripcion_proceso|default:'' }}</textarea>
+
+              <textarea class="form-control" name="descripcion_proceso" id="descripcion_proceso" rows="10" required>
+            {{ datos_examen.descripcion_proceso|default:"Se realizó el proceso de consentimiento informado siguiendo la versión vigente del formato aprobado por el Comité de Bioética de la Facultad de Medicina y del Laboratorio de Neurociencias Cognitivas GRUNECO. El participante recibió una explicación verbal completa sobre el objetivo del estudio, procedimientos (evaluación médica y neurológica, evaluación cognitiva, afectiva y de sueño, y uso de dispositivo portátil), riesgos, beneficios, voluntariedad, confidencialidad, posibilidad de retiro y uso de datos en estudios futuros. Se verificó comprensión y se resolvieron todas las dudas. El participante firmó el consentimiento en presencia del investigador y testigos." }}
+              </textarea>
             </div>
 
             <!-- Preguntas planteadas -->
