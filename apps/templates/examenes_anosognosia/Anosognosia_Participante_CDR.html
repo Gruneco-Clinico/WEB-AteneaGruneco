@@ -69,7 +69,7 @@
                     <!-- Subpreguntas -->
                     <div class="mt-3 ml-3">
                       <label>En el curso de una semana</label>
-                      <textarea class="form-control mb-2" name="evento_recuerda_semana" id="evento_recuerda_semana" value="{{ datos_examen.evento_recuerda_semana|default_if_none:'' }}" rows="3" required></textarea>
+                      <textarea class="form-control mb-2" name="evento_recuerda_semana" id="evento_recuerda_semana"  rows="3" required>{{ datos_examen.evento_recuerda_semana}}</textarea>
                       <select class="form-control mb-4" name="memoria_semana_calificacion" required>
                         {% if datos_examen.memoria_semana_calificacion %}
                         <option value="{{ datos_examen.memoria_semana_calificacion }}" selected>
@@ -84,7 +84,7 @@
                       </select>
 
                       <label>En el curso de un mes</label>
-                      <textarea class="form-control mb-2" name="evento_recuerda_mes" id="evento_recuerda_mes" value="{{ datos_examen.evento_recuerda_mes|default_if_none:'' }}" rows="3" required></textarea>
+                      <textarea class="form-control mb-2" name="evento_recuerda_mes" id="evento_recuerda_mes"  rows="3" required>{{ datos_examen.evento_recuerda_mes}}</textarea>
                       <select class="form-control" name="memoria_mes_calificacion" required>
                         {% if datos_examen.memoria_mes_calificacion %}
                         <option value="{{ datos_examen.memoria_mes_calificacion }}" selected>
@@ -220,7 +220,7 @@
                   <!-- Pregunta 9 -->
                   <div class="form-group">
                     <label for="jubilacion">9. ¿Cuándo se jubiló (o su cónyuge) y por qué?</label>
-                    <textarea class="form-control" name="jubilacion" id="jubilacion"  value="{{ datos_examen.jubilacion|default_if_none:'' }}" rows="3" required></textarea>
+                    <textarea class="form-control" name="jubilacion" id="jubilacion"   rows="3" required>{{ datos_examen.jubilacion }}</textarea>
                   </div>
 
                   <!-- Pregunta 10 -->
@@ -417,9 +417,9 @@
                       {% else %}
                       <option value="" disabled selected>Seleccione puntuación</option>
                       {% endif %}
-                      <option value="0">0: Verduras</option>
-                      <option value="1">1: Alimentos, cosas vivas, se pueden cocinar</option>
-                      <option value="2">2: Respuesta no pertinente, diferencias, que se compran</option>
+                      <option value='0'>0: Verduras</option>
+                      <option value='1'>1: Alimentos, cosas vivas, se pueden cocinar</option>
+                      <option value='2'>2: Respuesta no pertinente, diferencias, que se compran</option>
                     </select>
                   </div>
 
@@ -493,33 +493,62 @@
                   <!-- Pregunta 5 -->
                   <div class="form-group">
                     <label>5. ¿Cuántos centavos hay en un peso?</label>
-                    <p class="text-muted" style="margin-bottom: 8px;">Respuesta: En 1 peso hay 100 centavos</p>
+                    <p class="text-muted" style="margin-bottom: 8px;">
+                      Respuesta: En 1 peso hay 100 centavos
+                    </p>                  
+
                     <div class="form-check">
-                      <label class="form-check-label">
-                        <input type="checkbox" class="form-check-input" name="juicio_p5_correcto" {% if datos_examen.juicio_p5_correcto %}checked{% endif %}> Correcto
-                      </label>
+                      <input class="form-check-input" type="radio" name="juicio_p5" value="correcto"
+                        {% if datos_examen.juicio_p5 == "correcto" %}checked{% endif %}>
+                      <label class="form-check-label">Correcto</label>
+                    </div>                  
+
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" name="juicio_p5" value="incorrecto"
+                        {% if datos_examen.juicio_p5 == "incorrecto" %}checked{% endif %}>
+                      <label class="form-check-label">Incorrecto</label>
                     </div>
-                  </div>
+                  </div>                  
+
 
                   <!-- Pregunta 6 -->
-                  <div class="form-group">
-                    <label>6. ¿Cuántas monedas de 50 pesos hay en $1,350?</label>
-                    <p class="text-muted" style="margin-bottom: 8px;">Respuesta: Hay 27 monedas de 50 pesos en $1,350</p>
-                    <div class="form-check">
-                      <label class="form-check-label">
-                        <input type="checkbox" class="form-check-input" name="juicio_p6_correcto" {% if datos_examen.juicio_p6_correcto %}checked{% endif %}> Correcto
-                      </label>
-                    </div>
+                <div class="form-group">
+                  <label>6. ¿Cuántas monedas de 50 pesos hay en $1,350?</label>
+                  <p class="text-muted" style="margin-bottom: 8px;">
+                    Respuesta: Hay 27 monedas de 50 pesos en $1,350
+                  </p>
+
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="juicio_p6" value="correcto"
+                      {% if datos_examen.juicio_p6 == "correcto" %}checked{% endif %}>
+                    <label class="form-check-label">Correcto</label>
                   </div>
 
-                  <!-- Pregunta 7 -->
-                  <div class="form-group">
-                    <label>7. Restar 3 de 20 y continuar hasta llegar a 2 o 1</label>                    <div class="form-check">
-                      <label class="form-check-label">
-                        <input type="checkbox" class="form-check-input" name="juicio_p7_correcto" {% if datos_examen.juicio_p7_correcto %}checked{% endif %}> Correcto
-                      </label>
-                    </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="juicio_p6" value="incorrecto"
+                      {% if datos_examen.juicio_p6 == "incorrecto" %}checked{% endif %}>
+                    <label class="form-check-label">Incorrecto</label>
                   </div>
+                </div>
+
+
+                  <!-- Pregunta 7 -->
+                <div class="form-group">
+                  <label>7. Restar 3 de 20 y continuar hasta llegar a 2 o 1</label>
+
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="juicio_p7" value="correcto"
+                      {% if datos_examen.juicio_p7 == "correcto" %}checked{% endif %}>
+                    <label class="form-check-label">Correcto</label>
+                  </div>
+
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="juicio_p7" value="incorrecto"
+                      {% if datos_examen.juicio_p7 == "incorrecto" %}checked{% endif %}>
+                    <label class="form-check-label">Incorrecto</label>
+                  </div>
+                </div>
+
 
                   <!-- Pregunta 8 -->
                   <div class="form-group">

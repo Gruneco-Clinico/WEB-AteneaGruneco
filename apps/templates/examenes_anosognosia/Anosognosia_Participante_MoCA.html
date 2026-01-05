@@ -145,14 +145,60 @@
               
                 <!-- Concentración -->
                 <p><strong>Concentración (1 punto)</strong></p>
-                <p><em>Instrucciones:</em> El examinador lee una serie de letras a un ritmo de una por segundo, luego de haber dado las instrucciones: “Voy a leerle una serie de letras. Cada vez que diga la letra ‘A’, dé un golpecito con la mano. Cuando diga una letra que no sea la A, no dé ningún golpecito”.</p>
-                <p><em>Puntaje:</em> No se asigna ningún punto si se comete más de un error.</p>
-                <div class="form-check mb-2">
-                  <input class="form-check-input repeticion-check" type="checkbox" value="1" id="frase_1" name="frase_1" {% if datos_examen.frase_1 %}checked{% endif %}>
-                  <label class="form-check-label" for="frase_1">
-                    F B A C M N A A J K L B A F A K D E A A A J A M O F A A B
+
+              <p>
+                <em>Instrucciones:</em> El examinador lee una serie de letras a un ritmo de una por segundo,
+                luego de haber dado las instrucciones: “Voy a leerle una serie de letras. Cada vez que diga
+                la letra ‘A’, dé un golpecito con la mano. Cuando diga una letra que no sea la A, no dé ningún
+                golpecito”.
+              </p>
+
+              <p>
+                <em>Puntaje:</em> Se asigna 1 punto si hay <strong>0 o 1 error</strong>.  
+                No se asigna punto si se cometen <strong>más de 1 error</strong>.
+              </p>
+
+              <!-- Secuencia -->
+              <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" id="frase_1" name="frase_1"
+                  {% if datos_examen.frase_1 %}checked{% endif %}>
+                <label class="form-check-label" for="frase_1">
+                  F B A C M N A A J K L B A F A K D E A A A J A M O F A A B
+                </label>
+              </div>
+
+              <!-- Número de errores -->
+              <div class="form-group mb-3">
+                <label for="errores_concentracion"><strong>Número de errores</strong></label>
+                <input type="number" min="0" class="form-control"
+                      id="errores_concentracion"
+                      name="errores_concentracion"
+                      value="{{ datos_examen.errores_concentracion|default:'' }}">
+              </div>
+
+              <!-- Falló -->
+              <div class="form-group">
+                <label><strong>Resultado</strong></label>
+
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" name="concentracion_resultado"
+                        value="no_fallo"
+                        {% if datos_examen.concentracion_resultado == "no_fallo" %}checked{% endif %}>
+                  <label class="form-check-label">
+                    No falló (0–1 error) → 1 punto
                   </label>
                 </div>
+
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" name="concentracion_resultado"
+                        value="fallo"
+                        {% if datos_examen.concentracion_resultado == "fallo" %}checked{% endif %}>
+                  <label class="form-check-label">
+                    Falló (más de 1 error) → 0 puntos
+                  </label>
+                </div>
+              </div>
+
               
                 <!-- Sustracción en secuencia de 7 -->
                 <p><strong>Sustracción en secuencia de 7 (máximo 3 puntos)</strong></p>
@@ -209,18 +255,37 @@
 
             <!-- Ítem 8 -->
             <div class="form-group">
-              <label><strong>8. Fluidez verbal</strong></label>
-              <p>Decir la mayor cantidad de palabras que comiencen con "F" en un minuto. Se otorga 1 punto si dice 11 palabras o más en un minuto.</p>
-              <select class="form-control" name="fluidez" required>
-                {% if datos_examen.fluidez %}
-                <option value="{{ datos_examen.fluidez }}" selected>{{ datos_examen.fluidez }}</option>
-                {% else %}
-                <option value="">Seleccione una opción</option>
-                {% endif %}
-                <option value="0">0 puntos</option>
-                <option value="1">1 punto</option>
-              </select>
-            </div>
+  <label><strong>8. Fluidez verbal</strong></label>
+
+  <p>
+    Decir la mayor cantidad de palabras que comiencen con "F" en un minuto.
+    Se otorga 1 punto si dice <strong>11 palabras o más</strong>.
+  </p>
+
+  <!-- Número de palabras -->
+      <div class="mb-3">
+        <label for="numero_palabras_fluidez"><strong>Número de palabras</strong></label>
+        <input type="number" min="0" class="form-control"
+              id="numero_palabras_fluidez"
+              name="numero_palabras_fluidez"
+              value="{{ datos_examen.numero_palabras_fluidez|default:'' }}">
+      </div>
+
+      <!-- Puntaje -->
+      <label for="fluidez"><strong>Puntaje</strong></label>
+      <select class="form-control" name="fluidez" id="fluidez" required>
+        {% if datos_examen.fluidez %}
+          <option value="{{ datos_examen.fluidez }}" selected>
+            {{ datos_examen.fluidez }} punto{% if datos_examen.fluidez != '1' %}s{% endif %}
+          </option>
+        {% else %}
+          <option value="">Seleccione una opción</option>
+        {% endif %}
+        <option value="0">0 puntos</option>
+        <option value="1">1 punto</option>
+      </select>
+    </div>
+
 
             <!-- Ítem 9 -->
             <div class="form-group">

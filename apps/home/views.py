@@ -2852,6 +2852,7 @@ def realizar_examen(request, visita_id, examen_id, paciente_id):
         return redirect("detalle_paciente", paciente_id=paciente_id)
 
     # Obtener datos existentes
+    paciente = get_object_or_404(DatosDemograficos, id=paciente_id)
     datos_examen = None
     visita_examen_obj = None
     modo_edicion = False
@@ -3314,6 +3315,7 @@ def realizar_examen(request, visita_id, examen_id, paciente_id):
         "datos_examen": datos_examen,
         "modo_edicion": modo_edicion,
         "visita_examen_obj": visita_examen_obj,
+        "paciente": paciente,
     }
 
     # Si es anamnesis de sueño, agregar datos adicionales
@@ -4025,7 +4027,6 @@ def guardar_examen_fisico_sueno(request):
             sueno_fisico, created = SuenoFisicoResult.objects.get_or_create(
                 visita_examen=visita_examen,
                 defaults={
-                    # Medidas antropométricas - nombres comunes en templates
                     "peso": request.POST.get("peso")
                     or request.POST.get("weight")
                     or None,
@@ -4077,7 +4078,23 @@ def guardar_examen_fisico_sueno(request):
                     # Otros
                     "alteracion_craneo": request.POST.get("alteracion_craneo")
                     or request.POST.get("cranial_alteration")
-                    or "",
+                    or "",  # Signos vitales
+                    "frecuencia_cardiaca": request.POST.get("frecuencia_cardiaca")
+                    or None,
+                    "frecuencia_respiratoria": request.POST.get(
+                        "frecuencia_respiratoria"
+                    )
+                    or None,
+                    "saturacion_oxigeno": request.POST.get("saturacion_oxigeno")
+                    or None,
+                    "presion_arterial_sistolica": request.POST.get(
+                        "presion_arterial_sistolica"
+                    )
+                    or None,
+                    "presion_arterial_diastolica": request.POST.get(
+                        "presion_arterial_diastolica"
+                    )
+                    or None,
                 },
             )
 
@@ -4154,6 +4171,23 @@ def guardar_examen_fisico_sueno(request):
                     or request.POST.get("cranial_alteration")
                     or ""
                 )
+                # Signos vitales
+                sueno_fisico.frecuencia_cardiaca = (
+                    request.POST.get("frecuencia_cardiaca") or None
+                )
+                sueno_fisico.frecuencia_respiratoria = (
+                    request.POST.get("frecuencia_respiratoria") or None
+                )
+                sueno_fisico.saturacion_oxigeno = (
+                    request.POST.get("saturacion_oxigeno") or None
+                )
+                sueno_fisico.presion_arterial_sistolica = (
+                    request.POST.get("presion_arterial_sistolica") or None
+                )
+                sueno_fisico.presion_arterial_diastolica = (
+                    request.POST.get("presion_arterial_diastolica") or None
+                )
+
                 sueno_fisico.save()
 
             # CAMBIO: Marcar el examen como completado usando el nuevo método

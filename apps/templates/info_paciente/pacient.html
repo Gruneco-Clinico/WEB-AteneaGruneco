@@ -107,6 +107,78 @@
                 <p>{{ paciente.religion }}</p>
               </div>
             </div>
+            <!-- Información epidemiológica -->
+            <hr>
+            <h5 class="mt-4">Información epidemiológica</h5>
+
+            <div class="row mt-3">
+              <div class="col-md-4">
+                <strong>Género:</strong>
+                <p>{{ paciente.get_genero_display }}</p>
+              </div>
+              <div class="col-md-4">
+                <strong>Ocupación:</strong>
+                <p>{{ paciente.ocupacion }}</p>
+              </div>
+              <div class="col-md-4">
+                <strong>Lateralidad:</strong>
+                <p>{{ paciente.lateralidad }}</p>
+              </div>
+            </div>
+
+            <!-- Información geográfica -->
+            <hr>
+            <h5 class="mt-4">Información geográfica</h5>
+
+            <div class="row mt-3">
+              <div class="col-md-4">
+                <strong>Municipio de residencia:</strong>
+                <p>{{ paciente.municipio_residencia }}</p>
+              </div>
+              <div class="col-md-4">
+                <strong>Departamento de residencia:</strong>
+                <p>{{ paciente.departamento_residencia }}</p>
+              </div>
+              <div class="col-md-4">
+                <strong>País de residencia:</strong>
+                <p>{{ paciente.pais_residencia }}</p>
+              </div>
+            </div>
+
+            <div class="row mt-3">
+              <div class="col-md-4">
+                <strong>Municipio de nacimiento:</strong>
+                <p>{{ paciente.municipio_nacimiento }}</p>
+              </div>
+              <div class="col-md-4">
+                <strong>Departamento de nacimiento:</strong>
+                <p>{{ paciente.departamento_nacimiento }}</p>
+              </div>
+              <div class="col-md-4">
+                <strong>País de nacimiento:</strong>
+                <p>{{ paciente.pais_nacimiento }}</p>
+              </div>
+            </div>
+
+            <!-- Información del sistema de salud -->
+            <hr>
+            <h5 class="mt-4">Sistema de salud</h5>
+
+            <div class="row mt-3">
+              <div class="col-md-4">
+                <strong>Régimen:</strong>
+                <p>{{ paciente.get_regimen_display }}</p>
+              </div>
+              <div class="col-md-4">
+                <strong>EPS:</strong>
+                <p>{{ paciente.eps }}</p>
+              </div>
+              <div class="col-md-4">
+                <strong>Código del paciente:</strong>
+                <p>{{ paciente.codigo|default:"No asignado" }}</p>
+              </div>
+            </div>
+
           </div>
         </div>
       </div>

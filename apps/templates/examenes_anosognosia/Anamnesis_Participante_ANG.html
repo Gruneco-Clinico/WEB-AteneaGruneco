@@ -29,42 +29,48 @@
             <div class="form-group">
               <label for="nombres_apellidos"><strong>Nombres y apellidos</strong></label>
               <input type="text" class="form-control" name="nombres_apellidos" id="nombres_apellidos"
-                     value="{{ datos_examen.nombres_apellidos|default:'' }}" required>
+                     value="{{ paciente.primer_nombre }} {{ paciente.primer_apellido }}" required>
             </div>
 
             <!-- DOCUMENTO -->
             <div class="form-group">
               <label for="documento"><strong>Tipo de documento y número de identificación</strong></label>
               <input type="text" class="form-control" name="documento" id="documento"
-                     value="{{ datos_examen.documento|default:'' }}" required>
+                     value="{{ paciente.tipo_documento }} {{ paciente.numero_documento }}" required>
             </div>
 
             <!-- LUGAR DE NACIMIENTO -->
             <div class="form-group">
               <label for="lugar_nacimiento"><strong>Lugar de nacimiento</strong></label>
               <input type="text" class="form-control" name="lugar_nacimiento" id="lugar_nacimiento"
-                     value="{{ datos_examen.lugar_nacimiento|default:'' }}">
+                     value="{{ paciente.municipio_nacimiento }} - {{ paciente.departamento_nacimiento }}" required>
             </div>
 
             <!-- EDAD -->
             <div class="form-group">
               <label for="edad"><strong>Edad</strong></label>
               <input type="number" class="form-control" name="edad" id="edad"
-                     value="{{ datos_examen.edad|default:'' }}">
+                     value="{{ paciente.edad|default:'' }}">
             </div>
 
+            <!-- SEXO -->
             <!-- SEXO -->
             <div class="form-group">
               <label for="sexo"><strong>Sexo</strong></label>
               <select class="form-control" name="sexo" id="sexo">
-                {% if datos_examen.sexo %}
-                <option value="{{ datos_examen.sexo }}" selected>{{ datos_examen.sexo }}</option>
-                {% else %}
                 <option value="">Seleccione una opción</option>
-                {% endif %}
-                <option value="Masculino">Masculino</option>
-                <option value="Femenino">Femenino</option>
-                <option value="Otro">Otro</option>
+
+                <option value="M" {% if paciente.genero == "M" %}selected{% endif %}>
+                  Masculino
+                </option>
+
+                <option value="F" {% if paciente.genero == "F" %}selected{% endif %}>
+                  Femenino
+                </option>
+
+                <option value="O" {% if paciente.genero == "O" %}selected{% endif %}>
+                  Otro
+                </option>
               </select>
             </div>
 
@@ -102,23 +108,32 @@
             <div class="form-group">
               <label for="religion"><strong>Religión</strong></label>
               <input type="text" class="form-control" name="religion" id="religion"
-                     value="{{ datos_examen.religion|default:'' }}">
+                     value="{{ paciente.religion|default:'' }}">
             </div>
 
             <!-- LATERALIDAD -->
             <div class="form-group">
               <label for="lateralidad"><strong>Lateralidad</strong></label>
               <select class="form-control" name="lateralidad" id="lateralidad">
-                {% if datos_examen.lateralidad %}
-                <option value="{{ datos_examen.lateralidad }}" selected>{{ datos_examen.lateralidad }}</option>
-                {% else %}
                 <option value="">Seleccione una opción</option>
-                {% endif %}
-                <option value="Diestro">Diestro</option>
-                <option value="Zurdo">Zurdo</option>
-                <option value="Ambidiestro">Ambidiestro</option>
+
+                <option value="Diestro"
+                  {% if paciente.lateralidad == "Diestro" %}selected{% endif %}>
+                  Diestro
+                </option>
+
+                <option value="Zurdo"
+                  {% if paciente.lateralidad == "Zurdo" %}selected{% endif %}>
+                  Zurdo
+                </option>
+
+                <option value="Ambidiestro"
+                  {% if paciente.lateralidad == "Ambidiestro" %}selected{% endif %}>
+                  Ambidiestro
+                </option>
               </select>
             </div>
+
 
             <!-- CON QUIÉN VIVE -->
             <div class="form-group">
@@ -131,7 +146,7 @@
             <div class="form-group">
               <label for="eps"><strong>EPS</strong></label>
               <input type="text" class="form-control" name="eps" id="eps"
-                     value="{{ datos_examen.eps|default:'' }}">
+                     value="{{ paciente.eps|default:'' }}">
             </div>
 
             <!-- BOTONES -->

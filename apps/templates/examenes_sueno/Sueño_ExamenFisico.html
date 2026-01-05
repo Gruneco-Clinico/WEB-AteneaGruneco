@@ -57,6 +57,13 @@
                         <!-- Navegación por pestañas -->
                         <ul class="nav nav-pills nav-fill mb-4" id="sleepExamTabs" role="tablist">
                             <li class="nav-item">
+                                <a class="nav-link" id="signos-vitales-tab" data-toggle="tab"
+                                href="#signos-vitales" role="tab">
+                                Signos Vitales
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
                                 <a class="nav-link active" id="antropometricos-tab" data-toggle="tab"
                                     href="#antropometricos" role="tab">Antropométricos</a>
                             </li>
@@ -71,6 +78,68 @@
                         </ul>
 
                         <div class="tab-content" id="sleepExamTabContent">
+
+                            <!-- Pestaña Signos Vitales -->
+                            <div class="tab-pane fade" id="signos-vitales" role="tabpanel">
+                                <div class="card bg-gradient-default shadow-sm mb-4">
+                                    <div class="card-header bg-transparent">
+                                        <h4 class="text-white mb-0">Signos Vitales</h4>
+                                    </div>
+
+                                    <div class="card-body bg-white">
+                                        <div class="row">
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label>Frecuencia cardiaca (lpm)</label>
+                                                    <input type="number" class="form-control"
+                                                        name="frecuencia_cardiaca"
+                                                        value="{{ datos_examen.frecuencia_cardiaca|default_if_none:'' }}">
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label>Frecuencia respiratoria (rpm)</label>
+                                                    <input type="number" class="form-control"
+                                                        name="frecuencia_respiratoria"
+                                                        value="{{ datos_examen.frecuencia_respiratoria|default_if_none:'' }}">
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label>SatO₂ (%)</label>
+                                                    <input type="number" min="50" max="100"
+                                                        class="form-control"
+                                                        name="saturacion_oxigeno"
+                                                        value="{{ datos_examen.saturacion_oxigeno|default_if_none:'' }}">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label>PA sistólica (mmHg)</label>
+                                                    <input type="number" class="form-control"
+                                                        name="presion_arterial_sistolica"
+                                                        value="{{ datos_examen.presion_arterial_sistolica|default_if_none:'' }}">
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label>PA diastólica (mmHg)</label>
+                                                    <input type="number" class="form-control"
+                                                        name="presion_arterial_diastolica"
+                                                        value="{{ datos_examen.presion_arterial_diastolica|default_if_none:'' }}">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                             <!-- Pestaña Antropométricos -->
                             <div class="tab-pane fade show active" id="antropometricos" role="tabpanel">
                                 <div class="card bg-gradient-default shadow-sm mb-4">

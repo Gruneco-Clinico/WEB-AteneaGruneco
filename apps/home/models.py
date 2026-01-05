@@ -1165,6 +1165,23 @@ class SuenoFisicoResult(ResultadoExamenBase):
     rango_imc = models.CharField(max_length=50, blank=True, null=True)
     circunferencia_cuello = models.FloatField(blank=True, null=True)
     perimetro_abdominal = models.FloatField(blank=True, null=True)
+
+    frecuencia_cardiaca = models.PositiveIntegerField(
+        blank=True, null=True, verbose_name="Frecuencia cardiaca (lpm)"
+    )
+    frecuencia_respiratoria = models.PositiveIntegerField(
+        blank=True, null=True, verbose_name="Frecuencia respiratoria (rpm)"
+    )
+    saturacion_oxigeno = models.PositiveIntegerField(
+        blank=True, null=True, verbose_name="SatO₂ (%)"
+    )
+    presion_arterial_sistolica = models.PositiveIntegerField(
+        blank=True, null=True, verbose_name="Presión sistólica (mmHg)"
+    )
+    presion_arterial_diastolica = models.PositiveIntegerField(
+        blank=True, null=True, verbose_name="Presión diastólica (mmHg)"
+    )
+
     simetria_narinas = models.CharField(max_length=50, blank=True, null=True)
     tipo_narina = models.CharField(max_length=50, blank=True, null=True)
     desviacion_septo = models.CharField(max_length=50, blank=True, null=True)
@@ -1864,9 +1881,38 @@ class CDRParticipanteResult(ResultadoExamenBase):
     juicio_p4_respuesta = models.TextField(blank=True, null=True)
     juicio_p4_puntaje = models.IntegerField(blank=True, null=True)
 
-    juicio_p5_correcto = models.BooleanField(default=False)
-    juicio_p6_correcto = models.BooleanField(default=False)
-    juicio_p7_correcto = models.BooleanField(default=False)
+    juicio_p5 = models.CharField(
+        max_length=15,
+        choices=[
+            ("correcto", "Correcto"),
+            ("incorrecto", "Incorrecto"),
+        ],
+        blank=True,
+        null=True,
+        verbose_name="Juicio pregunta 5",
+    )
+
+    juicio_p6 = models.CharField(
+        max_length=15,
+        choices=[
+            ("correcto", "Correcto"),
+            ("incorrecto", "Incorrecto"),
+        ],
+        blank=True,
+        null=True,
+        verbose_name="Juicio pregunta 6",
+    )
+
+    juicio_p7 = models.CharField(
+        max_length=15,
+        choices=[
+            ("correcto", "Correcto"),
+            ("incorrecto", "Incorrecto"),
+        ],
+        blank=True,
+        null=True,
+        verbose_name="Juicio pregunta 7",
+    )
 
     juicio_p8_puntaje = models.IntegerField(blank=True, null=True)
 
