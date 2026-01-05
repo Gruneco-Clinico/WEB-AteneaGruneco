@@ -1612,6 +1612,10 @@
 </div>
             </div>
           </div>
+          <div id="form-error" class="alert alert-danger d-none">
+  No se pudo guardar el examen. Verifique los campos resaltados o incompletos.
+</div>
+
         </form>
       </div>
     </div>
@@ -1648,15 +1652,15 @@ window.agregarSustancia = function() {
       <h5>Sustancia ${contadorSustancias}</h5>
       <div class="form-group">
         <label>Tipo de sustancia</label>
-        <input type="text" class="form-control" name="sustancias_tipo[]" required>
+        <input type="text" class="form-control" name="sustancias_tipo[]" >
       </div>
       <div class="form-group">
         <label>Cantidad</label>
-        <input type="text" class="form-control" name="sustancias_cantidad[]" required>
+        <input type="text" class="form-control" name="sustancias_cantidad[]" >
       </div>
       <div class="form-group">
         <label>Frecuencia a la semana</label>
-        <select class="form-control" name="sustancias_frecuencia[]" required>
+        <select class="form-control" name="sustancias_frecuencia[]" >
           <option value="1 vez a la semana">1 vez a la semana</option>
           <option value="1-3 veces a la semana">1-3 veces a la semana</option>
           <option value="3-5 veces a la semana">3-5 veces a la semana</option>
@@ -1665,7 +1669,7 @@ window.agregarSustancia = function() {
       </div>
       <div class="form-group">
         <label>¿Cuánto tiempo antes de dormir?</label>
-        <select class="form-control" name="sustancias_tiempo[]" required>
+        <select class="form-control" name="sustancias_tiempo[]" >
           <option value="Antes de dormir">Antes de dormir</option>
           <option value="< 15 minutos antes">< 15 minutos antes</option>
           <option value="15-30 minutos antes">15-30 minutos antes</option>
@@ -1696,7 +1700,7 @@ window.agregarPantalla = function() {
     <h5>Pantalla ${contadorPantallas}</h5>
     <div class="form-group">
       <label>Tipo de pantalla</label>
-      <select class="form-control tipo-pantalla" name="tipo_pantalla[]" required>
+      <select class="form-control tipo-pantalla" name="tipo_pantalla[]" >
         <option value="">Selecciona una opción</option>
         <option value="celular">Celular</option>
         <option value="televisor">Televisor</option>
@@ -1707,7 +1711,7 @@ window.agregarPantalla = function() {
     </div>
     <div class="form-group">
       <label>Frecuencia a la semana</label>
-      <select class="form-control frecuencia" name="pantalla_frecuencia[]" required>
+      <select class="form-control frecuencia" name="pantalla_frecuencia[]" >
         <option value="">Selecciona una opción</option>
         <option value="1 vez a la semana">1 vez a la semana</option>
         <option value="1-3 veces a la semana">1-3 veces a la semana</option>
@@ -1717,7 +1721,7 @@ window.agregarPantalla = function() {
     </div>
     <div class="form-group">
       <label>¿Cuánto tiempo antes de dormir?</label>
-      <select class="form-control tiempo-dormir" name="pantalla_tiempo_dormir[]" required>
+      <select class="form-control tiempo-dormir" name="pantalla_tiempo_dormir[]" >
         <option value="">Selecciona una opción</option>
         <option value="Antes de dormir">Antes de dormir</option>
         <option value="< 15 minutos antes">&lt; 15 minutos antes</option>
@@ -1744,7 +1748,7 @@ window.agregarActividad = function() {
     <h5>Actividad ${contadorActividades}</h5>
     <div class="form-group">
       <label>Tipo de actividad</label>
-      <select class="form-control" name="tipo_actividad[]" multiple required>
+      <select class="form-control" name="tipo_actividad[]" multiple >
         <option value="comer">Comer</option>
         <option value="videojuegos">Jugar videojuegos</option>
         <option value="peliculas">Ver películas/series</option>
@@ -1759,7 +1763,7 @@ window.agregarActividad = function() {
     </div>
     <div class="form-group">
       <label>Frecuencia a la semana</label>
-      <select class="form-control" name="frecuencia_actividad[]" required>
+      <select class="form-control" name="frecuencia_actividad[]" >
         <option value="1 vez">1 vez a la semana</option>
         <option value="1-3 veces">1-3 veces a la semana</option>
         <option value="3-5 veces">3-5 veces a la semana</option>
@@ -1789,8 +1793,8 @@ window.agregarActividadFisica = function() {
       <div class="form-row">
         <div class="col-md-6">
           <label>Tipo de actividad</label>
-          <select class="form-control" name="tipo_actividad_fisica[]" required>
-            <option value="" disabled selected>Seleccione una actividad</option>
+          <select class="form-control" name="tipo_actividad_fisica[]" >
+            <option value="">Seleccione una actividad</option>
             <option value="pesas">Levantamiento de pesas</option>
             <option value="deportes">Deportes colectivos</option>
             <option value="natacion">Natación</option>
@@ -1804,12 +1808,12 @@ window.agregarActividadFisica = function() {
         </div>
         <div class="col-md-3">
           <label>Intensidad (1-10)</label>
-          <input type="number" class="form-control" name="intensidad_fisica[]" min="1" max="10" oninput="this.value = Math.max(1, Math.min(10, this.value));" required>
+          <input type="number" class="form-control" name="intensidad_fisica[]" min="1" max="10" oninput="this.value = Math.max(1, Math.min(10, this.value));" >
         </div>
         <div class="col-md-3">
           <label>Frecuencia</label>
-          <select class="form-control" name="frecuencia_fisica[]" required>
-            <option value="" disabled selected>Seleccione</option>
+          <select class="form-control" name="frecuencia_fisica[]" >
+            <option value="">Seleccione</option>
             <option value="1">1 vez a la semana</option>
             <option value="1-3">1-3 veces a la semana</option>
             <option value="3-5">3-5 veces a la semana</option>
@@ -1848,16 +1852,16 @@ window.agregarMedicamento = function() {
     <h5>Medicamento ${contadorMedicamentos}</h5>
     <div class="form-group">
       <label>Nombre del medicamento</label>
-      <input type="text" class="form-control" name="nombre_medicamento[]" placeholder="Ej. Paracetamol" required>
+      <input type="text" class="form-control" name="nombre_medicamento[]" placeholder="Ej. Paracetamol" >
     </div>
     <div class="form-group">
       <label>Dosis / Concentración</label>
-      <input type="text" class="form-control" name="dosis_medicamento[]" placeholder="Ej. 500mg" required>
+      <input type="text" class="form-control" name="dosis_medicamento[]" placeholder="Ej. 500mg" >
     </div>
     <div class="form-group">
       <label>Presentación</label>
-      <select class="form-control" name="presentacion[]" required>
-        <option value="" disabled selected>Seleccione una opción</option>
+      <select class="form-control" name="presentacion[]" >
+        <option value="">Seleccione una opción</option>
         <option value="Tabletas">Tabletas</option>
         <option value="Cápsulas">Cápsulas</option>
         <option value="Solución">Solución</option>
@@ -1865,12 +1869,12 @@ window.agregarMedicamento = function() {
     </div>
     <div class="form-group">
       <label>Número de veces al día</label>
-      <input type="number" class="form-control" name="veces_dia[]" min="1" required>
+      <input type="number" class="form-control" name="veces_dia[]" min="1" >
     </div>
     <div class="form-group">
       <label>Frecuencia</label>
-      <select class="form-control" name="frecuencia_medicamentos[]" required>
-        <option value="" disabled selected>Seleccione una opción</option>
+      <select class="form-control" name="frecuencia_medicamentos[]" >
+        <option value="" >Seleccione una opción</option>
         <option value="1 vez a la semana">1 vez a la semana</option>
         <option value="1-3 veces a la semana">1-3 veces a la semana</option>
         <option value="3-5 veces a la semana">3-5 veces a la semana</option>
@@ -1880,7 +1884,7 @@ window.agregarMedicamento = function() {
     <div class="form-group">
       <label>Tiempo antes de dormir</label>
       <select class="form-control" name="tiempo_antes_dormir[]" >
-        <option value="" disabled selected>Seleccione una opción</option>
+        <option value="">Seleccione una opción</option>
         <option value="Antes de dormir">Antes de dormir</option>
         <option value="15 minutos antes">15 minutos antes</option>
         <option value="Entre 15 - 30 minutos antes">Entre 15 - 30 minutos antes</option>
@@ -1911,7 +1915,7 @@ window.agregarSintoma = function() {
     <h5>Síntoma ${contadorSintomas}</h5>
     <div class="form-group">
       <label>Tipo de síntoma</label>
-      <select class="form-control" name="tipo_sintoma[]" required>
+      <select class="form-control" name="tipo_sintoma[]" >
         <option value="">Seleccione un síntoma</option>
         <option value="Cefalea">Cefalea</option>
         <option value="Nicturia">Nicturia</option>
@@ -1934,16 +1938,16 @@ window.agregarSintoma = function() {
     </div>
     <div class="form-group">
       <label>¿Cuándo inició?</label>
-      <input type="text" class="form-control" name="cuando_inicio[]" placeholder="Ej. Hace 3 meses" required>
+      <input type="text" class="form-control" name="cuando_inicio[]" placeholder="Ej. Hace 3 meses" >
     </div>
     <div class="form-group">
       <label>¿Cómo ha evolucionado?</label>
-      <input type="text" class="form-control" name="evolucion[]" placeholder="Ej. Ha empeorado con el tiempo" required>
+      <input type="text" class="form-control" name="evolucion[]" placeholder="Ej. Ha empeorado con el tiempo" >
     </div>
     <div class="form-group">
       <label>Frecuencia a la semana</label>
       <select class="form-control" name="frecuencia[]">
-        <option value="" disabled selected>Seleccione una opción</option>
+        <option value="" >Seleccione una opción</option>
         <option value="1">Una vez</option>
         <option value="2-3">2-3 veces</option>
         <option value="4-5">4-5 veces</option>
@@ -1953,7 +1957,7 @@ window.agregarSintoma = function() {
     <div class="form-group">
       <label>Gravedad</label>
       <select class="form-control" name="gravedad[]">
-        <option value="" disabled selected>Seleccione una opción</option>
+        <option value="" >Seleccione una opción</option>
         <option value="leve">Leve</option>
         <option value="moderado">Moderado</option>
         <option value="grave">Grave</option>
@@ -1981,7 +1985,7 @@ window.agregarSintomaDiurno = function() {
     <h5>Síntoma Diurno ${contadorSintomasDiurnos}</h5>
     <div class="form-group">
       <label>Tipo de síntoma</label>
-      <select class="form-control" name="tipo_sintoma_diurno[]" required>
+      <select class="form-control" name="tipo_sintoma_diurno[]" >
         <option value="">Seleccione un síntoma</option>
         <option value="Somnolencia diurna">Somnolencia diurna</option>
         <option value="Trastorno del humor">Trastorno del humor</option>
@@ -1993,11 +1997,11 @@ window.agregarSintomaDiurno = function() {
     </div>
     <div class="form-group">
       <label>¿Cuándo inició?</label>
-      <input type="text" class="form-control" name="cuando_inicio_diurno[]" placeholder="Ej. Hace 3 meses" required>
+      <input type="text" class="form-control" name="cuando_inicio_diurno[]" placeholder="Ej. Hace 3 meses" >
     </div>
     <div class="form-group">
       <label>¿Cómo ha evolucionado?</label>
-      <input type="text" class="form-control" name="evolucion_diurno[]" placeholder="Ej. Ha empeorado con el tiempo" required>
+      <input type="text" class="form-control" name="evolucion_diurno[]" placeholder="Ej. Ha empeorado con el tiempo" >
     </div>
     <div class="form-group">
       <label>Frecuencia a la semana</label>
@@ -2812,17 +2816,19 @@ document.addEventListener("DOMContentLoaded", function () {
       {% endif %}
       
       // Inicializar síntomas del sueño existentes
-      {% if sintomas %}
+      {% if sintomas_suenos %}
+     
       console.log('🩺 Inicializando síntomas del sueño existentes...');
       const sintomasSuenoSi = document.getElementById("sintomas_sueno_si");
 
-      if (sintomasSuenoSi && !sintomasSuenoSi.checked) {
+      if (sintomasSuenoSi) {
         sintomasSuenoSi.checked = true;
         sintomasSuenoSi.dispatchEvent(new Event('change'));
       }
 
+
       setTimeout(() => {
-        {% for sintoma in sintomas %}
+        {% for sintoma in sintomas_suenos %}
         console.log('➕ Agregando síntoma {{ forloop.counter }}: {{ sintoma.tipo|escapejs }}');
         
         if (typeof window.agregarSintoma === 'function') {
@@ -2844,6 +2850,7 @@ document.addEventListener("DOMContentLoaded", function () {
             if (frecuenciaSelect) frecuenciaSelect.value = "{{ sintoma.frecuencia|escapejs }}";
             if (gravedadSelect) gravedadSelect.value = "{{ sintoma.gravedad|escapejs }}";
             if (observacionesTextarea) observacionesTextarea.value = "{{ sintoma.observaciones|escapejs }}";
+
           }
         }
         {% endfor %}
@@ -2905,6 +2912,15 @@ document.addEventListener("DOMContentLoaded", function () {
       inicializarHabitosPrevios();
     }, 500);
   }
+
+  document.querySelector("form").addEventListener("submit", function (e) {
+  const invalid = this.querySelector(":invalid");
+  if (invalid) {
+    e.preventDefault();
+    invalid.scrollIntoView({ behavior: "smooth", block: "center" });
+    invalid.focus();
+  }
+});
 });
 </script>
 {% endblock javascripts %} {% endblock content %}
