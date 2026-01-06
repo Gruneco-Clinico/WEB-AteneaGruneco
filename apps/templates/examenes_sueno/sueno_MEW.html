@@ -34,7 +34,7 @@
                     <div class="card-header border-0">
                         <div class="row align-items-center">
                             <div class="col">
-                                <h3 class="mb-0">Cuestionario de Matutinidad-Vespertinidad (MEQ)</h3>
+                                <h3 class="mb-0">Cuestionario de Matutinidad-Vespertinidad (MEQ) </h3>
                             </div>
                             <div class="col text-right">
                                 <span class="text-muted">Fecha: {% now "d/m/Y" %}</span>
@@ -391,6 +391,17 @@
                             <input type="number" class="form-control" name="puntuacion" min="16" max="86" readonly>
                             <small class="form-text text-muted">La puntuación se calculará automáticamente al completar todas las preguntas.</small>
                         </div>
+                        <!-- Interpretación MEQ -->
+                        <div class="card mt-3 d-none" id="interpretacion-meq">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                            <i class="fas fa-brain mr-1"></i>
+                            Interpretación MEQ
+                            </h5>
+                            <p class="card-text mb-0" id="texto-interpretacion"></p>
+                        </div>
+                        </div>
+
                                     </div>
                                 </div>
                             </div>
@@ -411,242 +422,220 @@
 </div>
 
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const form = document.querySelector('form');
-        const puntuacionInput = document.querySelector('input[name="puntuacion"]');
-        const selects = document.querySelectorAll('select[required]');
+document.addEventListener("DOMContentLoaded", function () {
 
-        // Mapeo completo de puntuaciones para cada pregunta del MEQ
-        const puntuaciones = {
-            'hora_levantarse_meq': {
-                '(5 AM) y (6:30 AM) ': 5,
-                '(6:30 AM) y (7:45 AM) ': 4,
-                '(7:45 AM) y (9:45 AM) ': 3,
-                '(9:45 AM) y (11 AM) ': 2,
-                '(11 AM) y (12 pm)': 1
-            },
-            'hora_acostarse_meq': {
-                'A las 20:00 (8 PM) – 21:00 (9 PM)': 5,
-                'A las 21:00 (9 PM) – 22:15 (10:15 PM)': 4,
-                'A las 22:15 (10:15 PM) – 00:30 (12:30 AM)': 3,
-                'A las 00:30 (12:30 AM) – 01:45 (1:45 AM)': 2,
-                'A las 01:45 (1:45 AM) – 03:00 (3 AM)': 1
-            },
-            'uso_despertador_meq': {
-                'No lo necesito': 4,
-                'Lo necesito poco': 3,
-                'Lo necesito bastante': 2,
-                'Lo necesito mucho': 1
-            },
-            'facilidad_levantarse_meq': {
-                'Nada fácil': 1,
-                'No muy fácil': 2,
-                'Bastante fácil': 3,
-                'Muy fácil': 4
-            },
-            'alerta_manana_meq': {
-                'Nada alerta': 1,
-                'Poco alerta': 2,
-                'Bastante alerta': 3,
-                'Muy alerta': 4
-            },
-            'apetito_manana_meq': {
-                'Muy escaso': 1,
-                'Bastante escaso': 2,
-                'Bastante bueno': 3,
-                'Muy bueno': 4
-            },
-            'descanso_manana_meq': {
-                'Muy cansado': 1,
-                'Bastante cansado': 2,
-                'Bastante descansado': 3,
-                'Muy descansado': 4
-            },
-            'hora_acostarse_libre_meq': {
-                'Nunca o raramente o más tarde': 4,
-                'Menos de 1 hora más tarde': 3,
-                'De 1 a 2 horas más tarde': 2,
-                'Más de 2 horas más tarde': 1
-            },
-            'ejercicio_manana_meq': {
-                'Estaría en buena forma': 4,
-                'Estaría en una forma aceptable': 3,
-                'Me resultaría difícil': 2,
-                'Me resultaría muy difícil': 1
-            },
-            'hora_cansancio_noche_meq': {
-                '20:00 - 21:00': 5,
-                '21:00 - 22:15': 4,
-                '22:15 - 00:45': 3,
-                '00:45 - 02:00': 2,
-                '02:00 - 03:00': 1
-            },
-            'prueba_mental_meq': {
-                'De 08:00 (8 AM) a 10:00 (10 AM)': 6,
-                'De 11:00 (11 AM) a 13:00 (1 PM)': 4,
-                'De 13:00 (1 PM) a 17:00 (5 PM)': 2,
-                'De 19:00 (7 PM) a 21:00 (9 PM)': 0
-            },
-            'cansancio_11pm_meq': {
-                'Ningún cansancio': 0,
-                'Algún cansancio': 2,
-                'Bastante cansancio': 3,
-                'Mucho cansancio': 5
-            },
-            'despertar_tarde_meq': {
-                'A la hora habitual y ya no dormiría más': 4,
-                'A la hora habitual y luego dormitaría': 3,
-                'A la hora habitual y volvería a dormirme': 2,
-                'Más tarde de lo habitual': 1
-            },
-            'guardia_nocturna_meq': {
-                'No acostarme hasta pasada la guardia': 1,
-                'Echar una siesta antes y dormir después': 2,
-                'Echar un buen sueño antes y una siesta después': 3,
-                'Sólo dormirías antes de la guardia': 4
-            },
-            'trabajo_fisico_meq': {
-                'De 08:00 (8 AM) a 10:00 (10 AM)': 4,
-                'De 11:00 (11 AM) a 13:00 (1 PM)': 3,
-                'De 13:00 (1 PM) a 17:00 (5 PM)': 2,
-                'De 19:00 (7 PM) a 21:00 (9 PM)': 1
-            },
-            'ejercicio_nocturno_meq': {
-                'Estaría en buena forma': 1,
-                'Estaría en una forma aceptable': 2,
-                'Me resultaría difícil': 3,
-                'Me resultaría muy difícil': 4
-            },
-            'horario_trabajo_meq': {
-                'Entre las 4 AM y las 9 AM': 5,
-                'Entre las 9 AM y las 2 PM': 4,
-                'Entre las 2 PM y las 7 PM': 3,
-                'Entre las 7 PM y las 12 AM': 2,
-                'Entre las 12 AM y las 4 AM': 1
-            },
-            'maximo_bienestar_meq': {
-                'Entre las 05:00 (5 AM) y las 08:00 (8 AM)': 5,
-                'Entre las 08:00 (8 AM) y las 10:00 (10 AM)': 4,
-                'Entre las 10:00 (10 AM) y las 17:00 (5 PM)': 3,
-                'Entre las 17:00 (5 PM) y las 22:00 (10 PM)': 2,
-                'Entre las 22:00 (10 PM) y las 05:00 (5 AM)': 1
-            },
-            'tipo_persona_meq': {
-                'Un tipo claramente matutino': 6,
-                'Un tipo más matutino que vespertino': 4,
-                'Un tipo más vespertino que matutino': 2,
-                'Un tipo claramente vespertino': 0
-            }
-        };
+  /* ========================
+     ELEMENTOS BASE
+  ======================== */
+  const form = document.querySelector('form');
+  const puntuacionInput = document.querySelector('input[name="puntuacion"]');
+  const selects = document.querySelectorAll('select[required]');
+  const totalPreguntas = 19;
 
-        function calcularPuntuacion() {
-            let puntuacionTotal = 0;
-            let preguntasRespondidas = 0;
+  const cardInterpretacion = document.getElementById('interpretacion-meq');
+  const textoInterpretacion = document.getElementById('texto-interpretacion');
 
-            selects.forEach(select => {
-                if (select.name !== 'puntuacion' && select.value && select.value !== '') {
-                    const valor = select.value;
-                    if (puntuaciones[select.name] && puntuaciones[select.name].hasOwnProperty(valor)) {
-                        puntuacionTotal += puntuaciones[select.name][valor];
-                        preguntasRespondidas++;
-                        console.log(`${select.name}: ${valor} = ${puntuaciones[select.name][valor]} puntos`);
-                    } else {
-                        console.warn(`No se encontró puntuación para ${select.name}: ${valor}`);
-                    }
-                }
-            });
+  /* ========================
+     MAPEO DE PUNTUACIONES
+  ======================== */
+  const puntuaciones = {
+    hora_levantarse_meq: {
+      '(5 AM) y (6:30 AM) ': 5,
+      '(6:30 AM) y (7:45 AM) ': 4,
+      '(7:45 AM) y (9:45 AM) ': 3,
+      '(9:45 AM) y (11 AM) ': 2,
+      '(11 AM) y (12 pm)': 1
+    },
+    hora_acostarse_meq: {
+      'A las 20:00 (8 PM) – 21:00 (9 PM)': 5,
+      'A las 21:00 (9 PM) – 22:15 (10:15 PM)': 4,
+      'A las 22:15 (10:15 PM) – 00:30 (12:30 AM)': 3,
+      'A las 00:30 (12:30 AM) – 01:45 (1:45 AM)': 2,
+      'A las 01:45 (1:45 AM) – 03:00 (3 AM)': 1
+    },
+    uso_despertador_meq: {
+      'No lo necesito': 4,
+      'Lo necesito poco': 3,
+      'Lo necesito bastante': 2,
+      'Lo necesito mucho': 1
+    },
+    facilidad_levantarse_meq: {
+      'Nada fácil': 1,
+      'No muy fácil': 2,
+      'Bastante fácil': 3,
+      'Muy fácil': 4
+    },
+    alerta_manana_meq: {
+      'Nada alerta': 1,
+      'Poco alerta': 2,
+      'Bastante alerta': 3,
+      'Muy alerta': 4
+    },
+    apetito_manana_meq: {
+      'Muy escaso': 1,
+      'Bastante escaso': 2,
+      'Bastante bueno': 3,
+      'Muy bueno': 4
+    },
+    descanso_manana_meq: {
+      'Muy cansado': 1,
+      'Bastante cansado': 2,
+      'Bastante descansado': 3,
+      'Muy descansado': 4
+    },
+    hora_acostarse_libre_meq: {
+      'Nunca o raramente o más tarde': 4,
+      'Menos de 1 hora más tarde': 3,
+      'De 1 a 2 horas más tarde': 2,
+      'Más de 2 horas más tarde': 1
+    },
+    ejercicio_manana_meq: {
+      'Estaría en buena forma': 4,
+      'Estaría en una forma aceptable': 3,
+      'Me resultaría difícil': 2,
+      'Me resultaría muy difícil': 1
+    },
+    hora_cansancio_noche_meq: {
+      '20:00 - 21:00': 5,
+      '21:00 - 22:15': 4,
+      '22:15 - 00:45': 3,
+      '00:45 - 02:00': 2,
+      '02:00 - 03:00': 1
+    },
+    prueba_mental_meq: {
+      'De 08:00 (8 AM) a 10:00 (10 AM)': 6,
+      'De 11:00 (11 AM) a 13:00 (1 PM)': 4,
+      'De 13:00 (1 PM) a 17:00 (5 PM)': 2,
+      'De 19:00 (7 PM) a 21:00 (9 PM)': 0
+    },
+    cansancio_11pm_meq: {
+      'Ningún cansancio': 0,
+      'Algún cansancio': 2,
+      'Bastante cansancio': 3,
+      'Mucho cansancio': 5
+    },
+    despertar_tarde_meq: {
+      'A la hora habitual y ya no dormiría más': 4,
+      'A la hora habitual y luego dormitaría': 3,
+      'A la hora habitual y volvería a dormirme': 2,
+      'Más tarde de lo habitual': 1
+    },
+    guardia_nocturna_meq: {
+      'No acostarme hasta pasada la guardia': 1,
+      'Echar una siesta antes y dormir después': 2,
+      'Echar un buen sueño antes y una siesta después': 3,
+      'Sólo dormirías antes de la guardia': 4
+    },
+    trabajo_fisico_meq: {
+      'De 08:00 (8 AM) a 10:00 (10 AM)': 4,
+      'De 11:00 (11 AM) a 13:00 (1 PM)': 3,
+      'De 13:00 (1 PM) a 17:00 (5 PM)': 2,
+      'De 19:00 (7 PM) a 21:00 (9 PM)': 1
+    },
+    ejercicio_nocturno_meq: {
+      'Estaría en buena forma': 1,
+      'Estaría en una forma aceptable': 2,
+      'Me resultaría difícil': 3,
+      'Me resultaría muy difícil': 4
+    },
+    horario_trabajo_meq: {
+      'Entre las 4 AM y las 9 AM': 5,
+      'Entre las 9 AM y las 2 PM': 4,
+      'Entre las 2 PM y las 7 PM': 3,
+      'Entre las 7 PM y las 12 AM': 2,
+      'Entre las 12 AM y las 4 AM': 1
+    },
+    maximo_bienestar_meq: {
+      'Entre las 05:00 (5 AM) y las 08:00 (8 AM)': 5,
+      'Entre las 08:00 (8 AM) y las 10:00 (10 AM)': 4,
+      'Entre las 10:00 (10 AM) y las 17:00 (5 PM)': 3,
+      'Entre las 17:00 (5 PM) y las 22:00 (10 PM)': 2,
+      'Entre las 22:00 (10 PM) y las 05:00 (5 AM)': 1
+    },
+    tipo_persona_meq: {
+      'Un tipo claramente matutino': 6,
+      'Un tipo más matutino que vespertino': 4,
+      'Un tipo más vespertino que matutino': 2,
+      'Un tipo claramente vespertino': 0
+    }
+  };
 
-            // Mostrar la puntuación actual siempre
-            puntuacionInput.value = puntuacionTotal;
-            console.log(`Puntuación total: ${puntuacionTotal} (${preguntasRespondidas}/19 preguntas)`);
+  /* ========================
+     FUNCIONES
+  ======================== */
+  function calcularPuntuacion() {
+    let total = 0;
+    let respondidas = 0;
 
-            // Cambiar el color del campo según el rango MEQ
-            if (preguntasRespondidas === 19) {
-                if (puntuacionTotal >= 70) {
-                    puntuacionInput.style.backgroundColor = '#d4edda'; // Verde claro - Matutino definido
-                } else if (puntuacionTotal >= 59) {
-                    puntuacionInput.style.backgroundColor = '#f8f9fa'; // Gris claro - Moderadamente matutino
-                } else if (puntuacionTotal >= 42) {
-                    puntuacionInput.style.backgroundColor = '#fff3cd'; // Amarillo claro - Intermedio
-                } else if (puntuacionTotal >= 31) {
-                    puntuacionInput.style.backgroundColor = '#ffeaa7'; // Naranja claro - Moderadamente vespertino
-                } else {
-                    puntuacionInput.style.backgroundColor = '#f8d7da'; // Rojo claro - Vespertino definido
-                }
-            } else {
-                puntuacionInput.style.backgroundColor = '#ffffff'; // Blanco para incompleto
-            }
-
-            // Mostrar información del progreso
-            const infoText = preguntasRespondidas === 19 ? 
-                `Puntuación final: ${puntuacionTotal}/86` : 
-                `Puntuación parcial: ${puntuacionTotal} (${preguntasRespondidas}/19 preguntas completadas)`;
-            
-            puntuacionInput.title = infoText;
-        }
-
-        // Agregar indicador visual de progreso
-        function actualizarProgreso() {
-            const preguntasCompletas = Array.from(selects).filter(select => 
-                select.name !== 'puntuacion' && select.value && select.value !== ''
-            ).length;
-            
-            const porcentaje = (preguntasCompletas / 19) * 100;
-            
-            // Crear o actualizar barra de progreso
-            let barraProgreso = document.querySelector('#progreso-meq');
-            if (!barraProgreso) {
-                barraProgreso = document.createElement('div');
-                barraProgreso.id = 'progreso-meq';
-                barraProgreso.innerHTML = `
-                    <div style="background-color: #e9ecef; border-radius: 4px; height: 6px; margin: 10px 0;">
-                        <div id="barra-progreso-meq" style="background-color: #007bff; height: 100%; border-radius: 4px; transition: width 0.3s ease; width: ${porcentaje}%;"></div>
-                    </div>
-                    <small class="text-muted">Progreso: ${preguntasCompletas}/19 preguntas completadas</small>
-                `;
-                puntuacionInput.parentNode.insertBefore(barraProgreso, puntuacionInput);
-            } else {
-                const barra = document.querySelector('#barra-progreso-meq');
-                barra.style.width = porcentaje + '%';
-                barraProgreso.querySelector('small').textContent = `Progreso: ${preguntasCompletas}/19 preguntas completadas`;
-            }
-        }
-
-        // Calcula la puntuación cada vez que cambie una pregunta
-        selects.forEach(select => {
-            if (select.name !== 'puntuacion') {
-                select.addEventListener('change', function() {
-                    calcularPuntuacion();
-                    actualizarProgreso();
-                });
-            }
-        });
-
-        // Calcular puntuación inicial si hay datos precargados
-        calcularPuntuacion();
-        actualizarProgreso();
-
-        // Validación antes de enviar
-        form.addEventListener('submit', function (e) {
-            calcularPuntuacion();
-            
-            const preguntasCompletas = Array.from(selects).filter(select => 
-                select.name !== 'puntuacion' && select.value && select.value !== ''
-            ).length;
-            
-            if (preguntasCompletas < 19) {
-                alert(`Por favor, responda todas las preguntas antes de enviar el formulario. Faltan ${19 - preguntasCompletas} preguntas.`);
-                e.preventDefault();
-                return false;
-            }
-            
-            if (!puntuacionInput.value || puntuacionInput.value < 16 || puntuacionInput.value > 86) {
-                alert('Error en el cálculo de la puntuación. Por favor, revise sus respuestas.');
-                e.preventDefault();
-                return false;
-            }
-        });
+    selects.forEach(select => {
+      const valor = select.value;
+      if (valor && puntuaciones[select.name]?.[valor] !== undefined) {
+        total += puntuaciones[select.name][valor];
+        respondidas++;
+      }
     });
+
+    puntuacionInput.value = total;
+    actualizarColor(total, respondidas);
+    actualizarInterpretacion(total);
+    actualizarProgreso(respondidas);
+  }
+
+  function actualizarColor(total, respondidas) {
+    puntuacionInput.style.backgroundColor = '#fff';
+    if (respondidas !== totalPreguntas) return;
+
+    if (total >= 70) puntuacionInput.style.backgroundColor = '#d4edda';
+    else if (total >= 59) puntuacionInput.style.backgroundColor = '#e2e3e5';
+    else if (total >= 42) puntuacionInput.style.backgroundColor = '#fff3cd';
+    else if (total >= 31) puntuacionInput.style.backgroundColor = '#ffeaa7';
+    else puntuacionInput.style.backgroundColor = '#f8d7da';
+  }
+
+  function actualizarInterpretacion(total) {
+    if (isNaN(total)) return cardInterpretacion.classList.add('d-none');
+
+    let texto = '';
+    let clase = '';
+
+    if (total <= 30) { texto = 'Vespertino extremo'; clase = 'border-danger text-danger'; }
+    else if (total <= 41) { texto = 'Vespertino moderado'; clase = 'border-warning text-warning'; }
+    else if (total <= 58) { texto = 'Intermedio'; clase = 'border-info text-info'; }
+    else if (total <= 69) { texto = 'Matutino moderado'; clase = 'border-primary text-primary'; }
+    else { texto = 'Matutino extremo'; clase = 'border-success text-success'; }
+
+    cardInterpretacion.className = `card mt-3 ${clase}`;
+    textoInterpretacion.textContent = `Según la puntuación obtenida (${total}), el perfil corresponde a: ${texto}.`;
+    cardInterpretacion.classList.remove('d-none');
+  }
+
+  function actualizarProgreso(respondidas) {
+    let barra = document.getElementById('barra-progreso-meq');
+    if (!barra) return;
+
+    barra.style.width = `${(respondidas / totalPreguntas) * 100}%`;
+  }
+
+  /* ========================
+     EVENTOS
+  ======================== */
+  selects.forEach(select =>
+    select.addEventListener('change', calcularPuntuacion)
+  );
+
+  form.addEventListener('submit', function (e) {
+    calcularPuntuacion();
+    const respondidas = [...selects].filter(s => s.value).length;
+
+    if (respondidas < totalPreguntas) {
+      alert(`Faltan ${totalPreguntas - respondidas} preguntas por responder`);
+      e.preventDefault();
+    }
+  });
+
+  calcularPuntuacion();
+});
 </script>
+
 
 {% endblock %}
