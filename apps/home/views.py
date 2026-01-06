@@ -743,32 +743,56 @@ def agregar_disponibilidad(request):
 
         sala = get_object_or_404(Sala, id=sala_id, activa=True)
 
-        # 🔧 USAR LA VALIDACIÓN MEJORADA
-        conflictos = validar_conflictos_disponibilidad(
-            usuario=request.user,
-            sala=sala,
-            dia_semana=dia_semana,
-            hora_inicio=hora_inicio,
-            hora_fin=hora_fin,
-            fecha_inicio=fecha_inicio,
-            fecha_fin=fecha_fin,
-        )
+        # Convertir horas a datetime
+        hora_inicio_dt = datetime.strptime(hora_inicio, "%H:%M")
+        hora_fin_dt = datetime.strptime(hora_fin, "%H:%M")
 
-        if conflictos:
-            messages.error(request, f"❌ {conflictos}")
+        if hora_fin_dt <= hora_inicio_dt:
+            messages.error(request, "❌ La hora fin debe ser mayor que la hora inicio.")
             return redirect("gestionar_disponibilidad")
 
-        disponibilidad = DisponibilidadUsuario.objects.create(
-            usuario=request.user,
-            sala=sala,
-            dia_semana=dia_semana,
-            hora_inicio=hora_inicio,
-            hora_fin=hora_fin,
-            fecha_inicio=fecha_inicio,
-            fecha_fin=fecha_fin,
-        )
+        bloque_actual = hora_inicio_dt
+        creados = 0
 
-        messages.success(request, "✅ Disponibilidad agregada correctamente.")
+        while bloque_actual < hora_fin_dt:
+            bloque_siguiente = bloque_actual + timedelta(hours=1)
+
+            # Evitar pasar el límite
+            if bloque_siguiente > hora_fin_dt:
+                break
+
+            conflictos = validar_conflictos_disponibilidad(
+                usuario=request.user,
+                sala=sala,
+                dia_semana=dia_semana,
+                hora_inicio=bloque_actual.time(),
+                hora_fin=bloque_siguiente.time(),
+                fecha_inicio=fecha_inicio,
+                fecha_fin=fecha_fin,
+            )
+
+            if not conflictos:
+                DisponibilidadUsuario.objects.create(
+                    usuario=request.user,
+                    sala=sala,
+                    dia_semana=dia_semana,
+                    hora_inicio=bloque_actual.time(),
+                    hora_fin=bloque_siguiente.time(),
+                    fecha_inicio=fecha_inicio,
+                    fecha_fin=fecha_fin,
+                )
+                creados += 1
+
+            bloque_actual = bloque_siguiente
+
+        if creados == 0:
+            messages.error(
+                request, "❌ No se pudo crear la disponibilidad por conflictos."
+            )
+        else:
+            messages.success(
+                request, f"✅ Disponibilidad creada en {creados} bloques de 1 hora."
+            )
 
     except Exception as e:
         messages.error(request, f"❌ Error al agregar disponibilidad: {str(e)}")
