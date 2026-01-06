@@ -436,166 +436,298 @@
 
 <!-- Modal Agregar Visita - ESTRUCTURA CORREGIDA -->
 <div class="modal fade" id="modalAgregarVisita-{{ proyecto.id }}" tabindex="-1" role="dialog">
-  <div class="modal-dialog" role="document">
+  <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Nueva Visita para {{ proyecto.nombre }}</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+
+      <!-- HEADER -->
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title">
+          <i class="fas fa-calendar-plus mr-2"></i>
+          Nueva Visita – {{ proyecto.nombre }}
+        </h5>
+        <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
+
       <form method="POST" action="{% url 'crear_visita' paciente.id %}">
         {% csrf_token %}
+
         <div class="modal-body">
+
+          <!-- INFO PROYECTO -->
+          <div class="alert alert-light mb-4">
+            <i class="fas fa-flask mr-2"></i>
+            <strong>Proyecto:</strong> {{ proyecto.nombre }}
+          </div>
+
+          <!-- DATOS DE LA VISITA -->
+          <h6 class="mb-3 text-primary">
+            <i class="fas fa-notes-medical mr-1"></i>
+            Información de la Visita
+          </h6>
+
           <div class="form-group">
-            <label for="nombre_visita">Nombre de la Visita</label>
+            <label>
+              <i class="fas fa-tag mr-1"></i>
+              Nombre de la Visita
+            </label>
             <input type="text" class="form-control" name="nombre" required>
           </div>
 
           <div class="form-group">
-            <label for="tipo_visita">Tipo de Visita</label>
+            <label>
+              <i class="fas fa-list mr-1"></i>
+              Tipo de Visita
+            </label>
             <select class="form-control tipo-visita" name="tipo_visita">
               <option value="">Seleccione un tipo de visita</option>
               {% for visita in proyecto.visitas.all %}
-              <option value="{{ visita.id }}" data-examenes="{{ visita.examenes }}">
-                {{ visita.nombre }}
-              </option>
+                <option value="{{ visita.id }}" data-examenes="{{ visita.examenes }}">
+                  {{ visita.nombre }}
+                </option>
               {% endfor %}
             </select>
           </div>
 
           <div class="form-group">
-            <label>Exámenes Asociados:</label>
-            <ul id="examenesLista" class="list-unstyled"></ul>
+            <label>
+              <i class="fas fa-microscope mr-1"></i>
+              Exámenes Asociados
+            </label>
+            <div class="border rounded p-3 bg-light">
+              <ul id="examenesLista" class="list-unstyled mb-0"></ul>
+            </div>
           </div>
 
           <div class="form-group">
-            <label for="fecha">Fecha</label>
-            <input type="date" class="form-control" name="fecha" id="fecha" required>
+            <label>
+              <i class="fas fa-calendar-alt mr-1"></i>
+              Fecha
+            </label>
+            <input type="date" class="form-control" name="fecha"  value="{% now 'Y-m-d' %}" required>
           </div>
 
-          <div class="form-group">
-            <label>Evaluador:</label>
-            <input type="text" class="form-control" value="{{ request.user.get_full_name }}" readonly>
-          </div>
+          <div class="form-group"> <label>Evaluador:</label> <input type="text" class="form-control" value="{{ request.user.get_full_name }}" readonly> </div>
 
           <hr>
-          <h6>Información del Acompañante</h6>
+
+          <!-- ACOMPAÑANTE -->
+          <h6 class="mb-3 text-primary">
+            <i class="fas fa-user-friends mr-1"></i>
+            Información del Acompañante
+          </h6>
 
           <div class="form-group">
-            <label for="acompanante_nombre">Nombre del Acompañante</label>
+            <label>
+              <i class="fas fa-user mr-1"></i>
+              Nombre
+            </label>
             <input type="text" class="form-control" name="acompanante_nombre">
           </div>
 
           <div class="form-group">
-            <label for="acompanante_relacion">Relación con el Paciente</label>
+            <label>
+              <i class="fas fa-heart mr-1"></i>
+              Relación con el Paciente
+            </label>
             <input type="text" class="form-control" name="acompanante_relacion">
           </div>
 
           <div class="form-group">
-            <label for="acompanante_correo">Correo del Acompañante</label>
+            <label>
+              <i class="fas fa-envelope mr-1"></i>
+              Correo
+            </label>
             <input type="email" class="form-control" name="acompanante_correo">
           </div>
 
           <div class="form-group">
-            <label for="acompanante_telefono">Teléfono del Acompañante</label>
+            <label>
+              <i class="fas fa-phone mr-1"></i>
+              Teléfono
+            </label>
             <input type="tel" class="form-control" name="acompanante_telefono">
           </div>
+
         </div>
 
+        <!-- FOOTER -->
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-          <button type="submit" class="btn btn-primary">Guardar Visita</button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">
+            <i class="fas fa-times mr-1"></i> Cancelar
+          </button>
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save mr-1"></i> Guardar Visita
+          </button>
         </div>
+
       </form>
     </div>
   </div>
 </div>
+
 
 <!-- Modales Editar Visita para cada visita -->
 {% for visita in visitas_paciente %}
 {% if visita.Tipo_visita.proyecto == proyecto %}
 <div class="modal fade" id="modalEditarVisita-{{ visita.id }}" tabindex="-1" role="dialog">
-  <div class="modal-dialog" role="document">
+  <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Editar Visita: {{ visita.nombre }}</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+
+      <!-- HEADER -->
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title">
+          <i class="fas fa-edit mr-2"></i>
+          Editar Visita – {{ visita.nombre }}
+        </h5>
+        <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
+
       <form method="POST" action="{% url 'editar_v' visita.id %}">
         {% csrf_token %}
+
         <div class="modal-body">
+
+          <!-- INFO -->
+          <div class="alert alert-light mb-4">
+            <i class="fas fa-calendar-check mr-2"></i>
+            <strong>Visita:</strong> {{ visita.nombre }}
+          </div>
+
+          <!-- DATOS VISITA -->
+          <h6 class="text-primary mb-3">
+            <i class="fas fa-notes-medical mr-1"></i>
+            Información de la Visita
+          </h6>
+
           <div class="form-group">
-            <label for="nombre">Nombre de la Visita</label>
+            <label>
+              <i class="fas fa-tag mr-1"></i>
+              Nombre de la Visita
+            </label>
             <input type="text" class="form-control" name="nombre" value="{{ visita.nombre }}" required>
           </div>
+
           <div class="form-group">
-            <label for="fecha">Fecha</label>
-            <input type="date" class="form-control" name="fecha" value="{{ visita.fecha|date:'Y-m-d' }}" required>
+            <label>
+              <i class="fas fa-calendar-alt mr-1"></i>
+              Fecha
+            </label>
+            <input type="date" class="form-control" name="fecha"
+              value="{{ visita.fecha|date:'Y-m-d' }}" required>
           </div>
+
           <div class="form-group">
-            <label for="evaluador">Evaluador</label>
-            <input type="text" class="form-control" name="evaluador" value="{{ visita.evaluador }}">
+            <label>
+              <i class="fas fa-user-md mr-1"></i>
+              Evaluador
+            </label>
+            <input type="text" class="form-control" name="evaluador" value="{{ visita.evaluador }}" readonly>
           </div>
 
           <hr>
-          <h6>Acompañante</h6>
+
+          <!-- ACOMPAÑANTE -->
+          <h6 class="text-primary mb-3">
+            <i class="fas fa-user-friends mr-1"></i>
+            Acompañante
+          </h6>
 
           <div class="form-group">
-            <label for="acompanante_nombre">Nombre</label>
-            <input type="text" class="form-control" name="acompanante_nombre" value="{{ visita.acompanante_nombre }}">
+            <label>
+              <i class="fas fa-user mr-1"></i>
+              Nombre
+            </label>
+            <input type="text" class="form-control" name="acompanante_nombre"
+              value="{{ visita.acompanante_nombre }}">
           </div>
+
           <div class="form-group">
-            <label for="acompanante_relacion">Relación</label>
+            <label>
+              <i class="fas fa-heart mr-1"></i>
+              Relación
+            </label>
             <input type="text" class="form-control" name="acompanante_relacion"
               value="{{ visita.acompanante_relacion }}">
           </div>
+
           <div class="form-group">
-            <label for="acompanante_correo">Correo</label>
-            <input type="email" class="form-control" name="acompanante_correo" value="{{ visita.acompanante_correo }}">
+            <label>
+              <i class="fas fa-envelope mr-1"></i>
+              Correo
+            </label>
+            <input type="email" class="form-control" name="acompanante_correo"
+              value="{{ visita.acompanante_correo }}">
           </div>
+
           <div class="form-group">
-            <label for="acompanante_telefono">Teléfono</label>
+            <label>
+              <i class="fas fa-phone mr-1"></i>
+              Teléfono
+            </label>
             <input type="tel" class="form-control" name="acompanante_telefono"
               value="{{ visita.acompanante_telefono }}">
           </div>
 
           <hr>
-          <h6>Exámenes Asociados</h6>
+
+          <!-- EXÁMENES -->
+          <h6 class="text-primary mb-3">
+            <i class="fas fa-microscope mr-1"></i>
+            Exámenes Asociados
+          </h6>
 
           <div class="form-group">
-            <label>Exámenes actuales:</label>
-            <ul>
+            <label>Exámenes actuales</label>
+            <ul class="list-group mb-3">
               {% for visita_examen in visita.visita_examenes.all %}
-              <li>{{ visita_examen.examen.nombre }}</li>
+                <li class="list-group-item">
+                  <i class="fas fa-check-circle text-success mr-1"></i>
+                  {{ visita_examen.examen.nombre }}
+                </li>
+              {% empty %}
+                <li class="list-group-item text-muted">No hay exámenes asociados</li>
               {% endfor %}
             </ul>
           </div>
 
           <div class="form-group">
-            <label>Agregar Exámenes:</label>
-            {% for examen in visita.Tipo_visita.examenes %}
-            <div class="form-check">
-              <input class="form-check-input" type="checkbox" name="examenes_seleccionados" value="{{ examen.id }}"
-                id="examen_edit_{{ visita.id }}_{{ examen.id }}">
-              <label class="form-check-label" for="examen_edit_{{ visita.id }}_{{ examen.id }}">
-                {{ examen.nombre }}
-              </label>
+            <label>Agregar Exámenes</label>
+            <div class="border rounded p-3 bg-light" style="max-height: 250px; overflow-y: auto;">
+              {% for examen in visita.Tipo_visita.examenes %}
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox"
+                    name="examenes_seleccionados"
+                    value="{{ examen.id }}"
+                    id="examen_edit_{{ visita.id }}_{{ examen.id }}">
+                  <label class="form-check-label" for="examen_edit_{{ visita.id }}_{{ examen.id }}">
+                    <span class="badge badge-light border">{{ examen.nombre }}</span>
+                  </label>
+                </div>
+              {% endfor %}
             </div>
-            {% endfor %}
           </div>
+
         </div>
 
+        <!-- FOOTER -->
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-          <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">
+            <i class="fas fa-times mr-1"></i> Cancelar
+          </button>
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save mr-1"></i> Guardar Cambios
+          </button>
         </div>
+
       </form>
     </div>
   </div>
 </div>
+
 {% endif %}
 {% endfor %}
 
