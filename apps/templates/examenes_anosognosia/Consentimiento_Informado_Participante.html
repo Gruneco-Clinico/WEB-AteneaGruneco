@@ -28,7 +28,8 @@
             <!-- Fecha -->
             <div class="form-group">
               <label for="fecha">Fecha</label>
-              <input type="date" class="form-control" name="fecha" id="fecha" value="{{ datos_examen.fecha|date:'Y-m-d' }}" required>
+              <input type="date" class="form-control" name="fecha" id="fecha" value="{% if datos_examen.fecha %}{{ datos_examen.fecha|date:'Y-m-d' }}{% else %}{% now 'Y-m-d' %}{% endif %}"
+ required>
             </div>
 
             <!-- Hora inicio -->
@@ -40,8 +41,16 @@
             <!-- Investigador -->
             <div class="form-group">
               <label for="investigador">Investigador</label>
-              <input type="text" class="form-control" name="investigador" id="investigador" value="{{ datos_examen.investigador|default:'' }}" required>
+              <input
+                type="text"
+                class="form-control"
+                name="investigador"
+                id="investigador"
+                value="{{ datos_examen.investigador|default:request.user.get_full_name }}"
+                readonly
+              >
             </div>
+
 
             <!-- Versión del consentimiento -->
             <div class="form-group">
@@ -88,7 +97,7 @@
                 class="form-control" 
                 name="fecha_firma" 
                 id="fecha_firma"
-                value="{{ datos_examen.fecha_firma }}">
+                value="{% if datos_examen.fecha_firma %}{{ datos_examen.fecha_firma|date:'Y-m-d' }}{% else %}{% now 'Y-m-d' %}{% endif %}">
           </div>
 
             <!-- Nombre Testigo 1 -->

@@ -398,7 +398,6 @@ class Visita(models.Model):
         User, on_delete=models.SET_NULL, null=True, blank=True
     )
 
-    # NUEVO CAMPO: Estado de la visita
     estado_visita = models.CharField(
         max_length=20,
         choices=[
@@ -406,60 +405,91 @@ class Visita(models.Model):
             ("cerrada", "Cerrada"),
         ],
         default="abierta",
-        verbose_name="Estado de la Visita",
     )
 
-    # Campos del acompañante
-    acompanante_nombre = models.CharField(
-        max_length=255, verbose_name="Nombre del Acompañante", blank=True, null=True
-    )
-    acompanante_relacion = models.CharField(
-        max_length=100, verbose_name="Relación con el Paciente", blank=True, null=True
-    )
-    acompanante_correo = models.EmailField(
-        verbose_name="Correo del Acompañante", blank=True, null=True
-    )
-    acompanante_telefono = models.CharField(
-        max_length=20, verbose_name="Teléfono del Acompañante", blank=True, null=True
-    )
+    acompanante_nombre = models.CharField(max_length=255, blank=True, null=True)
+    acompanante_relacion = models.CharField(max_length=100, blank=True, null=True)
+    acompanante_correo = models.EmailField(blank=True, null=True)
+    acompanante_telefono = models.CharField(max_length=20, blank=True, null=True)
 
     def __str__(self):
-        try:
-            return f"{self.nombre} - {self.Tipo_visita.proyecto.nombre}"
-        except:
-            return self.nombre
+        print("🟡 __str__ llamado")
+        print("   nombre:", self.nombre)
+        print("   Tipo_visita:", self.Tipo_visita)
 
-    # Para códigos ANG-XXX consecutivos
+        if self.Tipo_visita:
+            print("   proyecto:", getattr(self.Tipo_visita, "proyecto", None))
+
+        if self.Tipo_visita and self.Tipo_visita.proyecto:
+            return f"{self.nombre} - {self.Tipo_visita.proyecto.nombre}"
+
+        return self.nombre
+
     def save(self, *args, **kwargs):
+        print("🟢 Entrando a Visita.save()")
+        print("   ID:", self.id)
+        print("   Tipo_visita:", self.Tipo_visita)
+        print("   Paciente:", self.paciente)
+
         super().save(*args, **kwargs)
 
-        # Asignar código único si aplica
+        print("🟢 super().save() ejecutado")
+
+        if not self.Tipo_visita:
+            print("🔴 Tipo_visita es None")
+            return
+
+        print("   Tipo_visita.nombre:", self.Tipo_visita.nombre)
+        print("   Tipo_visita.proyecto:", self.Tipo_visita.proyecto)
+
+        if not self.Tipo_visita.proyecto:
+            print("🔴 Tipo_visita.proyecto es None")
+            return
+
+        print("   Proyecto.nombre:", self.Tipo_visita.proyecto.nombre)
+
         if (
-            self.Tipo_visita
-            and self.Tipo_visita.proyecto.nombre == "Anosognosia"
+            self.Tipo_visita.proyecto.nombre == "Anosognosia"
             and self.Tipo_visita.nombre == "PosIntervención"
         ):
-            paciente = self.paciente
-            if paciente and not paciente.codigo:
-                # Obtener el último código asignado
-                ultimo = (
-                    DatosDemograficos.objects.exclude(codigo__isnull=True)
-                    .exclude(codigo__exact="")
-                    .order_by("-codigo")
-                    .first()
-                )
-                if ultimo and ultimo.codigo:
-                    try:
-                        numero = int(ultimo.codigo.split("-")[1])
-                    except (IndexError, ValueError):
-                        numero = 0
-                else:
-                    numero = 0
+            print("🟢 Cumple condiciones de Anosognosia PosIntervención")
 
-                # Generar nuevo consecutivo
-                nuevo_codigo = f"ANG-{numero + 1:03d}"
-                paciente.codigo = nuevo_codigo
-                paciente.save()
+            paciente = self.paciente
+            print("   Paciente:", paciente)
+
+            if not paciente:
+                print("🔴 No hay paciente")
+                return
+
+            if paciente.codigo:
+                print("🟡 Paciente ya tiene código:", paciente.codigo)
+                return
+
+            ultimo = (
+                DatosDemograficos.objects.exclude(codigo__isnull=True)
+                .exclude(codigo__exact="")
+                .order_by("-codigo")
+                .first()
+            )
+
+            print("   Último paciente con código:", ultimo)
+
+            if ultimo and ultimo.codigo:
+                try:
+                    numero = int(ultimo.codigo.split("-")[1])
+                except Exception as e:
+                    print("❌ Error al parsear código:", e)
+                    numero = 0
+            else:
+                numero = 0
+
+            nuevo_codigo = f"ANG-{numero + 1:03d}"
+            print("🟢 Nuevo código generado:", nuevo_codigo)
+
+            paciente.codigo = nuevo_codigo
+            paciente.save()
+
+        print("🟢 Fin de Visita.save()")
 
 
 class VisitaExamen(models.Model):
@@ -1489,27 +1519,71 @@ class EuroQolEVASaludResult(ResultadoExamenBase):
 
 
 class MoCAResult(ResultadoExamenBase):
-    # Ítems del MoCA
-    alternancia = models.PositiveSmallIntegerField()  # 0–1
-    cubo = models.PositiveSmallIntegerField()  # 0–1
-    reloj = models.PositiveSmallIntegerField()  # 0–3
-    denominacion = models.PositiveSmallIntegerField()  # 0–3
+    # ===== 1–4: Visuoespacial y denominación =====
+    alternancia = models.PositiveSmallIntegerField(default=0)  # 0–1
+    cubo = models.PositiveSmallIntegerField(default=0)  # 0–1
+    reloj = models.PositiveSmallIntegerField(default=0)  # 0–3
+    denominacion = models.PositiveSmallIntegerField(default=0)  # 0–3
 
-    # Atención y memoria
-    atencion = (
-        models.PositiveSmallIntegerField()
-    )  # 0–6 (suma de secuencia, inversa, concentración, sustracción)
-    repeticion = models.PositiveSmallIntegerField()  # 0–2
-    fluidez = models.PositiveSmallIntegerField()  # 0–1
-    abstraccion = models.PositiveSmallIntegerField()  # 0–2
-    diferido = models.PositiveSmallIntegerField()  # 0–5
-    orientacion = models.PositiveSmallIntegerField()  # 0–6
+    # ===== 6: Atención =====
+    atencion_secuencia = models.PositiveSmallIntegerField(default=0)  # 0–1
+    atencion_inversa = models.PositiveSmallIntegerField(default=0)  # 0–1
 
-    # Corrección por escolaridad baja (checkbox)
+    # Concentración
+    errores_concentracion = models.PositiveSmallIntegerField(default=0)
+    concentracion_resultado = models.CharField(
+        max_length=10,
+        choices=[("no_fallo", "No falló"), ("fallo", "Falló")],
+        blank=True,
+        null=True,
+    )
+
+    # Sustracción seriada
+    sustraccion_1 = models.BooleanField(default=False)  # 93
+    sustraccion_2 = models.BooleanField(default=False)  # 86
+    sustraccion_3 = models.BooleanField(default=False)  # 79
+    sustraccion_4 = models.BooleanField(default=False)  # 72
+    sustraccion_5 = models.BooleanField(default=False)  # 65
+
+    # Total atención (calculado)
+    atencion = models.PositiveSmallIntegerField(default=0)  # 0–6
+
+    # ===== 7: Repetición =====
+    repeticion_frase_1 = models.BooleanField(default=False)
+    repeticion_frase_2 = models.BooleanField(default=False)
+    repeticion = models.PositiveSmallIntegerField(default=0)  # 0–2
+
+    # ===== 8: Fluidez =====
+    numero_palabras_fluidez = models.PositiveSmallIntegerField(default=0)
+    fluidez = models.PositiveSmallIntegerField(default=0)  # 0–1
+
+    # ===== 9: Abstracción =====
+    abstraccion = models.PositiveSmallIntegerField(default=0)  # 0–2
+
+    # ===== 10: Recuerdo diferido =====
+    palabra_rostro = models.BooleanField(default=False)
+    palabra_seda = models.BooleanField(default=False)
+    palabra_iglesia = models.BooleanField(default=False)
+    palabra_clavel = models.BooleanField(default=False)
+    palabra_rojo = models.BooleanField(default=False)
+
+    diferido = models.PositiveSmallIntegerField(default=0)  # 0–5
+
+    # ===== 11: Orientación =====
+    orientacion_fecha = models.BooleanField(default=False)
+    orientacion_mes = models.BooleanField(default=False)
+    orientacion_anio = models.BooleanField(default=False)
+    orientacion_dia_semana = models.BooleanField(default=False)
+    orientacion_lugar = models.BooleanField(default=False)
+    orientacion_localidad = models.BooleanField(default=False)
+
+    orientacion = models.PositiveSmallIntegerField(default=0)  # 0–6
+
+    # ===== Escolaridad =====
     educacion_baja = models.BooleanField(default=False)
 
-    # Totales
-    puntaje_total = models.IntegerField(default=0)
+    # ===== Totales =====
+    puntaje_total = models.PositiveSmallIntegerField(default=0)
     interpretacion = models.CharField(max_length=255, blank=True, null=True)
 
     def __str__(self):

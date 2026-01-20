@@ -2877,6 +2877,7 @@ def realizar_examen(request, visita_id, examen_id, paciente_id):
 
     # Obtener datos existentes
     paciente = get_object_or_404(DatosDemograficos, id=paciente_id)
+    visita = get_object_or_404(Visita, id=visita_id, paciente=paciente)
     datos_examen = None
     visita_examen_obj = None
     modo_edicion = False
@@ -3340,6 +3341,7 @@ def realizar_examen(request, visita_id, examen_id, paciente_id):
         "modo_edicion": modo_edicion,
         "visita_examen_obj": visita_examen_obj,
         "paciente": paciente,
+        "visita": visita,
     }
 
     # Si es anamnesis de sueño, agregar datos adicionales
@@ -5870,109 +5872,199 @@ def guardar_examen_Participante_CDR(request):
 
 @login_required
 def guardar_examen_Participante_MoCA(request):
-    if request.method == "POST":
-        try:
-            visita_id = request.POST.get("visita_id")
-            paciente_id = request.POST.get("paciente_id")
-            examen_id = request.POST.get("examen_id")
-
-            # Obtener la instancia de VisitaExamen
-            visita_examen = get_object_or_404(
-                VisitaExamen, visita_id=visita_id, examen_id=examen_id
-            )
-
-            # Marcar como iniciado si está pendiente
-            if visita_examen.estado == "pendiente":
-                visita_examen.estado = "en_progreso"
-                visita_examen.fecha_inicio = timezone.now()
-                visita_examen.save()
-
-            # Obtener los campos EXACTOS del modelo MoCAResult
-            alternancia = int(request.POST.get("alternancia", 0))
-            cubo = int(request.POST.get("cubo", 0))
-            reloj = int(request.POST.get("reloj", 0))
-            denominacion = int(request.POST.get("denominacion", 0))
-            atencion = int(request.POST.get("atencion", 0))
-            repeticion = int(request.POST.get("repeticion", 0))
-            fluidez = int(request.POST.get("fluidez", 0))
-            abstraccion = int(request.POST.get("abstraccion", 0))
-            diferido = int(request.POST.get("diferido", 0))
-            orientacion = int(request.POST.get("orientacion", 0))
-            educacion_baja = (
-                True if request.POST.get("educacion_baja") == "on" else False
-            )
-
-            # Calcular puntaje total
-            puntaje_total = (
-                alternancia
-                + cubo
-                + reloj
-                + denominacion
-                + atencion
-                + repeticion
-                + fluidez
-                + abstraccion
-                + diferido
-                + orientacion
-            )
-
-            if educacion_baja and puntaje_total < 30:
-                puntaje_total += 1
-
-            # Determinar interpretación
-            if puntaje_total >= 26:
-                interpretacion = "Puntaje normal (función cognitiva preservada)"
-            else:
-                interpretacion = "Posible deterioro cognitivo. Se recomienda evaluación clínica adicional."
-
-            # Crear o actualizar el resultado
-            moca, created = MoCAResult.objects.update_or_create(
-                visita_examen=visita_examen,
-                defaults={
-                    "alternancia": alternancia,
-                    "cubo": cubo,
-                    "reloj": reloj,
-                    "denominacion": denominacion,
-                    "atencion": atencion,
-                    "repeticion": repeticion,
-                    "fluidez": fluidez,
-                    "abstraccion": abstraccion,
-                    "diferido": diferido,
-                    "orientacion": orientacion,
-                    "educacion_baja": educacion_baja,
-                    "puntaje_total": puntaje_total,
-                    "interpretacion": interpretacion,
-                },
-            )
-
-            # Marcar el examen como completado
-            visita_examen.estado = "completado"
-            visita_examen.fecha_completado = timezone.now()
-            visita_examen.save()
-
-            messages.success(
-                request,
-                f"✅ Escala MoCA guardada exitosamente.\n"
-                f"📊 Puntaje: {puntaje_total}/30\n"
-                f"🔍 Interpretación: {interpretacion}",
-            )
-            return redirect("detalle_paciente", paciente_id=paciente_id)
-
-        except Exception as e:
-            # Revertir estado si hubo error
-            try:
-                if "visita_examen" in locals():
-                    visita_examen.estado = "pendiente"
-                    visita_examen.save()
-            except:
-                pass
-
-            messages.error(request, f"❌ Error al guardar la escala MoCA: {str(e)}")
-            return redirect("detalle_paciente", paciente_id=paciente_id or 1)
-
-    else:
+    if request.method != "POST":
         messages.error(request, "❌ Método no permitido.")
         return redirect("index")
+
+    try:
+        visita_id = request.POST.get("visita_id")
+        paciente_id = request.POST.get("paciente_id")
+        examen_id = request.POST.get("examen_id")
+
+        visita_examen = get_object_or_404(
+            VisitaExamen, visita_id=visita_id, examen_id=examen_id
+        )
+
+        if visita_examen.estado == "pendiente":
+            visita_examen.estado = "en_progreso"
+            visita_examen.fecha_inicio = timezone.now()
+            visita_examen.save()
+
+        # =============================
+        # 1–4 VISUOESPACIAL
+        # =============================
+        alternancia = int(request.POST.get("alternancia", 0))
+        cubo = int(request.POST.get("cubo", 0))
+        reloj = int(request.POST.get("reloj", 0))
+        denominacion = int(request.POST.get("denominacion", 0))
+
+        # =============================
+        # 6 ATENCIÓN
+        # =============================
+        atencion_secuencia = int(request.POST.get("atencion_secuencia", 0))
+        atencion_inversa = int(request.POST.get("atencion_inversa", 0))
+
+        errores_concentracion = int(request.POST.get("errores_concentracion") or 0)
+        concentracion_resultado = request.POST.get("concentracion_resultado")
+
+        concentracion_puntos = 1 if concentracion_resultado == "no_fallo" else 0
+
+        sustracciones = sum(
+            1 for i in range(1, 6) if request.POST.get(f"sustraccion_{i}")
+        )
+
+        if sustracciones == 0:
+            sustraccion_puntos = 0
+        elif sustracciones == 1:
+            sustraccion_puntos = 1
+        elif sustracciones in (2, 3):
+            sustraccion_puntos = 2
+        else:
+            sustraccion_puntos = 3
+
+        atencion = (
+            atencion_secuencia
+            + atencion_inversa
+            + concentracion_puntos
+            + sustraccion_puntos
+        )
+
+        # =============================
+        # 7 REPETICIÓN
+        # =============================
+        repeticion_frase_1 = bool(request.POST.get("frase_1"))
+        repeticion_frase_2 = bool(request.POST.get("frase_2"))
+        repeticion = int(repeticion_frase_1) + int(repeticion_frase_2)
+
+        # =============================
+        # 8 FLUIDEZ
+        # =============================
+        numero_palabras_fluidez = int(request.POST.get("numero_palabras_fluidez") or 0)
+        fluidez = 1 if numero_palabras_fluidez >= 11 else 0
+
+        # =============================
+        # 9 ABSTRACCIÓN
+        # =============================
+        abstraccion = int(request.POST.get("abstraccion", 0))
+
+        # =============================
+        # 10 DIFERIDO
+        # =============================
+        palabras = [
+            "palabra_rostro",
+            "palabra_seda",
+            "palabra_iglesia",
+            "palabra_clavel",
+            "palabra_rojo",
+        ]
+
+        diferido = sum(1 for palabra in palabras if request.POST.get(palabra))
+
+        # =============================
+        # 11 ORIENTACIÓN
+        # =============================
+        orientacion_items = [
+            "orientacion_fecha",
+            "orientacion_mes",
+            "orientacion_anio",
+            "orientacion_dia_semana",
+            "orientacion_lugar",
+            "orientacion_localidad",
+        ]
+
+        orientacion = sum(1 for campo in orientacion_items if request.POST.get(campo))
+
+        # =============================
+        # ESCOLARIDAD
+        # =============================
+        educacion_baja = bool(request.POST.get("educacion_baja"))
+
+        # =============================
+        # TOTAL
+        # =============================
+        puntaje_total = (
+            alternancia
+            + cubo
+            + reloj
+            + denominacion
+            + atencion
+            + repeticion
+            + fluidez
+            + abstraccion
+            + diferido
+            + orientacion
+        )
+
+        if educacion_baja and puntaje_total < 30:
+            puntaje_total += 1
+
+        interpretacion = (
+            "Puntaje normal (función cognitiva preservada)"
+            if puntaje_total >= 26
+            else "Posible deterioro cognitivo. Se recomienda evaluación clínica adicional."
+        )
+
+        # =============================
+        # GUARDAR
+        # =============================
+        MoCAResult.objects.update_or_create(
+            visita_examen=visita_examen,
+            defaults={
+                "alternancia": alternancia,
+                "cubo": cubo,
+                "reloj": reloj,
+                "denominacion": denominacion,
+                "atencion_secuencia": atencion_secuencia,
+                "atencion_inversa": atencion_inversa,
+                "errores_concentracion": errores_concentracion,
+                "concentracion_resultado": concentracion_resultado,
+                "sustraccion_1": bool(request.POST.get("sustraccion_1")),
+                "sustraccion_2": bool(request.POST.get("sustraccion_2")),
+                "sustraccion_3": bool(request.POST.get("sustraccion_3")),
+                "sustraccion_4": bool(request.POST.get("sustraccion_4")),
+                "sustraccion_5": bool(request.POST.get("sustraccion_5")),
+                "atencion": atencion,
+                "repeticion_frase_1": repeticion_frase_1,
+                "repeticion_frase_2": repeticion_frase_2,
+                "repeticion": repeticion,
+                "numero_palabras_fluidez": numero_palabras_fluidez,
+                "fluidez": fluidez,
+                "abstraccion": abstraccion,
+                "palabra_rostro": request.POST.get("palabra_rostro") is not None,
+                "palabra_seda": request.POST.get("palabra_seda") is not None,
+                "palabra_iglesia": request.POST.get("palabra_iglesia") is not None,
+                "palabra_clavel": request.POST.get("palabra_clavel") is not None,
+                "palabra_rojo": request.POST.get("palabra_rojo") is not None,
+                "diferido": diferido,
+                "orientacion_fecha": request.POST.get("orientacion_fecha") is not None,
+                "orientacion_mes": request.POST.get("orientacion_mes") is not None,
+                "orientacion_anio": request.POST.get("orientacion_anio") is not None,
+                "orientacion_dia_semana": request.POST.get("orientacion_dia_semana")
+                is not None,
+                "orientacion_lugar": request.POST.get("orientacion_lugar") is not None,
+                "orientacion_localidad": request.POST.get("orientacion_localidad")
+                is not None,
+                "orientacion": orientacion,
+                "educacion_baja": educacion_baja,
+                "puntaje_total": puntaje_total,
+                "interpretacion": interpretacion,
+            },
+        )
+
+        visita_examen.estado = "completado"
+        visita_examen.fecha_completado = timezone.now()
+        visita_examen.save()
+
+        messages.success(
+            request,
+            f"✅ Escala MoCA guardada correctamente | Puntaje: {puntaje_total}/30",
+        )
+
+        return redirect("detalle_paciente", paciente_id=paciente_id)
+
+    except Exception as e:
+        messages.error(request, f"❌ Error al guardar MoCA: {str(e)}")
+        return redirect("detalle_paciente", paciente_id=paciente_id)
 
 
 @login_required

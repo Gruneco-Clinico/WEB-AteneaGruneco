@@ -28,7 +28,7 @@
             <!-- Fecha -->
             <div class="form-group">
               <label for="fecha">Fecha</label>
-              <input type="date" class="form-control" name="fecha" id="fecha" value="{{ datos_examen.fecha|date:'Y-m-d' }}" required>
+              <input type="date" class="form-control" name="fecha" id="fecha" value="{% if datos_examen.fecha %}{{ datos_examen.fecha|date:'Y-m-d' }}{% else %}{% now 'Y-m-d' %}{% endif %}" required>
             </div>
 
             <!-- Hora inicio -->
@@ -40,19 +40,20 @@
             <!-- Investigador -->
             <div class="form-group">
               <label for="investigador">Investigador</label>
-              <input type="text" class="form-control" name="investigador" id="investigador" value="{{ datos_examen.investigador|default:'' }}" required>
+              <input type="text" class="form-control" name="investigador" id="investigador" value="{{ datos_examen.investigador|default:request.user.get_full_name }}" readonly>
             </div>
 
             <!-- Acompañante -->
             <div class="form-group">
               <label for="nombre_acompanante">Nombre del acompañante</label>
-              <input type="text" class="form-control" name="nombre_acompanante" id="nombre_acompanante" value="{{ datos_examen.nombre_acompanante|default:'' }}" required>
+              <input type="text" class="form-control" name="nombre_acompanante" id="nombre_acompanante" value="{% if datos_examen.nombre_acompanante %}{{ datos_examen.nombre_acompanante }}{% else %}{{ visita.acompanante_nombre }}{% endif %}" required>
             </div>
 
             <!-- Investigador -->
             <div class="form-group">
               <label for="nombre_participante">Nombre del participante</label>
-              <input type="text" class="form-control" name="nombre_participante" id="nombre_participante" value="{{ datos_examen.nombre_participante|default:'' }}" required>
+              <input type="text" class="form-control" name="nombre_participante" id="nombre_participante"   value="{{ paciente.primer_nombre }} {{ paciente.segundo_nombre }} {{ paciente.primer_apellido }} {{ paciente.segundo_apellido }}"
+required>
             </div>
 
             <!-- Versión del consentimiento -->
@@ -64,7 +65,7 @@
             <!-- Descripción del proceso -->
             <div class="form-group">
               <label for="descripcion_proceso">Descripción del proceso de consentimiento</label>
-              <textarea class="form-control" name="descripcion_proceso" id="descripcion_proceso" rows="10" required>{{ datos_examen.descripcion_proceso|default:'' }}</textarea>
+              <textarea class="form-control" name="descripcion_proceso" id="descripcion_proceso" rows="10" required>{{ datos_examen.descripcion_proceso|default:"Se realizó el proceso de consentimiento informado siguiendo la versión vigente del formato aprobado por el Comité de Bioética de la Facultad de Medicina y del Laboratorio de Neurociencias Cognitivas GRUNECO. El participante recibió una explicación verbal completa sobre el objetivo del estudio, procedimientos (evaluación médica y neurológica, evaluación cognitiva, afectiva y de sueño, y uso de dispositivo portátil), riesgos, beneficios, voluntariedad, confidencialidad, posibilidad de retiro y uso de datos en estudios futuros. Se verificó comprensión y se resolvieron todas las dudas. El participante firmó el consentimiento en presencia del investigador y testigos." }}</textarea>
             </div>
 
             <!-- Preguntas planteadas -->
@@ -92,7 +93,7 @@
             <!-- Fecha de firma -->
             <div class="form-group">
               <label for="fecha_firma">Fecha de firma</label>
-              <input type="date" class="form-control" name="fecha_firma" id="fecha_firma" value="{{ datos_examen.fecha_firma|date:'Y-m-d' }}">
+              <input type="date" class="form-control" name="fecha_firma" id="fecha_firma" value="{% if datos_examen.fecha_firma %}{{ datos_examen.fecha_firma|date:'Y-m-d' }}{% else %}{% now 'Y-m-d' %}{% endif %}">
             </div>
 
             <!-- Nombre Testigo 1 -->
