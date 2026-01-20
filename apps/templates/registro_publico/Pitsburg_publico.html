@@ -550,6 +550,11 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="form-group mt-4">
+                            <label><strong>Puntuación Total del Pittsburgh</strong></label>
+                            <input type="number" class="form-control" id="puntuacion_total" name="puntuacion_total"
+                                    readonly placeholder="La puntuación se calcula automáticamente">
+                            </div>
 
                         <!-- Botones de acción -->
                         <div class="row mt-4">
@@ -567,22 +572,84 @@
 </div>
 
 <script>
-    function toggleFields() {
-        var select = document.getElementById("duerme_acompanado");
-        var fields = document.getElementById("acompanado_fields");
+document.addEventListener("DOMContentLoaded", function () {
 
-        // Mostrar campos si no es "Solo"
-        if (select.value !== "Solo" && select.value !== "") {
-            fields.style.display = "block";
-        } else {
-            fields.style.display = "none";
-        }
+    /* ---------------------------
+       Mostrar / Ocultar campos
+    ----------------------------*/
+    function toggleFields() {
+        const select = document.getElementById("duerme_acompanado");
+        const fields = document.getElementById("acompanado_fields");
+
+        fields.style.display = (select.value && select.value !== "Solo") ? "block" : "none";
     }
 
-    // Ejecutar al cargar la página para establecer el estado inicial
-    document.addEventListener("DOMContentLoaded", function () {
-        toggleFields();
+    document.getElementById("duerme_acompanado").addEventListener("change", toggleFields);
+    toggleFields();
+
+
+    /* ---------------------------
+       MAPEO DE RESPUESTAS
+    ----------------------------*/
+    const MAP_LATENCIA = {
+        "≤ 15 minutos — 0": 0,
+        "16–30 minutos — 1": 1,
+        "31–60 minutos — 2": 2,
+        "> 60 minutos — 3": 3
+    };
+
+    const MAP_FRECUENCIA = {
+        "Ninguna vez": 0,
+        "Menos de una vez a la semana": 1,
+        "Una o dos veces a la semana": 2,
+        "Tres o más veces a la semana": 3
+    };
+
+    const MAP_CALIDAD = {
+        "Buena": 0,
+        "Bastante buena": 1,
+        "Mala": 2,
+        "Bastante mala": 3
+    };
+
+
+    /* ---------------------------
+       CÁLCULO DE PUNTUACIÓN
+    ----------------------------*/
+    function calcularPuntuacion() {
+        let total = 0;
+
+        // Latencia
+        const latencia = document.querySelector('[name="latencia_sueno"]');
+        if (latencia && MAP_LATENCIA[latencia.value] !== undefined) {
+            total += MAP_LATENCIA[latencia.value];
+        }
+
+        // Calidad del sueño
+        const calidad = document.querySelector('[name="calidad_sueno"]');
+        if (calidad && MAP_CALIDAD[calidad.value] !== undefined) {
+            total += MAP_CALIDAD[calidad.value];
+        }
+
+        // TODOS los selects de frecuencia
+        document.querySelectorAll('select').forEach(select => {
+            if (MAP_FRECUENCIA[select.value] !== undefined) {
+                total += MAP_FRECUENCIA[select.value];
+            }
+        });
+
+        document.getElementById("puntuacion_total").value = total;
+    }
+
+
+    /* ---------------------------
+       ESCUCHAR CAMBIOS
+    ----------------------------*/
+    document.querySelectorAll("select").forEach(select => {
+        select.addEventListener("change", calcularPuntuacion);
     });
+
+});
 </script>
 
 {% endblock %}

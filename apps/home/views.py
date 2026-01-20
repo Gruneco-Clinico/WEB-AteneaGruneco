@@ -396,6 +396,8 @@ def enviar_correo_confirmacion_cita(cita_data):
 
         <p>➡ <strong>Después de registrar sus datos demográficos, aparecerá un botón para completar sus exámenes pendientes.</strong></p>
 
+        <h3>Si no logró finalizar el diligenciamiento de los formularios, por favor ingrese su número de cédula en el botón “Consultar exámenes pendientes” para continuar con el proceso.</h3>
+        
         <h3>📄 CONSENTIMIENTO INFORMADO</h3>
         <p>Adjunto encontrará el consentimiento informado del Proyecto Sueño. Por favor léalo antes de asistir a su cita.</p>
 
@@ -2231,6 +2233,7 @@ def guardar_examen_publico_pitsburg(request):
                 "descripcion_inconvenientes", ""
             )
             otros_inconvenientes = request.POST.get("otros_inconvenientes", "")
+            puntuacion_total = request.POST.get("puntuacion_total", "0")
 
             # Crear o actualizar el resultado Pittsburgh
             pitsburg_result, created = PittsburghResult.objects.update_or_create(
@@ -2266,6 +2269,7 @@ def guardar_examen_publico_pitsburg(request):
                     "desorientacion_confusion": desorientacion_confusion,
                     "descripcion_inconvenientes": descripcion_inconvenientes,
                     "otros_inconvenientes": otros_inconvenientes,
+                    "puntuacion_total": puntuacion_total,
                 },
             )
 
@@ -5018,6 +5022,7 @@ def guardar_examen_Pitsburg(request):
                 "descripcion_inconvenientes", ""
             )
             otros_inconvenientes = request.POST.get("otros_inconvenientes", "")
+            puntuacion_total = request.POST.get("puntuacion_total", 0)
 
             # Crear o actualizar el resultado Pittsburgh usando los CAMPOS EXACTOS del modelo
             pitsburg_result, created = PittsburghResult.objects.update_or_create(
@@ -5052,6 +5057,7 @@ def guardar_examen_Pitsburg(request):
                     "desorientacion_confusion": desorientacion_confusion,
                     "descripcion_inconvenientes": descripcion_inconvenientes,
                     "otros_inconvenientes": otros_inconvenientes,
+                    "puntuacion_total": puntuacion_total,
                 },
             )
 
