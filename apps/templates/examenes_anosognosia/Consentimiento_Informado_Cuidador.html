@@ -52,8 +52,7 @@
             <!-- Investigador -->
             <div class="form-group">
               <label for="nombre_participante">Nombre del participante</label>
-              <input type="text" class="form-control" name="nombre_participante" id="nombre_participante"   value="{{ paciente.primer_nombre }} {{ paciente.segundo_nombre }} {{ paciente.primer_apellido }} {{ paciente.segundo_apellido }}"
-required>
+              <input type="text" class="form-control" name="nombre_participante" id="nombre_participante"   value="{{ paciente.primer_nombre }} {{ paciente.segundo_nombre }} {{ paciente.primer_apellido }} {{ paciente.segundo_apellido }}"required>
             </div>
 
             <!-- Versión del consentimiento -->
@@ -124,6 +123,30 @@ required>
               <input type="time" class="form-control" name="hora_finalizacion" id="hora_finalizacion" value="{{ datos_examen.hora_finalizacion|default:'' }}">
             </div>
 
+            <!-- Firma del cuidador -->
+            <!-- Firma del cuidador -->
+            <div class="form-group">
+                <label for="firma_cuidador">Firma del cuidador</label>
+                
+                <!-- Canvas para dibujar -->
+                <canvas id="firma_cuidador" class="border" width="400" height="150"></canvas>
+                <input type="hidden" name="firma_cuidador" id="firma_cuidador_input">
+
+                <!-- Mostrar firma existente si hay -->
+                {% if datos_examen.firma_cuidador %}
+                    <div class="mt-2">
+                        <label>Firma guardada:</label><br>
+                        <img src="{{ datos_examen.firma_cuidador }}" alt="Firma del cuidador" class="border" style="width:400px; height:150px;">
+                    </div>
+                {% endif %}
+
+                <div class="mt-2">
+                    <button type="button" class="btn btn-sm btn-secondary" id="limpiar_firma">Limpiar firma</button>
+                </div>
+            </div>
+
+
+
             <div class="text-right mt-4">
               <button type="submit" class="btn btn-primary">Guardar</button>
               <a href="{% url 'detalle_paciente' paciente_id %}" class="btn btn-secondary">Ver Paciente</a>
@@ -135,5 +158,70 @@ required>
     </div>
   </div>
 </div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const canvas = document.getElementById("firma_cuidador");
+    const ctx = canvas.getContext("2d");
+    let dibujando = false;
+
+    // Cargar firma existente en el canvas si hay
+    {% if datos_examen.firma_cuidador %}
+        const img = new Image();
+        img.src = "{{ datos_examen.firma_cuidador }}";
+        img.onload = function() {
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        };
+    {% endif %}
+
+    canvas.addEventListener("mousedown", function(e) {
+        dibujando = true;
+        const rect = canvas.getBoundingClientRect();
+        ctx.beginPath();
+        ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+    });
+    canvas.addEventListener("mouseup", () => dibujando = false);
+    canvas.addEventListener("mouseleave", () => dibujando = false);
+    canvas.addEventListener("mousemove", function(e) {
+        if (!dibujando) return;
+        const rect = canvas.getBoundingClientRect();
+        ctx.lineWidth = 2;
+        ctx.lineCap = "round";
+        ctx.strokeStyle = "#000000";
+        ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+        ctx.stroke();
+        ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+    });
+
+    document.getElementById("limpiar_firma").addEventListener("click", function() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        document.getElementById("firma_cuidador_input").value = "";
+    });
+
+    const form = canvas.closest("form");
+    form.addEventListener("submit", function(e) {
+        e.preventDefault();
+        const input = document.getElementById("firma_cuidador_input");
+        const dataURL = canvas.toDataURL("image/png");
+        const blank = document.createElement("canvas");
+        blank.width = canvas.width;
+        blank.height = canvas.height;
+
+        if (dataURL !== blank.toDataURL()) {
+            input.value = dataURL; // Guardar Base64
+        } else if ("{{ datos_examen.firma_cuidador }}") {
+            input.value = "{{ datos_examen.firma_cuidador }}"; // Mantener la firma guardada
+        } else {
+            alert("Debe firmar antes de guardar.");
+            return;
+        }
+
+        form.submit();
+    });
+});
+</script>
+
+
+
 
 {% endblock %}

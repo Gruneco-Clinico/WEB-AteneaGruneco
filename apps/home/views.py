@@ -6574,6 +6574,7 @@ def guardar_consentimiento_participante(request):
                 "testigo2": request.POST.get("testigo2", ""),
                 "copia_entregada": request.POST.get("copia_entregada"),
                 "hora_finalizacion": request.POST.get("hora_finalizacion"),
+                "firma_participante": request.POST.get("firma_participante", ""),
             }
 
             # Guardar o actualizar
@@ -6648,6 +6649,7 @@ def guardar_consentimiento_cuidador(request):
                 "testigo2": request.POST.get("testigo2", ""),
                 "copia_entregada": request.POST.get("copia_entregada"),
                 "hora_finalizacion": request.POST.get("hora_finalizacion"),
+                "firma_cuidador": request.POST.get("firma_cuidador", ""),
             }
 
             # Guardar o actualizar

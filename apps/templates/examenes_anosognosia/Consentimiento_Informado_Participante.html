@@ -128,6 +128,15 @@
               <input type="time" class="form-control" name="hora_finalizacion" id="hora_finalizacion" value="{{ datos_examen.hora_finalizacion|default:'' }}">
             </div>
 
+            <div class="form-group">
+              <label for="firma_participante">Firma del participante</label>
+              <canvas id="firma_participante" class="border" width="400" height="150"></canvas>
+              <input type="hidden" name="firma_participante" id="firma_participante_input">
+              <div class="mt-2">
+                <button type="button" class="btn btn-sm btn-secondary" id="limpiar_firma">Limpiar firma</button>
+              </div>
+            </div>
+
             <div class="text-right mt-4">
               <button type="submit" class="btn btn-primary">Guardar</button>
               <a href="{% url 'detalle_paciente' paciente_id %}" class="btn btn-secondary">Ver Paciente</a>
@@ -147,6 +156,66 @@
           input.value = today;
       }
   });
+
+document.addEventListener("DOMContentLoaded", function() {
+    const canvas = document.getElementById("firma_participante");
+    const ctx = canvas.getContext("2d");
+    let dibujando = false;
+
+    // Cargar firma existente en el canvas si hay
+    {% if datos_examen.firma_participante %}
+        const img = new Image();
+        img.src = "{{ datos_examen.firma_participante }}";
+        img.onload = function() {
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        };
+    {% endif %}
+
+    canvas.addEventListener("mousedown", function(e) {
+        dibujando = true;
+        const rect = canvas.getBoundingClientRect();
+        ctx.beginPath();
+        ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+    });
+    canvas.addEventListener("mouseup", () => dibujando = false);
+    canvas.addEventListener("mouseleave", () => dibujando = false);
+    canvas.addEventListener("mousemove", function(e) {
+        if (!dibujando) return;
+        const rect = canvas.getBoundingClientRect();
+        ctx.lineWidth = 2;
+        ctx.lineCap = "round";
+        ctx.strokeStyle = "#000000";
+        ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+        ctx.stroke();
+        ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+    });
+
+    document.getElementById("limpiar_firma").addEventListener("click", function() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        document.getElementById("firma_participante_input").value = "";
+    });
+
+    const form = canvas.closest("form");
+    form.addEventListener("submit", function(e) {
+        e.preventDefault();
+        const input = document.getElementById("firma_participante_input");
+        const dataURL = canvas.toDataURL("image/png");
+        const blank = document.createElement("canvas");
+        blank.width = canvas.width;
+        blank.height = canvas.height;
+
+        if (dataURL !== blank.toDataURL()) {
+            input.value = dataURL; // Guardar Base64
+        } else if ("{{ datos_examen.firma_participante }}") {
+            input.value = "{{ datos_examen.firma_participante }}"; // Mantener la firma guardada
+        } else {
+            alert("Debe firmar antes de guardar.");
+            return;
+        }
+
+        form.submit();
+    });
+});
 </script>
 
 {% endblock %}

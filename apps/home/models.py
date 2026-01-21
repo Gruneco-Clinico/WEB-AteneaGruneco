@@ -2151,6 +2151,7 @@ class ConsentimientoInformadoParticipanteResult(ResultadoExamenBase):
     testigo2 = models.CharField(max_length=255, blank=True, null=True)
     copia_entregada = models.CharField(max_length=10)  # "Si" o "No"
     hora_finalizacion = models.TimeField()
+    firma_participante = models.TextField(blank=True, null=True)  # Guardar como Base64
 
     def __str__(self):
         return f"Consentimiento Informado - {self.visita_examen_id}"
@@ -2172,6 +2173,7 @@ class ConsentimientoInformadoCuidadorResult(ResultadoExamenBase):
     testigo2 = models.CharField(max_length=255, blank=True, null=True)
     copia_entregada = models.CharField(max_length=10)  # "Si" o "No"
     hora_finalizacion = models.TimeField()
+    firma_cuidador = models.TextField(blank=True, null=True)  # Guardar como Base64
 
     def __str__(self):
         return f"Consentimiento Informado - {self.visita_examen_id}"
