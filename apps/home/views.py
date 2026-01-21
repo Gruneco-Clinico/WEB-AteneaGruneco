@@ -28,6 +28,7 @@ from django.core.mail import send_mail
 import logging
 import os
 from django.core.mail import EmailMessage
+from django.db.models import Max
 # AGENDAMIENTO PUBLICO
 
 
@@ -1428,6 +1429,27 @@ def detalle_paciente(request, paciente_id):
         proyecto = Proyecto.objects.get(id=proyecto_id)
         proyecto.pacientes.add(paciente)
         proyecto.save()
+
+        codigo = proyecto.codigo_siu
+        # Prefijo: SUE, ANG, etc.
+        prefijo = codigo.upper()
+
+        # Obtener último código del proyecto
+        ultimo = ProyectoPacienteExtra.objects.filter(proyecto=proyecto).aggregate(
+            Max("codigo_proyecto")
+        )["codigo_proyecto__max"]
+
+        if ultimo:
+            # Extrae el número: SUE_0003 -> 3
+            consecutivo = int(ultimo.split("_")[-1]) + 1
+        else:
+            consecutivo = 1
+
+        codigo_final = f"{prefijo}_{consecutivo:04d}"
+
+        ProyectoPacienteExtra.objects.create(
+            proyecto=proyecto, paciente=paciente, codigo_proyecto=codigo_final
+        )
 
     return render(
         request,
@@ -3716,11 +3738,20 @@ def ver_resultado_examen(request, visita_examen_id):
                 valor = getattr(resultado, field.name)
                 datos_resultado[field.verbose_name or field.name] = valor
 
+        proyecto = visita_examen.visita.Tipo_visita.proyecto
+        paciente = visita_examen.visita.paciente
+        codigo_proyecto = (
+            ProyectoPacienteExtra.objects.filter(proyecto=proyecto, paciente=paciente)
+            .values_list("codigo_proyecto", flat=True)
+            .first()
+        )
+
         context = {
             "visita_examen": visita_examen,
             "resultado": resultado,
             "datos_resultado": datos_resultado,
             "paciente": visita_examen.visita.paciente,
+            "codigo_proyecto": codigo_proyecto,
         }
         return render(request, "examenes_resultados/resultado_generico.html", context)
 

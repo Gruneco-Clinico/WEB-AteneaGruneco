@@ -307,7 +307,7 @@ class DatosDemograficos(models.Model):
     )
 
     def __str__(self):
-        return f"{self.primer_nombre} {self.primer_apellido} ({self.codigo or 'sin código'})"
+        return f"{self.primer_nombre} {self.primer_apellido} "
 
     # Antes estaba esto:
     # def __str__(self):
@@ -334,11 +334,23 @@ class Proyecto(models.Model):
         blank=True, null=True, verbose_name="Fecha de Financiación"
     )
     pacientes = models.ManyToManyField(
-        "DatosDemograficos", related_name="proyectos", verbose_name="Pacientes"
+        "DatosDemograficos",
+        related_name="proyectos",
+        verbose_name="Pacientes",
     )
 
     def __str__(self):
         return self.nombre
+
+
+class ProyectoPacienteExtra(models.Model):
+    proyecto = models.ForeignKey(Proyecto, on_delete=models.CASCADE)
+    paciente = models.ForeignKey(DatosDemograficos, on_delete=models.CASCADE)
+
+    codigo_proyecto = models.CharField(max_length=20)
+
+    class Meta:
+        unique_together = ("proyecto", "paciente")
 
 
 class Examen(models.Model):
