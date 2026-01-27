@@ -55,9 +55,31 @@
                         <h5>Antecedentes Farmacológicos</h5>
                         {% for item in farmacologicos %}
                         <div class="border p-3 mb-2">
-                            <strong>{{ item.medicamento }}</strong>
+                            <strong>
+                                {% if item.nombre_comercial %}
+                                    {{ item.nombre_comercial }}
+                                {% elif item.nombre_generico %}
+                                    {{ item.nombre_generico }}
+                                {% else %}
+                                    Medicamento sin nombre
+                                {% endif %}
+                            </strong>
+                            {% if item.presentacion or item.concentracion or item.unidad %}
+                            <br>
+                            <small>
+                                {{ item.presentacion }}{% if item.concentracion %} - {{ item.concentracion }}{% endif %}{% if item.unidad %} {{ item.unidad }}{% endif %}
+                            </small>
+                            {% endif %}
                             <br>
                             <small>Inicio: {{ item.fecha_inicio|date:"d/m/Y" }}</small>
+                            {% if item.via_administracion or item.cantidad or item.frecuencia %}
+                            <br>
+                            <small>
+                                {% if item.via_administracion %}Vía: {{ item.via_administracion }}{% endif %}
+                                {% if item.cantidad %} • Cantidad: {{ item.cantidad }}{% endif %}
+                                {% if item.frecuencia %} • Frecuencia: {{ item.frecuencia }}{% endif %}
+                            </small>
+                            {% endif %}
                             {% if item.observaciones %}<br><em>{{ item.observaciones }}</em>{% endif %}
                         </div>
                         {% endfor %}

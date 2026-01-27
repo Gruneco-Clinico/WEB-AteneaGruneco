@@ -3029,43 +3029,155 @@ class AntecedenteQuirurgico(models.Model):
 
 
 class AntecedenteFarmacologico(models.Model):
-    """Antecedentes Farmacológicos"""
+    """Antecedentes Farmacológicos (estructura equivalente a `Medicamento`)"""
+
+    PRESENTACION_CHOICES = [
+        ("tableta", "Tableta"),
+        ("capsula", "Cápsula"),
+        ("solucion", "Solución"),
+        ("ampolla", "Ampolla"),
+        ("spray", "Spray"),
+        ("jarabe", "Jarabe"),
+        ("crema", "Crema"),
+        ("pomada", "Pomada"),
+        ("gel", "Gel"),
+        ("ovulos", "Óvulos"),
+        ("supositorio", "Supositorio"),
+        ("parche", "Parche"),
+        ("inhalador", "Inhalador"),
+        ("gotas", "Gotas"),
+        ("otros", "Otros"),
+    ]
+
+    UNIDAD_CHOICES = [
+        ("microgramos", "Microgramos (μg)"),
+        ("miligramos", "Miligramos (mg)"),
+        ("gramos", "Gramos (g)"),
+        ("mililitros", "Mililitros (ml)"),
+        ("porcentaje", "Porcentaje (%)"),
+        ("volumen", "Volumen"),
+        ("unidades_internacionales", "Unidades Internacionales (UI)"),
+        ("miliequivalentes", "Miliequivalentes (mEq)"),
+        ("otros", "Otros"),
+    ]
+
+    VIA_ADMINISTRACION_CHOICES = [
+        ("oral", "Oral"),
+        ("topico", "Tópico"),
+        ("intramuscular", "Intramuscular"),
+        ("subcutaneo", "Subcutáneo"),
+        ("intravenoso", "Intravenoso"),
+        ("intrarectal", "Intrarectal"),
+        ("vaginal", "Vaginal"),
+        ("subdermico", "Subdérmico"),
+        ("otico", "Ótico"),
+        ("optico", "Óptico"),
+        ("intranasal", "Intranasal"),
+        ("inhalatorio", "Inhalatorio"),
+        ("transdermico", "Transdérmico"),
+        ("sublingual", "Sublingual"),
+        ("otros", "Otros"),
+    ]
 
     antecedente_result = models.ForeignKey(
         AntecedentesResult,
         on_delete=models.CASCADE,
         related_name="antecedentes_farmacologicos",
     )
-    descripcion = models.CharField(
-        max_length=200, verbose_name="Descripción del Medicamento/Reacción"
+
+    # Información del medicamento
+    nombre_comercial = models.CharField(null=True, max_length=200, verbose_name="Nombre Comercial")
+    nombre_generico = models.CharField(
+        max_length=200, blank=True, null=True, verbose_name="Nombre Genérico (DCI)"
     )
+
+    # Presentación y dosis
+    presentacion = models.CharField(
+        null=True,
+        max_length=50, choices=PRESENTACION_CHOICES, verbose_name="Presentación"
+    )
+    concentracion = models.CharField(
+        null=True,
+        max_length=100, verbose_name="Concentración", help_text="Ej: 500, 25, 10/5"
+    )
+    unidad = models.CharField(
+        max_length=50, choices=UNIDAD_CHOICES, verbose_name="Unidad de Concentración", null=True
+    )
+
+    # Administración
+    via_administracion = models.CharField(
+        null=True,
+        max_length=50,
+        choices=VIA_ADMINISTRACION_CHOICES,
+        verbose_name="Vía de Administración",
+    )
+    cantidad = models.CharField(
+        null=True,
+        max_length=100,
+        verbose_name="Cantidad por Toma",
+        help_text="Ej: 1 tableta, 5 ml, 2 gotas",
+    )
+    frecuencia = models.CharField(
+        max_length=100,
+        null=True,
+        verbose_name="Frecuencia",
+        help_text="Ej: Cada 8 horas, 2 veces al día, PRN",
+    )
+
+    # Fechas
     fecha_inicio = models.DateField(verbose_name="Fecha de Inicio")
-    recibio_tratamiento = models.BooleanField(
-        default=False, verbose_name="¿Recibió tratamiento?"
-    )
-    detalle_tratamiento = models.TextField(
-        blank=True, null=True, verbose_name="Detalle del Tratamiento"
-    )
-    tuvo_complicaciones = models.BooleanField(
-        default=False, verbose_name="¿Tuvo complicaciones?"
-    )
-    detalle_complicaciones = models.TextField(
-        blank=True, null=True, verbose_name="Detalle de Complicaciones"
-    )
-    activo = models.BooleanField(default=True, verbose_name="¿Está activo?")
     fecha_finalizacion = models.DateField(
-        blank=True, null=True, verbose_name="Fecha de Finalización"
+        blank=True,
+        null=True,
+        verbose_name="Fecha de Finalización",
+        help_text="Dejar vacío si es tratamiento continuo",
+    )
+
+    # Indicaciones
+    indicacion = models.TextField(null=True,verbose_name="Indicación/Motivo del Tratamiento")
+
+    # Control adicional
+    activo = models.BooleanField(default=True, verbose_name="Medicamento Activo")
+    adherencia = models.CharField(
+        max_length=20,
+        choices=[
+            ("buena", "Buena"),
+            ("regular", "Regular"),
+            ("mala", "Mala"),
+            ("no_evaluada", "No Evaluada"),
+        ],
+        default="no_evaluada",
+        verbose_name="Adherencia al Tratamiento",
+    )
+    efectos_adversos = models.BooleanField(
+        default=False, verbose_name="¿Presenta Efectos Adversos?"
+    )
+    descripcion_efectos_adversos = models.TextField(
+        blank=True, null=True, verbose_name="Descripción de Efectos Adversos"
     )
     observaciones = models.TextField(
         blank=True, null=True, verbose_name="Observaciones"
     )
 
+    # Campos de auditoría
+    fecha_registro = models.DateTimeField(
+        null=True,
+        auto_now_add=True, verbose_name="Fecha de Registro"
+    )
+    fecha_modificacion = models.DateTimeField(
+        null=True,
+        auto_now=True, verbose_name="Última Modificación"
+    )
+
     class Meta:
         verbose_name = "Antecedente Farmacológico"
         verbose_name_plural = "Antecedentes Farmacológicos"
+        ordering = ["-fecha_inicio", "nombre_comercial"]
 
     def __str__(self):
-        return f"{self.descripcion} - {self.fecha_inicio}"
+        estado = "Activo" if self.activo else "Inactivo"
+        conc = f" {self.concentracion}" if self.concentracion else ""
+        return f"{self.nombre_comercial}{conc} - {estado}"
 
 
 class AntecedenteToxico(models.Model):

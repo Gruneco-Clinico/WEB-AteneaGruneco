@@ -410,7 +410,7 @@ def enviar_correo_confirmacion_cita(cita_data):
         La constancia no constituye excusa válida para ausencias académicas.</p>
 
         <p>Para cancelar o reprogramar, comuníquese con anticipación a 
-        <strong>gruponeuropsicologia@udea.edu.co</strong></p>
+        <strong>veronica.ramirezl@udea.edu.co</strong></p>
 
         <p>Gracias por confiar en nosotros.</p>
 
@@ -435,7 +435,7 @@ def enviar_correo_confirmacion_cita(cita_data):
             static_root_path,
             "assets",
             "pdfs",
-            "CI_ProyectoSueno.pdf",
+            "CONSENTIMIENTOINFORMADOESTUDIANTES.pdf",
         )
 
         if os.path.exists(pdf_path):
@@ -3203,14 +3203,22 @@ def realizar_examen(request, visita_id, examen_id, paciente_id):
 
                         datos_examen["farmacologicos"] = list(
                             antecedentes.antecedentes_farmacologicos.values(
-                                "descripcion",
+                                "id",
+                                "nombre_comercial",
+                                "nombre_generico",
+                                "presentacion",
+                                "concentracion",
+                                "unidad",
+                                "via_administracion",
+                                "cantidad",
+                                "frecuencia",
                                 "fecha_inicio",
-                                "recibio_tratamiento",
-                                "detalle_tratamiento",
-                                "tuvo_complicaciones",
-                                "detalle_complicaciones",
-                                "activo",
                                 "fecha_finalizacion",
+                                "indicacion",
+                                "activo",
+                                "adherencia",
+                                "efectos_adversos",
+                                "descripcion_efectos_adversos",
                                 "observaciones",
                             )
                         )
@@ -3511,14 +3519,22 @@ def realizar_examen(request, visita_id, examen_id, paciente_id):
                     )
                     datos_examen["farmacologicos"] = list(
                         antecedentes.antecedentes_farmacologicos.values(
-                            "descripcion",
+                            "id",
+                            "nombre_comercial",
+                            "nombre_generico",
+                            "presentacion",
+                            "concentracion",
+                            "unidad",
+                            "via_administracion",
+                            "cantidad",
+                            "frecuencia",
                             "fecha_inicio",
-                            "recibio_tratamiento",
-                            "detalle_tratamiento",
-                            "tuvo_complicaciones",
-                            "detalle_complicaciones",
-                            "activo",
                             "fecha_finalizacion",
+                            "indicacion",
+                            "activo",
+                            "adherencia",
+                            "efectos_adversos",
+                            "descripcion_efectos_adversos",
                             "observaciones",
                         )
                     )
@@ -8278,28 +8294,40 @@ def guardar_examen_antecedentes(request):
                 antecedentes_result.antecedentes_farmacologicos.all().delete()
 
                 for item in farmacologicos_list:
-                    if item.get("descripcion"):
+                    # Considerar registro válido si tiene nombre comercial o genérico
+                    if item.get("nombre_comercial") or item.get("nombre_generico"):
                         tiene_antecedentes = True
+                        # Parsear fechas de forma segura
+                        fecha_inicio = (
+                            datetime.strptime(item.get("fecha_inicio"), "%Y-%m-%d").date()
+                            if item.get("fecha_inicio")
+                            else None
+                        )
+                        fecha_finalizacion = (
+                            datetime.strptime(item.get("fecha_finalizacion"), "%Y-%m-%d").date()
+                            if item.get("fecha_finalizacion")
+                            else None
+                        )
+
                         AntecedenteFarmacologico.objects.create(
                             antecedente_result=antecedentes_result,
-                            descripcion=item.get("descripcion"),
-                            fecha_inicio=datetime.strptime(
-                                item.get("fecha_inicio"), "%Y-%m-%d"
-                            ).date()
-                            if item.get("fecha_inicio")
-                            else None,
-                            recibio_tratamiento=item.get("recibio_tratamiento", False),
-                            detalle_tratamiento=item.get("detalle_tratamiento", ""),
-                            tuvo_complicaciones=item.get("tuvo_complicaciones", False),
-                            detalle_complicaciones=item.get(
-                                "detalle_complicaciones", ""
-                            ),
+                            nombre_comercial=item.get("nombre_comercial"),
+                            nombre_generico=item.get("nombre_generico", ""),
+                            presentacion=item.get("presentacion") or None,
+                            concentracion=item.get("concentracion", ""),
+                            unidad=item.get("unidad") or None,
+                            via_administracion=item.get("via_administracion") or None,
+                            cantidad=item.get("cantidad", ""),
+                            frecuencia=item.get("frecuencia", ""),
+                            fecha_inicio=fecha_inicio,
+                            fecha_finalizacion=fecha_finalizacion,
+                            indicacion=item.get("indicacion", ""),
                             activo=item.get("activo", True),
-                            fecha_finalizacion=datetime.strptime(
-                                item.get("fecha_finalizacion"), "%Y-%m-%d"
-                            ).date()
-                            if item.get("fecha_finalizacion")
-                            else None,
+                            adherencia=item.get("adherencia", ""),
+                            efectos_adversos=item.get("efectos_adversos", False),
+                            descripcion_efectos_adversos=item.get(
+                                "descripcion_efectos_adversos", ""
+                            ),
                             observaciones=item.get("observaciones", ""),
                         )
                 if farmacologicos_list:

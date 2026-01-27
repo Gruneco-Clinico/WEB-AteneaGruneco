@@ -902,52 +902,138 @@
           </div>
           <div class="card-body">
             <div class="row">
-              <div class="col-md-8">
+              <div class="col-md-6">
                 <div class="form-group">
-                  <label class="form-control-label font-weight-bold">Descripción del medicamento/reacción *</label>
-                  <input type="text" class="form-control" name="farmacologicos[${indice}][descripcion]" required placeholder="Nombre del medicamento y reacción...">
+                  <label class="form-control-label font-weight-bold">Nombre comercial *</label>
+                  <input type="text" class="form-control" name="farmacologicos[${indice}][nombre_comercial]" required placeholder="Nombre comercial...">
                 </div>
               </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">Principio activo</label>
+                  <input type="text" class="form-control" name="farmacologicos[${indice}][nombre_generico]" placeholder="Nombre genérico (DCI)...">
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">Presentación</label>
+                  <select class="form-control" name="farmacologicos[${indice}][presentacion]">
+                    <option value="">Seleccione...</option>
+                    <option value="tableta">Tableta</option>
+                    <option value="capsula">Cápsula</option>
+                    <option value="solucion">Solución</option>
+                    <option value="ampolla">Ampolla</option>
+                    <option value="spray">Spray</option>
+                    <option value="jarabe">Jarabe</option>
+                    <option value="crema">Crema</option>
+                    <option value="pomada">Pomada</option>
+                    <option value="gel">Gel</option>
+                    <option value="ovulos">Óvulos</option>
+                    <option value="supositorio">Supositorio</option>
+                    <option value="parche">Parche</option>
+                    <option value="inhalador">Inhalador</option>
+                    <option value="gotas">Gotas</option>
+                    <option value="otros">Otros</option>
+                  </select>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">Concentración</label>
+                  <input type="text" class="form-control" name="farmacologicos[${indice}][concentracion]" placeholder="Ej: 500, 10/5">
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">Unidad</label>
+                  <select class="form-control" name="farmacologicos[${indice}][unidad]">
+                    <option value="">Seleccione...</option>
+                    <option value="microgramos">Microgramos (μg)</option>
+                    <option value="miligramos">Miligramos (mg)</option>
+                    <option value="gramos">Gramos (g)</option>
+                    <option value="mililitros">Mililitros (ml)</option>
+                    <option value="porcentaje">Porcentaje (%)</option>
+                    <option value="volumen">Volumen</option>
+                    <option value="unidades_internacionales">Unidades Internacionales (UI)</option>
+                    <option value="miliequivalentes">Miliequivalentes (mEq)</option>
+                    <option value="otros">Otros</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">Vía de administración</label>
+                  <select class="form-control" name="farmacologicos[${indice}][via_administracion]">
+                    <option value="">Seleccione...</option>
+                    <option value="oral">Oral</option>
+                    <option value="topico">Tópico</option>
+                    <option value="intramuscular">Intramuscular</option>
+                    <option value="subcutaneo">Subcutáneo</option>
+                    <option value="intravenoso">Intravenoso</option>
+                    <option value="intrarectal">Intrarectal</option>
+                    <option value="vaginal">Vaginal</option>
+                    <option value="subdermico">Subdérmico</option>
+                    <option value="otico">Ótico</option>
+                    <option value="optico">Óptico</option>
+                    <option value="intranasal">Intranasal</option>
+                    <option value="inhalatorio">Inhalatorio</option>
+                    <option value="transdermico">Transdérmico</option>
+                    <option value="sublingual">Sublingual</option>
+                    <option value="otros">Otros</option>
+                  </select>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">Cantidad por toma</label>
+                  <input type="text" class="form-control" name="farmacologicos[${indice}][cantidad]" placeholder="Ej: 1 tableta, 5 ml">
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">Frecuencia</label>
+                  <input type="text" class="form-control" name="farmacologicos[${indice}][frecuencia]" placeholder="Ej: Cada 8 horas">
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
               <div class="col-md-4">
                 <div class="form-group">
                   <label class="form-control-label font-weight-bold">Fecha de inicio *</label>
                   <input type="date" class="form-control" name="farmacologicos[${indice}][fecha_inicio]" required>
                 </div>
               </div>
-            </div>
-
-            <div class="row">
-              <div class="col-md-6">
+              <div class="col-md-4">
                 <div class="form-group">
-                  <div class="custom-control custom-switch">
-                    <input type="checkbox" class="custom-control-input" 
-                           id="tratamiento_farm_${indice}" name="farmacologicos[${indice}][recibio_tratamiento]" value="true">
-                    <label class="custom-control-label" for="tratamiento_farm_${indice}">¿Recibió tratamiento?</label>
-                  </div>
+                  <label class="form-control-label font-weight-bold">Fecha de finalización</label>
+                  <input type="date" class="form-control" name="farmacologicos[${indice}][fecha_finalizacion]">
                 </div>
               </div>
-              <div class="col-md-6">
+              <div class="col-md-4">
                 <div class="form-group">
-                  <div class="custom-control custom-switch">
-                    <input type="checkbox" class="custom-control-input" 
-                           id="complicaciones_farm_${indice}" name="farmacologicos[${indice}][tuvo_complicaciones]" value="true">
-                    <label class="custom-control-label" for="complicaciones_farm_${indice}">¿Tuvo complicaciones?</label>
-                  </div>
+                  <label class="form-control-label font-weight-bold">Adherencia</label>
+                  <select class="form-control" name="farmacologicos[${indice}][adherencia]">
+                    <option value="no_evaluada">No evaluada</option>
+                    <option value="buena">Buena</option>
+                    <option value="regular">Regular</option>
+                    <option value="mala">Mala</option>
+                  </select>
                 </div>
               </div>
             </div>
 
             <div class="row">
-              <div class="col-md-6">
+              <div class="col-md-12">
                 <div class="form-group">
-                  <label class="form-control-label font-weight-bold">Detalle del tratamiento</label>
-                  <textarea class="form-control" name="farmacologicos[${indice}][detalle_tratamiento]" rows="2" placeholder="Tratamiento recibido para la reacción..."></textarea>
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label class="form-control-label font-weight-bold">Detalle de complicaciones</label>
-                  <textarea class="form-control" name="farmacologicos[${indice}][detalle_complicaciones]" rows="2" placeholder="Complicaciones presentadas..."></textarea>
+                  <label class="form-control-label font-weight-bold">Indicación / Motivo</label>
+                  <textarea class="form-control" name="farmacologicos[${indice}][indicacion]" rows="2" placeholder="Indicación o motivo del tratamiento"></textarea>
                 </div>
               </div>
             </div>
@@ -956,16 +1042,26 @@
               <div class="col-md-6">
                 <div class="form-group">
                   <div class="custom-control custom-switch">
-                    <input type="checkbox" class="custom-control-input" 
-                           id="activo_farm_${indice}" name="farmacologicos[${indice}][activo]" value="true" checked>
+                    <input type="checkbox" class="custom-control-input" id="activo_farm_${indice}" name="farmacologicos[${indice}][activo]" value="true" checked>
                     <label class="custom-control-label" for="activo_farm_${indice}">¿Está activo?</label>
                   </div>
                 </div>
               </div>
               <div class="col-md-6">
                 <div class="form-group">
-                  <label class="form-control-label font-weight-bold">Fecha de finalización</label>
-                  <input type="date" class="form-control" name="farmacologicos[${indice}][fecha_finalizacion]">
+                  <div class="custom-control custom-switch">
+                    <input type="checkbox" class="custom-control-input" id="efectos_farm_${indice}" name="farmacologicos[${indice}][efectos_adversos]" value="true">
+                    <label class="custom-control-label" for="efectos_farm_${indice}">¿Presenta efectos adversos?</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-12">
+                <div class="form-group">
+                  <label class="form-control-label font-weight-bold">Descripción de efectos adversos</label>
+                  <textarea class="form-control" name="farmacologicos[${indice}][descripcion_efectos_adversos]" rows="2" placeholder="Describa efectos adversos"></textarea>
                 </div>
               </div>
             </div>
