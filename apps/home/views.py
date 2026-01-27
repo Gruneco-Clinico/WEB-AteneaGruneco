@@ -2418,36 +2418,62 @@ def crear_visita(request, paciente_id):
             acompanante_telefono=acompanante_telefono,
         )
 
-        # Procesar los exámenes seleccionados
-        examenes_seleccionados = request.POST.get("examenes_seleccionados")
-        if examenes_seleccionados:
-            try:
-                lista_ids_examenes = json.loads(examenes_seleccionados)
+        # Procesar los exámenes seleccionados: soportar inputs múltiples o JSON
+        try:
+            post_list = request.POST.getlist("examenes_seleccionados") or []
+            lista_ids_examenes = []
 
-                # Crear un registro VisitaExamen para cada examen seleccionado
-                for examen_id in lista_ids_examenes:
+            if post_list:
+                # Si viene una sola cadena que es JSON, parsearla
+                if len(post_list) == 1:
+                    single = post_list[0]
+                    try:
+                        parsed = json.loads(single)
+                        if isinstance(parsed, list):
+                            lista_ids_examenes = parsed
+                        else:
+                            lista_ids_examenes = post_list
+                    except Exception:
+                        lista_ids_examenes = post_list
+                else:
+                    lista_ids_examenes = post_list
+            else:
+                # Fallback: intentar obtener como string JSON
+                s = request.POST.get("examenes_seleccionados")
+                if s:
+                    try:
+                        parsed = json.loads(s)
+                        if isinstance(parsed, list):
+                            lista_ids_examenes = parsed
+                        else:
+                            lista_ids_examenes = [s]
+                    except Exception:
+                        lista_ids_examenes = [s]
+
+            # Normalizar a enteros y crear VisitaExamen (ignorar IDs inválidos)
+            created_count = 0
+            clean_ids = []
+            for eid in lista_ids_examenes:
+                try:
+                    clean_ids.append(int(eid))
+                except (TypeError, ValueError):
+                    continue
+
+            for examen_id in clean_ids:
+                try:
                     examen = Examen.objects.get(id=examen_id)
-                    VisitaExamen.objects.create(
-                        visita=nueva_visita,
-                        examen=examen,
-                        # El campo resultado quedará como NULL
-                        # Los resultados se agregarán en otra función
-                    )
+                    VisitaExamen.objects.create(visita=nueva_visita, examen=examen)
+                    created_count += 1
+                except Examen.DoesNotExist:
+                    continue
 
-                # Mensaje de éxito
+            if created_count:
                 messages.success(
                     request,
-                    f"Visita creada con éxito con {len(lista_ids_examenes)} exámenes asociados.",
+                    f"Visita creada con éxito con {created_count} exámenes asociados.",
                 )
-
-            except json.JSONDecodeError as e:
-                messages.error(request, "Error al procesar los exámenes seleccionados.")
-
-            # Mensaje de éxito
-            messages.success(
-                request,
-                f"Visita  creada con éxito con {len(lista_ids_examenes)} exámenes asociados.",
-            )
+        except Exception as e:
+            messages.error(request, f"Error al procesar los exámenes seleccionados: {str(e)}")
 
         return redirect(
             "detalle_paciente", paciente_id=paciente.id
@@ -3079,7 +3105,6 @@ def realizar_examen(request, visita_id, examen_id, paciente_id):
                     analisis = AnalisisGeneralResult.objects.prefetch_related(
                         "diagnosticos_cie10",
                         "diagnosticos_dsmv",
-                        "diagnosticos_icsd3",
                         "diagnosticos_no_clasificados",
                     ).get(id=resultado.id)
 
@@ -3106,16 +3131,7 @@ def realizar_examen(request, visita_id, examen_id, paciente_id):
                         )
                     )
 
-                    datos_examen["diagnosticos_icsd3"] = list(
-                        analisis.diagnosticos_icsd3.values(
-                            "codigo",
-                            "diagnostico",
-                            "confirmado_nuevo",
-                            "confirmado_antiguo",
-                            "en_estudio",
-                            "orden",
-                        )
-                    )
+                   
 
                     datos_examen["diagnosticos_no_clasificados"] = list(
                         analisis.diagnosticos_no_clasificados.values(
@@ -3893,7 +3909,7 @@ def ver_resultado_examen(request, visita_examen_id):
             analisis = AnalisisGeneralResult.objects.prefetch_related(
                 "diagnosticos_cie10",
                 "diagnosticos_dsmv",
-                "diagnosticos_icsd3",
+
                 "diagnosticos_no_clasificados",
             ).get(id=analisis_result.id)
 
@@ -3904,7 +3920,6 @@ def ver_resultado_examen(request, visita_examen_id):
                 # Incluir diagnósticos específicos
                 "diagnosticos_cie10": analisis.diagnosticos_cie10.all(),
                 "diagnosticos_dsmv": analisis.diagnosticos_dsmv.all(),
-                "diagnosticos_icsd3": analisis.diagnosticos_icsd3.all(),
                 "diagnosticos_no_clasificados": analisis.diagnosticos_no_clasificados.all(),
             }
             return render(
@@ -8019,7 +8034,6 @@ def guardar_examen_analisis(request):
             # Limpiar diagnósticos existentes
             analisis_result.diagnosticos_cie10.all().delete()
             analisis_result.diagnosticos_dsmv.all().delete()
-            analisis_result.diagnosticos_icsd3.all().delete()
             analisis_result.diagnosticos_no_clasificados.all().delete()
 
             # Procesar diagnósticos CIE-10
@@ -8074,31 +8088,7 @@ def guardar_examen_analisis(request):
 
                     diag_dsmv.save()
 
-            # Procesar diagnósticos ICSD-3 (similar estructura)
-            icsd3_codigos = request.POST.getlist("icsd3_codigo[]")
-            icsd3_diagnosticos = request.POST.getlist("icsd3_diagnostico[]")
-            icsd3_estados = request.POST.getlist("icsd3_estado[]")
-
-            for i, (codigo, diagnostico) in enumerate(
-                zip(icsd3_codigos, icsd3_diagnosticos)
-            ):
-                if codigo.strip() and diagnostico.strip():
-                    diag_icsd3 = DiagnosticoICSD3.objects.create(
-                        analisis_result=analisis_result,
-                        codigo=codigo.strip(),
-                        diagnostico=diagnostico.strip(),
-                        orden=i + 1,
-                    )
-
-                    if "confirmado_nuevo" in icsd3_estados:
-                        diag_icsd3.confirmado_nuevo = True
-                    if "confirmado_antiguo" in icsd3_estados:
-                        diag_icsd3.confirmado_antiguo = True
-                    if "en_estudio" in icsd3_estados:
-                        diag_icsd3.en_estudio = True
-
-                    diag_icsd3.save()
-
+           
             # Procesar diagnósticos no clasificados
             noclasi_diagnosticos = request.POST.getlist("noclasi_diagnostico[]")
             noclasi_estados = request.POST.getlist("noclasi_estado[]")
@@ -8129,7 +8119,6 @@ def guardar_examen_analisis(request):
             total_diagnosticos = (
                 analisis_result.diagnosticos_cie10.count()
                 + analisis_result.diagnosticos_dsmv.count()
-                + analisis_result.diagnosticos_icsd3.count()
                 + analisis_result.diagnosticos_no_clasificados.count()
             )
 
