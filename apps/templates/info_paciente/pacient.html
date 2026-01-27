@@ -760,14 +760,7 @@
             var jsonString = examenesData.replace(/'/g, '"');
             var examenes = JSON.parse(jsonString);
 
-            var hiddenInput = currentForm.querySelector("#examenes_seleccionados");
-            if (!hiddenInput) {
-              hiddenInput = document.createElement("input");
-              hiddenInput.type = "hidden";
-              hiddenInput.name = "examenes_seleccionados";
-              hiddenInput.id = "examenes_seleccionados";
-              currentForm.appendChild(hiddenInput);
-            }
+            // NO crear input oculto: usaremos checkboxes con el mismo `name` para enviar múltiples valores
 
             examenes.forEach(function (examen) {
               var li = document.createElement("li");
@@ -775,6 +768,7 @@
 
               var checkbox = document.createElement("input");
               checkbox.type = "checkbox";
+              checkbox.name = "examenes_seleccionados"; // importante: nombre para enviar múltiples valores
               checkbox.id = "examen_" + examen.id + "_" + Math.random();
               checkbox.value = examen.id;
               checkbox.className = "form-check-input examen-checkbox mr-2";
@@ -789,12 +783,10 @@
               li.appendChild(label);
               examenesLista.appendChild(li);
 
-              checkbox.addEventListener("change", function () {
-                actualizarExamenesSeleccionados(currentForm);
-              });
+              // No necesitamos sincronizar a un input oculto; el formulario enviará los checkboxes seleccionados
+              // Pero mantenemos la clase 'examen-checkbox' para poder consultarlos si hace falta
             });
 
-            actualizarExamenesSeleccionados(currentForm);
 
           } catch (error) {
             console.error("Error al procesar exámenes:", error);

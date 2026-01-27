@@ -2495,44 +2495,90 @@ def editar_v(request, visita_id):
     )
 
     if request.method == "POST":
-        # Obtener datos del formulario
-        visita.nombre = request.POST.get("nombre", visita.nombre)
-        visita.fecha = request.POST.get("fecha", visita.fecha)
-        visita.evaluador = request.POST.get("evaluador", visita.evaluador)
+        try:
+            # Obtener datos del formulario
+            visita.nombre = request.POST.get("nombre", visita.nombre)
+            visita.fecha = request.POST.get("fecha", visita.fecha)
+            # Asignar evaluador correctamente: puede venir como id, email o no enviarse
+            evaluador_val = request.POST.get("evaluador", None)
+            if evaluador_val:
+                try:
+                    # intentar como id
+                    posible = User.objects.get(id=int(evaluador_val))
+                    visita.evaluador = posible
+                except (ValueError, TypeError, User.DoesNotExist):
+                    try:
+                        # intentar buscar por email
+                        posible = User.objects.get(email=evaluador_val)
+                        visita.evaluador = posible
+                    except User.DoesNotExist:
+                        # no se encontró: mantener el evaluador previo
+                        visita.evaluador = visita.evaluador
+            else:
+                # Si no se envía evaluador, mantener el existente
+                visita.evaluador = visita.evaluador
 
-        # Datos del acompañante
-        visita.acompanante_nombre = request.POST.get(
-            "acompanante_nombre", visita.acompanante_nombre
-        )
-        visita.acompanante_relacion = request.POST.get(
-            "acompanante_relacion", visita.acompanante_relacion
-        )
-        visita.acompanante_correo = request.POST.get(
-            "acompanante_correo", visita.acompanante_correo
-        )
-        visita.acompanante_telefono = request.POST.get(
-            "acompanante_telefono", visita.acompanante_telefono
-        )
+            # Datos del acompañante
+            visita.acompanante_nombre = request.POST.get(
+                "acompanante_nombre", visita.acompanante_nombre
+            )
+            visita.acompanante_relacion = request.POST.get(
+                "acompanante_relacion", visita.acompanante_relacion
+            )
+            visita.acompanante_correo = request.POST.get(
+                "acompanante_correo", visita.acompanante_correo
+            )
+            visita.acompanante_telefono = request.POST.get(
+                "acompanante_telefono", visita.acompanante_telefono
+            )
 
-        # Guardar cambios en la visita
-        visita.save()
+            # Guardar cambios en la visita
+            visita.save()
 
-        # Procesar los exámenes seleccionados
-        examenes_seleccionados = request.POST.getlist("examenes_seleccionados")
+            # Procesar los exámenes seleccionados
+            examenes_seleccionados = request.POST.getlist("examenes_seleccionados")
 
-        for examen_id in examenes_seleccionados:
-            examen = Examen.objects.get(id=int(examen_id))  # Convertimos ID a entero
-            if not VisitaExamen.objects.filter(visita=visita, examen=examen).exists():
-                VisitaExamen.objects.create(visita=visita, examen=examen)
+            # Si el frontend envía un único campo con JSON (p. ej. '["1","2"]'), parsearlo
+            if len(examenes_seleccionados) == 1:
+                single = examenes_seleccionados[0]
+                if single and single.strip().startswith("["):
+                    try:
+                        import json
 
+                        parsed = json.loads(single)
+                        # Asegurar que queden como strings simples
+                        examenes_seleccionados = [str(x) for x in parsed]
+                    except Exception:
+                        # Si no es JSON válido, mantener el valor tal cual (fallará más abajo si no válido)
+                        pass
+
+            added = 0
+            for examen_id in examenes_seleccionados:
+                try:
+                    examen = Examen.objects.get(id=int(examen_id))  # Convertimos ID a entero
+                except (ValueError, Examen.DoesNotExist):
+                    continue
+
+                if not VisitaExamen.objects.filter(visita=visita, examen=examen).exists():
+                    VisitaExamen.objects.create(visita=visita, examen=examen)
+                    added += 1
+
+            if added:
                 messages.success(
                     request,
-                    f"Visita actualizada con éxito con {len(examenes_seleccionados)} exámenes.",
+                    f"Visita actualizada con éxito con {added} exámenes.",
                 )
             else:
-                messages.warning(request, "No se seleccionaron exámenes.")
+                messages.info(request, "No se agregaron nuevos exámenes.")
 
-        return redirect("detalle_paciente", paciente_id=paciente.id)
+            return redirect("detalle_paciente", paciente_id=paciente.id)
+
+        except Exception as e:
+            import traceback
+
+            traceback.print_exc()
+            messages.error(request, f"Error actualizando visita: {str(e)}")
+            return redirect("detalle_paciente", paciente_id=paciente.id)
     return render(
         request,
         "info_paciente/editar_visita.html",
@@ -3262,7 +3308,7 @@ def realizar_examen(request, visita_id, examen_id, paciente_id):
                                 "motivo_hospitalizacion",
                                 "fecha_ingreso",
                                 "fecha_egreso",
-                                "duracion",
+                                "dias_hospitalizacion",
                                 "institucion",
                                 "observaciones",
                             )
@@ -3277,6 +3323,20 @@ def realizar_examen(request, visita_id, examen_id, paciente_id):
                             )
                         )
 
+                        # Mapear claves a las que espera el frontend/guardado
+                        try:
+                            mapped_inmunizaciones = []
+                            for itm in datos_examen.get("inmunizaciones", []):
+                                mapped_inmunizaciones.append({
+                                    "vacuna_inmunizacion": itm.get("nombre_vacuna"),
+                                    "fecha_ultima_dosis": itm.get("fecha_aplicacion"),
+                                    "numero_dosis": itm.get("dosis_numero"),
+                                    "observaciones": itm.get("observaciones", ""),
+                                })
+                            datos_examen["inmunizaciones"] = mapped_inmunizaciones
+                        except Exception:
+                            pass
+
                         datos_examen["transfusionales"] = list(
                             antecedentes.antecedentes_transfusionales.values(
                                 "motivo_transfusion",
@@ -3289,8 +3349,43 @@ def realizar_examen(request, visita_id, examen_id, paciente_id):
                             )
                         )
 
+                        # Mapear claves para transfusionales al formato esperado
+                        try:
+                            mapped_trans = []
+                            for itm in datos_examen.get("transfusionales", []):
+                                mapped_trans.append({
+                                    "motivo_transfusion": itm.get("motivo_transfusion"),
+                                    "fecha_ultima_transfusion": itm.get("fecha_transfusion"),
+                                    "tipo_componente": itm.get("tipo_componente"),
+                                    "numero_unidades": itm.get("cantidad_unidades"),
+                                    "tuvo_reacciones": itm.get("tuvo_reacciones", False),
+                                    "detalle_reacciones": itm.get("detalle_reacciones", ""),
+                                    "observaciones": itm.get("observaciones", ""),
+                                })
+                            datos_examen["transfusionales"] = mapped_trans
+                        except Exception:
+                            pass
+
                         modo_edicion = True
 
+                        # Convertir fechas y objetos no-serializables a strings para JSON
+                        try:
+                            def _convert_dates(obj):
+                                if isinstance(obj, dict):
+                                    return {k: _convert_dates(v) for k, v in obj.items()}
+                                if isinstance(obj, list):
+                                    return [_convert_dates(i) for i in obj]
+                                if hasattr(obj, "strftime"):
+                                    try:
+                                        return obj.strftime("%Y-%m-%d")
+                                    except Exception:
+                                        return str(obj)
+                                return obj
+
+                            datos_examen = _convert_dates(datos_examen)
+                            datos_examen_json = json.dumps(datos_examen)
+                        except Exception:
+                            datos_examen_json = None
                 except AntecedentesVisitaLink.DoesNotExist:
                     # No hay antecedentes previos para esta visita
                     pass
@@ -3358,12 +3453,250 @@ def realizar_examen(request, visita_id, examen_id, paciente_id):
     except VisitaExamen.DoesNotExist:
         messages.error(request, "Visita-examen no encontrada")
         return redirect("detalle_paciente", paciente_id=paciente_id)
+    # Asegurar que `datos_examen_json` esté disponible para la plantilla
+    datos_examen_json = None
+    # Si es el examen de Antecedentes (id 5), asegurar que incluya las relaciones
+    if int(examen_id) == 5:
+        try:
+            if not datos_examen or not datos_examen.get("patologicos"):
+                try:
+                    antecedentes_link = AntecedentesVisitaLink.objects.get(
+                        visita_examen=visita_examen_obj
+                    )
+                    antecedentes_result = antecedentes_link.antecedentes_result
+
+                    antecedentes = AntecedentesResult.objects.prefetch_related(
+                        "antecedentes_patologicos",
+                        "antecedentes_quirurgicos",
+                        "antecedentes_farmacologicos",
+                        "antecedentes_toxicos",
+                        "antecedentes_familiares",
+                        "antecedentes_alergicos",
+                        "antecedentes_traumaticos",
+                        "antecedentes_gineco",
+                        "antecedentes_epidemiologicos",
+                        "antecedentes_ets",
+                        "antecedentes_hospitalizaciones",
+                        "antecedentes_inmunizaciones",
+                        "antecedentes_transfusionales",
+                    ).get(id=antecedentes_result.id)
+
+                    datos_examen = datos_examen or {}
+                    datos_examen["patologicos"] = list(
+                        antecedentes.antecedentes_patologicos.values(
+                            "tipo_patologia",
+                            "descripcion_otros",
+                            "fecha_inicio",
+                            "ha_recibido_tratamiento",
+                            "detalle_tratamiento",
+                            "tiene_complicaciones",
+                            "detalle_complicaciones",
+                            "activo",
+                            "fecha_finalizacion",
+                            "observaciones",
+                        )
+                    )
+                    datos_examen["quirurgicos"] = list(
+                        antecedentes.antecedentes_quirurgicos.values(
+                            "descripcion",
+                            "fecha_intervencion",
+                            "ha_recibido_tratamiento",
+                            "detalle_tratamiento",
+                            "tiene_complicaciones",
+                            "detalle_complicaciones",
+                            "activo",
+                            "fecha_finalizacion",
+                            "observaciones",
+                        )
+                    )
+                    datos_examen["farmacologicos"] = list(
+                        antecedentes.antecedentes_farmacologicos.values(
+                            "descripcion",
+                            "fecha_inicio",
+                            "recibio_tratamiento",
+                            "detalle_tratamiento",
+                            "tuvo_complicaciones",
+                            "detalle_complicaciones",
+                            "activo",
+                            "fecha_finalizacion",
+                            "observaciones",
+                        )
+                    )
+                    datos_examen["toxicos"] = list(
+                        antecedentes.antecedentes_toxicos.values(
+                            "tipos_toxico",
+                            "descripcion_otros",
+                            "fecha_inicio",
+                            "ha_recibido_tratamiento",
+                            "detalle_tratamiento",
+                            "tiene_complicaciones",
+                            "detalle_complicaciones",
+                            "activo",
+                            "fecha_finalizacion",
+                            "observaciones",
+                        )
+                    )
+                    datos_examen["familiares"] = list(
+                        antecedentes.antecedentes_familiares.values(
+                            "tipo_antecedente",
+                            "parentesco",
+                            "observaciones",
+                        )
+                    )
+                    datos_examen["alergicos"] = list(
+                        antecedentes.antecedentes_alergicos.values(
+                            "descripcion",
+                            "fecha_inicio",
+                            "tratamiento_recibido",
+                            "detalle_tratamiento",
+                            "complicaciones",
+                            "activo",
+                            "fecha_finalizacion",
+                            "observaciones",
+                        )
+                    )
+                    datos_examen["traumaticos"] = list(
+                        antecedentes.antecedentes_traumaticos.values(
+                            "descripcion",
+                            "fecha_inicio",
+                            "tratamiento_recibido",
+                            "detalle_tratamiento",
+                            "complicaciones",
+                            "activo",
+                            "fecha_finalizacion",
+                            "observaciones",
+                        )
+                    )
+                    if hasattr(antecedentes, "antecedentes_gineco") and antecedentes.antecedentes_gineco:
+                        gineco_data = model_to_dict(antecedentes.antecedentes_gineco)
+                        gineco_data.pop("id", None)
+                        gineco_data.pop("antecedente_result", None)
+                        datos_examen["gineco_obstetricos"] = gineco_data
+                    else:
+                        datos_examen["gineco_obstetricos"] = {}
+
+                    datos_examen["epidemiologicos"] = list(
+                        antecedentes.antecedentes_epidemiologicos.values(
+                            "tipo_antecedente",
+                            "fecha_inicio",
+                            "tratamiento_detalle",
+                            "complicaciones_asociadas",
+                            "detallar_complicaciones",
+                            "activo_actualmente",
+                            "fecha_finalizacion",
+                            "observaciones",
+                        )
+                    )
+                    datos_examen["ets"] = list(
+                        antecedentes.antecedentes_ets.values(
+                            "tipo_ets",
+                            "fecha_diagnostico",
+                            "tratamiento_recibido",
+                            "detalle_tratamiento",
+                            "complicaciones",
+                            "detalle_complicaciones",
+                            "curado",
+                            "fecha_curacion",
+                            "observaciones",
+                        )
+                    )
+                    datos_examen["hospitalizaciones"] = list(
+                        antecedentes.antecedentes_hospitalizaciones.values(
+                            "motivo_hospitalizacion",
+                            "fecha_ingreso",
+                            "fecha_egreso",
+                            "dias_hospitalizacion",
+                            "institucion",
+                            "observaciones",
+                        )
+                    )
+                    datos_examen["inmunizaciones"] = list(
+                        antecedentes.antecedentes_inmunizaciones.values(
+                            "nombre_vacuna",
+                            "fecha_aplicacion",
+                            "dosis_numero",
+                            "observaciones",
+                        )
+                    )
+                    # Mapear claves a las que espera el frontend/guardado
+                    try:
+                        mapped_inmunizaciones = []
+                        for itm in datos_examen.get("inmunizaciones", []):
+                            mapped_inmunizaciones.append({
+                                "vacuna_inmunizacion": itm.get("nombre_vacuna"),
+                                "fecha_ultima_dosis": itm.get("fecha_aplicacion"),
+                                "numero_dosis": itm.get("dosis_numero"),
+                                "observaciones": itm.get("observaciones", ""),
+                            })
+                        datos_examen["inmunizaciones"] = mapped_inmunizaciones
+                    except Exception:
+                        pass
+                    datos_examen["transfusionales"] = list(
+                        antecedentes.antecedentes_transfusionales.values(
+                            "motivo_transfusion",
+                            "fecha_transfusion",
+                            "tipo_componente",
+                            "cantidad_unidades",
+                            "tuvo_reacciones",
+                            "detalle_reacciones",
+                            "observaciones",
+                        )
+                    )
+                    # Mapear claves para transfusionales al formato esperado
+                    try:
+                        mapped_trans = []
+                        for itm in datos_examen.get("transfusionales", []):
+                            mapped_trans.append({
+                                "motivo_transfusion": itm.get("motivo_transfusion"),
+                                "fecha_ultima_transfusion": itm.get("fecha_transfusion"),
+                                "tipo_componente": itm.get("tipo_componente"),
+                                "numero_unidades": itm.get("cantidad_unidades"),
+                                "tuvo_reacciones": itm.get("tuvo_reacciones", False),
+                                "detalle_reacciones": itm.get("detalle_reacciones", ""),
+                                "observaciones": itm.get("observaciones", ""),
+                            })
+                        datos_examen["transfusionales"] = mapped_trans
+                    except Exception:
+                        pass
+                    modo_edicion = True
+                except AntecedentesVisitaLink.DoesNotExist:
+                    pass
+        except Exception:
+            pass
+    if datos_examen:
+        try:
+            def _convert_dates(obj):
+                if isinstance(obj, dict):
+                    return {k: _convert_dates(v) for k, v in obj.items()}
+                if isinstance(obj, list):
+                    return [_convert_dates(i) for i in obj]
+                if hasattr(obj, "strftime"):
+                    try:
+                        return obj.strftime("%Y-%m-%d")
+                    except Exception:
+                        return str(obj)
+                return obj
+
+            safe_obj = _convert_dates(datos_examen)
+            datos_examen_json = json.dumps(safe_obj)
+        except Exception as e:
+            # Registrar en servidor para depuración
+            try:
+                import logging
+
+                logging.getLogger(__name__).exception(
+                    "Error serializando datos_examen: %s", str(e)
+                )
+            except Exception:
+                pass
+            datos_examen_json = None
 
     context = {
         "visita_examen": visita_id,
         "paciente_id": paciente_id,
         "examen_id": examen_id,
         "datos_examen": datos_examen,
+        "datos_examen_json": datos_examen_json,
         "modo_edicion": modo_edicion,
         "visita_examen_obj": visita_examen_obj,
         "paciente": paciente,

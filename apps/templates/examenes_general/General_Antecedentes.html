@@ -639,25 +639,12 @@
 
 <script>
   document.addEventListener("DOMContentLoaded", function () {
-    // Variables de datos existentes (viene del servidor) - CORREGIDO
-    let datosExamen = null;
-    let modoEdicion = false;
-    
-    try {
-      // Manejo seguro de datos del servidor
-      {% if datos_examen %}
-        datosExamen = {{ datos_examen|safe }};
-      {% endif %}
-      
-      {% if modo_edicion %}
-        modoEdicion = true;
-      {% endif %}
-    } catch (error) {
-      console.error("Error al cargar datos del servidor:", error);
-      datosExamen = null;
-      modoEdicion = false;
-    }
-    
+    // Variables de datos existentes (vienen del servidor)
+    // Insertar JSON directamente como literal JS para evitar problemas de escape/parseo
+    let datosExamen = {{ datos_examen_json|default:'null'|safe }};
+
+    let modoEdicion = {{ modo_edicion|yesno:"true,false" }};
+
     console.log("🔍 Modo edición:", modoEdicion);
     console.log("📋 Datos existentes:", datosExamen);
 
@@ -2178,7 +2165,7 @@ hospitalizaciones: function (indice) {
       return datos;
     }
 
-    // ======= EXPONER FUNCIONES AL SCOPE GLOBAL =======
+    // ======= EXPONER FUNCION~ES AL SCOPE GLOBAL =======
     window.agregarAntecedente = agregarAntecedente;
     window.eliminarItem = eliminarItem;
 

@@ -2141,7 +2141,10 @@ class ConsentimientoInformadoParticipanteResult(ResultadoExamenBase):
     fecha = models.DateField()
     hora_inicio = models.TimeField()
     investigador = models.CharField(max_length=255)
-    version_consentimiento = models.CharField(max_length=50)
+    version_consentimiento = models.TextField(
+    null=True,
+    blank=True
+)
     descripcion_proceso = models.TextField(blank=True, null=True)
     preguntas = models.TextField(blank=True, null=True)
     acepta = models.CharField(max_length=10)  # "Si" o "No"
@@ -2163,7 +2166,10 @@ class ConsentimientoInformadoCuidadorResult(ResultadoExamenBase):
     investigador = models.CharField(max_length=255)
     nombre_acompanante = models.CharField(max_length=255)
     nombre_participante = models.CharField(max_length=255)
-    version_consentimiento = models.CharField(max_length=50)
+    version_consentimiento = models.TextField(
+    null=True,
+    blank=True
+)
     descripcion_proceso = models.TextField(blank=True, null=True)
     preguntas = models.TextField(blank=True, null=True)
     acepta = models.CharField(max_length=10)  # "Si" o "No"

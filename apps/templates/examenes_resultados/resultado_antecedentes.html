@@ -49,10 +49,179 @@
                     </div>
                     {% endif %}
 
-                    <!-- Continúa con otros tipos... -->
+                    <!-- Farmacológicos -->
+                    {% if farmacologicos %}
+                    <div class="mb-4">
+                        <h5>Antecedentes Farmacológicos</h5>
+                        {% for item in farmacologicos %}
+                        <div class="border p-3 mb-2">
+                            <strong>{{ item.medicamento }}</strong>
+                            <br>
+                            <small>Inicio: {{ item.fecha_inicio|date:"d/m/Y" }}</small>
+                            {% if item.observaciones %}<br><em>{{ item.observaciones }}</em>{% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <!-- Tóxicos -->
+                    {% if toxicos %}
+                    <div class="mb-4">
+                        <h5>Antecedentes Tóxicos</h5>
+                        {% for item in toxicos %}
+                        <div class="border p-3 mb-2">
+                            <strong>{{ item.sustancia }}</strong>
+                            <br>
+                            <small>Inicio: {{ item.fecha_inicio|date:"d/m/Y" }}</small>
+                            {% if item.observaciones %}<br><em>{{ item.observaciones }}</em>{% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <!-- Familiares -->
+                    {% if familiares %}
+                    <div class="mb-4">
+                        <h5>Antecedentes Familiares</h5>
+                        {% for item in familiares %}
+                        <div class="border p-3 mb-2">
+                            <strong>{{ item.parentesco }}</strong> - {{ item.descripcion }}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <!-- Alérgicos -->
+                    {% if alergicos %}
+                    <div class="mb-4">
+                        <h5>Antecedentes Alérgicos</h5>
+                        {% for item in alergicos %}
+                        <div class="border p-3 mb-2">
+                            <strong>{{ item.alergeno }}</strong>
+                            {% if item.observaciones %}<br><em>{{ item.observaciones }}</em>{% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <!-- Traumáticos -->
+                    {% if traumaticos %}
+                    <div class="mb-4">
+                        <h5>Antecedentes Traumáticos</h5>
+                        {% for item in traumaticos %}
+                        <div class="border p-3 mb-2">
+                            <strong>{{ item.tipo_trauma }}</strong>
+                            <br>
+                            <small>Fecha: {{ item.fecha|date:"d/m/Y" }}</small>
+                            {% if item.observaciones %}<br><em>{{ item.observaciones }}</em>{% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <!-- Gineco-obstétricos -->
+                    {% if gineco_obstetricos %}
+                    <div class="mb-4">
+                        <h5>Antecedentes Gineco-Obstétricos</h5>
+                        {% if gineco_obstetricos.all %}
+                            {% for item in gineco_obstetricos.all %}
+                                <div class="border p-3 mb-2">
+                                    <strong>{{ item }}</strong>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="border p-3 mb-2">
+                                <small>Menarquia: {{ gineco_obstetricos.tiene_menarquia|yesno:"Sí,No" }}</small><br>
+                                <small>Edad menarquia: {{ gineco_obstetricos.edad_menarquia }}</small><br>
+                                <small>Menopausia: {{ gineco_obstetricos.tiene_menopausia|yesno:"Sí,No" }}</small><br>
+                                <small>Edad menopausia: {{ gineco_obstetricos.edad_menopausia }}</small><br>
+                                <small>Gravidez: {{ gineco_obstetricos.gravidez }}</small><br>
+                                <small>Abortos: {{ gineco_obstetricos.abortos }}</small><br>
+                                <small>Hijos vivos: {{ gineco_obstetricos.hijos_vivos }}</small><br>
+                                {% if gineco_obstetricos.observaciones %}
+                                <br><em>{{ gineco_obstetricos.observaciones }}</em>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+
+                    <!-- Epidemiológicos -->
+                    {% if epidemiologicos %}
+                    <div class="mb-4">
+                        <h5>Antecedentes Epidemiológicos</h5>
+                        {% for item in epidemiologicos %}
+                        <div class="border p-3 mb-2">
+                            <strong>{{ item.enfermedad }}</strong>
+                            <br>
+                            <small>Situación actual: {{ item.activo_actualmente|yesno:"Sí,No" }}</small>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <!-- ETS -->
+                    {% if ets %}
+                    <div class="mb-4">
+                        <h5>Antecedentes ETS</h5>
+                        {% for item in ets %}
+                        <div class="border p-3 mb-2">
+                            <strong>{{ item.tipo_ets }}</strong>
+                            <br>
+                            <small>Curado: {{ item.curado|yesno:"Sí,No" }}</small>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <!-- Hospitalizaciones -->
+                    {% if hospitalizaciones %}
+                    <div class="mb-4">
+                        <h5>Hospitalizaciones</h5>
+                        {% for item in hospitalizaciones %}
+                        <div class="border p-3 mb-2">
+                            <strong>{{ item.motivo_hospitalizacion }}</strong>
+                            <br>
+                            <small>Fecha ingreso: {{ item.fecha_ingreso|date:"d/m/Y" }}</small>
+                            <br>
+                            <small>Fecha egreso: {{ item.fecha_egreso|date:"d/m/Y" }}</small>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <!-- Inmunizaciones -->
+                    {% if inmunizaciones %}
+                    <div class="mb-4">
+                        <h5>Inmunizaciones</h5>
+                        {% for item in inmunizaciones %}
+                        <div class="border p-3 mb-2">
+                            <strong>{{ item.nombre_vacuna }}</strong>
+                            <br>
+                            <small>Fecha: {{ item.fecha_aplicacion|date:"d/m/Y" }}</small>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <!-- Transfusionales -->
+                    {% if transfusionales %}
+                    <div class="mb-4">
+                        <h5>Transfusionales</h5>
+                        {% for item in transfusionales %}
+                        <div class="border p-3 mb-2">
+                            <strong>{{ item.tipo_componente }}</strong>
+                            <br>
+                            <small>Fecha: {{ item.fecha_transfusion|date:"d/m/Y" }}</small>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
                 </div>
             </div>
         </div>
     </div>
 </div>
+
 {% endblock %}
