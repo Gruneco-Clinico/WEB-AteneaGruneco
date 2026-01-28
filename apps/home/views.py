@@ -29,6 +29,7 @@ import logging
 import os
 from django.core.mail import EmailMessage
 from django.db.models import Max
+import base64
 # AGENDAMIENTO PUBLICO
 
 
@@ -996,10 +997,14 @@ def administrar_usuarios(request):
         elif accion == "eliminar":
             return _procesar_eliminacion_usuario(request)
 
+        # --- ACCIÓN: GUARDAR FIRMA DEL SUPERUSUARIO ---
+        elif accion == "guardar_firma":
+            return guardar_firma_usuario(request)
+
     # GET - mostrar interfaz principal
     return render(request, "home/administrar_usuarios.html", context)
 
-
+@login_required
 def _procesar_registro_usuario(request, context):
     """Función auxiliar para procesar registro de nuevo usuario"""
     try:
@@ -1087,7 +1092,7 @@ def _procesar_registro_usuario(request, context):
         messages.error(request, f"❌ Error durante el registro: {str(e)}")
         return render(request, "home/administrar_usuarios.html", context)
 
-
+@login_required
 def _procesar_modificacion_usuario(request, context):
     """Función auxiliar para procesar modificación de usuario"""
     try:
@@ -1162,7 +1167,7 @@ def _procesar_modificacion_usuario(request, context):
         messages.error(request, f"❌ Error durante la modificación: {str(e)}")
         return render(request, "home/administrar_usuarios.html", context)
 
-
+@login_required
 def _procesar_eliminacion_usuario(request):
     """Función auxiliar para procesar eliminación de usuario"""
     try:
@@ -1186,6 +1191,56 @@ def _procesar_eliminacion_usuario(request):
 
     return redirect("administrar_usuarios")
 
+
+@login_required
+def guardar_firma_usuario(request):
+    if request.method == "POST" and request.POST.get("accion_usuario") == "guardar_firma":
+        try:
+            user = request.user
+            perfil, _ = UserProfile.objects.get_or_create(user=user)
+
+            imagen = request.FILES.get("firma_imagen")
+            imagen_url = (request.POST.get("firma_imagen_url") or "").strip()
+            firma_texto = (request.POST.get("firma_usuario") or "").strip()
+
+            if imagen:
+                contenido = imagen.read()
+                mime = getattr(imagen, "content_type", "image/png")
+                base64_img = base64.b64encode(contenido).decode("utf-8")
+                perfil.firma = f"data:{mime};base64,{base64_img}"
+
+            elif imagen_url:
+                # Intentar descargar con timeout; manejar errores
+                try:
+                    resp = requests.get(imagen_url, timeout=5)
+                    if resp.status_code == 200 and resp.content:
+                        mime = resp.headers.get("Content-Type", "image/png")
+                        base64_img = base64.b64encode(resp.content).decode("utf-8")
+                        perfil.firma = f"data:{mime};base64,{base64_img}"
+                    else:
+                        messages.error(request, "No se pudo descargar la imagen desde la URL proporcionada.")
+                        return redirect(request.META.get("HTTP_REFERER", "/"))
+                except Exception as e:
+                    logging.exception("Error descargando imagen de firma: %s", e)
+                    messages.error(request, "Error descargando la imagen de la URL. Ver logs.")
+                    return redirect(request.META.get("HTTP_REFERER", "/"))
+
+            elif firma_texto:
+                perfil.firma = firma_texto
+
+            else:
+                # Nada enviado
+                messages.error(request, "No se proporcionó imagen ni texto para la firma.")
+                return redirect(request.META.get("HTTP_REFERER", "/"))
+
+            perfil.save()
+            messages.success(request, "Firma guardada correctamente.")
+            return redirect(request.META.get("HTTP_REFERER", "/"))
+
+        except Exception as e:
+            logging.exception("Error guardando firma de usuario: %s", e)
+            messages.error(request, f"Error guardando la firma: {str(e)}")
+            return redirect(request.META.get("HTTP_REFERER", "/"))
 
 # dashboard
 @login_required(login_url="/login/")
@@ -4715,7 +4770,13 @@ def guardar_sueno_anamnesis(request):
             ]
 
             for campo in campos_simples:
-                setattr(anamnesis, campo, request.POST.get(campo, ""))
+                if campo == "periodo_siestas":
+                    valores = request.POST.getlist("periodo_siestas")
+                    # unir las selecciones en una sola cadena separada por punto y coma
+                    valor = "; ".join([v for v in valores if v]) if valores else ""
+                else:
+                    valor = request.POST.get(campo, "")
+                setattr(anamnesis, campo, valor)
 
             anamnesis.save()
 

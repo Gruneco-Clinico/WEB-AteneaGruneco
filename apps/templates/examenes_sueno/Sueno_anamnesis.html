@@ -1147,18 +1147,19 @@
 
                   <div class="form-group">
                     <label>Periodo en el que realiza las siestas</label>
-                    <select class="form-control" name="periodo_siestas">
+                    <select class="form-control" name="periodo_siestas" multiple>
                       <option value="">Seleccione...</option>
-                      <option value="Jornada laboral / académica" {% if datos_examen.periodo_siestas == "Jornada laboral / académica" %}selected{% endif %}>
+                      <option value="Jornada laboral / académica" {% if datos_examen.periodo_siestas and "Jornada laboral / académica" in datos_examen.periodo_siestas %}selected{% endif %}>
                         Jornada laboral / académica
                       </option>
-                      <option value="Fines de Semana" {% if datos_examen.periodo_siestas == "Fines de Semana" %}selected{% endif %}>
+                      <option value="Fines de Semana" {% if datos_examen.periodo_siestas and "Fines de Semana" in datos_examen.periodo_siestas %}selected{% endif %}>
                         Fines de Semana
                       </option>
-                      <option value="Vacaciones" {% if datos_examen.periodo_siestas == "Vacaciones" %}selected{% endif %}>
+                      <option value="Vacaciones" {% if datos_examen.periodo_siestas and "Vacaciones" in datos_examen.periodo_siestas %}selected{% endif %}>
                         Vacaciones
                       </option>
                     </select>
+                    <small class="form-text text-muted">Mantenga presionada la tecla Ctrl (o Cmd) para seleccionar varias opciones.</small>
                   </div>
                 </div>
               </div>

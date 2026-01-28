@@ -164,7 +164,7 @@ class CustomUser(AbstractUser):
     # Campos adicionales
     phone = models.CharField(max_length=15, blank=True)
     address = models.TextField(blank=True)
-
+    firma = models.TextField(blank=True, null=True)
     # Sobrescribir las relaciones con related_name personalizado
     groups = models.ManyToManyField(
         Group,
@@ -186,6 +186,13 @@ class CustomUser(AbstractUser):
         return self.username
 
 
+class UserProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="perfil")
+    firma = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return self.user.username
+    
 class DatosDemograficos(models.Model):
     # Información Personal
     primer_nombre = models.CharField(max_length=50)
@@ -407,7 +414,7 @@ class Visita(models.Model):
     )
     fecha = models.DateField(blank=True, null=True)
     evaluador = models.ForeignKey(
-        User, on_delete=models.SET_NULL, null=True, blank=True
+        User, on_delete=models.SET_NULL, null=True, blank=True, related_name="visitas_evaluador"
     )
 
     estado_visita = models.CharField(
@@ -417,6 +424,12 @@ class Visita(models.Model):
             ("cerrada", "Cerrada"),
         ],
         default="abierta",
+    )
+
+    # Indica si la visita fue firmada (no se podrán editar exámenes relacionados si es True)
+    firmado = models.BooleanField(default=False, verbose_name="Firmado")
+    firmado_por = models.ForeignKey(
+        User, on_delete=models.SET_NULL, null=True, blank=True, related_name="visitas_firmadas"
     )
 
     acompanante_nombre = models.CharField(max_length=255, blank=True, null=True)
@@ -1061,7 +1074,7 @@ class SuenoAnamnesisResult(ResultadoExamenBase):
     duracion_siestas = models.CharField(max_length=20, blank=True, null=True)
     siesta_frecuencia = models.CharField(max_length=100, blank=True, null=True)
     siesta_reparadora = models.CharField(max_length=10, blank=True, null=True)
-    periodo_siestas = models.CharField(max_length=100, blank=True, null=True)
+    periodo_siestas = models.CharField(max_length=500, blank=True, null=True)
     momento_dia_siesta = models.CharField(max_length=50, blank=True, null=True)
 
     # Ambiente
