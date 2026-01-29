@@ -533,6 +533,82 @@ def gestionar_disponibilidad(request):
 
 
 @login_required
+def gestionar_salas(request):
+    """Vista para gestionar salas (crear, editar, desactivar)"""
+    if request.method == "POST":
+        accion = request.POST.get("accion")
+        
+        if accion == "crear_sala":
+            nombre = request.POST.get("nombre", "").strip()
+            descripcion = request.POST.get("descripcion", "").strip()
+            capacidad = request.POST.get("capacidad", 1)
+            
+            if not nombre:
+                messages.error(request, "El nombre de la sala es obligatorio")
+            elif Sala.objects.filter(nombre=nombre).exists():
+                messages.error(request, "Ya existe una sala con ese nombre")
+            else:
+                try:
+                    sala = Sala.objects.create(
+                        nombre=nombre,
+                        descripcion=descripcion,
+                        capacidad=int(capacidad),
+                        activa=True
+                    )
+                    messages.success(request, f"Sala '{sala.nombre}' creada exitosamente")
+                except Exception as e:
+                    messages.error(request, f"Error al crear la sala: {str(e)}")
+            
+            return redirect("gestionar_salas")
+        
+        elif accion == "editar_sala":
+            sala_id = request.POST.get("sala_id")
+            sala = get_object_or_404(Sala, id=sala_id)
+            
+            sala.nombre = request.POST.get("nombre", sala.nombre).strip()
+            sala.descripcion = request.POST.get("descripcion", sala.descripcion).strip()
+            sala.capacidad = int(request.POST.get("capacidad", sala.capacidad))
+            
+            try:
+                sala.save()
+                messages.success(request, f"Sala '{sala.nombre}' actualizada exitosamente")
+            except Exception as e:
+                messages.error(request, f"Error al actualizar la sala: {str(e)}")
+            
+            return redirect("gestionar_salas")
+        
+        elif accion == "desactivar_sala":
+            sala_id = request.POST.get("sala_id")
+            sala = get_object_or_404(Sala, id=sala_id)
+            sala.activa = False
+            sala.save()
+            messages.success(request, f"Sala '{sala.nombre}' desactivada exitosamente")
+            return redirect("gestionar_salas")
+        
+        elif accion == "activar_sala":
+            sala_id = request.POST.get("sala_id")
+            sala = get_object_or_404(Sala, id=sala_id)
+            sala.activa = True
+            sala.save()
+            messages.success(request, f"Sala '{sala.nombre}' activada exitosamente")
+            return redirect("gestionar_salas")
+    
+    # Obtener todas las salas
+    salas = Sala.objects.all().order_by("-activa", "nombre")
+    salas_activas = salas.filter(activa=True)
+    salas_inactivas = salas.filter(activa=False)
+    
+    context = {
+        "salas": salas,
+        "salas_activas": salas_activas,
+        "salas_inactivas": salas_inactivas,
+        "segment": "gestionar_salas",
+    }
+    
+    return render(request, "scheduling/gestionar_salas.html", context)
+
+
+@login_required
 def api_eventos_disponibilidad(request):
     try:
         disponibilidades = DisponibilidadUsuario.objects.filter(

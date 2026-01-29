@@ -1,0 +1,455 @@
+{% extends 'layouts/base.html' %}
+
+{% block stylesheets %}
+<style>
+.header .h2 {
+    font-weight: 600 !important;
+    letter-spacing: 0.5px;
+}
+
+.card {
+    border-radius: 12px !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08) !important;
+    transition: all 0.3s ease;
+}
+
+.alert {
+    border-radius: 8px !important;
+    font-weight: 500 !important;
+    animation: slideInAlert 0.3s ease-out;
+}
+
+@keyframes slideInAlert {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.sala-badge-activa {
+    display: inline-block;
+    background-color: #28a745;
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.sala-badge-inactiva {
+    display: inline-block;
+    background-color: #6c757d;
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.sala-card {
+    border-left: 4px solid #007bff;
+    transition: all 0.3s ease;
+}
+
+.sala-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12) !important;
+}
+
+.sala-card.inactiva {
+    border-left-color: #6c757d;
+    opacity: 0.85;
+}
+
+.btn-action {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+    margin: 0 2px;
+}
+
+.form-section {
+    background: #f7fafc;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: #6c757d;
+}
+
+.empty-state i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="header bg-primary pb-6">
+    <div class="container-fluid">
+        <div class="header-body">
+            <!-- Breadcrumb -->
+            <div class="row align-items-center py-3">
+                <div class="col-lg-12">
+                    <nav aria-label="breadcrumb" class="d-none d-md-inline-block">
+                        <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
+                            <li class="breadcrumb-item">
+                                <a href="{% url 'index' %}"><i class="fas fa-home"></i></a>
+                            </li>
+                            <li class="breadcrumb-item">
+                                <a href="{% url 'gestionar_disponibilidad' %}">Disponibilidad</a>
+                            </li>
+                            <li class="breadcrumb-item active">
+                                Gestión de Salas
+                            </li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- Título y Controles -->
+            <div class="row align-items-center py-4">
+                <div class="col-lg-6 col-md-6">
+                    <h2 class="text-white mb-0">
+                        <i class="fas fa-door-open mr-2"></i>
+                        Gestión de Salas
+                    </h2>
+                    <p class="text-white-50 mb-0 mt-1">
+                        Crea, edita y gestiona las salas de consulta
+                    </p>
+                </div>
+
+                <div class="col-lg-6 col-md-6">
+                    <div class="d-flex justify-content-end align-items-center">
+                        <button class="btn btn-neutral" data-toggle="modal" data-target="#modalNuevaSala">
+                            <span class="btn-inner--icon">
+                                <i class="fas fa-plus"></i>
+                            </span>
+                            <span class="btn-inner--text">Nueva Sala</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid mt--6">
+    <!-- Mensajes -->
+    {% if messages %}
+    <div class="row mb-3">
+        <div class="col">
+            {% for message in messages %}
+            <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}success{% endif %} alert-dismissible fade show">
+                <span class="alert-text">{{ message }}</span>
+                <button type="button" class="close" data-dismiss="alert">
+                    <span>&times;</span>
+                </button>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Salas Activas -->
+    {% if salas_activas %}
+    <div class="row mb-4">
+        <div class="col">
+            <div class="card">
+                <div class="card-header border-0">
+                    <h3 class="mb-0">
+                        <i class="fas fa-check-circle text-success mr-2"></i>
+                        Salas Activas ({{ salas_activas.count }})
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for sala in salas_activas %}
+                        <div class="col-md-6 col-lg-4 mb-3">
+                            <div class="card sala-card">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <h5 class="card-title mb-0">{{ sala.nombre }}</h5>
+                                        <span class="sala-badge-activa">Activa</span>
+                                    </div>
+                                    {% if sala.descripcion %}
+                                    <p class="card-text text-muted small mb-2">{{ sala.descripcion }}</p>
+                                    {% endif %}
+                                    <div class="text-muted small mb-3">
+                                        <div><strong>Capacidad:</strong> {{ sala.capacidad }} persona(s)</div>
+                                        <div><strong>Creada:</strong> {{ sala.fecha_creacion|date:"d/m/Y" }}</div>
+                                    </div>
+                                    <div class="d-flex gap-2">
+                                        <button class="btn btn-sm btn-primary btn-action" 
+                                                data-toggle="modal" 
+                                                data-target="#modalEditarSala"
+                                                onclick="cargarSalaEditar({{ sala.id }}, '{{ sala.nombre }}', '{{ sala.descripcion }}', {{ sala.capacidad }})">
+                                            <i class="fas fa-edit"></i> Editar
+                                        </button>
+                                        <button class="btn btn-sm btn-danger btn-action" 
+                                                onclick="confirmarDesactivar({{ sala.id }}, '{{ sala.nombre }}')">
+                                            <i class="fas fa-times"></i> Desactivar
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="row mb-4">
+        <div class="col">
+            <div class="card">
+                <div class="card-body">
+                    <div class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <p class="mb-0">No hay salas activas. <a href="#" data-toggle="modal" data-target="#modalNuevaSala">Crea una nueva</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Salas Inactivas -->
+    {% if salas_inactivas %}
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <div class="card-header border-0">
+                    <h3 class="mb-0">
+                        <i class="fas fa-archive text-secondary mr-2"></i>
+                        Salas Inactivas ({{ salas_inactivas.count }})
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for sala in salas_inactivas %}
+                        <div class="col-md-6 col-lg-4 mb-3">
+                            <div class="card sala-card inactiva">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <h5 class="card-title mb-0">{{ sala.nombre }}</h5>
+                                        <span class="sala-badge-inactiva">Inactiva</span>
+                                    </div>
+                                    {% if sala.descripcion %}
+                                    <p class="card-text text-muted small mb-2">{{ sala.descripcion }}</p>
+                                    {% endif %}
+                                    <div class="text-muted small mb-3">
+                                        <div><strong>Capacidad:</strong> {{ sala.capacidad }} persona(s)</div>
+                                        <div><strong>Creada:</strong> {{ sala.fecha_creacion|date:"d/m/Y" }}</div>
+                                    </div>
+                                    <div class="d-flex gap-2">
+                                        <button class="btn btn-sm btn-success btn-action" 
+                                                onclick="confirmarActivar({{ sala.id }}, '{{ sala.nombre }}')">
+                                            <i class="fas fa-check"></i> Activar
+                                        </button>
+                                        <button class="btn btn-sm btn-secondary btn-action" 
+                                                onclick="cargarSalaEditar({{ sala.id }}, '{{ sala.nombre }}', '{{ sala.descripcion }}', {{ sala.capacidad }})"
+                                                data-toggle="modal" 
+                                                data-target="#modalEditarSala">
+                                            <i class="fas fa-edit"></i> Editar
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Modal: Nueva Sala -->
+<div class="modal fade" id="modalNuevaSala" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h5 class="modal-title">
+                    <i class="fas fa-door-open mr-2"></i>
+                    Crear Nueva Sala
+                </h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <form method="POST" action="{% url 'gestionar_salas' %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <input type="hidden" name="accion" value="crear_sala">
+                    
+                    <div class="form-group">
+                        <label for="nombre_sala">Nombre de la Sala <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="nombre_sala" name="nombre" 
+                               placeholder="Ej: Consultorio A" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="descripcion_sala">Descripción</label>
+                        <textarea class="form-control" id="descripcion_sala" name="descripcion" 
+                                  rows="3" placeholder="Describa las características de la sala (opcional)"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="capacidad_sala">Capacidad <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" id="capacidad_sala" name="capacidad" 
+                               value="1" min="1" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-link" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save mr-1"></i>
+                        Crear Sala
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Editar Sala -->
+<div class="modal fade" id="modalEditarSala" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h5 class="modal-title">
+                    <i class="fas fa-edit mr-2"></i>
+                    Editar Sala
+                </h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <form method="POST" action="{% url 'gestionar_salas' %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <input type="hidden" name="accion" value="editar_sala">
+                    <input type="hidden" name="sala_id" id="edit_sala_id">
+                    
+                    <div class="form-group">
+                        <label for="edit_nombre">Nombre de la Sala <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="edit_nombre" name="nombre" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit_descripcion">Descripción</label>
+                        <textarea class="form-control" id="edit_descripcion" name="descripcion" rows="3"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit_capacidad">Capacidad <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" id="edit_capacidad" name="capacidad" min="1" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-link" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save mr-1"></i>
+                        Guardar Cambios
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Confirmar Desactivar -->
+<div class="modal fade" id="modalConfirmarDesactivar" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header border-0 bg-danger text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-exclamation-triangle mr-2"></i>
+                    Desactivar Sala
+                </h5>
+                <button type="button" class="close text-white" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <form id="formDesactivar" method="POST" action="{% url 'gestionar_salas' %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <input type="hidden" name="accion" value="desactivar_sala">
+                    <input type="hidden" name="sala_id" id="confirm_sala_id">
+                    
+                    <p>¿Está seguro de que desea desactivar la sala <strong id="confirm_sala_nombre"></strong>?</p>
+                    <p class="text-muted small">La sala no será visible en los formularios pero se conservarán sus datos.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-link" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-times mr-1"></i>
+                        Desactivar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Confirmar Activar -->
+<div class="modal fade" id="modalConfirmarActivar" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header border-0 bg-success text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-check-circle mr-2"></i>
+                    Activar Sala
+                </h5>
+                <button type="button" class="close text-white" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <form id="formActivar" method="POST" action="{% url 'gestionar_salas' %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <input type="hidden" name="accion" value="activar_sala">
+                    <input type="hidden" name="sala_id" id="confirm_activar_sala_id">
+                    
+                    <p>¿Está seguro de que desea activar la sala <strong id="confirm_activar_sala_nombre"></strong>?</p>
+                    <p class="text-muted small">La sala volverá a ser visible para crear disponibilidades.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-link" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-check mr-1"></i>
+                        Activar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function cargarSalaEditar(id, nombre, descripcion, capacidad) {
+    document.getElementById('edit_sala_id').value = id;
+    document.getElementById('edit_nombre').value = nombre;
+    document.getElementById('edit_descripcion').value = descripcion;
+    document.getElementById('edit_capacidad').value = capacidad;
+}
+
+function confirmarDesactivar(id, nombre) {
+    document.getElementById('confirm_sala_id').value = id;
+    document.getElementById('confirm_sala_nombre').textContent = nombre;
+    $('#modalConfirmarDesactivar').modal('show');
+}
+
+function confirmarActivar(id, nombre) {
+    document.getElementById('confirm_activar_sala_id').value = id;
+    document.getElementById('confirm_activar_sala_nombre').textContent = nombre;
+    $('#modalConfirmarActivar').modal('show');
+}
+</script>
+
+{% endblock %}
