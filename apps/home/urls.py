@@ -111,6 +111,7 @@ urlpatterns = [
     path("visita/<int:paciente_id>/", views.crear_visita, name="crear_visita"),
     path("eliminar-visita/<int:visita_id>/", views.eliminar_v, name="eliminar_v"),
     path("editar-visita/<int:visita_id>/", views.editar_v, name="editar_v"),
+    path("firmar-visita/<int:visita_id>/", views.firmar_visita, name="firmar_visita"),
     # Exámenes
     # path(
     #     "examen/resultado/<int:visita_examen_id>/",

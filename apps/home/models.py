@@ -681,11 +681,12 @@ class VisitaExamen(models.Model):
     @property
     def puede_editarse(self):
         """Verifica si el examen puede editarse."""
-        # NUEVO: Solo puede editarse si la visita está abierta Y el examen está realizado
+        # Solo puede editarse si la visita está abierta, NO está firmada Y el examen está realizado
         visita_abierta = self.visita.estado_visita == "abierta"
+        visita_no_firmada = not self.visita.firmado
         examen_realizado = self.esta_realizado
 
-        puede_editar = visita_abierta and examen_realizado
+        puede_editar = visita_abierta and visita_no_firmada and examen_realizado
 
         return puede_editar
 

@@ -248,20 +248,7 @@
                     <div class="col-md-8">
                       <div class="d-flex align-items-center">
                         <div>
-                          <!-- <h6 class="mb-0 text-dark">{{ visita.nombre }}</h6> -->
-
-                          <!-- Mostrar código ANG-XXX si el paciente está en la Visita PosIntervención anosognosia -->
-                          <h6 class="mb-0 text-dark">
-                            {{ visita.nombre }}
-                            {% if visita.Tipo_visita.proyecto.nombre == "Anosognosia" and visita.Tipo_visita.nombre == "PosIntervención" %}
-                              <span class="ml-2 font-weight-bold text-primary">
-                                {{ paciente.codigo }}
-                              </span>
-                            {% endif %}
-                          </h6>
-
-
-
+ 
                           <small class="text-muted">
                             <i class="fas fa-calendar mr-1"></i>{{ visita.fecha|date:"d/m/Y" }}
                             <span class="mx-2">•</span>
@@ -283,6 +270,20 @@
                           data-target="#modalEditarVisita-{{ visita.id }}" title="Editar Visita">
                           <i class="fas fa-edit"></i>
                         </button>
+
+                        {% if request.user.is_superuser and not visita.firmado %}
+                        <form action="{% url 'firmar_visita' visita.id %}" method="POST" class="d-inline"
+                          onsubmit="return confirm('¿Está seguro de firmar y cerrar esta visita? Esta acción no se puede deshacer.');">
+                          {% csrf_token %}
+                          <button type="submit" class="btn btn-outline-primary" title="Firmar Visita">
+                            <i class="fas fa-crown"></i>
+                          </button>
+                        </form>
+                        {% elif request.user.is_superuser and visita.firmado %}
+                        <button type="button" class="btn btn-success" title="Visita Firmada" disabled>
+                          <i class="fas fa-check-circle"></i>
+                        </button>
+                        {% endif %}
 
                         <form action="{% url 'eliminar_v' visita.id %}" method="POST" class="d-inline"
                           onsubmit="return confirm('¿Eliminar esta visita?');">
@@ -359,17 +360,29 @@
 
                               {% elif visita_examen.estado == 'en_progreso' %}
                               <!-- Examen En Progreso -->
+                              {% if not visita.firmado %}
                               <a href="{% url 'realizar_examen' visita_examen.visita.id visita_examen.examen.id visita_examen.visita.paciente.id %}"
                                 class="btn btn-warning btn-sm w-100">
                                 <i class="fas fa-play-circle mr-1"></i>Continuar Examen
                               </a>
+                              {% else %}
+                              <button class="btn btn-secondary btn-sm w-100" disabled title="Visita firmada">
+                                <i class="fas fa-lock mr-1"></i>Visita Firmada
+                              </button>
+                              {% endif %}
 
                               {% else %}
                               <!-- Examen Pendiente -->
+                              {% if not visita.firmado %}
                               <a href="{% url 'realizar_examen' visita_examen.visita.id visita_examen.examen.id visita_examen.visita.paciente.id %}"
                                 class="btn btn-primary btn-sm w-100">
                                 <i class="fas fa-plus-circle mr-1"></i>Iniciar Examen
                               </a>
+                              {% else %}
+                              <button class="btn btn-secondary btn-sm w-100" disabled title="Visita firmada">
+                                <i class="fas fa-lock mr-1"></i>Visita Firmada
+                              </button>
+                              {% endif %}
                               {% endif %}
                             </div>
                           </div>

@@ -2558,6 +2558,29 @@ def eliminar_v(request, visita_id):
 
 
 @login_required
+@user_passes_test(lambda u: u.is_superuser)
+def firmar_visita(request, visita_id):
+    """
+    Firmar una visita. Solo superusuarios pueden firmar.
+    Al firmar: se marca firmado=True, firmado_por=usuario, estado_visita=cerrada
+    """
+    if request.method == "POST":
+        visita = get_object_or_404(Visita, id=visita_id)
+        paciente_id = visita.paciente.id
+        
+        # Marcar la visita como firmada y cerrada
+        visita.firmado = True
+        visita.firmado_por = request.user
+        visita.estado_visita = "cerrada"
+        visita.save()
+        
+        messages.success(request, f"Visita '{visita.nombre}' firmada y cerrada exitosamente.")
+        return redirect("detalle_paciente", paciente_id=paciente_id)
+    
+    return redirect("index")
+
+
+@login_required
 def editar_v(request, visita_id):
     visita = get_object_or_404(Visita, id=visita_id)
     paciente = visita.paciente
@@ -3031,6 +3054,12 @@ def realizar_examen(request, visita_id, examen_id, paciente_id):
     # Obtener datos existentes
     paciente = get_object_or_404(DatosDemograficos, id=paciente_id)
     visita = get_object_or_404(Visita, id=visita_id, paciente=paciente)
+    
+    # BLOQUEAR EDICIÓN SI LA VISITA ESTÁ FIRMADA
+    if visita.firmado:
+        messages.error(request, "No se puede editar un examen de una visita firmada.")
+        return redirect("detalle_paciente", paciente_id=paciente_id)
+    
     datos_examen = None
     visita_examen_obj = None
     modo_edicion = False

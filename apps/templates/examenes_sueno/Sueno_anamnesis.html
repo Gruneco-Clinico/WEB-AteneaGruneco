@@ -382,16 +382,16 @@
         class="custom-control-input queja-checkbox"
         type="checkbox"
         name="tipo_queja[]"
-        value="Trastorno de conducta del sueño"
-        id="trastorno_sueno"
+        value="habitos inadecuados de sueño"
+        id="habitos_inadecuados_sueno"
         {% if datos_examen.tipos_queja %}
           {% for queja in datos_examen.tipos_queja %}
-            {% if queja.nombre == "Trastorno de conducta del sueño" %}checked{% endif %}
+            {% if queja.nombre == "habitos inadecuados de sueño" %}checked{% endif %}
           {% endfor %}
         {% endif %}
       />
-      <label class="custom-control-label" for="trastorno_sueno">
-        Trastorno de conducta del sueño
+      <label class="custom-control-label" for="habitos_inadecuados_sueno">
+        habitos inadecuados de sueño
       </label>
     </div>
         </div>
