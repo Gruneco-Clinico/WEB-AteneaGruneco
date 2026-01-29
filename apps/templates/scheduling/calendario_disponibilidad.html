@@ -364,7 +364,7 @@
                 <h5 class="modal-title">
                     <i class="fas fa-info-circle mr-2"></i>Detalle de Disponibilidad
                 </h5>
-                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close text-white" onclick="cerrarModal('modalDetalleDisponibilidad')" aria-label="Close">
                     <span>&times;</span>
                 </button>
             </div>
@@ -386,7 +386,7 @@
                 <h5 class="modal-title">
                     <i class="fas fa-user-check mr-2"></i>Detalle de Cita Agendada
                 </h5>
-                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close text-white" onclick="cerrarModal('modalDetalleCita')" aria-label="Close">
                     <span>&times;</span>
                 </button>
             </div>
@@ -394,7 +394,7 @@
                 <!-- Contenido dinámico -->
             </div>
             <div class="modal-footer" id="detalleCitaFooter">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                <!-- Botones dinámicos -->
             </div>
         </div>
     </div>
@@ -533,11 +533,11 @@ function mostrarDetalleDisponibilidad(evento) {
         </div>
     `;
     
-    let footer = '<button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>';
+    let footer = '<button type="button" class="btn btn-secondary" onclick="cerrarModal(\'modalDetalleDisponibilidad\')">Cerrar</button>';
     
     if (props.es_mio) {
         footer = `
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+            <button type="button" class="btn btn-secondary" onclick="cerrarModal('modalDetalleDisponibilidad')">Cancelar</button>
             <button type="button" class="btn btn-danger" onclick="eliminarDisponibilidad(${props.disponibilidad_id})">
                 <i class="fas fa-trash mr-1"></i>Eliminar
             </button>
@@ -599,9 +599,16 @@ function mostrarDetalleCita(evento) {
         </div>
     `;
     
+    let footer = '<button type="button" class="btn btn-secondary" onclick="cerrarModal(\'modalDetalleCita\')">Cerrar</button>';
+    
     document.getElementById('detalleCitaContent').innerHTML = contenido;
+    document.getElementById('detalleCitaFooter').innerHTML = footer;
     
     $('#modalDetalleCita').modal('show');
+}
+
+function cerrarModal(modalId) {
+    $('#' + modalId).modal('hide');
 }
 
 function eliminarDisponibilidad(disponibilidadId) {
@@ -629,7 +636,6 @@ setTimeout(() => {
         setTimeout(() => alert.remove(), 300);
     });
 }, 5000);
-
 
 </script>
 {% endblock %}
