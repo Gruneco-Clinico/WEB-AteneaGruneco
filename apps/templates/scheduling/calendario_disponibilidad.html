@@ -128,11 +128,11 @@
                         <strong class="mr-3">Leyenda:</strong>
                         <div class="leyenda-item">
                             <div class="leyenda-color" style="background-color: #007bff;"></div>
-                            <span>Mi disponibilidad</span>
+                            <span>Disponibilidad</span>
                         </div>
                         <div class="leyenda-item">
                             <div class="leyenda-color" style="background-color: #28a745;"></div>
-                            <span>Otros usuarios</span>
+                            <span>Cita Agendada</span>
                         </div>
                         <div class="leyenda-item text-muted">
                             <i class="fas fa-info-circle mr-1"></i>
@@ -179,6 +179,7 @@
                                 <th>Día</th>
                                 <th>Horario</th>
                                 <th>Período</th>
+                                <th>Registrado por</th>
                                 <th>Acciones</th>
                             </tr>
                         </thead>
@@ -197,6 +198,11 @@
                                     {% endif %}
                                 </td>
                                 <td>
+                                    <span class="badge badge-primary">
+                                        {{ disp.usuario.get_full_name|default:disp.usuario.username }}
+                                    </span>
+                                </td>
+                                <td>
                                     <button class="btn btn-sm btn-danger" 
                                             onclick="eliminarDisponibilidad({{ disp.id }})"
                                             title="Eliminar disponibilidad">
@@ -206,7 +212,7 @@
                             </tr>
                             {% empty %}
                             <tr>
-                                <td colspan="5" class="text-center text-muted py-4">
+                                <td colspan="6" class="text-center text-muted py-4">
                                     <i class="fas fa-calendar-plus fa-2x mb-3"></i><br>
                                     No tienes disponibilidades registradas.<br>
                                     <small>Haz clic en "Nueva Disponibilidad" para agregar una.</small>
@@ -350,7 +356,7 @@
     </div>
 </div>
 
-<!-- Modal Ver Detalles -->
+<!-- Modal Ver Detalles Disponibilidad -->
 <div class="modal fade" id="modalDetalleDisponibilidad" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -358,13 +364,37 @@
                 <h5 class="modal-title">
                     <i class="fas fa-info-circle mr-2"></i>Detalle de Disponibilidad
                 </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span>&times;</span>
+                </button>
             </div>
             <div class="modal-body" id="detalleDisponibilidadContent">
                 <!-- Contenido dinámico -->
             </div>
             <div class="modal-footer" id="detalleDisponibilidadFooter">
                 <!-- Botones dinámicos -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Ver Detalles Cita -->
+<div class="modal fade" id="modalDetalleCita" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-user-check mr-2"></i>Detalle de Cita Agendada
+                </h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="detalleCitaContent">
+                <!-- Contenido dinámico -->
+            </div>
+            <div class="modal-footer" id="detalleCitaFooter">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
             </div>
         </div>
     </div>
@@ -431,7 +461,11 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Manejar clic en eventos
         eventClick: function(info) {
-            mostrarDetalleDisponibilidad(info.event);
+            if (info.event.extendedProps.tipo === 'cita') {
+                mostrarDetalleCita(info.event);
+            } else {
+                mostrarDetalleDisponibilidad(info.event);
+            }
         },
         
         // Manejar selección para nuevas disponibilidades
@@ -480,8 +514,8 @@ function mostrarDetalleDisponibilidad(evento) {
     let contenido = `
         <div class="row">
             <div class="col-12">
-                <h6><i class="fas fa-user mr-2"></i>Usuario:</h6>
-                <p class="ml-3">${evento.title}</p>
+                <h6><i class="fas fa-user-md mr-2"></i>Profesional/Usuario:</h6>
+                <p class="ml-3"><strong>${props.usuario}</strong></p>
                 
                 <h6><i class="fas fa-door-open mr-2"></i>Sala:</h6>
                 <p class="ml-3">${props.sala}</p>
@@ -499,13 +533,11 @@ function mostrarDetalleDisponibilidad(evento) {
         </div>
     `;
     
-    let footer = '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal"> Cancelar </button>';
+    let footer = '<button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>';
     
     if (props.es_mio) {
         footer = `
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-    Cancelar
-</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
             <button type="button" class="btn btn-danger" onclick="eliminarDisponibilidad(${props.disponibilidad_id})">
                 <i class="fas fa-trash mr-1"></i>Eliminar
             </button>
@@ -516,6 +548,60 @@ function mostrarDetalleDisponibilidad(evento) {
     document.getElementById('detalleDisponibilidadFooter').innerHTML = footer;
     
     $('#modalDetalleDisponibilidad').modal('show');
+}
+
+function mostrarDetalleCita(evento) {
+    const props = evento.extendedProps;
+    
+    let contenido = `
+        <div class="row">
+            <div class="col-12">
+                <div class="alert alert-success" role="alert">
+                    <i class="fas fa-check-circle mr-2"></i>
+                    <strong>Cita Agendada</strong>
+                </div>
+                
+                <h6><i class="fas fa-user mr-2"></i>Paciente:</h6>
+                <p class="ml-3"><strong>${props.paciente}</strong></p>
+                
+                <h6><i class="fas fa-envelope mr-2"></i>Email:</h6>
+                <p class="ml-3">${props.email}</p>
+                
+                ${props.telefono ? `
+                <h6><i class="fas fa-phone mr-2"></i>Teléfono:</h6>
+                <p class="ml-3">${props.telefono}</p>
+                ` : ''}
+                
+                <h6><i class="fas fa-user-md mr-2"></i>Profesional:</h6>
+                <p class="ml-3">${props.profesional}</p>
+                
+                <h6><i class="fas fa-door-open mr-2"></i>Sala:</h6>
+                <p class="ml-3">${props.sala}</p>
+                
+                <h6><i class="fas fa-clock mr-2"></i>Horario:</h6>
+                <p class="ml-3">${evento.start.toLocaleString('es-ES', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                })} - ${evento.end.toLocaleTimeString('es-ES', {hour: '2-digit', minute:'2-digit'})}</p>
+                
+                ${props.motivo ? `
+                <h6><i class="fas fa-notes-medical mr-2"></i>Motivo de Consulta:</h6>
+                <p class="ml-3">${props.motivo}</p>
+                ` : ''}
+                
+                <h6><i class="fas fa-info-circle mr-2"></i>Estado:</h6>
+                <p class="ml-3"><span class="badge badge-success">${props.estado}</span></p>
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('detalleCitaContent').innerHTML = contenido;
+    
+    $('#modalDetalleCita').modal('show');
 }
 
 function eliminarDisponibilidad(disponibilidadId) {

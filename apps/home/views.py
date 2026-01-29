@@ -619,7 +619,20 @@ def api_eventos_disponibilidad(request):
         fecha_inicio = timezone.now().date()
 
         # ================================
-        # 1️⃣ EVENTOS DE DISPONIBILIDAD
+        # 1️⃣ OBTENER CITAS PRIMERO
+        # ================================
+        citas = CitaMedica.objects.filter(
+            estado__in=["agendada", "confirmada"]
+        ).select_related("disponibilidad", "disponibilidad__sala", "disponibilidad__usuario")
+
+        # Crear set de slots ocupados (disponibilidad_id + fecha)
+        slots_ocupados = set()
+        for cita in citas:
+            slot_key = f"{cita.disponibilidad.id}_{cita.fecha_cita.strftime('%Y%m%d')}"
+            slots_ocupados.add(slot_key)
+
+        # ================================
+        # 2️⃣ EVENTOS DE DISPONIBILIDAD (excluir ocupados)
         # ================================
         for disp in disponibilidades:
             for semana in range(12):
@@ -629,30 +642,29 @@ def api_eventos_disponibilidad(request):
 
                 if fecha_evento >= disp.fecha_inicio:
                     if not disp.fecha_fin or fecha_evento <= disp.fecha_fin:
-                        eventos.append(
-                            {
-                                "id": f"disp_{disp.id}_{fecha_evento.strftime('%Y%m%d')}",
-                                "title": f"Disponible - {disp.sala.nombre}",
-                                "start": f"{fecha_evento}T{disp.hora_inicio}",
-                                "end": f"{fecha_evento}T{disp.hora_fin}",
-                                "backgroundColor": "#007bff",
-                                "borderColor": "#007bff",
-                                "extendedProps": {
-                                    "tipo": "disponibilidad",
-                                    "sala": disp.sala.nombre,
-                                    "usuario": disp.usuario.get_full_name(),
-                                    "disponibilidad_id": disp.id,
-                                },
-                            }
-                        )
+                        # Verificar si este slot está ocupado
+                        slot_key = f"{disp.id}_{fecha_evento.strftime('%Y%m%d')}"
+                        if slot_key not in slots_ocupados:
+                            eventos.append(
+                                {
+                                    "id": f"disp_{disp.id}_{fecha_evento.strftime('%Y%m%d')}",
+                                    "title": f"Disponible - {disp.sala.nombre}",
+                                    "start": f"{fecha_evento}T{disp.hora_inicio}",
+                                    "end": f"{fecha_evento}T{disp.hora_fin}",
+                                    "backgroundColor": "#007bff",
+                                    "borderColor": "#007bff",
+                                    "extendedProps": {
+                                        "tipo": "disponibilidad",
+                                        "sala": disp.sala.nombre,
+                                        "usuario": disp.usuario.get_full_name() or disp.usuario.username,
+                                        "disponibilidad_id": disp.id,
+                                    },
+                                }
+                            )
 
         # ================================
-        # 2️⃣ EVENTOS DE CITAS
+        # 3️⃣ EVENTOS DE CITAS (color verde)
         # ================================
-        citas = CitaMedica.objects.filter(
-            estado__in=["agendada", "confirmada"]
-        ).select_related("disponibilidad", "disponibilidad__sala")
-
         for cita in citas:
             eventos.append(
                 {
@@ -660,16 +672,18 @@ def api_eventos_disponibilidad(request):
                     "title": f"Cita: {cita.nombre_paciente}",
                     "start": f"{cita.fecha_cita}T{cita.disponibilidad.hora_inicio}",
                     "end": f"{cita.fecha_cita}T{cita.disponibilidad.hora_fin}",
-                    "backgroundColor": "#dc3545",
-                    "borderColor": "#dc3545",
+                    "backgroundColor": "#28a745",
+                    "borderColor": "#28a745",
                     "extendedProps": {
                         "tipo": "cita",
                         "cita_id": cita.id,
                         "paciente": cita.nombre_paciente,
+                        "telefono": cita.telefono_paciente,
                         "email": cita.email_paciente,
                         "sala": cita.disponibilidad.sala.nombre,
-                        "profesional": cita.disponibilidad.usuario.get_full_name(),
+                        "profesional": cita.disponibilidad.usuario.get_full_name() or cita.disponibilidad.usuario.username,
                         "motivo": cita.motivo_consulta,
+                        "estado": cita.get_estado_display(),
                     },
                 }
             )
@@ -902,27 +916,27 @@ def eliminar_disponibilidad(request):
             cita.estado = "Cancelada"
             cita.save()
 
-            # Enviar correo de cancelación
-            if paciente_email:
-                try:
-                    send_mail(
-                        subject="Cancelación de cita médica",
-                        message=(
-                            f"Hola {cita.nombre_paciente},\n\n"
-                            "Te informamos que tu cita ha sido CANCELADA debido a cambios "
-                            "en la disponibilidad del profesional.\n\n"
-                            f"Fecha de la cita: {cita.fecha_cita}\n"
-                            f"Hora: {cita.hora_inicio.strftime('%H:%M')} - {cita.hora_fin.strftime('%H:%M')}\n"
-                            f"Sala: {cita.sala.nombre}\n\n"
-                            "Por favor ingresa nuevamente al sistema para reprogramar tu cita.\n\n"
-                            "Gracias por tu comprensión."
-                        ),
-                        from_email=settings.DEFAULT_FROM_EMAIL,
-                        recipient_list=[cita.email_paciente],
-                        fail_silently=False,
-                    )
-                except Exception as e:
-                    logger.error(f"⚠️ Error enviando correo a {paciente_email}: {e}")
+            ### Enviar correo de cancelación
+            ###if paciente_email:
+            ###    try:
+            ###        send_mail(
+            ###            subject="Cancelación de cita médica",
+            ###            message=(
+            ###                f"Hola {cita.nombre_paciente},\n\n"
+            ###                "Te informamos que tu cita ha sido CANCELADA debido a cambios "
+            ###                "en la disponibilidad del profesional.\n\n"
+            ###                f"Fecha de la cita: {cita.fecha_cita}\n"
+            ###                f"Hora: {cita.hora_inicio.strftime('%H:%M')} - {cita.hora_fin.strftime('%H:%M')}\n"
+            ###                f"Sala: {cita.sala.nombre}\n\n"
+            ###                "Por favor ingresa nuevamente al sistema para reprogramar tu cita.\n\n"
+            ###                "Gracias por tu comprensión."
+            ###            ),
+            ###            from_email=settings.DEFAULT_FROM_EMAIL,
+            ###            recipient_list=[cita.email_paciente],
+            ###            fail_silently=False,
+            ###        )
+            ###    except Exception as e:
+            ###        logger.error(f"⚠️ Error enviando correo a {paciente_email}: {e}")
 
         # ---------------------------------------------------------------------
         # 2️⃣ ELIMINAR LA DISPONIBILIDAD
