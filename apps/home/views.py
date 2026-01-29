@@ -916,27 +916,27 @@ def eliminar_disponibilidad(request):
             cita.estado = "Cancelada"
             cita.save()
 
-            ### Enviar correo de cancelación
-            ###if paciente_email:
-            ###    try:
-            ###        send_mail(
-            ###            subject="Cancelación de cita médica",
-            ###            message=(
-            ###                f"Hola {cita.nombre_paciente},\n\n"
-            ###                "Te informamos que tu cita ha sido CANCELADA debido a cambios "
-            ###                "en la disponibilidad del profesional.\n\n"
-            ###                f"Fecha de la cita: {cita.fecha_cita}\n"
-            ###                f"Hora: {cita.hora_inicio.strftime('%H:%M')} - {cita.hora_fin.strftime('%H:%M')}\n"
-            ###                f"Sala: {cita.sala.nombre}\n\n"
-            ###                "Por favor ingresa nuevamente al sistema para reprogramar tu cita.\n\n"
-            ###                "Gracias por tu comprensión."
-            ###            ),
-            ###            from_email=settings.DEFAULT_FROM_EMAIL,
-            ###            recipient_list=[cita.email_paciente],
-            ###            fail_silently=False,
-            ###        )
-            ###    except Exception as e:
-            ###        logger.error(f"⚠️ Error enviando correo a {paciente_email}: {e}")
+            # Enviar correo de cancelación
+            if paciente_email:
+                try:
+                    send_mail(
+                        subject="Cancelación de cita médica",
+                        message=(
+                            f"Hola {cita.nombre_paciente},\n\n"
+                            "Te informamos que tu cita ha sido CANCELADA debido a cambios "
+                            "en la disponibilidad del profesional.\n\n"
+                            f"Fecha de la cita: {cita.fecha_cita}\n"
+                            f"Hora: {cita.hora_inicio.strftime('%H:%M')} - {cita.hora_fin.strftime('%H:%M')}\n"
+                            f"Sala: {cita.sala.nombre}\n\n"
+                            "Por favor ingresa nuevamente al sistema para reprogramar tu cita.\n\n"
+                            "Gracias por tu comprensión."
+                        ),
+                        from_email=settings.DEFAULT_FROM_EMAIL,
+                        recipient_list=[cita.email_paciente],
+                        fail_silently=False,
+                    )
+                except Exception as e:
+                    logger.error(f"⚠️ Error enviando correo a {paciente_email}: {e}")
 
         # ---------------------------------------------------------------------
         # 2️⃣ ELIMINAR LA DISPONIBILIDAD
