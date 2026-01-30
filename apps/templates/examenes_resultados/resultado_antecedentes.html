@@ -107,7 +107,10 @@
                         <h5>Antecedentes Familiares</h5>
                         {% for item in familiares %}
                         <div class="border p-3 mb-2">
-                            <strong>{{ item.parentesco }}</strong> - {{ item.descripcion }}
+                            <strong>{{ item.parentesco }}</strong>
+                            <br>
+                            <span>{{ item.tipo_antecedente }}</span>
+                            {% if item.observaciones %}<br><em>{{ item.observaciones }}</em>{% endif %}
                         </div>
                         {% endfor %}
                     </div>

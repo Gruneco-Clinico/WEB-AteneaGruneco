@@ -279,6 +279,17 @@
                   >
                 </div>
               </div>
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label class="form-control-label">Próxima fecha de seguimiento</label>
+                  <input
+                    type="date"
+                    class="form-control"
+                    name="fecha_proximo_seguimiento"
+                    value="{% if datos_examen.fecha_proximo_seguimiento %}{{ datos_examen.fecha_proximo_seguimiento|date:'Y-m-d' }}{% endif %}"
+                  />
+                </div>
+              </div>
             </div>
 
             <div class="section-divider"></div>

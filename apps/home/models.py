@@ -2335,6 +2335,12 @@ class AnalisisGeneralResult(ResultadoExamenBase):
         blank=True, null=True, verbose_name="Plan de Tratamiento"
     )
 
+    fecha_proximo_seguimiento = models.DateField(
+        blank=True,
+        null=True,
+        verbose_name="Próxima fecha de seguimiento",
+    )
+
     def __str__(self):
         return f"Análisis General - {self.visita_examen_id}"
 

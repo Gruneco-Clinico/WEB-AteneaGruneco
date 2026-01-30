@@ -118,6 +118,11 @@ urlpatterns = [
     path("eliminar-visita/<int:visita_id>/", views.eliminar_v, name="eliminar_v"),
     path("editar-visita/<int:visita_id>/", views.editar_v, name="editar_v"),
     path("firmar-visita/<int:visita_id>/", views.firmar_visita, name="firmar_visita"),
+    path(
+        "visita/<int:visita_id>/pdf/",
+        views.generar_pdf_historia_clinica_visita,
+        name="generar_pdf_historia_clinica_visita",
+    ),
     # Exámenes
     # path(
     #     "examen/resultado/<int:visita_examen_id>/",
