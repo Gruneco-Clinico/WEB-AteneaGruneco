@@ -89,16 +89,6 @@
               <li class="nav-item">
                 <a
                   class="nav-link active"
-                  id="anamnesis-tab"
-                  data-toggle="tab"
-                  href="#anamnesis"
-                  role="tab"
-                  >Anamnesis</a
-                >
-              </li>
-              <li class="nav-item">
-                <a
-                  class="nav-link"
                   id="evaluacion_queja-tab"
                   data-toggle="tab"
                   href="#evaluacion_queja"
@@ -136,47 +126,20 @@
                   >Síntomas asociados</a
                 >
               </li>
+               <li class="nav-item">
+                <a
+                  class="nav-link"
+                  id="anamnesis-tab"
+                  data-toggle="tab"
+                  href="#anamnesis"
+                  role="tab"
+                  >Anamnesis</a
+                >
+              </li>
             </ul>
             <div class="tab-content" id="examTabContent">
-              <!-- Anamnesis -->
-              <div
-                class="tab-pane fade show active"
-                id="anamnesis"
-                role="tabpanel"
-              >
-                <div class="card bg-gradient-default shadow-sm mb-4">
-                  <div class="card-header bg-transparent">
-                    <h4 class="text-white mb-0">Anamnesis</h4>
-                  </div>
-                  <div class="card-body bg-white">
-                    <!-- Sección: Motivo de consulta y Enfermedad actual -->
-                    <div class="form-group">
-                      <label for="motivo_consulta">Motivo de consulta</label>
-                      <textarea
-                        class="form-control"
-                        id="motivo_consulta"
-                        name="motivo_consulta"
-                        rows="3"
-                      >
-{{ datos_examen.motivo_consulta|default:"" }}</textarea
-                      >
-                    </div>
-                    <div class="form-group">
-                      <label for="enfermedad_actual">Enfermedad actual</label>
-                      <textarea
-                        class="form-control"
-                        id="enfermedad_actual"
-                        name="enfermedad_actual"
-                        rows="3"
-                      >
-{{ datos_examen.enfermedad_actual|default:"" }}</textarea
-                      >
-                    </div>
-                  </div>
-                </div>
-              </div>
               <!-- Queja de sueño -->
-<div class="tab-pane fade" id="evaluacion_queja" role="tabpanel">
+<div class="tab-pane fade show active" id="evaluacion_queja" role="tabpanel">
   <div class="card bg-gradient-default shadow-sm mb-4">
     <div class="card-header bg-transparent">
       <h4 class="text-white mb-0">Queja de sueño</h4>
@@ -445,16 +408,17 @@
               id="especifique_causas"
             >{{ datos_examen.especificacion_causa|default:"" }}</textarea>
           </div>
-          <div class="col-md-12">
-            <div class="form-group">
-              <label class="form-control-label">Observaciones</label>
-              <textarea
-                class="form-control"
-                name="observaciones_queja"
-                id="observaciones_queja"
-              >{{ datos_examen.observaciones_queja|default:"" }}</textarea>
-            </div>
-          </div>
+        </div>
+      </div>
+
+      <div class="col-md-12">
+        <div class="form-group">
+          <label class="form-control-label">Observaciones</label>
+          <textarea
+            class="form-control"
+            name="observaciones_queja"
+            id="observaciones_queja"
+          >{{ datos_examen.observaciones_queja|default:"" }}</textarea>
         </div>
       </div>
     </div>
@@ -1610,6 +1574,41 @@
     </div>
   </div>
 </div>
+
+              <!-- Anamnesis -->
+              <div
+                class="tab-pane fade"
+                id="anamnesis"
+                role="tabpanel"
+              >
+                <div class="card bg-gradient-default shadow-sm mb-4">
+                  <div class="card-header bg-transparent">
+                    <h4 class="text-white mb-0">Anamnesis</h4>
+                  </div>
+                  <div class="card-body bg-white">
+                    <!-- Sección: Motivo de consulta y Enfermedad actual -->
+                    <div class="form-group">
+                      <label for="motivo_consulta">Motivo de consulta</label>
+                      <textarea
+                        class="form-control"
+                        id="motivo_consulta"
+                        name="motivo_consulta"
+                        rows="3"
+                      >{{ datos_examen.motivo_consulta|default:"" }}</textarea>
+                    </div>
+                    <div class="form-group">
+                      <label for="enfermedad_actual">Enfermedad actual</label>
+                      <textarea
+                        class="form-control"
+                        id="enfermedad_actual"
+                        name="enfermedad_actual"
+                        rows="3"
+                      >{{ datos_examen.enfermedad_actual|default:"" }}</textarea>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
 </div>
             </div>
           </div>

@@ -8219,7 +8219,6 @@ def guardar_examen_analisis(request):
             # Procesar diagnósticos CIE-10
             cie10_codigos = request.POST.getlist("cie10_codigo[]")
             cie10_diagnosticos = request.POST.getlist("cie10_diagnostico[]")
-            cie10_estados = request.POST.getlist("cie10_estado[]")
 
             for i, (codigo, diagnostico) in enumerate(
                 zip(cie10_codigos, cie10_diagnosticos)
@@ -8233,12 +8232,12 @@ def guardar_examen_analisis(request):
                         orden=i + 1,
                     )
 
-                    # Marcar estados correspondientes basados en los checkboxes
-                    if "confirmado_nuevo" in cie10_estados:
+                    # Marcar estados correspondientes basados en los checkboxes con índice
+                    if request.POST.get(f"cie10_confirmado_nuevo_{i}"):
                         diag_cie10.confirmado_nuevo = True
-                    if "confirmado_antiguo" in cie10_estados:
+                    if request.POST.get(f"cie10_confirmado_antiguo_{i}"):
                         diag_cie10.confirmado_antiguo = True
-                    if "en_estudio" in cie10_estados:
+                    if request.POST.get(f"cie10_en_estudio_{i}"):
                         diag_cie10.en_estudio = True
 
                     diag_cie10.save()
@@ -8246,7 +8245,6 @@ def guardar_examen_analisis(request):
             # Procesar diagnósticos DSM-V (similar estructura)
             dsmv_codigos = request.POST.getlist("dsmv_codigo[]")
             dsmv_diagnosticos = request.POST.getlist("dsmv_diagnostico[]")
-            dsmv_estados = request.POST.getlist("dsmv_estado[]")
 
             for i, (codigo, diagnostico) in enumerate(
                 zip(dsmv_codigos, dsmv_diagnosticos)
@@ -8259,19 +8257,17 @@ def guardar_examen_analisis(request):
                         orden=i + 1,
                     )
 
-                    if "confirmado_nuevo" in dsmv_estados:
+                    if request.POST.get(f"dsmv_confirmado_nuevo_{i}"):
                         diag_dsmv.confirmado_nuevo = True
-                    if "confirmado_antiguo" in dsmv_estados:
+                    if request.POST.get(f"dsmv_confirmado_antiguo_{i}"):
                         diag_dsmv.confirmado_antiguo = True
-                    if "en_estudio" in dsmv_estados:
+                    if request.POST.get(f"dsmv_en_estudio_{i}"):
                         diag_dsmv.en_estudio = True
 
                     diag_dsmv.save()
 
-           
             # Procesar diagnósticos no clasificados
             noclasi_diagnosticos = request.POST.getlist("noclasi_diagnostico[]")
-            noclasi_estados = request.POST.getlist("noclasi_estado[]")
 
             for i, diagnostico in enumerate(noclasi_diagnosticos):
                 if diagnostico.strip():
@@ -8281,11 +8277,11 @@ def guardar_examen_analisis(request):
                         orden=i + 1,
                     )
 
-                    if "confirmado_nuevo" in noclasi_estados:
+                    if request.POST.get(f"noclasi_confirmado_nuevo_{i}"):
                         diag_noclasi.confirmado_nuevo = True
-                    if "confirmado_antiguo" in noclasi_estados:
+                    if request.POST.get(f"noclasi_confirmado_antiguo_{i}"):
                         diag_noclasi.confirmado_antiguo = True
-                    if "en_estudio" in noclasi_estados:
+                    if request.POST.get(f"noclasi_en_estudio_{i}"):
                         diag_noclasi.en_estudio = True
 
                     diag_noclasi.save()

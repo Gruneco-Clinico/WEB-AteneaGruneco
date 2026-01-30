@@ -438,13 +438,12 @@
                             <input
                               type="checkbox"
                               class="custom-control-input"
-                              name="cie10_estado[]"
-                              value="confirmado_nuevo"
-                              id="cie10-confirmado-nuevo-1"
+                              name="cie10_confirmado_nuevo_{{ forloop.counter0 }}"
+                              id="cie10-confirmado-nuevo-{{ forloop.counter }}"
                             />
                             <label
                               class="custom-control-label"
-                              for="cie10-confirmado-nuevo-1"
+                              for="cie10-confirmado-nuevo-{{ forloop.counter }}"
                               >Confirmado Nuevo</label
                             >
                           </div>
@@ -454,13 +453,12 @@
                             <input
                               type="checkbox"
                               class="custom-control-input"
-                              name="cie10_estado[]"
-                              value="confirmado_antiguo"
-                              id="cie10-confirmado-antiguo-1"
+                              name="cie10_confirmado_antiguo_{{ forloop.counter0 }}"
+                              id="cie10-confirmado-antiguo-{{ forloop.counter }}"
                             />
                             <label
                               class="custom-control-label"
-                              for="cie10-confirmado-antiguo-1"
+                              for="cie10-confirmado-antiguo-{{ forloop.counter }}"
                               >Confirmado Antiguo</label
                             >
                           </div>
@@ -470,13 +468,12 @@
                             <input
                               type="checkbox"
                               class="custom-control-input"
-                              name="cie10_estado[]"
-                              value="en_estudio"
-                              id="cie10-en-estudio-1"
+                              name="cie10_en_estudio_{{ forloop.counter0 }}"
+                              id="cie10-en-estudio-{{ forloop.counter }}"
                             />
                             <label
                               class="custom-control-label"
-                              for="cie10-en-estudio-1"
+                              for="cie10-en-estudio-{{ forloop.counter }}"
                               >En Estudio</label
                             >
                           </div>
@@ -653,8 +650,7 @@
                             <input
                               type="checkbox"
                               class="custom-control-input"
-                              name="dsmv_estado[]"
-                              value="confirmado_nuevo"
+                              name="dsmv_confirmado_nuevo_0"
                               id="dsmv-confirmado-nuevo-1"
                             />
                             <label
@@ -669,8 +665,7 @@
                             <input
                               type="checkbox"
                               class="custom-control-input"
-                              name="dsmv_estado[]"
-                              value="confirmado_antiguo"
+                              name="dsmv_confirmado_antiguo_0"
                               id="dsmv-confirmado-antiguo-1"
                             />
                             <label
@@ -685,8 +680,7 @@
                             <input
                               type="checkbox"
                               class="custom-control-input"
-                              name="dsmv_estado[]"
-                              value="en_estudio"
+                              name="dsmv_en_estudio_0"
                               id="dsmv-en-estudio-1"
                             />
                             <label
@@ -745,8 +739,7 @@
                     <input
                       type="checkbox"
                       class="custom-control-input"
-                      name="noclasi_estado_{{ forloop.counter }}"
-                      value="confirmado_nuevo"
+                      name="noclasi_confirmado_nuevo_{{ forloop.counter0 }}"
                       id="noclasi-confirmado-nuevo-{{ forloop.counter }}"
                       {% if diagnostico.confirmado_nuevo %}checked{% endif %}
                     />
@@ -760,8 +753,7 @@
                     <input
                       type="checkbox"
                       class="custom-control-input"
-                      name="noclasi_estado_{{ forloop.counter }}"
-                      value="confirmado_antiguo"
+                      name="noclasi_confirmado_antiguo_{{ forloop.counter0 }}"
                       id="noclasi-confirmado-antiguo-{{ forloop.counter }}"
                       {% if diagnostico.confirmado_antiguo %}checked{% endif %}
                     />
@@ -775,8 +767,7 @@
                     <input
                       type="checkbox"
                       class="custom-control-input"
-                      name="noclasi_estado_{{ forloop.counter }}"
-                      value="en_estudio"
+                      name="noclasi_en_estudio_{{ forloop.counter0 }}"
                       id="noclasi-en-estudio-{{ forloop.counter }}"
                       {% if diagnostico.en_estudio %}checked{% endif %}
                     />
@@ -958,15 +949,15 @@
           <div class="col-md-3">
             <label class="form-control-label">Estado</label>
             <div class="checkbox-custom custom-control custom-checkbox">
-              <input type="checkbox" class="custom-control-input" name="cie10_estado[]" value="confirmado_nuevo" id="cie10-confirmado-nuevo-${contadorCIE10}">
+              <input type="checkbox" class="custom-control-input" name="cie10_confirmado_nuevo_${contadorCIE10}" id="cie10-confirmado-nuevo-${contadorCIE10}">
               <label class="custom-control-label" for="cie10-confirmado-nuevo-${contadorCIE10}">Confirmado Nuevo</label>
             </div>
             <div class="checkbox-custom custom-control custom-checkbox">
-              <input type="checkbox" class="custom-control-input" name="cie10_estado[]" value="confirmado_antiguo" id="cie10-confirmado-antiguo-${contadorCIE10}">
+              <input type="checkbox" class="custom-control-input" name="cie10_confirmado_antiguo_${contadorCIE10}" id="cie10-confirmado-antiguo-${contadorCIE10}">
               <label class="custom-control-label" for="cie10-confirmado-antiguo-${contadorCIE10}">Confirmado Antiguo</label>
             </div>
             <div class="checkbox-custom custom-control custom-checkbox">
-              <input type="checkbox" class="custom-control-input" name="cie10_estado[]" value="en_estudio" id="cie10-en-estudio-${contadorCIE10}">
+              <input type="checkbox" class="custom-control-input" name="cie10_en_estudio_${contadorCIE10}" id="cie10-en-estudio-${contadorCIE10}">
               <label class="custom-control-label" for="cie10-en-estudio-${contadorCIE10}">En Estudio</label>
             </div>
           </div>
@@ -1006,15 +997,15 @@
           <div class="col-md-3">
             <label class="form-control-label">Estado</label>
             <div class="checkbox-custom custom-control custom-checkbox">
-              <input type="checkbox" class="custom-control-input" name="dsmv_estado[]" value="confirmado_nuevo" id="dsmv-confirmado-nuevo-${contadorDSMV}">
+              <input type="checkbox" class="custom-control-input" name="dsmv_confirmado_nuevo_${contadorDSMV}" id="dsmv-confirmado-nuevo-${contadorDSMV}">
               <label class="custom-control-label" for="dsmv-confirmado-nuevo-${contadorDSMV}">Confirmado Nuevo</label>
             </div>
             <div class="checkbox-custom custom-control custom-checkbox">
-              <input type="checkbox" class="custom-control-input" name="dsmv_estado[]" value="confirmado_antiguo" id="dsmv-confirmado-antiguo-${contadorDSMV}">
+              <input type="checkbox" class="custom-control-input" name="dsmv_confirmado_antiguo_${contadorDSMV}" id="dsmv-confirmado-antiguo-${contadorDSMV}">
               <label class="custom-control-label" for="dsmv-confirmado-antiguo-${contadorDSMV}">Confirmado Antiguo</label>
             </div>
             <div class="checkbox-custom custom-control custom-checkbox">
-              <input type="checkbox" class="custom-control-input" name="dsmv_estado[]" value="en_estudio" id="dsmv-en-estudio-${contadorDSMV}">
+              <input type="checkbox" class="custom-control-input" name="dsmv_en_estudio_${contadorDSMV}" id="dsmv-en-estudio-${contadorDSMV}">
               <label class="custom-control-label" for="dsmv-en-estudio-${contadorDSMV}">En Estudio</label>
             </div>
           </div>

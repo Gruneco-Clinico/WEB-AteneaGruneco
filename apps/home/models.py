@@ -1113,7 +1113,7 @@ class TipoQuejaSueno(models.Model):
     )
     nombre = models.CharField(max_length=100)
     inicio = models.CharField(max_length=100, blank=True, null=True)
-    evolucion = models.CharField(max_length=100, blank=True, null=True)
+    evolucion = models.TextField(blank=True, null=True)
     frecuencia = models.CharField(max_length=100, blank=True, null=True)
     gravedad = models.CharField(max_length=100, blank=True, null=True)
 
