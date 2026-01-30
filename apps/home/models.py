@@ -1079,9 +1079,13 @@ class SuenoAnamnesisResult(ResultadoExamenBase):
     momento_dia_siesta = models.CharField(max_length=50, blank=True, null=True)
 
     # Ambiente
-    iluminacion = models.CharField(max_length=255, blank=True, null=True)
-    comodidad = models.CharField(max_length=255, blank=True, null=True)
-    ruido = models.CharField(max_length=255, blank=True, null=True)
+    iluminacion = models.CharField(max_length=255, blank=True, null=True, verbose_name="Condiciones de iluminación")
+    comodidad = models.CharField(max_length=255, blank=True, null=True, verbose_name="Comodidad del espacio")
+    ruido = models.CharField(max_length=255, blank=True, null=True, verbose_name="Condiciones de ruido")
+    
+    # Posición al dormir
+    posicion_dormir = models.CharField(max_length=100, blank=True, null=True, verbose_name="Posición al dormir")
+    posicion_dormir_otra = models.CharField(max_length=255, blank=True, null=True, verbose_name="Descripción de otra posición")
 
     # Consumo - CORREGIDO: CharField
     consume = models.CharField(max_length=10, blank=True, null=True, default="no")

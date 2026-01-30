@@ -1284,6 +1284,82 @@
                 </div>
               </div>
 
+              <!-- SECCIÓN 2.5: POSICIÓN AL DORMIR -->
+              <div class="mb-4 border-bottom pb-3">
+                <h4 class="mb-3">Posición al dormir</h4>
+                <div class="form-group">
+                  <label>¿En qué posición suele dormir?</label>
+                  <div class="custom-control custom-radio">
+                    <input
+                      type="radio"
+                      class="custom-control-input"
+                      id="posicion_prono"
+                      name="posicion_dormir"
+                      value="Decúbito prono"
+                      {% if datos_examen.posicion_dormir == "Decúbito prono" %}checked{% endif %}
+                    />
+                    <label class="custom-control-label" for="posicion_prono">Decúbito prono (boca abajo)</label>
+                  </div>
+                  <div class="custom-control custom-radio">
+                    <input
+                      type="radio"
+                      class="custom-control-input"
+                      id="posicion_supino"
+                      name="posicion_dormir"
+                      value="Decúbito supino"
+                      {% if datos_examen.posicion_dormir == "Decúbito supino" %}checked{% endif %}
+                    />
+                    <label class="custom-control-label" for="posicion_supino">Decúbito supino (boca arriba)</label>
+                  </div>
+                  <div class="custom-control custom-radio">
+                    <input
+                      type="radio"
+                      class="custom-control-input"
+                      id="posicion_lateral_derecho"
+                      name="posicion_dormir"
+                      value="Decúbito lateral derecho"
+                      {% if datos_examen.posicion_dormir == "Decúbito lateral derecho" %}checked{% endif %}
+                    />
+                    <label class="custom-control-label" for="posicion_lateral_derecho">Decúbito lateral derecho</label>
+                  </div>
+                  <div class="custom-control custom-radio">
+                    <input
+                      type="radio"
+                      class="custom-control-input"
+                      id="posicion_lateral_izquierdo"
+                      name="posicion_dormir"
+                      value="Decúbito lateral izquierdo"
+                      {% if datos_examen.posicion_dormir == "Decúbito lateral izquierdo" %}checked{% endif %}
+                    />
+                    <label class="custom-control-label" for="posicion_lateral_izquierdo">Decúbito lateral izquierdo</label>
+                  </div>
+                  <div class="custom-control custom-radio">
+                    <input
+                      type="radio"
+                      class="custom-control-input"
+                      id="posicion_otros"
+                      name="posicion_dormir"
+                      value="Otros"
+                      {% if datos_examen.posicion_dormir == "Otros" %}checked{% endif %}
+                    />
+                    <label class="custom-control-label" for="posicion_otros">Otros</label>
+                  </div>
+                </div>
+
+                <!-- Campo de texto para describir otra posición -->
+                <div id="posicion-otros-container" class="mt-3" {% if datos_examen.posicion_dormir != "Otros" %}style="display: none"{% endif %}>
+                  <div class="form-group">
+                    <label for="posicion_dormir_otra">Describa la posición</label>
+                    <textarea
+                      class="form-control"
+                      id="posicion_dormir_otra"
+                      name="posicion_dormir_otra"
+                      rows="2"
+                    >{{ datos_examen.posicion_dormir_otra|default:"" }}</textarea>
+                  </div>
+                </div>
+              </div>
+
               <!-- SECCIÓN 3: HÁBITOS PREVIOS AL SUEÑO -->
               <div class="mb-4 border-bottom pb-3">
                 <h4 class="mb-3">Hábitos previos al sueño</h4>
@@ -2208,6 +2284,24 @@ document.addEventListener("DOMContentLoaded", function () {
     if (agregarActividadBtn) agregarActividadBtn.addEventListener("click", window.agregarActividad);
     if (contenedorActividades) contenedorActividades.addEventListener("click", eliminarActividad);
     toggleAgregarActividad();
+
+    // SECCIÓN: POSICIÓN AL DORMIR
+    const posicionRadios = document.querySelectorAll('input[name="posicion_dormir"]');
+    const posicionOtrosContainer = document.getElementById("posicion-otros-container");
+
+    function togglePosicionOtros() {
+      const posicionOtrosRadio = document.getElementById("posicion_otros");
+      if (posicionOtrosRadio && posicionOtrosRadio.checked) {
+        posicionOtrosContainer.style.display = "block";
+      } else {
+        posicionOtrosContainer.style.display = "none";
+      }
+    }
+
+    posicionRadios.forEach(radio => {
+      radio.addEventListener("change", togglePosicionOtros);
+    });
+    togglePosicionOtros();
 
     // SECCIÓN 6: SÍNTOMAS DEL SUEÑO
     const sintomasSuenoSi = document.getElementById("sintomas_sueno_si");

@@ -3629,10 +3629,16 @@ def realizar_examen(request, visita_id, examen_id, paciente_id):
             elif int(examen_id) == 5:
                 # Para antecedentes, verificar si existe un AntecedentesVisitaLink
                 try:
-                    antecedentes_link = AntecedentesVisitaLink.objects.get(
-                        visita_examen=visita_examen_obj
-                    )
-                    antecedentes_result = antecedentes_link.antecedentes_result
+                    antecedentes_result = None
+                    try:
+                        antecedentes_link = AntecedentesVisitaLink.objects.get(
+                            visita_examen=visita_examen_obj
+                        )
+                        antecedentes_result = antecedentes_link.antecedentes_result
+                    except AntecedentesVisitaLink.DoesNotExist:
+                        antecedentes_result = AntecedentesResult.objects.filter(
+                            paciente=paciente
+                        ).first()
 
                     if antecedentes_result:
                         # Obtener datos básicos del modelo principal
@@ -3954,10 +3960,19 @@ def realizar_examen(request, visita_id, examen_id, paciente_id):
         try:
             if not datos_examen or not datos_examen.get("patologicos"):
                 try:
-                    antecedentes_link = AntecedentesVisitaLink.objects.get(
-                        visita_examen=visita_examen_obj
-                    )
-                    antecedentes_result = antecedentes_link.antecedentes_result
+                    antecedentes_result = None
+                    try:
+                        antecedentes_link = AntecedentesVisitaLink.objects.get(
+                            visita_examen=visita_examen_obj
+                        )
+                        antecedentes_result = antecedentes_link.antecedentes_result
+                    except AntecedentesVisitaLink.DoesNotExist:
+                        antecedentes_result = AntecedentesResult.objects.filter(
+                            paciente=paciente
+                        ).first()
+
+                    if not antecedentes_result:
+                        raise AntecedentesVisitaLink.DoesNotExist()
 
                     antecedentes = AntecedentesResult.objects.prefetch_related(
                         "antecedentes_patologicos",
@@ -5174,6 +5189,8 @@ def guardar_sueno_anamnesis(request):
                 "iluminacion",
                 "comodidad",
                 "ruido",
+                "posicion_dormir",
+                "posicion_dormir_otra",
                 "consume",
                 "consume_medicamento",
                 "usa_pantallas",
