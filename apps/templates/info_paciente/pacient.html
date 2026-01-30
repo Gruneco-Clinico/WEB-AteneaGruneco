@@ -259,23 +259,33 @@
                     </div>
 
                     <div class="col-md-4 text-right">
-                      <!-- Botones de Acción de Visita CORREGIDOS -->
+                      <!-- Botones de Acción de Visita -->
                       <div class="btn-group btn-group-sm" role="group">
+                        <!-- Ver Exámenes - SIEMPRE HABILITADO -->
                         <button type="button" class="btn btn-outline-info" data-toggle="collapse"
                           data-target="#examenes-visita-{{ visita.id }}" title="Ver Exámenes">
                           <i class="fas fa-list"></i>
                         </button>
 
+                        <!-- Descargar PDF - SIEMPRE HABILITADO -->
                         <a href="{% url 'generar_pdf_historia_clinica_visita' visita.id %}" 
                           class="btn btn-outline-success" title="Descargar PDF de Historia Clínica">
                           <i class="fas fa-file-pdf"></i>
                         </a>
 
+                        <!-- Editar Visita - DESHABILITADO si está firmada -->
+                        {% if visita.firmado %}
+                        <button type="button" class="btn btn-outline-warning" title="Visita firmada - No se puede editar" disabled>
+                          <i class="fas fa-edit"></i>
+                        </button>
+                        {% else %}
                         <button type="button" class="btn btn-outline-warning" data-toggle="modal"
                           data-target="#modalEditarVisita-{{ visita.id }}" title="Editar Visita">
                           <i class="fas fa-edit"></i>
                         </button>
+                        {% endif %}
 
+                        <!-- Firmar Visita - Solo superusuario -->
                         {% if request.user.is_superuser and not visita.firmado %}
                         <form action="{% url 'firmar_visita' visita.id %}" method="POST" class="d-inline"
                           onsubmit="return confirm('¿Está seguro de firmar y cerrar esta visita? Esta acción no se puede deshacer.');">
@@ -290,6 +300,12 @@
                         </button>
                         {% endif %}
 
+                        <!-- Eliminar Visita - DESHABILITADO si está firmada -->
+                        {% if visita.firmado %}
+                        <button type="button" class="btn btn-outline-danger" title="Visita firmada - No se puede eliminar" disabled>
+                          <i class="fas fa-trash"></i>
+                        </button>
+                        {% else %}
                         <form action="{% url 'eliminar_v' visita.id %}" method="POST" class="d-inline"
                           onsubmit="return confirm('¿Eliminar esta visita?');">
                           {% csrf_token %}
@@ -297,6 +313,7 @@
                             <i class="fas fa-trash"></i>
                           </button>
                         </form>
+                        {% endif %}
                       </div>
                     </div>
                   </div>

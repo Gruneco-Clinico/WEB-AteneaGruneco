@@ -10349,8 +10349,12 @@ def _extraer_informacion_resultado(resultado):
                         continue
                     valor_formateado = valor_str
                 
-                # Formatear el nombre del campo (convertir snake_case a Title Case)
-                nombre_campo = field.name.replace('_', ' ').title()
+                # Formatear el nombre del campo
+                # Usar verbose_name si está disponible, sino convertir snake_case a Title Case
+                if hasattr(field, 'verbose_name') and field.verbose_name:
+                    nombre_campo = field.verbose_name.capitalize()
+                else:
+                    nombre_campo = field.name.replace('_', ' ').title()
                 
                 # Agregar a la lista
                 info.append(f"{nombre_campo}: {valor_formateado}")
@@ -10399,7 +10403,7 @@ def generar_pdf_historia_clinica_visita(request, visita_id):
             'CustomTitle',
             parent=styles['Heading1'],
             fontSize=16,
-            textColor=colors.HexColor('#003366'),
+            textColor=colors.HexColor('#0d5e3a'),
             spaceAfter=6,
             alignment=TA_CENTER,
             fontName='Helvetica-Bold'
@@ -10409,12 +10413,12 @@ def generar_pdf_historia_clinica_visita(request, visita_id):
             'CustomHeading',
             parent=styles['Heading2'],
             fontSize=12,
-            textColor=colors.HexColor('#003366'),
+            textColor=colors.HexColor('#0d5e3a'),
             spaceAfter=8,
             spaceBefore=12,
             fontName='Helvetica-Bold',
             borderPadding=5,
-            backColor=colors.HexColor('#e6f2ff')
+            backColor=colors.HexColor('#e8f5e9')
         )
         
         normal_style = ParagraphStyle(
@@ -10444,7 +10448,7 @@ def generar_pdf_historia_clinica_visita(request, visita_id):
         
         datos_table = Table(datos_tabla, colWidths=[2*inch, 4*inch])
         datos_table.setStyle(TableStyle([
-            ('BACKGROUND', (0, 0), (1, 0), colors.HexColor('#003366')),
+            ('BACKGROUND', (0, 0), (1, 0), colors.HexColor('#0d5e3a')),
             ('TEXTCOLOR', (0, 0), (1, 0), colors.whitesmoke),
             ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
             ('FONTNAME', (0, 0), (1, 0), 'Helvetica-Bold'),
