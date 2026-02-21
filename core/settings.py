@@ -1,5 +1,5 @@
 import os
-from decouple import config
+from decouple import config, Csv
 from unipath import Path
 from django.contrib.messages import constants as message_constants
 
@@ -8,7 +8,8 @@ BASE_DIR = Path(__file__).parent
 CORE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config("SECRET_KEY", default="S#perS3crEt_1122")
+# No default — forces .env to be configured before the app starts.
+SECRET_KEY = config("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config("DEBUG", default=False, cast=bool)
@@ -75,14 +76,14 @@ WSGI_APPLICATION = "core.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.mysql",
-        "NAME": "ateneagrunecodb",
-        "USER": "root",
-        "PASSWORD": "@tene@2025",
-        "HOST": "localhost",  # O la dirección de tu servidor MySQL
-        "PORT": "3306",  # Puerto por defecto de MySQL
+        "ENGINE": config("DB_ENGINE", default="django.db.backends.mysql"),
+        "NAME": config("DB_NAME"),
+        "USER": config("DB_USER"),
+        "PASSWORD": config("DB_PASSWORD"),
+        "HOST": config("DB_HOST", default="localhost"),
+        "PORT": config("DB_PORT", default="3306"),
         "OPTIONS": {
-            "unix_socket": "/opt/bitnami/mariadb/tmp/mysql.sock",
+            "unix_socket": config("DB_UNIX_SOCKET", default="/opt/bitnami/mariadb/tmp/mysql.sock"),
         },
     }
 }
@@ -146,30 +147,30 @@ MESSAGE_TAGS = {
 
 #### INTEGRACIÓN RECUÉRDAME
 
-# settings.py
-POSTHOG_PERSONAL_API_KEY = "phx_IZAgbd0Yz5PbND0I5haEW40WNM8XTxToBAyJZ2bUShgCY6h"
-POSTHOG_PROJECT_ID = "158471"
-POSTHOG_API_URL = "https://us.posthog.com"
-POSTHOG_DAU_INSIGHT_ID = "nL40xbp4"  # shortid
-POSTHOG_GROWTH_INSIGHT_ID = "Jj4v9dZQ"  # shortid
-POSTHOG_DEVICE_TYPE_INSIGHT_ID = "3549611"
-POSTHOG_IDENTIFY_COUNT_INSIGHT_ID = "3549724"
-POSTHOG_SESION_TIME_INSIGHT_ID = "3550075"
-POSTHOG_VIEWS_PER_PAGE = "3552640"
-POSTHOG_PAGES_VIEWS_PER_USER = "3553192"
-POSTHOG_DAU_PER_USER_ID = "3600057"
-POSTHOG_AUTOCAPTURE_PER_USER_ID = "3600226"
+POSTHOG_PERSONAL_API_KEY = config("POSTHOG_PERSONAL_API_KEY", default="")
+POSTHOG_API_KEY = POSTHOG_PERSONAL_API_KEY  # Alias for posthog_service.py compatibility
+POSTHOG_PROJECT_ID = config("POSTHOG_PROJECT_ID", default="")
+POSTHOG_API_URL = config("POSTHOG_API_URL", default="https://us.posthog.com")
+POSTHOG_DAU_INSIGHT_ID = config("POSTHOG_DAU_INSIGHT_ID", default="")
+POSTHOG_GROWTH_INSIGHT_ID = config("POSTHOG_GROWTH_INSIGHT_ID", default="")
+POSTHOG_DEVICE_TYPE_INSIGHT_ID = config("POSTHOG_DEVICE_TYPE_INSIGHT_ID", default="")
+POSTHOG_IDENTIFY_COUNT_INSIGHT_ID = config("POSTHOG_IDENTIFY_COUNT_INSIGHT_ID", default="")
+POSTHOG_SESION_TIME_INSIGHT_ID = config("POSTHOG_SESION_TIME_INSIGHT_ID", default="")
+POSTHOG_VIEWS_PER_PAGE = config("POSTHOG_VIEWS_PER_PAGE", default="")
+POSTHOG_PAGES_VIEWS_PER_USER = config("POSTHOG_PAGES_VIEWS_PER_USER", default="")
+POSTHOG_DAU_PER_USER_ID = config("POSTHOG_DAU_PER_USER_ID", default="")
+POSTHOG_AUTOCAPTURE_PER_USER_ID = config("POSTHOG_AUTOCAPTURE_PER_USER_ID", default="")
 
 
 # Configuración del correo electrónico usando Gmail SMTP
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 
-EMAIL_HOST = "smtp.gmail.com"
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
+EMAIL_HOST = config("EMAIL_HOST", default="smtp.gmail.com")
+EMAIL_PORT = config("EMAIL_PORT", default=587, cast=int)
+EMAIL_USE_TLS = config("EMAIL_USE_TLS", default=True, cast=bool)
 
-EMAIL_HOST_USER = "ateneagruneco@gmail.com"
-EMAIL_HOST_PASSWORD = "kbkznkhskatrpidk"
+EMAIL_HOST_USER = config("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD")
 
-DEFAULT_FROM_EMAIL = "Atenea Gruneco <ateneagruneco@gmail.com>"
+DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL", default="Atenea Gruneco <ateneagruneco@gmail.com>")

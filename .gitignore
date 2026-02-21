@@ -1,0 +1,46 @@
+# ============================================================
+# ATENEA EHR — .gitignore
+# ============================================================
+
+# ----- Environment & Secrets -----
+.env
+.env.local
+.env.production
+
+# ----- Python -----
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+dist/
+build/
+*.egg
+
+# ----- Virtual Environment -----
+venv/
+.venv/
+env/
+
+# ----- IDE -----
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ----- OS Files -----
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ----- Django -----
+*.sqlite3
+db.sqlite3
+staticfiles/
+
+# ----- Node -----
+node_modules/
+
+# ----- Logs -----
+*.log
