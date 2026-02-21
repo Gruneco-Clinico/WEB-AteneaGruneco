@@ -21,7 +21,6 @@ import json
 from django.forms.models import model_to_dict
 import requests  # Integración RecuérdaMe
 from django.contrib.auth.models import User
-from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView
 from django.contrib.auth import update_session_auth_hash
 from django.core.mail import send_mail
@@ -186,7 +185,6 @@ def api_eventos_disponibilidad_publica(request):
         return JsonResponse({"error": str(e)}, status=500)
 
 
-@csrf_exempt
 def agendar_cita_ajax(request):
     """
     Vista para agendar una cita médica desde la agenda pública
@@ -1513,6 +1511,7 @@ def registro_demografico(request):
 
 
 @login_required
+@user_passes_test(is_superuser, login_url="/login/")
 def eliminar_paciente(request, numero_documento):
     if request.method == "POST":
         paciente = get_object_or_404(
