@@ -538,6 +538,7 @@ def gestionar_disponibilidad(request):
 
 
 @login_required
+@user_passes_test(lambda u: u.is_superuser, login_url="/login/")
 def gestionar_salas(request):
     """Vista para gestionar salas (crear, editar, desactivar)"""
     if request.method == "POST":
@@ -1786,19 +1787,24 @@ def formulario_demografico_externo(request):
 
 
 def consulta_examenes(request):
-    documento = request.GET.get("documento")
+    documento = request.GET.get("documento", "").strip()
+
+    # Validate input — reject empty or too-short document numbers
+    if not documento or len(documento) < 5:
+        return JsonResponse({"examenes": []})
 
     # 1. Verificar si existe un paciente con ese documento
     paciente = DatosDemograficos.objects.filter(numero_documento=documento).first()
 
     if not paciente:
-        return JsonResponse({"demograficos_completos": False, "examenes": []})
+        # Return same shape as "no exams" — prevents patient enumeration
+        return JsonResponse({"examenes": []})
 
     # 2. Buscar su visita más reciente
     visita = Visita.objects.filter(paciente=paciente).order_by("-id").first()
 
     if not visita:
-        return JsonResponse({"demograficos_completos": True, "examenes": []})
+        return JsonResponse({"examenes": []})
 
     # 3. Buscar exámenes pendientes Y exámenes en proceso
     examenes = VisitaExamen.objects.filter(
@@ -1861,7 +1867,7 @@ def consulta_examenes(request):
             }
         )
 
-    return JsonResponse({"demograficos_completos": True, "examenes": examenes_data})
+    return JsonResponse({"examenes": examenes_data})
 
 
 # ===== EXÁMENES PÚBLICOS =====
@@ -2646,7 +2652,12 @@ def crear_visita(request, paciente_id):
 
 
 @login_required
+@user_passes_test(is_superuser, login_url="/login/")
 def eliminar_v(request, visita_id):
+    if request.method != "POST":
+        messages.error(request, "Método no permitido.")
+        return redirect("index")
+
     visita = get_object_or_404(Visita, id=visita_id)
     paciente_id = visita.paciente.id  # Para redirigir después de eliminar
 
@@ -7956,7 +7967,7 @@ def estadisticas(request):
             "dateRange": {"date_from": "-30d", "explicitDate": False},
         }
 
-        r1 = requests.post(url_query, headers=headers, json={"query": query_dau})
+        r1 = requests.post(url_query, headers=headers, json={"query": query_dau}, timeout=10)
         r1.raise_for_status()
         data_dau = r1.json()
 
@@ -7976,7 +7987,7 @@ def estadisticas(request):
             "interval": "day",
         }
 
-        r2 = requests.post(url_query, headers=headers, json={"query": query_growth})
+        r2 = requests.post(url_query, headers=headers, json={"query": query_growth}, timeout=10)
         r2.raise_for_status()
         data_growth = r2.json()
 
@@ -8004,14 +8015,14 @@ def estadisticas(request):
 
         # 1. Obtener el insight ya configurado
         url_insight = f"{settings.POSTHOG_API_URL}/api/projects/{settings.POSTHOG_PROJECT_ID}/insights/{settings.POSTHOG_DEVICE_TYPE_INSIGHT_ID}/"
-        r = requests.get(url_insight, headers=headers)
+        r = requests.get(url_insight, headers=headers, timeout=10)
         r.raise_for_status()
         insight = r.json()
 
         # 2. Ejecutar la query del insight
         query = insight.get("query")
         url_query = f"{settings.POSTHOG_API_URL}/api/projects/{settings.POSTHOG_PROJECT_ID}/query/"
-        r = requests.post(url_query, headers=headers, json={"query": query})
+        r = requests.post(url_query, headers=headers, json={"query": query}, timeout=10)
         r.raise_for_status()
         data = r.json()
 
@@ -8065,14 +8076,14 @@ def estadisticas(request):
 
         # 1. Traer el insight
         url_insight = f"{settings.POSTHOG_API_URL}/api/projects/{settings.POSTHOG_PROJECT_ID}/insights/{settings.POSTHOG_VIEWS_PER_PAGE}/"
-        r = requests.get(url_insight, headers=headers)
+        r = requests.get(url_insight, headers=headers, timeout=10)
         r.raise_for_status()
         insight = r.json()
 
         # 2. Ejecutar la query del insight
         query = insight.get("query")
         url_query = f"{settings.POSTHOG_API_URL}/api/projects/{settings.POSTHOG_PROJECT_ID}/query/"
-        r = requests.post(url_query, headers=headers, json={"query": query})
+        r = requests.post(url_query, headers=headers, json={"query": query}, timeout=10)
         r.raise_for_status()
         data = r.json()
 
@@ -8146,14 +8157,14 @@ def listado_usuarios_recuerdame(request):
         "Content-Type": "application/json",
     }
     try:
-        r = requests.get(url_insight, headers=headers)
+        r = requests.get(url_insight, headers=headers, timeout=10)
         r.raise_for_status()
         insight = r.json()
 
         # Ejecutar query
         query = insight.get("query")
         url_query = f"{settings.POSTHOG_API_URL}/api/projects/{settings.POSTHOG_PROJECT_ID}/query/"
-        r = requests.post(url_query, headers=headers, json={"query": query})
+        r = requests.post(url_query, headers=headers, json={"query": query}, timeout=10)
         r.raise_for_status()
         data = r.json()
 
@@ -8201,13 +8212,13 @@ def estadisticas_usuario_detalle(request, email):
     try:
         # --------- 4. Ingresos por usuario (Login) ---------
         url_insight = f"{settings.POSTHOG_API_URL}/api/projects/{settings.POSTHOG_PROJECT_ID}/insights/{settings.POSTHOG_IDENTIFY_COUNT_INSIGHT_ID}/"
-        r = requests.get(url_insight, headers=headers)
+        r = requests.get(url_insight, headers=headers, timeout=10)
         r.raise_for_status()
         insight = r.json()
 
         # Ejecutar query
         query = insight.get("query")
-        r = requests.post(url_query, headers=headers, json={"query": query})
+        r = requests.post(url_query, headers=headers, json={"query": query}, timeout=10)
         r.raise_for_status()
         data = r.json()
 
@@ -8244,12 +8255,12 @@ def estadisticas_usuario_detalle(request, email):
         # --------- 5. Sesiones (Pageview -> Pageleave) ---------
         session_rows = []
         url_insight = f"{settings.POSTHOG_API_URL}/api/projects/{settings.POSTHOG_PROJECT_ID}/insights/{settings.POSTHOG_SESION_TIME_INSIGHT_ID}/"
-        r = requests.get(url_insight, headers=headers)
+        r = requests.get(url_insight, headers=headers, timeout=10)
         r.raise_for_status()
         insight = r.json()
 
         query = insight.get("query")
-        r = requests.post(url_query, headers=headers, json={"query": query})
+        r = requests.post(url_query, headers=headers, json={"query": query}, timeout=10)
         r.raise_for_status()
         data = r.json()
 
@@ -8309,12 +8320,12 @@ def estadisticas_usuario_detalle(request, email):
 
         # --------- 7. Vistas por página con breakdown por email ---------
         url_insight = f"{settings.POSTHOG_API_URL}/api/projects/{settings.POSTHOG_PROJECT_ID}/insights/{settings.POSTHOG_PAGES_VIEWS_PER_USER}/"
-        r = requests.get(url_insight, headers=headers)
+        r = requests.get(url_insight, headers=headers, timeout=10)
         r.raise_for_status()
         insight = r.json()
 
         query = insight.get("query")
-        r = requests.post(url_query, headers=headers, json={"query": query})
+        r = requests.post(url_query, headers=headers, json={"query": query}, timeout=10)
         r.raise_for_status()
         data = r.json()
 
@@ -8376,12 +8387,12 @@ def estadisticas_usuario_detalle(request, email):
 
         # --------- DAU por usuario (Insight con breakdown) ---------
         url_insight = f"{settings.POSTHOG_API_URL}/api/projects/{settings.POSTHOG_PROJECT_ID}/insights/{settings.POSTHOG_DAU_PER_USER_ID}/"
-        r = requests.get(url_insight, headers=headers)
+        r = requests.get(url_insight, headers=headers, timeout=10)
         r.raise_for_status()
         insight = r.json()
 
         query = insight.get("query")
-        r = requests.post(url_query, headers=headers, json={"query": query})
+        r = requests.post(url_query, headers=headers, json={"query": query}, timeout=10)
         r.raise_for_status()
         data = r.json()
 
@@ -8411,12 +8422,12 @@ def estadisticas_usuario_detalle(request, email):
 
         # --------- Autocapture por usuario ---------
         url_insight = f"{settings.POSTHOG_API_URL}/api/projects/{settings.POSTHOG_PROJECT_ID}/insights/{settings.POSTHOG_AUTOCAPTURE_PER_USER_ID}/"
-        r = requests.get(url_insight, headers=headers)
+        r = requests.get(url_insight, headers=headers, timeout=10)
         r.raise_for_status()
         insight = r.json()
 
         query = insight.get("query")
-        r = requests.post(url_query, headers=headers, json={"query": query})
+        r = requests.post(url_query, headers=headers, json={"query": query}, timeout=10)
         r.raise_for_status()
         data = r.json()
 
