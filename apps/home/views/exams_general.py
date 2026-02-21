@@ -14,7 +14,10 @@ from django.core.mail import send_mail, EmailMessage
 from django.db.models import Max
 from datetime import datetime, timedelta
 from ..models import *
-from ..forms import ProyectoForm, RegistroDemograficoForm
+from ..forms import (
+    ProyectoForm, RegistroDemograficoForm,
+    AnalisisGeneralForm, ExamenFisicoForm, ExamenNeurologicoForm,
+)
 import json
 import requests
 import logging
@@ -49,21 +52,19 @@ def guardar_examen_analisis(request):
                 visita_examen.fecha_inicio = timezone.now()
                 visita_examen.save()
 
-            # Obtener datos principales
-            analisis_historia = request.POST.get("analisis_historia", "")
-            plan_tratamiento = request.POST.get("plan_tratamiento", "")
-            fecha_proximo_seguimiento = request.POST.get(
-                "fecha_proximo_seguimiento"
-            )
+            # Parent model via form
+            form = AnalisisGeneralForm(request.POST)
+            if not form.is_valid():
+                error_msgs = "; ".join(
+                    f"{field}: {', '.join(errs)}"
+                    for field, errs in form.errors.items()
+                )
+                messages.error(request, f"❌ Error de validación en análisis: {error_msgs}")
+                return redirect("detalle_paciente", paciente_id=paciente_id)
 
-            # Crear o actualizar resultado principal
             analisis_result, created = AnalisisGeneralResult.objects.update_or_create(
                 visita_examen=visita_examen,
-                defaults={
-                    "analisis_historia": analisis_historia,
-                    "plan_tratamiento": plan_tratamiento,
-                    "fecha_proximo_seguimiento": fecha_proximo_seguimiento or None,
-                },
+                defaults=form.cleaned_data,
             )
 
             # Limpiar diagnósticos existentes
@@ -928,378 +929,65 @@ def guardar_examen_medicamentos(request):
 
 @login_required
 def guardar_examen_fisico(request):
-    """
-    Vista para guardar el examen físico general basada en el template
-    General_ExamenFísico.html y siguiendo el patrón del examen de sueño
-    """
+    """Vista para guardar el examen físico general usando ExamenFisicoForm."""
     if request.method == "POST":
         try:
-            # Obtener IDs del formulario
             visita_id = request.POST.get("visita_id")
             paciente_id = request.POST.get("paciente_id")
             examen_id = request.POST.get("examen_id")
 
-            # Validar datos requeridos
             if not visita_id or not paciente_id or not examen_id:
                 raise ValueError("Faltan datos requeridos")
 
-            # Convertir a enteros
-            visita_id = int(visita_id)
-            paciente_id = int(paciente_id)
-            examen_id = int(examen_id)
-
-            # Obtener la instancia de VisitaExamen
             visita_examen = get_object_or_404(
-                VisitaExamen, visita_id=visita_id, examen_id=examen_id
+                VisitaExamen, visita_id=int(visita_id), examen_id=int(examen_id)
             )
 
-            # Marcar como iniciado si está pendiente
             if visita_examen.estado == "pendiente":
                 visita_examen.estado = "en_progreso"
                 visita_examen.fecha_inicio = timezone.now()
                 visita_examen.save()
 
-            # Crear o actualizar el resultado del examen físico
-            examen_fisico, created = ExamenFisicoResult.objects.get_or_create(
-                visita_examen=visita_examen,
-                defaults={
-                    # === SIGNOS VITALES ===
-                    "talla": safe_float_required(request.POST.get("talla"), 0.0),
-                    "peso": safe_float_required(request.POST.get("peso"), 0.0),
-                    "temperatura": safe_float_required(
-                        request.POST.get("temperatura"), 36.5
-                    ),
-                    "frecuencia_cardiaca": safe_int_required(
-                        request.POST.get("frecuencia_cardiaca"), 70
-                    ),
-                    "frecuencia_respiratoria": safe_int_required(
-                        request.POST.get("frecuencia_respiratoria"), 16
-                    ),
-                    "presion_arterial_sistolica": safe_int_required(
-                        request.POST.get("presion_arterial_sistolica"), 120
-                    ),
-                    "presion_arterial_diastolica": safe_int_required(
-                        request.POST.get("presion_arterial_diastolica"), 80
-                    ),
-                    "perimetro_cefalico": safe_float_optional(
-                        request.POST.get("perimetro_cefalico")
-                    ),
-                    # === CABEZA Y CUELLO ===
-                    "cuero_cabelludo_normal": "normal"
-                    in request.POST.getlist("cuero_cabelludo"),
-                    "cuero_cabelludo_anormal": "anormal"
-                    in request.POST.getlist("cuero_cabelludo"),
-                    "observaciones_cuero_cabelludo": request.POST.get(
-                        "observaciones_cuero_cabelludo", ""
-                    ),
-                    "oidos_normal": "normal" in request.POST.getlist("oidos"),
-                    "oidos_anormal": "anormal" in request.POST.getlist("oidos"),
-                    "observaciones_oidos": request.POST.get("observaciones_oidos", ""),
-                    "nariz_normal": "normal" in request.POST.getlist("nariz"),
-                    "nariz_anormal": "anormal" in request.POST.getlist("nariz"),
-                    "observaciones_nariz": request.POST.get("observaciones_nariz", ""),
-                    "cuello_normal": "normal" in request.POST.getlist("cuello"),
-                    "cuello_anormal": "anormal" in request.POST.getlist("cuello"),
-                    "observaciones_cuello": request.POST.get(
-                        "observaciones_cuello", ""
-                    ),
-                    "otros_hallazgos_importantes": request.POST.get(
-                        "otros_hallazgos_importantes", ""
-                    ),
-                    # === TÓRAX / CARDIORESPIRATORIO ===
-                    "forma_torax": request.POST.get("forma_torax", "normal"),
-                    "observaciones_forma_torax": request.POST.get(
-                        "observaciones_forma_torax", ""
-                    ),
-                    "murmullo_vesicular": request.POST.get(
-                        "murmullo_vesicular", "conservado"
-                    ),
-                    "observaciones_murmullo_vesicular": request.POST.get(
-                        "observaciones_murmullo_vesicular", ""
-                    ),
-                    "ruidos_sobreagregados": bool(
-                        request.POST.get("ruidos_sobreagregados")
-                    ),
-                    "observaciones_ruidos_sobreagregados": request.POST.get(
-                        "observaciones_ruidos_sobreagregados", ""
-                    ),
-                    "ruidos_cardiacos": request.POST.get(
-                        "ruidos_cardiacos", "ritmicos"
-                    ),
-                    "observaciones_ruidos_cardiacos": request.POST.get(
-                        "observaciones_ruidos_cardiacos", ""
-                    ),
-                    # === ABDOMEN ===
-                    "peristaltismo": request.POST.get("peristaltismo", "presente"),
-                    "pared_abdominal_normal": "normal"
-                    in request.POST.getlist("pared_abdominal"),
-                    "pared_abdominal_anormal": "anormal"
-                    in request.POST.getlist("pared_abdominal"),
-                    "masas": bool(request.POST.get("masas")),
-                    "megalias": bool(request.POST.get("megalias")),
-                    "observaciones_abdomen": request.POST.get(
-                        "observaciones_abdomen", ""
-                    ),
-                    # === OSTEOMUSCULAR ===
-                    "curvatura_cervical_normal": "normal"
-                    in request.POST.getlist("curvatura_cervical"),
-                    "curvatura_cervical_anormal": "anormal"
-                    in request.POST.getlist("curvatura_cervical"),
-                    "curvatura_toracica_normal": "normal"
-                    in request.POST.getlist("curvatura_toracica"),
-                    "curvatura_toracica_anormal": "anormal"
-                    in request.POST.getlist("curvatura_toracica"),
-                    "curvatura_lumbar_normal": "normal"
-                    in request.POST.getlist("curvatura_lumbar"),
-                    "curvatura_lumbar_anormal": "anormal"
-                    in request.POST.getlist("curvatura_lumbar"),
-                    "arcos_movimiento_superiores_normal": "normal"
-                    in request.POST.getlist("arcos_movimiento_superiores"),
-                    "arcos_movimiento_superiores_anormal": "anormal"
-                    in request.POST.getlist("arcos_movimiento_superiores"),
-                    "arcos_movimiento_inferiores_normal": "normal"
-                    in request.POST.getlist("arcos_movimiento_inferiores"),
-                    "arcos_movimiento_inferiores_anormal": "anormal"
-                    in request.POST.getlist("arcos_movimiento_inferiores"),
-                    "asimetrias_inferiores_normal": "normal"
-                    in request.POST.getlist("asimetrias_inferiores"),
-                    "asimetrias_inferiores_anormal": "anormal"
-                    in request.POST.getlist("asimetrias_inferiores"),
-                    "asimetrias_superiores_normal": "normal"
-                    in request.POST.getlist("asimetrias_superiores"),
-                    "asimetrias_superiores_anormal": "anormal"
-                    in request.POST.getlist("asimetrias_superiores"),
-                    "observaciones_osteomuscular": request.POST.get(
-                        "observaciones_osteomuscular", ""
-                    ),
-                    # === PIEL Y ANEXOS ===
-                    "maculas": bool(request.POST.get("maculas")),
-                    "papulas": bool(request.POST.get("papulas")),
-                    "vesiculas": bool(request.POST.get("vesiculas")),
-                    "pustulas": bool(request.POST.get("pustulas")),
-                    "fisuras": bool(request.POST.get("fisuras")),
-                    "escaras": bool(request.POST.get("escaras")),
-                    "petequias": bool(request.POST.get("petequias")),
-                    "equimosis": bool(request.POST.get("equimosis")),
-                    "ulceras": bool(request.POST.get("ulceras")),
-                    "observaciones_piel_anexos": request.POST.get(
-                        "observaciones_piel_anexos", ""
-                    ),
-                },
-            )
-
-            # Si no es nuevo, actualizar los campos
-            if not created:
-                # === SIGNOS VITALES ===
-                examen_fisico.talla = safe_float_required(
-                    request.POST.get("talla"), 0.0
-                )
-                examen_fisico.peso = safe_float_required(request.POST.get("peso"), 0.0)
-                examen_fisico.temperatura = safe_float_required(
-                    request.POST.get("temperatura"), 36.5
-                )
-                examen_fisico.frecuencia_cardiaca = safe_int_required(
-                    request.POST.get("frecuencia_cardiaca"), 70
-                )
-                examen_fisico.frecuencia_respiratoria = safe_int_required(
-                    request.POST.get("frecuencia_respiratoria"), 16
-                )
-                examen_fisico.presion_arterial_sistolica = safe_int_required(
-                    request.POST.get("presion_arterial_sistolica"), 120
-                )
-                examen_fisico.presion_arterial_diastolica = safe_int_required(
-                    request.POST.get("presion_arterial_diastolica"), 80
-                )
-                examen_fisico.perimetro_cefalico = safe_float_optional(
-                    request.POST.get("perimetro_cefalico")
+            form = ExamenFisicoForm(request.POST)
+            if form.is_valid():
+                ExamenFisicoResult.objects.update_or_create(
+                    visita_examen=visita_examen,
+                    defaults=form.cleaned_data,
                 )
 
-                # === CABEZA Y CUELLO ===
-                examen_fisico.cuero_cabelludo_normal = "normal" in request.POST.getlist(
-                    "cuero_cabelludo"
-                )
-                examen_fisico.cuero_cabelludo_anormal = (
-                    "anormal" in request.POST.getlist("cuero_cabelludo")
-                )
-                examen_fisico.observaciones_cuero_cabelludo = request.POST.get(
-                    "observaciones_cuero_cabelludo", ""
-                )
+                visita_examen.estado = "completado"
+                visita_examen.fecha_completado = timezone.now()
+                visita_examen.save()
 
-                examen_fisico.oidos_normal = "normal" in request.POST.getlist("oidos")
-                examen_fisico.oidos_anormal = "anormal" in request.POST.getlist("oidos")
-                examen_fisico.observaciones_oidos = request.POST.get(
-                    "observaciones_oidos", ""
-                )
-
-                examen_fisico.nariz_normal = "normal" in request.POST.getlist("nariz")
-                examen_fisico.nariz_anormal = "anormal" in request.POST.getlist("nariz")
-                examen_fisico.observaciones_nariz = request.POST.get(
-                    "observaciones_nariz", ""
-                )
-
-                examen_fisico.cuello_normal = "normal" in request.POST.getlist("cuello")
-                examen_fisico.cuello_anormal = "anormal" in request.POST.getlist(
-                    "cuello"
-                )
-                examen_fisico.observaciones_cuello = request.POST.get(
-                    "observaciones_cuello", ""
-                )
-
-                examen_fisico.otros_hallazgos_importantes = request.POST.get(
-                    "otros_hallazgos_importantes", ""
-                )
-
-                # === TÓRAX / CARDIORESPIRATORIO ===
-                examen_fisico.forma_torax = request.POST.get("forma_torax", "normal")
-                examen_fisico.observaciones_forma_torax = request.POST.get(
-                    "observaciones_forma_torax", ""
-                )
-                examen_fisico.murmullo_vesicular = request.POST.get(
-                    "murmullo_vesicular", "conservado"
-                )
-                examen_fisico.observaciones_murmullo_vesicular = request.POST.get(
-                    "observaciones_murmullo_vesicular", ""
-                )
-                examen_fisico.ruidos_sobreagregados = bool(
-                    request.POST.get("ruidos_sobreagregados")
-                )
-                examen_fisico.observaciones_ruidos_sobreagregados = request.POST.get(
-                    "observaciones_ruidos_sobreagregados", ""
-                )
-                examen_fisico.ruidos_cardiacos = request.POST.get(
-                    "ruidos_cardiacos", "ritmicos"
-                )
-                examen_fisico.observaciones_ruidos_cardiacos = request.POST.get(
-                    "observaciones_ruidos_cardiacos", ""
-                )
-
-                # === ABDOMEN ===
-                examen_fisico.peristaltismo = request.POST.get(
-                    "peristaltismo", "presente"
-                )
-                examen_fisico.pared_abdominal_normal = "normal" in request.POST.getlist(
-                    "pared_abdominal"
-                )
-                examen_fisico.pared_abdominal_anormal = (
-                    "anormal" in request.POST.getlist("pared_abdominal")
-                )
-                examen_fisico.masas = bool(request.POST.get("masas"))
-                examen_fisico.megalias = bool(request.POST.get("megalias"))
-                examen_fisico.observaciones_abdomen = request.POST.get(
-                    "observaciones_abdomen", ""
-                )
-
-                # === OSTEOMUSCULAR ===
-                examen_fisico.curvatura_cervical_normal = (
-                    "normal" in request.POST.getlist("curvatura_cervical")
-                )
-                examen_fisico.curvatura_cervical_anormal = (
-                    "anormal" in request.POST.getlist("curvatura_cervical")
-                )
-                examen_fisico.curvatura_toracica_normal = (
-                    "normal" in request.POST.getlist("curvatura_toracica")
-                )
-                examen_fisico.curvatura_toracica_anormal = (
-                    "anormal" in request.POST.getlist("curvatura_toracica")
-                )
-                examen_fisico.curvatura_lumbar_normal = (
-                    "normal" in request.POST.getlist("curvatura_lumbar")
-                )
-                examen_fisico.curvatura_lumbar_anormal = (
-                    "anormal" in request.POST.getlist("curvatura_lumbar")
-                )
-                examen_fisico.arcos_movimiento_superiores_normal = (
-                    "normal" in request.POST.getlist("arcos_movimiento_superiores")
-                )
-                examen_fisico.arcos_movimiento_superiores_anormal = (
-                    "anormal" in request.POST.getlist("arcos_movimiento_superiores")
-                )
-                examen_fisico.arcos_movimiento_inferiores_normal = (
-                    "normal" in request.POST.getlist("arcos_movimiento_inferiores")
-                )
-                examen_fisico.arcos_movimiento_inferiores_anormal = (
-                    "anormal" in request.POST.getlist("arcos_movimiento_inferiores")
-                )
-                examen_fisico.asimetrias_inferiores_normal = (
-                    "normal" in request.POST.getlist("asimetrias_inferiores")
-                )
-                examen_fisico.asimetrias_inferiores_anormal = (
-                    "anormal" in request.POST.getlist("asimetrias_inferiores")
-                )
-                examen_fisico.asimetrias_superiores_normal = (
-                    "normal" in request.POST.getlist("asimetrias_superiores")
-                )
-                examen_fisico.asimetrias_superiores_anormal = (
-                    "anormal" in request.POST.getlist("asimetrias_superiores")
-                )
-                examen_fisico.observaciones_osteomuscular = request.POST.get(
-                    "observaciones_osteomuscular", ""
-                )
-
-                # === PIEL Y ANEXOS ===
-                examen_fisico.maculas = bool(request.POST.get("maculas"))
-                examen_fisico.papulas = bool(request.POST.get("papulas"))
-                examen_fisico.vesiculas = bool(request.POST.get("vesiculas"))
-                examen_fisico.pustulas = bool(request.POST.get("pustulas"))
-                examen_fisico.fisuras = bool(request.POST.get("fisuras"))
-                examen_fisico.escaras = bool(request.POST.get("escaras"))
-                examen_fisico.petequias = bool(request.POST.get("petequias"))
-                examen_fisico.equimosis = bool(request.POST.get("equimosis"))
-                examen_fisico.ulceras = bool(request.POST.get("ulceras"))
-                examen_fisico.observaciones_piel_anexos = request.POST.get(
-                    "observaciones_piel_anexos", ""
-                )
-
-            # Calcular IMC si tenemos talla y peso
-            if examen_fisico.talla > 0 and examen_fisico.peso > 0:
-                talla_metros = examen_fisico.talla / 100
-                examen_fisico.imc = round(examen_fisico.peso / (talla_metros**2), 2)
+                messages.success(request, "✅ Examen físico general guardado correctamente.")
+                return redirect("detalle_paciente", paciente_id=paciente_id)
             else:
-                examen_fisico.imc = 0.0
-
-            # Guardar los cambios
-            try:
-                examen_fisico.save()
-            except Exception as save_error:
-                raise save_error
-
-            # Marcar el examen como completado
-            visita_examen.estado = "completado"
-            visita_examen.fecha_completado = timezone.now()
-            visita_examen.save()
-
-            messages.success(
-                request, "✅ Examen físico general guardado correctamente."
-            )
-            return redirect("detalle_paciente", paciente_id=paciente_id)
+                error_msgs = "; ".join(
+                    f"{field}: {', '.join(errs)}"
+                    for field, errs in form.errors.items()
+                )
+                messages.error(request, f"❌ Error de validación en examen físico: {error_msgs}")
+                return redirect("detalle_paciente", paciente_id=paciente_id)
 
         except ValueError as ve:
-            # Revertir estado si hubo error
             try:
                 if "visita_examen" in locals():
                     visita_examen.estado = "pendiente"
                     visita_examen.save()
-            except:
+            except Exception:
                 pass
-
             messages.error(request, f"❌ Error de datos: {str(ve)}")
-            return redirect(
-                "detalle_paciente", paciente_id=paciente_id if paciente_id else 1
-            )
+            return redirect("detalle_paciente", paciente_id=paciente_id if paciente_id else 1)
 
         except Exception as e:
-            # Revertir estado si hubo error
             try:
                 if "visita_examen" in locals():
                     visita_examen.estado = "pendiente"
                     visita_examen.save()
-            except:
+            except Exception:
                 pass
-
             messages.error(request, f"❌ Error al guardar el examen físico: {str(e)}")
-            return redirect(
-                "detalle_paciente", paciente_id=paciente_id if paciente_id else 1
-            )
+            return redirect("detalle_paciente", paciente_id=paciente_id if paciente_id else 1)
 
     else:
         messages.error(request, "❌ Método no permitido.")
@@ -1466,663 +1154,54 @@ def guardar_revision_sistemas(request):
 
 @login_required
 def guardar_examen_neurologico(request):
-    """Vista específica para guardar el examen neurológico"""
+    """Vista para guardar el examen neurológico usando ExamenNeurologicoForm."""
     if request.method == "POST":
         visita_id = request.POST.get("visita_examen")
         paciente_id = request.POST.get("paciente_id")
         examen_id = request.POST.get("examen_id")
 
         try:
-            # ===================================================
-            # 1. OBTENER OBJETOS PRINCIPALES
-            # ===================================================
             visita_examen = get_object_or_404(
                 VisitaExamen, visita_id=visita_id, examen_id=examen_id
             )
-            paciente = get_object_or_404(DatosDemograficos, id=paciente_id)
 
-            # ===================================================
-            # 2. OBTENER O CREAR EL RESULTADO
-            # ===================================================
-            resultado, created = ExamenNeurologicoResult.objects.get_or_create(
-                visita_examen=visita_examen, defaults={}
-            )
-
-            accion = "creado" if created else "actualizado"
-
-            # ===================================================
-            # 3. PROCESAR CAMPOS I PAR CRANEAL (OLFATORIO)
-            # ===================================================
-            resultado.clavos_izquierdo = request.POST.get("clavos_izquierdo") == "on"
-            resultado.clavos_derecho = request.POST.get("clavos_derecho") == "on"
-            resultado.pimienta_izquierdo = (
-                request.POST.get("pimienta_izquierdo") == "on"
-            )
-            resultado.pimienta_derecho = request.POST.get("pimienta_derecho") == "on"
-            resultado.cafe_izquierdo = request.POST.get("cafe_izquierdo") == "on"
-            resultado.cafe_derecho = request.POST.get("cafe_derecho") == "on"
-            resultado.canela_izquierdo = request.POST.get("canela_izquierdo") == "on"
-            resultado.canela_derecho = request.POST.get("canela_derecho") == "on"
-            resultado.alcohol_izquierdo = request.POST.get("alcohol_izquierdo") == "on"
-            resultado.alcohol_derecho = request.POST.get("alcohol_derecho") == "on"
-
-            # ===================================================
-            # 4. PROCESAR CAMPOS II PAR CRANEAL (ÓPTICO)
-            # ===================================================
-            # Síntomas visuales
-            resultado.amaurosis = request.POST.get("amaurosis") == "on"
-            resultado.oscurecimientos = request.POST.get("oscurecimientos") == "on"
-            resultado.fotopsias = request.POST.get("fotopsias") == "on"
-            resultado.escotomas = request.POST.get("escotomas") == "on"
-            resultado.agudeza_visual = request.POST.get("agudeza_visual") == "on"
-
-            # Fundoscopia
-            resultado.hemorragias = request.POST.get("hemorragias") == "on"
-            resultado.exudados = request.POST.get("exudados") == "on"
-            resultado.fundoscopia = request.POST.get("fundoscopia") or None
-
-            # Evaluación detallada
-            resultado.color_disco = request.POST.get("color_disco") or None
-            resultado.bordes = request.POST.get("bordes") or None
-
-            # Pupilas y reflejos
-            resultado.pupilas = request.POST.get("pupilas") or None
-            resultado.reflejo_fotomotor = request.POST.get("reflejo_fotomotor") or None
-            resultado.vision_colores = request.POST.get("vision_colores") or None
-
-            # Campimetría
-            resultado.campimetria = request.POST.get("campimetria") or None
-
-            # Observaciones II Par
-            resultado.observaciones_ii_par = request.POST.get(
-                "observaciones_ii_par", ""
-            ).strip()
-
-            # ===================================================
-            # 5. PROCESAR CAMPOS III, IV, VI PAR (OCULOMOTORES)
-            # ===================================================
-            # Síntomas
-            resultado.diplopia = request.POST.get("diplopia") == "on"
-            resultado.ptosis_palpebral = request.POST.get("ptosis_palpebral") == "on"
-            resultado.desviaciones_oculares = (
-                request.POST.get("desviaciones_oculares") == "on"
-            )
-
-            # Funciones motoras
-            resultado.elevacion_parpado = request.POST.get("elevacion_parpado") or None
-            resultado.movimientos_oculares = (
-                request.POST.get("movimientos_oculares") or None
-            )
-
-            # Coordinación
-            resultado.mirada_conjugada = request.POST.get("mirada_conjugada") or None
-            resultado.movimientos_seguimiento = (
-                request.POST.get("movimientos_seguimiento") or None
-            )
-
-            # Observaciones Oculomotores
-            resultado.observaciones_oculomotores = request.POST.get(
-                "observaciones_oculomotores", ""
-            ).strip()
-
-            # ===================================================
-            # 6. PROCESAR CAMPOS V PAR CRANEAL (TRIGÉMINO)
-            # ===================================================
-            # Tacto superficial
-            resultado.tacto_frente_globo = (
-                request.POST.get("tacto_frente_globo") == "on"
-            )
-            resultado.tacto_parpado_labio_sup = (
-                request.POST.get("tacto_parpado_labio_sup") == "on"
-            )
-            resultado.tacto_labio_inf_menton = (
-                request.POST.get("tacto_labio_inf_menton") == "on"
-            )
-
-            # Dolor
-            resultado.dolor_frente_globo = (
-                request.POST.get("dolor_frente_globo") == "on"
-            )
-            resultado.dolor_parpado_labio_sup = (
-                request.POST.get("dolor_parpado_labio_sup") == "on"
-            )
-            resultado.dolor_labio_inf_menton = (
-                request.POST.get("dolor_labio_inf_menton") == "on"
-            )
-
-            # Temperatura
-            resultado.temp_frente_globo = request.POST.get("temp_frente_globo") == "on"
-            resultado.temp_parpado_labio_sup = (
-                request.POST.get("temp_parpado_labio_sup") == "on"
-            )
-            resultado.temp_labio_inf_menton = (
-                request.POST.get("temp_labio_inf_menton") == "on"
-            )
-
-            # Fuerza muscular
-            resultado.fuerza_maseteros = request.POST.get("fuerza_maseteros") == "on"
-            resultado.fuerza_temporales = request.POST.get("fuerza_temporales") == "on"
-            resultado.fuerza_pterigoideos = (
-                request.POST.get("fuerza_pterigoideos") == "on"
-            )
-
-            # Trofismo
-            resultado.trofismo_maseteros = (
-                request.POST.get("trofismo_maseteros") == "on"
-            )
-            resultado.trofismo_temporales = (
-                request.POST.get("trofismo_temporales") == "on"
-            )
-            resultado.trofismo_pterigoideos = (
-                request.POST.get("trofismo_pterigoideos") == "on"
-            )
-
-            # Observaciones V Par
-            resultado.observaciones_v_par = request.POST.get(
-                "observaciones_v_par", ""
-            ).strip()
-
-            # ===================================================
-            # 7. PROCESAR CAMPOS VII PAR CRANEAL (FACIAL)
-            # ===================================================
-            # Mímica facial
-            resultado.mimica_frente = request.POST.get("mimica_frente") == "on"
-            resultado.mimica_parpados = request.POST.get("mimica_parpados") == "on"
-            resultado.mimica_elevacion_nasal = (
-                request.POST.get("mimica_elevacion_nasal") == "on"
-            )
-            resultado.mimica_buccinadores = (
-                request.POST.get("mimica_buccinadores") == "on"
-            )
-            resultado.mimica_orbicular_labios = (
-                request.POST.get("mimica_orbicular_labios") == "on"
-            )
-
-            # Gusto
-            resultado.gusto_anterior = request.POST.get("gusto_anterior") or None
-
-            # ===================================================
-            # 8. PROCESAR CAMPOS VIII PAR CRANEAL (AUDITIVO)
-            # ===================================================
-            # Síntomas auditivos
-            resultado.hipoacusia = request.POST.get("hipoacusia") == "on"
-            resultado.tinitus = request.POST.get("tinitus") == "on"
-            resultado.acufenos = request.POST.get("acufenos") == "on"
-
-            # Pruebas auditivas
-            resultado.weber = request.POST.get("weber") or None
-            resultado.rinne = request.POST.get("rinne") or None
-
-            # Síntomas vestibulares
-            resultado.vertigo = request.POST.get("vertigo") == "on"
-            resultado.mareo = request.POST.get("mareo") == "on"
-            resultado.nistagmus = request.POST.get("nistagmus") == "on"
-
-            # Observaciones VIII Par
-            resultado.observaciones_viii_par = request.POST.get(
-                "observaciones_viii_par", ""
-            ).strip()
-
-            # ===================================================
-            # 9. PROCESAR CAMPOS IX Y X PAR (GLOSOFARÍNGEO Y VAGO)
-            # ===================================================
-            # Síntomas vocales
-            resultado.disfonia = request.POST.get("disfonia") == "on"
-            resultado.afonia = request.POST.get("afonia") == "on"
-            resultado.voz_nasal = request.POST.get("voz_nasal") == "on"
-
-            # Síntomas deglutorios
-            resultado.disfagia = request.POST.get("disfagia") == "on"
-            resultado.sialorrea = request.POST.get("sialorrea") == "on"
-            resultado.dolor_faringe = request.POST.get("dolor_faringe") == "on"
-
-            # Exploración física
-            resultado.reflejo_nauseoso = request.POST.get("reflejo_nauseoso") or None
-            resultado.uvula = request.POST.get("uvula") or None
-            resultado.paladar = request.POST.get("paladar") or None
-            resultado.gusto_posterior = request.POST.get("gusto_posterior") or None
-
-            # ===================================================
-            # 10. PROCESAR CAMPOS XI PAR (ESPINAL ACCESORIO)
-            # ===================================================
-            resultado.movimientos_cuello = (
-                request.POST.get("movimientos_cuello") or None
-            )
-            resultado.elevacion_hombros = request.POST.get("elevacion_hombros") or None
-            resultado.atrofia_lingual = request.POST.get("atrofia_lingual") == "on"
-
-            # Observaciones XI Par
-            resultado.observaciones_xi_par = request.POST.get(
-                "observaciones_xi_par", ""
-            ).strip()
-
-            # ===================================================
-            # 11. PROCESAR CAMPOS XII PAR (HIPOGLOSO)
-            # ===================================================
-            resultado.fasciculaciones_linguales = (
-                request.POST.get("fasciculaciones_linguales") == "on"
-            )
-            resultado.movimientos_lengua = (
-                request.POST.get("movimientos_lengua") or None
-            )
-
-            # Observaciones XII Par
-            resultado.observaciones_xii_par = request.POST.get(
-                "observaciones_xii_par", ""
-            ).strip()
-
-            # ===================================================
-            # 12. PROCESAR SENSIBILIDAD
-            # ===================================================
-            # Dolor al pinchazo
-            resultado.dolor_cuello = request.POST.get("dolor_cuello") == "on"
-            resultado.dolor_torax = request.POST.get("dolor_torax") == "on"
-            resultado.dolor_miembros_superiores = (
-                request.POST.get("dolor_miembros_superiores") == "on"
-            )
-            resultado.dolor_abdomen = request.POST.get("dolor_abdomen") == "on"
-            resultado.dolor_miembros_inferiores = (
-                request.POST.get("dolor_miembros_inferiores") == "on"
-            )
-
-            # Táctil superficial
-            resultado.tactil_cuello = request.POST.get("tactil_cuello") == "on"
-            resultado.tactil_torax = request.POST.get("tactil_torax") == "on"
-            resultado.tactil_miembros_superiores = (
-                request.POST.get("tactil_miembros_superiores") == "on"
-            )
-            resultado.tactil_abdomen = request.POST.get("tactil_abdomen") == "on"
-            resultado.tactil_miembros_inferiores = (
-                request.POST.get("tactil_miembros_inferiores") == "on"
-            )
-
-            # Discriminación térmica
-            resultado.termica_cuello = request.POST.get("termica_cuello") == "on"
-            resultado.termica_torax = request.POST.get("termica_torax") == "on"
-            resultado.termica_miembros_superiores = (
-                request.POST.get("termica_miembros_superiores") == "on"
-            )
-            resultado.termica_abdomen = request.POST.get("termica_abdomen") == "on"
-            resultado.termica_miembros_inferiores = (
-                request.POST.get("termica_miembros_inferiores") == "on"
-            )
-
-            # Sensibilidad especializada
-            resultado.vibratoria = request.POST.get("vibratoria") or None
-            resultado.propiocepcion_superiores = (
-                request.POST.get("propiocepcion_superiores") or None
-            )
-            resultado.propiocepcion_inferiores = (
-                request.POST.get("propiocepcion_inferiores") or None
-            )
-            resultado.reconocimiento_objetos = (
-                request.POST.get("reconocimiento_objetos") or None
-            )
-            resultado.discriminacion_dos_puntos = (
-                request.POST.get("discriminacion_dos_puntos") or None
-            )
-
-            # Observaciones Sensibilidad
-            resultado.observaciones_sensibilidad = request.POST.get(
-                "observaciones_sensibilidad", ""
-            ).strip()
-
-            # ===================================================
-            # 13. PROCESAR REFLEJOS
-            # ===================================================
-            # Reflejos osteotendinosos
-            resultado.maseteriano_izquierdo = (
-                request.POST.get("maseteriano_izquierdo") or None
-            )
-            resultado.maseteriano_derecho = (
-                request.POST.get("maseteriano_derecho") or None
-            )
-
-            # Miembros superiores
-            resultado.tricipital_izquierdo = (
-                request.POST.get("tricipital_izquierdo") or None
-            )
-            resultado.tricipital_derecho = (
-                request.POST.get("tricipital_derecho") or None
-            )
-            resultado.bicipital_izquierdo = (
-                request.POST.get("bicipital_izquierdo") or None
-            )
-            resultado.bicipital_derecho = request.POST.get("bicipital_derecho") or None
-            resultado.estilorradial_izquierdo = (
-                request.POST.get("estilorradial_izquierdo") or None
-            )
-            resultado.estilorradial_derecho = (
-                request.POST.get("estilorradial_derecho") or None
-            )
-            resultado.cubitopronador_izquierdo = (
-                request.POST.get("cubitopronador_izquierdo") or None
-            )
-            resultado.cubitopronador_derecho = (
-                request.POST.get("cubitopronador_derecho") or None
-            )
-
-            # Reflejos cutáneos
-            resultado.cutaneo_abdominal_izquierdo = (
-                request.POST.get("cutaneo_abdominal_izquierdo") or None
-            )
-            resultado.cutaneo_abdominal_derecho = (
-                request.POST.get("cutaneo_abdominal_derecho") or None
-            )
-
-            # Miembros inferiores
-            resultado.rotuliano_izquierdo = (
-                request.POST.get("rotuliano_izquierdo") or None
-            )
-            resultado.rotuliano_derecho = request.POST.get("rotuliano_derecho") or None
-            resultado.aquiliano_izquierdo = (
-                request.POST.get("aquiliano_izquierdo") or None
-            )
-            resultado.aquiliano_derecho = request.POST.get("aquiliano_derecho") or None
-
-            # Reflejos patológicos
-            resultado.glabela = request.POST.get("glabela") or None
-            resultado.succion = request.POST.get("succion") or None
-            resultado.palmomentoniano = request.POST.get("palmomentoniano") or None
-            resultado.hoffman = request.POST.get("hoffman") or None
-            resultado.palmar = request.POST.get("palmar") or None
-            resultado.marinesco = request.POST.get("marinesco") or None
-            resultado.prension = request.POST.get("prension") or None
-
-            # Observaciones Reflejos
-            resultado.observaciones_reflejos = request.POST.get(
-                "observaciones_reflejos", ""
-            ).strip()
-
-            # ===================================================
-            # 14. PROCESAR FUERZA MUSCULAR
-            # ===================================================
-            # Miembro Superior - Brazo
-            resultado.brazo_abduccion_izq = (
-                request.POST.get("brazo_abduccion_izq") or None
-            )
-            resultado.brazo_abduccion_der = (
-                request.POST.get("brazo_abduccion_der") or None
-            )
-            resultado.brazo_antepulsion_izq = (
-                request.POST.get("brazo_antepulsion_izq") or None
-            )
-            resultado.brazo_antepulsion_der = (
-                request.POST.get("brazo_antepulsion_der") or None
-            )
-            resultado.brazo_rotacion_interna_izq = (
-                request.POST.get("brazo_rotacion_interna_izq") or None
-            )
-            resultado.brazo_rotacion_interna_der = (
-                request.POST.get("brazo_rotacion_interna_der") or None
-            )
-            resultado.brazo_rotacion_externa_izq = (
-                request.POST.get("brazo_rotacion_externa_izq") or None
-            )
-            resultado.brazo_rotacion_externa_der = (
-                request.POST.get("brazo_rotacion_externa_der") or None
-            )
-
-            # Miembro Superior - Antebrazo
-            resultado.antebrazo_flexion_izq = (
-                request.POST.get("antebrazo_flexion_izq") or None
-            )
-            resultado.antebrazo_flexion_der = (
-                request.POST.get("antebrazo_flexion_der") or None
-            )
-            resultado.antebrazo_extension_izq = (
-                request.POST.get("antebrazo_extension_izq") or None
-            )
-            resultado.antebrazo_extension_der = (
-                request.POST.get("antebrazo_extension_der") or None
-            )
-
-            # Miembro Superior - Mano
-            resultado.mano_flexion_izq = request.POST.get("mano_flexion_izq") or None
-            resultado.mano_flexion_der = request.POST.get("mano_flexion_der") or None
-            resultado.mano_extension_izq = (
-                request.POST.get("mano_extension_izq") or None
-            )
-            resultado.mano_extension_der = (
-                request.POST.get("mano_extension_der") or None
-            )
-            resultado.mano_prension_izq = request.POST.get("mano_prension_izq") or None
-            resultado.mano_prension_der = request.POST.get("mano_prension_der") or None
-
-            # Miembro Inferior - Muslo
-            resultado.muslo_flexion_izq = request.POST.get("muslo_flexion_izq") or None
-            resultado.muslo_flexion_der = request.POST.get("muslo_flexion_der") or None
-            resultado.muslo_abduccion_izq = (
-                request.POST.get("muslo_abduccion_izq") or None
-            )
-            resultado.muslo_abduccion_der = (
-                request.POST.get("muslo_abduccion_der") or None
-            )
-            resultado.muslo_aduccion_izq = (
-                request.POST.get("muslo_aduccion_izq") or None
-            )
-            resultado.muslo_aduccion_der = (
-                request.POST.get("muslo_aduccion_der") or None
-            )
-
-            # Miembro Inferior - Pierna
-            resultado.pierna_flexion_izq = (
-                request.POST.get("pierna_flexion_izq") or None
-            )
-            resultado.pierna_flexion_der = (
-                request.POST.get("pierna_flexion_der") or None
-            )
-            resultado.pierna_extension_izq = (
-                request.POST.get("pierna_extension_izq") or None
-            )
-            resultado.pierna_extension_der = (
-                request.POST.get("pierna_extension_der") or None
-            )
-
-            # Miembro Inferior - Pie
-            resultado.pie_flexion_izq = request.POST.get("pie_flexion_izq") or None
-            resultado.pie_flexion_der = request.POST.get("pie_flexion_der") or None
-            resultado.pie_extension_izq = request.POST.get("pie_extension_izq") or None
-            resultado.pie_extension_der = request.POST.get("pie_extension_der") or None
-            resultado.pie_eversion_izq = request.POST.get("pie_eversion_izq") or None
-            resultado.pie_eversion_der = request.POST.get("pie_eversion_der") or None
-            resultado.pie_inversion_izq = request.POST.get("pie_inversion_izq") or None
-            resultado.pie_inversion_der = request.POST.get("pie_inversion_der") or None
-
-            # Observaciones Fuerza
-            resultado.observaciones_fuerza = request.POST.get(
-                "observaciones_fuerza", ""
-            ).strip()
-
-            # ===================================================
-            # 15. PROCESAR COORDINACIÓN
-            # ===================================================
-            resultado.coordinacion_dedo_nariz = (
-                request.POST.get("coordinacion_dedo_nariz") or None
-            )
-            resultado.romberg = request.POST.get("romberg") or None
-            resultado.talon_rodilla = request.POST.get("talon_rodilla") or None
-            resultado.pronacion_supinacion = (
-                request.POST.get("pronacion_supinacion") or None
-            )
-
-            # ===================================================
-            # 16. PROCESAR MARCHA
-            # ===================================================
-            # Evaluación básica
-            resultado.postura = request.POST.get("postura") or None
-            resultado.marcha_lineal = request.POST.get("marcha_lineal") or None
-            resultado.marcha_puntillas = request.POST.get("marcha_puntillas") or None
-
-            # Patrones patológicos
-            resultado.marcha_hemiplejica = (
-                request.POST.get("marcha_hemiplejica") == "on"
-            )
-            resultado.marcha_parkinsoniana = (
-                request.POST.get("marcha_parkinsoniana") == "on"
-            )
-            resultado.marcha_espastica = request.POST.get("marcha_espastica") == "on"
-            resultado.marcha_polineuritica = (
-                request.POST.get("marcha_polineuritica") == "on"
-            )
-            resultado.marcha_ataxica = request.POST.get("marcha_ataxica") == "on"
-            resultado.marcha_miopatica = request.POST.get("marcha_miopatica") == "on"
-            resultado.marcha_steppage = request.POST.get("marcha_steppage") == "on"
-
-            # Observaciones Marcha
-            resultado.observaciones_marcha = request.POST.get(
-                "observaciones_marcha", ""
-            ).strip()
-
-            # ===================================================
-            # 17. PROCESAR MOVIMIENTOS ANORMALES
-            # ===================================================
-            resultado.convulsiones = request.POST.get("convulsiones") == "on"
-            resultado.fasciculaciones = request.POST.get("fasciculaciones") == "on"
-            resultado.mioclonias = request.POST.get("mioclonias") == "on"
-            resultado.temblores = request.POST.get("temblores") == "on"
-            resultado.corea = request.POST.get("corea") == "on"
-            resultado.espasmos = request.POST.get("espasmos") == "on"
-            resultado.balismos = request.POST.get("balismos") == "on"
-            resultado.calambres = request.POST.get("calambres") == "on"
-            resultado.tics = request.POST.get("tics") == "on"
-            resultado.distonias = request.POST.get("distonias") == "on"
-
-            # ===================================================
-            # 18. GUARDAR RESULTADO
-            # ===================================================
-            resultado.save()
-
-            # ===================================================
-            # 19. ACTUALIZAR ESTADO DE LA VISITA-EXAMEN
-            # ===================================================
-            visita_examen.estado = "completado"
-            visita_examen.fecha_completado = timezone.now()
-            visita_examen.save()
-
-            # ===================================================
-            # 20. GENERAR RESUMEN PARA EL MENSAJE
-            # ===================================================
-            # Contar campos completados
-            campos_completados = 0
-            total_campos = 0
-
-            # Contar pares craneales
-            if any(
-                [
-                    resultado.clavos_izquierdo,
-                    resultado.clavos_derecho,
-                    resultado.pimienta_izquierdo,
-                    resultado.pimienta_derecho,
-                    resultado.cafe_izquierdo,
-                    resultado.cafe_derecho,
-                ]
-            ):
-                campos_completados += 1
-            total_campos += 1
-
-            if any(
-                [resultado.amaurosis, resultado.agudeza_visual, resultado.fundoscopia]
-            ):
-                campos_completados += 1
-            total_campos += 1
-
-            if any(
-                [
-                    resultado.diplopia,
-                    resultado.ptosis_palpebral,
-                    resultado.movimientos_oculares,
-                ]
-            ):
-                campos_completados += 1
-            total_campos += 1
-
-            # Contar sensibilidad
-            sensibilidad_count = 0
-            if any(
-                [
-                    resultado.dolor_cuello,
-                    resultado.dolor_torax,
-                    resultado.dolor_miembros_superiores,
-                    resultado.dolor_abdomen,
-                    resultado.dolor_miembros_inferiores,
-                ]
-            ):
-                sensibilidad_count += 1
-            if any(
-                [
-                    resultado.tactil_cuello,
-                    resultado.tactil_torax,
-                    resultado.tactil_miembros_superiores,
-                    resultado.tactil_abdomen,
-                    resultado.tactil_miembros_inferiores,
-                ]
-            ):
-                sensibilidad_count += 1
-            if any(
-                [
-                    resultado.termica_cuello,
-                    resultado.termica_torax,
-                    resultado.termica_miembros_superiores,
-                    resultado.termica_abdomen,
-                    resultado.termica_miembros_inferiores,
-                ]
-            ):
-                sensibilidad_count += 1
-
-            # Contar reflejos evaluados
-            reflejos_evaluados = 0
-            reflejos_campos = [
-                resultado.maseteriano_izquierdo,
-                resultado.maseteriano_derecho,
-                resultado.bicipital_izquierdo,
-                resultado.bicipital_derecho,
-                resultado.tricipital_izquierdo,
-                resultado.tricipital_derecho,
-                resultado.rotuliano_izquierdo,
-                resultado.rotuliano_derecho,
-                resultado.aquiliano_izquierdo,
-                resultado.aquiliano_derecho,
-            ]
-            reflejos_evaluados = sum(1 for r in reflejos_campos if r is not None)
-
-            # Contar fuerza evaluada
-            fuerza_evaluada = 0
-            fuerza_campos = [
-                resultado.brazo_abduccion_izq,
-                resultado.brazo_abduccion_der,
-                resultado.antebrazo_flexion_izq,
-                resultado.antebrazo_flexion_der,
-                resultado.mano_flexion_izq,
-                resultado.mano_flexion_der,
-                resultado.muslo_flexion_izq,
-                resultado.muslo_flexion_der,
-                resultado.pierna_flexion_izq,
-                resultado.pierna_flexion_der,
-                resultado.pie_flexion_izq,
-                resultado.pie_flexion_der,
-            ]
-            fuerza_evaluada = sum(1 for f in fuerza_campos if f is not None)
-
-            mensaje_resumen = (
-                f"✅ Examen Neurológico {accion} correctamente.\n"
-                f"📊 Pares craneales: {campos_completados}/{total_campos} evaluados\n"
-                f"🧠 Sensibilidad: {sensibilidad_count} tipos evaluados\n"
-                f"🔨 Reflejos: {reflejos_evaluados} evaluados\n"
-                f"💪 Fuerza muscular: {fuerza_evaluada} movimientos evaluados"
-            )
-
-            messages.success(request, mensaje_resumen)
-
-            return redirect("detalle_paciente", paciente_id=paciente_id)
+            if visita_examen.estado == "pendiente":
+                visita_examen.estado = "en_progreso"
+                visita_examen.fecha_inicio = timezone.now()
+                visita_examen.save()
+
+            form = ExamenNeurologicoForm(request.POST)
+            if form.is_valid():
+                ExamenNeurologicoResult.objects.update_or_create(
+                    visita_examen=visita_examen,
+                    defaults=form.cleaned_data,
+                )
+
+                visita_examen.estado = "completado"
+                visita_examen.fecha_completado = timezone.now()
+                visita_examen.save()
+
+                messages.success(
+                    request, "✅ Examen Neurológico guardado correctamente."
+                )
+                return redirect("detalle_paciente", paciente_id=paciente_id)
+            else:
+                error_msgs = "; ".join(
+                    f"{field}: {', '.join(errs)}"
+                    for field, errs in list(form.errors.items())[:5]
+                )
+                messages.error(
+                    request,
+                    f"❌ Error de validación en examen neurológico: {error_msgs}",
+                )
+                return redirect("detalle_paciente", paciente_id=paciente_id)
 
         except Exception as e:
-            import traceback
-
-            messages.error(request, f"Error al procesar Examen Neurológico: {str(e)}")
+            messages.error(
+                request, f"❌ Error al procesar Examen Neurológico: {str(e)}"
+            )
             return redirect("detalle_paciente", paciente_id=paciente_id)
 
-    # Si no es POST, redirigir al home
     return redirect("home")
 
 

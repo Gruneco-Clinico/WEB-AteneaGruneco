@@ -1,8 +1,0 @@
-[33mcommit dd714de911bede33c4c6c176612e5fa818bd19f5[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mv2.0[m[33m, [m[1;31morigin/v2.0[m[33m)[m
-Author: Silvania Ramos Paternina <113859946+lasilvi@users.noreply.github.com>
-Date:   Tue Sep 9 16:46:20 2025 -0500
-
-    commit
-
- apps/templates/layouts/base_theme.html | 13 [32m+++++++[m[31m------[m
- 1 file changed, 7 insertions(+), 6 deletions(-)
