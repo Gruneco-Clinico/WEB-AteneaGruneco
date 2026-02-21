@@ -47,7 +47,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // Función para inicializar un formulario específico
     function initializeForm(formType) {
         const form = document.querySelector(`#form-${formType}`);
-        
+
+        if (!form) {
+            console.warn(`initializeForm: formulario #form-${formType} no encontrado.`);
+            return;
+        }
+
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             const formData = new FormData(form);
