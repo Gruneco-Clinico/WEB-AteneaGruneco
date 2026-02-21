@@ -8,7 +8,7 @@ def get_posthog_events(limit=50):
     }
     params = {"limit": limit}
 
-    response = requests.get(url, headers=headers, params=params)
+    response = requests.get(url, headers=headers, params=params, timeout=10)
     if response.status_code == 200:
         return response.json().get("results", [])
     return []
@@ -19,7 +19,7 @@ def get_insight_data(insight_id):
         "Authorization": f"Bearer {settings.POSTHOG_API_KEY}"
     }
 
-    response = requests.get(url, headers=headers)
+    response = requests.get(url, headers=headers, timeout=10)
     response.raise_for_status()
     return response.json()
 
