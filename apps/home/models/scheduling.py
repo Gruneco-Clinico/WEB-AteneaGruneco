@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from .project import Proyecto
 
 
 class Sala(models.Model):
@@ -108,6 +109,16 @@ class CitaMedica(models.Model):
     # Control
     estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default="agendada")
     fecha_agendamiento = models.DateTimeField(auto_now_add=True)
+
+    # Proyecto asociado (opcional)
+    proyecto = models.ForeignKey(
+        Proyecto,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="citas",
+        verbose_name="Proyecto asociado",
+    )
 
     # Propiedades de conveniencia
     @property

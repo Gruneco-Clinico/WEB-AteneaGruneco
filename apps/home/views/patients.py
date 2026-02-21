@@ -34,7 +34,22 @@ logger = logging.getLogger(__name__)
 @login_required
 def lista_pacientes(request):
     pacientes = DatosDemograficos.objects.all()
-    return render(request, "home/tables.html", {"pacientes": pacientes})
+    proyectos = Proyecto.objects.all()
+    filtro_proyecto = request.GET.get("proyecto", "")
+    if filtro_proyecto:
+        try:
+            pacientes = pacientes.filter(proyectos__id=int(filtro_proyecto))
+        except (ValueError, TypeError):
+            pass
+    return render(
+        request,
+        "home/tables.html",
+        {
+            "pacientes": pacientes,
+            "proyectos": proyectos,
+            "filtro_proyecto": filtro_proyecto,
+        },
+    )
 
 
 @login_required

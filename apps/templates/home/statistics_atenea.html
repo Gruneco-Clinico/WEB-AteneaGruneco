@@ -1,75 +1,35 @@
 {% extends 'layouts/base.html' %}
 {% load static %}
-{% load custom_filters %}
 
-<!-- Specific CSS goes HERE -->
-{% block stylesheets %}{% endblock stylesheets %} {% block content %}
+{% block stylesheets %}
+<style>
+  .filter-card { border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+  .stat-card { border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.08); transition: all .3s ease; }
+  .stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
+  .badge-gender-m { background-color: #5e72e4; color: #fff; }
+  .badge-gender-f { background-color: #f5365c; color: #fff; }
+  .badge-gender-o { background-color: #fb6340; color: #fff; }
+  .table th { font-weight: 600; text-transform: uppercase; font-size: .8rem; letter-spacing: .5px; }
+  #statsContainer .card, #evaluadoresContainer .card { animation: fadeIn .4s ease; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+</style>
+{% endblock stylesheets %}
+
+{% block content %}
 <!-- Header -->
 <div class="header bg-primary pb-6">
   <div class="container-fluid">
     <div class="header-body">
       <div class="row align-items-center py-4">
         <div class="col-lg-6 col-7">
-          <h6 class="h2 text-white d-inline-block mb-0">GRUNECO</h6>
+          <h6 class="h2 text-white d-inline-block mb-0">Estadísticas ATENEA</h6>
           <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
             <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
-              <li class="breadcrumb-item">
-                <a href="#"><i class="fas fa-home"></i></a>
-              </li>
-              <li class="breadcrumb-item"><a href="#">Atenea</a></li>
-              <li class="breadcrumb-item active" aria-current="page">
-                Estadísticas Atenea
-              </li>
+              <li class="breadcrumb-item"><a href="/index/"><i class="fas fa-home"></i></a></li>
+              <li class="breadcrumb-item active" aria-current="page">Estadísticas</li>
             </ol>
           </nav>
         </div>
-      </div>
-      <!-- Card stats -->
-      <div class="row">
-
-        <!-- Número de participantes por proyecto -->
-        {% for p in proyectos_info %}
-        <div class="col-xl-4 col-md-6 mb-3">
-          <div class="card card-stats">
-            <div class="card-body">
-              <div class="row">
-                <div class="col">
-                  <h5 class="card-title text-uppercase text-muted mb-0">
-                    {{ p.label }}
-                  </h5>
-
-                  <!-- Cantidad de Participantes por Proyecto -->
-                  <div class="d-flex align-items-baseline">
-                    <span class="h2 font-weight-bold mb-0 mr-3">{{ p.participants }}</span>
-                    <small class="text-muted">Participantes</small>
-                  </div>
-
-                  <!-- Datos recolectados por Proyecto (Exámenes completados)-->
-                  <div class="mt-2 d-flex align-items-baseline">
-                    <span class="h3 font-weight-semibold mb-0 mr-3 text-success">{{ p.exams_completed }}</span>
-                    <small class="text-muted">Datos recolectados (exámenes completados)</small>
-                  </div>
-
-                </div>
-
-                <div class="col-auto">
-                  <div class="icon icon-shape bg-gradient-blue text-white rounded-circle shadow">
-                    <i class="ni ni-briefcase-24"></i>
-                  </div>
-                </div>
-              </div>
-
-              <p class="mt-3 mb-0 text-sm">
-                <span class="text-success mr-2">
-                  <i class="fa fa-arrow-up"></i>
-                  Nuevos participantes en curso
-                </span>
-                <span class="text-nowrap">Actualizado recientemente</span>
-              </p>
-            </div>
-          </div>
-        </div>
-      {% endfor %}
       </div>
     </div>
   </div>
@@ -77,116 +37,375 @@
 
 <!-- Page content -->
 <div class="container-fluid mt--6">
-  <div class="row mb-0">
+  <!-- ====== FILTROS ====== -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card filter-card">
+        <div class="card-header border-0 pb-0">
+          <h3 class="mb-0"><i class="fas fa-filter mr-2 text-primary"></i>Filtros</h3>
+        </div>
+        <div class="card-body pt-3">
+          <div class="row align-items-end">
+            <div class="col-md-3">
+              <label class="form-control-label">Proyecto</label>
+              <select class="form-control" id="filtroProyecto">
+                <option value="">Todos los proyectos</option>
+                {% for p in proyectos %}
+                <option value="{{ p.id }}" {% if filtro_proyecto|stringformat:"s" == p.id|stringformat:"s" %}selected{% endif %}>
+                  {{ p.nombre }}
+                </option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-2">
+              <label class="form-control-label">Sexo</label>
+              <select class="form-control" id="filtroGenero">
+                <option value="">Todos</option>
+                <option value="M" {% if filtro_genero == "M" %}selected{% endif %}>Masculino</option>
+                <option value="F" {% if filtro_genero == "F" %}selected{% endif %}>Femenino</option>
+                <option value="O" {% if filtro_genero == "O" %}selected{% endif %}>Otro</option>
+              </select>
+            </div>
+            <div class="col-md-2">
+              <label class="form-control-label">Edad mínima</label>
+              <input type="number" class="form-control" id="filtroEdadMin" min="0" max="120"
+                     value="{{ filtro_edad_min }}" placeholder="18">
+            </div>
+            <div class="col-md-2">
+              <label class="form-control-label">Edad máxima</label>
+              <input type="number" class="form-control" id="filtroEdadMax" min="0" max="120"
+                     value="{{ filtro_edad_max }}" placeholder="120">
+            </div>
+            <div class="col-md-3 d-flex">
+              <button class="btn btn-primary mr-2 flex-fill" onclick="aplicarFiltros()">
+                <i class="fas fa-search mr-1"></i> Filtrar
+              </button>
+              <button class="btn btn-outline-secondary flex-fill" onclick="limpiarFiltros()">
+                <i class="fas fa-times mr-1"></i> Limpiar
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== ESTADÍSTICAS POR PROYECTO ====== -->
+  <div id="statsContainer">
     {% for p in proyectos_info %}
-    <div class="col-xl-6">
-      <div class="card">
-          <div class="card-header border-0">
-            <div class="row align-items-center">
+    <div class="row mb-4">
+      <!-- Summary card -->
+      <div class="col-xl-4 col-md-6 mb-3">
+        <div class="card stat-card">
+          <div class="card-body">
+            <div class="row">
               <div class="col">
-                <h3 class="mb-0">Estadísticas Clínicas - {{ p.label }}</h3>
+                <h5 class="card-title text-uppercase text-muted mb-0">{{ p.proyecto_nombre }}</h5>
+                <div class="d-flex align-items-baseline">
+                  <span class="h2 font-weight-bold mb-0 mr-2">{{ p.participantes }}</span>
+                  <small class="text-muted">Participantes</small>
+                </div>
+                <div class="mt-2 d-flex align-items-baseline">
+                  <span class="h3 font-weight-semibold mb-0 mr-2 text-success">{{ p.exams_completed }}</span>
+                  <small class="text-muted">Exámenes completados</small>
+                </div>
+                <div class="mt-2">
+                  <span class="badge badge-gender-m mr-1">M: {{ p.genero.M }}</span>
+                  <span class="badge badge-gender-f mr-1">F: {{ p.genero.F }}</span>
+                  {% if p.genero.O %}<span class="badge badge-gender-o">O: {{ p.genero.O }}</span>{% endif %}
+                </div>
               </div>
-              <div class="col text-right">
-                <a href="#!" class="btn btn-sm btn-primary">Ver detalles</a>
+              <div class="col-auto">
+                <div class="icon icon-shape bg-gradient-blue text-white rounded-circle shadow">
+                  <i class="ni ni-briefcase-24"></i>
+                </div>
               </div>
             </div>
           </div>
+        </div>
+      </div>
+
+      <!-- Age distribution -->
+      <div class="col-xl-4 col-md-6 mb-3">
+        <div class="card stat-card">
+          <div class="card-header border-0 py-3">
+            <h6 class="mb-0">Distribución por Edad — {{ p.proyecto_nombre }}</h6>
+          </div>
           <div class="table-responsive">
-            <table class="table align-items-center table-flush">
+            <table class="table table-sm align-items-center table-flush mb-0">
               <thead class="thead-light">
-                <tr>
-                  <th scope="col">Rango de Edad</th>
-                  <th scope="col">Número de Participantes</th>
-                </tr>
+                <tr><th>Rango</th><th>Cantidad</th><th>%</th></tr>
               </thead>
               <tbody>
-                {% for stat in p.clinical_stats %}
-                  <tr>
-                    <td>{{ stat.rango }}</td>
-                    <td>{{ stat.count }}</td>
-                  </tr>
-                {% empty %}
-                  <tr>
-                    <td colspan="2" class="text-center text-muted">
-                      No hay participantes registrados
-                    </td>
-                  </tr>
+                {% for a in p.edad %}
+                <tr>
+                  <td>{{ a.rango }}</td>
+                  <td>{{ a.count }}</td>
+                  <td>
+                    {% if p.participantes %}
+                      <div class="progress" style="min-width:60px;">
+                        <div class="progress-bar bg-primary" style="width:{% widthratio a.count p.participantes 100 %}%"></div>
+                      </div>
+                    {% else %}-{% endif %}
+                  </td>
+                </tr>
                 {% endfor %}
               </tbody>
             </table>
           </div>
         </div>
+      </div>
 
-
-
-      <!-- Gráficos que van a la derecha -->
-
-    </div>
-
-    <div class="col-xl-6">
-      <div class="card">
-        <div class="card-header border-0">
-          <div class="row align-items-center">
-            <div class="col">
-              <h3 class="mb-0">Distribución Demográfica - {{ p.label }}</h3>
-            </div>
+      <!-- Escolaridad distribution -->
+      <div class="col-xl-4 col-md-12 mb-3">
+        <div class="card stat-card">
+          <div class="card-header border-0 py-3">
+            <h6 class="mb-0">Distribución por Escolaridad — {{ p.proyecto_nombre }}</h6>
+          </div>
+          <div class="table-responsive">
+            <table class="table table-sm align-items-center table-flush mb-0">
+              <thead class="thead-light">
+                <tr><th>Nivel</th><th>Cantidad</th><th>%</th></tr>
+              </thead>
+              <tbody>
+                {% for e in p.escolaridad %}
+                {% if e.count %}
+                <tr>
+                  <td>{{ e.nivel|title }}</td>
+                  <td>{{ e.count }}</td>
+                  <td>
+                    <div class="progress" style="min-width:60px;">
+                      <div class="progress-bar bg-success" style="width:{% widthratio e.count p.participantes 100 %}%"></div>
+                    </div>
+                  </td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+              </tbody>
+            </table>
           </div>
         </div>
-        <div class="table-responsive">
-          <table class="table align-items-center table-flush">
-            <thead class="thead-light">
-              <tr>
-                <th scope="col">Categoría</th>
-                <th scope="col">Cantidad</th>
-                <th scope="col">Porcentaje</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for stat in p.demografia %}
-              <tr>
-                <th scope="row">{{ stat.label }}</th>
-                <td>{{ stat.count }}</td>
-                <td>
-                  <div class="d-flex align-items-center">
-                    <span class="mr-2">{{ stat.percent }}%</span>
-                    <div>
-                      <div class="progress">
-                        <div class="progress-bar bg-gradient-{{ stat.color }}"
-                            role="progressbar"
-                            aria-valuenow="{{ stat.percent|default_if_none:0|floatformat:0 }}"
-                            aria-valuemin="0"
-                            aria-valuemax="100"
-                            style="width: {{ stat.percent|default_if_none:0|floatformat:0 }}%;">
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </td>
-              </tr>
-              {% empty %}
-              <tr>
-                <td colspan="3" class="text-center text-muted">
-                  No hay participantes registrados
-                </td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
+      </div>
+    </div>
+    {% empty %}
+    <div class="row">
+      <div class="col text-center py-5">
+        <i class="fas fa-chart-bar fa-3x text-muted mb-3"></i>
+        <p class="text-muted">No se encontraron datos con los filtros seleccionados.</p>
       </div>
     </div>
     {% endfor %}
   </div>
-  
-{% include "includes/footer.html" %}
-</div>
 
+  <!-- ====== ESTADÍSTICAS POR EVALUADOR ====== -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card stat-card">
+        <div class="card-header border-0">
+          <h3 class="mb-0"><i class="fas fa-user-md mr-2 text-info"></i>Estadísticas por Evaluador</h3>
+        </div>
+        <div class="card-body pt-0" id="evaluadoresContainer">
+          <p class="text-muted" id="evalLoading">Cargando datos de evaluadores…</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% include "includes/footer.html" %}
+</div>
 {% endblock content %}
 
-
 {% block javascripts %}
+<script>
+const API_STATS = "{% url 'api_estadisticas_proyecto' %}";
+const API_EVALS = "{% url 'api_estadisticas_evaluadores' %}";
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+function getFilters() {
+  return {
+    proyecto: document.getElementById('filtroProyecto').value,
+    genero: document.getElementById('filtroGenero').value,
+    edad_min: document.getElementById('filtroEdadMin').value,
+    edad_max: document.getElementById('filtroEdadMax').value,
+  };
+}
 
+function buildQS(filters) {
+  const params = new URLSearchParams();
+  for (const [k, v] of Object.entries(filters)) { if (v) params.set(k, v); }
+  return params.toString();
+}
+
+function pct(count, total) {
+  return total ? Math.round(count / total * 100) : 0;
+}
+
+function aplicarFiltros() {
+  const filters = getFilters();
+  const qs = buildQS(filters);
+
+  // Update URL without reload (bookmarkable)
+  const newUrl = window.location.pathname + (qs ? '?' + qs : '');
+  history.replaceState(null, '', newUrl);
+
+  // Fetch project stats
+  fetch(API_STATS + '?' + qs, { credentials: 'same-origin' })
+    .then(r => r.json())
+    .then(data => renderStats(data.proyectos))
+    .catch(() => {
+      document.getElementById('statsContainer').innerHTML =
+        '<div class="col text-center py-4 text-danger">Error al cargar estadísticas.</div>';
+    });
+
+  // Fetch evaluator stats
+  const evalQS = filters.proyecto ? 'proyecto=' + filters.proyecto : '';
+  fetch(API_EVALS + '?' + evalQS, { credentials: 'same-origin' })
+    .then(r => r.json())
+    .then(data => renderEvaluadores(data.proyectos))
+    .catch(() => {
+      document.getElementById('evaluadoresContainer').innerHTML =
+        '<p class="text-danger">Error al cargar datos de evaluadores.</p>';
+    });
+}
+
+function limpiarFiltros() {
+  document.getElementById('filtroProyecto').value = '';
+  document.getElementById('filtroGenero').value = '';
+  document.getElementById('filtroEdadMin').value = '';
+  document.getElementById('filtroEdadMax').value = '';
+  aplicarFiltros();
+}
+
+function renderStats(proyectos) {
+  const container = document.getElementById('statsContainer');
+  if (!proyectos.length) {
+    container.innerHTML = `
+      <div class="row"><div class="col text-center py-5">
+        <i class="fas fa-chart-bar fa-3x text-muted mb-3"></i>
+        <p class="text-muted">No se encontraron datos con los filtros seleccionados.</p>
+      </div></div>`;
+    return;
+  }
+
+  let html = '';
+  proyectos.forEach(p => {
+    const t = p.participantes;
+    let ageRows = '';
+    p.edad.forEach(a => {
+      ageRows += `<tr><td>${a.rango}</td><td>${a.count}</td>
+        <td><div class="progress" style="min-width:60px;"><div class="progress-bar bg-primary" style="width:${pct(a.count,t)}%"></div></div></td></tr>`;
+    });
+
+    let escRows = '';
+    p.escolaridad.forEach(e => {
+      if (e.count) {
+        escRows += `<tr><td>${e.nivel.charAt(0).toUpperCase()+e.nivel.slice(1)}</td><td>${e.count}</td>
+          <td><div class="progress" style="min-width:60px;"><div class="progress-bar bg-success" style="width:${pct(e.count,t)}%"></div></div></td></tr>`;
+      }
+    });
+
+    html += `
+    <div class="row mb-4">
+      <div class="col-xl-4 col-md-6 mb-3">
+        <div class="card stat-card"><div class="card-body">
+          <div class="row"><div class="col">
+            <h5 class="card-title text-uppercase text-muted mb-0">${p.proyecto_nombre}</h5>
+            <div class="d-flex align-items-baseline">
+              <span class="h2 font-weight-bold mb-0 mr-2">${t}</span>
+              <small class="text-muted">Participantes</small>
+            </div>
+            <div class="mt-2 d-flex align-items-baseline">
+              <span class="h3 font-weight-semibold mb-0 mr-2 text-success">${p.exams_completed}</span>
+              <small class="text-muted">Exámenes completados</small>
+            </div>
+            <div class="mt-2">
+              <span class="badge badge-gender-m mr-1">M: ${p.genero.M}</span>
+              <span class="badge badge-gender-f mr-1">F: ${p.genero.F}</span>
+              ${p.genero.O ? '<span class="badge badge-gender-o">O: '+p.genero.O+'</span>' : ''}
+            </div>
+          </div>
+          <div class="col-auto">
+            <div class="icon icon-shape bg-gradient-blue text-white rounded-circle shadow">
+              <i class="ni ni-briefcase-24"></i>
+            </div>
+          </div></div>
+        </div></div>
+      </div>
+      <div class="col-xl-4 col-md-6 mb-3">
+        <div class="card stat-card">
+          <div class="card-header border-0 py-3"><h6 class="mb-0">Distribución por Edad — ${p.proyecto_nombre}</h6></div>
+          <div class="table-responsive">
+            <table class="table table-sm align-items-center table-flush mb-0">
+              <thead class="thead-light"><tr><th>Rango</th><th>Cantidad</th><th>%</th></tr></thead>
+              <tbody>${ageRows}</tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="col-xl-4 col-md-12 mb-3">
+        <div class="card stat-card">
+          <div class="card-header border-0 py-3"><h6 class="mb-0">Distribución por Escolaridad — ${p.proyecto_nombre}</h6></div>
+          <div class="table-responsive">
+            <table class="table table-sm align-items-center table-flush mb-0">
+              <thead class="thead-light"><tr><th>Nivel</th><th>Cantidad</th><th>%</th></tr></thead>
+              <tbody>${escRows || '<tr><td colspan="3" class="text-center text-muted">Sin datos</td></tr>'}</tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  });
+
+  container.innerHTML = html;
+}
+
+function renderEvaluadores(proyectos) {
+  const container = document.getElementById('evaluadoresContainer');
+
+  if (!proyectos.length) {
+    container.innerHTML = '<p class="text-muted text-center py-3">No se encontraron evaluadores asignados.</p>';
+    return;
+  }
+
+  let html = '';
+  proyectos.forEach(pp => {
+    let rows = '';
+    pp.evaluadores.forEach(ev => {
+      rows += `<tr>
+        <td><strong>${ev.nombre}</strong></td>
+        <td><span class="badge badge-pill badge-primary">${ev.num_pacientes}</span></td>
+        <td><span class="badge badge-pill badge-info">${ev.num_consultas}</span></td>
+        <td><span class="badge badge-pill badge-success">${ev.exams_completados}</span></td>
+      </tr>`;
+    });
+
+    html += `
+    <div class="mb-4">
+      <h6 class="text-uppercase text-muted mb-2"><i class="ni ni-briefcase-24 mr-1"></i>${pp.proyecto_nombre}</h6>
+      <div class="table-responsive">
+        <table class="table table-sm align-items-center table-flush">
+          <thead class="thead-light">
+            <tr><th>Evaluador</th><th>Pacientes</th><th>Consultas</th><th>Exámenes completados</th></tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+    </div>`;
+  });
+
+  container.innerHTML = html;
+}
+
+// Initial load of evaluators via AJAX
+document.addEventListener('DOMContentLoaded', function() {
+  const filters = getFilters();
+  const evalQS = filters.proyecto ? 'proyecto=' + filters.proyecto : '';
+  fetch(API_EVALS + '?' + evalQS, { credentials: 'same-origin' })
+    .then(r => r.json())
+    .then(data => renderEvaluadores(data.proyectos))
+    .catch(() => {
+      document.getElementById('evaluadoresContainer').innerHTML =
+        '<p class="text-danger">Error al cargar datos de evaluadores.</p>';
+    });
+});
+</script>
 {% endblock javascripts %}

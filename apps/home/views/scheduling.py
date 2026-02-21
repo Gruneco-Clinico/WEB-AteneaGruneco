@@ -48,6 +48,7 @@ class AgendarCitaPublicaView(TemplateView):
         context.update(
             {
                 "profesionales": profesionales_con_disponibilidad,
+                "proyectos": Proyecto.objects.all(),
                 "titulo": "Reservar Cita Médica",
             }
         )
@@ -191,6 +192,7 @@ def agendar_cita_ajax(request):
             nombre_paciente = data.get("nombre_paciente")
             telefono_paciente = data.get("telefono_paciente", "")
             motivo_consulta = data.get("motivo_consulta", "")
+            proyecto_id = data.get("proyecto_id", None)
 
             # Validaciones básicas
             if not all(
@@ -260,6 +262,14 @@ def agendar_cita_ajax(request):
                     }
                 )
 
+            # Obtener proyecto asociado (opcional)
+            proyecto_obj = None
+            if proyecto_id:
+                try:
+                    proyecto_obj = Proyecto.objects.get(id=int(proyecto_id))
+                except (Proyecto.DoesNotExist, ValueError, TypeError):
+                    pass
+
             # Crear la nueva cita
             nueva_cita = CitaMedica.objects.create(
                 disponibilidad=disponibilidad,
@@ -269,6 +279,7 @@ def agendar_cita_ajax(request):
                 telefono_paciente=telefono_paciente.strip(),
                 motivo_consulta=motivo_consulta.strip(),
                 estado="agendada",
+                proyecto=proyecto_obj,
             )
 
             # Formatear información para la respuesta

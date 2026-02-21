@@ -11,7 +11,7 @@ from django.forms.models import model_to_dict
 from django.contrib.auth.models import User
 from django.views.generic import TemplateView
 from django.core.mail import send_mail, EmailMessage
-from django.db.models import Max
+from django.db.models import Max, Count, Q
 from datetime import datetime, timedelta
 from ..models import *
 from ..forms import ProyectoForm, RegistroDemograficoForm
@@ -32,114 +32,214 @@ logger = logging.getLogger(__name__)
 
 from .auth import is_superuser
 
+
+# ---------------------------------------------------------------------------
+# Helpers
+# ---------------------------------------------------------------------------
+
+RANGOS_EDAD = [
+    (18, 30, "18-30"),
+    (31, 45, "31-45"),
+    (46, 60, "46-60"),
+    (61, 200, "60+"),
+]
+
+
+def _build_project_stats(proyecto, genero=None, edad_min=None, edad_max=None):
+    """Return a dict with participant & exam stats for one Proyecto, applying
+    optional gender / age filters."""
+    patients = DatosDemograficos.objects.filter(proyectos=proyecto)
+
+    if genero:
+        patients = patients.filter(genero__iexact=genero)
+    if edad_min is not None:
+        patients = patients.filter(edad__gte=edad_min)
+    if edad_max is not None:
+        patients = patients.filter(edad__lte=edad_max)
+
+    total = patients.count()
+
+    # Gender distribution
+    hombres = patients.filter(genero__iexact="M").count()
+    mujeres = patients.filter(genero__iexact="F").count()
+    otros = patients.filter(genero__iexact="O").count()
+
+    # Age distribution
+    age_dist = []
+    for lo, hi, label in RANGOS_EDAD:
+        c = patients.filter(edad__gte=lo, edad__lte=hi).count()
+        age_dist.append({"rango": label, "count": c})
+
+    # Escolaridad
+    esc_dist = []
+    for nivel, _ in DatosDemograficos.ESCOLARIDAD_CHOICES:
+        c = patients.filter(escolaridad__iexact=nivel).count()
+        esc_dist.append({"nivel": nivel, "count": c})
+
+    # Exams completed
+    exams_completed = VisitaExamen.objects.filter(
+        visita__Tipo_visita__proyecto=proyecto,
+        estado="completado",
+    ).count()
+
+    return {
+        "proyecto_id": proyecto.id,
+        "proyecto_nombre": proyecto.nombre,
+        "participantes": total,
+        "exams_completed": exams_completed,
+        "genero": {"M": hombres, "F": mujeres, "O": otros},
+        "edad": age_dist,
+        "escolaridad": esc_dist,
+    }
+
+
+def _build_evaluator_stats(proyecto):
+    """Return a list of evaluator dicts for one Proyecto."""
+    visitas = Visita.objects.filter(
+        Tipo_visita__proyecto=proyecto,
+        evaluador__isnull=False,
+    )
+
+    evaluadores = (
+        visitas.values("evaluador__id", "evaluador__first_name", "evaluador__last_name", "evaluador__username")
+        .annotate(
+            num_pacientes=Count("paciente", distinct=True),
+            num_consultas=Count("id"),
+            exams_completados=Count(
+                "visita_examenes",
+                filter=Q(visita_examenes__estado="completado"),
+            ),
+        )
+        .order_by("-num_consultas")
+    )
+
+    result = []
+    for ev in evaluadores:
+        nombre = f"{ev['evaluador__first_name']} {ev['evaluador__last_name']}".strip()
+        if not nombre:
+            nombre = ev["evaluador__username"]
+        result.append({
+            "id": ev["evaluador__id"],
+            "nombre": nombre,
+            "num_pacientes": ev["num_pacientes"],
+            "num_consultas": ev["num_consultas"],
+            "exams_completados": ev["exams_completados"],
+        })
+
+    return result
+
+
+# ---------------------------------------------------------------------------
+# Views
+# ---------------------------------------------------------------------------
+
 @login_required(login_url="/login/")
 @user_passes_test(is_superuser, login_url="/login/")
 def atenea_estadisticas(request):
-    context = {"segment": "atenea_estadisticas"}
+    """Página principal de estadísticas con filtros dinámicos por proyecto."""
+    proyectos = Proyecto.objects.all().order_by("nombre")
 
-    proyectos_a_buscar = [
-        ("Anosognosia", "Anosognosia"),
-        ("Proyecto Sueño", "Proyecto Sueño"),
-        ("Envejecimiento", "Envejecimiento"),
-    ]
+    # Obtener filtros de query params (para carga inicial con filtro)
+    proyecto_id = request.GET.get("proyecto")
+    genero = request.GET.get("genero")
+    edad_min = request.GET.get("edad_min")
+    edad_max = request.GET.get("edad_max")
+
+    try:
+        edad_min = int(edad_min) if edad_min else None
+    except (ValueError, TypeError):
+        edad_min = None
+    try:
+        edad_max = int(edad_max) if edad_max else None
+    except (ValueError, TypeError):
+        edad_max = None
 
     proyectos_info = []
+    if proyecto_id:
+        # Solo el proyecto seleccionado
+        try:
+            proy = Proyecto.objects.get(id=int(proyecto_id))
+            proyectos_info.append(_build_project_stats(proy, genero, edad_min, edad_max))
+        except Proyecto.DoesNotExist:
+            pass
+    else:
+        # Todos los proyectos
+        for proy in proyectos:
+            proyectos_info.append(_build_project_stats(proy, genero, edad_min, edad_max))
 
-    for term, label in proyectos_a_buscar:
-        qs = Proyecto.objects.filter(nombre__icontains=term)
-
-        participantes_count = 0
-        exams_completed = 0
-        clinical_stats = []
-        genero_stats = []
-        escolaridad_stats = []
-
-        if qs.exists():
-            # Participantes únicos
-            patient_ids = qs.values_list("pacientes", flat=True)
-            unique_patients = DatosDemograficos.objects.filter(id__in=patient_ids)
-
-            participantes_count = unique_patients.count()
-
-            # Distribución género
-            if participantes_count > 0:
-                hombres = unique_patients.filter(genero__iexact="M").count()
-                mujeres = unique_patients.filter(genero__iexact="F").count()
-
-                genero_stats = [
-                    {
-                        "label": "Género: Masculino",
-                        "count": hombres,
-                        "percent": round((hombres / participantes_count) * 100, 2),
-                        "color": "primary",
-                    },
-                    {
-                        "label": "Género: Femenino",
-                        "count": mujeres,
-                        "percent": round((mujeres / participantes_count) * 100, 2),
-                        "color": "info",
-                    },
-                ]
-
-            # Distribución escolaridad
-            if participantes_count > 0:
-                for nivel, color in [
-                    ("primario", "warning"),
-                    ("bachiller", "warning"),
-                    ("universidad", "success"),
-                    ("maestria", "danger"),
-                    ("doctorado", "danger"),
-                    ("especializacion", "danger"),
-                ]:
-                    count = unique_patients.filter(escolaridad__iexact=nivel).count()
-                    escolaridad_stats.append(
-                        {
-                            "label": f"Escolaridad: {nivel}",
-                            "count": count,
-                            "percent": round((count / participantes_count) * 100, 2),
-                            "color": color,
-                        }
-                    )
-
-            # Exámenes completados
-            exams_qs = VisitaExamen.objects.filter(
-                visita__Tipo_visita__proyecto__in=qs,
-                estado="completado",
-            )
-            exams_completed = exams_qs.count()
-
-            # --- Distribución por rangos de edad ---
-            rangos = [
-                (18, 30, "18-30 años"),
-                (31, 45, "31-45 años"),
-                (46, 60, "46-60 años"),
-                (61, 200, "60+ años"),  # límite alto grande
-            ]
-
-            for min_age, max_age, label_rango in rangos:
-                count = unique_patients.filter(
-                    edad__gte=min_age, edad__lte=max_age
-                ).count()
-                clinical_stats.append(
-                    {
-                        "rango": label_rango,
-                        "count": count,
-                    }
-                )
-
-        proyectos_info.append(
-            {
-                "term": term,
-                "label": label,
-                "participants": participantes_count,
-                "exams_completed": exams_completed,
-                "clinical_stats": clinical_stats,
-                "demografia": genero_stats + escolaridad_stats,
-            }
-        )
-
-    context["proyectos_info"] = proyectos_info
+    context = {
+        "segment": "atenea_estadisticas",
+        "proyectos": proyectos,
+        "proyectos_info": proyectos_info,
+        "filtro_proyecto": proyecto_id or "",
+        "filtro_genero": genero or "",
+        "filtro_edad_min": edad_min or "",
+        "filtro_edad_max": edad_max or "",
+    }
     return render(request, "home/statistics_atenea.html", context)
+
+
+@login_required(login_url="/login/")
+@user_passes_test(is_superuser, login_url="/login/")
+def api_estadisticas_proyecto(request):
+    """JSON API for AJAX-driven project stats filtering."""
+    proyecto_id = request.GET.get("proyecto")
+    genero = request.GET.get("genero")
+    edad_min = request.GET.get("edad_min")
+    edad_max = request.GET.get("edad_max")
+
+    try:
+        edad_min = int(edad_min) if edad_min else None
+    except (ValueError, TypeError):
+        edad_min = None
+    try:
+        edad_max = int(edad_max) if edad_max else None
+    except (ValueError, TypeError):
+        edad_max = None
+
+    if proyecto_id:
+        try:
+            proy = Proyecto.objects.get(id=int(proyecto_id))
+            data = [_build_project_stats(proy, genero, edad_min, edad_max)]
+        except Proyecto.DoesNotExist:
+            data = []
+    else:
+        data = [
+            _build_project_stats(p, genero, edad_min, edad_max)
+            for p in Proyecto.objects.all().order_by("nombre")
+        ]
+
+    return JsonResponse({"proyectos": data}, safe=False)
+
+
+@login_required(login_url="/login/")
+@user_passes_test(is_superuser, login_url="/login/")
+def api_estadisticas_evaluadores(request):
+    """JSON API for evaluator stats per project."""
+    proyecto_id = request.GET.get("proyecto")
+
+    if proyecto_id:
+        try:
+            proy = Proyecto.objects.get(id=int(proyecto_id))
+            data = [{
+                "proyecto_id": proy.id,
+                "proyecto_nombre": proy.nombre,
+                "evaluadores": _build_evaluator_stats(proy),
+            }]
+        except Proyecto.DoesNotExist:
+            data = []
+    else:
+        data = []
+        for proy in Proyecto.objects.all().order_by("nombre"):
+            evals = _build_evaluator_stats(proy)
+            if evals:
+                data.append({
+                    "proyecto_id": proy.id,
+                    "proyecto_nombre": proy.nombre,
+                    "evaluadores": evals,
+                })
+
+    return JsonResponse({"proyectos": data}, safe=False)
 
 
 # pacientes

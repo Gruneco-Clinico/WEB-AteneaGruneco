@@ -20,6 +20,16 @@ urlpatterns = [
     path(
         "atenea_estadisticas/", views.atenea_estadisticas, name="atenea_estadisticas"
     ),  # Página de estadísticas
+    path(
+        "api/estadisticas-proyecto/",
+        views.api_estadisticas_proyecto,
+        name="api_estadisticas_proyecto",
+    ),
+    path(
+        "api/estadisticas-evaluadores/",
+        views.api_estadisticas_evaluadores,
+        name="api_estadisticas_evaluadores",
+    ),
     path("login/", login_view, name="login"),
     path("logout/", views.logout_view, name="logout"),
     path("profile/", profile_view, name="profile"),  # Perfil de usuario

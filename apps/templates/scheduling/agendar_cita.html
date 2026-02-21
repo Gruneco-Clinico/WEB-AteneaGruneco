@@ -261,6 +261,24 @@
                         </div>
                     </div>
 
+                    <!-- Selector de proyecto -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-control-label">
+                                    <i class="ni ni-briefcase-24 mr-2 text-info"></i>
+                                    Proyecto asociado <small class="text-muted">(opcional)</small>
+                                </label>
+                                <select class="form-control" id="proyecto_id" name="proyecto_id">
+                                    <option value="">— Ninguno —</option>
+                                    {% for p in proyectos %}
+                                    <option value="{{ p.id }}">{{ p.nombre }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Políticas y consentimiento -->
                     <div class="row mt-3 mb-5">
                         <div class="col-12">

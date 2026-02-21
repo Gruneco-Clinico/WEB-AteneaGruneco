@@ -367,6 +367,17 @@
           <!-- Controls Container Reorganizado -->
           <div class="d-flex justify-content-end align-items-center">
 
+            <!-- Project Filter -->
+            <select class="form-control mr-3" id="filtroProyecto" style="max-width: 200px;"
+                    onchange="window.location.href='?proyecto='+this.value">
+              <option value="">Todos los proyectos</option>
+              {% for p in proyectos %}
+              <option value="{{ p.id }}" {% if filtro_proyecto == p.id|stringformat:"s" %}selected{% endif %}>
+                {{ p.nombre }}
+              </option>
+              {% endfor %}
+            </select>
+
             <!-- Search Input -->
             <div class="input-group mr-3" style="max-width: 300px;">
               <input type="text" class="form-control" id="searchPatient" placeholder="Buscar paciente...">
