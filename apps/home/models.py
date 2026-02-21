@@ -438,56 +438,29 @@ class Visita(models.Model):
     acompanante_telefono = models.CharField(max_length=20, blank=True, null=True)
 
     def __str__(self):
-        print("🟡 __str__ llamado")
-        print("   nombre:", self.nombre)
-        print("   Tipo_visita:", self.Tipo_visita)
-
-        if self.Tipo_visita:
-            print("   proyecto:", getattr(self.Tipo_visita, "proyecto", None))
-
         if self.Tipo_visita and self.Tipo_visita.proyecto:
             return f"{self.nombre} - {self.Tipo_visita.proyecto.nombre}"
-
         return self.nombre
 
     def save(self, *args, **kwargs):
-        print("🟢 Entrando a Visita.save()")
-        print("   ID:", self.id)
-        print("   Tipo_visita:", self.Tipo_visita)
-        print("   Paciente:", self.paciente)
-
         super().save(*args, **kwargs)
 
-        print("🟢 super().save() ejecutado")
-
         if not self.Tipo_visita:
-            print("🔴 Tipo_visita es None")
             return
-
-        print("   Tipo_visita.nombre:", self.Tipo_visita.nombre)
-        print("   Tipo_visita.proyecto:", self.Tipo_visita.proyecto)
 
         if not self.Tipo_visita.proyecto:
-            print("🔴 Tipo_visita.proyecto es None")
             return
-
-        print("   Proyecto.nombre:", self.Tipo_visita.proyecto.nombre)
 
         if (
             self.Tipo_visita.proyecto.nombre == "Anosognosia"
             and self.Tipo_visita.nombre == "PosIntervención"
         ):
-            print("🟢 Cumple condiciones de Anosognosia PosIntervención")
-
             paciente = self.paciente
-            print("   Paciente:", paciente)
 
             if not paciente:
-                print("🔴 No hay paciente")
                 return
 
             if paciente.codigo:
-                print("🟡 Paciente ya tiene código:", paciente.codigo)
                 return
 
             ultimo = (
@@ -497,24 +470,17 @@ class Visita(models.Model):
                 .first()
             )
 
-            print("   Último paciente con código:", ultimo)
-
             if ultimo and ultimo.codigo:
                 try:
                     numero = int(ultimo.codigo.split("-")[1])
-                except Exception as e:
-                    print("❌ Error al parsear código:", e)
+                except Exception:
                     numero = 0
             else:
                 numero = 0
 
             nuevo_codigo = f"ANG-{numero + 1:03d}"
-            print("🟢 Nuevo código generado:", nuevo_codigo)
-
             paciente.codigo = nuevo_codigo
             paciente.save()
-
-        print("🟢 Fin de Visita.save()")
 
 
 class VisitaExamen(models.Model):
