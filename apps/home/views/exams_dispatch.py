@@ -1321,6 +1321,9 @@ def ver_resultado_examen(request, visita_examen_id):
                 valor = getattr(resultado, field.name)
                 datos_resultado[field.verbose_name or field.name] = valor
 
+        # Extraer puntaje total si existe
+        puntaje_total = getattr(resultado, "puntaje_total", None)
+
         proyecto = visita_examen.visita.Tipo_visita.proyecto
         paciente = visita_examen.visita.paciente
         codigo_proyecto = (
@@ -1335,6 +1338,7 @@ def ver_resultado_examen(request, visita_examen_id):
             "datos_resultado": datos_resultado,
             "paciente": visita_examen.visita.paciente,
             "codigo_proyecto": codigo_proyecto,
+            "puntaje_total": puntaje_total,
         }
         return render(request, "examenes_resultados/resultado_generico.html", context)
 

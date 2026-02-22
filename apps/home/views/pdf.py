@@ -24,7 +24,7 @@ from reportlab.lib.pagesizes import letter, A4
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, PageBreak
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, PageBreak, Image, HRFlowable
 from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT, TA_JUSTIFY
 from io import BytesIO
 
@@ -172,9 +172,29 @@ def generar_pdf_historia_clinica_visita(request, visita_id):
         )
         
         # TÍTULO DEL DOCUMENTO
+        # --- Logo de GRUNECO ---
+        logo_path = os.path.join(
+            settings.BASE_DIR, "apps", "static", "assets", "img", "brand",
+            "Logo_GRUNECO_Sin_Fondo.png"
+        )
+        if os.path.exists(logo_path):
+            try:
+                logo = Image(logo_path, width=1.8*inch, height=1.8*inch)
+                logo.hAlign = 'CENTER'
+                elements.append(logo)
+                elements.append(Spacer(1, 0.05*inch))
+            except Exception:
+                pass  # Si falla la imagen, continuamos sin ella
+
         titulo = Paragraph("HISTORIA CLÍNICA", title_style)
         elements.append(titulo)
-        elements.append(Spacer(1, 0.1*inch))
+
+        # Línea separadora
+        elements.append(HRFlowable(
+            width="100%", thickness=1.5,
+            color=colors.HexColor('#0d5e3a'),
+            spaceAfter=10, spaceBefore=4
+        ))
         
         # INFORMACIÓN DEL PACIENTE Y VISITA
         datos_tabla = [
@@ -233,8 +253,15 @@ def generar_pdf_historia_clinica_visita(request, visita_id):
         ]))
         
         elements.append(visita_table)
-        elements.append(Spacer(1, 0.2*inch))
-        
+        elements.append(Spacer(1, 0.15*inch))
+
+        # Separador antes de exámenes
+        elements.append(HRFlowable(
+            width="100%", thickness=0.75,
+            color=colors.HexColor('#cccccc'),
+            spaceAfter=8, spaceBefore=4
+        ))
+
         # EXÁMENES REALIZADOS
         examenes_realizados = visita.visita_examenes.filter(estado='completado')
         
@@ -286,6 +313,11 @@ def generar_pdf_historia_clinica_visita(request, visita_id):
         
         # Agregar firma guardada del profesional si existe
         if visita.firmado_por:
+            elements.append(HRFlowable(
+                width="100%", thickness=0.75,
+                color=colors.HexColor('#cccccc'),
+                spaceAfter=8, spaceBefore=8
+            ))
             try:
                 from apps.home.models import UserProfile
                 perfil = UserProfile.objects.filter(user=visita.firmado_por).first()

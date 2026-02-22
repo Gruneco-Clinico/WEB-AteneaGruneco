@@ -120,6 +120,22 @@ urlpatterns = [
     path(
         "proyecto/<int:id>/editar/", views.editar_proyecto, name="editar_proyecto"
     ),
+    path(
+        "proyecto/<int:proyecto_id>/exportar-csv/",
+        views.exportar_csv_proyecto,
+        name="exportar_csv_proyecto",
+    ),
+    path(
+        "paciente/<int:paciente_id>/proyecto/<int:proyecto_id>/quitar/",
+        views.quitar_paciente_proyecto,
+        name="quitar_paciente_proyecto",
+    ),
+    # Visitas pendientes de firma
+    path(
+        "visitas-pendientes-firma/",
+        views.visitas_pendientes_firma,
+        name="visitas_pendientes_firma",
+    ),
     # Tipos de visitas
     path("agregar-visita/", views.agregar_visita, name="agregar_visita"),
     path(

@@ -11,7 +11,7 @@ from django.forms.models import model_to_dict
 from django.contrib.auth.models import User
 from django.views.generic import TemplateView
 from django.core.mail import send_mail, EmailMessage
-from django.db.models import Max
+from django.db.models import Max, Q
 from datetime import datetime, timedelta
 from ..models import *
 from ..forms import ProyectoForm, RegistroDemograficoForm
@@ -77,7 +77,7 @@ def api_eventos_disponibilidad_publica(request):
         # Filtrar por fecha_fin si existe, o permitir indefinidas
         fecha_actual = datetime.now().date()
         disponibilidades = disponibilidades.filter(
-            models.Q(fecha_fin__isnull=True) | models.Q(fecha_fin__gte=fecha_actual),
+            Q(fecha_fin__isnull=True) | Q(fecha_fin__gte=fecha_actual),
             fecha_inicio__lte=fecha_actual + timedelta(weeks=8),  # Máximo 8 semanas
         )
 
@@ -306,7 +306,7 @@ def agendar_cita_ajax(request):
             # Enviar correo de confirmación al paciente
             correo_enviado = False
             try:
-                correo_enviado = enviar_correo_confirmacion_cita(cita_data)
+                correo_enviado = enviar_correo_confirmacion_cita(cita_data, proyecto_obj=proyecto_obj)
 
             except Exception as e:
                 correo_enviado = False
@@ -376,90 +376,138 @@ def agendar_cita_ajax(request):
 logger = logging.getLogger(__name__)
 
 
-def enviar_correo_confirmacion_cita(cita_data):
+def obtener_plantilla_correo_proyecto(proyecto_obj, cita_data):
+    """
+    Retorna el cuerpo HTML del correo según el proyecto seleccionado.
+    Permite personalizar el mensaje, adjuntos y contenido por proyecto.
+    """
+    nombre_proyecto = proyecto_obj.nombre.lower().strip() if proyecto_obj else ""
+
+    # Bloque común de datos de cita
+    bloque_cita = f"""
+    <h3>🔹 DETALLES DE LA CITA</h3>
+    <ul>
+        <li><strong>Fecha:</strong> {cita_data["fecha_cita"]}</li>
+        <li><strong>Hora:</strong> {cita_data["hora_inicio"]} - {cita_data["hora_fin"]}</li>
+        <li><strong>Profesional:</strong> {cita_data["profesional"]}</li>
+        <li><strong>Consultorio:</strong> {cita_data["sala"]} — Laboratorio de Neuropsicología y Conducta – GRUNECO</li>
+        <li><strong>Código de cita:</strong> #{cita_data["cita_id"]}</li>
+        <li><strong>Proyecto:</strong> {proyecto_obj.nombre if proyecto_obj else 'No especificado'}</li>
+    </ul>
+    """
+
+    bloque_registro = """
+    <h3>📝 ACCIÓN IMPORTANTE ANTES DE SU CITA</h3>
+    <p><strong>Por favor registre sus datos demográficos en el siguiente enlace:</strong></p>
+    <p style="font-size: 18px;">
+        <a href="https://www.gruneco.com.co/registro-demografico/"
+        style="font-weight: bold; color: #004aad;">
+        https://www.gruneco.com.co/registro-demografico/
+        </a>
+    </p>
+    <p>➡ <strong>Después de registrar sus datos demográficos, aparecerá un botón para completar sus exámenes pendientes.</strong></p>
+    <h3>Si no logró finalizar el diligenciamiento de los formularios, por favor ingrese su número de cédula en el botón "Consultar exámenes pendientes" para continuar con el proceso.</h3>
+    """
+
+    # --- PLANTILLA POR PROYECTO ---
+    if "sueño" in nombre_proyecto or "sueno" in nombre_proyecto:
+        # Proyecto de Sueño
+        return {
+            "subject": f"Confirmación de Cita — Proyecto Sueño - {cita_data['fecha_cita']}",
+            "body": f"""
+            <p>Estimado/a {cita_data["nombre_paciente"]},</p>
+            <p>Su cita para el <strong>Proyecto de Investigación en Sueño</strong> ha sido agendada exitosamente.</p>
+            {bloque_cita}
+            {bloque_registro}
+            <h3>📄 CONSENTIMIENTO INFORMADO</h3>
+            <p>Adjunto encontrará el consentimiento informado del Proyecto Sueño. Por favor léalo antes de asistir a su cita.</p>
+            <h3>📌 RECORDATORIO</h3>
+            <p>Duerma de manera habitual la noche anterior y llegue 10 minutos antes de su hora programada.</p>
+            <p>Esta cita no requiere dormir durante la sesión.</p>
+            <p>Se generará una constancia de asistencia al finalizar la evaluación.
+            La constancia no constituye excusa válida para ausencias académicas.</p>
+            <p>Para cancelar o reprogramar, comuníquese con anticipación a
+            <strong>veronica.ramirezl@udea.edu.co</strong></p>
+            <p>Gracias por confiar en nosotros.</p>
+            <p>Saludos cordiales,<br><strong>GRUNECO — Proyecto Sueño</strong></p>
+            """,
+            "pdf_attachment": "CONSENTIMIENTOINFORMADOESTUDIANTES.pdf",
+        }
+
+    elif "anosognosia" in nombre_proyecto:
+        # Proyecto de Anosognosia
+        return {
+            "subject": f"Confirmación de Cita — Proyecto Anosognosia - {cita_data['fecha_cita']}",
+            "body": f"""
+            <p>Estimado/a {cita_data["nombre_paciente"]},</p>
+            <p>Su cita para el <strong>Proyecto de Investigación en Anosognosia</strong> ha sido agendada.</p>
+            {bloque_cita}
+            {bloque_registro}
+            <h3>📌 IMPORTANTE</h3>
+            <p>Para esta evaluación es necesario asistir acompañado/a de un familiar o cuidador principal
+            que conozca su desempeño diario.</p>
+            <p>Por favor llegue 15 minutos antes de su hora programada.</p>
+            <p>Para cancelar o reprogramar, comuníquese con anticipación a
+            <strong>gruponeuropsicologia@udea.edu.co</strong></p>
+            <p>Saludos cordiales,<br><strong>GRUNECO — Proyecto Anosognosia</strong></p>
+            """,
+            "pdf_attachment": None,
+        }
+
+    else:
+        # Plantilla genérica para cualquier otro proyecto
+        return {
+            "subject": f"Confirmación de Cita Médica - {cita_data['fecha_cita']}",
+            "body": f"""
+            <p>Estimado/a {cita_data["nombre_paciente"]},</p>
+            <p>Su cita médica ha sido agendada exitosamente{f' para el proyecto <strong>{proyecto_obj.nombre}</strong>' if proyecto_obj else ''}.</p>
+            {bloque_cita}
+            {bloque_registro}
+            <h3>📌 RECORDATORIO</h3>
+            <p>Por favor llegue 15 minutos antes de su hora programada.</p>
+            <p>Para cancelar o reprogramar, comuníquese con anticipación a
+            <strong>gruponeuropsicologia@udea.edu.co</strong></p>
+            <p>Saludos cordiales,<br><strong>GRUNECO</strong></p>
+            """,
+            "pdf_attachment": None,
+        }
+
+
+def enviar_correo_confirmacion_cita(cita_data, proyecto_obj=None):
     try:
-        mensaje = f"""
-        <p>Estimado/a {cita_data["nombre_paciente"]},</p>
+        # Obtener plantilla personalizada segun proyecto
+        plantilla = obtener_plantilla_correo_proyecto(proyecto_obj, cita_data)
+        mensaje = plantilla['body']
 
-        <p>Su cita médica ha sido agendada exitosamente.</p>
-
-        <h3>🔹 DETALLES DE LA CITA</h3>
-        <ul>
-            <li><strong>Fecha:</strong> {cita_data["fecha_cita"]}</li>
-            <li><strong>Hora:</strong> {cita_data["hora_inicio"]} - {cita_data["hora_fin"]}</li>
-            <li><strong>Profesional:</strong> {cita_data["profesional"]}</li>
-            <li><strong>Consultorio:</strong> {cita_data["sala"]} — Laboratorio de Neuropsicología y Conducta – GRUNECO</li>
-            <li><strong>Código de cita:</strong> #{cita_data["cita_id"]}</li>
-        </ul>
-
-        <h3>📝 ACCIÓN IMPORTANTE ANTES DE SU CITA</h3>
-
-        <p><strong>Por favor registre sus datos demográficos en el siguiente enlace:</strong></p>
-
-        <p style="font-size: 18px;">
-            <a href="https://www.gruneco.com.co/registro-demografico/" 
-            style="font-weight: bold; color: #004aad;">
-            https://www.gruneco.com.co/registro-demografico/
-            </a>
-        </p>
-
-        <p>➡ <strong>Después de registrar sus datos demográficos, aparecerá un botón para completar sus exámenes pendientes.</strong></p>
-
-        <h3>Si no logró finalizar el diligenciamiento de los formularios, por favor ingrese su número de cédula en el botón “Consultar exámenes pendientes” para continuar con el proceso.</h3>
-        
-        <h3>📄 CONSENTIMIENTO INFORMADO</h3>
-        <p>Adjunto encontrará el consentimiento informado del Proyecto Sueño. Por favor léalo antes de asistir a su cita.</p>
-
-        <h3>📌 RECORDATORIO</h3>
-        <p>Duerma de manera habitual la noche anterior y llegue 10 minutos antes de su hora programada.</p>
-        <p>Esta cita no requiere dormir durante la sesión.</p>
-
-        <p>Se generará una constancia de asistencia al finalizar la evaluación.
-        La constancia no constituye excusa válida para ausencias académicas.</p>
-
-        <p>Para cancelar o reprogramar, comuníquese con anticipación a 
-        <strong>veronica.ramirezl@udea.edu.co</strong></p>
-
-        <p>Gracias por confiar en nosotros.</p>
-
-        <p>Saludos cordiales,<br><strong>GRUNECO</strong></p>
-        """
-
-        # Construir el correo con adjunto
+        # Construir el correo
         correo = EmailMessage(
-            subject=f"Confirmación de Cita Médica - {cita_data['fecha_cita']}",
+            subject=plantilla['subject'],
             body=mensaje,
             from_email=settings.DEFAULT_FROM_EMAIL,
-            to=[cita_data["email_paciente"]],
+            to=[cita_data['email_paciente']],
         )
 
-        correo.content_subtype = "html"
+        correo.content_subtype = 'html'
 
-        # -------------------------------
-        # 📎 ADJUNTAR EL PDF DEL CONSENTIMIENTO
-        # -------------------------------
-        static_root_path = settings.STATICFILES_DIRS[0]  # apps/static
-        pdf_path = os.path.join(
-            static_root_path,
-            "assets",
-            "pdfs",
-            "CONSENTIMIENTOINFORMADOESTUDIANTES.pdf",
-        )
-
-        if os.path.exists(pdf_path):
-            correo.attach_file(pdf_path)
-            logger.info(f"📎 PDF adjuntado: {pdf_path}")
-        else:
-            logger.warning(f"⚠️ No se encontró el PDF: {pdf_path}")
+        # Adjuntar PDF segun plantilla del proyecto
+        pdf_filename = plantilla.get('pdf_attachment')
+        if pdf_filename:
+            static_root_path = settings.STATICFILES_DIRS[0]
+            pdf_path = os.path.join(static_root_path, 'assets', 'pdfs', pdf_filename)
+            if os.path.exists(pdf_path):
+                correo.attach_file(pdf_path)
+                logger.info(f"PDF adjuntado: {pdf_path}")
+            else:
+                logger.warning(f"No se encontro el PDF: {pdf_path}")
 
         correo.send(fail_silently=False)
 
-        logger.info(f"✅ Correo enviado exitosamente a {cita_data['email_paciente']}")
+        logger.info(f"Correo enviado exitosamente a {cita_data['email_paciente']}")
         return True
 
     except Exception as e:
         logger.error(
-            f"❌ Error al enviar correo a {cita_data.get('email_paciente', 'unknown')}: {str(e)}"
+            f"Error al enviar correo a {cita_data.get('email_paciente', 'unknown')}: {str(e)}"
         )
         return False
 
@@ -702,6 +750,8 @@ def api_eventos_disponibilidad(request):
         return JsonResponse(eventos, safe=False)
 
     except Exception as e:
+        import traceback
+        logger.error(f"Error en api_eventos_disponibilidad: {str(e)}\n{traceback.format_exc()}")
         return JsonResponse({"error": str(e)}, status=500)
 
 

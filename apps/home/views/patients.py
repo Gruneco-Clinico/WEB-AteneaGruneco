@@ -311,65 +311,93 @@ def formulario_demografico_externo(request):
 
             paciente_nuevo.save()
 
-            # ===== NUEVA FUNCIONALIDAD: VINCULAR AL PROYECTO ID 8 =====
-            try:
-                proyecto_automatico = Proyecto.objects.get(id=8)
-                proyecto_automatico.pacientes.add(paciente_nuevo)
-                proyecto_automatico.save()
+            # ===== VINCULAR PROYECTO VÍA ÚLTIMA CITA MÉDICA =====
+            correo_paciente = paciente_nuevo.correo
+            proyecto_vinculado = None
 
-            except Proyecto.DoesNotExist:
-                print(
-                    f"⚠️ El proyecto con ID 8 no existe. Paciente {paciente_nuevo.id} registrado sin vinculación automática."
-                )
-            except Exception as e:
-                print(
-                    f"❌ Error al vincular paciente {paciente_nuevo.id} al proyecto ID 8: {str(e)}"
+            if correo_paciente:
+                ultima_cita = (
+                    CitaMedica.objects.filter(email_paciente__iexact=correo_paciente)
+                    .select_related("proyecto")
+                    .order_by("-fecha_agendamiento")
+                    .first()
                 )
 
-            # ===== NUEVA FUNCIONALIDAD: CREAR VISITA AUTOMÁTICA =====
-            try:
-                tipo_visita_automatico = TipoVisita.objects.get(id=7)
+                if ultima_cita and ultima_cita.proyecto:
+                    proyecto_vinculado = ultima_cita.proyecto
+                    try:
+                        proyecto_vinculado.pacientes.add(paciente_nuevo)
+                        logger.info(
+                            "Paciente %s vinculado al proyecto '%s' (cita #%s)",
+                            paciente_nuevo.id,
+                            proyecto_vinculado.nombre,
+                            ultima_cita.id,
+                        )
+                    except Exception as e:
+                        logger.error(
+                            "Error al vincular paciente %s al proyecto '%s': %s",
+                            paciente_nuevo.id,
+                            proyecto_vinculado.nombre,
+                            e,
+                        )
 
-                # Crear visita automática
-                visita_automatica = Visita.objects.create(
-                    paciente=paciente_nuevo,
-                    nombre="VISITA EPWORTH/MEW",
-                    Tipo_visita=tipo_visita_automatico,
-                    fecha=timezone.now().date(),
-                )
+            # ===== CREAR VISITA AUTOMÁTICA (si el proyecto lo requiere) =====
+            if (
+                proyecto_vinculado
+                and proyecto_vinculado.crear_visita_automatica
+                and proyecto_vinculado.tipo_visita_automatica
+            ):
+                try:
+                    tipo_visita_auto = proyecto_vinculado.tipo_visita_automatica
+                    nombre_visita = (
+                        proyecto_vinculado.nombre_visita_automatica
+                        or tipo_visita_auto.nombre
+                    )
 
-                # Crear los exámenes asociados automáticamente según el tipo de visita
-                if (
-                    hasattr(tipo_visita_automatico, "examenes")
-                    and tipo_visita_automatico.examenes
-                ):
-                    examenes_tipo_visita = tipo_visita_automatico.examenes
+                    visita_automatica = Visita.objects.create(
+                        paciente=paciente_nuevo,
+                        nombre=nombre_visita,
+                        Tipo_visita=tipo_visita_auto,
+                        fecha=timezone.now().date(),
+                    )
 
-                    for examen_data in examenes_tipo_visita:
-                        try:
-                            examen = Examen.objects.get(id=examen_data["id"])
-                            VisitaExamen.objects.create(
-                                visita=visita_automatica,
-                                examen=examen,
-                                estado="pendiente",
-                            )
+                    # Crear los exámenes asociados según el tipo de visita
+                    examenes_config = getattr(tipo_visita_auto, "examenes", None)
+                    if examenes_config:
+                        for examen_data in examenes_config:
+                            try:
+                                examen = Examen.objects.get(id=examen_data["id"])
+                                VisitaExamen.objects.create(
+                                    visita=visita_automatica,
+                                    examen=examen,
+                                    estado="pendiente",
+                                )
+                            except Examen.DoesNotExist:
+                                logger.warning(
+                                    "Examen ID %s no existe (tipo_visita=%s)",
+                                    examen_data.get("id"),
+                                    tipo_visita_auto.id,
+                                )
+                            except Exception as e:
+                                logger.error(
+                                    "Error al asociar examen %s a visita automática: %s",
+                                    examen_data.get("id"),
+                                    e,
+                                )
 
-                        except Examen.DoesNotExist:
-                            print(f"⚠️ Examen con ID {examen_data['id']} no existe")
-                        except Exception as e:
-                            print(
-                                f"❌ Error al asociar examen {examen_data['id']}: {str(e)}"
-                            )
-
-            except TipoVisita.DoesNotExist:
-                print(
-                    f"⚠️ El tipo de visita con ID 7 no existe. No se creó visita automática para el paciente {paciente_nuevo.id}."
-                )
-            except Exception as e:
-                print(
-                    f"❌ Error al crear visita automática para el paciente {paciente_nuevo.id}: {str(e)}"
-                )
-            # ===== FIN NUEVA FUNCIONALIDAD =====
+                    logger.info(
+                        "Visita automática '%s' creada para paciente %s (proyecto '%s')",
+                        nombre_visita,
+                        paciente_nuevo.id,
+                        proyecto_vinculado.nombre,
+                    )
+                except Exception as e:
+                    logger.error(
+                        "Error al crear visita automática para paciente %s: %s",
+                        paciente_nuevo.id,
+                        e,
+                    )
+            # ===== FIN VINCULACIÓN Y VISITA AUTOMÁTICA =====
 
             # Generar código de confirmación único
             from datetime import datetime
@@ -385,6 +413,7 @@ def formulario_demografico_externo(request):
                 "documento": paciente_nuevo.numero_documento,
                 "correo": paciente_nuevo.correo,
                 "paciente_id": paciente_nuevo.id,
+                "proyecto_id": proyecto_vinculado.id if proyecto_vinculado else None,
             }
 
             return redirect("confirmacion_registro_externo")

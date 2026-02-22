@@ -26,6 +26,31 @@ class Proyecto(models.Model):
         verbose_name="Pacientes",
     )
 
+    # --- Configuración de registro público automático ---
+    crear_visita_automatica = models.BooleanField(
+        default=False,
+        verbose_name="Crear visita automática al registrar paciente",
+        help_text="Si está activo, al registrarse un paciente desde el formulario público "
+                  "se creará una visita automática con el tipo de visita configurado.",
+    )
+    tipo_visita_automatica = models.ForeignKey(
+        "TipoVisita",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="proyectos_auto",
+        verbose_name="Tipo de visita automática",
+        help_text="Tipo de visita que se creará automáticamente al registrar paciente.",
+    )
+    nombre_visita_automatica = models.CharField(
+        max_length=255,
+        blank=True,
+        default="",
+        verbose_name="Nombre de la visita automática",
+        help_text="Nombre que se asignará a la visita creada automáticamente. "
+                  "Si está vacío, se usará el nombre del tipo de visita.",
+    )
+
     def __str__(self):
         return self.nombre
 
@@ -41,6 +66,8 @@ class ProyectoPacienteExtra(models.Model):
 
 
 class Examen(models.Model):
+    """Catálogo de exámenes clínicos disponibles."""
+
     nombre = models.CharField(max_length=255, verbose_name="Nombre del Examen")
     descripcion = models.TextField(
         verbose_name="Descripción del Examen", blank=True, null=True

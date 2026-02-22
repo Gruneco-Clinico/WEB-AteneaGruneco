@@ -643,15 +643,25 @@ def guardar_examen_publico_pitsburg(request):
 
 
 def confirmacion_registro_externo(request):
-    """Muestra la confirmación del registro exitoso"""
     datos_sesion = request.session.get("registro_completado")
     if not datos_sesion:
         return redirect("formulario_demografico_externo")
 
-    context = {"datos": datos_sesion}
+    proyecto_id = datos_sesion.get("proyecto_id")
+
+    mostrar_examenes_sueno = False
+
+    if proyecto_id:
+        proyecto = Proyecto.objects.filter(id=proyecto_id).first()
+        if proyecto and proyecto.nombre_visita_automatica == 'Caracterización sueño':
+            mostrar_examenes_sueno = True
+
+    context = {
+        "datos": datos_sesion,
+        "mostrar_examenes_sueno": mostrar_examenes_sueno,
+    }
 
     return render(request, "registro_publico/successfullyRegistered.html", context)
-
 
 # ===== FUNCIONES AUXILIARES =====
 

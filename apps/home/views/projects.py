@@ -262,4 +262,115 @@ def editar_visita(request, visita_id):
         return redirect("proyectos")
 
 
+# ===== EXPORTACIÓN CSV POR PROYECTO =====
+
+import csv
+
+@login_required
+@user_passes_test(is_superuser, login_url="/login/")
+def exportar_csv_proyecto(request, proyecto_id):
+    """
+    Exporta un CSV con los datos de pacientes y puntajes de exámenes
+    para un proyecto específico.
+    Columnas: Código Proyecto, Paciente, Edad, Tipo Visita, Fecha Visita,
+              y una columna por cada examen con su puntaje_total.
+    """
+    proyecto = get_object_or_404(Proyecto, id=proyecto_id)
+
+    # Obtener visitas del proyecto
+    visitas = Visita.objects.filter(
+        Tipo_visita__proyecto=proyecto
+    ).select_related(
+        "paciente", "Tipo_visita"
+    ).prefetch_related(
+        "visita_examenes__examen"
+    ).order_by("paciente__primer_apellido", "fecha")
+
+    if not visitas.exists():
+        messages.warning(request, "No hay visitas registradas en este proyecto.")
+        return redirect("proyectos")
+
+    # Recopilar todos los nombres de exámenes únicos del proyecto
+    examenes_unicos = set()
+    for visita in visitas:
+        for ve in visita.visita_examenes.all():
+            examenes_unicos.add(ve.examen.nombre)
+    examenes_ordenados = sorted(examenes_unicos)
+
+    # Obtener códigos de proyecto para los pacientes
+    codigos = {}
+    for extra in ProyectoPacienteExtra.objects.filter(proyecto=proyecto):
+        codigos[extra.paciente_id] = extra.codigo_proyecto
+
+    # Crear respuesta CSV
+    response = HttpResponse(content_type="text/csv; charset=utf-8")
+    response["Content-Disposition"] = (
+        f'attachment; filename="Proyecto_{proyecto.nombre}_{datetime.now().strftime("%Y%m%d")}.csv"'
+    )
+    response.write("\ufeff")  # BOM para Excel
+
+    writer = csv.writer(response, delimiter=";")
+
+    # Encabezados
+    headers = [
+        "Código Proyecto",
+        "Paciente",
+        "Documento",
+        "Edad",
+        "Tipo de Visita",
+        "Fecha Visita",
+        "Estado Visita",
+    ]
+    for examen_nombre in examenes_ordenados:
+        headers.append(f"Puntaje - {examen_nombre}")
+    writer.writerow(headers)
+
+    # Fila por cada visita
+    for visita in visitas:
+        paciente = visita.paciente
+        if not paciente:
+            continue
+
+        codigo = codigos.get(paciente.id, "")
+        nombre_paciente = (
+            f"{paciente.primer_nombre} {paciente.primer_apellido}"
+        )
+        edad = getattr(paciente, "edad", "")
+
+        tipo_visita = visita.Tipo_visita.nombre if visita.Tipo_visita else ""
+        fecha = visita.fecha.strftime("%d/%m/%Y") if visita.fecha else ""
+        estado = "Firmada" if visita.firmado else "Abierta"
+
+        # Obtener puntajes por examen
+        puntajes = {}
+        for ve in visita.visita_examenes.all():
+            puntaje = ""
+            if ve.estado == "completado":
+                try:
+                    resultado = ve.get_resultado_instance()
+                    if resultado and hasattr(resultado, "puntaje_total"):
+                        puntaje = resultado.puntaje_total
+                        if puntaje is None:
+                            puntaje = ""
+                except Exception:
+                    pass
+            puntajes[ve.examen.nombre] = puntaje
+
+        row = [
+            codigo,
+            nombre_paciente,
+            paciente.numero_documento,
+            edad,
+            tipo_visita,
+            fecha,
+            estado,
+        ]
+        for examen_nombre in examenes_ordenados:
+            row.append(puntajes.get(examen_nombre, ""))
+
+        writer.writerow(row)
+
+    return response
+
+
 # exámenes #######################

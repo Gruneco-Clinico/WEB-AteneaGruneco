@@ -72,7 +72,7 @@
             </td>
             <td>{{ visita.nombre }}</td>
             <td>{{ visita.fecha|date:"d/m/Y"|default:"Sin fecha" }}</td>
-            <td>{{ visita.evaluador.get_full_name|default:visita.evaluador.username|default:"Sin asignar" }}</td>
+            <td>{{ visita.evaluador|default:visita.evaluador|default:"Sin asignar" }}</td>
             <td>
               <span class="badge badge-info">{{ visita.total_examenes }} completado{{ visita.total_examenes|pluralize:"s" }}</span>
             </td>

@@ -139,6 +139,11 @@
                         <i class="fas fa-trash"></i>
                       </button>
                     </form>
+
+                    <a href="{% url 'exportar_csv_proyecto' proyecto_id=proyecto.id %}"
+                      class="btn btn-light" title="Exportar CSV">
+                      <i class="fas fa-file-csv"></i>
+                    </a>
                   </div>
                 </div>
               </div>

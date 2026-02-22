@@ -1,8 +1,8 @@
 {% extends 'layouts/base.html' %}
 
 {% block stylesheets %}
-<!-- FullCalendar CSS -->
-<link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css' rel='stylesheet' />
+<!-- FullCalendar CSS (v6 bundles CSS in JS, fallback link kept for compatibility) -->
+<!-- <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css' rel='stylesheet' /> -->
 <style>
 /* Reutilizar estilos de tables.html */
 .header .h2 {
@@ -458,8 +458,9 @@ document.addEventListener('DOMContentLoaded', function() {
         // Cargar eventos desde la API
         events: {
             url: '{% url "api_eventos_disponibilidad" %}',
-            failure: function() {
-                alert('Error al cargar las disponibilidades');
+            failure: function(error) {
+                console.error('Error al cargar disponibilidades:', error);
+                alert('Error al cargar las disponibilidades. Revisa la consola del navegador (F12) para más detalles.');
             }
         },
         
