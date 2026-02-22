@@ -19,15 +19,9 @@ import json
 import requests
 import logging
 import os
-import base64
-from reportlab.lib.pagesizes import letter, A4
-from reportlab.lib import colors
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.lib.units import inch
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, PageBreak
-from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT, TA_JUSTIFY
 from io import BytesIO
 from .auth import is_superuser
+from .pdf import construir_pdf_visita
 
 logger = logging.getLogger(__name__)
 
@@ -166,271 +160,69 @@ def firmar_visita(request, visita_id):
     """
     Firmar una visita. Solo superusuarios pueden firmar.
     Al firmar: se marca firmado=True, firmado_por=usuario, estado_visita=cerrada
-    Además, envía un correo al paciente con el PDF de la historia clínica
+    Además, envía un correo al paciente con el PDF de la historia clínica.
     """
     if request.method == "POST":
         visita = get_object_or_404(Visita, id=visita_id)
         paciente_id = visita.paciente.id
         paciente = visita.paciente
-        
+
         # Marcar la visita como firmada y cerrada
         visita.firmado = True
         visita.firmado_por = request.user
         visita.estado_visita = "cerrada"
         visita.save()
-        
+
         # ========== ENVIAR CORREO CON PDF ==========
         try:
             # Verificar si hay fecha de seguimiento en el examen de análisis
             fecha_seguimiento = None
             try:
-                # Buscar el examen de análisis (ID = 7)
                 visita_examen_analisis = VisitaExamen.objects.filter(
                     visita=visita,
-                    examen_id=7,
-                    estado='completado'
+                    examen__nombre__icontains="analisis",
+                    estado="completado",
                 ).first()
-                
                 if visita_examen_analisis:
                     analisis_result = AnalisisGeneralResult.objects.filter(
                         visita_examen=visita_examen_analisis
                     ).first()
-                    
                     if analisis_result and analisis_result.fecha_seguimiento:
                         fecha_seguimiento = analisis_result.fecha_seguimiento
             except Exception as e:
-                logging.error(f"Error al buscar fecha de seguimiento: {str(e)}")
-            
-            # Generar PDF en memoria
+                logger.error("Error al buscar fecha de seguimiento: %s", e)
+
+            # Generar PDF con el builder compartido
             buffer = BytesIO()
-            doc = SimpleDocTemplate(
-                buffer,
-                pagesize=letter,
-                rightMargin=0.75*inch,
-                leftMargin=0.75*inch,
-                topMargin=0.75*inch,
-                bottomMargin=0.75*inch,
-            )
-            
-            # Lista de elementos para el PDF
-            elements = []
-            
-            # Estilos
-            styles = getSampleStyleSheet()
-            title_style = ParagraphStyle(
-                'CustomTitle',
-                parent=styles['Heading1'],
-                fontSize=16,
-                textColor=colors.HexColor('#0d5e3a'),
-                spaceAfter=6,
-                alignment=TA_CENTER,
-                fontName='Helvetica-Bold'
-            )
-            
-            heading_style = ParagraphStyle(
-                'CustomHeading',
-                parent=styles['Heading2'],
-                fontSize=12,
-                textColor=colors.HexColor('#0d5e3a'),
-                spaceAfter=8,
-                spaceBefore=12,
-                fontName='Helvetica-Bold',
-                borderPadding=5,
-                backColor=colors.HexColor('#e8f5e9')
-            )
-            
-            normal_style = ParagraphStyle(
-                'CustomNormal',
-                parent=styles['Normal'],
-                fontSize=10,
-                alignment=TA_JUSTIFY,
-                spaceAfter=6
-            )
-            
-            # TÍTULO DEL DOCUMENTO
-            titulo = Paragraph("HISTORIA CLÍNICA", title_style)
-            elements.append(titulo)
-            elements.append(Spacer(1, 0.1*inch))
-            
-            # INFORMACIÓN DEL PACIENTE Y VISITA
-            datos_tabla = [
-                ['DATOS DEL PACIENTE', ''],
-                ['Nombre Completo:', f"{paciente.primer_nombre} {paciente.segundo_nombre or ''} {paciente.primer_apellido} {paciente.segundo_apellido or ''}"],
-                ['Tipo de Documento:', paciente.tipo_documento],
-                ['Número de Documento:', str(paciente.numero_documento)],
-                ['Edad:', str(paciente.edad)],
-                ['Fecha de Nacimiento:', str(paciente.fecha_nacimiento)],
-                ['EPS:', paciente.eps or 'N/A'],
-                ['Teléfono:', paciente.celular or 'N/A'],
-            ]
-            
-            datos_table = Table(datos_tabla, colWidths=[2*inch, 4*inch])
-            datos_table.setStyle(TableStyle([
-                ('BACKGROUND', (0, 0), (1, 0), colors.HexColor('#0d5e3a')),
-                ('TEXTCOLOR', (0, 0), (1, 0), colors.whitesmoke),
-                ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-                ('FONTSIZE', (0, 0), (-1, 0), 11),
-                ('BOTTOMPADDING', (0, 0), (-1, 0), 10),
-                ('BACKGROUND', (0, 1), (-1, -1), colors.HexColor('#e8f5e9')),
-                ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#0d5e3a')),
-                ('FONTSIZE', (0, 1), (-1, -1), 9),
-            ]))
-            
-            elements.append(datos_table)
-            elements.append(Spacer(1, 0.2*inch))
-            
-            # INFORMACIÓN DE LA VISITA
-            visita_tabla = [
-                ['INFORMACIÓN DE LA VISITA', ''],
-                ['Nombre de Visita:', visita.nombre],
-                ['Tipo de Visita:', visita.Tipo_visita.nombre if visita.Tipo_visita else 'N/A'],
-                ['Fecha:', str(visita.fecha)],
-                ['Evaluador:', visita.evaluador.get_full_name() if visita.evaluador else 'N/A'],
-            ]
-            
-            # Agregar información del acompañante si existe
-            if visita.acompanante_nombre:
-                visita_tabla.extend([
-                    ['Acompañante:', visita.acompanante_nombre],
-                    ['Relación:', visita.acompanante_relacion or 'N/A'],
-                ])
-            
-            visita_table = Table(visita_tabla, colWidths=[2*inch, 4*inch])
-            visita_table.setStyle(TableStyle([
-                ('BACKGROUND', (0, 0), (1, 0), colors.HexColor('#0d5e3a')),
-                ('TEXTCOLOR', (0, 0), (1, 0), colors.whitesmoke),
-                ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-                ('FONTSIZE', (0, 0), (-1, 0), 11),
-                ('BOTTOMPADDING', (0, 0), (-1, 0), 10),
-                ('BACKGROUND', (0, 1), (-1, -1), colors.HexColor('#e8f5e9')),
-                ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#0d5e3a')),
-                ('FONTSIZE', (0, 1), (-1, -1), 9),
-            ]))
-            
-            elements.append(visita_table)
-            elements.append(Spacer(1, 0.2*inch))
-            
-            # EXÁMENES REALIZADOS
-            examenes_realizados = visita.visita_examenes.filter(estado='completado')
-            
-            if examenes_realizados.exists():
-                examenes_titulo = Paragraph(f"<b>EXÁMENES REALIZADOS ({examenes_realizados.count()})</b>", heading_style)
-                elements.append(examenes_titulo)
-                elements.append(Spacer(1, 0.1*inch))
-                
-                for i, visita_examen in enumerate(examenes_realizados, 1):
-                    # Obtener el resultado del examen usando el método del modelo
-                    resultado = visita_examen.get_resultado_instance()
-                    
-                    examen_info = f"<b>{i}. {visita_examen.examen.nombre}</b>"
-                    if visita_examen.fecha_completado:
-                        examen_info += f"<br/>Completado: {visita_examen.fecha_completado.strftime('%d/%m/%Y %H:%M')}"
-                    
-                    elements.append(Paragraph(examen_info, normal_style))
-                    
-                    # Extraer información del resultado si existe
-                    if resultado:
-                        info_resultado = _extraer_informacion_resultado(resultado)
-                        if info_resultado:
-                            elementos_info = Paragraph(info_resultado, ParagraphStyle(
-                                'ResultadoInfo',
-                                parent=styles['Normal'],
-                                fontSize=9,
-                                leftIndent=0.25*inch,
-                                textColor=colors.HexColor('#333333'),
-                                spaceAfter=4
-                            ))
-                            elements.append(elementos_info)
-                    
-                    if visita_examen.notas_examinador:
-                        notas = Paragraph(
-                            f"<i>Notas: {visita_examen.notas_examinador}</i>",
-                            ParagraphStyle(
-                                'Notas',
-                                parent=styles['Normal'],
-                                fontSize=9,
-                                leftIndent=0.25*inch,
-                                textColor=colors.HexColor('#666666'),
-                                spaceAfter=4
-                            )
-                        )
-                        elements.append(notas)
-                    
-                    elements.append(Spacer(1, 0.08*inch))
-            else:
-                examenes_titulo = Paragraph(f"<b>EXÁMENES REALIZADOS</b>", heading_style)
-                elements.append(examenes_titulo)
-                elements.append(Spacer(1, 0.1*inch))
-                elements.append(Paragraph("No hay exámenes completados en esta visita.", normal_style))
-                elements.append(Spacer(1, 0.1*inch))
-            
-            
-            
-            # Agregar firma guardada del profesional si existe
-            if visita.firmado_por:
-                try:
-                    from apps.home.models import UserProfile
-                    perfil = UserProfile.objects.filter(user=visita.firmado_por).first()
-                    
-                    if perfil and perfil.firma:
-                        elements.append(Spacer(1, 0.15*inch))
-                        elements.append(Paragraph(
-                            f"<b>Firma de: {visita.firmado_por.get_full_name() or visita.firmado_por.username}</b>",
-                            ParagraphStyle('FirmaProf', parent=styles['Normal'], fontSize=9)
-                        ))
-                        elements.append(Spacer(1, 0.08*inch))
-                        elements.append(Paragraph(
-                            f"<i>Firma registrada digitalmente</i>",
-                            ParagraphStyle('FirmaNota', parent=styles['Normal'], fontSize=8, textColor=colors.grey)
-                        ))
-                except Exception as e:
-                    logging.error(f"Error al procesar firma del profesional: {str(e)}")
-            
-            elements.append(Spacer(1, 0.1*inch))
-            
-            # PIE DE PÁGINA
-            pie = Paragraph(
-                f"<i>Documento generado el {datetime.now().strftime('%d/%m/%Y a las %H:%M')}</i>",
-                ParagraphStyle('Footer', parent=styles['Normal'], fontSize=8, alignment=TA_CENTER, textColor=colors.grey)
-            )
-            elements.append(pie)
-            
-            # Construir el PDF
-            doc.build(elements)
-            buffer.seek(0)
-            
+            construir_pdf_visita(buffer, visita)
+
             # Construir mensaje del correo
-            asunto = f"Historia Clínica - Visita: {visita.nombre}"
-            
-            mensaje_cuerpo = f"""
-Estimado(a) {paciente.primer_nombre} {paciente.primer_apellido},
+            asunto = f"Historia Clinica - Visita: {visita.nombre}"
 
-La visita "{visita.nombre}" realizada el {visita.fecha} ha sido completada y firmada.
+            mensaje_cuerpo = (
+                f"Estimado(a) {paciente.primer_nombre} {paciente.primer_apellido},\n\n"
+                f'La visita "{visita.nombre}" realizada el {visita.fecha} '
+                f"ha sido completada y firmada.\n\n"
+                f"Adjunto encontrara el PDF con su historia clinica y los "
+                f"examenes realizados durante esta visita.\n"
+            )
 
-Adjunto encontrará el PDF con su historia clínica y los exámenes realizados durante esta visita.
-"""
-            
-            # Agregar recordatorio de próxima cita si existe fecha de seguimiento
             if fecha_seguimiento:
-                mensaje_cuerpo += f"""
-📅 RECORDATORIO DE PRÓXIMA CITA:
-Su próxima cita de seguimiento está programada para el {fecha_seguimiento.strftime('%d de %B de %Y')}.
-Por favor, asista puntualmente a su cita.
-"""
-            
-            mensaje_cuerpo += """
+                mensaje_cuerpo += (
+                    f"\nRECORDATORIO DE PROXIMA CITA:\n"
+                    f"Su proxima cita de seguimiento esta programada para el "
+                    f"{fecha_seguimiento.strftime('%d de %B de %Y')}.\n"
+                    f"Por favor, asista puntualmente a su cita.\n"
+                )
 
-Gracias por confiar en nosotros.
+            mensaje_cuerpo += (
+                "\nGracias por confiar en nosotros.\n\n"
+                "Atentamente,\nSistema ATENEA\n"
+            )
 
-Atentamente,
-Sistema ATENEA
-"""
-            
             # Enviar correo
             correo_paciente = paciente.correo
-            
+
             if correo_paciente:
                 email = EmailMessage(
                     asunto,
@@ -438,34 +230,37 @@ Sistema ATENEA
                     settings.EMAIL_HOST_USER,
                     [correo_paciente],
                 )
-                
-                # Adjuntar PDF
-                nombre_archivo = f"Historia_Clinica_Visita_{visita_id}_{datetime.now().strftime('%Y%m%d')}.pdf"
-                email.attach(nombre_archivo, buffer.getvalue(), 'application/pdf')
-                
+                nombre_archivo = (
+                    f"Historia_Clinica_Visita_{visita_id}"
+                    f"_{datetime.now().strftime('%Y%m%d')}.pdf"
+                )
+                email.attach(nombre_archivo, buffer.getvalue(), "application/pdf")
                 email.send()
-                
+
                 messages.success(
-                    request, 
-                    f"Visita '{visita.nombre}' firmada y cerrada exitosamente. Se ha enviado un correo a {correo_paciente} con la historia clínica."
+                    request,
+                    f"Visita '{visita.nombre}' firmada y cerrada exitosamente. "
+                    f"Se ha enviado un correo a {correo_paciente} con la historia clinica.",
                 )
             else:
                 messages.warning(
                     request,
-                    f"Visita '{visita.nombre}' firmada y cerrada exitosamente. No se pudo enviar el correo porque el paciente no tiene correo electrónico registrado."
+                    f"Visita '{visita.nombre}' firmada y cerrada exitosamente. "
+                    f"No se pudo enviar el correo porque el paciente no tiene "
+                    f"correo electronico registrado.",
                 )
-                
+
         except Exception as e:
-            logging.error(f"Error al enviar correo de visita firmada: {str(e)}")
+            logger.error("Error al enviar correo de visita firmada: %s", e)
             import traceback
             traceback.print_exc()
             messages.warning(
                 request,
-                f"Visita firmada exitosamente, pero hubo un error al enviar el correo: {str(e)}"
+                f"Visita firmada exitosamente, pero hubo un error al enviar el correo: {e}",
             )
-        
+
         return redirect("detalle_paciente", paciente_id=paciente_id)
-    
+
     return redirect("index")
 
 

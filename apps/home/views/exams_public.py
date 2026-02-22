@@ -648,12 +648,13 @@ def confirmacion_registro_externo(request):
         return redirect("formulario_demografico_externo")
 
     proyecto_id = datos_sesion.get("proyecto_id")
+    print ("Datos de sesión en confirmación:", datos_sesion)
 
     mostrar_examenes_sueno = False
 
     if proyecto_id:
         proyecto = Proyecto.objects.filter(id=proyecto_id).first()
-        if proyecto and proyecto.nombre_visita_automatica == 'Caracterización sueño':
+        if proyecto and proyecto.id == 11 :
             mostrar_examenes_sueno = True
 
     context = {
