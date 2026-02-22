@@ -11,7 +11,7 @@ from django.forms.models import model_to_dict
 from django.contrib.auth.models import User
 from django.views.generic import TemplateView
 from django.core.mail import send_mail, EmailMessage
-from django.db.models import Max
+from django.db.models import Max, F
 from datetime import datetime, timedelta
 from ..models import *
 from ..forms import ProyectoForm, RegistroDemograficoForm
@@ -581,6 +581,37 @@ def editar_v(request, visita_id):
             "examenes_actuales": examenes_actuales,
             "examenes_disponibles": examenes_disponibles,
         },
+    )
+
+
+@login_required
+@user_passes_test(is_superuser, login_url="/login/")
+def visitas_pendientes_firma(request):
+    """
+    Lista visitas con TODOS los exámenes completados pero pendientes de firma.
+    Solo superusuarios.
+    """
+    from django.db.models import Count, Q
+
+    # Visitas no firmadas que tienen al menos un examen
+    visitas_candidatas = (
+        Visita.objects.filter(firmado=False)
+        .exclude(visita_examenes__isnull=True)
+        .annotate(
+            total_examenes=Count("visita_examenes"),
+            examenes_completados=Count(
+                "visita_examenes", filter=Q(visita_examenes__estado="completado")
+            ),
+        )
+        .filter(total_examenes__gt=0, total_examenes=F("examenes_completados"))
+        .select_related("paciente", "Tipo_visita", "Tipo_visita__proyecto", "evaluador")
+        .order_by("-fecha")
+    )
+
+    return render(
+        request,
+        "home/visitas_pendientes_firma.html",
+        {"visitas": visitas_candidatas},
     )
 
 

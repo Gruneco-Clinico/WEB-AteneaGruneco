@@ -1,0 +1,111 @@
+{% extends 'layouts/base.html' %}
+
+{% block content %}
+<div class="header bg-primary pb-6">
+  <div class="container-fluid">
+    <div class="header-body">
+      <div class="row align-items-center py-4">
+        <div class="col-lg-6 col-5">
+          <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
+            <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
+              <li class="breadcrumb-item"><a href="/index/"><i class="fas fa-home"></i></a></li>
+              <li class="breadcrumb-item active">Visitas Pendientes de Firma</li>
+            </ol>
+          </nav>
+        </div>
+        <div class="col-lg-6 col-7 text-right">
+          <span class="badge badge-warning badge-lg px-3 py-2">
+            <i class="fas fa-signature mr-1"></i>
+            {{ visitas|length }} pendiente{{ visitas|length|pluralize:"s" }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid mt--6">
+  <div class="card shadow">
+    <div class="card-header border-0">
+      <div class="row align-items-center">
+        <div class="col">
+          <h3 class="mb-0">
+            <i class="fas fa-clipboard-check mr-2 text-warning"></i>
+            Visitas con Exámenes Completados — Pendientes de Firma
+          </h3>
+          <p class="text-muted small mb-0 mt-1">
+            Estas visitas tienen todos sus exámenes completados y están listas para ser firmadas.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table align-items-center table-flush">
+        <thead class="thead-light">
+          <tr>
+            <th scope="col">Paciente</th>
+            <th scope="col">Proyecto</th>
+            <th scope="col">Tipo de Visita</th>
+            <th scope="col">Fecha</th>
+            <th scope="col">Evaluador</th>
+            <th scope="col">Exámenes</th>
+            <th scope="col" class="text-center">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for visita in visitas %}
+          <tr>
+            <td>
+              <a href="{% url 'detalle_paciente' visita.paciente.id %}" class="font-weight-bold text-dark">
+                {{ visita.paciente.primer_nombre }} {{ visita.paciente.primer_apellido }}
+              </a>
+              <br>
+              <small class="text-muted">{{ visita.paciente.numero_documento }}</small>
+            </td>
+            <td>
+              {% if visita.Tipo_visita and visita.Tipo_visita.proyecto %}
+                <span class="badge badge-success">{{ visita.Tipo_visita.proyecto.nombre }}</span>
+              {% else %}
+                <span class="text-muted">—</span>
+              {% endif %}
+            </td>
+            <td>{{ visita.nombre }}</td>
+            <td>{{ visita.fecha|date:"d/m/Y"|default:"Sin fecha" }}</td>
+            <td>{{ visita.evaluador.get_full_name|default:visita.evaluador.username|default:"Sin asignar" }}</td>
+            <td>
+              <span class="badge badge-info">{{ visita.total_examenes }} completado{{ visita.total_examenes|pluralize:"s" }}</span>
+            </td>
+            <td class="text-center">
+              <div class="btn-group btn-group-sm" role="group">
+                <a href="{% url 'detalle_paciente' visita.paciente.id %}" class="btn btn-outline-info" title="Ver paciente">
+                  <i class="fas fa-eye"></i>
+                </a>
+                <a href="{% url 'generar_pdf_historia_clinica_visita' visita.id %}" class="btn btn-outline-success" title="Descargar PDF">
+                  <i class="fas fa-file-pdf"></i>
+                </a>
+                <form action="{% url 'firmar_visita' visita.id %}" method="POST" class="d-inline"
+                  onsubmit="return confirm('¿Firmar y cerrar esta visita? Esta acción no se puede deshacer.');">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-warning" title="Firmar visita">
+                    <i class="fas fa-signature mr-1"></i> Firmar
+                  </button>
+                </form>
+              </div>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="7" class="text-center py-5">
+              <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+              <h5 class="text-muted">¡No hay visitas pendientes de firma!</h5>
+              <p class="text-muted">Todas las visitas completadas han sido firmadas.</p>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

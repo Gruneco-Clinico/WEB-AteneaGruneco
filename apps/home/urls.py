@@ -117,6 +117,9 @@ urlpatterns = [
     path(
         "proyecto/<int:id>/eliminar/", views.eliminar_proyecto, name="eliminar_proyecto"
     ),
+    path(
+        "proyecto/<int:id>/editar/", views.editar_proyecto, name="editar_proyecto"
+    ),
     # Tipos de visitas
     path("agregar-visita/", views.agregar_visita, name="agregar_visita"),
     path(

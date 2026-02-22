@@ -205,6 +205,36 @@ def detalle_paciente(request, paciente_id):
     )
 
 
+@login_required
+@user_passes_test(is_superuser, login_url="/login/")
+def quitar_paciente_proyecto(request, paciente_id, proyecto_id):
+    """
+    Quita la relación M2M entre paciente y proyecto.
+    NO elimina el paciente del sistema, solo la asociación.
+    También elimina el ProyectoPacienteExtra correspondiente.
+    """
+    if request.method == "POST":
+        paciente = get_object_or_404(DatosDemograficos, id=paciente_id)
+        proyecto = get_object_or_404(Proyecto, id=proyecto_id)
+
+        # Quitar relación M2M
+        proyecto.pacientes.remove(paciente)
+
+        # Eliminar registro extra de código de proyecto
+        ProyectoPacienteExtra.objects.filter(
+            proyecto=proyecto, paciente=paciente
+        ).delete()
+
+        messages.success(
+            request,
+            f"El paciente ha sido removido del proyecto '{proyecto.nombre}'."
+        )
+    else:
+        messages.error(request, "Método no permitido.")
+
+    return redirect("detalle_paciente", paciente_id=paciente_id)
+
+
 #######################################################
 # registro externo datos demograficos
 

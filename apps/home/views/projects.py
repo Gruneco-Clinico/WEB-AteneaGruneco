@@ -95,6 +95,24 @@ def proyectos(request):
 
 @login_required
 @user_passes_test(is_superuser, login_url="/login/")
+def editar_proyecto(request, id):
+    proyecto = get_object_or_404(Proyecto, id=id)
+    if request.method == "POST":
+        form = ProyectoForm(request.POST, instance=proyecto)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f"El proyecto '{proyecto.nombre}' ha sido actualizado correctamente.")
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"{field}: {error}")
+    else:
+        messages.error(request, "Método no permitido.")
+    return redirect("proyectos")
+
+
+@login_required
+@user_passes_test(is_superuser, login_url="/login/")
 def eliminar_proyecto(request, id):
     if request.method == "POST":
         proyecto = get_object_or_404(

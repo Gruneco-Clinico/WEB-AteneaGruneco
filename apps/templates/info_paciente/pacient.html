@@ -230,6 +230,17 @@
                     <i class="fas fa-plus mr-2"></i>
                     Nueva Visita
                   </button>
+                  {% if request.user.is_superuser %}
+                  <form method="POST"
+                    action="{% url 'quitar_paciente_proyecto' paciente_id=paciente.id proyecto_id=proyecto.id %}"
+                    class="d-inline"
+                    onsubmit="return confirm('¿Quitar al paciente del proyecto {{ proyecto.nombre }}? No se eliminará del sistema.');">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline-danger btn-sm" title="Quitar del proyecto">
+                      <i class="fas fa-unlink mr-1"></i> Quitar
+                    </button>
+                  </form>
+                  {% endif %}
                 </div>
               </div>
             </div>

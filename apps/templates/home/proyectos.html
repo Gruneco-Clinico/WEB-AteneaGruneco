@@ -120,6 +120,12 @@
                       <i class="fas fa-info-circle"></i>
                     </button>
 
+                    <button class="btn btn-light" data-toggle="modal"
+                      data-target="#modalEditarProyecto-{{ proyecto.id }}"
+                      title="Editar Proyecto">
+                      <i class="fas fa-edit"></i>
+                    </button>
+
                     <button class="btn btn-light" data-toggle="modal" data-target="#modalAgregarVisita"
                       data-proyecto-id="{{ proyecto.id }}" data-nombre="{{ proyecto.nombre }}"
                       title="Agregar Tipo de Visita">
@@ -425,6 +431,86 @@
 {% endfor %}
 {% endif %}
 {% endfor %}
+{% endfor %}
+
+<!-- Modales Editar Proyecto -->
+{% for proyecto in proyectos %}
+<div class="modal fade" id="modalEditarProyecto-{{ proyecto.id }}" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header bg-warning">
+        <h5 class="modal-title text-white">
+          <i class="fas fa-edit mr-2"></i>
+          Editar Proyecto: {{ proyecto.nombre }}
+        </h5>
+        <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form method="POST" action="{% url 'editar_proyecto' id=proyecto.id %}">
+        {% csrf_token %}
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="editNombre-{{ proyecto.id }}">
+              <i class="fas fa-flask mr-1"></i> Nombre del Proyecto
+            </label>
+            <input type="text" class="form-control" id="editNombre-{{ proyecto.id }}"
+              name="nombre" value="{{ proyecto.nombre }}" required>
+          </div>
+          <div class="form-group">
+            <label for="editDescripcion-{{ proyecto.id }}">
+              <i class="fas fa-align-left mr-1"></i> Descripción del Proyecto
+            </label>
+            <textarea class="form-control" id="editDescripcion-{{ proyecto.id }}"
+              name="descripcion" rows="3">{{ proyecto.descripcion|default_if_none:'' }}</textarea>
+          </div>
+          <div class="form-group">
+            <label for="editInvestigador-{{ proyecto.id }}">
+              <i class="fas fa-user-tie mr-1"></i> Investigador Principal
+            </label>
+            <input type="text" class="form-control" id="editInvestigador-{{ proyecto.id }}"
+              name="investigador_principal" value="{{ proyecto.investigador_principal|default_if_none:'' }}">
+          </div>
+          <div class="form-group">
+            <label for="editCodigo-{{ proyecto.id }}">
+              <i class="fas fa-barcode mr-1"></i> Código SIU
+            </label>
+            <input type="text" class="form-control" id="editCodigo-{{ proyecto.id }}"
+              name="codigo_siu" value="{{ proyecto.codigo_siu|default_if_none:'' }}">
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="editFechaInicio-{{ proyecto.id }}">
+                  <i class="fas fa-calendar mr-1"></i> Fecha de Inicio
+                </label>
+                <input type="date" class="form-control" id="editFechaInicio-{{ proyecto.id }}"
+                  name="fecha_inicio" value="{{ proyecto.fecha_inicio|date:'Y-m-d' }}">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="editFechaFinanciacion-{{ proyecto.id }}">
+                  <i class="fas fa-money-bill mr-1"></i> Fecha de Financiación
+                </label>
+                <input type="date" class="form-control" id="editFechaFinanciacion-{{ proyecto.id }}"
+                  name="fecha_financiacion" value="{{ proyecto.fecha_financiacion|date:'Y-m-d' }}">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">
+            <i class="fas fa-times mr-1"></i>Cancelar
+          </button>
+          <button type="submit" class="btn btn-warning text-white">
+            <i class="fas fa-save mr-1"></i>Guardar Cambios
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
 {% endfor %}
 
 <!-- Modal Ver Descripción del Proyecto MEJORADO -->
