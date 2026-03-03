@@ -28,6 +28,7 @@ from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, 
 from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT, TA_JUSTIFY
 from io import BytesIO
 from .auth import is_superuser
+from ..tokens import generar_token_paciente
 
 logger = logging.getLogger(__name__)
 
@@ -413,6 +414,7 @@ def formulario_demografico_externo(request):
                 "documento": paciente_nuevo.numero_documento,
                 "correo": paciente_nuevo.correo,
                 "paciente_id": paciente_nuevo.id,
+                "token": generar_token_paciente(paciente_nuevo.id),
                 "proyecto_id": proyecto_vinculado.id if proyecto_vinculado else None,
             }
 
@@ -470,7 +472,7 @@ def consulta_examenes(request):
                 {
                     "nombre": ve.examen.nombre,
                     "estado": estado,
-                    "url": f"/guardar-examen-publico-epworth/?paciente_id={paciente.id}",
+                    "url": f"/guardar-examen-publico-epworth/?token={generar_token_paciente(paciente.id)}",
                 }
             )
             continue
@@ -483,7 +485,7 @@ def consulta_examenes(request):
                 {
                     "nombre": ve.examen.nombre,
                     "estado": estado,
-                    "url": f"/guardar-examen-publico-mew/?paciente_id={paciente.id}",
+                    "url": f"/guardar-examen-publico-mew/?token={generar_token_paciente(paciente.id)}",
                 }
             )
             continue
@@ -496,7 +498,7 @@ def consulta_examenes(request):
                 {
                     "nombre": ve.examen.nombre,
                     "estado": estado,
-                    "url": f"/guardar-examen-publico-pitsburg/?paciente_id={paciente.id}",
+                    "url": f"/guardar-examen-publico-pitsburg/?token={generar_token_paciente(paciente.id)}",
                 }
             )
             continue

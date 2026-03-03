@@ -28,29 +28,55 @@ from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, 
 from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT, TA_JUSTIFY
 from io import BytesIO
 
+from ..tokens import generar_token_paciente, validar_token_paciente
+
 logger = logging.getLogger(__name__)
 
-def guardar_examen_publico_epworth(request):
-    """Cargar y guardar examen Epworth desde enlace público"""
 
-    # Función auxiliar para validar acceso
-    def validar_acceso():
-        if request.method == "GET":
-            paciente_id = request.GET.get("paciente_id")
-        else:
-            paciente_id = request.POST.get("paciente_id")
+def _validar_acceso_publico(request):
+    """Shared access validation for public exam endpoints.
 
-        if not paciente_id:
-            return None, "❌ Datos de acceso incompletos."
+    Accepts ``token`` (signed, preferred) **or** ``paciente_id`` (legacy).
+    Returns ``(paciente, error_message)``.
+    """
+    if request.method == "GET":
+        params = request.GET
+    else:
+        params = request.POST
 
+    # --- Prefer signed token ---
+    token = params.get("token")
+    if token:
+        paciente_id = validar_token_paciente(token)
+        if paciente_id is None:
+            return None, "❌ Enlace inválido o expirado. Solicite uno nuevo."
         try:
-            paciente = get_object_or_404(DatosDemograficos, id=paciente_id)
+            paciente = DatosDemograficos.objects.get(id=paciente_id)
+            return paciente, None
+        except DatosDemograficos.DoesNotExist:
+            return None, "❌ Paciente no encontrado."
+
+    # --- Legacy fallback: raw paciente_id (deprecated) ---
+    paciente_id_raw = params.get("paciente_id")
+    if paciente_id_raw:
+        logger.warning(
+            "Acceso público con paciente_id sin firmar (deprecated) id=%s uri=%s",
+            paciente_id_raw,
+            request.path,
+        )
+        try:
+            paciente = get_object_or_404(DatosDemograficos, id=paciente_id_raw)
             return paciente, None
         except Exception as e:
             return None, f"❌ Error al validar acceso: {str(e)}"
 
-    # Validar acceso
-    paciente, error = validar_acceso()
+    return None, "❌ Datos de acceso incompletos."
+
+def guardar_examen_publico_epworth(request):
+    """Cargar y guardar examen Epworth desde enlace público"""
+
+    # Validar acceso (token firmado o paciente_id legacy)
+    paciente, error = _validar_acceso_publico(request)
     if error:
         messages.error(request, error)
         return redirect("formulario_demografico_externo")
@@ -101,6 +127,7 @@ def guardar_examen_publico_epworth(request):
                 "paciente": paciente,
                 "visita": visita,
                 "visita_examen": visita_examen,
+                "token": generar_token_paciente(paciente.id),
             }
 
             return render(request, "registro_publico/epworth_publico.html", context)
@@ -192,23 +219,8 @@ def guardar_examen_publico_epworth(request):
 def guardar_examen_publico_mew(request):
     """Cargar y guardar examen MEW desde enlace público"""
 
-    def validar_acceso():
-        if request.method == "GET":
-            paciente_id = request.GET.get("paciente_id")
-        else:
-            paciente_id = request.POST.get("paciente_id")
-
-        if not paciente_id:
-            return None, "❌ Datos de acceso incompletos."
-
-        try:
-            paciente = get_object_or_404(DatosDemograficos, id=paciente_id)
-            return paciente, None
-        except Exception as e:
-            return None, f"❌ Error al validar acceso: {str(e)}"
-
-    # Validar acceso
-    paciente, error = validar_acceso()
+    # Validar acceso (token firmado o paciente_id legacy)
+    paciente, error = _validar_acceso_publico(request)
     if error:
         messages.error(request, error)
         return redirect("formulario_demografico_externo")
@@ -270,6 +282,7 @@ def guardar_examen_publico_mew(request):
                 "visita": visita,
                 "visita_examen": visita_examen,
                 "datos_examen": datos_examen,
+                "token": generar_token_paciente(paciente.id),
             }
 
             return render(request, "registro_publico/mew_publico.html", context)
@@ -304,7 +317,7 @@ def guardar_examen_publico_mew(request):
                     request, "❌ Error: Puntuación MEQ fuera del rango válido (16-86)."
                 )
                 return redirect(
-                    f"/guardar-examen-publico-mew/?paciente_id={paciente.id}"
+                    f"/guardar-examen-publico-mew/?token={generar_token_paciente(paciente.id)}"
                 )
 
             # Obtener campos del formulario MEW (usando nombres del formulario HTML)
@@ -433,24 +446,8 @@ def obtener_descripcion_cronotipo(puntuacion):
 def guardar_examen_publico_pitsburg(request):
     """Cargar y guardar examen Pittsburgh desde enlace público"""
 
-    # Función auxiliar para validar acceso
-    def validar_acceso():
-        if request.method == "GET":
-            paciente_id = request.GET.get("paciente_id")
-        else:
-            paciente_id = request.POST.get("paciente_id")
-
-        if not paciente_id:
-            return None, "❌ Datos de acceso incompletos."
-
-        try:
-            paciente = get_object_or_404(DatosDemograficos, id=paciente_id)
-            return paciente, None
-        except Exception as e:
-            return None, f"❌ Error al validar acceso: {str(e)}"
-
-    # Validar acceso
-    paciente, error = validar_acceso()
+    # Validar acceso (token firmado o paciente_id legacy)
+    paciente, error = _validar_acceso_publico(request)
     if error:
         messages.error(request, error)
         return redirect("formulario_demografico_externo")
@@ -516,6 +513,7 @@ def guardar_examen_publico_pitsburg(request):
                 "datos_examen": datos_examen,
                 "paciente_id": paciente.id,
                 "examen_id": 13,
+                "token": generar_token_paciente(paciente.id),
             }
 
             return render(request, "registro_publico/Pitsburg_publico.html", context)

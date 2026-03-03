@@ -76,7 +76,7 @@
                         <h6 class="card-title">Escala de Somnolencia de Epworth</h6>
                         <p class="card-text small">Evalúa la tendencia a quedarse dormido en situaciones cotidianas.</p>
 
-                        <a href="{% url 'guardar_examen_publico_epworth' %}?paciente_id={{ datos.paciente_id }}"
+                        <a href="{% url 'guardar_examen_publico_epworth' %}?token={{ datos.token }}"
                           class="btn btn-primary btn-sm"
                           target="_blank"
                           rel="noopener noreferrer">
@@ -93,7 +93,7 @@
                         <h6 class="card-title">Cuestionario MEW (Matutinidad-Vespertinidad)</h6>
                         <p class="card-text small">Determina si es una persona matutina o vespertina.</p>
 
-                        <a href="{% url 'guardar_examen_publico_mew' %}?paciente_id={{ datos.paciente_id }}"
+                        <a href="{% url 'guardar_examen_publico_mew' %}?token={{ datos.token }}"
                           class="btn btn-info btn-sm"
                           target="_blank"
                           rel="noopener noreferrer">
@@ -110,7 +110,7 @@
                         <h6 class="card-title">Cuestionario de Pittsburgh</h6>
                         <p class="card-text small">Evalúa la calidad del sueño y los hábitos de descanso.</p>
 
-                        <a href="{% url 'guardar_examen_publico_pitsburg' %}?paciente_id={{ datos.paciente_id }}"
+                        <a href="{% url 'guardar_examen_publico_pitsburg' %}?token={{ datos.token }}"
                           class="btn btn-warning btn-sm"
                           target="_blank"
                           rel="noopener noreferrer">

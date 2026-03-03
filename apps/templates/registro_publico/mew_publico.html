@@ -45,6 +45,7 @@
                 <form method="post" action="{% url 'guardar_examen_publico_mew' %}">
                     {% csrf_token %}
                     <input type="hidden" name="visita_id" id="visita_id" value="{{ visita.id }}" />
+                    <input type="hidden" name="token" value="{{ token }}" />
                     <input type="hidden" name="paciente_id" id="paciente_id" value="{{ paciente.id }}" />
                     <input type="hidden" name="puntuacion" id="puntuacion_hidden" value="0" />
 
