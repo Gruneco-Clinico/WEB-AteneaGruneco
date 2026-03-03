@@ -386,6 +386,46 @@ def _build_visit_section(elements, styles, visita):
     elements.append(Spacer(1, 0.15 * inch))
 
 
+# ---------------------------------------------------------------------------
+# Sueño Anamnesis — child model renderer
+# ---------------------------------------------------------------------------
+_ANAMNESIS_CHILD_SECTIONS = [
+    ("tipos_queja_detalle", "Quejas de sueño", ["nombre", "inicio", "evolucion", "frecuencia", "gravedad"]),
+    ("sustancias", "Sustancias", ["tipo", "cantidad", "frecuencia", "tiempo", "observaciones"]),
+    ("medicamentos", "Medicamentos", ["nombre", "dosis", "presentacion", "veces_dia", "frecuencia", "tiempo", "observaciones"]),
+    ("pantallas", "Uso de pantallas", ["tipo", "frecuencia", "tiempo_antes_dormir"]),
+    ("actividades_en_cama", "Actividades en cama", ["tipo", "frecuencia", "observaciones"]),
+    ("actividades_fisicas", "Actividades físicas", ["tipo", "intensidad", "frecuencia", "observaciones"]),
+    ("sintomas_suenos", "Síntomas de sueño", ["tipo", "cuando_inicio", "evolucion", "frecuencia", "gravedad", "observaciones"]),
+    ("sintomas_diurno", "Síntomas diurnos", ["tipo", "cuando_inicio", "evolucion", "frecuencia", "gravedad", "observaciones"]),
+]
+
+
+def _build_anamnesis_children(elements, styles, anamnesis):
+    """Render child-model tables for SuenoAnamnesisResult."""
+    for related_name, title, col_names in _ANAMNESIS_CHILD_SECTIONS:
+        qs = getattr(anamnesis, related_name, None)
+        if qs is None:
+            continue
+        items = qs.all()
+        if not items.exists():
+            continue
+
+        elements.append(Spacer(1, 0.06 * inch))
+        elements.append(Paragraph(f"<b>{title}</b>", styles["small"]))
+
+        header = [Paragraph(f"<b>{c.replace('_', ' ').title()}</b>", styles["small"]) for c in col_names]
+        rows = [header]
+        for item in items:
+            row = [Paragraph(str(getattr(item, c, "") or ""), styles["small"]) for c in col_names]
+            rows.append(row)
+
+        col_width = 6.5 * inch / len(col_names)
+        t = Table(rows, colWidths=[col_width] * len(col_names))
+        t.setStyle(_EXAM_FIELD_TABLE_STYLE)
+        elements.append(t)
+
+
 def _build_exam_section(elements, styles, visita_examen, index):
     """Build a single exam result section with Q&A table, score box, classification."""
     resultado = visita_examen.get_resultado_instance()
@@ -458,6 +498,14 @@ def _build_exam_section(elements, styles, visita_examen, index):
         t.setStyle(_EXAM_FIELD_TABLE_STYLE)
         elements.append(Spacer(1, 0.04 * inch))
         elements.append(t)
+
+    # --- Sueño Anamnesis: child model tables ---
+    try:
+        from ..models import SuenoAnamnesisResult
+        if isinstance(resultado, SuenoAnamnesisResult):
+            _build_anamnesis_children(elements, styles, resultado)
+    except Exception as e:
+        logger.debug("Skipping anamnesis children: %s", e)
 
     # --- Examiner notes ---
     if visita_examen.notas_examinador:
