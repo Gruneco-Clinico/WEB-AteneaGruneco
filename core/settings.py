@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "simple_history",  # Audit trail for clinical models
     "apps.home",  # Enable the inner home (home)
 ]
 
@@ -45,6 +46,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "apps.home.middleware.RateLimitMiddleware",
+    "simple_history.middleware.HistoryRequestMiddleware",  # Audit: tracks request.user on history records
 ]
 # Configuraciones de login
 LOGIN_URL = "accounts/login"  # URL para el login

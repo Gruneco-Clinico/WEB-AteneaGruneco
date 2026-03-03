@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser, Group, Permission, User
+from simple_history.models import HistoricalRecords
 
 
 class CustomUser(AbstractUser):
@@ -38,6 +39,9 @@ class UserProfile(models.Model):
 class DatosDemograficos(models.Model):
     # Información Personal
     primer_nombre = models.CharField(max_length=50)
+
+    # Audit trail — tracks all changes with user and timestamp
+    history = HistoricalRecords()
     segundo_nombre = models.CharField(max_length=50, blank=True, null=True)
     primer_apellido = models.CharField(max_length=50)
     segundo_apellido = models.CharField(max_length=50, blank=True, null=True)

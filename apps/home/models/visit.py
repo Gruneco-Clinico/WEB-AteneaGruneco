@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.urls import reverse, NoReverseMatch
 from django.core.exceptions import ValidationError
+from simple_history.models import HistoricalRecords
 
 from .patient import DatosDemograficos
 
@@ -46,6 +47,9 @@ class Visita(models.Model):
     acompanante_relacion = models.CharField(max_length=100, blank=True, null=True)
     acompanante_correo = models.EmailField(blank=True, null=True)
     acompanante_telefono = models.CharField(max_length=20, blank=True, null=True)
+
+    # Audit trail — tracks all changes with user and timestamp
+    history = HistoricalRecords()
 
     def __str__(self):
         if self.Tipo_visita and self.Tipo_visita.proyecto:
@@ -132,6 +136,9 @@ class VisitaExamen(models.Model):
     tiempo_duracion = models.DurationField(
         null=True, blank=True, verbose_name="Tiempo de Duración"
     )
+
+    # Audit trail — tracks all changes with user and timestamp
+    history = HistoricalRecords()
 
     class Meta:
         unique_together = ["visita", "examen"]
