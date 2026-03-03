@@ -179,6 +179,98 @@ EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD")
 DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL", default="Atenea Gruneco <ateneagruneco@gmail.com>")
 
 
+# ----- Logging Configuration -----
+# Structured logging for security events, clinical data access, and debugging.
+LOG_DIR = os.path.join(CORE_DIR, "logs")
+os.makedirs(LOG_DIR, exist_ok=True)
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            "format": "[{asctime}] {levelname} {name} {module}.{funcName}:{lineno} — {message}",
+            "style": "{",
+            "datefmt": "%Y-%m-%d %H:%M:%S",
+        },
+        "simple": {
+            "format": "[{asctime}] {levelname} — {message}",
+            "style": "{",
+            "datefmt": "%Y-%m-%d %H:%M:%S",
+        },
+    },
+    "filters": {
+        "require_debug_false": {
+            "()": "django.utils.log.RequireDebugFalse",
+        },
+        "require_debug_true": {
+            "()": "django.utils.log.RequireDebugTrue",
+        },
+    },
+    "handlers": {
+        "console": {
+            "level": "INFO",
+            "class": "logging.StreamHandler",
+            "formatter": "simple",
+        },
+        "file_general": {
+            "level": "INFO",
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": os.path.join(LOG_DIR, "atenea.log"),
+            "maxBytes": 5 * 1024 * 1024,  # 5 MB
+            "backupCount": 5,
+            "formatter": "verbose",
+            "encoding": "utf-8",
+        },
+        "file_security": {
+            "level": "INFO",
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": os.path.join(LOG_DIR, "security.log"),
+            "maxBytes": 5 * 1024 * 1024,  # 5 MB
+            "backupCount": 10,
+            "formatter": "verbose",
+            "encoding": "utf-8",
+        },
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["console", "file_general"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        "django.security": {
+            "handlers": ["console", "file_security"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        "django.request": {
+            "handlers": ["console", "file_general"],
+            "level": "WARNING",
+            "propagate": False,
+        },
+        "apps.home": {
+            "handlers": ["console", "file_general"],
+            "level": "DEBUG" if DEBUG else "INFO",
+            "propagate": False,
+        },
+        "apps.home.tokens": {
+            "handlers": ["console", "file_security"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        "apps.home.decorators": {
+            "handlers": ["console", "file_security"],
+            "level": "INFO",
+            "propagate": False,
+        },
+    },
+    "root": {
+        "handlers": ["console", "file_general"],
+        "level": "INFO",
+    },
+}
+
+
 # ----- Security Hardening -----
 # Only enforce HTTPS/secure cookies when NOT in DEBUG mode (production)
 if not DEBUG:
