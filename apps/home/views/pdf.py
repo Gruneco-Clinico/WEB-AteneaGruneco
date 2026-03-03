@@ -56,6 +56,19 @@ def _get_logo_path():
     return None
 
 
+def _get_udea_logo_path():
+    candidates = [
+        os.path.join(settings.BASE_DIR, "staticfiles", "assets", "img", "theme", "UdeA.jpeg"),
+        os.path.join(settings.BASE_DIR, "apps", "static", "assets", "img", "theme", "UdeA.jpeg"),
+        os.path.join(settings.BASE_DIR, "staticfiles", "assets", "img", "theme", "universidad-antioquia.jpg"),
+        os.path.join(settings.BASE_DIR, "apps", "static", "assets", "img", "theme", "universidad-antioquia.jpg"),
+    ]
+    for p in candidates:
+        if os.path.isfile(p):
+            return p
+    return None
+
+
 # ---------------------------------------------------------------------------
 # Shared styles factory
 # ---------------------------------------------------------------------------
@@ -264,19 +277,39 @@ def _extraer_informacion_resultado(resultado):
 # PDF element builders
 # ---------------------------------------------------------------------------
 def _build_header(elements, styles, visita, paciente):
-    """Institutional header: logo + title + patient/visit id line."""
-    logo_path = _get_logo_path()
-    if logo_path:
-        try:
-            logo = Image(logo_path, width=1.6 * inch, height=0.65 * inch, kind="proportional")
-            logo.hAlign = "LEFT"
-            elements.append(logo)
-            elements.append(Spacer(1, 0.08 * inch))
-        except Exception:
-            pass
+    """Institutional header: dual logos (GRUNECO + UdeA) + title + patient/visit id line."""
+    gruneco_path = _get_logo_path()
+    udea_path = _get_udea_logo_path()
 
-    elements.append(Paragraph("HISTORIA CLINICA ELECTRONICA", styles["title"]))
-    elements.append(Paragraph("Sistema ATENEA - GRUNECO", styles["subtitle"]))
+    # Build a row with logos on each side and title in the centre
+    logo_left = ""
+    logo_right = ""
+    try:
+        if gruneco_path:
+            logo_left = Image(gruneco_path, width=1.4 * inch, height=0.55 * inch, kind="proportional")
+        if udea_path:
+            logo_right = Image(udea_path, width=1.0 * inch, height=0.55 * inch, kind="proportional")
+    except Exception:
+        pass
+
+    if logo_left or logo_right:
+        title_para = Paragraph("HISTORIA CLINICA ELECTRONICA", styles["title"])
+        logo_row = Table(
+            [[logo_left or "", title_para, logo_right or ""]],
+            colWidths=[1.6 * inch, 3.8 * inch, 1.1 * inch],
+        )
+        logo_row.setStyle(TableStyle([
+            ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+            ("ALIGN", (0, 0), (0, 0), "LEFT"),
+            ("ALIGN", (1, 0), (1, 0), "CENTER"),
+            ("ALIGN", (2, 0), (2, 0), "RIGHT"),
+        ]))
+        elements.append(logo_row)
+        elements.append(Spacer(1, 0.06 * inch))
+    else:
+        elements.append(Paragraph("HISTORIA CLINICA ELECTRONICA", styles["title"]))
+
+    elements.append(Paragraph("Sistema ATENEA - GRUNECO | Universidad de Antioquia", styles["subtitle"]))
 
     # Thin divider
     elements.append(HRFlowable(
