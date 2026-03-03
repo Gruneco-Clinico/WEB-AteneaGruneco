@@ -32,6 +32,24 @@ from ..tokens import generar_token_paciente
 
 logger = logging.getLogger(__name__)
 
+
+def _build_codigos_map(pacientes_qs):
+    """Return {paciente_id: [code1, code2, ...]} from ProyectoPacienteExtra."""
+    from ..models import ProyectoPacienteExtra
+
+    pac_ids = list(pacientes_qs.values_list("id", flat=True))
+    ppe_qs = (
+        ProyectoPacienteExtra.objects
+        .filter(paciente_id__in=pac_ids)
+        .select_related("proyecto")
+        .order_by("proyecto__nombre")
+    )
+    codigos = {}
+    for ppe in ppe_qs:
+        codigos.setdefault(ppe.paciente_id, []).append(ppe.codigo_proyecto)
+    return codigos
+
+
 @login_required
 def lista_pacientes(request):
     pacientes = DatosDemograficos.objects.all()
@@ -42,6 +60,10 @@ def lista_pacientes(request):
             pacientes = pacientes.filter(proyectos__id=int(filtro_proyecto))
         except (ValueError, TypeError):
             pass
+    codigos_map = _build_codigos_map(pacientes)
+    # Attach codes to each patient object for easy template access
+    for pac in pacientes:
+        pac.codigos_list = codigos_map.get(pac.id, [])
     return render(
         request,
         "home/tables.html",
@@ -49,6 +71,7 @@ def lista_pacientes(request):
             "pacientes": pacientes,
             "proyectos": proyectos,
             "filtro_proyecto": filtro_proyecto,
+            "codigos_map": codigos_map,
         },
     )
 

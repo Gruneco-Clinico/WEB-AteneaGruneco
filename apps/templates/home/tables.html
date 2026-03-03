@@ -420,6 +420,7 @@
               <tr>
                 <th scope="col" class="sort" data-sort="id">ID del Paciente</th>
                 <th scope="col" class="sort" data-sort="name">Nombre</th>
+                <th scope="col" class="sort" data-sort="codes">Códigos</th>
                 <th scope="col" class="sort" data-sort="age">Edad</th>
                 <th scope="col" class="sort" data-sort="gender">Fecha nacimiento</th>
                 <!-- <th scope="col" class="sort" data-sort="status">Ocupación</th> -->
@@ -432,6 +433,15 @@
               <tr>
                 <td><strong>{{ paciente.numero_documento }}</strong></td>
                 <td>{{ paciente.primer_nombre }} {{ paciente.primer_apellido }}</td>
+                <td>
+                  {% if paciente.codigos_list %}
+                    {% for code in paciente.codigos_list %}
+                      <span class="badge badge-primary">{{ code }}</span>
+                    {% endfor %}
+                  {% else %}
+                    <span class="text-muted">—</span>
+                  {% endif %}
+                </td>
                 <td><span class="badge badge-pill badge-success">{{ paciente.edad }} años</span></td>
                 <td>{{ paciente.fecha_nacimiento|date:"d/m/Y" }}</td>
                 <!-- <td>{{ paciente.ocupacion|title }}</td> -->
@@ -527,7 +537,7 @@
         const messageRow = document.createElement("tr");
         messageRow.id = "no-results-message";
         messageRow.innerHTML = `
-          <td colspan="6" class="text-center py-4">
+          <td colspan="7" class="text-center py-4">
             <i class="fas fa-search text-muted mb-2" style="font-size: 2rem;"></i>
             <p class="text-muted mb-0">No se encontraron pacientes que coincidan con: <strong>"${searchTerm}"</strong></p>
           </td>

@@ -28,6 +28,13 @@ class Visita(models.Model):
         User, on_delete=models.SET_NULL, null=True, blank=True, related_name="visitas_evaluador"
     )
 
+    # Notas aclaratorias — editable even after visit signature
+    notas_aclaratorias = models.TextField(
+        blank=True, null=True,
+        verbose_name="Notas aclaratorias",
+        help_text="Notas de clarificación editables después de la firma.",
+    )
+
     estado_visita = models.CharField(
         max_length=20,
         choices=[
@@ -47,13 +54,6 @@ class Visita(models.Model):
     acompanante_relacion = models.CharField(max_length=100, blank=True, null=True)
     acompanante_correo = models.EmailField(blank=True, null=True)
     acompanante_telefono = models.CharField(max_length=20, blank=True, null=True)
-
-    # Notas aclaratorias — editable even after visit signature
-    notas_aclaratorias = models.TextField(
-        blank=True, null=True,
-        verbose_name="Notas aclaratorias",
-        help_text="Notas de clarificación editables después de la firma.",
-    )
 
     # Audit trail — tracks all changes with user and timestamp
     history = HistoricalRecords()

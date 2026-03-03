@@ -85,11 +85,13 @@ DATABASES = {
         "PASSWORD": config("DB_PASSWORD"),
         "HOST": config("DB_HOST", default="localhost"),
         "PORT": config("DB_PORT", default="3306"),
-        "OPTIONS": {
-            "unix_socket": config("DB_UNIX_SOCKET", default="/opt/bitnami/mariadb/tmp/mysql.sock"),
-        },
     }
 }
+
+# Unix socket only for Bitnami/Linux production
+_unix_socket = config("DB_UNIX_SOCKET", default="")
+if _unix_socket:
+    DATABASES["default"]["OPTIONS"] = {"unix_socket": _unix_socket}
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
