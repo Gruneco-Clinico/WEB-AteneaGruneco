@@ -148,6 +148,11 @@ urlpatterns = [
     path("editar-visita/<int:visita_id>/", views.editar_v, name="editar_v"),
     path("firmar-visita/<int:visita_id>/", views.firmar_visita, name="firmar_visita"),
     path(
+        "editar-notas-aclaratorias/<int:visita_id>/",
+        views.editar_notas_aclaratorias,
+        name="editar_notas_aclaratorias",
+    ),
+    path(
         "visita/<int:visita_id>/pdf/",
         views.generar_pdf_historia_clinica_visita,
         name="generar_pdf_historia_clinica_visita",

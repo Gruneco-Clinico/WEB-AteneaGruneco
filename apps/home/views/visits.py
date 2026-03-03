@@ -410,4 +410,22 @@ def visitas_pendientes_firma(request):
     )
 
 
+@login_required
+def editar_notas_aclaratorias(request, visita_id):
+    """
+    Update notas_aclaratorias on a visit.
+    Allowed even when firmado=True — this is by design so clinicians
+    can add post-signature clarifying notes.
+    """
+    if request.method != "POST":
+        messages.error(request, "Método no permitido.")
+        return redirect("index")
+
+    visita = get_object_or_404(Visita, id=visita_id)
+    visita.notas_aclaratorias = request.POST.get("notas_aclaratorias", "")
+    visita.save()
+    messages.success(request, "Notas aclaratorias actualizadas correctamente.")
+    return redirect("detalle_paciente", paciente_id=visita.paciente.id)
+
+
 # proyectos ############################################################

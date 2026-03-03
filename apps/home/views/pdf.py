@@ -543,7 +543,16 @@ def construir_pdf_visita(buffer, visita):
     # 5. Signature
     _build_signature_section(elements, styles, visita)
 
-    # 6. Footer
+    # 6. Notas aclaratorias (editable post-firma)
+    if visita.notas_aclaratorias:
+        elements.append(Spacer(1, 0.12 * inch))
+        elements.append(Paragraph("NOTAS ACLARATORIAS", styles["heading"]))
+        elements.append(Paragraph(
+            visita.notas_aclaratorias.replace("\n", "<br/>"),
+            styles["normal"],
+        ))
+
+    # 7. Footer
     _build_footer(elements, styles)
 
     doc.build(elements)

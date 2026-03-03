@@ -330,6 +330,53 @@
                   </div>
                 </div>
 
+                <!-- Notas aclaratorias (editable incluso post-firma) -->
+                <div class="card-body pt-2 pb-2 border-top">
+                  <div class="d-flex align-items-start">
+                    <div class="flex-grow-1">
+                      <h6 class="text-muted mb-1">
+                        <i class="fas fa-sticky-note mr-1"></i> Notas aclaratorias
+                      </h6>
+                      {% if visita.notas_aclaratorias %}
+                      <p class="mb-0 small">{{ visita.notas_aclaratorias|linebreaksbr }}</p>
+                      {% else %}
+                      <p class="mb-0 small text-muted"><em>Sin notas aclaratorias.</em></p>
+                      {% endif %}
+                    </div>
+                    <button type="button" class="btn btn-sm btn-outline-info ml-2"
+                      data-toggle="modal" data-target="#modalNotas-{{ visita.id }}"
+                      title="Editar notas aclaratorias">
+                      <i class="fas fa-edit"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Modal para editar notas aclaratorias -->
+                <div class="modal fade" id="modalNotas-{{ visita.id }}" tabindex="-1" role="dialog">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <form method="POST" action="{% url 'editar_notas_aclaratorias' visita.id %}">
+                        {% csrf_token %}
+                        <div class="modal-header">
+                          <h5 class="modal-title">Notas aclaratorias — {{ visita.nombre }}</h5>
+                          <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                        </div>
+                        <div class="modal-body">
+                          <textarea name="notas_aclaratorias" class="form-control" rows="5"
+                            placeholder="Escriba notas de clarificación...">{{ visita.notas_aclaratorias|default:"" }}</textarea>
+                          <small class="form-text text-muted">
+                            Estas notas son editables incluso después de firmar la visita.
+                          </small>
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                          <button type="submit" class="btn btn-primary">Guardar</button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+
                 <!-- Contenido de Exámenes (Colapsable) DENTRO DE LA TARJETA DE VISITA -->
                 <div id="examenes-visita-{{ visita.id }}" class="collapse">
                   <div class="card-body pt-3">

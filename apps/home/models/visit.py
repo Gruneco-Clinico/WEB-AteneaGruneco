@@ -48,6 +48,13 @@ class Visita(models.Model):
     acompanante_correo = models.EmailField(blank=True, null=True)
     acompanante_telefono = models.CharField(max_length=20, blank=True, null=True)
 
+    # Notas aclaratorias — editable even after visit signature
+    notas_aclaratorias = models.TextField(
+        blank=True, null=True,
+        verbose_name="Notas aclaratorias",
+        help_text="Notas de clarificación editables después de la firma.",
+    )
+
     # Audit trail — tracks all changes with user and timestamp
     history = HistoricalRecords()
 
