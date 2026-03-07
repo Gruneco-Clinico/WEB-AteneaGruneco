@@ -173,6 +173,7 @@ def administrar_usuarios(request):
         "usuarios_activos": usuarios_list.filter(is_active=True).count(),
         "administradores": usuarios_list.filter(is_superuser=True).count(),
         "stats_usuario_proyecto": list(stats_usuario_proyecto),
+        "stats_usuario_proyecto_json": json.dumps(list(stats_usuario_proyecto)),
     }
 
     # === PROCESAMIENTO DE ACCIONES ===

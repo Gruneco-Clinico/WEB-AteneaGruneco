@@ -483,48 +483,16 @@
   <input type="hidden" name="usuario_id" id="delete_user_id">
 </form>
 
-<!-- Tabla: Pacientes por Usuario por Proyecto -->
+<!-- Estadísticas por Evaluador -->
 <div class="container-fluid mt-4">
-  <div class="row">
-    <div class="col">
-      <div class="card">
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card stat-card">
         <div class="card-header border-0">
-          <div class="row align-items-center">
-            <div class="col">
-              <h3 class="mb-0">
-                <i class="fas fa-chart-bar mr-2"></i>
-                Pacientes Atendidos por Usuario y Proyecto
-              </h3>
-            </div>
-          </div>
+          <h3 class="mb-0"><i class="fas fa-user-md mr-2 text-info"></i>Estadísticas por Evaluador</h3>
         </div>
-        <div class="table-responsive">
-          <table class="table align-items-center table-flush">
-            <thead class="thead-light">
-              <tr>
-                <th>Usuario</th>
-                <th>Nombre</th>
-                <th>Proyecto</th>
-                <th>Pacientes</th>
-                <th>Visitas</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for stat in stats_usuario_proyecto %}
-              <tr>
-                <td><strong>{{ stat.evaluador__username }}</strong></td>
-                <td>{{ stat.evaluador__first_name }} {{ stat.evaluador__last_name }}</td>
-                <td>{{ stat.Tipo_visita__proyecto__nombre }}</td>
-                <td><span class="badge badge-pill badge-success">{{ stat.num_pacientes }}</span></td>
-                <td><span class="badge badge-pill badge-primary">{{ stat.num_visitas }}</span></td>
-              </tr>
-              {% empty %}
-              <tr>
-                <td colspan="5" class="text-center text-muted py-4">No hay visitas registradas aún.</td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
+        <div class="card-body pt-0" id="evaluadoresContainer">
+          <p class="text-muted" id="evalLoading">Cargando datos de evaluadores…</p>
         </div>
       </div>
     </div>
@@ -686,6 +654,178 @@ document.addEventListener('DOMContentLoaded', function() {
     hidePreview();
     if (firmaFileInput) firmaFileInput.value = null;
   });
+
+  // === Cargar estadísticas por evaluador ===
+  cargarEstadisticasEvaluadores();
 });
+
+function cargarEstadisticasEvaluadores() {
+  const container = document.getElementById('evaluadoresContainer');
+  if (!container) return;
+
+  // Datos enviados desde el backend
+  const statsData = {{ stats_usuario_proyecto_json|safe }};
+  
+  if (!statsData || statsData.length === 0) {
+    container.innerHTML = '<p class="text-muted text-center py-4">No hay estadísticas disponibles.</p>';
+    return;
+  }
+
+  // Agrupar por evaluador
+  const evaluadoresMap = {};
+  
+  statsData.forEach(stat => {
+    const evalId = stat.evaluador__id;
+    if (!evaluadoresMap[evalId]) {
+      evaluadoresMap[evalId] = {
+        id: evalId,
+        username: stat.evaluador__username,
+        nombre: `${stat.evaluador__first_name} ${stat.evaluador__last_name}`.trim() || 'Sin nombre',
+        proyectos: [],
+        totalPacientes: 0,
+        totalVisitas: 0
+      };
+    }
+    
+    evaluadoresMap[evalId].proyectos.push({
+      nombre: stat.Tipo_visita__proyecto__nombre,
+      pacientes: stat.num_pacientes,
+      visitas: stat.num_visitas
+    });
+    
+    evaluadoresMap[evalId].totalPacientes += stat.num_pacientes;
+    evaluadoresMap[evalId].totalVisitas += stat.num_visitas;
+  });
+
+  // Convertir a array y ordenar
+  const evaluadores = Object.values(evaluadoresMap).sort((a, b) => 
+    b.totalVisitas - a.totalVisitas
+  );
+
+  // Generar HTML
+  let html = '<div class="accordion" id="accordionEvaluadores">';
+  
+  evaluadores.forEach((evaluador, index) => {
+    const collapseId = `collapse${evaluador.id}`;
+    
+    html += `
+      <div class="card mb-2 border-left-info">
+        <div class="card-header p-3" id="heading${evaluador.id}" style="background-color: #f8f9fa;">
+          <div class="d-flex justify-content-between align-items-center" 
+               style="cursor: pointer;" 
+               data-toggle="collapse" 
+               data-target="#${collapseId}" 
+               aria-expanded="${index === 0 ? 'true' : 'false'}" 
+               aria-controls="${collapseId}">
+            <div class="d-flex align-items-center">
+              <i class="fas fa-user-circle fa-2x text-info mr-3"></i>
+              <div>
+                <h5 class="mb-0 font-weight-bold">${evaluador.username}</h5>
+                <small class="text-muted">${evaluador.nombre}</small>
+              </div>
+            </div>
+            <div class="d-flex align-items-center">
+              <span class="badge badge-success badge-pill mr-2" title="Total de pacientes">
+                <i class="fas fa-users"></i> ${evaluador.totalPacientes} pacientes
+              </span>
+              <span class="badge badge-primary badge-pill mr-2" title="Total de visitas">
+                <i class="fas fa-calendar-check"></i> ${evaluador.totalVisitas} visitas
+              </span>
+              <i class="fas fa-chevron-down text-muted"></i>
+            </div>
+          </div>
+        </div>
+        
+        <div id="${collapseId}" 
+             class="collapse ${index === 0 ? 'show' : ''}" 
+             aria-labelledby="heading${evaluador.id}" 
+             data-parent="#accordionEvaluadores">
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-sm table-hover mb-0">
+                <thead class="thead-light">
+                  <tr>
+                    <th class="border-0"><i class="fas fa-project-diagram mr-1"></i>Proyecto</th>
+                    <th class="border-0 text-center"><i class="fas fa-user-friends mr-1"></i>Pacientes</th>
+                    <th class="border-0 text-center"><i class="fas fa-clipboard-list mr-1"></i>Visitas</th>
+                    <th class="border-0 text-center">Promedio Visitas/Paciente</th>
+                  </tr>
+                </thead>
+                <tbody>
+    `;
+    
+    evaluador.proyectos.forEach(proyecto => {
+      const promedio = (proyecto.visitas / proyecto.pacientes).toFixed(1);
+      html += `
+        <tr>
+          <td class="font-weight-500">${proyecto.nombre}</td>
+          <td class="text-center">
+            <span class="badge badge-soft-success">${proyecto.pacientes}</span>
+          </td>
+          <td class="text-center">
+            <span class="badge badge-soft-primary">${proyecto.visitas}</span>
+          </td>
+          <td class="text-center">
+            <span class="badge badge-soft-info">${promedio}</span>
+          </td>
+        </tr>
+      `;
+    });
+    
+    html += `
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  });
+  
+  html += '</div>';
+  
+  container.innerHTML = html;
+}
 </script>
+
+<style>
+.border-left-info {
+  border-left: 4px solid #11cdef !important;
+}
+
+.badge-soft-success {
+  background-color: rgba(45, 206, 137, 0.15);
+  color: #2dce89;
+  font-weight: 600;
+}
+
+.badge-soft-primary {
+  background-color: rgba(94, 114, 228, 0.15);
+  color: #5e72e4;
+  font-weight: 600;
+}
+
+.badge-soft-info {
+  background-color: rgba(17, 205, 239, 0.15);
+  color: #11cdef;
+  font-weight: 600;
+}
+
+.card-header[data-toggle="collapse"] {
+  transition: background-color 0.2s ease;
+}
+
+.card-header[data-toggle="collapse"]:hover {
+  background-color: #e9ecef !important;
+}
+
+.font-weight-500 {
+  font-weight: 500;
+}
+
+.stat-card {
+  border-radius: 12px !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08) !important;
+}
+</style>
 {% endblock javascripts %}
