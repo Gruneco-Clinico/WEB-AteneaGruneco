@@ -339,12 +339,32 @@ def formulario_demografico_externo(request):
             proyecto_vinculado = None
 
             try:
-                proyecto_vinculado = Proyecto.objects.get(id =11)  # ID fijo para "Caracterización sueño"
+                proyecto_vinculado = Proyecto.objects.get(id=11)  # ID fijo para "Caracterización sueño"
                 proyecto_vinculado.pacientes.add(paciente_nuevo)
+
+                # Generar código de proyecto (ej: CRS_0001)
+                prefijo = (proyecto_vinculado.codigo_siu or "").upper()
+                ultimo = ProyectoPacienteExtra.objects.filter(
+                    proyecto=proyecto_vinculado
+                ).aggregate(Max("codigo_proyecto"))["codigo_proyecto__max"]
+
+                if ultimo:
+                    consecutivo = int(ultimo.split("_")[-1]) + 1
+                else:
+                    consecutivo = 1
+
+                codigo_final = f"{prefijo}_{consecutivo:04d}"
+                ProyectoPacienteExtra.objects.create(
+                    proyecto=proyecto_vinculado,
+                    paciente=paciente_nuevo,
+                    codigo_proyecto=codigo_final,
+                )
+
                 logger.info(
-                    "Paciente %s vinculado al proyecto '%s'",
+                    "Paciente %s vinculado al proyecto '%s' con código %s",
                     paciente_nuevo.id,
                     proyecto_vinculado.nombre,
+                    codigo_final,
                 )
             except Proyecto.DoesNotExist:
                 logger.error(
