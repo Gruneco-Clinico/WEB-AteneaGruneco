@@ -84,10 +84,10 @@ def guardar_examen_publico_epworth(request):
     if request.method == "GET":
         # MOSTRAR FORMULARIO
         try:
-            # Buscar visita automática
+            # Buscar visita automática (soporta tipo 20 actual y tipo 7 legacy)
             visita = Visita.objects.filter(
-                paciente=paciente, nombre="VISITA EPWORTH/MEW", Tipo_visita_id=7
-            ).first()
+                paciente=paciente, Tipo_visita_id__in=[20, 7]
+            ).order_by("-id").first()
 
             if not visita:
                 messages.error(request, "❌ No se encontró la visita asociada.")
@@ -228,10 +228,10 @@ def guardar_examen_publico_mew(request):
     if request.method == "GET":
         # MOSTRAR FORMULARIO
         try:
-            # Buscar visita automática
+            # Buscar visita automática (soporta tipo 20 actual y tipo 7 legacy)
             visita = Visita.objects.filter(
-                paciente=paciente, nombre="VISITA EPWORTH/MEW", Tipo_visita_id=7
-            ).first()
+                paciente=paciente, Tipo_visita_id__in=[20, 7]
+            ).order_by("-id").first()
 
             if not visita:
                 messages.error(request, "❌ No se encontró la visita asociada.")
@@ -455,10 +455,10 @@ def guardar_examen_publico_pitsburg(request):
     if request.method == "GET":
         # MOSTRAR FORMULARIO
         try:
-            # Buscar visita automática
+            # Buscar visita automática (soporta tipo 20 actual y tipo 7 legacy)
             visita = Visita.objects.filter(
-                paciente=paciente, nombre="VISITA EPWORTH/MEW", Tipo_visita_id=7
-            ).first()
+                paciente=paciente, Tipo_visita_id__in=[20, 7]
+            ).order_by("-id").first()
 
             if not visita:
                 messages.error(request, "❌ No se encontró la visita asociada.")

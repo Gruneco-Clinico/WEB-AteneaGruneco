@@ -28,7 +28,7 @@ class Proyecto(models.Model):
 
     # --- Configuración de registro público automático ---
     crear_visita_automatica = models.BooleanField(
-        default=False,
+        default=True,
         verbose_name="Crear visita automática al registrar paciente",
         help_text="Si está activo, al registrarse un paciente desde el formulario público "
                   "se creará una visita automática con el tipo de visita configurado.",

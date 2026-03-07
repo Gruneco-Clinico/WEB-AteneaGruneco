@@ -335,48 +335,34 @@ def formulario_demografico_externo(request):
 
             paciente_nuevo.save()
 
-            # ===== VINCULAR PROYECTO VÍA ÚLTIMA CITA MÉDICA =====
-            correo_paciente = paciente_nuevo.correo
+            # ===== VINCULAR PROYECTO: Caracterización sueño =====
             proyecto_vinculado = None
 
-            if correo_paciente:
-                ultima_cita = (
-                    CitaMedica.objects.filter(email_paciente__iexact=correo_paciente)
-                    .select_related("proyecto")
-                    .order_by("-fecha_agendamiento")
-                    .first()
+            try:
+                proyecto_vinculado = Proyecto.objects.get(id =11)  # ID fijo para "Caracterización sueño"
+                proyecto_vinculado.pacientes.add(paciente_nuevo)
+                logger.info(
+                    "Paciente %s vinculado al proyecto '%s'",
+                    paciente_nuevo.id,
+                    proyecto_vinculado.nombre,
+                )
+            except Proyecto.DoesNotExist:
+                logger.error(
+                    "Proyecto 'Caracterización sueño' no existe. Paciente %s no fue vinculado a ningún proyecto.",
+                    paciente_nuevo.id,
+                )
+            except Exception as e:
+                logger.error(
+                    "Error al vincular paciente %s al proyecto 'Caracterización sueño': %s",
+                    paciente_nuevo.id,
+                    e,
                 )
 
-                if ultima_cita and ultima_cita.proyecto:
-                    proyecto_vinculado = ultima_cita.proyecto
-                    try:
-                        proyecto_vinculado.pacientes.add(paciente_nuevo)
-                        logger.info(
-                            "Paciente %s vinculado al proyecto '%s' (cita #%s)",
-                            paciente_nuevo.id,
-                            proyecto_vinculado.nombre,
-                            ultima_cita.id,
-                        )
-                    except Exception as e:
-                        logger.error(
-                            "Error al vincular paciente %s al proyecto '%s': %s",
-                            paciente_nuevo.id,
-                            proyecto_vinculado.nombre,
-                            e,
-                        )
-
             # ===== CREAR VISITA AUTOMÁTICA (si el proyecto lo requiere) =====
-            if (
-                proyecto_vinculado
-                and proyecto_vinculado.crear_visita_automatica
-                and proyecto_vinculado.tipo_visita_automatica
-            ):
+            if proyecto_vinculado:
                 try:
-                    tipo_visita_auto = proyecto_vinculado.tipo_visita_automatica
-                    nombre_visita = (
-                        proyecto_vinculado.nombre_visita_automatica
-                        or tipo_visita_auto.nombre
-                    )
+                    tipo_visita_auto = TipoVisita.objects.get(id=20)
+                    nombre_visita = "Visita Inicial"
 
                     visita_automatica = Visita.objects.create(
                         paciente=paciente_nuevo,
@@ -387,14 +373,31 @@ def formulario_demografico_externo(request):
 
                     # Crear los exámenes asociados según el tipo de visita
                     examenes_config = getattr(tipo_visita_auto, "examenes", None)
-                    if examenes_config:
+                    logger.debug(
+                        "examenes_config para tipo_visita_auto %s: %s",
+                        tipo_visita_auto.id,
+                        examenes_config,
+                    )
+                    
+                    if examenes_config and isinstance(examenes_config, (list, tuple)):
+                        examenes_creados = 0
                         for examen_data in examenes_config:
                             try:
-                                examen = Examen.objects.get(id=examen_data["id"])
+                                # Convertir ID de string a int si es necesario
+                                examen_id = examen_data["id"]
+                                if isinstance(examen_id, str):
+                                    examen_id = int(examen_id)
+                                
+                                examen = Examen.objects.get(id=examen_id)
                                 VisitaExamen.objects.create(
                                     visita=visita_automatica,
                                     examen=examen,
                                     estado="pendiente",
+                                )
+                                examenes_creados += 1
+                                logger.debug(
+                                    "Examen %s asociado a visita automática",
+                                    examen_id,
                                 )
                             except Examen.DoesNotExist:
                                 logger.warning(
@@ -402,18 +405,39 @@ def formulario_demografico_externo(request):
                                     examen_data.get("id"),
                                     tipo_visita_auto.id,
                                 )
+                            except (ValueError, TypeError) as e:
+                                logger.error(
+                                    "Error al parsear ID de examen %s: %s",
+                                    examen_data.get("id"),
+                                    e,
+                                )
                             except Exception as e:
                                 logger.error(
                                     "Error al asociar examen %s a visita automática: %s",
                                     examen_data.get("id"),
                                     e,
                                 )
+                        logger.debug(
+                            "Se crearon %d exámenes para la visita automática",
+                            examenes_creados,
+                        )
+                    elif examenes_config:
+                        logger.warning(
+                            "examenes_config no es una lista válida: tipo=%s, valor=%s",
+                            type(examenes_config),
+                            examenes_config,
+                        )
 
                     logger.info(
                         "Visita automática '%s' creada para paciente %s (proyecto '%s')",
                         nombre_visita,
                         paciente_nuevo.id,
                         proyecto_vinculado.nombre,
+                    )
+                except TipoVisita.DoesNotExist:
+                    logger.error(
+                        "TipoVisita ID 20 ('Caracterización sueño') no existe. No se pudo crear visita automática para paciente %s.",
+                        paciente_nuevo.id,
                     )
                 except Exception as e:
                     logger.error(
@@ -459,9 +483,6 @@ def formulario_demografico_externo(request):
 def consulta_examenes(request):
     documento = request.GET.get("documento", "").strip()
 
-    # Validate input — reject empty or too-short document numbers
-    if not documento or len(documento) < 5:
-        return JsonResponse({"examenes": []})
 
     # 1. Verificar si existe un paciente con ese documento
     paciente = DatosDemograficos.objects.filter(numero_documento=documento).first()
