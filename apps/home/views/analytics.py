@@ -11,7 +11,7 @@ from django.forms.models import model_to_dict
 from django.contrib.auth.models import User
 from django.views.generic import TemplateView
 from django.core.mail import send_mail, EmailMessage
-from django.db.models import Max, Count, Q
+from django.db.models import Max, Count, Q, Avg, F
 from datetime import datetime, timedelta
 from ..models import *
 from ..forms import ProyectoForm, RegistroDemograficoForm
@@ -132,6 +132,125 @@ def _build_evaluator_stats(proyecto):
 # ---------------------------------------------------------------------------
 # Views
 # ---------------------------------------------------------------------------
+
+
+@login_required(login_url="/login/")
+@user_passes_test(is_superuser, login_url="/login/")
+def api_dashboard_data(request):
+    """JSON endpoint that returns all dashboard KPIs, demographics, and exam
+    statistics in a single request for the Chart.js-powered dashboard."""
+
+    proyecto_id = request.GET.get("proyecto")
+
+    # Base patient queryset
+    pacientes = DatosDemograficos.objects.all()
+    exams_qs = VisitaExamen.objects.filter(estado="completado")
+
+    if proyecto_id:
+        try:
+            proyecto_id = int(proyecto_id)
+            pacientes = pacientes.filter(proyectos__id=proyecto_id)
+            exams_qs = exams_qs.filter(visita__Tipo_visita__proyecto_id=proyecto_id)
+        except (ValueError, TypeError):
+            pass
+
+    # --- KPIs ---
+    total_participantes = pacientes.count()
+    edad_promedio = pacientes.aggregate(avg=Avg("edad"))["avg"] or 0
+    total_examenes = exams_qs.count()
+
+    # --- Gender distribution ---
+    genero_data = (
+        pacientes.values("genero")
+        .annotate(count=Count("id"))
+        .order_by("genero")
+    )
+    genero_labels = []
+    genero_values = []
+    GENERO_MAP = {"F": "Femenino", "M": "Masculino", "O": "Otro"}
+    for item in genero_data:
+        g = item["genero"] or "Sin dato"
+        genero_labels.append(GENERO_MAP.get(g, g))
+        genero_values.append(item["count"])
+
+    # --- Escolaridad ---
+    esc_data = (
+        pacientes.exclude(escolaridad__isnull=True)
+        .exclude(escolaridad__exact="")
+        .values("escolaridad")
+        .annotate(count=Count("id"))
+        .order_by("escolaridad")
+    )
+    esc_labels = []
+    esc_values = []
+    for item in esc_data:
+        esc_labels.append(item["escolaridad"].capitalize())
+        esc_values.append(item["count"])
+
+    # --- Age distribution (histogram buckets) ---
+    edad_labels = []
+    edad_values = []
+    for lo, hi, label in RANGOS_EDAD:
+        c = pacientes.filter(edad__gte=lo, edad__lte=hi).count()
+        edad_labels.append(label)
+        edad_values.append(c)
+
+    # --- Estado civil ---
+    ecivil_data = (
+        pacientes.exclude(estado_civil__exact="")
+        .values("estado_civil")
+        .annotate(count=Count("id"))
+        .order_by("estado_civil")
+    )
+    ecivil_labels = [item["estado_civil"] for item in ecivil_data]
+    ecivil_values = [item["count"] for item in ecivil_data]
+
+    # --- Grupo sanguíneo ---
+    gs_data = (
+        pacientes.exclude(grupo_sanguineo__isnull=True)
+        .exclude(grupo_sanguineo__exact="")
+        .values("grupo_sanguineo")
+        .annotate(count=Count("id"))
+        .order_by("grupo_sanguineo")
+    )
+    gs_labels = [item["grupo_sanguineo"] for item in gs_data]
+    gs_values = [item["count"] for item in gs_data]
+
+    # --- Exams by project ---
+    exams_por_proyecto = (
+        VisitaExamen.objects.filter(estado="completado")
+        .values(nombre_proyecto=F("visita__Tipo_visita__proyecto__nombre"))
+        .annotate(count=Count("id"))
+        .order_by("-count")
+    )
+    ep_labels = [item["nombre_proyecto"] or "Sin proyecto" for item in exams_por_proyecto]
+    ep_values = [item["count"] for item in exams_por_proyecto]
+
+    # --- Exams by visit type ---
+    exams_por_tipo = (
+        exams_qs
+        .values(nombre_tipo=F("visita__Tipo_visita__nombre"))
+        .annotate(count=Count("id"))
+        .order_by("-count")
+    )
+    et_labels = [item["nombre_tipo"] or "Sin tipo" for item in exams_por_tipo]
+    et_values = [item["count"] for item in exams_por_tipo]
+
+    return JsonResponse({
+        "kpis": {
+            "total_participantes": total_participantes,
+            "edad_promedio": round(edad_promedio, 1),
+            "total_examenes": total_examenes,
+        },
+        "genero": {"labels": genero_labels, "values": genero_values},
+        "escolaridad": {"labels": esc_labels, "values": esc_values},
+        "edad": {"labels": edad_labels, "values": edad_values},
+        "estado_civil": {"labels": ecivil_labels, "values": ecivil_values},
+        "grupo_sanguineo": {"labels": gs_labels, "values": gs_values},
+        "examenes_por_proyecto": {"labels": ep_labels, "values": ep_values},
+        "examenes_por_tipo_visita": {"labels": et_labels, "values": et_values},
+    })
+
 
 @login_required(login_url="/login/")
 @user_passes_test(is_superuser, login_url="/login/")

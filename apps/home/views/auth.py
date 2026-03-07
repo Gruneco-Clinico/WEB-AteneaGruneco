@@ -11,7 +11,7 @@ from django.forms.models import model_to_dict
 from django.contrib.auth.models import User
 from django.views.generic import TemplateView
 from django.core.mail import send_mail, EmailMessage
-from django.db.models import Max
+from django.db.models import Max, Count, Q
 from datetime import datetime, timedelta
 from ..models import *
 from ..forms import ProyectoForm, RegistroDemograficoForm
@@ -73,7 +73,45 @@ def login_view(request):
 # Perfil #########################################################
 @login_required
 def profile_view(request):
-    return render(request, "home/profile.html")
+    user = request.user
+
+    # Total visits where user is evaluador
+    total_visitas = Visita.objects.filter(evaluador=user).count()
+
+    # Distinct patients seen
+    total_pacientes = (
+        Visita.objects.filter(evaluador=user)
+        .values("paciente")
+        .distinct()
+        .count()
+    )
+
+    # Visits per project
+    visitas_por_proyecto = (
+        Visita.objects.filter(evaluador=user, Tipo_visita__proyecto__isnull=False)
+        .values("Tipo_visita__proyecto__id", "Tipo_visita__proyecto__nombre")
+        .annotate(
+            num_visitas=Count("id"),
+            num_pacientes=Count("paciente", distinct=True),
+        )
+        .order_by("-num_visitas")
+    )
+
+    stats_proyecto = [
+        {
+            "nombre": item["Tipo_visita__proyecto__nombre"],
+            "num_visitas": item["num_visitas"],
+            "num_pacientes": item["num_pacientes"],
+        }
+        for item in visitas_por_proyecto
+    ]
+
+    context = {
+        "total_visitas": total_visitas,
+        "total_pacientes": total_pacientes,
+        "stats_proyecto": stats_proyecto,
+    }
+    return render(request, "home/profile.html", context)
 
 
 @login_required
@@ -111,12 +149,30 @@ def administrar_usuarios(request):
     # Obtener lista de usuarios
     usuarios_list = User.objects.all().order_by("-date_joined")
 
+    # Estadísticas: pacientes vistos por usuario por proyecto
+    stats_usuario_proyecto = (
+        Visita.objects.filter(evaluador__isnull=False, Tipo_visita__proyecto__isnull=False)
+        .values(
+            "evaluador__id",
+            "evaluador__username",
+            "evaluador__first_name",
+            "evaluador__last_name",
+            "Tipo_visita__proyecto__nombre",
+        )
+        .annotate(
+            num_pacientes=Count("paciente", distinct=True),
+            num_visitas=Count("id"),
+        )
+        .order_by("evaluador__username", "Tipo_visita__proyecto__nombre")
+    )
+
     # Preparar contexto inicial
     context = {
         "usuarios": usuarios_list,
         "total_usuarios": usuarios_list.count(),
         "usuarios_activos": usuarios_list.filter(is_active=True).count(),
         "administradores": usuarios_list.filter(is_superuser=True).count(),
+        "stats_usuario_proyecto": list(stats_usuario_proyecto),
     }
 
     # === PROCESAMIENTO DE ACCIONES ===

@@ -102,9 +102,10 @@
       <!-- Tarjeta de estadísticas -->
       <div class="card mt-4">
         <div class="card-body stats-card">
-          <h3>Estadísticas</h3>
-          <p>Proyectos Activos: <strong>3</strong></p>
-
+          <h3>Mis Estadísticas</h3>
+          <p>Visitas Realizadas: <strong>{{ total_visitas }}</strong></p>
+          <p>Pacientes Atendidos: <strong>{{ total_pacientes }}</strong></p>
+          <p>Proyectos: <strong>{{ stats_proyecto|length }}</strong></p>
         </div>
       </div>
       {% if messages %}
@@ -162,71 +163,36 @@
         </div>
       </div>
 
-      <!-- Tarjeta de proyectos activos -->
+      <!-- Tarjeta de visitas por proyecto -->
       <div class="card mt-4">
         <div class="card-header">
-          <h3 class="mb-0">Proyectos Activos</h3>
+          <h3 class="mb-0">Mis Visitas por Proyecto</h3>
         </div>
         <div class="card-body">
-          <!-- Proyecto Sueño -->
-          <div class="row mt-4">
-            <div class="col-md-12">
-              <div class="card">
-                <div class="card-body">
-                  <div class="row">
-                    <div class="col-2 d-flex align-items-center justify-content-center">
-                      <i class="ni ni-planet text-primary ni-3x"></i>
-                    </div>
-                    <div class="col-10">
-                      <h5 class="card-title text-uppercase text-muted mb-0">Proyecto Sueño</h5>
-                      <p>Investigamos el impacto del sueño en la función cognitiva, explorando su relación con la
-                        memoria, la atención y el procesamiento emocional.</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+          {% if stats_proyecto %}
+          <div class="table-responsive">
+            <table class="table align-items-center table-flush">
+              <thead class="thead-light">
+                <tr>
+                  <th>Proyecto</th>
+                  <th>Visitas</th>
+                  <th>Pacientes</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for sp in stats_proyecto %}
+                <tr>
+                  <td>{{ sp.nombre }}</td>
+                  <td><span class="badge badge-pill badge-primary">{{ sp.num_visitas }}</span></td>
+                  <td><span class="badge badge-pill badge-success">{{ sp.num_pacientes }}</span></td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
           </div>
-
-          <!-- Proyecto Envejecimiento -->
-          <div class="row mt-4">
-            <div class="col-md-12">
-              <div class="card">
-                <div class="card-body">
-                  <div class="row">
-                    <div class="col-2 d-flex align-items-center justify-content-center">
-                      <i class="ni ni-single-02 text-primary ni-3x"></i>
-                    </div>
-                    <div class="col-10">
-                      <h5 class="card-title text-uppercase text-muted mb-0">Proyecto Envejecimiento</h5>
-                      <p>Estudiamos los efectos del envejecimiento en la plasticidad cerebral y la función cognitiva.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Proyecto Anosognosia -->
-          <div class="row mt-4">
-            <div class="col-md-12">
-              <div class="card">
-                <div class="card-body">
-                  <div class="row">
-                    <div class="col-2 d-flex align-items-center justify-content-center">
-                      <i class="ni ni-world-2 text-primary ni-3x"></i>
-                    </div>
-                    <div class="col-10">
-                      <h5 class="card-title text-uppercase text-muted mb-0">Proyecto Anosognosia</h5>
-                      <p>Investigamos los mecanismos neurocognitivos de la anosognosia en diversas patologías
-                        neurológicas.</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+          {% else %}
+          <p class="text-muted text-center py-3">Aún no tienes visitas registradas como evaluador.</p>
+          {% endif %}
         </div>
       </div>
     </div>

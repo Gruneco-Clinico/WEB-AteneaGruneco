@@ -483,6 +483,54 @@
   <input type="hidden" name="usuario_id" id="delete_user_id">
 </form>
 
+<!-- Tabla: Pacientes por Usuario por Proyecto -->
+<div class="container-fluid mt-4">
+  <div class="row">
+    <div class="col">
+      <div class="card">
+        <div class="card-header border-0">
+          <div class="row align-items-center">
+            <div class="col">
+              <h3 class="mb-0">
+                <i class="fas fa-chart-bar mr-2"></i>
+                Pacientes Atendidos por Usuario y Proyecto
+              </h3>
+            </div>
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table class="table align-items-center table-flush">
+            <thead class="thead-light">
+              <tr>
+                <th>Usuario</th>
+                <th>Nombre</th>
+                <th>Proyecto</th>
+                <th>Pacientes</th>
+                <th>Visitas</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for stat in stats_usuario_proyecto %}
+              <tr>
+                <td><strong>{{ stat.evaluador__username }}</strong></td>
+                <td>{{ stat.evaluador__first_name }} {{ stat.evaluador__last_name }}</td>
+                <td>{{ stat.Tipo_visita__proyecto__nombre }}</td>
+                <td><span class="badge badge-pill badge-success">{{ stat.num_pacientes }}</span></td>
+                <td><span class="badge badge-pill badge-primary">{{ stat.num_visitas }}</span></td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="5" class="text-center text-muted py-4">No hay visitas registradas aún.</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 {% endblock content %}
 
 {% block javascripts %}

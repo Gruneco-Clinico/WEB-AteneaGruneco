@@ -30,6 +30,11 @@ urlpatterns = [
         views.api_estadisticas_evaluadores,
         name="api_estadisticas_evaluadores",
     ),
+    path(
+        "api/dashboard-data/",
+        views.api_dashboard_data,
+        name="api_dashboard_data",
+    ),
     path("login/", login_view, name="login"),
     path("logout/", views.logout_view, name="logout"),
     path("profile/", profile_view, name="profile"),  # Perfil de usuario
