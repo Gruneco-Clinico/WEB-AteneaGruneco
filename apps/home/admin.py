@@ -29,7 +29,34 @@ from .models import (
     SintomaSueno,
 )
 
-admin.site.register(Proyecto)
+
+class ProyectoAdmin(admin.ModelAdmin):
+    list_display = ('nombre', 'investigador_principal', 'fecha_inicio', 'tiene_consentimiento')
+    list_filter = ('fecha_inicio',)
+    search_fields = ('nombre', 'investigador_principal', 'codigo_siu')
+    fieldsets = (
+        ('Información General', {
+            'fields': ('nombre', 'descripcion', 'investigador_principal', 'codigo_siu')
+        }),
+        ('Fechas', {
+            'fields': ('fecha_inicio', 'fecha_financiacion')
+        }),
+        ('Consentimiento Informado', {
+            'fields': ('consentimiento_pdf',),
+            'description': 'Suba el PDF del consentimiento informado que se enviará automáticamente por correo al agendar citas para este proyecto.'
+        }),
+        ('Configuración de Registro Público', {
+            'fields': ('crear_visita_automatica', 'tipo_visita_automatica', 'nombre_visita_automatica'),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    def tiene_consentimiento(self, obj):
+        return "✅ Sí" if obj.consentimiento_pdf else "❌ No"
+    tiene_consentimiento.short_description = 'Consentimiento'
+
+
+admin.site.register(Proyecto, ProyectoAdmin)
 admin.site.register(Visita)
 admin.site.register(Examen)
 admin.site.register(VisitaExamen)

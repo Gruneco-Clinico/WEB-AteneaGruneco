@@ -1,0 +1,233 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %} Exportar Datos del Proyecto {% endblock %}
+
+{% block stylesheets %}
+<style>
+    .field-checkbox {
+        padding: 8px 12px;
+        margin: 4px 0;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        transition: background-color 0.2s;
+    }
+    .field-checkbox:hover {
+        background-color: #f8f9fa;
+    }
+    .field-checkbox label {
+        margin: 0;
+        cursor: pointer;
+        font-weight: normal;
+    }
+    .section-title {
+        background: linear-gradient(90deg, #5e72e4 0%, #825ee4 100%);
+        color: white;
+        padding: 10px 15px;
+        border-radius: 4px;
+        font-weight: 600;
+        margin-top: 20px;
+        margin-bottom: 15px;
+    }
+    .select-all-btn {
+        font-size: 0.875rem;
+        padding: 4px 12px;
+        margin-left: 10px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="header bg-primary pb-6">
+    <div class="container-fluid">
+        <div class="header-body">
+            <div class="row align-items-center py-4">
+                <div class="col-lg-6 col-7">
+                    <h6 class="h2 text-white d-inline-block mb-0">Exportar Datos del Proyecto</h6>
+                    <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
+                        <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
+                            <li class="breadcrumb-item"><a href="{% url 'index' %}"><i class="fas fa-home"></i></a></li>
+                            <li class="breadcrumb-item"><a href="{% url 'proyectos' %}">Proyectos</a></li>
+                            <li class="breadcrumb-item active">Exportar</li>
+                        </ol>
+                    </nav>
+                </div>
+                <div class="col-lg-6 col-5 text-right">
+                    <a href="{% url 'proyectos' %}" class="btn btn-neutral">
+                        <i class="fas fa-arrow-left"></i> Volver
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid mt--6">
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="mb-0">
+                        <i class="fas fa-file-csv mr-2"></i>
+                        Seleccionar Campos para Exportar - {{ proyecto.nombre }}
+                    </h3>
+                    <p class="text-sm text-muted mb-0">Selecciona los campos que deseas incluir en el archivo CSV</p>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{% url 'exportar_csv_proyecto' proyecto_id=proyecto.id %}">
+                        {% csrf_token %}
+                        
+                        <!-- Campos base siempre incluidos -->
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle mr-2"></i>
+                            <strong>Campos base incluidos automáticamente:</strong> Código Proyecto, Paciente, Tipo de Visita, Fecha Visita, Estado Visita
+                        </div>
+
+                        <!-- Datos Demográficos -->
+                        <div class="section-title">
+                            <i class="fas fa-user mr-2"></i> Datos Demográficos
+                            <button type="button" class="btn btn-sm btn-light select-all-btn" onclick="toggleSection('demograficos', true)">
+                                Seleccionar Todos
+                            </button>
+                            <button type="button" class="btn btn-sm btn-light select-all-btn" onclick="toggleSection('demograficos', false)">
+                                Deseleccionar Todos
+                            </button>
+                        </div>
+                        <div class="row">
+                            {% for field in campos_demograficos %}
+                            <div class="col-md-4">
+                                <div class="field-checkbox">
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input demograficos" 
+                                               id="demo_{{ field.0 }}" name="demograficos" value="{{ field.0 }}">
+                                        <label class="custom-control-label" for="demo_{{ field.0 }}">
+                                            {{ field.1 }}
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Campos de Exámenes -->
+                        <div class="section-title">
+                            <i class="fas fa-notes-medical mr-2"></i> Campos de Exámenes
+                            <button type="button" class="btn btn-sm btn-light select-all-btn" onclick="toggleSection('examenes', true)">
+                                Seleccionar Todos
+                            </button>
+                            <button type="button" class="btn btn-sm btn-light select-all-btn" onclick="toggleSection('examenes', false)">
+                                Deseleccionar Todos
+                            </button>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="field-checkbox">
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input examenes" 
+                                               id="exam_motivo" name="campos_examen" value="motivo_consulta" checked>
+                                        <label class="custom-control-label" for="exam_motivo">
+                                            Motivo de Consulta
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="field-checkbox">
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input examenes" 
+                                               id="exam_puntaje" name="campos_examen" value="puntaje_total" checked>
+                                        <label class="custom-control-label" for="exam_puntaje">
+                                            Puntaje Total
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="field-checkbox">
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input examenes" 
+                                               id="exam_interpretacion" name="campos_examen" value="interpretacion">
+                                        <label class="custom-control-label" for="exam_interpretacion">
+                                            Interpretación
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="field-checkbox">
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input examenes" 
+                                               id="exam_observaciones" name="campos_examen" value="observaciones">
+                                        <label class="custom-control-label" for="exam_observaciones">
+                                            Observaciones
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="field-checkbox">
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input examenes" 
+                                               id="exam_notas" name="campos_examen" value="notas_aclaratorias">
+                                        <label class="custom-control-label" for="exam_notas">
+                                            Notas Aclaratorias
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Exámenes del Proyecto -->
+                        {% if examenes_proyecto %}
+                        <div class="section-title">
+                            <i class="fas fa-clipboard-list mr-2"></i> Exámenes del Proyecto
+                            <button type="button" class="btn btn-sm btn-light select-all-btn" onclick="toggleSection('examenes_lista', true)">
+                                Seleccionar Todos
+                            </button>
+                            <button type="button" class="btn btn-sm btn-light select-all-btn" onclick="toggleSection('examenes_lista', false)">
+                                Deseleccionar Todos
+                            </button>
+                        </div>
+                        <div class="alert alert-sm alert-secondary">
+                            Selecciona qué exámenes incluir en el CSV. Para cada examen seleccionado se crearán columnas según los campos de exámenes marcados arriba.
+                        </div>
+                        <div class="row">
+                            {% for examen in examenes_proyecto %}
+                            <div class="col-md-6">
+                                <div class="field-checkbox">
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input examenes_lista" 
+                                               id="examen_{{ examen.id }}" name="examenes" value="{{ examen.id }}" checked>
+                                        <label class="custom-control-label" for="examen_{{ examen.id }}">
+                                            {{ examen.nombre }}
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+
+                        <div class="mt-4 text-right">
+                            <a href="{% url 'proyectos' %}" class="btn btn-secondary">
+                                <i class="fas fa-times mr-2"></i> Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-download mr-2"></i> Descargar CSV
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleSection(sectionClass, checked) {
+    document.querySelectorAll('.' + sectionClass).forEach(checkbox => {
+        checkbox.checked = checked;
+    });
+}
+</script>
+
+{% endblock %}

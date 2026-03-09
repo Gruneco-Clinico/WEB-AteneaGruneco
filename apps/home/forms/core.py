@@ -208,6 +208,7 @@ class ProyectoForm(forms.ModelForm):
             "codigo_siu",
             "fecha_inicio",
             "fecha_financiacion",
+            "consentimiento_pdf",
         ]
         widgets = {
             "fecha_inicio": forms.DateInput(attrs={"type": "date"}),

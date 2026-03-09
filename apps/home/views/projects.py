@@ -83,7 +83,7 @@ def proyectos(request):
     }
 
     if request.method == "POST":
-        proyecto_form = ProyectoForm(request.POST)
+        proyecto_form = ProyectoForm(request.POST, request.FILES)
         if proyecto_form.is_valid():
             proyecto_form.save()
             messages.success(request, "Proyecto creado correctamente.")
@@ -98,7 +98,7 @@ def proyectos(request):
 def editar_proyecto(request, id):
     proyecto = get_object_or_404(Proyecto, id=id)
     if request.method == "POST":
-        form = ProyectoForm(request.POST, instance=proyecto)
+        form = ProyectoForm(request.POST, request.FILES, instance=proyecto)
         if form.is_valid():
             form.save()
             messages.success(request, f"El proyecto '{proyecto.nombre}' ha sido actualizado correctamente.")
@@ -272,10 +272,60 @@ def exportar_csv_proyecto(request, proyecto_id):
     """
     Exporta un CSV con los datos de pacientes y puntajes de exámenes
     para un proyecto específico.
-    Columnas: Código Proyecto, Paciente, Edad, Tipo Visita, Fecha Visita,
-              y una columna por cada examen con su puntaje_total.
+    GET: Muestra formulario de selección de campos
+    POST: Genera CSV con campos seleccionados
     """
     proyecto = get_object_or_404(Proyecto, id=proyecto_id)
+
+    # Si es GET, mostrar formulario de selección
+    if request.method == "GET":
+        # Definir campos demográficos disponibles
+        campos_demograficos = [
+            ("numero_documento", "Número de Documento"),
+            ("tipo_documento", "Tipo de Documento"),
+            ("celular", "Celular"),
+            ("fecha_nacimiento", "Fecha de Nacimiento"),
+            ("edad", "Edad"),
+            ("genero", "Género"),
+            ("municipio_nacimiento", "Municipio de Nacimiento"),
+            ("departamento_nacimiento", "Departamento de Nacimiento"),
+            ("pais_nacimiento", "País de Nacimiento"),
+            ("estado_civil", "Estado Civil"),
+            ("escolaridad", "Escolaridad"),
+            ("ocupacion", "Ocupación"),
+            ("lateralidad", "Lateralidad"),
+            ("grupo_sanguineo", "Grupo Sanguíneo"),
+            ("religion", "Religión"),
+            ("eps", "EPS"),
+            ("regimen", "Régimen"),
+            ("direccion", "Dirección"),
+            ("municipio_residencia", "Municipio de Residencia"),
+            ("departamento_residencia", "Departamento de Residencia"),
+            ("pais_residencia", "País de Residencia"),
+            ("correo", "Correo Electrónico"),
+        ]
+
+        # Obtener exámenes del proyecto
+        examenes_proyecto = []
+        visitas = Visita.objects.filter(Tipo_visita__proyecto=proyecto)
+        examenes_ids = set()
+        for visita in visitas:
+            for ve in visita.visita_examenes.all():
+                examenes_ids.add(ve.examen.id)
+        
+        examenes_proyecto = Examen.objects.filter(id__in=examenes_ids).order_by("nombre")
+
+        context = {
+            "proyecto": proyecto,
+            "campos_demograficos": campos_demograficos,
+            "examenes_proyecto": examenes_proyecto,
+        }
+        return render(request, "home/exportar_proyecto_form.html", context)
+
+    # Si es POST, generar CSV con campos seleccionados
+    demograficos_selected = request.POST.getlist("demograficos")
+    campos_examen_selected = request.POST.getlist("campos_examen")
+    examenes_selected = request.POST.getlist("examenes")
 
     # Obtener visitas del proyecto
     visitas = Visita.objects.filter(
@@ -290,12 +340,17 @@ def exportar_csv_proyecto(request, proyecto_id):
         messages.warning(request, "No hay visitas registradas en este proyecto.")
         return redirect("proyectos")
 
-    # Recopilar todos los nombres de exámenes únicos del proyecto
-    examenes_unicos = set()
-    for visita in visitas:
-        for ve in visita.visita_examenes.all():
-            examenes_unicos.add(ve.examen.nombre)
-    examenes_ordenados = sorted(examenes_unicos)
+    # Obtener exámenes a incluir
+    examenes_incluir = []
+    if examenes_selected:
+        examenes_incluir = Examen.objects.filter(id__in=examenes_selected).order_by("nombre")
+    else:
+        # Si no se seleccionó ninguno, incluir todos
+        examenes_unicos = set()
+        for visita in visitas:
+            for ve in visita.visita_examenes.all():
+                examenes_unicos.add(ve.examen.nombre)
+        examenes_incluir = sorted(examenes_unicos)
 
     # Obtener códigos de proyecto para los pacientes
     codigos = {}
@@ -311,62 +366,140 @@ def exportar_csv_proyecto(request, proyecto_id):
 
     writer = csv.writer(response, delimiter=";")
 
-    # Encabezados
+    # Construir encabezados dinámicamente
     headers = [
         "Código Proyecto",
         "Paciente",
-        "Documento",
-        "Edad",
         "Tipo de Visita",
         "Fecha Visita",
         "Estado Visita",
     ]
-    for examen_nombre in examenes_ordenados:
-        headers.append(f"Puntaje - {examen_nombre}")
+
+    # Mapeo de nombres técnicos a nombres legibles
+    campo_labels = {
+        "numero_documento": "Documento",
+        "tipo_documento": "Tipo Documento",
+        "celular": "Celular",
+        "fecha_nacimiento": "Fecha Nacimiento",
+        "edad": "Edad",
+        "genero": "Género",
+        "municipio_nacimiento": "Municipio Nacimiento",
+        "departamento_nacimiento": "Departamento Nacimiento",
+        "pais_nacimiento": "País Nacimiento",
+        "estado_civil": "Estado Civil",
+        "escolaridad": "Escolaridad",
+        "ocupacion": "Ocupación",
+        "lateralidad": "Lateralidad",
+        "grupo_sanguineo": "Grupo Sanguíneo",
+        "religion": "Religión",
+        "eps": "EPS",
+        "regimen": "Régimen",
+        "direccion": "Dirección",
+        "municipio_residencia": "Municipio Residencia",
+        "departamento_residencia": "Departamento Residencia",
+        "pais_residencia": "País Residencia",
+        "correo": "Correo",
+    }
+
+    # Agregar campos demográficos seleccionados
+    for campo in demograficos_selected:
+        headers.append(campo_labels.get(campo, campo))
+
+    # Agregar columnas de exámenes según campos seleccionados
+    campo_examen_labels = {
+        "motivo_consulta": "Motivo Consulta",
+        "puntaje_total": "Puntaje",
+        "interpretacion": "Interpretación",
+        "observaciones": "Observaciones",
+        "notas_aclaratorias": "Notas",
+    }
+
+    if isinstance(examenes_incluir, list):
+        # Si examenes_incluir es lista de strings (nombres)
+        for examen_nombre in examenes_incluir:
+            for campo_exam in campos_examen_selected:
+                label = campo_examen_labels.get(campo_exam, campo_exam)
+                headers.append(f"{examen_nombre} - {label}")
+    else:
+        # Si examenes_incluir es queryset de objetos Examen
+        for examen in examenes_incluir:
+            for campo_exam in campos_examen_selected:
+                label = campo_examen_labels.get(campo_exam, campo_exam)
+                headers.append(f"{examen.nombre} - {label}")
+
     writer.writerow(headers)
 
-    # Fila por cada visita
+    # Escribir filas de datos
+    examenes_nombres = []
+    if isinstance(examenes_incluir, list):
+        examenes_nombres = examenes_incluir
+    else:
+        examenes_nombres = [e.nombre for e in examenes_incluir]
+
     for visita in visitas:
         paciente = visita.paciente
         if not paciente:
             continue
 
         codigo = codigos.get(paciente.id, "")
-        nombre_paciente = (
-            f"{paciente.primer_nombre} {paciente.primer_apellido}"
-        )
-        edad = getattr(paciente, "edad", "")
+        nombre_paciente = f"{paciente.primer_nombre} {paciente.primer_apellido}"
 
         tipo_visita = visita.Tipo_visita.nombre if visita.Tipo_visita else ""
         fecha = visita.fecha.strftime("%d/%m/%Y") if visita.fecha else ""
         estado = "Firmada" if visita.firmado else "Abierta"
 
-        # Obtener puntajes por examen
-        puntajes = {}
-        for ve in visita.visita_examenes.all():
-            puntaje = ""
-            if ve.estado == "completado":
-                try:
-                    resultado = ve.get_resultado_instance()
-                    if resultado and hasattr(resultado, "puntaje_total"):
-                        puntaje = resultado.puntaje_total
-                        if puntaje is None:
-                            puntaje = ""
-                except Exception:
-                    pass
-            puntajes[ve.examen.nombre] = puntaje
-
+        # Construir fila base
         row = [
             codigo,
             nombre_paciente,
-            paciente.numero_documento,
-            edad,
             tipo_visita,
             fecha,
             estado,
         ]
-        for examen_nombre in examenes_ordenados:
-            row.append(puntajes.get(examen_nombre, ""))
+
+        # Agregar campos demográficos seleccionados
+        for campo in demograficos_selected:
+            valor = getattr(paciente, campo, "")
+            if campo == "fecha_nacimiento" and valor:
+                valor = valor.strftime("%d/%m/%Y")
+            elif campo == "tipo_documento":
+                valor = paciente.get_tipo_documento_display() if hasattr(paciente, 'get_tipo_documento_display') else valor
+            elif campo == "genero":
+                valor = paciente.get_genero_display() if hasattr(paciente, 'get_genero_display') else valor
+            elif campo == "estado_civil":
+                valor = paciente.get_estado_civil_display() if hasattr(paciente, 'get_estado_civil_display') else valor
+            elif campo == "escolaridad":
+                valor = paciente.get_escolaridad_display() if hasattr(paciente, 'get_escolaridad_display') else valor
+            elif campo == "lateralidad":
+                valor = paciente.get_lateralidad_display() if hasattr(paciente, 'get_lateralidad_display') else valor
+            elif campo == "regimen":
+                valor = paciente.get_regimen_display() if hasattr(paciente, 'get_regimen_display') else valor
+            row.append(valor if valor else "")
+
+        # Obtener datos de exámenes
+        examenes_data = {}
+        for ve in visita.visita_examenes.all():
+            if ve.examen.nombre not in examenes_nombres:
+                continue
+            
+            datos = {}
+            if ve.estado == "completado":
+                try:
+                    resultado = ve.get_resultado_instance()
+                    if resultado:
+                        for campo in campos_examen_selected:
+                            valor = getattr(resultado, campo, "")
+                            datos[campo] = valor if valor is not None else ""
+                except Exception:
+                    pass
+            
+            examenes_data[ve.examen.nombre] = datos
+
+        # Agregar columnas de exámenes
+        for examen_nombre in examenes_nombres:
+            datos = examenes_data.get(examen_nombre, {})
+            for campo_exam in campos_examen_selected:
+                row.append(datos.get(campo_exam, ""))
 
         writer.writerow(row)
 

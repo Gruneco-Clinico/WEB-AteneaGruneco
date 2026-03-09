@@ -27,6 +27,8 @@ from reportlab.lib.units import inch
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, PageBreak
 from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT, TA_JUSTIFY
 from io import BytesIO
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 
 logger = logging.getLogger(__name__)
 
@@ -69,16 +71,18 @@ def api_eventos_disponibilidad_publica(request):
             return JsonResponse({"error": "Acceso no autorizado"}, status=403)
 
         # Filtrar solo disponibilidades futuras y activas
+        fecha_actual = timezone.now().date()
+        fecha_maxima = fecha_actual + timedelta(weeks=8)  # Máximo 8 semanas
+        
         disponibilidades = DisponibilidadUsuario.objects.filter(
             activa=True,
             usuario__is_active=True,
         ).select_related("usuario", "sala")
 
-        # Filtrar por fecha_fin si existe, o permitir indefinidas
-        fecha_actual = datetime.now().date()
+        # Filtrar por rango de fechas más preciso
         disponibilidades = disponibilidades.filter(
-            Q(fecha_fin__isnull=True) | Q(fecha_fin__gte=fecha_actual),
-            fecha_inicio__lte=fecha_actual + timedelta(weeks=8),  # Máximo 8 semanas
+            Q(fecha_fin__isnull=True, fecha_inicio__lte=fecha_maxima) | 
+            Q(fecha_fin__gte=fecha_actual, fecha_inicio__lte=fecha_maxima)
         )
 
         # Aplicar filtro de profesional si se proporciona
@@ -173,10 +177,10 @@ def api_eventos_disponibilidad_publica(request):
 
     except Exception as e:
         import traceback
-
+        logger.error(f"Error en api_eventos_disponibilidad_publica: {str(e)}\n{traceback.format_exc()}")
         return JsonResponse({"error": str(e)}, status=500)
 
-
+@csrf_exempt
 def agendar_cita_ajax(request):
     """
     Vista para agendar una cita médica desde la agenda pública
@@ -410,8 +414,18 @@ def obtener_plantilla_correo_proyecto(proyecto_obj, cita_data):
     """
 
     # --- PLANTILLA POR PROYECTO ---
+    # Determinar si adjuntar consentimiento informado
+    tiene_consentimiento = proyecto_obj and hasattr(proyecto_obj, 'consentimiento_pdf') and proyecto_obj.consentimiento_pdf
+    
+    mensaje_consentimiento = ""
+    if tiene_consentimiento:
+        mensaje_consentimiento = """
+        <h3>📄 CONSENTIMIENTO INFORMADO</h3>
+        <p>Adjunto encontrará el consentimiento informado del proyecto. Por favor léalo antes de asistir a su cita.</p>
+        """
+    
+    # Personalización básica según proyecto
     if "sueño" in nombre_proyecto or "sueno" in nombre_proyecto:
-        # Proyecto de Sueño
         return {
             "subject": f"Confirmación de Cita — Proyecto Sueño - {cita_data['fecha_cita']}",
             "body": f"""
@@ -419,8 +433,7 @@ def obtener_plantilla_correo_proyecto(proyecto_obj, cita_data):
             <p>Su cita para el <strong>Proyecto de Investigación en Sueño</strong> ha sido agendada exitosamente.</p>
             {bloque_cita}
             {bloque_registro}
-            <h3>📄 CONSENTIMIENTO INFORMADO</h3>
-            <p>Adjunto encontrará el consentimiento informado del Proyecto Sueño. Por favor léalo antes de asistir a su cita.</p>
+            {mensaje_consentimiento}
             <h3>📌 RECORDATORIO</h3>
             <p>Duerma de manera habitual la noche anterior y llegue 10 minutos antes de su hora programada.</p>
             <p>Esta cita no requiere dormir durante la sesión.</p>
@@ -431,11 +444,10 @@ def obtener_plantilla_correo_proyecto(proyecto_obj, cita_data):
             <p>Gracias por confiar en nosotros.</p>
             <p>Saludos cordiales,<br><strong>GRUNECO — Proyecto Sueño</strong></p>
             """,
-            "pdf_attachment": "CONSENTIMIENTOINFORMADOESTUDIANTES.pdf",
+            "proyecto_obj": proyecto_obj,
         }
 
     elif "anosognosia" in nombre_proyecto:
-        # Proyecto de Anosognosia
         return {
             "subject": f"Confirmación de Cita — Proyecto Anosognosia - {cita_data['fecha_cita']}",
             "body": f"""
@@ -443,6 +455,7 @@ def obtener_plantilla_correo_proyecto(proyecto_obj, cita_data):
             <p>Su cita para el <strong>Proyecto de Investigación en Anosognosia</strong> ha sido agendada.</p>
             {bloque_cita}
             {bloque_registro}
+            {mensaje_consentimiento}
             <h3>📌 IMPORTANTE</h3>
             <p>Para esta evaluación es necesario asistir acompañado/a de un familiar o cuidador principal
             que conozca su desempeño diario.</p>
@@ -451,7 +464,7 @@ def obtener_plantilla_correo_proyecto(proyecto_obj, cita_data):
             <strong>gruponeuropsicologia@udea.edu.co</strong></p>
             <p>Saludos cordiales,<br><strong>GRUNECO — Proyecto Anosognosia</strong></p>
             """,
-            "pdf_attachment": None,
+            "proyecto_obj": proyecto_obj,
         }
 
     else:
@@ -463,13 +476,14 @@ def obtener_plantilla_correo_proyecto(proyecto_obj, cita_data):
             <p>Su cita médica ha sido agendada exitosamente{f' para el proyecto <strong>{proyecto_obj.nombre}</strong>' if proyecto_obj else ''}.</p>
             {bloque_cita}
             {bloque_registro}
+            {mensaje_consentimiento}
             <h3>📌 RECORDATORIO</h3>
             <p>Por favor llegue 15 minutos antes de su hora programada.</p>
             <p>Para cancelar o reprogramar, comuníquese con anticipación a
             <strong>gruponeuropsicologia@udea.edu.co</strong></p>
             <p>Saludos cordiales,<br><strong>GRUNECO</strong></p>
             """,
-            "pdf_attachment": None,
+            "proyecto_obj": proyecto_obj,
         }
 
 
@@ -489,16 +503,15 @@ def enviar_correo_confirmacion_cita(cita_data, proyecto_obj=None):
 
         correo.content_subtype = 'html'
 
-        # Adjuntar PDF segun plantilla del proyecto
-        pdf_filename = plantilla.get('pdf_attachment')
-        if pdf_filename:
-            static_root_path = settings.STATICFILES_DIRS[0]
-            pdf_path = os.path.join(static_root_path, 'assets', 'pdfs', pdf_filename)
-            if os.path.exists(pdf_path):
-                correo.attach_file(pdf_path)
-                logger.info(f"PDF adjuntado: {pdf_path}")
-            else:
-                logger.warning(f"No se encontro el PDF: {pdf_path}")
+        # Adjuntar PDF de consentimiento desde el proyecto
+        proyecto_obj = plantilla.get('proyecto_obj')
+        if proyecto_obj and hasattr(proyecto_obj, 'consentimiento_pdf') and proyecto_obj.consentimiento_pdf:
+            try:
+                # Adjuntar el archivo FileField
+                correo.attach_file(proyecto_obj.consentimiento_pdf.path)
+                logger.info(f"PDF de consentimiento adjuntado: {proyecto_obj.consentimiento_pdf.name}")
+            except Exception as e:
+                logger.warning(f"No se pudo adjuntar el PDF de consentimiento: {str(e)}")
 
         correo.send(fail_silently=False)
 
@@ -570,8 +583,13 @@ def gestionar_disponibilidad(request):
 
     # Datos para el contexto
     salas = Sala.objects.filter(activa=True)
+    
+    # Filtrar disponibilidades que no hayan pasado (reducir ruido visual)
+    fecha_hoy = timezone.now().date()
     disponibilidades_usuario = DisponibilidadUsuario.objects.filter(
         usuario=request.user, activa=True
+    ).filter(
+        Q(fecha_fin__isnull=True) | Q(fecha_fin__gte=fecha_hoy)
     ).select_related("sala")
 
     citas_usuario = CitaMedica.objects.filter(disponibilidad__usuario=request.user)
@@ -667,18 +685,37 @@ def gestionar_salas(request):
 @login_required
 def api_eventos_disponibilidad(request):
     try:
+        # Obtener rango de fechas desde el request (enviado por FullCalendar)
+        fecha_inicio_str = request.GET.get('start')
+        fecha_fin_str = request.GET.get('end')
+        
+        if fecha_inicio_str and fecha_fin_str:
+            try:
+                # FullCalendar envía fechas en formato ISO
+                fecha_inicio = datetime.fromisoformat(fecha_inicio_str.replace('Z', '+00:00')).date()
+                fecha_fin = datetime.fromisoformat(fecha_fin_str.replace('Z', '+00:00')).date()
+            except (ValueError, AttributeError):
+                # Fallback si el formato es diferente
+                fecha_inicio = timezone.now().date()
+                fecha_fin = fecha_inicio + timedelta(weeks=12)
+        else:
+            # Por defecto, cargar 12 semanas
+            fecha_inicio = timezone.now().date()
+            fecha_fin = fecha_inicio + timedelta(weeks=12)
+        
         disponibilidades = DisponibilidadUsuario.objects.filter(
             activa=True
         ).select_related("usuario", "sala")
 
         eventos = []
-        fecha_inicio = timezone.now().date()
 
         # ================================
-        # 1️⃣ OBTENER CITAS PRIMERO
+        # 1️⃣ OBTENER CITAS PRIMERO (solo en el rango de fechas)
         # ================================
         citas = CitaMedica.objects.filter(
-            estado__in=["agendada", "confirmada"]
+            estado__in=["agendada", "confirmada"],
+            fecha_cita__gte=fecha_inicio,
+            fecha_cita__lte=fecha_fin
         ).select_related("disponibilidad", "disponibilidad__sala", "disponibilidad__usuario")
 
         # Crear set de slots ocupados (disponibilidad_id + fecha)
@@ -691,11 +728,18 @@ def api_eventos_disponibilidad(request):
         # 2️⃣ EVENTOS DE DISPONIBILIDAD (excluir ocupados)
         # ================================
         for disp in disponibilidades:
-            for semana in range(12):
+            # Calcular cuántas semanas mostrar basado en el rango
+            semanas_a_mostrar = min((fecha_fin - fecha_inicio).days // 7 + 1, 52)
+            
+            for semana in range(semanas_a_mostrar):
                 fecha_base = fecha_inicio + timedelta(weeks=semana)
                 dias_diferencia = (disp.dia_semana - fecha_base.weekday()) % 7
                 fecha_evento = fecha_base + timedelta(days=dias_diferencia)
 
+                # Verificar que esté dentro del rango solicitado y de la disponibilidad
+                if fecha_evento < fecha_inicio or fecha_evento > fecha_fin:
+                    continue
+                    
                 if fecha_evento >= disp.fecha_inicio:
                     if not disp.fecha_fin or fecha_evento <= disp.fecha_fin:
                         # Verificar si este slot está ocupado
@@ -845,6 +889,53 @@ def validar_conflictos_disponibilidad(
                     f"en {sala.nombre}"
                 )
 
+    # 🔧 VALIDACIÓN ADICIONAL: Verificar solapamiento del mismo usuario en CUALQUIER sala
+    conflictos_usuario = DisponibilidadUsuario.objects.filter(
+        usuario=usuario,
+        dia_semana=dia_semana,
+        activa=True
+    )
+    
+    if disponibilidad_id:
+        conflictos_usuario = conflictos_usuario.exclude(pk=disponibilidad_id)
+    
+    fecha_fin_actual = fecha_fin or date(2099, 12, 31)
+    
+    for conf in conflictos_usuario:
+        # Verificar solapamiento de horarios
+        if not (hora_inicio < conf.hora_fin and hora_fin > conf.hora_inicio):
+            continue
+        
+        # Verificar solapamiento de fechas
+        fecha_fin_conf = conf.fecha_fin or date(2099, 12, 31)
+        if not (fecha_inicio <= fecha_fin_conf and fecha_fin_actual >= conf.fecha_inicio):
+            continue
+        
+        # Generar fechas específicas de conflicto
+        fechas_conflicto_usuario = obtener_fechas_conflicto_python(
+            fecha_inicio,
+            fecha_fin_actual,
+            dia_semana,
+            conf.fecha_inicio,
+            fecha_fin_conf,
+            conf.dia_semana,
+        )
+        
+        if fechas_conflicto_usuario:
+            fechas_texto = ", ".join(
+                [f.strftime("%d/%m/%Y") for f in fechas_conflicto_usuario[:3]]
+            )
+            mas_fechas = (
+                f" y {len(fechas_conflicto_usuario) - 3} fecha(s) más"
+                if len(fechas_conflicto_usuario) > 3
+                else ""
+            )
+            return (
+                f"Ya tienes otra disponibilidad que se solapa en las siguientes fechas: {fechas_texto}{mas_fechas} "
+                f"de {conf.hora_inicio.strftime('%H:%M')} a {conf.hora_fin.strftime('%H:%M')} "
+                f"en {conf.sala.nombre}. No puedes estar en dos salas al mismo tiempo."
+            )
+
     return None
 
 
@@ -890,7 +981,7 @@ def obtener_fechas_conflicto_python(
 def agregar_disponibilidad(request):
     try:
         sala_id = request.POST.get("sala")
-        dia_semana = int(request.POST.get("dia_semana"))
+        dia_semana_form = request.POST.get("dia_semana")
         hora_inicio = request.POST.get("hora_inicio")
         hora_fin = request.POST.get("hora_fin")
         fecha_inicio = request.POST.get("fecha_inicio")
@@ -898,9 +989,27 @@ def agregar_disponibilidad(request):
 
         sala = get_object_or_404(Sala, id=sala_id, activa=True)
 
-        # Convertir horas a datetime
-        hora_inicio_dt = datetime.strptime(hora_inicio, "%H:%M")
-        hora_fin_dt = datetime.strptime(hora_fin, "%H:%M")
+        # Convertir y validar fechas/horas con manejo de errores
+        try:
+            hora_inicio_dt = datetime.strptime(hora_inicio, "%H:%M")
+            hora_fin_dt = datetime.strptime(hora_fin, "%H:%M")
+            fecha_inicio_obj = datetime.strptime(fecha_inicio, "%Y-%m-%d").date()
+            fecha_fin_obj = None
+            if fecha_fin:
+                fecha_fin_obj = datetime.strptime(fecha_fin, "%Y-%m-%d").date()
+        except ValueError as e:
+            messages.error(request, f"❌ Formato de fecha/hora inválido: {e}")
+            logger.error(f"Error de formato en agregar_disponibilidad: {e}")
+            return redirect("gestionar_disponibilidad")
+
+        # Calcular día de la semana automáticamente desde fecha_inicio
+        # (el formulario ya no requiere selección manual)
+        dia_semana = fecha_inicio_obj.weekday()  # 0=lunes, 6=domingo en Python
+
+        # Validar que la fecha de inicio no sea pasada
+        if fecha_inicio_obj < timezone.now().date():
+            messages.error(request, "❌ La fecha de inicio no puede ser en el pasado.")
+            return redirect("gestionar_disponibilidad")
 
         if hora_fin_dt <= hora_inicio_dt:
             messages.error(request, "❌ La hora fin debe ser mayor que la hora inicio.")
@@ -922,8 +1031,8 @@ def agregar_disponibilidad(request):
                 dia_semana=dia_semana,
                 hora_inicio=bloque_actual.time(),
                 hora_fin=bloque_siguiente.time(),
-                fecha_inicio=fecha_inicio,
-                fecha_fin=fecha_fin,
+                fecha_inicio=fecha_inicio_obj,
+                fecha_fin=fecha_fin_obj,
             )
 
             if not conflictos:
@@ -933,8 +1042,8 @@ def agregar_disponibilidad(request):
                     dia_semana=dia_semana,
                     hora_inicio=bloque_actual.time(),
                     hora_fin=bloque_siguiente.time(),
-                    fecha_inicio=fecha_inicio,
-                    fecha_fin=fecha_fin,
+                    fecha_inicio=fecha_inicio_obj,
+                    fecha_fin=fecha_fin_obj,
                 )
                 creados += 1
 
@@ -950,6 +1059,7 @@ def agregar_disponibilidad(request):
             )
 
     except Exception as e:
+        logger.exception(f"Error al agregar disponibilidad: {e}")
         messages.error(request, f"❌ Error al agregar disponibilidad: {str(e)}")
 
     return redirect("gestionar_disponibilidad")
@@ -967,18 +1077,22 @@ def eliminar_disponibilidad(request):
         # 1️⃣ CANCELAR TODAS LAS CITAS ASOCIADAS A ESTA DISPONIBILIDAD
         # ---------------------------------------------------------------------
         citas = CitaMedica.objects.filter(
-            disponibilidad=disponibilidad, estado="Agendada"
+            disponibilidad=disponibilidad, estado__in=["agendada", "confirmada"]
         )
+
+        fecha_hoy = timezone.now().date()
+        correos_enviados = 0
 
         for cita in citas:
             paciente_email = cita.email_paciente
 
             # Cambiar estado de la cita
-            cita.estado = "Cancelada"
+            cita.estado = "cancelada"
             cita.save()
 
-            # Enviar correo de cancelación
-            if paciente_email:
+            # Enviar correo de cancelación SOLO si la cita es futura
+            # No enviar correos para citas que ya pasaron (reduce ruido)
+            if paciente_email and cita.fecha_cita >= fecha_hoy:
                 try:
                     send_mail(
                         subject="Cancelación de cita médica",
@@ -996,6 +1110,7 @@ def eliminar_disponibilidad(request):
                         recipient_list=[cita.email_paciente],
                         fail_silently=False,
                     )
+                    correos_enviados += 1
                 except Exception as e:
                     logger.error(f"⚠️ Error enviando correo a {paciente_email}: {e}")
 
@@ -1004,10 +1119,16 @@ def eliminar_disponibilidad(request):
         # ---------------------------------------------------------------------
         disponibilidad.delete()
 
-        messages.success(
-            request,
-            "✅ Disponibilidad eliminada. Las citas fueron canceladas y se enviaron los correos.",
-        )
+        if correos_enviados > 0:
+            messages.success(
+                request,
+                f"✅ Disponibilidad eliminada. {len(citas)} cita(s) cancelada(s), {correos_enviados} correo(s) enviado(s).",
+            )
+        else:
+            messages.success(
+                request,
+                f"✅ Disponibilidad eliminada. {len(citas)} cita(s) cancelada(s) (sin correos por ser citas pasadas).",
+            )
 
     except Exception as e:
         messages.error(request, f"❌ Error al eliminar disponibilidad: {str(e)}")

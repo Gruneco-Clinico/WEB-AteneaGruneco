@@ -50,6 +50,15 @@ class Proyecto(models.Model):
         help_text="Nombre que se asignará a la visita creada automáticamente. "
                   "Si está vacío, se usará el nombre del tipo de visita.",
     )
+    
+    # --- Consentimiento informado ---
+    consentimiento_pdf = models.FileField(
+        upload_to="consentimientos/",
+        blank=True,
+        null=True,
+        verbose_name="Consentimiento Informado (PDF)",
+        help_text="PDF del consentimiento informado que se enviará por correo al agendar citas de este proyecto.",
+    )
 
     def __str__(self):
         return self.nombre
