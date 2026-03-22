@@ -77,7 +77,21 @@ class ProyectoPacienteExtra(models.Model):
 class Examen(models.Model):
     """Catálogo de exámenes clínicos disponibles."""
 
+    CATEGORIA_CHOICES = [
+        ("MEDICAS", "Evaluaciones Medicas"),
+        ("CLINICAS", "Escalas clinicas"),
+        ("NEUROPSICO", "Evaluaciones Neuropsicologicas"),
+        ("SUENO", "Escalas de sueno"),
+        ("OTROS", "Otros"),
+    ]
+
     nombre = models.CharField(max_length=255, verbose_name="Nombre del Examen")
+    categoria = models.CharField(
+        max_length=20,
+        choices=CATEGORIA_CHOICES,
+        default="OTROS",
+        verbose_name="Categoria",
+    )
     descripcion = models.TextField(
         verbose_name="Descripción del Examen", blank=True, null=True
     )

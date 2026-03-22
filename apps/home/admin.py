@@ -58,7 +58,15 @@ class ProyectoAdmin(admin.ModelAdmin):
 
 admin.site.register(Proyecto, ProyectoAdmin)
 admin.site.register(Visita)
-admin.site.register(Examen)
+
+
+@admin.register(Examen)
+class ExamenAdmin(admin.ModelAdmin):
+    list_display = ("nombre", "categoria")
+    list_filter = ("categoria",)
+    search_fields = ("nombre",)
+
+
 admin.site.register(VisitaExamen)
 admin.site.register(DatosDemograficos)
 admin.site.register(PittsburghResult)

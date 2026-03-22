@@ -847,6 +847,13 @@
     console.log("Inicializando scripts...");
 
     var visitaSelects = document.querySelectorAll(".tipo-visita");
+    var categoriasExamen = {
+      MEDICAS: "Evaluaciones Medicas",
+      CLINICAS: "Escalas clinicas",
+      NEUROPSICO: "Evaluaciones Neuropsicologicas",
+      SUENO: "Escalas de sueno",
+      OTROS: "Otros"
+    };
     console.log("Selectores de visita encontrados:", visitaSelects.length);
 
     visitaSelects.forEach(function (select) {
@@ -884,7 +891,8 @@
 
               var label = document.createElement("label");
               label.htmlFor = checkbox.id;
-              label.textContent = examen.nombre;
+              var categoriaTexto = examen.categoria ? " [" + (categoriasExamen[examen.categoria] || examen.categoria) + "]" : "";
+              label.textContent = examen.nombre + categoriaTexto;
               label.className = "form-check-label";
 
               li.appendChild(checkbox);
