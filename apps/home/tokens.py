@@ -39,6 +39,7 @@ _DEFAULT_MAX_AGE = 72 * 60 * 60  # 259 200 s
 # Namespace prefix prevents collision with other signed values
 _SIGNER_SEP = ":"
 _SIGNER_SALT = "atenea.public_exam_token"
+_SIGNER_SALT_CONSENT = "atenea.public_consent_signature_token"
 
 
 def _get_max_age():
@@ -75,4 +76,33 @@ def validar_token_paciente(token: str) -> int | None:
         return None
     except (ValueError, TypeError):
         logger.warning("Token con valor no numérico: %s…", token[:20])
+        return None
+
+
+def generar_token_consentimiento_envio(envio_id: int) -> str:
+    """Return a signed, time-stamped token encoding a consent send id."""
+    signer = TimestampSigner(salt=_SIGNER_SALT_CONSENT)
+    return signer.sign(str(envio_id))
+
+
+def validar_token_consentimiento_envio(token: str) -> int | None:
+    """Validate *token* and return the ``envio_id`` it encodes.
+
+    Returns ``None`` when token is invalid, expired, or malformed.
+    """
+    if not token:
+        return None
+
+    signer = TimestampSigner(salt=_SIGNER_SALT_CONSENT)
+    try:
+        value = signer.unsign(token, max_age=_get_max_age())
+        return int(value)
+    except SignatureExpired:
+        logger.warning("Token consentimiento expirado: %s…", token[:20])
+        return None
+    except BadSignature:
+        logger.warning("Token consentimiento inválido: %s…", token[:20])
+        return None
+    except (ValueError, TypeError):
+        logger.warning("Token consentimiento con valor no numérico: %s…", token[:20])
         return None

@@ -224,6 +224,21 @@
 
                 </div>
                 <div class="col-md-4 text-right">
+                  {% if proyecto.id in proyectos_con_consentimiento_firmado %}
+                  <span class="badge badge-success" title="Consentimiento ya firmado">
+                    <i class="fas fa-check-circle mr-1"></i> Consentimiento firmado
+                  </span>
+                  {% else %}
+                  <form method="POST"
+                    action="{% url 'enviar_link_firma_consentimiento' paciente_id=paciente.id proyecto_id=proyecto.id %}"
+                    class="d-inline"
+                    onsubmit="return confirm('¿Enviar enlace de firma de consentimiento al correo del paciente?');">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline-primary btn-sm" title="Enviar link de firma">
+                      <i class="fas fa-paper-plane mr-1"></i> Enviar link firma
+                    </button>
+                  </form>
+                  {% endif %}
                   <!-- BOTÓN CORREGIDO -->
                   <button class="btn btn-light btn-sm" data-toggle="modal"
                     data-target="#modalAgregarVisita-{{ proyecto.id }}">
