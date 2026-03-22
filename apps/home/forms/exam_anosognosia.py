@@ -218,7 +218,15 @@ class MoCAForm(forms.ModelForm):
 
     class Meta:
         model = MoCAResult
-        exclude = ["visita_examen"]
+        exclude = ["visita_examen",
+                   "puntaje_total",
+        "interpretacion",
+        "atencion",
+        "repeticion",
+        "fluidez",
+        "diferido",
+        "orientacion",
+        "concentracion_resultado",]
 
     def __init__(self, data=None, *args, **kwargs):
         if data is not None:
