@@ -96,6 +96,13 @@ class PittsburghForm(forms.ModelForm):
 
         import datetime
 
+        # 🔥 convertir string → time si es necesario
+        if isinstance(acostarse, str):
+            acostarse = datetime.datetime.strptime(acostarse, "%H:%M").time()
+
+        if isinstance(levantarse, str):
+            levantarse = datetime.datetime.strptime(levantarse, "%H:%M").time()
+
         a = datetime.datetime.combine(datetime.date.today(), acostarse)
         l = datetime.datetime.combine(datetime.date.today(), levantarse)
 
@@ -214,12 +221,7 @@ class PittsburghForm(forms.ModelForm):
 
         cleaned["puntuacion_total"] = total
 
-        # 📊 Interpretación clínica
-        if total <= 5:
-            cleaned["interpretacion"] = "Buena calidad de sueño"
-        else:
-            cleaned["interpretacion"] = "Mala calidad de sueño (PSQI > 5)"
-
+       
         return cleaned
 
 
