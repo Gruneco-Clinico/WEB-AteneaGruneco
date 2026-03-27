@@ -1,5 +1,7 @@
 ﻿# Generated manually for adding consentimiento_pdf field
-from django.db import migrations, models
+# NOTE: This field already exists in 0001_initial. Migration kept as no-op
+# to preserve the migration chain.
+from django.db import migrations
 
 
 class Migration(migrations.Migration):
@@ -9,9 +11,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AddField(
-            model_name='proyecto',
-            name='consentimiento_pdf',
-            field=models.FileField(blank=True, help_text='PDF del consentimiento informado que se enviará por correo al agendar citas de este proyecto.', null=True, upload_to='consentimientos/', verbose_name='Consentimiento Informado (PDF)'),
-        ),
+        # No-op: consentimiento_pdf already included in 0001_initial
     ]
