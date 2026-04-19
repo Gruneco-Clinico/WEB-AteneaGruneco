@@ -31,6 +31,60 @@ from .auth import is_superuser
 
 logger = logging.getLogger(__name__)
 
+
+def _build_examenes_por_categoria(examenes_qs):
+    categorias = dict(Examen.CATEGORIA_CHOICES)
+    agrupados = []
+    for codigo, nombre in Examen.CATEGORIA_CHOICES:
+        exams_cat = list(examenes_qs.filter(categoria=codigo).order_by("nombre"))
+        if exams_cat:
+            agrupados.append(
+                {
+                    "codigo": codigo,
+                    "nombre": nombre,
+                    "examenes": exams_cat,
+                }
+            )
+    return agrupados
+
+
+def _normalizar_examenes_tipo_visita(examenes_data):
+    if not isinstance(examenes_data, list):
+        return []
+
+    ids = []
+    for examen in examenes_data:
+        try:
+            ids.append(int(examen.get("id")))
+        except (TypeError, ValueError, AttributeError):
+            continue
+
+    examenes_db = Examen.objects.filter(id__in=ids)
+    examenes_map = {e.id: e for e in examenes_db}
+    cat_label = dict(Examen.CATEGORIA_CHOICES)
+
+    salida = []
+    for examen in examenes_data:
+        try:
+            eid = int(examen.get("id"))
+        except (TypeError, ValueError, AttributeError):
+            continue
+
+        exam_db = examenes_map.get(eid)
+        categoria_codigo = (
+            exam_db.categoria if exam_db else examen.get("categoria", "OTROS")
+        )
+        salida.append(
+            {
+                "id": eid,
+                "nombre": exam_db.nombre if exam_db else examen.get("nombre", f"Examen {eid}"),
+                "categoria": categoria_codigo,
+                "categoria_nombre": cat_label.get(categoria_codigo, "Otros"),
+            }
+        )
+
+    return salida
+
 @login_required
 @user_passes_test(is_superuser, login_url="/login/")
 def proyectos(request):
@@ -41,7 +95,8 @@ def proyectos(request):
         )  # Cambia 'home' por la vista a la que quieras redirigir
 
     proyectos = Proyecto.objects.all()
-    examenes = Examen.objects.all()
+    examenes = Examen.objects.all().order_by("categoria", "nombre")
+    examenes_por_categoria = _build_examenes_por_categoria(examenes)
     visitas = TipoVisita.objects.all()
 
     # Crear un diccionario para almacenar las visitas y exámenes por proyecto
@@ -57,20 +112,15 @@ def proyectos(request):
                 else json.loads(visita.examenes)
             )
 
-            # Extraer solo los IDs de los exámenes y convertirlos a enteros
-            examenes_ids = [int(examen["id"]) for examen in examenes_data]
-
-            # Buscar los nombres de los exámenes en la base de datos
-            examenes_nombres = Examen.objects.filter(id__in=examenes_ids).values_list(
-                "nombre", flat=True
-            )
+            examenes_info = _normalizar_examenes_tipo_visita(examenes_data)
 
             visitas_info.append(
                 {
                     "id": visita.id,
                     "nombre": visita.nombre,
                     "observaciones": visita.observaciones,
-                    "examenes": examenes_nombres,
+                    "examenes": examenes_info,
+                    "examenes_ids": [e["id"] for e in examenes_info],
                 }
             )
         proyecto_data[proyecto.id] = visitas_info
@@ -80,6 +130,7 @@ def proyectos(request):
         "examenes": examenes,
         "visitas": visitas,
         "proyecto_data": proyecto_data,
+        "examenes_por_categoria": examenes_por_categoria,
     }
 
     if request.method == "POST":
@@ -133,7 +184,8 @@ def eliminar_proyecto(request, id):
 # tipos de visita visitas
 def agregar_visita(request):
     proyectos = Proyecto.objects.all()
-    examenes = Examen.objects.all()
+    examenes = Examen.objects.all().order_by("categoria", "nombre")
+    examenes_por_categoria = _build_examenes_por_categoria(examenes)
     visitas = TipoVisita.objects.all()
 
     # Crear un diccionario para almacenar las visitas y exámenes por proyecto
@@ -149,19 +201,14 @@ def agregar_visita(request):
                 else json.loads(visita.examenes)
             )
 
-            # Extraer solo los IDs de los exámenes y convertirlos a enteros
-            examenes_ids = [int(examen["id"]) for examen in examenes_data]
-
-            # Buscar los nombres de los exámenes en la base de datos
-            examenes_nombres = Examen.objects.filter(id__in=examenes_ids).values_list(
-                "nombre", flat=True
-            )
+            examenes_info = _normalizar_examenes_tipo_visita(examenes_data)
             visitas_info.append(
                 {
                     "id": visita.id,
                     "nombre": visita.nombre,
                     "observaciones": visita.observaciones,
-                    "examenes": examenes_nombres,
+                    "examenes": examenes_info,
+                    "examenes_ids": [e["id"] for e in examenes_info],
                 }
             )
         proyecto_data[proyecto.id] = visitas_info
@@ -171,6 +218,7 @@ def agregar_visita(request):
         "examenes": examenes,
         "visitas": visitas,
         "proyecto_data": proyecto_data,
+        "examenes_por_categoria": examenes_por_categoria,
     }
 
     if request.method == "POST":
@@ -180,7 +228,20 @@ def agregar_visita(request):
 
         # Recibir el JSON desde el formulario y decodificarlo
         examenes_json = request.POST.get("examenes_json", "[]")
-        examenes_lista = json.loads(examenes_json)  # Convertir a lista de diccionarios
+        examenes_lista_raw = json.loads(examenes_json)  # Convertir a lista de diccionarios
+        examenes_lista = []
+        categorias_validas = {codigo for codigo, _ in Examen.CATEGORIA_CHOICES}
+        for examen in examenes_lista_raw:
+            categoria = examen.get("categoria", "OTROS")
+            if categoria not in categorias_validas:
+                categoria = "OTROS"
+            examenes_lista.append(
+                {
+                    "id": examen.get("id"),
+                    "nombre": examen.get("nombre"),
+                    "categoria": categoria,
+                }
+            )
 
         for i in range(len(nombres)):  # Crear una visita por cada nombre recibido
             TipoVisita.objects.create(
@@ -241,7 +302,7 @@ def editar_visita(request, visita_id):
         )
 
         # Crear un diccionario de exámenes existentes para evitar duplicados
-        examenes_dict = {examen["id"]: examen for examen in examenes_existentes}
+        examenes_dict = {str(examen.get("id")): examen for examen in examenes_existentes}
 
         # Agregar los nuevos exámenes seleccionados
         for examen in examenes_seleccionados:
@@ -249,6 +310,7 @@ def editar_visita(request, visita_id):
                 examenes_dict[str(examen.id)] = {
                     "id": examen.id,
                     "nombre": examen.nombre,
+                    "categoria": examen.categoria,
                 }
 
         # Convertir el diccionario de vuelta a lista

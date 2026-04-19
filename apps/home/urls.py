@@ -100,6 +100,11 @@ urlpatterns = [
         name="confirmacion_registro_externo",
     ),
     path("consulta-examenes/", views.consulta_examenes, name="consulta_examenes"),
+    path(
+        "firma-consentimiento-publico/",
+        views.firma_consentimiento_publico,
+        name="firma_consentimiento_publico",
+    ),
     # URLs públicas para exámenes
     path(
         "guardar-examen-publico-epworth/",
@@ -134,6 +139,11 @@ urlpatterns = [
         "paciente/<int:paciente_id>/proyecto/<int:proyecto_id>/quitar/",
         views.quitar_paciente_proyecto,
         name="quitar_paciente_proyecto",
+    ),
+    path(
+        "paciente/<int:paciente_id>/proyecto/<int:proyecto_id>/enviar-link-firma/",
+        views.enviar_link_firma_consentimiento,
+        name="enviar_link_firma_consentimiento",
     ),
     # Visitas pendientes de firma
     path(

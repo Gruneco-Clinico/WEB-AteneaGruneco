@@ -266,7 +266,8 @@
                             <div class="col-md-6 mb-1">
                               <small class="badge badge-light border">
                                 <i class="fas fa-check-circle text-success mr-1"></i>
-                                {{ examen }}
+                                {{ examen.nombre }}
+                                <span class="text-muted">({{ examen.categoria_nombre }})</span>
                               </small>
                             </div>
                             {% endfor %}
@@ -400,13 +401,12 @@
                     Exámenes Asociados
                   </h6>
                   <div class="border rounded p-3" style="max-height: 200px; overflow-y: auto;">
-                    {% for examen in visita.examenes.all %}
+                    {% for examen in visita.examenes %}
                     <div class="form-check mb-1">
-                      <input class="form-check-input" type="checkbox" value="{{ examen.id }}"
-                        id="examen_asociado_{{ examen.id }}" checked>
-                      <label class="form-check-label" for="examen_asociado_{{ examen.id }}">
-                        <small class="badge badge-success">{{ examen }}</small>
-                      </label>
+                      <small class="badge badge-success">
+                        {{ examen.nombre }}
+                        <span class="ml-1">({{ examen.categoria_nombre }})</span>
+                      </small>
                     </div>
                     {% empty %}
                     <div class="text-center py-3">
@@ -424,16 +424,20 @@
                     Exámenes Disponibles
                   </h6>
                   <div class="border rounded p-3" style="max-height: 200px; overflow-y: auto;">
-                    {% for examen in examenes %}
-                    {% if examen.nombre not in visita.examenes.all %}
-                    <div class="form-check mb-1">
-                      <input class="form-check-input" type="checkbox" name="examenes" value="{{ examen.id }}"
-                        id="examen_disponible_{{ examen.id }}">
-                      <label class="form-check-label" for="examen_disponible_{{ examen.id }}">
+                    {% for grupo in examenes_por_categoria %}
+                    <div class="mb-2">
+                      <small class="text-muted font-weight-bold">{{ grupo.nombre }}</small>
+                    </div>
+                    {% for examen in grupo.examenes %}
+                    {% if examen.id not in visita.examenes_ids %}
+                    <div class="form-check mb-1 ml-2">
+                      <input class="form-check-input" type="checkbox" name="examenes" value="{{ examen.id }}" id="examen_disponible_{{ visita.id }}_{{ examen.id }}">
+                      <label class="form-check-label" for="examen_disponible_{{ visita.id }}_{{ examen.id }}">
                         <small class="badge badge-light border">{{ examen.nombre }}</small>
                       </label>
                     </div>
                     {% endif %}
+                    {% endfor %}
                     {% empty %}
                     <div class="text-center py-3">
                       <i class="fas fa-check-circle text-success"></i>
@@ -687,15 +691,38 @@
                   <i class="fas fa-microscope mr-1"></i>
                   Exámenes Asociados
                 </label>
+                <div class="mb-3 d-flex flex-wrap">
+                  <button type="button" class="btn btn-sm btn-outline-primary mr-2 mb-2" id="seleccionar-todos-examenes">
+                    <i class="fas fa-check-double mr-1"></i>Seleccionar todos
+                  </button>
+                  <button type="button" class="btn btn-sm btn-outline-secondary mb-2" id="limpiar-todos-examenes">
+                    <i class="fas fa-eraser mr-1"></i>Limpiar todos
+                  </button>
+                </div>
                 <div class="border rounded p-3" style="max-height: 300px; overflow-y: auto;">
                   <div class="examenes-container">
-                    {% for examen in examenes %}
-                    <div class="form-check mb-2">
-                      <input class="form-check-input examen-checkbox" type="checkbox" data-id="{{ examen.id }}"
-                        data-nombre="{{ examen.nombre }}" id="examen_new_{{ examen.id }}">
-                      <label class="form-check-label" for="examen_new_{{ examen.id }}">
-                        <span class="badge badge-light border">{{ examen.nombre }}</span>
-                      </label>
+                    {% for grupo in examenes_por_categoria %}
+                    <div class="mb-3">
+                      <div class="d-flex align-items-center justify-content-between mb-2">
+                        <h6 class="text-muted mb-0">{{ grupo.nombre }}</h6>
+                        <div>
+                          <button type="button" class="btn btn-sm btn-link p-0 mr-2 btn-seleccionar-categoria" data-categoria="{{ grupo.codigo }}">
+                            Seleccionar
+                          </button>
+                          <button type="button" class="btn btn-sm btn-link text-secondary p-0 btn-limpiar-categoria" data-categoria="{{ grupo.codigo }}">
+                            Limpiar
+                          </button>
+                        </div>
+                      </div>
+                      {% for examen in grupo.examenes %}
+                      <div class="form-check mb-2 ml-2">
+                        <input class="form-check-input examen-checkbox" type="checkbox" data-id="{{ examen.id }}"
+                          data-nombre="{{ examen.nombre }}" data-categoria="{{ examen.categoria }}" id="examen_new_{{ examen.id }}">
+                        <label class="form-check-label" for="examen_new_{{ examen.id }}">
+                          <span class="badge badge-light border">{{ examen.nombre }}</span>
+                        </label>
+                      </div>
+                      {% endfor %}
                     </div>
                     {% endfor %}
                   </div>
@@ -757,24 +784,72 @@
     // Gestión de exámenes
     let checkboxes = document.querySelectorAll(".examen-checkbox");
     let hiddenInput = document.getElementById("examenes-json");
+    let btnSelectAll = document.getElementById("seleccionar-todos-examenes");
+    let btnClearAll = document.getElementById("limpiar-todos-examenes");
+    let btnSelectCategoria = document.querySelectorAll(".btn-seleccionar-categoria");
+    let btnClearCategoria = document.querySelectorAll(".btn-limpiar-categoria");
+
+    function syncExamenesJson() {
+      let examenesSeleccionados = [];
+      checkboxes.forEach(function (cb) {
+        if (cb.checked) {
+          examenesSeleccionados.push({
+            id: cb.dataset.id,
+            nombre: cb.dataset.nombre,
+            categoria: cb.dataset.categoria || 'OTROS'
+          });
+        }
+      });
+      hiddenInput.value = JSON.stringify(examenesSeleccionados);
+    }
+
+    function setCategoriaEstado(categoria, checked) {
+      checkboxes.forEach(function (cb) {
+        if (cb.dataset.categoria === categoria) {
+          cb.checked = checked;
+        }
+      });
+      syncExamenesJson();
+    }
+
+    function setTodosEstado(checked) {
+      checkboxes.forEach(function (cb) {
+        cb.checked = checked;
+      });
+      syncExamenesJson();
+    }
 
     checkboxes.forEach(checkbox => {
       checkbox.addEventListener("change", function () {
-        let examenesSeleccionados = JSON.parse(hiddenInput.value || "[]");
-        let examenId = this.dataset.id;
-        let examenNombre = this.dataset.nombre;
-
-        if (this.checked) {
-          if (!examenesSeleccionados.some(e => e.id === examenId)) {
-            examenesSeleccionados.push({ id: examenId, nombre: examenNombre });
-          }
-        } else {
-          examenesSeleccionados = examenesSeleccionados.filter(e => e.id !== examenId);
-        }
-
-        hiddenInput.value = JSON.stringify(examenesSeleccionados);
+        syncExamenesJson();
       });
     });
+
+    if (btnSelectAll) {
+      btnSelectAll.addEventListener("click", function () {
+        setTodosEstado(true);
+      });
+    }
+
+    if (btnClearAll) {
+      btnClearAll.addEventListener("click", function () {
+        setTodosEstado(false);
+      });
+    }
+
+    btnSelectCategoria.forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        setCategoriaEstado(this.dataset.categoria, true);
+      });
+    });
+
+    btnClearCategoria.forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        setCategoriaEstado(this.dataset.categoria, false);
+      });
+    });
+
+    syncExamenesJson();
   });
 </script>
 

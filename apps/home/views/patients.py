@@ -12,6 +12,7 @@ from django.contrib.auth.models import User
 from django.views.generic import TemplateView
 from django.core.mail import send_mail, EmailMessage
 from django.db.models import Max
+from django.urls import reverse
 from datetime import datetime, timedelta
 from ..models import *
 from ..forms import ProyectoForm, RegistroDemograficoForm
@@ -28,9 +29,23 @@ from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, 
 from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT, TA_JUSTIFY
 from io import BytesIO
 from .auth import is_superuser
-from ..tokens import generar_token_paciente
+from ..tokens import generar_token_paciente, generar_token_consentimiento_envio, validar_token_consentimiento_envio
 
 logger = logging.getLogger(__name__)
+
+
+def _obtener_ip_cliente(request):
+    forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
+    if forwarded_for:
+        return forwarded_for.split(",")[0].strip()
+    return request.META.get("REMOTE_ADDR")
+
+
+def _normalizar_tipo_documento(tipo_documento):
+    valores_permitidos = {"CC", "TI", "NUIP", "CE", "PS"}
+    if tipo_documento in valores_permitidos:
+        return tipo_documento
+    return "CC"
 
 
 def _build_codigos_map(pacientes_qs):
@@ -52,23 +67,29 @@ def _build_codigos_map(pacientes_qs):
 
 @login_required
 def lista_pacientes(request):
-    pacientes = DatosDemograficos.objects.all()
+    pacientes_qs = DatosDemograficos.objects.all()
     proyectos = Proyecto.objects.all()
     filtro_proyecto = request.GET.get("proyecto", "")
     if filtro_proyecto:
         try:
-            pacientes = pacientes.filter(proyectos__id=int(filtro_proyecto))
+            pacientes_qs = pacientes_qs.filter(proyectos__id=int(filtro_proyecto))
         except (ValueError, TypeError):
             pass
-    codigos_map = _build_codigos_map(pacientes)
+
+    paginator = Paginator(pacientes_qs, 100)
+    page_number = request.GET.get("page", 1)
+    page_obj = paginator.get_page(page_number)
+
+    codigos_map = _build_codigos_map(page_obj)
     # Attach codes to each patient object for easy template access
-    for pac in pacientes:
+    for pac in page_obj:
         pac.codigos_list = codigos_map.get(pac.id, [])
     return render(
         request,
         "home/tables.html",
         {
-            "pacientes": pacientes,
+            "pacientes": page_obj,
+            "page_obj": page_obj,
             "proyectos": proyectos,
             "filtro_proyecto": filtro_proyecto,
             "codigos_map": codigos_map,
@@ -186,6 +207,12 @@ def detalle_paciente(request, paciente_id):
     visitas_paciente = Visita.objects.filter(paciente=paciente).prefetch_related(
         "visita_examenes__examen"
     )
+    proyectos_con_consentimiento_firmado = list(
+        ConsentimientoFirmaEnvio.objects.filter(
+            paciente=paciente,
+            estado="completado",
+        ).values_list("proyecto_id", flat=True).distinct()
+    )
 
     if request.method == "POST":
         proyecto_id = request.POST.get("proyecto_id")
@@ -225,7 +252,156 @@ def detalle_paciente(request, paciente_id):
             "proyectos_asociados": proyectos_asociados,
             "proyectos_disponibles": proyectos_disponibles,
             "visitas_paciente": visitas_paciente,
+            "proyectos_con_consentimiento_firmado": proyectos_con_consentimiento_firmado,
         },
+    )
+
+
+@login_required
+def enviar_link_firma_consentimiento(request, paciente_id, proyecto_id):
+    if request.method != "POST":
+        messages.error(request, "Metodo no permitido para enviar enlace.")
+        return redirect("detalle_paciente", paciente_id=paciente_id)
+
+    paciente = get_object_or_404(DatosDemograficos, id=paciente_id)
+    proyecto = get_object_or_404(Proyecto, id=proyecto_id)
+
+    if not proyecto.pacientes.filter(id=paciente.id).exists():
+        messages.error(request, "El paciente no pertenece al proyecto seleccionado.")
+        return redirect("detalle_paciente", paciente_id=paciente_id)
+
+    if not paciente.correo:
+        messages.error(request, "El paciente no tiene correo registrado para enviar el enlace.")
+        return redirect("detalle_paciente", paciente_id=paciente_id)
+
+    ya_firmado = ConsentimientoFirmaEnvio.objects.filter(
+        paciente=paciente,
+        proyecto=proyecto,
+        estado="completado",
+    ).exists()
+    if ya_firmado:
+        messages.info(request, "El consentimiento ya fue firmado para este proyecto.")
+        return redirect("detalle_paciente", paciente_id=paciente_id)
+
+    try:
+        nombre_completo = " ".join(
+            x
+            for x in [
+                paciente.primer_nombre,
+                paciente.segundo_nombre,
+                paciente.primer_apellido,
+                paciente.segundo_apellido,
+            ]
+            if x
+        ).strip()
+
+        envio = ConsentimientoFirmaEnvio.objects.create(
+            paciente=paciente,
+            proyecto=proyecto,
+            enviado_por=request.user,
+            nombres_apellidos=nombre_completo,
+            tipo_documento=_normalizar_tipo_documento(paciente.tipo_documento),
+            numero_documento=paciente.numero_documento or "",
+            correo_electronico=paciente.correo or "",
+            celular=paciente.celular or "",
+        )
+
+        token = generar_token_consentimiento_envio(envio.id)
+        enlace_relativo = reverse("firma_consentimiento_publico")
+        enlace_publico = f"{request.build_absolute_uri(enlace_relativo)}?token={token}"
+
+        mensaje = (
+            f"Hola {nombre_completo or 'participante'},\n\n"
+            f"Te compartimos el enlace para diligenciar la firma del consentimiento informado del proyecto: {proyecto.nombre}.\n\n"
+            f"Enlace seguro:\n{enlace_publico}\n\n"
+            "Este enlace tiene vencimiento por seguridad.\n\n"
+            "Equipo ATENEA - GRUNECO"
+        )
+
+        send_mail(
+            subject=f"Firma de consentimiento informado - {proyecto.nombre}",
+            message=mensaje,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[paciente.correo],
+            fail_silently=False,
+        )
+
+        messages.success(request, "Enlace de firma enviado correctamente al correo del paciente.")
+    except Exception as e:
+        logger.exception("Error enviando enlace de firma de consentimiento")
+        messages.error(request, f"No se pudo enviar el enlace: {str(e)}")
+
+    return redirect("detalle_paciente", paciente_id=paciente_id)
+
+
+def firma_consentimiento_publico(request):
+    token = request.GET.get("token") if request.method == "GET" else request.POST.get("token")
+    envio_id = validar_token_consentimiento_envio(token)
+
+    if envio_id is None:
+        messages.error(request, "Enlace invalido o expirado. Solicite uno nuevo.")
+        return redirect("formulario_demografico_externo")
+
+    envio = get_object_or_404(
+        ConsentimientoFirmaEnvio.objects.select_related("paciente", "proyecto"),
+        id=envio_id,
+    )
+
+    if envio.estado == "completado":
+        return render(
+            request,
+            "registro_publico/firma_consentimiento_exitoso.html",
+            {"envio": envio},
+        )
+
+    if request.method == "POST":
+        acepta_participacion = request.POST.get("acepta_participacion")
+        acepta_uso = request.POST.get("acepta_uso_futuras_investigaciones")
+        acepta_contacto = request.POST.get("acepta_contacto_nuevas_investigaciones")
+
+        if not all([acepta_participacion, acepta_uso, acepta_contacto]):
+            messages.error(request, "Debe responder todas las preguntas de aceptacion.")
+            return render(
+                request,
+                "registro_publico/firma_consentimiento_publico.html",
+                {"envio": envio, "token": token},
+            )
+
+        firma = request.POST.get("firma_participante", "").strip()
+        if not firma:
+            messages.error(request, "La firma es obligatoria.")
+            return render(
+                request,
+                "registro_publico/firma_consentimiento_publico.html",
+                {"envio": envio, "token": token},
+            )
+
+        envio.acepta_participacion = acepta_participacion == "si"
+        envio.acepta_uso_futuras_investigaciones = acepta_uso == "si"
+        envio.acepta_contacto_nuevas_investigaciones = acepta_contacto == "si"
+        envio.nombres_apellidos = request.POST.get("nombres_apellidos", "").strip()
+        envio.tipo_documento = _normalizar_tipo_documento(request.POST.get("tipo_documento"))
+        envio.numero_documento = request.POST.get("numero_documento", "").strip()
+        envio.fecha_firma = request.POST.get("fecha_firma") or None
+        envio.hora_firma = request.POST.get("hora_firma") or None
+        envio.correo_electronico = request.POST.get("correo_electronico", "").strip()
+        envio.celular = request.POST.get("celular", "").strip()
+        envio.firma_participante = firma
+        envio.fecha_guardado_formulario = timezone.now()
+        envio.ip_guardado_formulario = _obtener_ip_cliente(request)
+        envio.estado = "completado"
+        envio.save()
+
+        return render(
+            request,
+            "registro_publico/firma_consentimiento_exitoso.html",
+            {"envio": envio},
+        )
+
+    return render(
+        request,
+        "registro_publico/firma_consentimiento_publico.html",
+        {"envio": envio, "token": token},
     )
 
 

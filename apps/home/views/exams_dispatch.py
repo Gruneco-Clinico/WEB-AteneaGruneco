@@ -16,6 +16,7 @@ from datetime import datetime, timedelta
 from ..models import *
 from ..forms import ProyectoForm, RegistroDemograficoForm, CognitivoAnamnesisForm
 from .exam_builder import builder_result_response, realizar_examen_builder
+from ..exam_registry import get_exam_config, get_exam_model
 import json
 import requests
 import logging
@@ -33,143 +34,11 @@ logger = logging.getLogger(__name__)
 
 @login_required
 def realizar_examen(request, visita_id, examen_id, paciente_id):
-    # Diccionario de configuración de exámenes
-    exam_config = {
-        3: {
-            "template": "examenes_general/General_ExamenFísico.html",
-            "model": ExamenFisicoResult,
-        },
-        4: {
-            "template": "examenes_general/General_RevisiónSistemas.html",
-            "model": RevisionSistemasResult,
-        },
-        5: {
-            "template": "examenes_general/General_Antecedentes.html",
-            "model": AntecedentesResult,
-        },
-        7: {
-            "template": "examenes_general/General_Análisis.html",
-            "model": AnalisisGeneralResult,
-        },
-        8: {
-            "template": "examenes_general/General_Medicamentos.html",
-            "model": MedicamentosResult,
-        },
-        9: {
-            "template": "examenes_general/General_ExamenNeurológico.html",
-            "model": ExamenNeurologicoResult,
-        },
-        10: {
-            "template": "examenes_sueno/Sueno_anamnesis.html",
-            "model": SuenoAnamnesisResult,
-        },
-        11: {"template": "examenes_sueno/Sueño_Cuestionarios.html", "model": None},
-        12: {
-            "template": "examenes_sueno/Sueño_ExamenFisico.html",
-            "model": SuenoFisicoResult,
-        },
-        13: {
-            "template": "examenes_sueno/sueno_Pitsburg.html",
-            "model": PittsburghResult,
-        },
-        14: {"template": "examenes_sueno/sueno_Epworth.html", "model": EpworthResult},
-        15: {
-            "template": "examenes_sueno/sueno_Stop_Bang.html",
-            "model": StopBangResult,
-        },
-        16: {"template": "examenes_sueno/sueno_MEW.html", "model": MEWResult},
-        17: {"template": "examenes_sueno/sueno_Berlín.html", "model": BerlinResult},
-        18: {"template": "examenes_sueno/sueno_atenas.html", "model": AtenasResult},
-        19: {"template": "examenes_sueno/sueno_ISI.html", "model": ISIResult},
-        20: {
-            "template": "examenes_general/cognitivo_Anamnesis.html",
-            "model": CognitivoAnamnesisResult,
-        },
-        21: {
-            "template": "examenes_anosognosia/Anosognosia_Participante_EuroQoL.html",
-            "model": EuroQol5D5LResult,
-        },
-        22: {
-            "template": "examenes_anosognosia/Anosognosia_Participante_EVA_EuroQoL.html",
-            "model": EuroQolEVASaludResult,
-        },
-        23: {
-            "template": "examenes_anosognosia/Anosognosia_Participante_Yesavage.html",
-            "model": ParticipanteYesavageResult,
-        },
-        24: {
-            "template": "examenes_anosognosia/Anosognosia_Cuidador_NPI.html",
-            "model": CuidadorNPIResult,
-        },
-        25: {
-            "template": "examenes_anosognosia/Anosognosia_Cuidador_LawtonBrody.html",
-            "model": LawtonBrodyResult,
-        },
-        26: {
-            "template": "examenes_anosognosia/Anosognosia_Cuidador_CalidadVida_BettyFerrel.html",
-            "model": BettyFerrelResult,
-        },
-        27: {
-            "template": "examenes_anosognosia/Anosognosia_Participante_MoCA.html",
-            "model": MoCAResult,
-        },
-        28: {
-            "template": "examenes_anosognosia/Anosognosia_Participante_AdherenciaTerapeutica.html",
-            "model": AdherenciaTerapeuticaResult,
-        },
-        29: {
-            "template": "examenes_anosognosia/Anosognosia_Cuidador_EscalaZarit.html",
-            "model": ZaritResult,
-        },
-        30: {
-            "template": "examenes_anosognosia/Anosognosia_Cuidador_AQD.html",
-            "model": AQDCuidadorResult,
-        },
-        31: {
-            "template": "examenes_anosognosia/Anosognosia_Participante_AQD.html",
-            "model": AQDParticipanteResult,
-        },
-        32: {
-            "template": "examenes_anosognosia/Anosognosia_Cuidador_RedLatSpanish.html",
-            "model": RedLatSpanishResult,
-        },
-        33: {
-            "template": "examenes_anosognosia/Anosognosia_Cuidador_CDR.html",
-            "model": CDRCuidadorResult,
-        },
-        34: {
-            "template": "examenes_anosognosia/Anosognosia_Participante_CDR.html",
-            "model": CDRParticipanteResult,
-        },
-        35: {
-            "template": "examenes_anosognosia/CDR_Evaluacion_Clinica.html",
-            "model": PuntajeCDRResult,
-        },
-        36: {
-            "template": "examenes_anosognosia/Consentimiento_Informado_Participante.html",
-            "model": ConsentimientoInformadoParticipanteResult,
-        },
-        37: {
-            "template": "examenes_anosognosia/Consentimiento_Informado_Cuidador.html",
-            "model": ConsentimientoInformadoCuidadorResult,
-        },
-        38: {
-            "template": "examenes_anosognosia/Anamnesis_Cuidador_ANG.html",
-            "model": AnamnesisCuidadorResult,
-        },
-        39: {
-            "template": "examenes_anosognosia/Anamnesis_Participante_ANG.html",
-            "model": AnamnesisParticipanteResult,
-        },
-        40: {
-            "template": "examenes_anosognosia/SeguimientoIntervenciones_ANG.html",
-            "model": SeguimientoIntervencionesResult,
-        },
-    }
-
-    config = exam_config.get(int(examen_id))
+    config = get_exam_config(int(examen_id))
     if not config:
         return realizar_examen_builder(request, visita_id, examen_id, paciente_id)
+
+    exam_model = get_exam_model(int(examen_id))
 
     # Obtener datos existentes
     paciente = get_object_or_404(DatosDemograficos, id=paciente_id)
@@ -189,9 +58,9 @@ def realizar_examen(request, visita_id, examen_id, paciente_id):
             visita_id=visita_id, examen_id=examen_id
         )
 
-        if config["model"] and visita_examen_obj.esta_realizado:
+        if exam_model and visita_examen_obj.esta_realizado:
             resultado = visita_examen_obj.get_resultado_instance()
-            if resultado and isinstance(resultado, config["model"]):
+            if resultado and isinstance(resultado, exam_model):
                 # ===================================================
                 # CASO ESPECIAL: ANAMNESIS DE SUEÑO (ID 10)
                 # ===================================================

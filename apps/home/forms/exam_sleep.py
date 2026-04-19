@@ -21,7 +21,12 @@ from ..models import (
 
 
 class PittsburghForm(forms.ModelForm):
-    """HTML sends 'horas_sueno_real' but model field is 'horas_dormidas'."""
+    """
+    Formulario PSQI (Pittsburgh Sleep Quality Index)
+    - Calcula automáticamente los 7 componentes (0–3)
+    - Calcula puntuación total (0–21)
+    - Genera interpretación clínica
+    """
 
     HTML_FIELD_MAP = {
         "horas_sueno_real": "horas_dormidas",
@@ -29,7 +34,11 @@ class PittsburghForm(forms.ModelForm):
 
     class Meta:
         model = PittsburghResult
-        exclude = ["visita_examen"]
+        exclude = [
+            "visita_examen",
+            "puntuacion_total",
+            "interpretacion",
+        ]
 
     def __init__(self, data=None, *args, **kwargs):
         if data is not None:
@@ -38,6 +47,182 @@ class PittsburghForm(forms.ModelForm):
                 if html_name in data and model_name not in data:
                     data[model_name] = data[html_name]
         super().__init__(data, *args, **kwargs)
+
+    # 🔧 Helpers
+    def map_frecuencia(self, val):
+        if not val:
+            return 0
+        val = val.lower()
+        if "ninguna" in val:
+            return 0
+        if "menos" in val:
+            return 1
+        if "una o dos" in val:
+            return 2
+        if "tres" in val:
+            return 3
+        return 0
+
+    def map_calidad(self, val):
+        if not val:
+            return 0
+        val = val.lower()
+        if "bastante buena" in val:
+            return 0
+        if "buena" in val:
+            return 1
+        if "mala" in val:
+            return 2
+        if "bastante mala" in val:
+            return 3
+        return 0
+
+    def map_latencia(self, val):
+        if not val:
+            return 0
+        if "0" in val:
+            return 0
+        if "1" in val:
+            return 1
+        if "2" in val:
+            return 2
+        if "3" in val:
+            return 3
+        return 0
+
+    def calcular_horas_cama(self, acostarse, levantarse):
+        if not acostarse or not levantarse:
+            return 0
+
+        import datetime
+
+        # 🔥 convertir string → time si es necesario
+        if isinstance(acostarse, str):
+            acostarse = datetime.datetime.strptime(acostarse, "%H:%M").time()
+
+        if isinstance(levantarse, str):
+            levantarse = datetime.datetime.strptime(levantarse, "%H:%M").time()
+
+        a = datetime.datetime.combine(datetime.date.today(), acostarse)
+        l = datetime.datetime.combine(datetime.date.today(), levantarse)
+
+        if l < a:
+            l += datetime.timedelta(days=1)
+
+        return (l - a).total_seconds() / 3600
+
+    # 🧠 CORE CLÍNICO
+    def clean(self):
+        cleaned = super().clean()
+
+        # 1️⃣ Calidad subjetiva
+        calidad = self.map_calidad(cleaned.get("calidad_sueno"))
+
+        # 2️⃣ Latencia
+        lat_base = self.map_latencia(cleaned.get("latencia_sueno"))
+        lat_freq = self.map_frecuencia(cleaned.get("conciliar_sueno"))
+        lat_total = lat_base + lat_freq
+
+        if lat_total == 0:
+            latencia = 0
+        elif lat_total <= 2:
+            latencia = 1
+        elif lat_total <= 4:
+            latencia = 2
+        else:
+            latencia = 3
+
+        # 3️⃣ Duración
+        horas = float(cleaned.get("horas_dormidas") or 0)
+
+        if horas >= 7:
+            duracion = 0
+        elif horas >= 6:
+            duracion = 1
+        elif horas >= 5:
+            duracion = 2
+        else:
+            duracion = 3
+
+        # 4️⃣ Eficiencia
+        horas_cama = self.calcular_horas_cama(
+            cleaned.get("hora_acostarse"),
+            cleaned.get("hora_levantarse")
+        )
+
+        eficiencia = (horas / horas_cama * 100) if horas_cama > 0 else 0
+
+        if eficiencia >= 85:
+            eficiencia_score = 0
+        elif eficiencia >= 75:
+            eficiencia_score = 1
+        elif eficiencia >= 65:
+            eficiencia_score = 2
+        else:
+            eficiencia_score = 3
+
+        # 5️⃣ Alteraciones
+        campos = [
+            "despertarse_sueno",
+            "levantarse_servicio_sueno",
+            "respirar",
+            "toser_roncar_sueno",
+            "sentir_frio_sueno",
+            "calor_sueno",
+            "pesadillas_sueno",
+            "dolores_sueno",
+            "otras_sueno",
+        ]
+
+        suma_alt = sum(self.map_frecuencia(cleaned.get(c)) for c in campos)
+
+        if suma_alt == 0:
+            alteraciones = 0
+        elif suma_alt <= 9:
+            alteraciones = 1
+        elif suma_alt <= 18:
+            alteraciones = 2
+        else:
+            alteraciones = 3
+
+        # 6️⃣ Medicación
+        medicacion = self.map_frecuencia(cleaned.get("medicinas_sueno"))
+
+        # 7️⃣ Disfunción diurna
+        somnolencia = self.map_frecuencia(cleaned.get("somnolencia_sueno"))
+
+        animo = cleaned.get("problemas_animos_sueno", "")
+        if "ningun" in animo.lower():
+            animo_score = 0
+        elif "leve" in animo.lower():
+            animo_score = 1
+        elif "grave" in animo.lower():
+            animo_score = 3
+        else:
+            animo_score = 2
+
+        dis_total = somnolencia + animo_score
+
+        if dis_total == 0:
+            disfuncion = 0
+        elif dis_total <= 2:
+            disfuncion = 1
+        elif dis_total <= 4:
+            disfuncion = 2
+        else:
+            disfuncion = 3
+
+        # 🎯 TOTAL FINAL
+        total = (
+            calidad + latencia + duracion +
+            eficiencia_score + alteraciones +
+            medicacion + disfuncion
+        )
+
+        cleaned["puntuacion_total"] = total
+
+       
+        return cleaned
 
 
 class EpworthForm(forms.ModelForm):

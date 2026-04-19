@@ -1,0 +1,68 @@
+{% extends 'layouts/base_public.html' %}
+
+{% block content %}
+<div class="header bg-success pb-6">
+  <div class="container-fluid">
+    <div class="header-body">
+      <div class="row align-items-center py-4">
+        <div class="col-lg-12">
+          <h6 class="h2 text-white d-inline-block mb-0">Firma guardada correctamente</h6>
+          <p class="text-white-50 mb-0 mt-1">{{ envio.proyecto.nombre }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid mt--6">
+  <div class="row">
+    <div class="col-lg-10 col-xl-8 mx-auto">
+      <div class="card shadow">
+        <div class="card-header bg-white border-0">
+          <h3 class="mb-0">Vista previa del formulario guardado</h3>
+        </div>
+
+        <div class="card-body">
+          <div class="alert alert-success">
+            El formulario de firma fue guardado exitosamente.
+          </div>
+
+          <h5>Datos de participación</h5>
+          <ul class="list-group list-group-flush mb-4">
+            <li class="list-group-item d-flex justify-content-between">
+              <span>Participación voluntaria</span>
+              <strong>{% if envio.acepta_participacion %}Si{% else %}No{% endif %}</strong>
+            </li>
+            <li class="list-group-item d-flex justify-content-between">
+              <span>Uso en futuras investigaciones</span>
+              <strong>{% if envio.acepta_uso_futuras_investigaciones %}Si{% else %}No{% endif %}</strong>
+            </li>
+            <li class="list-group-item d-flex justify-content-between">
+              <span>Contacto para nuevos estudios</span>
+              <strong>{% if envio.acepta_contacto_nuevas_investigaciones %}Si{% else %}No{% endif %}</strong>
+            </li>
+          </ul>
+
+          <h5>Datos del participante</h5>
+          <ul class="list-group list-group-flush mb-4">
+            <li class="list-group-item"><strong>Nombre:</strong> {{ envio.nombres_apellidos }}</li>
+            <li class="list-group-item"><strong>Tipo documento:</strong> {{ envio.get_tipo_documento_display }}</li>
+            <li class="list-group-item"><strong>Numero documento:</strong> {{ envio.numero_documento }}</li>
+            <li class="list-group-item"><strong>Fecha firma:</strong> {{ envio.fecha_firma|date:'d/m/Y' }}</li>
+            <li class="list-group-item"><strong>Hora firma:</strong> {{ envio.hora_firma|time:'H:i' }}</li>
+            <li class="list-group-item"><strong>Correo electronico:</strong> {{ envio.correo_electronico }}</li>
+            <li class="list-group-item"><strong>Celular:</strong> {{ envio.celular }}</li>
+          </ul>
+
+          <h5>Trazabilidad de envío</h5>
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item"><strong>Fecha envio formulario:</strong> {{ envio.fecha_guardado_formulario|date:'d/m/Y' }}</li>
+            <li class="list-group-item"><strong>Hora envio formulario:</strong> {{ envio.fecha_guardado_formulario|time:'H:i:s' }}</li>
+            <li class="list-group-item"><strong>IP de envio formulario:</strong> {{ envio.ip_guardado_formulario|default:'No disponible' }}</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
