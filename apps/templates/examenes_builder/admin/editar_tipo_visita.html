@@ -1,0 +1,21 @@
+{% extends "layouts/base.html" %}
+{% block title %}Tipo visita — exámenes JSON{% endblock %}
+{% block content %}
+<div class="container-fluid mt-4">
+  <h1>{{ tipo_visita.nombre }}</h1>
+  <p>Proyecto: {{ tipo_visita.proyecto.nombre }}</p>
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
+  <form method="post">
+    {% csrf_token %}
+    <div class="form-group">
+      <label>examenes (JSON)</label>
+      <textarea name="examenes_json" class="form-control font-monospace" rows="18">{{ examenes_str }}</textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Guardar</button>
+  </form>
+</div>
+{% endblock %}

@@ -12,6 +12,7 @@ from .exams_public import *  # noqa: F401,F403
 from .visits import *  # noqa: F401,F403
 from .projects import *  # noqa: F401,F403
 from .exams_dispatch import *  # noqa: F401,F403
+from .exam_builder import *  # noqa: F401,F403
 from .exams_sleep import *  # noqa: F401,F403
 from .exams_anosognosia import *  # noqa: F401,F403
 from .analytics import *  # noqa: F401,F403

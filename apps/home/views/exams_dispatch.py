@@ -15,6 +15,7 @@ from django.db.models import Max
 from datetime import datetime, timedelta
 from ..models import *
 from ..forms import ProyectoForm, RegistroDemograficoForm, CognitivoAnamnesisForm
+from .exam_builder import builder_result_response, realizar_examen_builder
 import json
 import requests
 import logging
@@ -168,8 +169,7 @@ def realizar_examen(request, visita_id, examen_id, paciente_id):
 
     config = exam_config.get(int(examen_id))
     if not config:
-        messages.error(request, "Examen no encontrado")
-        return redirect("detalle_paciente", paciente_id=paciente_id)
+        return realizar_examen_builder(request, visita_id, examen_id, paciente_id)
 
     # Obtener datos existentes
     paciente = get_object_or_404(DatosDemograficos, id=paciente_id)
@@ -981,6 +981,10 @@ def ver_resultado_examen(request, visita_examen_id):
         return redirect(
             "detalle_paciente", paciente_id=visita_examen.visita.paciente.id
         )
+
+    br = builder_result_response(request, visita_examen)
+    if br is not None:
+        return br
 
     # SeguimientoIntervenciones - es diferente al resto
     if visita_examen.examen.nombre == "SeguimientoIntervencionesParticipantes_ANG":

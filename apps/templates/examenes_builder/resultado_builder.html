@@ -1,0 +1,63 @@
+{% extends "layouts/base.html" %}
+{% load form_builder_tags %}
+
+{% block title %}Resultado — {{ visita_examen.examen.nombre }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+  <div class="card shadow">
+    <div class="card-header">
+      <h2 class="mb-0">{{ visita_examen.examen.nombre }}</h2>
+      <small class="text-muted">{{ paciente }}</small>
+    </div>
+    <div class="card-body">
+      {% if submission.computed %}
+      <h4 class="mt-2">Valores calculados</h4>
+      <table class="table table-sm">
+        {% for k, v in submission.computed.items %}
+        <tr><th>{{ k }}</th><td>{{ v }}</td></tr>
+        {% endfor %}
+      </table>
+      {% endif %}
+
+      <h4 class="mt-4">Respuestas</h4>
+      <table class="table table-bordered">
+        <tbody>
+          {% for field in builder_fields %}
+            {% if field.type != 'section' and field.type != 'computed' and field.type != 'repeater' %}
+            <tr>
+              <th style="width:35%">{{ field.label }}</th>
+              <td>{{ submission.answers|get_item:field.id|default:"—" }}</td>
+            </tr>
+            {% elif field.type == 'repeater' %}
+            <tr>
+              <th colspan="2">{{ field.label }}</th>
+            </tr>
+            {% with rows=submission.answers|get_item:field.id %}
+              {% if rows %}
+                {% for row in rows %}
+                <tr><td colspan="2">
+                  <strong>Fila {{ forloop.counter }}</strong>
+                  <ul class="mb-0">
+                    {% for sf in field.fields %}
+                      {% if sf.type != 'section' %}
+                      <li><strong>{{ sf.label }}:</strong> {{ row|get_item:sf.id|default:"—" }}</li>
+                      {% endif %}
+                    {% endfor %}
+                  </ul>
+                </td></tr>
+                {% endfor %}
+              {% else %}
+                <tr><td colspan="2">—</td></tr>
+              {% endif %}
+            {% endwith %}
+            {% endif %}
+          {% endfor %}
+        </tbody>
+      </table>
+
+      <a href="{% url 'detalle_paciente' paciente.id %}" class="btn btn-secondary">Volver al paciente</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

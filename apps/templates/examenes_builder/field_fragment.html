@@ -1,0 +1,123 @@
+{% load form_builder_tags %}
+{% with t=field.type %}
+{% if t == 'section' %}
+  <h4 class="mt-4 text-primary">{{ field.label }}</h4>
+{% elif t == 'computed' %}
+  <div class="form-group fb-computed" data-formula="{{ field.formula|default:'' }}" data-id="{{ field.id }}"
+       data-depends="{{ field.depends_on|default_if_none:''|join:',' }}">
+    <label>{{ field.label }}</label>
+    <input type="text" class="form-control" readonly id="computed_{{ field.id }}"
+           value="{{ datos_examen|get_item:field.id|default:'' }}">
+    {% if field.help_text %}<small class="text-muted">{{ field.help_text }}</small>{% endif %}
+  </div>
+{% elif t == 'repeater' %}
+  <div class="form-group fb-repeater" data-rid="{{ field.id }}">
+    <label class="font-weight-bold">{{ field.label }}</label>
+    {% with rows=datos_examen|get_item:field.id %}
+    <div class="repeater-rows">
+      {% if rows %}
+        {% for row in rows %}
+        <div class="border rounded p-3 mb-2 repeater-row" data-index="{{ forloop.counter0 }}">
+          {% for sf in field.fields %}
+            {% fb_concat field.id "__" forloop.parentloop.counter0 "__" as rp %}
+            {% include "examenes_builder/field_fragment.html" with field=sf datos_examen=row name_prefix=rp %}
+          {% endfor %}
+        </div>
+        {% endfor %}
+      {% else %}
+        <div class="border rounded p-3 mb-2 repeater-row" data-index="0">
+          {% for sf in field.fields %}
+            {% fb_concat field.id "__0__" as rp %}
+            {% include "examenes_builder/field_fragment.html" with field=sf datos_examen=None name_prefix=rp %}
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+    {% endwith %}
+    <button type="button" class="btn btn-sm btn-outline-primary fb-add-row mt-1">+ Agregar fila</button>
+  </div>
+{% else %}
+  {% fb_input_name name_prefix field.id as input_name %}
+  <div class="form-group fb-field mb-3"
+       {% if field.visible_when %}data-vw-field="{{ field.visible_when.field }}" data-vw-eq="{{ field.visible_when.equals|yesno:'true,false' }}"{% endif %}>
+    <label for="id_{{ input_name|slugify }}">{{ field.label }}{% if field.required %} <span class="text-danger">*</span>{% endif %}</label>
+    {% if field.help_text %}<small class="d-block text-muted mb-1">{{ field.help_text }}</small>{% endif %}
+
+    {% if t == 'textarea' %}
+      <textarea class="form-control" name="{{ input_name }}" id="id_{{ input_name|slugify }}" rows="3"
+        {% if field.required %}required{% endif %}>{{ datos_examen|get_item:field.id|default:'' }}</textarea>
+
+    {% elif t == 'number' %}
+      <input type="number" class="form-control fb-number" name="{{ input_name }}" id="id_{{ input_name|slugify }}"
+        value="{{ datos_examen|get_item:field.id|default:'' }}"
+        {% if field.min != None %}min="{{ field.min }}"{% endif %}
+        {% if field.max != None %}max="{{ field.max }}"{% endif %}
+        {% if field.required %}required{% endif %}>
+
+    {% elif t == 'date' %}
+      <input type="date" class="form-control" name="{{ input_name }}" id="id_{{ input_name|slugify }}"
+        value="{{ datos_examen|get_item:field.id|default:'' }}" {% if field.required %}required{% endif %}>
+
+    {% elif t == 'time' %}
+      <input type="time" class="form-control" name="{{ input_name }}" id="id_{{ input_name|slugify }}"
+        value="{{ datos_examen|get_item:field.id|default:'' }}" {% if field.required %}required{% endif %}>
+
+    {% elif t == 'email' %}
+      <input type="email" class="form-control" name="{{ input_name }}" id="id_{{ input_name|slugify }}"
+        value="{{ datos_examen|get_item:field.id|default:'' }}" {% if field.required %}required{% endif %}>
+
+    {% elif t == 'select' %}
+      <select class="form-control" name="{{ input_name }}" id="id_{{ input_name|slugify }}" {% if field.required %}required{% endif %}>
+        <option value="">—</option>
+        {% for opt in field.options %}
+          <option value="{{ opt.value }}" {% if datos_examen|get_item:field.id == opt.value %}selected{% endif %}>{{ opt.label }}</option>
+        {% endfor %}
+      </select>
+
+    {% elif t == 'radio' %}
+      {% for opt in field.options %}
+      <div class="custom-control custom-radio">
+        <input type="radio" class="custom-control-input" name="{{ input_name }}" id="{{ input_name|slugify }}_{{ forloop.counter }}"
+          value="{{ opt.value }}" {% if datos_examen|get_item:field.id == opt.value %}checked{% endif %}>
+        <label class="custom-control-label" for="{{ input_name|slugify }}_{{ forloop.counter }}">{{ opt.label }}</label>
+      </div>
+      {% endfor %}
+
+    {% elif t == 'checkbox' %}
+      <div class="custom-control custom-checkbox">
+        <input type="checkbox" class="custom-control-input" name="{{ input_name }}" id="id_{{ input_name|slugify }}"
+          {% if datos_examen|get_item:field.id %}checked{% endif %}>
+        <label class="custom-control-label" for="id_{{ input_name|slugify }}">Sí</label>
+      </div>
+
+    {% elif t == 'boolean' %}
+      <div class="custom-control custom-radio custom-control-inline">
+        <input type="radio" class="custom-control-input" name="{{ input_name }}" id="{{ input_name|slugify }}_si" value="true"
+          {% if datos_examen|get_item:field.id == True or datos_examen|get_item:field.id == 'true' %}checked{% endif %}>
+        <label class="custom-control-label" for="{{ input_name|slugify }}_si">Sí</label>
+      </div>
+      <div class="custom-control custom-radio custom-control-inline">
+        <input type="radio" class="custom-control-input" name="{{ input_name }}" id="{{ input_name|slugify }}_no" value="false"
+          {% if datos_examen|get_item:field.id == False or datos_examen|get_item:field.id == 'false' %}checked{% endif %}>
+        <label class="custom-control-label" for="{{ input_name|slugify }}_no">No</label>
+      </div>
+
+    {% elif t == 'multiselect' %}
+      {% with cur=datos_examen|get_item:field.id %}
+      {% for opt in field.options %}
+      <div class="custom-control custom-checkbox">
+        <input type="checkbox" class="custom-control-input" name="{{ input_name }}" id="{{ input_name|slugify }}_{{ forloop.counter }}"
+          value="{{ opt.value }}"
+          {% if cur|contains_val:opt.value %}checked{% endif %}>
+        <label class="custom-control-label" for="{{ input_name|slugify }}_{{ forloop.counter }}">{{ opt.label }}</label>
+      </div>
+      {% endfor %}
+      {% endwith %}
+
+    {% else %}
+      <input type="text" class="form-control" name="{{ input_name }}" id="id_{{ input_name|slugify }}"
+        value="{{ datos_examen|get_item:field.id|default:'' }}" {% if field.required %}required{% endif %}>
+    {% endif %}
+  </div>
+{% endif %}
+{% endwith %}

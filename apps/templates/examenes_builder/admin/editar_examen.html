@@ -1,0 +1,42 @@
+{% extends "layouts/base.html" %}
+{% block title %}Editar examen {{ examen.id }}{% endblock %}
+{% block content %}
+<div class="container-fluid mt-4">
+  <h1>{{ examen.nombre }}</h1>
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
+  <form method="post">
+    {% csrf_token %}
+    <div class="form-group">
+      <label>Nombre</label>
+      <input type="text" name="nombre" class="form-control" value="{{ examen.nombre }}">
+    </div>
+    <div class="form-group">
+      <label>Descripción</label>
+      <textarea name="descripcion" class="form-control" rows="2">{{ examen.descripcion }}</textarea>
+    </div>
+    <div class="form-group">
+      <label>Campos (JSON — lista o <code>{"fields": [...]}</code>)</label>
+      <textarea name="campos_json" class="form-control font-monospace" rows="24">{{ campos_str }}</textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Guardar</button>
+  </form>
+  <form method="post" action="{% url 'exam_builder_publish' examen.pk %}" class="d-inline">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-outline-secondary">Publicar versión de esquema</button>
+  </form>
+  <a href="{% url 'exam_builder_list' %}" class="btn btn-link">Volver</a>
+
+  <h3 class="mt-4">Versiones recientes</h3>
+  <ul>
+    {% for v in versions %}
+    <li>v{{ v.version }} — {{ v.created_at }}</li>
+    {% empty %}
+    <li>Ninguna aún</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}

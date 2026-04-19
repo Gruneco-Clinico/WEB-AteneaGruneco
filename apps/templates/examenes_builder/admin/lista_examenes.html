@@ -1,0 +1,21 @@
+{% extends "layouts/base.html" %}
+{% block title %}Form Builder — Exámenes{% endblock %}
+{% block content %}
+<div class="container-fluid mt-4">
+  <h1>Exámenes (Form Builder)</h1>
+  <p class="text-muted">Edite el JSON de <code>campos</code> para exámenes cuyo <code>id</code> no esté en el dispatch legacy. Asigne el examen al tipo de visita desde Proyectos o editando el JSON de <code>TipoVisita.examenes</code>.</p>
+  <table class="table table-striped">
+    <thead><tr><th>ID</th><th>Nombre</th><th>Campos</th><th></th></tr></thead>
+    <tbody>
+      {% for e in examenes %}
+      <tr>
+        <td>{{ e.id }}</td>
+        <td>{{ e.nombre }}</td>
+        <td>{% if e.campos %}{{ e.campos|length }} nodos{% else %}vacío{% endif %}</td>
+        <td><a href="{% url 'exam_builder_edit' e.pk %}" class="btn btn-sm btn-primary">Editar</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
