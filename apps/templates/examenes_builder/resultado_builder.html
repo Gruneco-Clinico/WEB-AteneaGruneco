@@ -23,36 +23,7 @@
       <h4 class="mt-4">Respuestas</h4>
       <table class="table table-bordered">
         <tbody>
-          {% for field in builder_fields %}
-            {% if field.type != 'section' and field.type != 'computed' and field.type != 'repeater' %}
-            <tr>
-              <th style="width:35%">{{ field.label }}</th>
-              <td>{{ submission.answers|get_item:field.id|default:"—" }}</td>
-            </tr>
-            {% elif field.type == 'repeater' %}
-            <tr>
-              <th colspan="2">{{ field.label }}</th>
-            </tr>
-            {% with rows=submission.answers|get_item:field.id %}
-              {% if rows %}
-                {% for row in rows %}
-                <tr><td colspan="2">
-                  <strong>Fila {{ forloop.counter }}</strong>
-                  <ul class="mb-0">
-                    {% for sf in field.fields %}
-                      {% if sf.type != 'section' %}
-                      <li><strong>{{ sf.label }}:</strong> {{ row|get_item:sf.id|default:"—" }}</li>
-                      {% endif %}
-                    {% endfor %}
-                  </ul>
-                </td></tr>
-                {% endfor %}
-              {% else %}
-                <tr><td colspan="2">—</td></tr>
-              {% endif %}
-            {% endwith %}
-            {% endif %}
-          {% endfor %}
+          {% include "examenes_builder/resultado_builder_fragment.html" with fields=builder_fields %}
         </tbody>
       </table>
 
