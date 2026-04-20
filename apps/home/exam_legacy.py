@@ -51,3 +51,10 @@ def is_legacy_examen(examen_id) -> bool:
         return int(examen_id) in LEGACY_REALIZAR_EXAMEN_IDS
     except (TypeError, ValueError):
         return False
+
+
+def examen_has_builder_schema(campos) -> bool:
+    """True si ``Examen.campos`` define al menos un nodo del form builder."""
+    from .form_builder.schema import normalize_schema
+
+    return bool(normalize_schema(campos))

@@ -1,7 +1,16 @@
 {% load form_builder_tags %}
 {% with t=field.type %}
 {% if t == 'section' %}
-  <h4 class="mt-4 text-primary">{{ field.label }}</h4>
+  <div class="fb-section-block fb-field mb-3"
+       {% if field.visible_when %}data-vw-cond="{{ field.visible_when|fb_attr_json }}"{% endif %}>
+    <h4 class="mt-4 text-primary mb-2">{{ field.label }}</h4>
+    {% if field.help_text %}<p class="text-muted small mb-2">{{ field.help_text }}</p>{% endif %}
+    {% if field.fields %}
+      {% for sf in field.fields %}
+        {% include "examenes_builder/field_fragment.html" with field=sf datos_examen=datos_examen name_prefix=name_prefix %}
+      {% endfor %}
+    {% endif %}
+  </div>
 {% elif t == 'computed' %}
   <div class="form-group fb-computed" data-formula="{{ field.formula|default:'' }}" data-id="{{ field.id }}"
        data-depends="{{ field.depends_on|default_if_none:''|join:',' }}">
@@ -11,8 +20,10 @@
     {% if field.help_text %}<small class="text-muted">{{ field.help_text }}</small>{% endif %}
   </div>
 {% elif t == 'repeater' %}
-  <div class="form-group fb-repeater" data-rid="{{ field.id }}">
-    <label class="font-weight-bold">{{ field.label }}</label>
+  <div class="form-group fb-repeater fb-field mb-3" data-rid="{{ field.id }}"
+       {% if field.visible_when %}data-vw-cond="{{ field.visible_when|fb_attr_json }}"{% endif %}>
+    <label class="font-weight-bold">{{ field.label }}{% if field.required %} <span class="text-danger">*</span>{% endif %}</label>
+    {% if field.help_text %}<small class="d-block text-muted mb-1">{{ field.help_text }}</small>{% endif %}
     {% with rows=datos_examen|get_item:field.id %}
     <div class="repeater-rows">
       {% if rows %}
@@ -34,12 +45,12 @@
       {% endif %}
     </div>
     {% endwith %}
-    <button type="button" class="btn btn-sm btn-outline-primary fb-add-row mt-1">+ Agregar fila</button>
+    <button type="button" class="btn btn-sm btn-outline-primary fb-add-row mt-1">{{ field.add_label|default:"+ Agregar fila" }}</button>
   </div>
 {% else %}
   {% fb_input_name name_prefix field.id as input_name %}
   <div class="form-group fb-field mb-3"
-       {% if field.visible_when %}data-vw-field="{{ field.visible_when.field }}" data-vw-eq="{{ field.visible_when.equals|yesno:'true,false' }}"{% endif %}>
+       {% if field.visible_when %}data-vw-cond="{{ field.visible_when|fb_attr_json }}"{% endif %}>
     <label for="id_{{ input_name|slugify }}">{{ field.label }}{% if field.required %} <span class="text-danger">*</span>{% endif %}</label>
     {% if field.help_text %}<small class="d-block text-muted mb-1">{{ field.help_text }}</small>{% endif %}
 
@@ -52,7 +63,13 @@
         value="{{ datos_examen|get_item:field.id|default:'' }}"
         {% if field.min != None %}min="{{ field.min }}"{% endif %}
         {% if field.max != None %}max="{{ field.max }}"{% endif %}
+        {% if field.step != None and field.step != '' %}step="{{ field.step }}"{% endif %}
         {% if field.required %}required{% endif %}>
+
+    {% elif t == 'text' and field.multiline %}
+      <textarea class="form-control" name="{{ input_name }}" id="id_{{ input_name|slugify }}"
+        rows="{{ field.rows|default:3 }}"
+        {% if field.required %}required{% endif %}>{{ datos_examen|get_item:field.id|default:'' }}</textarea>
 
     {% elif t == 'date' %}
       <input type="date" class="form-control" name="{{ input_name }}" id="id_{{ input_name|slugify }}"

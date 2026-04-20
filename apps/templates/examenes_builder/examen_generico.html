@@ -38,27 +38,65 @@
 {% block javascripts %}
 <script>
 (function() {
-  function evalVisible(wrap) {
-    var f = wrap.getAttribute('data-vw-field');
-    if (!f) return true;
-    var want = wrap.getAttribute('data-vw-eq');
-    var el = document.querySelector('[name="' + f + '"]');
-    if (!el) return true;
-    var val;
-    if (el.type === 'checkbox' && !el.name.includes('__')) {
-      val = el.checked ? 'true' : 'false';
-    } else if (el.type === 'radio') {
-      var sel = document.querySelector('[name="' + f + '"]:checked');
-      val = sel ? sel.value : '';
-    } else {
-      val = el.value;
+  function readControlValue(f) {
+    var els = document.querySelectorAll('[name="' + f + '"]');
+    if (!els.length) return undefined;
+    if (els.length > 1 && els[0].type === 'checkbox') {
+      var out = [];
+      for (var i = 0; i < els.length; i++) {
+        if (els[i].checked) out.push(els[i].value);
+      }
+      return out;
     }
-    if (want === 'true') return (val === 'true' || val === 'on' || val === '1');
-    if (want === 'false') return (val === 'false' || val === '' || val === '0');
+    var el = els[0];
+    if (el.type === 'checkbox' && !el.name.includes('__')) {
+      return el.checked;
+    }
+    if (el.type === 'radio') {
+      var sel = document.querySelector('[name="' + f + '"]:checked');
+      return sel ? sel.value : '';
+    }
+    return el.value;
+  }
+
+  function evalVisible(wrap) {
+    var j = wrap.getAttribute('data-vw-cond');
+    if (j) {
+      try {
+        var cond = JSON.parse(j);
+        var op = (cond.op || 'equals').toLowerCase();
+        var f = cond.field;
+        var expected = ('value' in cond) ? cond.value : cond.equals;
+        var actual = readControlValue(f);
+        if (op === 'not_equals') {
+          if (typeof expected === 'boolean') return Boolean(actual) !== expected;
+          return String(actual) !== String(expected);
+        }
+        if (op === 'contains') {
+          if (actual === undefined || actual === null) return false;
+          if (Array.isArray(actual)) {
+            var es = String(expected);
+            return actual.some(function(x) { return String(x) === es; });
+          }
+          return String(actual).indexOf(String(expected)) !== -1;
+        }
+        if (typeof expected === 'boolean') return Boolean(actual) === expected;
+        return String(actual) === String(expected);
+      } catch (e) { return true; }
+    }
+    var f2 = wrap.getAttribute('data-vw-field');
+    if (!f2) return true;
+    var want = wrap.getAttribute('data-vw-eq');
+    var val = readControlValue(f2);
+    if (want === 'true') return (val === true || val === 'true' || val === 'on' || val === '1');
+    if (want === 'false') return (val === false || val === 'false' || val === '' || val === '0');
     return String(val) === String(want);
   }
   function refreshVisibility() {
-    document.querySelectorAll('.fb-field[data-vw-field]').forEach(function(w) {
+    document.querySelectorAll('[data-vw-cond]').forEach(function (w) {
+      w.style.display = evalVisible(w) ? '' : 'none';
+    });
+    document.querySelectorAll('.fb-field[data-vw-field]').forEach(function (w) {
       w.style.display = evalVisible(w) ? '' : 'none';
     });
   }

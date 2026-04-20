@@ -3,16 +3,19 @@
 # Background:
 #   * The model ``home.Proyecto`` declares ``consentimiento_pdf``.
 #   * ``0001_initial.py`` also declares the column.
-#   * The former ``0002_proyecto_consentimiento_pdf.py`` (which added the column
-#     via AddField) was removed from the repo after its content was squashed
-#     into ``0001_initial``.
+#   * The former ``0002_proyecto_consentimiento_pdf`` used to add the column
+#     via AddField, but was later converted to a no-op (the column was
+#     squashed into 0001_initial).
 #   * Some environments were migrated before that squash and therefore never
-#     ran the AddField, so the physical column is missing in MySQL even though
-#     Django's migration state believes it should be there.
+#     ran the AddField, so the physical column may be missing in MySQL even
+#     though Django's migration state believes it should be there.
 #
-# This migration uses SeparateDatabaseAndState so the ORM state is NOT touched
-# (it is already correct from 0001_initial) and only the physical column is
-# ensured, idempotently, via information_schema.
+# This migration uses RunPython with introspection of ``information_schema``
+# so the ORM state is NOT touched (it is already correct from 0001_initial)
+# and only the physical column is ensured, idempotently.
+#
+# Safe to run on any environment: if the column already exists, the migration
+# becomes a no-op.
 
 from django.db import migrations
 
@@ -39,7 +42,6 @@ def ensure_consentimiento_pdf_column(apps, schema_editor):
                     "ADD COLUMN consentimiento_pdf VARCHAR(100) NULL"
                 )
         else:
-            # Sqlite / Postgres / others: try to detect via ORM introspection.
             columns = {
                 col.name
                 for col in connection.introspection.get_table_description(
@@ -68,7 +70,7 @@ def noop_reverse(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("home", "0002_exam_builder_schema_submission"),
+        ("home", "0008_exam_builder_schema_submission"),
     ]
 
     operations = [

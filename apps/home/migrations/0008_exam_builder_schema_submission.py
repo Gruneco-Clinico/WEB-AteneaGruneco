@@ -8,7 +8,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("home", "0001_initial"),
+        ("home", "0007_phase0_add_indexes"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 

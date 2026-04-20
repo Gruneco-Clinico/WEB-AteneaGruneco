@@ -199,6 +199,16 @@ urlpatterns = [
         name="exam_builder_list",
     ),
     path(
+        "builder/examenes/nuevo/",
+        views.exam_builder_create,
+        name="exam_builder_create",
+    ),
+    path(
+        "builder/examenes/preview/",
+        views.exam_builder_preview,
+        name="exam_builder_preview",
+    ),
+    path(
         "builder/examenes/<int:pk>/",
         views.exam_builder_edit,
         name="exam_builder_edit",

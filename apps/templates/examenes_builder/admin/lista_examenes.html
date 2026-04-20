@@ -1,17 +1,32 @@
 {% extends "layouts/base.html" %}
+{% load form_builder_tags %}
 {% block title %}Form Builder — Exámenes{% endblock %}
 {% block content %}
 <div class="container-fluid mt-4">
-  <h1>Exámenes (Form Builder)</h1>
-  <p class="text-muted">Edite el JSON de <code>campos</code> para exámenes cuyo <code>id</code> no esté en el dispatch legacy. Asigne el examen al tipo de visita desde Proyectos o editando el JSON de <code>TipoVisita.examenes</code>.</p>
+  <div class="d-flex justify-content-between align-items-center flex-wrap mb-3">
+    <h1 class="mb-0">Exámenes (Form Builder)</h1>
+    <a href="{% url 'exam_builder_create' %}" class="btn btn-primary">Crear examen</a>
+  </div>
+  <p class="text-muted">Editor visual para exámenes cuyo <code>id</code> no esté en el dispatch legacy. Asigne cada examen a un tipo de visita desde <code>/builder/tipo-visita/&lt;id&gt;/examenes/</code> o el flujo de proyectos.</p>
   <table class="table table-striped">
-    <thead><tr><th>ID</th><th>Nombre</th><th>Campos</th><th></th></tr></thead>
+    <thead><tr><th>ID</th><th>Nombre</th><th>Campos</th><th>Asignado a</th><th></th></tr></thead>
     <tbody>
       {% for e in examenes %}
       <tr>
         <td>{{ e.id }}</td>
         <td>{{ e.nombre }}</td>
         <td>{% if e.campos %}{{ e.campos|length }} nodos{% else %}vacío{% endif %}</td>
+        <td class="small">
+          {% if assignments|get_item:e.id %}
+            <ul class="mb-0 pl-3">
+              {% for tv in assignments|get_item:e.id %}
+                <li>{{ tv }}</li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <span class="text-muted">—</span>
+          {% endif %}
+        </td>
         <td><a href="{% url 'exam_builder_edit' e.pk %}" class="btn btn-sm btn-primary">Editar</a></td>
       </tr>
       {% endfor %}

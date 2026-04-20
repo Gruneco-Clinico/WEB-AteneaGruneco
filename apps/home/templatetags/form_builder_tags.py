@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
+import json
+
 from django import template
+from django.utils.html import escape
 
 register = template.Library()
 
@@ -33,3 +36,11 @@ def fb_input_name(prefix, fid):
 @register.simple_tag
 def fb_concat(*parts):
     return "".join(str(p) for p in parts)
+
+
+@register.filter
+def fb_attr_json(value):
+    """Serializa a JSON y escapa para usar dentro de un atributo HTML."""
+    if value is None:
+        return ""
+    return escape(json.dumps(value, default=str, ensure_ascii=False))

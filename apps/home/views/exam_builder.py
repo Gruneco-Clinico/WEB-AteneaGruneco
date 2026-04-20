@@ -4,13 +4,15 @@ import json
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.http import HttpResponseForbidden
+from django.http import HttpResponseForbidden, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.template.loader import render_to_string
 from django.utils import timezone
+from types import SimpleNamespace
 
 from ..form_builder.schema import normalize_schema, validate_and_parse_post
 from ..models import DatosDemograficos, Examen, ExamenSchemaVersion, ExamenSubmission, TipoVisita, Visita, VisitaExamen
-from ..exam_legacy import is_legacy_examen
+from ..exam_legacy import examen_has_builder_schema, is_legacy_examen
 
 
 def _staff(u):
@@ -115,8 +117,11 @@ def guardar_examen_builder(request):
         messages.error(request, "No se puede guardar: visita firmada.")
         return redirect("detalle_paciente", paciente_id=paciente_id)
 
-    if is_legacy_examen(examen_id):
-        messages.error(request, "Este examen usa el flujo legacy, no el builder.")
+    if not examen_has_builder_schema(examen.campos):
+        messages.error(
+            request,
+            "Este examen no tiene formulario dinámico configurado (campos vacíos).",
+        )
         return redirect("detalle_paciente", paciente_id=paciente_id)
 
     answers, computed, errors = validate_and_parse_post(examen.campos, request.POST)
@@ -153,14 +158,71 @@ def guardar_examen_builder(request):
     return redirect("detalle_paciente", paciente_id=paciente_id)
 
 
+def _examen_assignments_by_tipo_visita():
+    """{examen_id: [\"Tipo (Proyecto)\", ...]} desde TipoVisita.examenes (lista JSON)."""
+    assign = {}
+    for tv in TipoVisita.objects.select_related("proyecto").all():
+        raw = tv.examenes
+        if not isinstance(raw, list):
+            continue
+        label = f"{tv.nombre} ({tv.proyecto.nombre})"
+        for item in raw:
+            if not isinstance(item, dict):
+                continue
+            try:
+                eid = int(item.get("id"))
+            except (TypeError, ValueError):
+                continue
+            assign.setdefault(eid, []).append(label)
+    return assign
+
+
 @login_required
 @user_passes_test(_staff)
 def exam_builder_list(request):
     examenes = Examen.objects.all().order_by("nombre")
+    assignments = _examen_assignments_by_tipo_visita()
     return render(
         request,
         "examenes_builder/admin/lista_examenes.html",
-        {"examenes": examenes},
+        {
+            "examenes": examenes,
+            "assignments": assignments,
+        },
+    )
+
+
+@login_required
+@user_passes_test(_staff)
+def exam_builder_create(request):
+    if request.method == "POST":
+        nombre = (request.POST.get("nombre") or "").strip()
+        if not nombre:
+            messages.error(request, "El nombre del examen es obligatorio.")
+            return redirect("exam_builder_create")
+        categoria = request.POST.get("categoria") or "OTROS"
+        valid_cats = {c[0] for c in Examen.CATEGORIA_CHOICES}
+        if categoria not in valid_cats:
+            categoria = "OTROS"
+        descripcion = request.POST.get("descripcion") or ""
+        examen = Examen.objects.create(
+            nombre=nombre,
+            categoria=categoria,
+            descripcion=descripcion,
+            campos=[],
+        )
+        messages.success(
+            request,
+            "Examen creado. Agregue campos en el editor visual y guarde.",
+        )
+        return redirect("exam_builder_edit", pk=examen.pk)
+
+    return render(
+        request,
+        "examenes_builder/admin/crear_examen.html",
+        {
+            "categorias": Examen.CATEGORIA_CHOICES,
+        },
     )
 
 
@@ -171,6 +233,10 @@ def exam_builder_edit(request, pk):
     if request.method == "POST":
         examen.nombre = request.POST.get("nombre", examen.nombre).strip()
         examen.descripcion = request.POST.get("descripcion", "")
+        cat = request.POST.get("categoria") or examen.categoria
+        valid_cats = {c[0] for c in Examen.CATEGORIA_CHOICES}
+        if cat in valid_cats:
+            examen.categoria = cat
         raw = request.POST.get("campos_json", "").strip()
         try:
             parsed = json.loads(raw) if raw else []
@@ -184,7 +250,17 @@ def exam_builder_edit(request, pk):
             messages.error(request, f"JSON inválido: {exc}")
             return redirect("exam_builder_edit", pk=pk)
         examen.save()
-        messages.success(request, "Examen actualizado. Use Publicar para fijar versión.")
+        if request.POST.get("publicar"):
+            ensure_schema_version(examen, request.user)
+            messages.success(
+                request,
+                "Examen actualizado y versión de esquema publicada.",
+            )
+        else:
+            messages.success(
+                request,
+                "Examen actualizado. Marque «Publicar al guardar» para fijar versión.",
+            )
         return redirect("exam_builder_edit", pk=pk)
 
     campos_str = json.dumps(
@@ -193,6 +269,7 @@ def exam_builder_edit(request, pk):
         indent=2,
     )
     versions = examen.schema_versions.all()[:15]
+    initial_fields = normalize_schema(examen.campos)
     return render(
         request,
         "examenes_builder/admin/editar_examen.html",
@@ -200,8 +277,42 @@ def exam_builder_edit(request, pk):
             "examen": examen,
             "campos_str": campos_str,
             "versions": versions,
+            "categorias": Examen.CATEGORIA_CHOICES,
+            "initial_fields": initial_fields,
         },
     )
+
+
+@login_required
+@user_passes_test(_staff)
+def exam_builder_preview(request):
+    """POST: devuelve HTML del formulario dinámico (solo lectura) para vista previa."""
+    if request.method != "POST":
+        return HttpResponseForbidden()
+    raw = request.POST.get("campos_json", "").strip()
+    titulo = (request.POST.get("titulo_preview") or "Vista previa").strip()
+    try:
+        parsed = json.loads(raw) if raw else []
+        if isinstance(parsed, dict) and "fields" in parsed:
+            parsed = parsed["fields"]
+        if not isinstance(parsed, list):
+            raise ValueError("campos debe ser una lista")
+    except (json.JSONDecodeError, ValueError) as exc:
+        return JsonResponse({"ok": False, "error": str(exc)}, status=400)
+
+    fields = normalize_schema(parsed)
+    examen = SimpleNamespace(id=0, nombre=titulo)
+    html = render_to_string(
+        "examenes_builder/preview_fragment.html",
+        {
+            "builder_fields": fields,
+            "datos_examen": {},
+            "examen": examen,
+            "builder_preview_mode": True,
+        },
+        request=request,
+    )
+    return JsonResponse({"ok": True, "html": html})
 
 
 @login_required
@@ -248,7 +359,9 @@ def exam_builder_tipo_visita_edit(request, pk):
 @login_required
 def builder_result_response(request, visita_examen):
     """Si el examen es dinámico y hay submission, devuelve HttpResponse; si no, None."""
-    if is_legacy_examen(visita_examen.examen_id):
+    if is_legacy_examen(visita_examen.examen_id) and not examen_has_builder_schema(
+        visita_examen.examen.campos
+    ):
         return None
     try:
         submission = visita_examen.builder_submission
