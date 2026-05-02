@@ -42,11 +42,10 @@ class Visita(models.Model):
             ("cerrada", "Cerrada"),
         ],
         default="abierta",
-        db_index=True,
     )
 
     # Indica si la visita fue firmada (no se podrán editar exámenes relacionados si es True)
-    firmado = models.BooleanField(default=False, verbose_name="Firmado", db_index=True)
+    firmado = models.BooleanField(default=False, verbose_name="Firmado")
     firmado_por = models.ForeignKey(
         User, on_delete=models.SET_NULL, null=True, blank=True, related_name="visitas_firmadas"
     )
@@ -58,12 +57,6 @@ class Visita(models.Model):
 
     # Audit trail — tracks all changes with user and timestamp
     history = HistoricalRecords()
-
-    class Meta:
-        indexes = [
-            models.Index(fields=["paciente", "estado_visita"], name="visita_pac_estado_idx"),
-            models.Index(fields=["paciente", "fecha"], name="visita_pac_fecha_idx"),
-        ]
 
     def __str__(self):
         if self.Tipo_visita and self.Tipo_visita.proyecto:
@@ -130,7 +123,6 @@ class VisitaExamen(models.Model):
         ],
         default="pendiente",
         verbose_name="Estado del Examen",
-        db_index=True,
     )
 
     # Fechas de seguimiento
@@ -157,9 +149,6 @@ class VisitaExamen(models.Model):
 
     class Meta:
         unique_together = ["visita", "examen"]
-        indexes = [
-            models.Index(fields=["visita", "estado"], name="visitaexam_visita_estado_idx"),
-        ]
         verbose_name = "Examen de Visita"
         verbose_name_plural = "Exámenes de Visita"
         ordering = ["fecha_creacion"]

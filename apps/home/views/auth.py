@@ -11,7 +11,6 @@ from django.forms.models import model_to_dict
 from django.contrib.auth.models import User
 from django.views.generic import TemplateView
 from django.core.mail import send_mail, EmailMessage
-from django.core.paginator import Paginator
 from django.db.models import Max, Count, Q
 from datetime import datetime, timedelta
 from ..models import *
@@ -148,11 +147,7 @@ def administrar_usuarios(request):
         return redirect("index")
 
     # Obtener lista de usuarios
-    usuarios_qs = User.objects.all().order_by("-date_joined")
-
-    paginator = Paginator(usuarios_qs, 100)
-    page_number = request.GET.get("page", 1)
-    page_obj = paginator.get_page(page_number)
+    usuarios_list = User.objects.all().order_by("-date_joined")
 
     # Estadísticas: pacientes vistos por usuario por proyecto
     stats_usuario_proyecto = (
@@ -173,11 +168,10 @@ def administrar_usuarios(request):
 
     # Preparar contexto inicial
     context = {
-        "usuarios": page_obj,
-        "page_obj": page_obj,
-        "total_usuarios": usuarios_qs.count(),
-        "usuarios_activos": usuarios_qs.filter(is_active=True).count(),
-        "administradores": usuarios_qs.filter(is_superuser=True).count(),
+        "usuarios": usuarios_list,
+        "total_usuarios": usuarios_list.count(),
+        "usuarios_activos": usuarios_list.filter(is_active=True).count(),
+        "administradores": usuarios_list.filter(is_superuser=True).count(),
         "stats_usuario_proyecto": list(stats_usuario_proyecto),
         "stats_usuario_proyecto_json": json.dumps(list(stats_usuario_proyecto)),
     }

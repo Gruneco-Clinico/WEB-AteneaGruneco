@@ -67,29 +67,23 @@ def _build_codigos_map(pacientes_qs):
 
 @login_required
 def lista_pacientes(request):
-    pacientes_qs = DatosDemograficos.objects.all()
+    pacientes = DatosDemograficos.objects.all()
     proyectos = Proyecto.objects.all()
     filtro_proyecto = request.GET.get("proyecto", "")
     if filtro_proyecto:
         try:
-            pacientes_qs = pacientes_qs.filter(proyectos__id=int(filtro_proyecto))
+            pacientes = pacientes.filter(proyectos__id=int(filtro_proyecto))
         except (ValueError, TypeError):
             pass
-
-    paginator = Paginator(pacientes_qs, 100)
-    page_number = request.GET.get("page", 1)
-    page_obj = paginator.get_page(page_number)
-
-    codigos_map = _build_codigos_map(page_obj)
+    codigos_map = _build_codigos_map(pacientes)
     # Attach codes to each patient object for easy template access
-    for pac in page_obj:
+    for pac in pacientes:
         pac.codigos_list = codigos_map.get(pac.id, [])
     return render(
         request,
         "home/tables.html",
         {
-            "pacientes": page_obj,
-            "page_obj": page_obj,
+            "pacientes": pacientes,
             "proyectos": proyectos,
             "filtro_proyecto": filtro_proyecto,
             "codigos_map": codigos_map,
