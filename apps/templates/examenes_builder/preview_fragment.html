@@ -1,7 +1,5 @@
 {% load form_builder_tags %}
 <div class="fb-preview-root border rounded p-3 bg-white">
-  <p class="text-muted small mb-3">Vista previa: los datos no se guardan. Condicionales y repetidores son interactivos.</p>
-  {% for field in builder_fields %}
-    {% include "examenes_builder/field_fragment.html" with field=field datos_examen=datos_examen name_prefix="" %}
-  {% endfor %}
+  <p class="text-muted small mb-3">Vista previa: los datos no se guardan. Las pestañas, condicionales y repetidores son interactivos.</p>
+  {% include "examenes_builder/_tabs_layout.html" with builder_fields=builder_fields datos_examen=datos_examen tabs_prefix="fbpv" %}
 </div>

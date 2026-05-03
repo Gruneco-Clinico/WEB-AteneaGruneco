@@ -1,0 +1,62 @@
+[
+  {
+    "name": "equals_match",
+    "cond": { "field": "fuma", "equals": "si" },
+    "answers": { "fuma": "si" },
+    "expected": true
+  },
+  {
+    "name": "equals_no_match",
+    "cond": { "field": "fuma", "equals": "si" },
+    "answers": { "fuma": "no" },
+    "expected": false
+  },
+  {
+    "name": "equals_field_missing",
+    "cond": { "field": "fuma", "equals": "si" },
+    "answers": {},
+    "expected": false
+  },
+  {
+    "name": "not_equals_match",
+    "cond": { "field": "tipo", "op": "not_equals", "value": "A" },
+    "answers": { "tipo": "B" },
+    "expected": true
+  },
+  {
+    "name": "not_equals_no_match",
+    "cond": { "field": "tipo", "op": "not_equals", "value": "A" },
+    "answers": { "tipo": "A" },
+    "expected": false
+  },
+  {
+    "name": "contains_in_list",
+    "cond": { "field": "tags", "op": "contains", "value": "rojo" },
+    "answers": { "tags": ["rojo", "azul"] },
+    "expected": true
+  },
+  {
+    "name": "contains_not_in_list",
+    "cond": { "field": "tags", "op": "contains", "value": "verde" },
+    "answers": { "tags": ["rojo", "azul"] },
+    "expected": false
+  },
+  {
+    "name": "contains_substring",
+    "cond": { "field": "obs", "op": "contains", "value": "urg" },
+    "answers": { "obs": "es urgente revisar" },
+    "expected": true
+  },
+  {
+    "name": "no_visible_when_means_visible",
+    "cond": null,
+    "answers": {},
+    "expected": true
+  },
+  {
+    "name": "no_field_means_visible",
+    "cond": { "equals": "x" },
+    "answers": {},
+    "expected": true
+  }
+]

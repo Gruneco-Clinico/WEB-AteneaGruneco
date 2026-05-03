@@ -47,8 +47,8 @@ flowchart TB
 
 | Zona | Uso |
 |------|-----|
-| **Paleta** | Añade un **nuevo** bloque o campo del tipo elegido (sección, texto, número, etc.). |
-| **Lienzo** | Muestra la **estructura** del formulario. Puede **arrastrar** tarjetas para reordenar. Cada tarjeta tiene acciones (eliminar, duplicar, mover dentro de sección o repetidor). |
+| **Paleta** | Añade un **nuevo** bloque o campo del tipo elegido (sección, texto, número, etc.). Tiene **buscador rápido** (atajo `/`) y **drag & drop** hacia el lienzo. La paleta es **contextual**: si tiene una sección o repetidor seleccionado en el lienzo, el clic añade el campo dentro de ese contenedor. Active la casilla *"Añadir siempre a raíz"* para forzar el nivel raíz. |
+| **Lienzo** | Muestra la **estructura** del formulario como árbol. Puede **arrastrar** tarjetas (incluido desde la paleta) para colocar y reordenar. Cada tarjeta tiene acciones (eliminar, duplicar, subir/bajar). Las secciones top-level llevan un **número** (la pestaña que verá el paciente) y un icono `◎` si tienen visibilidad condicional. |
 | **Propiedades** | Al **seleccionar** una tarjeta en el lienzo, aquí se editan etiqueta, id, obligatoriedad, opciones, condiciones de visibilidad, etc. |
 
 ### Pestañas
@@ -87,7 +87,9 @@ Todos los campos con valor (excepto la **sección**) tienen un **`id`**: es la *
 
 - **Qué es:** un **título de bloque** que agrupa otros campos **por debajo** en el árbol.
 - **Propiedades:** etiqueta, texto de ayuda opcional, **visibilidad condicional** opcional.
-- **Comportamiento:** si la sección está oculta por condición, en el servidor **no se exigen** validaciones de los campos internos de esa sección.
+- **Comportamiento en el editor:** se ve como una tarjeta anidada con sus campos hijos. Tiene un botón **«+ Añadir campo»** que despliega TODOS los tipos permitidos para añadir directamente dentro.
+- **Comportamiento en el paciente / vista previa:** cada sección top-level se muestra como una **pestaña** (ver §11). Si la sección está oculta por condición, su pestaña desaparece y, si era la activa, el sistema cambia automáticamente a la primera visible. En el servidor **no se exigen** validaciones de los campos internos de una sección oculta.
+- **Restricción:** no se permite anidar secciones dentro de secciones, ni anidar repetidores dentro de repetidores. El editor lo bloquea al guardar.
 
 ### Texto corto (`text`)
 
@@ -168,9 +170,14 @@ El editor adapta el control de **valor esperado** al tipo del campo dependiente 
 
 ## 6. Orden, duplicado y validaciones del editor
 
-- **Arrastrar** tarjetas en el lienzo reordena el formulario (incluido dentro de secciones y repetidores, según la jerarquía).
+- **Arrastrar** tarjetas en el lienzo reordena el formulario (incluido dentro y entre secciones / repetidores). También se puede arrastrar **desde la paleta** directamente al contenedor deseado.
 - **Duplicar** crea una copia; el sistema suele **sufijar el id** para evitar colisiones — revíselo en propiedades.
-- Al **guardar** el examen, el cliente puede avisar si faltan **ids**, hay **ids duplicados**, opciones vacías en listas, o un calculado sin fórmula o sin dependencias.
+- **Atajos de teclado del editor:**
+  - `/` enfoca el buscador de la paleta.
+  - `Esc` cancela un arrastre activo o cierra menús abiertos.
+  - `Shift + ↑` saca el campo seleccionado de su sección/repetidor (lo sube un nivel).
+  - `Shift + ↓` introduce el campo seleccionado en la siguiente sección/repetidor hermana.
+- Al **guardar** el examen, el cliente bloquea el envío si faltan **ids**, hay **ids duplicados**, opciones vacías en listas, un calculado sin fórmula o sin dependencias, o si hay anidación inválida (sección dentro de sección, repetidor dentro de repetidor). Avisos no bloqueantes (confirmación): más de 9 secciones, etiquetas de sección duplicadas, vacías o muy largas (>28 caracteres, se truncan en pestañas).
 
 ---
 
@@ -221,6 +228,41 @@ sequenceDiagram
 
 ---
 
+## 9bis. Pestañas en vista previa y en la visita del paciente
+
+Desde 2026 el formulario que ve el paciente y la **vista previa** del editor renderizan la estructura de la misma forma:
+
+- Cada **sección top-level** del lienzo se convierte en una **pestaña** (numerada en orden).
+- Los campos que estén **fuera de toda sección** aparecen como un bloque **«general»** antes de las pestañas.
+- Si una sección tiene **visibilidad condicional**, su pestaña aparece solo cuando se cumple la condición; si la pestaña activa deja de cumplir, el sistema selecciona automáticamente la siguiente visible.
+- Los **repetidores** y los campos **calculados (IMC, etc.)** funcionan igual dentro de una pestaña.
+
+```mermaid
+flowchart LR
+  Editor["Editor (outline)"] -->|JSON| Render["Renderer compartido<br/>(_tabs_layout.html)"]
+  Render --> Preview["Vista previa<br/>(pestaña Vista previa)"]
+  Render --> Runtime["Visita del paciente<br/>(examen_generico.html)"]
+```
+
+**Regla operativa**: lo que ve en *Vista previa* es lo mismo que verá el paciente. Use esa pestaña para validar el flujo completo antes de publicar.
+
+### Adaptaciones automáticas
+
+| Situación | Comportamiento |
+|-----------|---------------|
+| Más de 7 secciones | La barra de pestañas permite scroll horizontal; las etiquetas se truncan a 9rem. |
+| Pantalla < 768 px (móvil/tablet) | Las pestañas degradan a **acordeón**: todos los paneles se muestran apilados con su título encima. |
+| Sección sin etiqueta | Aparece como `(sin etiqueta)` en la pestaña — corregirlo antes de publicar. |
+| Etiqueta > 28 caracteres | Se trunca con `…`; el editor avisa al guardar. |
+
+### Buenas prácticas
+
+- Use **3–7 secciones** por examen; nombres cortos y específicos.
+- Coloque preguntas de **filtro** (las que activan visibilidad condicional de otras) en una sección temprana (idealmente la primera).
+- Si una sección agrupa subgrupos (p. ej. *Examen físico → Cabeza, Tórax, Abdomen*), evalúe usar **secciones separadas** en lugar de anidar visualmente con texto en las etiquetas.
+
+---
+
 ## 10. Dónde encontrar las pantallas en la aplicación
 
 Las rutas internas de Django suelen incluir (nombres `name` en `urls.py`):
@@ -233,4 +275,4 @@ La URL exacta depende del prefijo montado en su instalación (`/.../`). Si no la
 
 ---
 
-*Última actualización alineada con el editor en paleta + lienzo + propiedades, SortableJS, vista previa, publicación al guardar y plantilla `field_fragment.html`.*
+*Última actualización: paleta contextual y drag & drop hacia secciones, atajos de teclado (`/`, `Esc`, `Shift + ↑/↓`), pestañas en runtime y vista previa (renderer compartido `_tabs_layout.html` + `runtime.js`), validación de anidación, avisos de cantidad de secciones y etiquetas largas. Ver [analysis/FORM_BUILDER_DND_TABS_ADR.md](analysis/FORM_BUILDER_DND_TABS_ADR.md) para la decisión y los detalles técnicos.*

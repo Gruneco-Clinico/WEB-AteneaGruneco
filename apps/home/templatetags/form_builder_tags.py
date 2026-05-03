@@ -44,3 +44,25 @@ def fb_attr_json(value):
     if value is None:
         return ""
     return escape(json.dumps(value, default=str, ensure_ascii=False))
+
+
+def _field_type(f):
+    if isinstance(f, dict):
+        return (f.get("type") or "").strip()
+    return (getattr(f, "type", "") or "").strip()
+
+
+@register.filter
+def fb_filter_sections(fields):
+    """Devuelve solo los campos top-level cuyo type == 'section'."""
+    if not fields:
+        return []
+    return [f for f in fields if _field_type(f) == "section"]
+
+
+@register.filter
+def fb_filter_non_sections(fields):
+    """Devuelve solo los campos top-level cuyo type != 'section'."""
+    if not fields:
+        return []
+    return [f for f in fields if _field_type(f) != "section"]

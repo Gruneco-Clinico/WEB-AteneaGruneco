@@ -22,6 +22,20 @@
     computed: 'Calculado',
   };
 
+  var SOFT_SECTION_LIMIT = 9;
+
+  function isAllowedTypeIn(type, parentType) {
+    if (parentType === 'section') return type !== 'section';
+    if (parentType === 'repeater') return type !== 'section' && type !== 'repeater';
+    return true;
+  }
+
+  function countTopLevelSections(fields) {
+    var c = 0;
+    for (var i = 0; i < fields.length; i++) if ((fields[i].type || '') === 'section') c++;
+    return c;
+  }
+
   function slugify(s) {
     if (!s) return 'campo';
     var x = String(s)
@@ -217,13 +231,20 @@
     });
   }
 
-  function validateState(fields, errs) {
+  function validateState(fields, errs, warns) {
     errs = errs || [];
+    warns = warns || [];
     var seen = {};
-    function walk(nodes) {
+    function walk(nodes, parentType) {
       for (var i = 0; i < nodes.length; i++) {
         var n = nodes[i];
         var t = n.type || 'text';
+        if (parentType === 'section' && t === 'section') {
+          errs.push('No se permite anidar secciones (sección «' + (n.label || '') + '»).');
+        }
+        if (parentType === 'repeater' && (t === 'section' || t === 'repeater')) {
+          errs.push('Dentro de un repetidor no se permiten ' + (t === 'section' ? 'secciones' : 'repetidores anidados') + ' (en «' + (n.label || n.id || '') + '»).');
+        }
         if (t !== 'section') {
           if (!n.id || !String(n.id).trim()) errs.push('Cada campo (excepto sección) necesita un id.');
           else {
@@ -243,95 +264,44 @@
           if (!n.depends_on || !n.depends_on.length)
             errs.push('Campo calculado «' + (n.label || n.id) + '»: indique al menos una dependencia.');
         }
-        if (n.fields && n.fields.length) walk(n.fields);
+        if (n.fields && n.fields.length) walk(n.fields, t);
       }
     }
-    walk(fields);
+    walk(fields, null);
+
+    var topSections = countTopLevelSections(fields);
+    if (topSections > SOFT_SECTION_LIMIT) {
+      warns.push(
+        'Hay ' + topSections + ' secciones (recomendado ≤ ' + SOFT_SECTION_LIMIT +
+        '). En la vista del paciente se mostrarán como pestañas y podrían ser muchas.'
+      );
+    }
+    var seenSectionLabels = {};
+    fields.forEach(function (n) {
+      if ((n.type || '') !== 'section') return;
+      var lbl = String(n.label || '').trim();
+      if (!lbl) {
+        warns.push('Hay una sección sin etiqueta; revise la pestaña que verá el paciente.');
+        return;
+      }
+      if (seenSectionLabels[lbl]) warns.push('Etiqueta de sección duplicada: «' + lbl + '».');
+      seenSectionLabels[lbl] = true;
+      if (lbl.length > 28) warns.push('Etiqueta de sección muy larga (>28): «' + lbl + '». Se truncará en pestañas.');
+    });
     return errs;
   }
 
+  /**
+   * Inicializa visibilidad condicional, repetidores y cómputos en un fragmento
+   * cargado por el preview. Usa el runtime compartido (`window.FBRuntime`) si
+   * está disponible (preferido). Si no, omite la inicialización y solo dispara
+   * un evento custom para que el host pueda reaccionar.
+   */
   function initVisibilityAndRepeater(root) {
-    function readControlValue(f) {
-      var els = root.querySelectorAll('[name="' + f + '"]');
-      if (!els.length) return undefined;
-      if (els.length > 1 && els[0].type === 'checkbox') {
-        var out = [];
-        for (var i = 0; i < els.length; i++) {
-          if (els[i].checked) out.push(els[i].value);
-        }
-        return out;
-      }
-      var el = els[0];
-      if (el.type === 'checkbox' && !el.name.includes('__')) return el.checked;
-      if (el.type === 'radio') {
-        var sel = root.querySelector('[name="' + f + '"]:checked');
-        return sel ? sel.value : '';
-      }
-      return el.value;
+    if (global.FBRuntime && typeof global.FBRuntime.init === 'function') {
+      global.FBRuntime.init(root);
+      return;
     }
-
-    function evalVisible(wrap) {
-      var j = wrap.getAttribute('data-vw-cond');
-      if (j) {
-        try {
-          var cond = JSON.parse(j);
-          var op = (cond.op || 'equals').toLowerCase();
-          var f = cond.field;
-          var expected = 'value' in cond ? cond.value : cond.equals;
-          var actual = readControlValue(f);
-          if (op === 'not_equals') {
-            if (typeof expected === 'boolean') return Boolean(actual) !== expected;
-            return String(actual) !== String(expected);
-          }
-          if (op === 'contains') {
-            if (actual === undefined || actual === null) return false;
-            if (Array.isArray(actual)) {
-              var es = String(expected);
-              return actual.some(function (x) {
-                return String(x) === es;
-              });
-            }
-            return String(actual).indexOf(String(expected)) !== -1;
-          }
-          if (typeof expected === 'boolean') return Boolean(actual) === expected;
-          return String(actual) === String(expected);
-        } catch (e) {
-          return true;
-        }
-      }
-      return true;
-    }
-
-    function refreshVisibility() {
-      root.querySelectorAll('[data-vw-cond]').forEach(function (w) {
-        w.style.display = evalVisible(w) ? '' : 'none';
-      });
-    }
-
-    root.addEventListener('change', refreshVisibility);
-    root.addEventListener('input', refreshVisibility);
-    refreshVisibility();
-
-    root.querySelectorAll('.fb-repeater').forEach(function (rep) {
-      var tplRow = rep.querySelector('.repeater-row');
-      var rowsWrap = rep.querySelector('.repeater-rows');
-      var btn = rep.querySelector('.fb-add-row');
-      if (!tplRow || !rowsWrap || !btn) return;
-      btn.addEventListener('click', function () {
-        var rows = rowsWrap.querySelectorAll('.repeater-row');
-        var idx = rows.length;
-        var clone = tplRow.cloneNode(true);
-        clone.setAttribute('data-index', idx);
-        clone.querySelectorAll('[name]').forEach(function (inp) {
-          var n = inp.getAttribute('name');
-          if (!n) return;
-          inp.setAttribute('name', n.replace(/__\d+__/g, '__' + idx + '__'));
-          if (inp.type === 'checkbox' || inp.type === 'radio') inp.checked = false;
-          else inp.value = '';
-        });
-        rowsWrap.appendChild(clone);
-      });
-    });
   }
 
   function FormBuilder() {}
@@ -357,11 +327,20 @@
       preview: rootEl.querySelector('[data-fb-preview]'),
       hiddenJson: rootEl.querySelector('input[name="campos_json"]'),
       form: rootEl.querySelector('form[data-fb-main-form]'),
+      paletteTarget: null,
+      paletteRootToggle: null,
+      aria: null,
     };
 
     if (!el.form || !el.hiddenJson || !el.canvas || !el.props) {
       return;
     }
+
+    el.aria = document.createElement('div');
+    el.aria.className = 'sr-only fb-aria-live';
+    el.aria.setAttribute('aria-live', 'polite');
+    el.aria.setAttribute('aria-atomic', 'true');
+    rootEl.appendChild(el.aria);
 
     function destroySortables() {
       sortables.forEach(function (s) {
@@ -405,6 +384,7 @@
       }
       syncHiddenJson();
       if (!opts.skipProps) renderProps();
+      if (typeof renderPaletteTarget === 'function') renderPaletteTarget();
     }
 
     function renderCard(node, parentKey) {
@@ -420,22 +400,52 @@
       handle.className = 'fb-card-handle';
       handle.innerHTML = '&#9776;';
       handle.title = 'Arrastrar';
+      handle.setAttribute('aria-label', 'Arrastrar para reordenar');
+      handle.setAttribute('role', 'button');
       var title = document.createElement('div');
       title.className = 'fb-card-title';
       var t = node.type || 'text';
-      var tit =
-        t === 'section'
-          ? '[Sección] ' + (node.label || '')
-          : '[' + (TYPE_LABELS[t] || t) + '] ' + (node.label || node.id || '');
-      title.textContent = tit;
+
+      if (t === 'section' && !parentKey) {
+        var idx = state.fields.indexOf(node);
+        if (idx >= 0) {
+          var badge = document.createElement('span');
+          badge.className = 'fb-section-badge';
+          badge.textContent = String(idx + 1);
+          badge.title = 'Pestaña ' + (idx + 1) + ' en la vista del paciente';
+          title.appendChild(badge);
+        }
+      }
+
+      var typeTag = document.createElement('span');
+      typeTag.className = 'fb-card-type';
+      typeTag.textContent = '[' + (TYPE_LABELS[t] || t) + ']';
+      title.appendChild(typeTag);
+
+      var titleText = document.createElement('span');
+      titleText.className = 'fb-card-label';
+      titleText.textContent = ' ' + (node.label || node.id || '');
+      title.appendChild(titleText);
+
+      if (node.visible_when) {
+        var vwIcon = document.createElement('span');
+        vwIcon.className = 'fb-card-vw';
+        vwIcon.innerHTML = '&#9678;';
+        vwIcon.title = 'Visibilidad condicional activa';
+        vwIcon.setAttribute('aria-label', 'Visibilidad condicional');
+        title.appendChild(vwIcon);
+      }
+
       var actions = document.createElement('div');
       actions.className = 'fb-card-actions btn-group';
 
-      function mkBtn(label, fn) {
+      function mkBtn(label, ariaLabel, fn) {
         var b = document.createElement('button');
         b.type = 'button';
         b.className = 'btn btn-sm btn-outline-secondary';
         b.textContent = label;
+        b.setAttribute('aria-label', ariaLabel);
+        b.title = ariaLabel;
         b.addEventListener('click', function (e) {
           e.stopPropagation();
           fn();
@@ -444,22 +454,22 @@
       }
 
       actions.appendChild(
-        mkBtn('↑', function () {
+        mkBtn('↑', 'Mover arriba', function () {
           moveKey(node._bk, -1);
         })
       );
       actions.appendChild(
-        mkBtn('↓', function () {
+        mkBtn('↓', 'Mover abajo', function () {
           moveKey(node._bk, 1);
         })
       );
       actions.appendChild(
-        mkBtn('Dup', function () {
+        mkBtn('Dup', 'Duplicar', function () {
           duplicateKey(node._bk);
         })
       );
       actions.appendChild(
-        mkBtn('✕', function () {
+        mkBtn('✕', 'Eliminar', function () {
           removeKey(node._bk);
         })
       );
@@ -479,23 +489,48 @@
       if ((t === 'section' || t === 'repeater') && node.fields) {
         var nest = document.createElement('div');
         nest.className = 'fb-nested-wrap';
-        var addSmall = document.createElement('div');
-        addSmall.className = 'mb-1';
-        var drop = document.createElement('div');
-        drop.className = 'btn-group btn-group-sm';
-        ;['text', 'number', 'select', 'textarea'].forEach(function (pt) {
-          var b = document.createElement('button');
-          b.type = 'button';
-          b.className = 'btn btn-outline-primary btn-sm';
-          b.textContent = '+' + (TYPE_LABELS[pt] || pt).slice(0, 8);
-          b.addEventListener('click', function (e) {
-            e.stopPropagation();
+
+        var addBar = document.createElement('div');
+        addBar.className = 'fb-nested-addbar mb-1';
+
+        var addBtn = document.createElement('button');
+        addBtn.type = 'button';
+        addBtn.className = 'btn btn-sm btn-outline-primary fb-nested-add';
+        addBtn.textContent = '+ Añadir campo';
+        addBtn.setAttribute('aria-label', 'Añadir campo dentro de ' + (TYPE_LABELS[t] || t) + ' «' + (node.label || '') + '»');
+
+        var addMenu = document.createElement('div');
+        addMenu.className = 'fb-nested-menu';
+        addMenu.setAttribute('hidden', 'hidden');
+        Object.keys(TYPE_LABELS).forEach(function (pt) {
+          if (!isAllowedTypeIn(pt, t)) return;
+          var item = document.createElement('button');
+          item.type = 'button';
+          item.className = 'fb-nested-menu-item';
+          item.textContent = TYPE_LABELS[pt];
+          item.addEventListener('click', function (ev) {
+            ev.stopPropagation();
+            addMenu.setAttribute('hidden', 'hidden');
             addField(pt, node._bk);
           });
-          drop.appendChild(b);
+          addMenu.appendChild(item);
         });
-        addSmall.appendChild(drop);
-        nest.appendChild(addSmall);
+
+        addBtn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          var hidden = addMenu.hasAttribute('hidden');
+          // Close any other open menus
+          document.querySelectorAll('.fb-nested-menu').forEach(function (m) {
+            if (m !== addMenu) m.setAttribute('hidden', 'hidden');
+          });
+          if (hidden) addMenu.removeAttribute('hidden');
+          else addMenu.setAttribute('hidden', 'hidden');
+        });
+
+        addBar.appendChild(addBtn);
+        addBar.appendChild(addMenu);
+        nest.appendChild(addBar);
+
         var ul = document.createElement('ul');
         ul.className = 'fb-nested-list list-unstyled';
         ul.setAttribute('data-parent-key', node._bk);
@@ -511,12 +546,131 @@
       return li;
     }
 
+    function getUlParentInfo(ulEl) {
+      var pk = ulEl.getAttribute('data-parent-key') || '';
+      if (!pk) return { parentKey: null, parentType: null, list: state.fields };
+      var hit = findNode(state.fields, pk);
+      if (!hit) return { parentKey: null, parentType: null, list: state.fields };
+      return { parentKey: pk, parentType: hit.node.type || null, list: hit.node.fields };
+    }
+
+    function inferDraggedType(draggedEl) {
+      if (!draggedEl) return null;
+      var paletteType = draggedEl.getAttribute('data-fb-type');
+      if (paletteType) return paletteType;
+      var k = draggedEl.getAttribute('data-key');
+      if (k) {
+        var hit = findNode(state.fields, k);
+        if (hit) return hit.node.type || 'text';
+      }
+      return null;
+    }
+
+    function clearDropMarkers() {
+      document.querySelectorAll('.fb-drop-target, .fb-drop-invalid').forEach(function (n) {
+        n.classList.remove('fb-drop-target');
+        n.classList.remove('fb-drop-invalid');
+      });
+    }
+
+    function scheduleAutoExpand(toUl) {
+      // En el editor las secciones/repetidores ya están expandidos; conservamos el
+      // hook por si en el futuro hay colapso. Solo marca el contenedor como
+      // "objetivo activo" para que el usuario tenga retroalimentación clara.
+      clearTimeout(state._expandTimer);
+      state._expandTimer = setTimeout(function () {
+        if (toUl && toUl.parentNode) {
+          toUl.parentNode.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+      }, 600);
+    }
+
     function initSortable(ul, parentKey) {
       if (typeof global.Sortable === 'undefined') return;
       var s = global.Sortable.create(ul, {
         handle: '.fb-card-handle',
         animation: 150,
-        onEnd: function (evt) {
+        group: { name: 'fb', pull: true, put: ['fb'] },
+        ghostClass: 'fb-sortable-ghost',
+        chosenClass: 'fb-sortable-chosen',
+        dragClass: 'fb-sortable-drag',
+        revertOnSpill: true,
+        emptyInsertThreshold: 24,
+        fallbackOnBody: true,
+        onMove: function (evt) {
+          var draggedType = inferDraggedType(evt.dragged);
+          var toUl = evt.to;
+          var info = getUlParentInfo(toUl);
+          var allowed = !draggedType || isAllowedTypeIn(draggedType, info.parentType);
+          clearDropMarkers();
+          var container = toUl.parentNode;
+          if (!container) return allowed;
+          if (allowed) {
+            container.classList.add('fb-drop-target');
+            scheduleAutoExpand(toUl);
+          } else {
+            container.classList.add('fb-drop-invalid');
+          }
+          return allowed;
+        },
+        onAdd: function (evt) {
+          clearTimeout(state._expandTimer);
+          var item = evt.item;
+          var paletteType = item.getAttribute('data-fb-type');
+          var movedKey = item.getAttribute('data-key');
+          var info = getUlParentInfo(ul);
+
+          if (item.parentNode) item.parentNode.removeChild(item);
+          clearDropMarkers();
+
+          if (paletteType) {
+            if (!isAllowedTypeIn(paletteType, info.parentType)) {
+              announce('No permitido aquí.');
+              return;
+            }
+            var node = defaultNode(paletteType);
+            info.list.splice(evt.newIndex, 0, node);
+            state.selectedKey = node._bk;
+            setTimeout(function () {
+              renderCanvas();
+              announce(
+                'Añadido: ' + (TYPE_LABELS[paletteType] || paletteType) +
+                ' en ' + (info.parentKey ? '«' + ((findNode(state.fields, info.parentKey) || {}).node || {}).label + '»' : 'raíz') +
+                ', posición ' + (evt.newIndex + 1) + '.'
+              );
+            }, 0);
+            return;
+          }
+
+          if (movedKey) {
+            var hit = findNode(state.fields, movedKey);
+            if (!hit) {
+              setTimeout(function () { renderCanvas(); }, 0);
+              return;
+            }
+            var draggedType = hit.node.type || 'text';
+            if (!isAllowedTypeIn(draggedType, info.parentType)) {
+              announce('Movimiento bloqueado: tipo no permitido en este contenedor.');
+              setTimeout(function () { renderCanvas(); }, 0);
+              return;
+            }
+            hit.list.splice(hit.index, 1);
+            // Re-leer la lista de destino: si el destino y origen comparten lista, los índices cambian
+            var freshInfo = getUlParentInfo(ul);
+            var insertIdx = Math.min(evt.newIndex, freshInfo.list.length);
+            freshInfo.list.splice(insertIdx, 0, hit.node);
+            setTimeout(function () {
+              renderCanvas();
+              announce(
+                'Movido: ' + (TYPE_LABELS[draggedType] || draggedType) +
+                ' a posición ' + (insertIdx + 1) + '.'
+              );
+            }, 0);
+          }
+        },
+        onUpdate: function (evt) {
+          // Reordenamiento intra-lista: actualizar el orden en estado por keys del DOM.
+          clearDropMarkers();
           var keys = [];
           for (var i = 0; i < ul.children.length; i++) {
             keys.push(ul.children[i].getAttribute('data-key'));
@@ -529,9 +683,44 @@
           }
           if (list) reorderListByKeys(list, keys);
           syncHiddenJson();
+          announce('Reordenado.');
+        },
+        onEnd: function () {
+          clearTimeout(state._expandTimer);
+          clearDropMarkers();
+          document.body.classList.remove('fb-dragging');
+        },
+        onStart: function () {
+          document.body.classList.add('fb-dragging');
         },
       });
       sortables.push(s);
+    }
+
+    /**
+     * Configura la paleta como fuente arrastrable: cada botón clona-y-suelta hacia
+     * cualquier `<ul.fb-nested-list>` del lienzo (mismo grupo "fb").
+     */
+    function initPaletteSortable() {
+      if (typeof global.Sortable === 'undefined' || !el.palette) return;
+      global.Sortable.create(el.palette, {
+        group: { name: 'fb', pull: 'clone', put: false },
+        sort: false,
+        draggable: '.fb-palette-btn',
+        animation: 150,
+        ghostClass: 'fb-sortable-ghost',
+        chosenClass: 'fb-sortable-chosen',
+        dragClass: 'fb-sortable-drag',
+        fallbackOnBody: true,
+        onStart: function () {
+          document.body.classList.add('fb-dragging');
+        },
+        onEnd: function () {
+          document.body.classList.remove('fb-dragging');
+          clearTimeout(state._expandTimer);
+          clearDropMarkers();
+        },
+      });
     }
 
     function moveKey(key, delta) {
@@ -568,17 +757,85 @@
       renderCanvas();
     }
 
-    function addField(type, parentKey) {
+    function addField(type, parentKey, opts) {
+      opts = opts || {};
       var n = defaultNode(type);
       if (!parentKey) {
-        state.fields.push(n);
+        if (typeof opts.afterIndex === 'number' && opts.afterIndex >= -1) {
+          state.fields.splice(opts.afterIndex + 1, 0, n);
+        } else {
+          state.fields.push(n);
+        }
       } else {
         var hit = findNode(state.fields, parentKey);
         if (!hit || !hit.node.fields) return;
-        hit.node.fields.push(n);
+        if (typeof opts.afterIndex === 'number' && opts.afterIndex >= -1) {
+          hit.node.fields.splice(opts.afterIndex + 1, 0, n);
+        } else {
+          hit.node.fields.push(n);
+        }
       }
       state.selectedKey = n._bk;
       renderCanvas();
+      announce('Añadido: ' + (TYPE_LABELS[type] || type) + ' «' + (n.label || n.id || '') + '».');
+    }
+
+    /**
+     * Calcula el contexto de inserción según el campo actualmente seleccionado.
+     * - Sin selección o "forzar raíz": inserta al final del nivel raíz.
+     * - Selección sobre sección/repetidor: inserta dentro, al final.
+     * - Selección sobre un campo hoja: inserta como hermano siguiente.
+     * Devuelve también `parentType` para validar tipos permitidos.
+     */
+    function getInsertionContext() {
+      if (state.forceRoot || !state.selectedKey) {
+        return { parentKey: null, parentType: null, parentLabel: 'Raíz', afterIndex: state.fields.length - 1 };
+      }
+      var hit = findNode(state.fields, state.selectedKey);
+      if (!hit) {
+        return { parentKey: null, parentType: null, parentLabel: 'Raíz', afterIndex: state.fields.length - 1 };
+      }
+      var n = hit.node;
+      var t = n.type || 'text';
+      if (t === 'section' || t === 'repeater') {
+        var len = (n.fields && n.fields.length) || 0;
+        return {
+          parentKey: n._bk,
+          parentType: t,
+          parentLabel: n.label || TYPE_LABELS[t],
+          afterIndex: len - 1,
+        };
+      }
+      var parent = hit.parent;
+      var parentType = parent ? (parent.type || null) : null;
+      var parentKey = parent ? parent._bk : null;
+      var parentLabel = parent ? (parent.label || TYPE_LABELS[parentType] || 'Raíz') : 'Raíz';
+      return {
+        parentKey: parentKey,
+        parentType: parentType,
+        parentLabel: parentLabel,
+        afterIndex: hit.index,
+      };
+    }
+
+    function addFieldAtSelection(type) {
+      var ctx = getInsertionContext();
+      if (!isAllowedTypeIn(type, ctx.parentType)) {
+        var why =
+          ctx.parentType === 'section'
+            ? 'No se permite una sección dentro de otra sección.'
+            : 'En un repetidor solo se permiten campos simples (no secciones ni repetidores).';
+        alert(why);
+        announce(why);
+        return;
+      }
+      addField(type, ctx.parentKey, { afterIndex: ctx.afterIndex });
+    }
+
+    function announce(msg) {
+      if (!el.aria) return;
+      el.aria.textContent = '';
+      setTimeout(function () { el.aria.textContent = msg; }, 30);
     }
 
     function renderProps() {
@@ -1091,34 +1348,263 @@
     /* Palette */
     if (el.palette) {
       el.palette.innerHTML = '';
+
+      var searchWrap = document.createElement('div');
+      searchWrap.className = 'fb-palette-search';
+      var searchInp = document.createElement('input');
+      searchInp.type = 'search';
+      searchInp.className = 'form-control form-control-sm';
+      searchInp.placeholder = 'Buscar tipo… (atajo: /)';
+      searchInp.setAttribute('aria-label', 'Buscar tipo de campo');
+      searchInp.id = 'fb-palette-search';
+      searchWrap.appendChild(searchInp);
+      el.paletteSearch = searchInp;
+      el.palette.appendChild(searchWrap);
+
+      var targetBox = document.createElement('div');
+      targetBox.className = 'fb-palette-target';
+      targetBox.setAttribute('aria-live', 'polite');
+      el.paletteTarget = targetBox;
+      el.palette.appendChild(targetBox);
+
+      var rootRow = document.createElement('div');
+      rootRow.className = 'form-check fb-palette-rootcheck';
+      var rootCb = document.createElement('input');
+      rootCb.type = 'checkbox';
+      rootCb.className = 'form-check-input';
+      rootCb.id = 'fb-palette-root-toggle';
+      rootCb.addEventListener('change', function () {
+        state.forceRoot = rootCb.checked;
+        renderPaletteTarget();
+      });
+      var rootLab = document.createElement('label');
+      rootLab.className = 'form-check-label small';
+      rootLab.htmlFor = 'fb-palette-root-toggle';
+      rootLab.textContent = ' Añadir siempre a raíz';
+      rootRow.appendChild(rootCb);
+      rootRow.appendChild(rootLab);
+      el.paletteRootToggle = rootCb;
+      el.palette.appendChild(rootRow);
+
+      var sep = document.createElement('hr');
+      sep.className = 'my-2';
+      el.palette.appendChild(sep);
+
       Object.keys(TYPE_LABELS).forEach(function (type) {
         var b = document.createElement('button');
         b.type = 'button';
-        b.className = 'btn btn-sm btn-outline-secondary';
+        b.className = 'btn btn-sm btn-outline-secondary fb-palette-btn';
         b.textContent = TYPE_LABELS[type];
+        b.setAttribute('data-fb-type', type);
+        b.setAttribute('aria-label', 'Añadir ' + TYPE_LABELS[type]);
+        b.title = 'Añadir ' + TYPE_LABELS[type];
         b.addEventListener('click', function () {
-          addField(type, null);
+          addFieldAtSelection(type);
         });
         el.palette.appendChild(b);
+      });
+
+      renderPaletteTarget();
+      initPaletteSortable();
+      bindPaletteSearch();
+    }
+
+    function bindPaletteSearch() {
+      if (!el.paletteSearch) return;
+      el.paletteSearch.addEventListener('input', function () {
+        var q = (el.paletteSearch.value || '').trim().toLowerCase();
+        el.palette.querySelectorAll('.fb-palette-btn').forEach(function (b) {
+          var label = (b.textContent || '').toLowerCase();
+          var match = !q || label.indexOf(q) !== -1;
+          b.style.display = match ? '' : 'none';
+        });
+      });
+      el.paletteSearch.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          var btn = el.palette.querySelector('.fb-palette-btn:not([style*="display: none"]):not(.fb-palette-btn-disabled)');
+          if (btn) {
+            var t = btn.getAttribute('data-fb-type');
+            if (t) addFieldAtSelection(t);
+            el.paletteSearch.value = '';
+            el.paletteSearch.dispatchEvent(new Event('input'));
+          }
+        } else if (e.key === 'Escape') {
+          e.preventDefault();
+          el.paletteSearch.value = '';
+          el.paletteSearch.dispatchEvent(new Event('input'));
+          el.paletteSearch.blur();
+        }
+      });
+    }
+
+    function renderPaletteTarget() {
+      if (!el.paletteTarget) return;
+      var ctx = getInsertionContext();
+      var icon = ctx.parentKey ? '↳' : '⌂';
+      var nameSpan = ctx.parentKey ? ('«' + (ctx.parentLabel || '') + '»') : 'Raíz';
+      el.paletteTarget.innerHTML =
+        '<span class="fb-palette-target-icon">' + icon + '</span>' +
+        '<span class="fb-palette-target-text">Añadiendo a: <strong>' +
+        nameSpan.replace(/[<>&]/g, function (c) { return { '<': '&lt;', '>': '&gt;', '&': '&amp;' }[c]; }) +
+        '</strong></span>';
+      // Disabled state of palette buttons depending on parent type
+      var btns = el.palette.querySelectorAll('.fb-palette-btn');
+      btns.forEach(function (b) {
+        var t = b.getAttribute('data-fb-type');
+        var allowed = isAllowedTypeIn(t, ctx.parentType);
+        if (allowed) {
+          b.removeAttribute('disabled');
+          b.classList.remove('fb-palette-btn-disabled');
+          b.title = 'Añadir ' + TYPE_LABELS[t];
+        } else {
+          b.setAttribute('disabled', 'disabled');
+          b.classList.add('fb-palette-btn-disabled');
+          b.title = ctx.parentType === 'section'
+            ? 'No se permite una sección dentro de otra'
+            : 'No permitido dentro de un repetidor';
+        }
       });
     }
 
     el.form.addEventListener('submit', function (e) {
-      var errs = validateState(state.fields);
+      var errs = [];
+      var warns = [];
+      validateState(state.fields, errs, warns);
       if (errs.length) {
         e.preventDefault();
         alert('Revise el formulario:\n\n' + errs.slice(0, 8).join('\n'));
         return;
       }
+      if (warns.length) {
+        var msg = 'Aviso (no bloqueante):\n\n' + warns.slice(0, 6).join('\n') + '\n\n¿Continuar y guardar?';
+        if (!confirm(msg)) {
+          e.preventDefault();
+          return;
+        }
+      }
       syncHiddenJson();
     });
+
+    document.addEventListener('click', function (e) {
+      if (e.target.closest('.fb-nested-addbar')) return;
+      document.querySelectorAll('.fb-nested-menu').forEach(function (m) {
+        m.setAttribute('hidden', 'hidden');
+      });
+    });
+
+    function isTypingTarget(t) {
+      if (!t) return false;
+      var tag = (t.tagName || '').toLowerCase();
+      if (tag === 'input' || tag === 'textarea' || tag === 'select') return true;
+      if (t.isContentEditable) return true;
+      return false;
+    }
+
+    document.addEventListener('keydown', function (e) {
+      // Esc: cancela drag o cierra menús.
+      if (e.key === 'Escape') {
+        if (document.body.classList.contains('fb-dragging')) {
+          var fakeUp = new MouseEvent('mouseup', { bubbles: true, cancelable: true });
+          document.dispatchEvent(fakeUp);
+          document.body.classList.remove('fb-dragging');
+          clearDropMarkers();
+          announce('Arrastre cancelado.');
+          return;
+        }
+        var open = document.querySelectorAll('.fb-nested-menu:not([hidden])');
+        if (open.length) {
+          open.forEach(function (m) { m.setAttribute('hidden', 'hidden'); });
+        }
+        return;
+      }
+
+      // "/" enfoca el buscador de la paleta cuando no estamos escribiendo.
+      if (e.key === '/' && !isTypingTarget(e.target) && el.paletteSearch) {
+        // Verificar que el editor esté visible (otherwise skip).
+        if (rootEl.offsetParent !== null) {
+          e.preventDefault();
+          el.paletteSearch.focus();
+          el.paletteSearch.select();
+        }
+        return;
+      }
+
+      // Shift + ↑ / ↓ : mover el card seleccionado entre niveles.
+      if (e.shiftKey && (e.key === 'ArrowUp' || e.key === 'ArrowDown')) {
+        if (!state.selectedKey) return;
+        if (isTypingTarget(e.target)) return;
+        e.preventDefault();
+        if (e.key === 'ArrowUp') moveOutOfParent(state.selectedKey);
+        else moveIntoNextSibling(state.selectedKey);
+      }
+    });
+
+    /**
+     * Sube el nodo seleccionado un nivel: lo saca de su sección/repetidor
+     * padre y lo coloca como hermano siguiente del padre.
+     */
+    function moveOutOfParent(key) {
+      var hit = findNode(state.fields, key);
+      if (!hit || !hit.parent) {
+        announce('El campo ya está en el nivel raíz.');
+        return;
+      }
+      var parent = hit.parent;
+      var grandHit = findNode(state.fields, parent._bk);
+      if (!grandHit) return;
+      var node = hit.node;
+      var draggedType = node.type || 'text';
+      var grandParent = grandHit.parent;
+      var grandParentType = grandParent ? (grandParent.type || null) : null;
+      if (!isAllowedTypeIn(draggedType, grandParentType)) {
+        announce('No se puede subir el nivel: el contenedor superior no admite este tipo.');
+        return;
+      }
+      hit.list.splice(hit.index, 1);
+      grandHit.list.splice(grandHit.index + 1, 0, node);
+      renderCanvas();
+      announce('Movido un nivel hacia arriba.');
+    }
+
+    /**
+     * Baja el nodo seleccionado un nivel: lo mete dentro de la siguiente
+     * sección/repetidor hermana (si existe).
+     */
+    function moveIntoNextSibling(key) {
+      var hit = findNode(state.fields, key);
+      if (!hit) return;
+      var siblings = hit.list;
+      var nextContainer = null;
+      for (var i = hit.index + 1; i < siblings.length; i++) {
+        var s = siblings[i];
+        var st = s.type || '';
+        if (st === 'section' || st === 'repeater') { nextContainer = s; break; }
+      }
+      if (!nextContainer) {
+        announce('No hay sección o repetidor hermano debajo para anidar.');
+        return;
+      }
+      var node = hit.node;
+      var draggedType = node.type || 'text';
+      if (!isAllowedTypeIn(draggedType, nextContainer.type)) {
+        announce('Tipo no permitido dentro del contenedor destino.');
+        return;
+      }
+      hit.list.splice(hit.index, 1);
+      nextContainer.fields = nextContainer.fields || [];
+      nextContainer.fields.unshift(node);
+      renderCanvas();
+      announce('Movido dentro de «' + (nextContainer.label || '') + '».');
+    }
 
     /* Preview tab */
     var previewBtn = rootEl.querySelector('[data-fb-refresh-preview]');
     if (previewBtn) {
       previewBtn.addEventListener('click', function () {
         if (!previewUrl) return;
-        var errs = validateState(state.fields);
+        var errs = [];
+        validateState(state.fields, errs, []);
         if (errs.length) {
           alert('Corrija errores antes de previsualizar:\n' + errs.slice(0, 6).join('\n'));
           return;

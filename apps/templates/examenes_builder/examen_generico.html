@@ -1,7 +1,12 @@
 {% extends "layouts/base.html" %}
+{% load static %}
 {% load form_builder_tags %}
 
 {% block title %}{{ examen.nombre }}{% endblock %}
+
+{% block stylesheets %}
+<link rel="stylesheet" href="{% static 'assets/css/form_builder/builder.css' %}">
+{% endblock %}
 
 {% block content %}
 <div class="container-fluid mt-4">
@@ -23,9 +28,7 @@
         <input type="hidden" name="paciente_id" value="{{ paciente_id }}">
         <input type="hidden" name="examen_id" value="{{ examen_id }}">
 
-        {% for field in builder_fields %}
-          {% include "examenes_builder/field_fragment.html" with field=field datos_examen=datos_examen name_prefix="" %}
-        {% endfor %}
+        {% include "examenes_builder/_tabs_layout.html" with builder_fields=builder_fields datos_examen=datos_examen tabs_prefix="fbrt" %}
 
         <button type="submit" class="btn btn-primary">Guardar</button>
         <a href="{% url 'detalle_paciente' paciente_id %}" class="btn btn-secondary">Volver</a>
@@ -36,110 +39,10 @@
 {% endblock %}
 
 {% block javascripts %}
+<script src="{% static 'assets/js/form_builder/runtime.js' %}"></script>
 <script>
-(function() {
-  function readControlValue(f) {
-    var els = document.querySelectorAll('[name="' + f + '"]');
-    if (!els.length) return undefined;
-    if (els.length > 1 && els[0].type === 'checkbox') {
-      var out = [];
-      for (var i = 0; i < els.length; i++) {
-        if (els[i].checked) out.push(els[i].value);
-      }
-      return out;
-    }
-    var el = els[0];
-    if (el.type === 'checkbox' && !el.name.includes('__')) {
-      return el.checked;
-    }
-    if (el.type === 'radio') {
-      var sel = document.querySelector('[name="' + f + '"]:checked');
-      return sel ? sel.value : '';
-    }
-    return el.value;
-  }
-
-  function evalVisible(wrap) {
-    var j = wrap.getAttribute('data-vw-cond');
-    if (j) {
-      try {
-        var cond = JSON.parse(j);
-        var op = (cond.op || 'equals').toLowerCase();
-        var f = cond.field;
-        var expected = ('value' in cond) ? cond.value : cond.equals;
-        var actual = readControlValue(f);
-        if (op === 'not_equals') {
-          if (typeof expected === 'boolean') return Boolean(actual) !== expected;
-          return String(actual) !== String(expected);
-        }
-        if (op === 'contains') {
-          if (actual === undefined || actual === null) return false;
-          if (Array.isArray(actual)) {
-            var es = String(expected);
-            return actual.some(function(x) { return String(x) === es; });
-          }
-          return String(actual).indexOf(String(expected)) !== -1;
-        }
-        if (typeof expected === 'boolean') return Boolean(actual) === expected;
-        return String(actual) === String(expected);
-      } catch (e) { return true; }
-    }
-    var f2 = wrap.getAttribute('data-vw-field');
-    if (!f2) return true;
-    var want = wrap.getAttribute('data-vw-eq');
-    var val = readControlValue(f2);
-    if (want === 'true') return (val === true || val === 'true' || val === 'on' || val === '1');
-    if (want === 'false') return (val === false || val === 'false' || val === '' || val === '0');
-    return String(val) === String(want);
-  }
-  function refreshVisibility() {
-    document.querySelectorAll('[data-vw-cond]').forEach(function (w) {
-      w.style.display = evalVisible(w) ? '' : 'none';
-    });
-    document.querySelectorAll('.fb-field[data-vw-field]').forEach(function (w) {
-      w.style.display = evalVisible(w) ? '' : 'none';
-    });
-  }
-  document.addEventListener('change', refreshVisibility);
-  document.addEventListener('input', refreshVisibility);
-  refreshVisibility();
-
-  function updateImc() {
-    document.querySelectorAll('.fb-computed[data-formula="imc"]').forEach(function(box) {
-      var id = box.getAttribute('data-id');
-      var deps = (box.getAttribute('data-depends') || '').split(',').filter(Boolean);
-      var peso = deps[0] ? (document.querySelector('[name="' + deps[0] + '"]') || {}).value : '';
-      var talla = deps[1] ? (document.querySelector('[name="' + deps[1] + '"]') || {}).value : '';
-      var out = document.getElementById('computed_' + id);
-      if (!out) return;
-      var p = parseFloat(peso), t = parseFloat(talla);
-      if (!p || !t) { out.value = ''; return; }
-      var m = t / 100.0;
-      out.value = (p / (m * m)).toFixed(2);
-    });
-  }
-  document.addEventListener('input', updateImc);
-  updateImc();
-
-  document.querySelectorAll('.fb-repeater').forEach(function(rep) {
-    var rid = rep.getAttribute('data-rid');
-    var rowsWrap = rep.querySelector('.repeater-rows');
-    var tplRow = rep.querySelector('.repeater-row');
-    rep.querySelector('.fb-add-row').addEventListener('click', function() {
-      var rows = rowsWrap.querySelectorAll('.repeater-row');
-      var idx = rows.length;
-      var clone = tplRow.cloneNode(true);
-      clone.setAttribute('data-index', idx);
-      clone.querySelectorAll('[name]').forEach(function(inp) {
-        var n = inp.getAttribute('name');
-        if (!n) return;
-        inp.setAttribute('name', n.replace(/__\d+__/g, '__' + idx + '__'));
-        if (inp.type === 'checkbox' || inp.type === 'radio') inp.checked = false;
-        else inp.value = '';
-      });
-      rowsWrap.appendChild(clone);
-    });
-  });
+(function () {
+  if (window.FBRuntime) FBRuntime.init(document);
 })();
 </script>
 {% endblock %}
