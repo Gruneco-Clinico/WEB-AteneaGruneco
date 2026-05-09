@@ -7,8 +7,9 @@
 
 ## Convivencia con legacy
 
-- Exámenes con `examen_id` en `apps/home/exam_legacy.py` siguen usando plantillas y modelos `*Result`.
-- Cualquier **otro** `Examen` en BD con `campos` (lista JSON no vacía) se renderiza con el template genérico y guarda en `ExamenSubmission`.
+- Los `examen_id` listados en `apps/home/exam_legacy.py` (**legacy**, típicamente 3–40) **siempre** usan plantillas en código y modelos `*Result` al **realizar** el examen y al **ver el resultado**. Eso aplica incluso si en BD apareciera `Examen.campos` no vacío (defensa ante datos inconsistentes).
+- Un `Examen` **no** legacy con `campos` (schema JSON válido y no vacío) se ejecuta con el Form Builder (`examen_generico.html`), guarda en `ExamenSubmission` y muestra resultado con `resultado_builder.html` cuando existe esa submission (vía `ver_resultado_examen`).
+- El módulo **Form Builder** (`/builder/examenes/`): los legacy aparecen en el listado **sin botón Editar**; las rutas **editar** y **publicar** rechazan IDs legacy (`redirect` + mensaje). No se debe guardar builder sobre legacy desde `guardar_examen_builder` (también bloqueado en servidor).
 
 ## Pasos operativos
 
@@ -17,7 +18,7 @@
 3. Opcional: **Publicar versión de esquema** para registrar `ExamenSchemaVersion`.
 4. Asignar el examen a visitas: editar `TipoVisita.examenes` (JSON) en `/builder/tipo-visita/<id>/examenes/` o por el flujo habitual de proyectos, asegurando que al crear la visita se generen filas `VisitaExamen` para ese `Examen`.
 5. El usuario abre el examen desde el detalle del paciente; al guardar, el estado pasa a `completado` y los datos quedan en `ExamenSubmission`.
-6. Ver resultado: misma URL que otros exámenes (`ver_resultado_examen`); el backend detecta envío builder y muestra `resultado_builder.html`.
+6. Ver resultado: misma URL (`ver_resultado_examen`). Si hay `ExamenSubmission` para ese `VisitaExamen` y el examen **no** es legacy, se muestra `resultado_builder.html`; si es legacy, el flujo sigue usando las plantillas de resultados legacy.
 
 ## Prueba mínima (smoke)
 

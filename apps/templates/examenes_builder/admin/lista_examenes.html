@@ -1,36 +1,136 @@
 {% extends "layouts/base.html" %}
 {% load form_builder_tags %}
-{% block title %}Form Builder — Exámenes{% endblock %}
+{% block title %}Constructor de Exámenes{% endblock %}
 {% block content %}
 <div class="container-fluid mt-4">
   <div class="d-flex justify-content-between align-items-center flex-wrap mb-3">
-    <h1 class="mb-0">Exámenes (Form Builder)</h1>
+    <h1 class="mb-0">Constructor de Exámenes</h1>
     <a href="{% url 'exam_builder_create' %}" class="btn btn-primary">Crear examen</a>
   </div>
-  <p class="text-muted">Editor visual para exámenes cuyo <code>id</code> no esté en el dispatch legacy. Asigne cada examen a un tipo de visita desde <code>/builder/tipo-visita/&lt;id&gt;/examenes/</code> o el flujo de proyectos.</p>
-  <table class="table table-striped">
-    <thead><tr><th>ID</th><th>Nombre</th><th>Campos</th><th>Asignado a</th><th></th></tr></thead>
-    <tbody>
-      {% for e in examenes %}
-      <tr>
-        <td>{{ e.id }}</td>
-        <td>{{ e.nombre }}</td>
-        <td>{% if e.campos %}{{ e.campos|length }} nodos{% else %}vacío{% endif %}</td>
-        <td class="small">
-          {% if assignments|get_item:e.id %}
-            <ul class="mb-0 pl-3">
-              {% for tv in assignments|get_item:e.id %}
-                <li>{{ tv }}</li>
+  {% if messages %}
+  <div class="mb-3">
+    {% for message in messages %}
+    <div class="alert alert-{% if 'error' in message.tags %}danger{% elif 'warning' in message.tags %}warning{% else %}success{% endif %} alert-dismissible fade show" role="alert">
+      <span class="alert-text">{{ message }}</span>
+      <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span></button>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <div class="card mb-4">
+    <div class="card-body">
+      <form method="get" action="" id="filtros-examenes-form">
+        <div class="form-row align-items-end">
+          <div class="form-group col-md-4 col-lg-3 mb-2 mb-md-0">
+            <label for="filtro-q" class="mb-1">Nombre</label>
+            <input type="text" name="q" id="filtro-q" value="{{ filter_q }}" class="form-control form-control-sm" placeholder="Buscar por nombre…" autocomplete="off">
+          </div>
+          <div class="form-group col-md-4 col-lg-2 mb-2 mb-md-0">
+            <label for="filtro-origen" class="mb-1">Origen</label>
+            <select name="origen" id="filtro-origen" class="form-control form-control-sm">
+              <option value="todos" {% if filter_origen == "todos" %}selected{% endif %}>Todos</option>
+              <option value="builder" {% if filter_origen == "builder" %}selected{% endif %}>Solo Form Builder</option>
+              <option value="legacy" {% if filter_origen == "legacy" %}selected{% endif %}>Solo legacy</option>
+            </select>
+          </div>
+          <div class="form-group col-md-4 col-lg-2 mb-2 mb-md-0">
+            <label for="filtro-categoria" class="mb-1">Categoría</label>
+            <select name="categoria" id="filtro-categoria" class="form-control form-control-sm">
+              <option value="" {% if not filter_categoria %}selected{% endif %}>Todas</option>
+              {% for codigo, etiqueta in categorias %}
+              <option value="{{ codigo }}" {% if filter_categoria == codigo %}selected{% endif %}>{{ etiqueta }}</option>
               {% endfor %}
-            </ul>
+            </select>
+          </div>
+          <div class="form-group col-md-4 col-lg-2 mb-2 mb-md-0">
+            <label for="filtro-asignacion" class="mb-1">Asignación</label>
+            <select name="asignacion" id="filtro-asignacion" class="form-control form-control-sm">
+              <option value="todos" {% if filter_asignacion == "todos" %}selected{% endif %}>Todas</option>
+              <option value="asignado" {% if filter_asignacion == "asignado" %}selected{% endif %}>Con tipo de visita</option>
+              <option value="sin_asignar" {% if filter_asignacion == "sin_asignar" %}selected{% endif %}>Sin tipo de visita</option>
+            </select>
+          </div>
+          <div class="form-group col-md-6 col-lg-3 mb-2 mb-md-0">
+            <label class="mb-1 d-block">Ordenar por</label>
+            <div class="input-group input-group-sm">
+              <select name="orden" id="filtro-orden" class="form-control form-control-sm" aria-label="Campo por el que ordenar">
+                <option value="id" {% if filter_orden == "id" %}selected{% endif %}>ID</option>
+                <option value="nombre" {% if filter_orden == "nombre" %}selected{% endif %}>Nombre</option>
+                <option value="campos" {% if filter_orden == "campos" %}selected{% endif %}>Campos (nodos)</option>
+              </select>
+              <select name="dir" id="filtro-dir" class="form-control form-control-sm" style="max-width:9rem;" aria-label="Dirección del orden">
+                <option value="desc" {% if filter_dir == "desc" %}selected{% endif %}>Mayor → menor</option>
+                <option value="asc" {% if filter_dir == "asc" %}selected{% endif %}>Menor → mayor</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group col-md-12 col-lg-12 mb-0 d-flex flex-wrap align-items-center">
+            <button type="submit" class="btn btn-sm btn-primary mr-2">Aplicar</button>
+            <a href="{% url 'exam_builder_list' %}" class="btn btn-sm btn-outline-secondary">Limpiar</a>
+          </div>
+        </div>
+        <p class="text-muted small mb-0 mt-3">
+          {{ examenes_total }} examen(es) según filtros.
+          {% if filter_orden == "id" %}
+            Orden: ID {% if filter_dir == "desc" %}(mayor primero){% else %}(menor primero){% endif %}.
+          {% elif filter_orden == "nombre" %}
+            Orden: nombre (alfabético{% if filter_dir == "desc" %} inverso{% endif %}; desempate por ID).
           {% else %}
-            <span class="text-muted">—</span>
+            Orden: cantidad de nodos en <code>campos</code> (segundo criterio: ID {% if filter_dir == "desc" %}desc{% else %}asc{% endif %}).
           {% endif %}
-        </td>
-        <td><a href="{% url 'exam_builder_edit' e.pk %}" class="btn btn-sm btn-primary">Editar</a></td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+        </p>
+      </form>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-striped mb-0">
+          <thead class="thead-light">
+            <tr>
+              <th>ID</th>
+              <th>Nombre</th>
+              <th>Campos</th>
+              <th>Asignado a</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for e in examenes %}
+            <tr>
+              <td>{{ e.id }}</td>
+              <td>{{ e.nombre }}</td>
+              <td>{% if e.campos %}{{ e.campos|length }} nodos{% else %}vacío{% endif %}</td>
+              <td class="small">
+                {% if assignments|get_item:e.id %}
+                  <ul class="mb-0 pl-3">
+                    {% for tv in assignments|get_item:e.id %}
+                      <li>{{ tv }}</li>
+                    {% endfor %}
+                  </ul>
+                {% else %}
+                  <span class="text-muted">—</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if e.id not in legacy_examen_ids %}
+                  <a href="{% url 'exam_builder_edit' e.pk %}" class="btn btn-sm btn-primary">Editar</a>
+                {% else %}
+                  <span class="text-muted small">Legacy</span>
+                {% endif %}
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="5" class="text-center text-muted py-4">No hay exámenes que coincidan con los filtros.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}

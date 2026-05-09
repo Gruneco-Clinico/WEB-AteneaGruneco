@@ -13,6 +13,7 @@ Cubre:
   ``ExamenSubmission`` con ``answers``/``computed`` y transición de estado de
   ``VisitaExamen`` a ``completado``.
 - Visita firmada → no permite guardar.
+- Exámenes legacy (IDs ``exam_legacy``) → rutas builder admin y ``guardar_examen_builder`` bloqueadas.
 """
 
 from django.contrib.auth.models import User
@@ -29,7 +30,13 @@ from apps.home.models import (
     Visita,
     VisitaExamen,
 )
+from apps.home.exam_legacy import LEGACY_REALIZAR_EXAMEN_IDS
 from apps.home.views.exam_builder import ensure_schema_version
+
+
+_LEGACY_EDIT_PK = 39
+_LEGACY_GUARDAR_PK = 37
+_LEGACY_LIST_FILTER_LEGACY_PK = 36
 
 
 def _make_paciente(**overrides):
@@ -210,6 +217,188 @@ class ExamBuilderAdminViewsTests(TestCase):
         self.client.post(url)
         self.assertEqual(
             ExamenSchemaVersion.objects.filter(examen=self.examen).count(), 1
+        )
+
+
+class LegacyExamBuilderBlockedTests(TestCase):
+    """Exámenes legacy no deben persistir/editarse vía rutas Form Builder."""
+
+    def setUp(self):
+        self.assertIn(_LEGACY_EDIT_PK, LEGACY_REALIZAR_EXAMEN_IDS)
+        self.staff = User.objects.create_user(
+            "admin-leg", password="x", is_staff=True
+        )
+        self.client = Client()
+        self.client.force_login(self.staff)
+        self.legacy_pk = _LEGACY_EDIT_PK
+        campos_legacy_con_schema = [{"type": "text", "id": "bogus", "label": "Z"}]
+        self.legacy_examen = Examen.objects.create(
+            pk=self.legacy_pk,
+            nombre="Examen legacy (test)",
+            categoria="OTROS",
+            campos=campos_legacy_con_schema,
+        )
+
+    def test_edit_get_redirects_to_list_without_touching_campos(self):
+        resp = self.client.get(
+            reverse("exam_builder_edit", kwargs={"pk": self.legacy_pk}),
+        )
+        self.assertRedirects(
+            resp,
+            reverse("exam_builder_list"),
+            status_code=302,
+            fetch_redirect_response=False,
+        )
+        self.legacy_examen.refresh_from_db()
+        self.assertEqual(len(self.legacy_examen.campos), 1)
+
+    def test_edit_post_does_not_persist_campos_or_nombre(self):
+        nome_antes = self.legacy_examen.nombre
+        campos_antes = list(self.legacy_examen.campos)
+        resp = self.client.post(
+            reverse("exam_builder_edit", kwargs={"pk": self.legacy_pk}),
+            {
+                "campos_json": "[]",
+                "nombre": "Nombre pirateado",
+                "categoria": "OTROS",
+            },
+        )
+        self.assertRedirects(
+            resp,
+            reverse("exam_builder_list"),
+            status_code=302,
+            fetch_redirect_response=False,
+        )
+        self.legacy_examen.refresh_from_db()
+        self.assertEqual(self.legacy_examen.nombre, nome_antes)
+        self.assertEqual(self.legacy_examen.campos, campos_antes)
+
+    def test_publish_redirects_to_list(self):
+        url = reverse("exam_builder_publish", kwargs={"pk": self.legacy_pk})
+        resp = self.client.post(url)
+        self.assertRedirects(
+            resp,
+            reverse("exam_builder_list"),
+            status_code=302,
+            fetch_redirect_response=False,
+        )
+        self.assertFalse(
+            ExamenSchemaVersion.objects.filter(examen=self.legacy_examen).exists(),
+        )
+
+    def test_list_does_not_link_edit_url_for_legacy_row(self):
+        resp = self.client.get(reverse("exam_builder_list"))
+        self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, "Legacy")
+        self.assertNotContains(
+            resp,
+            reverse("exam_builder_edit", kwargs={"pk": self.legacy_pk}),
+        )
+
+
+class ExamBuilderListFiltersTests(TestCase):
+    """Filtros GET en ``exam_builder_list``."""
+
+    def setUp(self):
+        self.assertIn(_LEGACY_LIST_FILTER_LEGACY_PK, LEGACY_REALIZAR_EXAMEN_IDS)
+        self.staff = User.objects.create_user(
+            "admin-filters", password="x", is_staff=True
+        )
+        self.client = Client()
+        self.client.force_login(self.staff)
+        self.e_builder = Examen.objects.create(
+            nombre="Zeta Builder Único",
+            categoria="OTROS",
+            campos=[{"type": "text", "id": "a"}],
+        )
+        self.e_legacy = Examen.objects.create(
+            pk=_LEGACY_LIST_FILTER_LEGACY_PK,
+            nombre="Legacy Lista Filtro",
+            categoria="SUENO",
+            campos=[],
+        )
+
+    def test_origen_builder_excludes_legacy(self):
+        url = reverse("exam_builder_list") + "?origen=builder"
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, 200)
+        ids = [e.id for e in resp.context["examenes"]]
+        self.assertIn(self.e_builder.pk, ids)
+        self.assertNotIn(self.e_legacy.pk, ids)
+
+    def test_origen_legacy_only_legacy_ids(self):
+        url = reverse("exam_builder_list") + "?origen=legacy&q=Lista+Filtro"
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, 200)
+        rows = list(resp.context["examenes"])
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0].pk, self.e_legacy.pk)
+
+    def test_categoria_filters(self):
+        url = reverse("exam_builder_list") + "?categoria=SUENO&origen=legacy"
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, 200)
+        ids = [e.id for e in resp.context["examenes"]]
+        self.assertIn(self.e_legacy.pk, ids)
+        self.assertNotIn(self.e_builder.pk, ids)
+
+    def test_orden_campos_with_context(self):
+        """Orden por cantidad de nodos (y parámetros pasan al contexto)."""
+        url = reverse("exam_builder_list") + "?orden=campos&dir=desc&origen=todos"
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.context["filter_orden"], "campos")
+        self.assertEqual(resp.context["filter_dir"], "desc")
+        ids = [e.id for e in resp.context["examenes"]]
+        self.assertLess(ids.index(self.e_builder.pk), ids.index(self.e_legacy.pk))
+
+
+class GuardarExamenLegacyBlocksTests(TestCase):
+    """``guardar_examen_builder`` no debe aceptar examen legacy."""
+
+    def setUp(self):
+        self.assertIn(_LEGACY_GUARDAR_PK, LEGACY_REALIZAR_EXAMEN_IDS)
+        self.user = User.objects.create_user("eval-leg", password="x")
+        self.client = Client()
+        self.client.force_login(self.user)
+        self.paciente = _make_paciente()
+        self.visita = _make_visita(self.paciente)
+        self.legacy_pk = _LEGACY_GUARDAR_PK
+        self.examen = Examen.objects.create(
+            pk=self.legacy_pk,
+            nombre="Legacy guardar test",
+            categoria="OTROS",
+            campos=[
+                {"type": "number", "id": "peso_kg", "label": "Peso", "required": True},
+                {"type": "number", "id": "talla_cm", "label": "Talla", "required": True},
+                {
+                    "type": "computed",
+                    "id": "imc",
+                    "formula": "imc",
+                    "depends_on": ["peso_kg", "talla_cm"],
+                },
+            ],
+        )
+        self.visita_examen = VisitaExamen.objects.create(
+            visita=self.visita,
+            examen=self.examen,
+            estado="pendiente",
+        )
+
+    def test_guardar_redirects_and_does_not_create_submission(self):
+        resp = self.client.post(
+            reverse("guardar_examen_builder"),
+            {
+                "visita_id": self.visita.id,
+                "paciente_id": self.paciente.id,
+                "examen_id": self.examen.id,
+                "peso_kg": "70",
+                "talla_cm": "170",
+            },
+        )
+        self.assertEqual(resp.status_code, 302)
+        self.assertFalse(
+            ExamenSubmission.objects.filter(visita_examen=self.visita_examen).exists(),
         )
 
 

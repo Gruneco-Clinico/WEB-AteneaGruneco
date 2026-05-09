@@ -16,7 +16,7 @@ from datetime import datetime, timedelta
 from ..models import *
 from ..forms import ProyectoForm, RegistroDemograficoForm, CognitivoAnamnesisForm
 from .exam_builder import builder_result_response, realizar_examen_builder
-from ..exam_legacy import examen_has_builder_schema
+from ..exam_legacy import examen_has_builder_schema, is_legacy_examen
 from ..exam_registry import get_exam_config, get_exam_model
 import json
 import requests
@@ -35,15 +35,23 @@ logger = logging.getLogger(__name__)
 
 @login_required
 def realizar_examen(request, visita_id, examen_id, paciente_id):
-    # Prioridad: si el registro Examen tiene schema en ``campos``, siempre builder
-    # (evita colisión con IDs 3–40 del registro legacy en BD recientes o datos de prueba).
+    # Legacy (IDs definidos en exam_legacy): siempre plantilla/registry fijos,
+    # nunca builder aunque ``Examen.campos`` esté poblado por error en BD.
     examen = get_object_or_404(Examen, pk=examen_id)
-    if examen_has_builder_schema(examen.campos):
-        return realizar_examen_builder(request, visita_id, examen_id, paciente_id)
-
-    config = get_exam_config(int(examen_id))
-    if not config:
-        return realizar_examen_builder(request, visita_id, examen_id, paciente_id)
+    if is_legacy_examen(examen_id):
+        config = get_exam_config(int(examen_id))
+        if not config:
+            messages.error(
+                request,
+                "Este examen legacy no tiene configuración de plantilla registrada.",
+            )
+            return redirect("detalle_paciente", paciente_id=paciente_id)
+    else:
+        if examen_has_builder_schema(examen.campos):
+            return realizar_examen_builder(request, visita_id, examen_id, paciente_id)
+        config = get_exam_config(int(examen_id))
+        if not config:
+            return realizar_examen_builder(request, visita_id, examen_id, paciente_id)
 
     exam_model = get_exam_model(int(examen_id))
 

@@ -1,7 +1,11 @@
 # -*- coding: utf-8 -*-
 """
-IDs de exámenes que usan el flujo legacy en realizar_examen (plantilla fija + modelo *Result).
-Cualquier otro examen_id definido en BD con Examen.campos no vacío usa el Form Builder.
+IDs de exámenes que usan el flujo legacy en ``realizar_examen`` (plantilla fija + modelo *Result).
+
+Estos IDs **siempre** usan ese flujo, aunque ``Examen.campos`` esté poblado; el dispatch y
+``ver_resultado_examen`` no los tratan como Form Builder.
+
+Los exámenes **nuevos** (fuera de este conjunto) con schema en ``Examen.campos`` usan el builder.
 """
 LEGACY_REALIZAR_EXAMEN_IDS = frozenset(
     {

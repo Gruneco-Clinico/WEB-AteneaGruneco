@@ -12,7 +12,7 @@ from types import SimpleNamespace
 
 from ..form_builder.schema import normalize_schema, validate_and_parse_post
 from ..models import DatosDemograficos, Examen, ExamenSchemaVersion, ExamenSubmission, TipoVisita, Visita, VisitaExamen
-from ..exam_legacy import examen_has_builder_schema, is_legacy_examen
+from ..exam_legacy import LEGACY_REALIZAR_EXAMEN_IDS, examen_has_builder_schema, is_legacy_examen
 
 
 def _staff(u):
@@ -45,6 +45,12 @@ def ensure_schema_version(examen: Examen, user) -> ExamenSchemaVersion:
 def realizar_examen_builder(request, visita_id, examen_id, paciente_id):
     """GET: mostrar formulario dinámico. Requiere Examen.campos no vacío."""
     examen = get_object_or_404(Examen, pk=examen_id)
+    if is_legacy_examen(examen_id):
+        messages.error(
+            request,
+            "Este examen usa el flujo legacy y no puede abrirse con el Form Builder.",
+        )
+        return redirect("detalle_paciente", paciente_id=paciente_id)
     paciente = get_object_or_404(DatosDemograficos, id=paciente_id)
     visita = get_object_or_404(Visita, id=visita_id, paciente=paciente)
 
@@ -113,6 +119,13 @@ def guardar_examen_builder(request):
     examen = visita_examen.examen
     visita = visita_examen.visita
 
+    if is_legacy_examen(examen_id):
+        messages.error(
+            request,
+            "No se pueden guardar respuestas del Form Builder en un examen legacy.",
+        )
+        return redirect("detalle_paciente", paciente_id=paciente_id)
+
     if visita.firmado:
         messages.error(request, "No se puede guardar: visita firmada.")
         return redirect("detalle_paciente", paciente_id=paciente_id)
@@ -180,14 +193,84 @@ def _examen_assignments_by_tipo_visita():
 @login_required
 @user_passes_test(_staff)
 def exam_builder_list(request):
-    examenes = Examen.objects.all().order_by("nombre")
     assignments = _examen_assignments_by_tipo_visita()
+    assigned_ids = set(assignments.keys())
+    qs = Examen.objects.all()
+
+    origen = (request.GET.get("origen") or "todos").strip().lower()
+    if origen == "legacy":
+        qs = qs.filter(pk__in=LEGACY_REALIZAR_EXAMEN_IDS)
+    elif origen == "builder":
+        qs = qs.exclude(pk__in=LEGACY_REALIZAR_EXAMEN_IDS)
+
+    q = (request.GET.get("q") or "").strip()
+    if q:
+        qs = qs.filter(nombre__icontains=q)
+
+    categoria = (request.GET.get("categoria") or "").strip()
+    valid_cats = {c[0] for c in Examen.CATEGORIA_CHOICES}
+    if categoria in valid_cats:
+        qs = qs.filter(categoria=categoria)
+
+    asignacion = (request.GET.get("asignacion") or "todos").strip().lower()
+    if asignacion == "asignado":
+        if assigned_ids:
+            qs = qs.filter(pk__in=assigned_ids)
+        else:
+            qs = qs.none()
+    elif asignacion == "sin_asignar":
+        if assigned_ids:
+            qs = qs.exclude(pk__in=assigned_ids)
+
+    orden = (request.GET.get("orden") or "id").strip().lower()
+    if orden not in ("id", "nombre", "campos"):
+        orden = "id"
+
+    direccion = (request.GET.get("dir") or "desc").strip().lower()
+    if direccion not in ("asc", "desc"):
+        direccion = "desc"
+
+    examenes_total = qs.count()
+
+    if orden == "id":
+        examenes = qs.order_by("-id" if direccion == "desc" else "id")
+    elif orden == "nombre":
+        if direccion == "desc":
+            examenes = qs.order_by("-nombre", "-id")
+        else:
+            examenes = qs.order_by("nombre", "id")
+    else:
+        _items = list(qs)
+
+        def _nodos(e):
+            c = e.campos
+            return len(c) if isinstance(c, list) else 0
+
+        if direccion == "desc":
+            _items.sort(key=lambda e: (-_nodos(e), -e.id))
+        else:
+            _items.sort(key=lambda e: (_nodos(e), e.id))
+        examenes = _items
+
     return render(
         request,
         "examenes_builder/admin/lista_examenes.html",
         {
             "examenes": examenes,
             "assignments": assignments,
+            "legacy_examen_ids": LEGACY_REALIZAR_EXAMEN_IDS,
+            "filter_origen": origen if origen in ("todos", "legacy", "builder") else "todos",
+            "filter_q": q,
+            "filter_categoria": categoria if categoria in valid_cats else "",
+            "filter_asignacion": (
+                asignacion
+                if asignacion in ("todos", "asignado", "sin_asignar")
+                else "todos"
+            ),
+            "filter_orden": orden,
+            "filter_dir": direccion,
+            "categorias": Examen.CATEGORIA_CHOICES,
+            "examenes_total": examenes_total,
         },
     )
 
@@ -230,6 +313,12 @@ def exam_builder_create(request):
 @user_passes_test(_staff)
 def exam_builder_edit(request, pk):
     examen = get_object_or_404(Examen, pk=pk)
+    if is_legacy_examen(pk):
+        messages.warning(
+            request,
+            "Los exámenes legacy (plantillas en código) no se editan en el Form Builder.",
+        )
+        return redirect("exam_builder_list")
     if request.method == "POST":
         examen.nombre = request.POST.get("nombre", examen.nombre).strip()
         examen.descripcion = request.POST.get("descripcion", "")
@@ -321,6 +410,12 @@ def exam_builder_publish(request, pk):
     if request.method != "POST":
         return HttpResponseForbidden()
     examen = get_object_or_404(Examen, pk=pk)
+    if is_legacy_examen(pk):
+        messages.warning(
+            request,
+            "Los exámenes legacy no publican versión desde el Form Builder.",
+        )
+        return redirect("exam_builder_list")
     ensure_schema_version(examen, request.user)
     messages.success(request, "Versión de esquema publicada.")
     return redirect("exam_builder_edit", pk=pk)
@@ -359,9 +454,7 @@ def exam_builder_tipo_visita_edit(request, pk):
 @login_required
 def builder_result_response(request, visita_examen):
     """Si el examen es dinámico y hay submission, devuelve HttpResponse; si no, None."""
-    if is_legacy_examen(visita_examen.examen_id) and not examen_has_builder_schema(
-        visita_examen.examen.campos
-    ):
+    if is_legacy_examen(visita_examen.examen_id):
         return None
     try:
         submission = visita_examen.builder_submission
