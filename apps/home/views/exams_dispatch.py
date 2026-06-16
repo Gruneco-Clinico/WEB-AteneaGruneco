@@ -53,8 +53,6 @@ def realizar_examen(request, visita_id, examen_id, paciente_id):
         if not config:
             return realizar_examen_builder(request, visita_id, examen_id, paciente_id)
 
-    exam_model = get_exam_model(int(examen_id))
-
     # Obtener datos existentes
     paciente = get_object_or_404(DatosDemograficos, id=paciente_id)
     visita = get_object_or_404(Visita, id=visita_id, paciente=paciente)
@@ -73,9 +71,9 @@ def realizar_examen(request, visita_id, examen_id, paciente_id):
             visita_id=visita_id, examen_id=examen_id
         )
 
-        if exam_model and visita_examen_obj.esta_realizado:
+        if config["model"] and visita_examen_obj.esta_realizado:
             resultado = visita_examen_obj.get_resultado_instance()
-            if resultado and isinstance(resultado, exam_model):
+            if resultado and isinstance(resultado, config["model"]):
                 # ===================================================
                 # CASO ESPECIAL: ANAMNESIS DE SUEÑO (ID 10)
                 # ===================================================

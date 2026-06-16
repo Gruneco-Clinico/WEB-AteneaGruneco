@@ -102,13 +102,13 @@ class CitaMedica(models.Model):
     # La hora se toma de disponibilidad.hora_inicio y disponibilidad.hora_fin
 
     # Datos del paciente
-    email_paciente = models.EmailField(db_index=True)
+    email_paciente = models.EmailField()
     nombre_paciente = models.CharField(max_length=200)
     telefono_paciente = models.CharField(max_length=20, blank=True)
     motivo_consulta = models.TextField(blank=True)
 
     # Control
-    estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default="agendada", db_index=True)
+    estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default="agendada")
     fecha_agendamiento = models.DateTimeField(auto_now_add=True)
 
     # Proyecto asociado (opcional)
@@ -140,12 +140,6 @@ class CitaMedica(models.Model):
 
     class Meta:
         unique_together = ["disponibilidad", "fecha_cita"]
-        indexes = [
-            models.Index(
-                fields=["disponibilidad", "fecha_cita", "estado"],
-                name="cita_disp_fecha_estado_idx",
-            ),
-        ]
 
     def __str__(self):
         return f"{self.nombre_paciente} - {self.fecha_cita} {self.hora_inicio}"
