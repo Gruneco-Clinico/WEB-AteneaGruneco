@@ -1,0 +1,153 @@
+{% load form_builder_tags %}
+{% with t=field.type %}
+{% if t == 'section' %}
+  <div class="fb-section-block fb-field mb-3"
+       {% if field.visible_when %}data-vw-cond="{{ field.visible_when|fb_attr_json }}"{% endif %}>
+    <h4 class="mt-4 text-primary mb-2">{{ field.label }}</h4>
+    {% if field.help_text %}<p class="text-muted small mb-2">{{ field.help_text }}</p>{% endif %}
+    {% if field.fields %}
+      {% for sf in field.fields %}
+        {% include "examenes_builder/field_fragment.html" with field=sf datos_examen=datos_examen name_prefix=name_prefix %}
+      {% endfor %}
+    {% endif %}
+  </div>
+{% elif t == 'computed' %}
+  <div class="form-group fb-computed" data-formula="{{ field.formula|default:'' }}" data-id="{{ field.id }}"
+       data-depends="{{ field.depends_on|default_if_none:''|join:',' }}"
+       data-precision="{{ field.precision|default:2 }}">
+    <label>{{ field.label }}</label>
+    <input type="text" class="form-control" readonly id="computed_{{ field.id }}"
+           value="{{ datos_examen|get_item:field.id|default:'' }}">
+    {% if field.help_text %}<small class="text-muted">{{ field.help_text }}</small>{% endif %}
+  </div>
+{% elif t == 'repeater' %}
+  <div class="form-group fb-repeater fb-field mb-3" data-rid="{{ field.id }}"
+       {% if field.visible_when %}data-vw-cond="{{ field.visible_when|fb_attr_json }}"{% endif %}>
+       <label class="font-weight-bold">{{ field.label }}{% if field.required %} <span class="text-danger">*</span>{% endif %}</label>
+       {% if field.help_text %}<small class="d-block text-muted mb-1">{{ field.help_text }}</small>{% endif %}
+       {% with rows=datos_examen|get_item:field.id %}
+    <div class="repeater-rows">
+      {% if rows %}
+        {% for row in rows %}
+        <div class="border rounded p-3 mb-2 repeater-row" data-index="{{ forloop.counter0 }}">
+          <div class="d-flex justify-content-end mb-2">
+            <button type="button" class="btn btn-sm btn-outline-danger fb-remove-row">{{ field.remove_label|default:"Eliminar" }}</button>
+          </div>
+          {% for sf in field.fields %}
+            {% fb_concat field.id "__" forloop.parentloop.counter0 "__" as rp %}
+            {% include "examenes_builder/field_fragment.html" with field=sf datos_examen=row name_prefix=rp %}
+          {% endfor %}
+        </div>
+        {% endfor %}
+      {% else %}
+        <div class="border rounded p-3 mb-2 repeater-row" data-index="0">
+          <div class="d-flex justify-content-end mb-2">
+            <button type="button" class="btn btn-sm btn-outline-danger fb-remove-row">{{ field.remove_label|default:"Eliminar" }}</button>
+          </div>
+          {% for sf in field.fields %}
+            {% fb_concat field.id "__0__" as rp %}
+            {% include "examenes_builder/field_fragment.html" with field=sf datos_examen=None name_prefix=rp %}
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+    {% endwith %}
+    <button type="button" class="btn btn-sm btn-outline-primary fb-add-row mt-1">{{ field.add_label|default:"+ Agregar fila" }}</button>
+  </div>
+{% elif t == 'info' %}
+  <div class="fb-info fb-field mb-3{% if field.variant == 'info' %} alert alert-info{% elif field.variant == 'warning' %} alert alert-warning{% endif %}"
+       {% if field.visible_when %}data-vw-cond="{{ field.visible_when|fb_attr_json }}"{% endif %}>
+    {% if field.label %}<div class="fb-info-label font-weight-bold mb-2">{{ field.label }}</div>{% endif %}
+    <div class="fb-info-content{% if field.variant == 'plain' or not field.variant %} text-muted{% endif %}">{{ field.content|fb_markdown }}</div>
+  </div>
+{% else %}
+  {% fb_input_name name_prefix field.id as input_name %}
+  <div class="form-group fb-field mb-3"
+       {% if field.visible_when %}data-vw-cond="{{ field.visible_when|fb_attr_json }}"{% endif %}>
+    <label for="id_{{ input_name|slugify }}">{{ field.label }}{% if field.required %} <span class="text-danger">*</span>{% endif %}</label>
+    {% if field.help_text %}<small class="d-block text-muted mb-1">{{ field.help_text }}</small>{% endif %}
+
+    {% if t == 'textarea' %}
+      <textarea class="form-control" name="{{ input_name }}" id="id_{{ input_name|slugify }}" rows="3"
+        {% if field.required %}required{% endif %}>{{ datos_examen|get_item:field.id|default:'' }}</textarea>
+
+    {% elif t == 'number' %}
+      <input type="number" class="form-control fb-number" name="{{ input_name }}" id="id_{{ input_name|slugify }}"
+        value="{{ datos_examen|get_item:field.id|default:'' }}"
+        {% if field.min != None %}min="{{ field.min }}"{% endif %}
+        {% if field.max != None %}max="{{ field.max }}"{% endif %}
+        {% if field.step != None and field.step != '' %}step="{{ field.step }}"{% endif %}
+        {% if field.required %}required{% endif %}>
+
+    {% elif t == 'text' and field.multiline %}
+      <textarea class="form-control" name="{{ input_name }}" id="id_{{ input_name|slugify }}"
+        rows="{{ field.rows|default:3 }}"
+        {% if field.required %}required{% endif %}>{{ datos_examen|get_item:field.id|default:'' }}</textarea>
+
+    {% elif t == 'date' %}
+      <input type="date" class="form-control" name="{{ input_name }}" id="id_{{ input_name|slugify }}"
+        value="{{ datos_examen|get_item:field.id|default:'' }}" {% if field.required %}required{% endif %}>
+
+    {% elif t == 'time' %}
+      <input type="time" class="form-control" name="{{ input_name }}" id="id_{{ input_name|slugify }}"
+        value="{{ datos_examen|get_item:field.id|default:'' }}" {% if field.required %}required{% endif %}>
+
+    {% elif t == 'email' %}
+      <input type="email" class="form-control" name="{{ input_name }}" id="id_{{ input_name|slugify }}"
+        value="{{ datos_examen|get_item:field.id|default:'' }}" {% if field.required %}required{% endif %}>
+
+    {% elif t == 'select' %}
+      <select class="form-control" name="{{ input_name }}" id="id_{{ input_name|slugify }}" {% if field.required %}required{% endif %}>
+        <option value="">—</option>
+        {% for opt in field.options %}
+          <option value="{{ opt.value }}" {% if datos_examen|get_item:field.id == opt.value %}selected{% endif %}>{{ opt.label }}</option>
+        {% endfor %}
+      </select>
+
+    {% elif t == 'radio' %}
+      {% for opt in field.options %}
+      <div class="custom-control custom-radio">
+        <input type="radio" class="custom-control-input" name="{{ input_name }}" id="{{ input_name|slugify }}_{{ forloop.counter }}"
+          value="{{ opt.value }}" {% if datos_examen|get_item:field.id == opt.value %}checked{% endif %}>
+        <label class="custom-control-label" for="{{ input_name|slugify }}_{{ forloop.counter }}">{{ opt.label }}</label>
+      </div>
+      {% endfor %}
+
+    {% elif t == 'checkbox' %}
+      <div class="custom-control custom-checkbox">
+        <input type="checkbox" class="custom-control-input" name="{{ input_name }}" id="id_{{ input_name|slugify }}"
+          {% if datos_examen|get_item:field.id %}checked{% endif %}>
+        <label class="custom-control-label" for="id_{{ input_name|slugify }}">Sí</label>
+      </div>
+
+    {% elif t == 'boolean' %}
+      <div class="fb-boolean-radio custom-control custom-radio custom-control-inline">
+        <label class="custom-control-label" for="{{ input_name|slugify }}_si">Sí</label>
+        <input type="radio" class="custom-control-input" name="{{ input_name }}" id="{{ input_name|slugify }}_si" value="true"
+          {% if datos_examen|get_item:field.id == True or datos_examen|get_item:field.id == 'true' %}checked{% endif %}>
+      </div>
+      <div class="fb-boolean-radio custom-control custom-radio custom-control-inline">
+        <label class="custom-control-label" for="{{ input_name|slugify }}_no">No</label>
+        <input type="radio" class="custom-control-input" name="{{ input_name }}" id="{{ input_name|slugify }}_no" value="false"
+          {% if datos_examen|get_item:field.id == False or datos_examen|get_item:field.id == 'false' %}checked{% endif %}>
+      </div>
+
+    {% elif t == 'multiselect' %}
+      {% with cur=datos_examen|get_item:field.id %}
+      {% for opt in field.options %}
+      <div class="custom-control custom-checkbox">
+        <input type="checkbox" class="custom-control-input" name="{{ input_name }}" id="{{ input_name|slugify }}_{{ forloop.counter }}"
+          value="{{ opt.value }}"
+          {% if cur|contains_val:opt.value %}checked{% endif %}>
+        <label class="custom-control-label" for="{{ input_name|slugify }}_{{ forloop.counter }}">{{ opt.label }}</label>
+      </div>
+      {% endfor %}
+      {% endwith %}
+
+    {% else %}
+      <input type="text" class="form-control" name="{{ input_name }}" id="id_{{ input_name|slugify }}"
+        value="{{ datos_examen|get_item:field.id|default:'' }}" {% if field.required %}required{% endif %}>
+    {% endif %}
+  </div>
+{% endif %}
+{% endwith %}

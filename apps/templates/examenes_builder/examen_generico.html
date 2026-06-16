@@ -1,0 +1,48 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+{% load form_builder_tags %}
+
+{% block title %}{{ examen.nombre }}{% endblock %}
+
+{% block stylesheets %}
+<link rel="stylesheet" href="{% static 'assets/css/form_builder/builder.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+  <div class="card shadow">
+    <div class="card-header">
+      <h2 class="mb-0">{{ examen.nombre }}</h2>
+      {% if modo_edicion %}<span class="badge badge-info">Edición</span>{% endif %}
+    </div>
+    <div class="card-body">
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+
+      <form method="post" action="{% url 'guardar_examen_builder' %}" id="fb-main-form">
+        {% csrf_token %}
+        <input type="hidden" name="visita_id" value="{{ visita_examen }}">
+        <input type="hidden" name="paciente_id" value="{{ paciente_id }}">
+        <input type="hidden" name="examen_id" value="{{ examen_id }}">
+
+        {% include "examenes_builder/_tabs_layout.html" with builder_fields=builder_fields datos_examen=datos_examen tabs_prefix="fbrt" %}
+
+        <button type="submit" class="btn btn-primary">Guardar</button>
+        <a href="{% url 'detalle_paciente' paciente_id %}" class="btn btn-secondary">Volver</a>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script src="{% static 'assets/js/form_builder/runtime.js' %}"></script>
+<script>
+(function () {
+  if (window.FBRuntime) FBRuntime.init(document);
+})();
+</script>
+{% endblock %}

@@ -11,6 +11,7 @@ from django.forms.models import model_to_dict
 from django.contrib.auth.models import User
 from django.views.generic import TemplateView
 from django.core.mail import send_mail, EmailMessage
+from django.core.paginator import Paginator
 from django.db.models import Max
 from django.urls import reverse
 from datetime import datetime, timedelta
@@ -48,11 +49,18 @@ def _normalizar_tipo_documento(tipo_documento):
     return "CC"
 
 
-def _build_codigos_map(pacientes_qs):
-    """Return {paciente_id: [code1, code2, ...]} from ProyectoPacienteExtra."""
+def _build_codigos_map(pacientes):
+    """Return {paciente_id: [code1, code2, ...]} from ProyectoPacienteExtra.
+
+    Accepts either a QuerySet of ``DatosDemograficos`` or any iterable of
+    ``DatosDemograficos`` instances (e.g. a ``django.core.paginator.Page``).
+    """
     from ..models import ProyectoPacienteExtra
 
-    pac_ids = list(pacientes_qs.values_list("id", flat=True))
+    if hasattr(pacientes, "values_list"):
+        pac_ids = list(pacientes.values_list("id", flat=True))
+    else:
+        pac_ids = [p.id for p in pacientes]
     ppe_qs = (
         ProyectoPacienteExtra.objects
         .filter(paciente_id__in=pac_ids)

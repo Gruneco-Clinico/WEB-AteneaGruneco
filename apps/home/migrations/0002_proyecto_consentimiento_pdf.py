@@ -1,4 +1,4 @@
-﻿# Generated manually for adding consentimiento_pdf field
+# Generated manually for adding consentimiento_pdf field
 from django.db import migrations, models
 
 

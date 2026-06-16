@@ -1,0 +1,34 @@
+{% extends "layouts/base.html" %}
+{% load form_builder_tags %}
+
+{% block title %}Resultado — {{ visita_examen.examen.nombre }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+  <div class="card shadow">
+    <div class="card-header">
+      <h2 class="mb-0">{{ visita_examen.examen.nombre }}</h2>
+      <small class="text-muted">{{ paciente }}</small>
+    </div>
+    <div class="card-body">
+      {% if submission.computed %}
+      <h4 class="mt-2">Valores calculados</h4>
+      <table class="table table-sm">
+        {% for k, v in submission.computed.items %}
+        <tr><th>{{ k }}</th><td>{{ v }}</td></tr>
+        {% endfor %}
+      </table>
+      {% endif %}
+
+      <h4 class="mt-4">Respuestas</h4>
+      <table class="table table-bordered">
+        <tbody>
+          {% include "examenes_builder/resultado_builder_fragment.html" with fields=builder_fields %}
+        </tbody>
+      </table>
+
+      <a href="{% url 'detalle_paciente' paciente.id %}" class="btn btn-secondary">Volver al paciente</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

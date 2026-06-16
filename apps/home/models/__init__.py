@@ -8,6 +8,7 @@ from .results_sleep import *  # noqa: F401,F403
 from .results_anosognosia import *  # noqa: F401,F403
 from .analytics import *  # noqa: F401,F403
 from .results_general import *  # noqa: F401,F403
+from .exam_builder import ExamenSchemaVersion, ExamenSubmission  # noqa: F401
 from .consent_signature import *  # noqa: F401,F403
 
 __all__ = [
@@ -96,5 +97,7 @@ __all__ = [
     "ErrorLenguajeCognitivo",
     "ActividadVidaDiaria",
     "ActividadCompleja",
+    "ExamenSchemaVersion",
+    "ExamenSubmission",
     "ConsentimientoFirmaEnvio",
 ]

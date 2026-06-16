@@ -258,11 +258,19 @@ class VisitaExamen(models.Model):
 
         estado_completado = self.estado == "completado"
 
+        # Form Builder: resultado = ExamenSubmission (incluye IDs legacy si tienen ``campos``)
+        from ..exam_legacy import examen_has_builder_schema, is_legacy_examen
+
+        if examen_has_builder_schema(self.examen.campos) or not is_legacy_examen(
+            self.examen_id
+        ):
+            from .exam_builder import ExamenSubmission
+
+            tiene = ExamenSubmission.objects.filter(visita_examen=self).exists()
+            return estado_completado and tiene
+
         resultado = self.get_resultado_instance()
         tiene_resultado = resultado is not None
-
-        if resultado:
-            pass
 
         final_result = estado_completado and tiene_resultado
 

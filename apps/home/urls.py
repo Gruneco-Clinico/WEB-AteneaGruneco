@@ -189,6 +189,46 @@ urlpatterns = [
         name="realizar_examen",
     ),
     path(
+        "guardar_examen_builder/",
+        views.guardar_examen_builder,
+        name="guardar_examen_builder",
+    ),
+    path(
+        "builder/examenes/",
+        views.exam_builder_list,
+        name="exam_builder_list",
+    ),
+    path(
+        "builder/examenes/nuevo/",
+        views.exam_builder_create,
+        name="exam_builder_create",
+    ),
+    path(
+        "builder/examenes/preview/",
+        views.exam_builder_preview,
+        name="exam_builder_preview",
+    ),
+    path(
+        "builder/examenes/<int:pk>/",
+        views.exam_builder_edit,
+        name="exam_builder_edit",
+    ),
+    path(
+        "builder/examenes/<int:pk>/publicar/",
+        views.exam_builder_publish,
+        name="exam_builder_publish",
+    ),
+    path(
+        "builder/examenes/<int:pk>/eliminar/",
+        views.exam_builder_delete,
+        name="exam_builder_delete",
+    ),
+    path(
+        "builder/tipo-visita/<int:pk>/examenes/",
+        views.exam_builder_tipo_visita_edit,
+        name="exam_builder_tipo_visita_edit",
+    ),
+    path(
         "examen_sueno_fisico/",
         views.guardar_examen_fisico_sueno,
         name="guardar_examen_sueno_fisico",

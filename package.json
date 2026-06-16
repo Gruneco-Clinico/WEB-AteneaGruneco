@@ -3,7 +3,11 @@
     "mastertemplate": "boilerplate-code-django-dashboard",
     "version": "1.0.2",
     "description": "Template project - Django Boilerplate Code ",
-    "scripts": {},
+    "scripts": {
+        "test": "vitest run",
+        "test:watch": "vitest",
+        "test:coverage": "vitest run --coverage"
+    },
     "repository": {
         "type": "git",
         "url": "https://github.com/creativetimofficial/argon-dashboard-django"
@@ -14,8 +18,11 @@
     },
     "author": "Creative-Tim / AppSeed.us",
     "engines": {
-        "node": ">=10.0.0"
+        "node": ">=18.0.0"
     },
     "dependencies": {},
-    "devDependencies": {}
+    "devDependencies": {
+        "vitest": "^2.1.9",
+        "jsdom": "^25.0.1"
+    }
 }
