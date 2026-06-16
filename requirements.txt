@@ -25,3 +25,6 @@ whitenoise>=6.6.0
 zopfli==0.2.3.post1
 mysqlclient==2.2.7
 requests==2.32.0
+django-simple-history==3.11.0
+markdown>=3.5,<4
+bleach>=6.0,<7

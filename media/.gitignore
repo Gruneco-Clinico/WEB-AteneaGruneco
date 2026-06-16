@@ -1,0 +1,5 @@
+﻿# Ignore uploaded media files
+*
+!.gitignore
+!consentimientos/
+consentimientos/*

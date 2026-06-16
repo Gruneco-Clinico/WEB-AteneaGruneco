@@ -1,0 +1,229 @@
+{% extends 'layouts/base_public.html' %}
+
+{% block content %}
+<div class="header bg-primary pb-6">
+  <div class="container-fluid">
+    <div class="header-body">
+      <div class="row align-items-center py-4">
+        <div class="col-lg-12">
+          <h6 class="h2 text-white d-inline-block mb-0">Firma consentimiento informado</h6>
+          <p class="text-white-50 mb-0 mt-1">{{ envio.proyecto.nombre }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid mt--6">
+  <div class="row">
+    <div class="col-lg-10 col-xl-8 mx-auto">
+      <div class="card shadow">
+        <div class="card-header border-0">
+          <h3 class="mb-0">Formulario de firma</h3>
+        </div>
+
+        <div class="card-body">
+          {% if messages %}
+          <div class="alert alert-danger" role="alert">
+            {% for message in messages %}
+            <p class="mb-0">{{ message }}</p>
+            {% endfor %}
+          </div>
+          {% endif %}
+
+          <form method="post" id="firma-consentimiento-form">
+            {% csrf_token %}
+            <input type="hidden" name="token" value="{{ token }}" />
+            <input type="hidden" name="firma_participante" id="firma_participante_input" />
+
+            <div class="alert alert-light border">
+              <p class="mb-0" style="font-size: 12pt; line-height: 1.6;">
+                Después de haber leído y comprendido toda la información contenida en el documento consentimiento informado del proyecto de investigación,
+                y de haber recibido de parte del investigador las explicaciones verbales y respuestas satisfactorias a mis preguntas, manifiesto que:
+              </p>
+            </div>
+
+            <h5 class="mt-4">Aceptación de participación</h5>
+
+            <div class="form-group mt-3">
+              <label class="d-block">¿Acepto voluntariamente mi participación en el estudio?</label>
+              <div class="custom-control custom-radio custom-control-inline">
+                <input type="radio" id="acepta_participacion_si" name="acepta_participacion" value="si" class="custom-control-input" {% if envio.acepta_participacion == True %}checked{% endif %} required>
+                <label class="custom-control-label" for="acepta_participacion_si">Si</label>
+              </div>
+              <div class="custom-control custom-radio custom-control-inline">
+                <input type="radio" id="acepta_participacion_no" name="acepta_participacion" value="no" class="custom-control-input" {% if envio.acepta_participacion == False %}checked{% endif %} required>
+                <label class="custom-control-label" for="acepta_participacion_no">No</label>
+              </div>
+            </div>
+
+            <div class="form-group mt-3">
+              <label class="d-block">Acepto que los resultados de mis evaluaciones sean almacenados y usados en futuras investigaciones realizadas por el grupo de investigación.</label>
+              <div class="custom-control custom-radio custom-control-inline">
+                <input type="radio" id="acepta_uso_si" name="acepta_uso_futuras_investigaciones" value="si" class="custom-control-input" {% if envio.acepta_uso_futuras_investigaciones == True %}checked{% endif %} required>
+                <label class="custom-control-label" for="acepta_uso_si">Si</label>
+              </div>
+              <div class="custom-control custom-radio custom-control-inline">
+                <input type="radio" id="acepta_uso_no" name="acepta_uso_futuras_investigaciones" value="no" class="custom-control-input" {% if envio.acepta_uso_futuras_investigaciones == False %}checked{% endif %} required>
+                <label class="custom-control-label" for="acepta_uso_no">No</label>
+              </div>
+            </div>
+
+            <div class="form-group mt-3">
+              <label class="d-block">Acepto que me contacten para invitarme a nuevas investigaciones, entendiendo que esto no obliga a mi participación.</label>
+              <div class="custom-control custom-radio custom-control-inline">
+                <input type="radio" id="acepta_contacto_si" name="acepta_contacto_nuevas_investigaciones" value="si" class="custom-control-input" {% if envio.acepta_contacto_nuevas_investigaciones == True %}checked{% endif %} required>
+                <label class="custom-control-label" for="acepta_contacto_si">Si</label>
+              </div>
+              <div class="custom-control custom-radio custom-control-inline">
+                <input type="radio" id="acepta_contacto_no" name="acepta_contacto_nuevas_investigaciones" value="no" class="custom-control-input" {% if envio.acepta_contacto_nuevas_investigaciones == False %}checked{% endif %} required>
+                <label class="custom-control-label" for="acepta_contacto_no">No</label>
+              </div>
+            </div>
+
+            <h5 class="mt-4">Información del participante</h5>
+
+            <div class="form-group">
+              <label for="nombres_apellidos">Nombres y apellidos completos</label>
+              <input type="text" class="form-control" id="nombres_apellidos" name="nombres_apellidos" value="{{ envio.nombres_apellidos|default:'' }}" required>
+            </div>
+
+            <div class="form-group">
+              <label for="tipo_documento">Tipo documento de identidad</label>
+              <select class="form-control" id="tipo_documento" name="tipo_documento" required>
+                <option value="CC" {% if envio.tipo_documento == 'CC' %}selected{% endif %}>Cedula de ciudadania</option>
+                <option value="TI" {% if envio.tipo_documento == 'TI' %}selected{% endif %}>Tarjeta de Identidad</option>
+                <option value="NUIP" {% if envio.tipo_documento == 'NUIP' %}selected{% endif %}>Numero Unico de Identificacion Personal - NUIP</option>
+                <option value="CE" {% if envio.tipo_documento == 'CE' %}selected{% endif %}>Cedula de Extranjeria</option>
+                <option value="PS" {% if envio.tipo_documento == 'PS' %}selected{% endif %}>Pasaporte</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="numero_documento">Numero de documento</label>
+              <input type="text" class="form-control" id="numero_documento" name="numero_documento" value="{{ envio.numero_documento|default:'' }}" required>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="fecha_firma">Fecha de firma / diligenciamiento</label>
+                  <input type="date" class="form-control" id="fecha_firma" name="fecha_firma" value="{% if envio.fecha_firma %}{{ envio.fecha_firma|date:'Y-m-d' }}{% else %}{% now 'Y-m-d' %}{% endif %}" required>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="hora_firma">Hora de firma / diligenciamiento</label>
+                  <input type="time" class="form-control" id="hora_firma" name="hora_firma" value="{% if envio.hora_firma %}{{ envio.hora_firma|time:'H:i' }}{% endif %}" required>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="correo_electronico">Correo electronico</label>
+              <input type="email" class="form-control" id="correo_electronico" name="correo_electronico" value="{{ envio.correo_electronico|default:'' }}" required>
+            </div>
+
+            <div class="form-group">
+              <label for="celular">Celular</label>
+              <input type="text" class="form-control" id="celular" name="celular" value="{{ envio.celular|default:'' }}" required>
+            </div>
+
+            <div class="form-group">
+              <label for="firma_participante_canvas">Firma</label>
+              <canvas id="firma_participante_canvas" class="border w-100" height="180"></canvas>
+              <div class="mt-2">
+                <button type="button" class="btn btn-sm btn-secondary" id="limpiar_firma">Limpiar firma</button>
+              </div>
+            </div>
+
+            <div class="text-right mt-4">
+              <button type="submit" class="btn btn-primary">Guardar firma</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  var canvas = document.getElementById('firma_participante_canvas');
+  var inputFirma = document.getElementById('firma_participante_input');
+  var form = document.getElementById('firma-consentimiento-form');
+  var limpiarBtn = document.getElementById('limpiar_firma');
+
+  var ctx = canvas.getContext('2d');
+  var dibujando = false;
+
+  function getPos(evt) {
+    var rect = canvas.getBoundingClientRect();
+    if (evt.touches && evt.touches.length > 0) {
+      return {
+        x: evt.touches[0].clientX - rect.left,
+        y: evt.touches[0].clientY - rect.top
+      };
+    }
+    return {
+      x: evt.clientX - rect.left,
+      y: evt.clientY - rect.top
+    };
+  }
+
+  function startDraw(evt) {
+    evt.preventDefault();
+    dibujando = true;
+    var pos = getPos(evt);
+    ctx.beginPath();
+    ctx.moveTo(pos.x, pos.y);
+  }
+
+  function draw(evt) {
+    if (!dibujando) {
+      return;
+    }
+    evt.preventDefault();
+    var pos = getPos(evt);
+    ctx.lineWidth = 2;
+    ctx.lineCap = 'round';
+    ctx.strokeStyle = '#000000';
+    ctx.lineTo(pos.x, pos.y);
+    ctx.stroke();
+  }
+
+  function stopDraw() {
+    dibujando = false;
+  }
+
+  canvas.addEventListener('mousedown', startDraw);
+  canvas.addEventListener('mousemove', draw);
+  canvas.addEventListener('mouseup', stopDraw);
+  canvas.addEventListener('mouseleave', stopDraw);
+
+  canvas.addEventListener('touchstart', startDraw, { passive: false });
+  canvas.addEventListener('touchmove', draw, { passive: false });
+  canvas.addEventListener('touchend', stopDraw);
+
+  limpiarBtn.addEventListener('click', function () {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    inputFirma.value = '';
+  });
+
+  form.addEventListener('submit', function (evt) {
+    var dataURL = canvas.toDataURL('image/png');
+    var blank = document.createElement('canvas');
+    blank.width = canvas.width;
+    blank.height = canvas.height;
+
+    if (dataURL === blank.toDataURL()) {
+      evt.preventDefault();
+      alert('Debe ingresar su firma antes de guardar.');
+      return;
+    }
+
+    inputFirma.value = dataURL;
+  });
+})();
+</script>
+{% endblock %}

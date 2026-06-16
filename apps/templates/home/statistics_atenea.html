@@ -1,192 +1,321 @@
 {% extends 'layouts/base.html' %}
 {% load static %}
-{% load custom_filters %}
 
-<!-- Specific CSS goes HERE -->
-{% block stylesheets %}{% endblock stylesheets %} {% block content %}
+{% block stylesheets %}
+<style>
+  .kpi-card { border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.08); transition: all .3s ease; }
+  .kpi-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.14); }
+  .chart-card { border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.07); }
+  .chart-card canvas { max-height: 320px; }
+  .filter-card { border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+  .kpi-value { font-size: 2rem; font-weight: 700; line-height: 1.1; }
+  .kpi-label { font-size: .85rem; text-transform: uppercase; letter-spacing: .5px; color: #8898aa; }
+  .loading-overlay { display:flex; align-items:center; justify-content:center; min-height:200px; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+  #dashboardContent .card { animation: fadeIn .4s ease; }
+</style>
+{% endblock stylesheets %}
+
+{% block content %}
 <!-- Header -->
 <div class="header bg-primary pb-6">
   <div class="container-fluid">
     <div class="header-body">
       <div class="row align-items-center py-4">
         <div class="col-lg-6 col-7">
-          <h6 class="h2 text-white d-inline-block mb-0">GRUNECO</h6>
+          <h6 class="h2 text-white d-inline-block mb-0">
+            <i class="fas fa-chart-pie mr-2"></i>Dashboard ATENEA
+          </h6>
           <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
             <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
-              <li class="breadcrumb-item">
-                <a href="#"><i class="fas fa-home"></i></a>
-              </li>
-              <li class="breadcrumb-item"><a href="#">Atenea</a></li>
-              <li class="breadcrumb-item active" aria-current="page">
-                Estadísticas Atenea
-              </li>
+              <li class="breadcrumb-item"><a href="/index/"><i class="fas fa-home"></i></a></li>
+              <li class="breadcrumb-item active">Dashboard</li>
             </ol>
           </nav>
         </div>
       </div>
-      <!-- Card stats -->
-      <div class="row">
-
-        <!-- Número de participantes por proyecto -->
-        {% for p in proyectos_info %}
-        <div class="col-xl-4 col-md-6 mb-3">
-          <div class="card card-stats">
-            <div class="card-body">
-              <div class="row">
-                <div class="col">
-                  <h5 class="card-title text-uppercase text-muted mb-0">
-                    {{ p.label }}
-                  </h5>
-
-                  <!-- Cantidad de Participantes por Proyecto -->
-                  <div class="d-flex align-items-baseline">
-                    <span class="h2 font-weight-bold mb-0 mr-3">{{ p.participants }}</span>
-                    <small class="text-muted">Participantes</small>
-                  </div>
-
-                  <!-- Datos recolectados por Proyecto (Exámenes completados)-->
-                  <div class="mt-2 d-flex align-items-baseline">
-                    <span class="h3 font-weight-semibold mb-0 mr-3 text-success">{{ p.exams_completed }}</span>
-                    <small class="text-muted">Datos recolectados (exámenes completados)</small>
-                  </div>
-
-                </div>
-
-                <div class="col-auto">
-                  <div class="icon icon-shape bg-gradient-blue text-white rounded-circle shadow">
-                    <i class="ni ni-briefcase-24"></i>
-                  </div>
-                </div>
-              </div>
-
-              <p class="mt-3 mb-0 text-sm">
-                <span class="text-success mr-2">
-                  <i class="fa fa-arrow-up"></i>
-                  Nuevos participantes en curso
-                </span>
-                <span class="text-nowrap">Actualizado recientemente</span>
-              </p>
-            </div>
-          </div>
-        </div>
-      {% endfor %}
-      </div>
     </div>
   </div>
 </div>
 
-<!-- Page content -->
 <div class="container-fluid mt--6">
-  <div class="row mb-0">
-    {% for p in proyectos_info %}
-    <div class="col-xl-6">
-      <div class="card">
-          <div class="card-header border-0">
-            <div class="row align-items-center">
-              <div class="col">
-                <h3 class="mb-0">Estadísticas Clínicas - {{ p.label }}</h3>
-              </div>
-              <div class="col text-right">
-                <a href="#!" class="btn btn-sm btn-primary">Ver detalles</a>
-              </div>
-            </div>
-          </div>
-          <div class="table-responsive">
-            <table class="table align-items-center table-flush">
-              <thead class="thead-light">
-                <tr>
-                  <th scope="col">Rango de Edad</th>
-                  <th scope="col">Número de Participantes</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for stat in p.clinical_stats %}
-                  <tr>
-                    <td>{{ stat.rango }}</td>
-                    <td>{{ stat.count }}</td>
-                  </tr>
-                {% empty %}
-                  <tr>
-                    <td colspan="2" class="text-center text-muted">
-                      No hay participantes registrados
-                    </td>
-                  </tr>
+
+  <!-- ====== FILTRO ====== -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card filter-card">
+        <div class="card-body py-3">
+          <div class="row align-items-end">
+            <div class="col-md-4">
+              <label class="form-control-label">Proyecto</label>
+              <select class="form-control" id="filtroProyecto">
+                <option value="">Todos los proyectos</option>
+                {% for p in proyectos %}
+                <option value="{{ p.id }}">{{ p.nombre }}</option>
                 {% endfor %}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-
-
-      <!-- Gráficos que van a la derecha -->
-
-    </div>
-
-    <div class="col-xl-6">
-      <div class="card">
-        <div class="card-header border-0">
-          <div class="row align-items-center">
-            <div class="col">
-              <h3 class="mb-0">Distribución Demográfica - {{ p.label }}</h3>
+              </select>
+            </div>
+            <div class="col-md-3 d-flex mt-3 mt-md-0">
+              <button class="btn btn-primary mr-2 flex-fill" id="btnFiltrar">
+                <i class="fas fa-search mr-1"></i> Filtrar
+              </button>
+              <button class="btn btn-outline-secondary flex-fill" id="btnLimpiar">
+                <i class="fas fa-times mr-1"></i> Limpiar
+              </button>
             </div>
           </div>
-        </div>
-        <div class="table-responsive">
-          <table class="table align-items-center table-flush">
-            <thead class="thead-light">
-              <tr>
-                <th scope="col">Categoría</th>
-                <th scope="col">Cantidad</th>
-                <th scope="col">Porcentaje</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for stat in p.demografia %}
-              <tr>
-                <th scope="row">{{ stat.label }}</th>
-                <td>{{ stat.count }}</td>
-                <td>
-                  <div class="d-flex align-items-center">
-                    <span class="mr-2">{{ stat.percent }}%</span>
-                    <div>
-                      <div class="progress">
-                        <div class="progress-bar bg-gradient-{{ stat.color }}"
-                            role="progressbar"
-                            aria-valuenow="{{ stat.percent|default_if_none:0|floatformat:0 }}"
-                            aria-valuemin="0"
-                            aria-valuemax="100"
-                            style="width: {{ stat.percent|default_if_none:0|floatformat:0 }}%;">
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </td>
-              </tr>
-              {% empty %}
-              <tr>
-                <td colspan="3" class="text-center text-muted">
-                  No hay participantes registrados
-                </td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
         </div>
       </div>
     </div>
-    {% endfor %}
   </div>
-  
-{% include "includes/footer.html" %}
-</div>
 
+  <!-- ====== KPI CARDS ====== -->
+  <div class="row mb-4">
+    <div class="col-xl-4 col-md-6 mb-3">
+      <div class="card kpi-card border-0">
+        <div class="card-body">
+          <div class="row">
+            <div class="col">
+              <p class="kpi-label mb-1">Total Participantes</p>
+              <span class="kpi-value text-primary" id="kpiParticipantes">—</span>
+            </div>
+            <div class="col-auto">
+              <div class="icon icon-shape bg-gradient-primary text-white rounded-circle shadow">
+                <i class="fas fa-users"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-4 col-md-6 mb-3">
+      <div class="card kpi-card border-0">
+        <div class="card-body">
+          <div class="row">
+            <div class="col">
+              <p class="kpi-label mb-1">Edad Promedio</p>
+              <span class="kpi-value text-info" id="kpiEdad">—</span>
+            </div>
+            <div class="col-auto">
+              <div class="icon icon-shape bg-gradient-info text-white rounded-circle shadow">
+                <i class="fas fa-birthday-cake"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-4 col-md-6 mb-3">
+      <div class="card kpi-card border-0">
+        <div class="card-body">
+          <div class="row">
+            <div class="col">
+              <p class="kpi-label mb-1">Total Exámenes Completados</p>
+              <span class="kpi-value text-success" id="kpiExamenes">—</span>
+            </div>
+            <div class="col-auto">
+              <div class="icon icon-shape bg-gradient-success text-white rounded-circle shadow">
+                <i class="fas fa-clipboard-check"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== CHARTS ROW 1: Género + Escolaridad ====== -->
+  <div class="row mb-4">
+    <div class="col-xl-6 mb-3">
+      <div class="card chart-card">
+        <div class="card-header border-0 py-3">
+          <h6 class="mb-0"><i class="fas fa-venus-mars mr-2 text-primary"></i>Distribución por Género</h6>
+        </div>
+        <div class="card-body pt-0">
+          <canvas id="chartGenero"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-6 mb-3">
+      <div class="card chart-card">
+        <div class="card-header border-0 py-3">
+          <h6 class="mb-0"><i class="fas fa-graduation-cap mr-2 text-success"></i>Distribución por Escolaridad</h6>
+        </div>
+        <div class="card-body pt-0">
+          <canvas id="chartEscolaridad"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== CHARTS ROW 2: Edad + Estado Civil ====== -->
+  <div class="row mb-4">
+    <div class="col-xl-6 mb-3">
+      <div class="card chart-card">
+        <div class="card-header border-0 py-3">
+          <h6 class="mb-0"><i class="fas fa-chart-bar mr-2 text-info"></i>Distribución de Edades</h6>
+        </div>
+        <div class="card-body pt-0">
+          <canvas id="chartEdad"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-6 mb-3">
+      <div class="card chart-card">
+        <div class="card-header border-0 py-3">
+          <h6 class="mb-0"><i class="fas fa-heart mr-2 text-danger"></i>Estado Civil</h6>
+        </div>
+        <div class="card-body pt-0">
+          <canvas id="chartEstadoCivil"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== CHARTS ROW 3: Grupo Sanguíneo + Exámenes por Proyecto ====== -->
+  <div class="row mb-4">
+    <div class="col-xl-6 mb-3">
+      <div class="card chart-card">
+        <div class="card-header border-0 py-3">
+          <h6 class="mb-0"><i class="fas fa-tint mr-2 text-warning"></i>Grupo Sanguíneo</h6>
+        </div>
+        <div class="card-body pt-0">
+          <canvas id="chartGrupoSanguineo"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-6 mb-3">
+      <div class="card chart-card">
+        <div class="card-header border-0 py-3">
+          <h6 class="mb-0"><i class="fas fa-project-diagram mr-2 text-purple"></i>Exámenes por Proyecto</h6>
+        </div>
+        <div class="card-body pt-0">
+          <canvas id="chartExamenesProyecto"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== CHART ROW 4: Exámenes por Tipo de Visita ====== -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card chart-card">
+        <div class="card-header border-0 py-3">
+          <h6 class="mb-0"><i class="fas fa-stethoscope mr-2 text-info"></i>Exámenes por Tipo de Visita</h6>
+        </div>
+        <div class="card-body pt-0">
+          <canvas id="chartExamenesTipoVisita" style="max-height:400px;"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% include "includes/footer.html" %}
+</div>
 {% endblock content %}
 
-
 {% block javascripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<script>
+(function() {
+  const API_URL = "{% url 'api_dashboard_data' %}";
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+  // Color palettes
+  const COLORS = ['#5e72e4','#f5365c','#2dce89','#fb6340','#11cdef','#8965e0','#ffd600','#f3a4b5','#5603ad','#172b4d'];
+  const BG_ALPHA = cc => cc + '33';
 
+  // Chart instances (for cleanup on re-render)
+  const charts = {};
+
+  function destroyChart(key) {
+    if (charts[key]) { charts[key].destroy(); charts[key] = null; }
+  }
+
+  function makeChart(canvasId, type, labels, values, opts = {}) {
+    destroyChart(canvasId);
+    const ctx = document.getElementById(canvasId).getContext('2d');
+    const colors = labels.map((_, i) => COLORS[i % COLORS.length]);
+
+    const datasets = [{
+      data: values,
+      backgroundColor: type === 'bar' ? colors.map(BG_ALPHA) : colors,
+      borderColor: colors,
+      borderWidth: type === 'bar' ? 2 : 1,
+      borderRadius: type === 'bar' ? 6 : 0,
+    }];
+
+    charts[canvasId] = new Chart(ctx, {
+      type: type,
+      data: { labels: labels, datasets: datasets },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+          legend: {
+            display: type !== 'bar',
+            position: 'bottom',
+            labels: { padding: 16, usePointStyle: true, font: { size: 12 } },
+          },
+          tooltip: {
+            callbacks: {
+              label: function(ctx) {
+                const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+                const pct = total ? ((ctx.parsed / total) * 100).toFixed(1) : 0;
+                if (type === 'bar') {
+                  const val = ctx.parsed.y != null ? ctx.parsed.y : ctx.parsed;
+                  return `${ctx.label}: ${val} (${((val / total) * 100).toFixed(1)}%)`;
+                }
+                return `${ctx.label}: ${ctx.parsed} (${pct}%)`;
+              }
+            }
+          }
+        },
+        scales: type === 'bar' ? {
+          y: { beginAtZero: true, ticks: { precision: 0 } },
+          x: { ticks: { font: { size: 11 } } }
+        } : {},
+        ...opts,
+      },
+    });
+  }
+
+  function updateKPIs(kpis) {
+    document.getElementById('kpiParticipantes').textContent = kpis.total_participantes.toLocaleString();
+    document.getElementById('kpiEdad').textContent = kpis.edad_promedio + ' años';
+    document.getElementById('kpiExamenes').textContent = kpis.total_examenes.toLocaleString();
+  }
+
+  function loadDashboard() {
+    const proyecto = document.getElementById('filtroProyecto').value;
+    const qs = proyecto ? '?proyecto=' + encodeURIComponent(proyecto) : '';
+
+    fetch(API_URL + qs, { credentials: 'same-origin' })
+      .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
+      .then(data => {
+        updateKPIs(data.kpis);
+        makeChart('chartGenero', 'doughnut', data.genero.labels, data.genero.values);
+        makeChart('chartEscolaridad', 'bar', data.escolaridad.labels, data.escolaridad.values);
+        makeChart('chartEdad', 'bar', data.edad.labels, data.edad.values);
+        makeChart('chartEstadoCivil', 'pie', data.estado_civil.labels, data.estado_civil.values);
+        makeChart('chartGrupoSanguineo', 'doughnut', data.grupo_sanguineo.labels, data.grupo_sanguineo.values);
+        makeChart('chartExamenesProyecto', 'bar', data.examenes_por_proyecto.labels, data.examenes_por_proyecto.values);
+        makeChart('chartExamenesTipoVisita', 'bar', data.examenes_por_tipo_visita.labels, data.examenes_por_tipo_visita.values);
+      })
+      .catch(() => {
+        ['kpiParticipantes','kpiEdad','kpiExamenes'].forEach(id => {
+          document.getElementById(id).textContent = 'Error';
+        });
+      });
+  }
+
+  document.getElementById('btnFiltrar').addEventListener('click', loadDashboard);
+  document.getElementById('btnLimpiar').addEventListener('click', function() {
+    document.getElementById('filtroProyecto').value = '';
+    loadDashboard();
+  });
+
+  // Initial load
+  document.addEventListener('DOMContentLoaded', loadDashboard);
+})();
+</script>
 {% endblock javascripts %}

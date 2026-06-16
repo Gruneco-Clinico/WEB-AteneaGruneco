@@ -583,7 +583,6 @@ document.addEventListener("DOMContentLoaded", function () {
     function toggleFields() {
         const select = document.getElementById("duerme_acompanado");
         const fields = document.getElementById("acompanado_fields");
-
         fields.style.display = (select.value && select.value !== "Solo") ? "block" : "none";
     }
 
@@ -592,7 +591,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     /* ---------------------------
-       MAPEO DE RESPUESTAS
+       MAPEOS
     ----------------------------*/
     const MAP_LATENCIA = {
         "≤ 15 minutos — 0": 0,
@@ -609,52 +608,124 @@ document.addEventListener("DOMContentLoaded", function () {
     };
 
     const MAP_CALIDAD = {
-        "Buena": 0,
-        "Bastante buena": 1,
+        "Bastante buena": 0,
+        "Buena": 1,
         "Mala": 2,
         "Bastante mala": 3
     };
 
+    function getVal(name) {
+        const el = document.querySelector(`[name="${name}"]`);
+        return el ? el.value : null;
+    }
+
+    function getNum(name) {
+        const el = document.querySelector(`[name="${name}"]`);
+        return el ? parseFloat(el.value) || 0 : 0;
+    }
 
     /* ---------------------------
-       CÁLCULO DE PUNTUACIÓN
+       HORAS EN CAMA
+    ----------------------------*/
+    function calcularHorasCama() {
+        let acostarse = getVal("hora_acostarse");
+        let levantarse = getVal("hora_levantarse");
+
+        if (!acostarse || !levantarse) return 0;
+
+        let a = new Date("1970-01-01T" + acostarse);
+        let l = new Date("1970-01-01T" + levantarse);
+
+        if (l < a) l.setDate(l.getDate() + 1);
+
+        return (l - a) / (1000 * 60 * 60);
+    }
+
+    /* ---------------------------
+       CÁLCULO PSQI REAL
     ----------------------------*/
     function calcularPuntuacion() {
-        let total = 0;
 
-        // Latencia
-        const latencia = document.querySelector('[name="latencia_sueno"]');
-        if (latencia && MAP_LATENCIA[latencia.value] !== undefined) {
-            total += MAP_LATENCIA[latencia.value];
-        }
+        // 1️⃣ Calidad
+        let calidad = MAP_CALIDAD[getVal("calidad_sueno")] ?? 0;
 
-        // Calidad del sueño
-        const calidad = document.querySelector('[name="calidad_sueno"]');
-        if (calidad && MAP_CALIDAD[calidad.value] !== undefined) {
-            total += MAP_CALIDAD[calidad.value];
-        }
+        // 2️⃣ Latencia
+        let latBase = MAP_LATENCIA[getVal("latencia_sueno")] ?? 0;
+        let latFreq = MAP_FRECUENCIA[getVal("conciliar_sueno")] ?? 0;
 
-        // TODOS los selects de frecuencia
-        document.querySelectorAll('select').forEach(select => {
-            if (MAP_FRECUENCIA[select.value] !== undefined) {
-                total += MAP_FRECUENCIA[select.value];
-            }
+        let latTotal = latBase + latFreq;
+        let latencia = latTotal === 0 ? 0 :
+                       latTotal <= 2 ? 1 :
+                       latTotal <= 4 ? 2 : 3;
+
+        // 3️⃣ Duración
+        let horas = getNum("horas_sueno_real");
+        let duracion = horas >= 7 ? 0 :
+                       horas >= 6 ? 1 :
+                       horas >= 5 ? 2 : 3;
+
+        // 4️⃣ Eficiencia
+        let horasCama = calcularHorasCama();
+        let eficiencia = horasCama > 0 ? (horas / horasCama) * 100 : 0;
+
+        let eficienciaScore = eficiencia >= 85 ? 0 :
+                              eficiencia >= 75 ? 1 :
+                              eficiencia >= 65 ? 2 : 3;
+
+        // 5️⃣ Alteraciones
+        let campos = [
+            "despertarse_sueno",
+            "levantarse_servicio_sueno",
+            "respirar",
+            "toser_roncar_sueno",
+            "sentir_frio_sueno",
+            "calor_sueno",
+            "pesadillas_sueno",
+            "dolores_sueno",
+            "otras_sueno"
+        ];
+
+        let sumaAlt = 0;
+        campos.forEach(c => {
+            sumaAlt += MAP_FRECUENCIA[getVal(c)] ?? 0;
         });
+
+        let alteraciones = sumaAlt === 0 ? 0 :
+                           sumaAlt <= 9 ? 1 :
+                           sumaAlt <= 18 ? 2 : 3;
+
+        // 6️⃣ Medicación
+        let medicacion = MAP_FRECUENCIA[getVal("medicinas_sueno")] ?? 0;
+
+        // 7️⃣ Disfunción diurna
+        let somnolencia = MAP_FRECUENCIA[getVal("somnolencia_sueno")] ?? 0;
+
+        let animo = getVal("problemas_animos_sueno") || "";
+        let animoScore = animo.includes("Ningun") ? 0 :
+                         animo.includes("leve") ? 1 :
+                         animo.includes("grave") ? 3 : 2;
+
+        let disTotal = somnolencia + animoScore;
+
+        let disfuncion = disTotal === 0 ? 0 :
+                         disTotal <= 2 ? 1 :
+                         disTotal <= 4 ? 2 : 3;
+
+        // 🎯 TOTAL FINAL
+        let total = calidad + latencia + duracion + eficienciaScore + alteraciones + medicacion + disfuncion;
 
         document.getElementById("puntuacion_total").value = total;
     }
 
-
     /* ---------------------------
-       ESCUCHAR CAMBIOS
+       EVENTOS
     ----------------------------*/
-    document.querySelectorAll("select").forEach(select => {
-        select.addEventListener("change", calcularPuntuacion);
+    document.querySelectorAll("input, select").forEach(el => {
+        el.addEventListener("change", calcularPuntuacion);
     });
 
 });
 </script>
-
 
 
 

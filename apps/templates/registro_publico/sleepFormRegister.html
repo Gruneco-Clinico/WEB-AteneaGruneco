@@ -422,20 +422,11 @@
         .then(data => {
             resultado.innerHTML = "";
 
-            if (!data.demograficos_completos) {
-                resultado.innerHTML = `
-                    <div class="alert alert-danger">
-                        No has registrado tus datos demográficos.<br>
-                        Por favor completa el formulario de registro antes de consultar exámenes pendientes.
-                    </div>
-                `;
-                return;
-            }
-
-            if (data.examenes.length === 0) {
+            if (!data.examenes || data.examenes.length === 0) {
                 resultado.innerHTML = `
                     <div class="alert alert-success">
-                        ✔ No tienes exámenes pendientes ni en proceso.
+                        No se encontraron exámenes pendientes ni en proceso para este documento.<br>
+                        Si aún no te has registrado, por favor completa el formulario de registro primero.
                     </div>
                 `;
                 return;

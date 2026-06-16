@@ -1,8 +1,8 @@
 {% extends 'layouts/base.html' %}
 
 {% block stylesheets %}
-<!-- FullCalendar CSS -->
-<link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css' rel='stylesheet' />
+<!-- FullCalendar CSS (v6 bundles CSS in JS, fallback link kept for compatibility) -->
+<!-- <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css' rel='stylesheet' /> -->
 <style>
 /* Reutilizar estilos de tables.html */
 .header .h2 {
@@ -180,7 +180,6 @@
                         <thead class="thead-light">
                             <tr>
                                 <th>Sala</th>
-                                <th>Día</th>
                                 <th>Horario</th>
                                 <th>Período</th>
                                 <th>Registrado por</th>
@@ -191,7 +190,6 @@
                             {% for disp in disponibilidades_usuario %}
                             <tr>
                                 <td><strong>{{ disp.sala.nombre }}</strong></td>
-                                <td>{{ disp.get_dia_semana_display }}</td>
                                 <td>{{ disp.hora_inicio|time:"H:i" }} - {{ disp.hora_fin|time:"H:i" }}</td>
                                 <td>
                                     {{ disp.fecha_inicio|date:"d/m/Y" }} 
@@ -216,7 +214,7 @@
                             </tr>
                             {% empty %}
                             <tr>
-                                <td colspan="6" class="text-center text-muted py-4">
+                                <td colspan="5" class="text-center text-muted py-4">
                                     <i class="fas fa-calendar-plus fa-2x mb-3"></i><br>
                                     No tienes disponibilidades registradas.<br>
                                     <small>Haz clic en "Nueva Disponibilidad" para agregar una.</small>
@@ -295,7 +293,7 @@
                 <input type="hidden" name="accion" value="agregar_disponibilidad">
                 <div class="modal-body">
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-12">
                             <div class="form-group">
                                 <label class="form-control-label">Sala <span class="text-danger">*</span></label>
                                 <select name="sala" class="form-control" required>
@@ -306,17 +304,10 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label class="form-control-label">Día de la Semana <span class="text-danger">*</span></label>
-                                <select name="dia_semana" class="form-control" id="diaSemanaSelect" required>
-                                    {% for value, nombre in dias_semana %}
-                                    <option value="{{ value }}">{{ nombre }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                        </div>
                     </div>
+                    
+                    <!-- Campo día de la semana oculto - se calculará automáticamente desde fecha_inicio -->
+                    <input type="hidden" name="dia_semana" id="diaSemanaSelect" value="0">
                     
                     <div class="row">
                         <div class="col-md-6">
@@ -458,8 +449,9 @@ document.addEventListener('DOMContentLoaded', function() {
         // Cargar eventos desde la API
         events: {
             url: '{% url "api_eventos_disponibilidad" %}',
-            failure: function() {
-                alert('Error al cargar las disponibilidades');
+            failure: function(error) {
+                console.error('Error al cargar disponibilidades:', error);
+                alert('Error al cargar las disponibilidades. Revisa la consola del navegador (F12) para más detalles.');
             }
         },
         
@@ -640,6 +632,14 @@ setTimeout(() => {
         setTimeout(() => alert.remove(), 300);
     });
 }, 5000);
+
+// Auto-calcular día de la semana cuando se cambia la fecha de inicio
+document.getElementById('fechaInicioInput').addEventListener('change', function() {
+    const fecha = new Date(this.value + 'T00:00:00');
+    const diaSemana = fecha.getDay(); // 0=domingo, 1=lunes, etc.
+    const diaDjango = diaSemana === 0 ? 6 : diaSemana - 1; // Convertir a formato Django
+    document.getElementById('diaSemanaSelect').value = diaDjango;
+});
 
 </script>
 {% endblock %}

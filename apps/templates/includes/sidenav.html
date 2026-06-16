@@ -115,6 +115,26 @@
               <span class="nav-link-text">Usuarios</span>
             </a>
           </li>
+          {% if user.is_staff %}
+          <li class="nav-item">
+            <a
+              class="nav-link {% if 'builder/examenes' in request.path %} active {% endif %}"
+              href="{% url 'exam_builder_list' %}"
+            >
+              <i class="ni ni-settings-gear-65 text-info"></i>
+              <span class="nav-link-text">Form Builder</span>
+            </a>
+          </li>
+          {% endif %}
+          <li class="nav-item">
+            <a
+              class="nav-link {% if 'visitas_pendientes' in segment %} active {% endif %}"
+              href="{% url 'visitas_pendientes_firma' %}"
+            >
+              <i class="ni ni-check-bold text-orange"></i>
+              <span class="nav-link-text">Pendientes Firma</span>
+            </a>
+          </li>
           <li class="nav-item">
             <a
               class="nav-link {% if 'disponibilidad' in segment %} active {% endif %}"

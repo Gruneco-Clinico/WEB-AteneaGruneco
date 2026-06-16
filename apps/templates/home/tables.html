@@ -367,6 +367,17 @@
           <!-- Controls Container Reorganizado -->
           <div class="d-flex justify-content-end align-items-center">
 
+            <!-- Project Filter -->
+            <select class="form-control mr-3" id="filtroProyecto" style="max-width: 200px;"
+                    onchange="window.location.href='?proyecto='+this.value">
+              <option value="">Todos los proyectos</option>
+              {% for p in proyectos %}
+              <option value="{{ p.id }}" {% if filtro_proyecto == p.id|stringformat:"s" %}selected{% endif %}>
+                {{ p.nombre }}
+              </option>
+              {% endfor %}
+            </select>
+
             <!-- Search Input -->
             <div class="input-group mr-3" style="max-width: 300px;">
               <input type="text" class="form-control" id="searchPatient" placeholder="Buscar paciente...">
@@ -409,6 +420,7 @@
               <tr>
                 <th scope="col" class="sort" data-sort="id">ID del Paciente</th>
                 <th scope="col" class="sort" data-sort="name">Nombre</th>
+                <th scope="col" class="sort" data-sort="codes">Códigos</th>
                 <th scope="col" class="sort" data-sort="age">Edad</th>
                 <th scope="col" class="sort" data-sort="gender">Fecha nacimiento</th>
                 <!-- <th scope="col" class="sort" data-sort="status">Ocupación</th> -->
@@ -421,6 +433,15 @@
               <tr>
                 <td><strong>{{ paciente.numero_documento }}</strong></td>
                 <td>{{ paciente.primer_nombre }} {{ paciente.primer_apellido }}</td>
+                <td>
+                  {% if paciente.codigos_list %}
+                    {% for code in paciente.codigos_list %}
+                      <span class="badge badge-primary">{{ code }}</span>
+                    {% endfor %}
+                  {% else %}
+                    <span class="text-muted">—</span>
+                  {% endif %}
+                </td>
                 <td><span class="badge badge-pill badge-success">{{ paciente.edad }} años</span></td>
                 <td>{{ paciente.fecha_nacimiento|date:"d/m/Y" }}</td>
                 <!-- <td>{{ paciente.ocupacion|title }}</td> -->
@@ -516,7 +537,7 @@
         const messageRow = document.createElement("tr");
         messageRow.id = "no-results-message";
         messageRow.innerHTML = `
-          <td colspan="6" class="text-center py-4">
+          <td colspan="7" class="text-center py-4">
             <i class="fas fa-search text-muted mb-2" style="font-size: 2rem;"></i>
             <p class="text-muted mb-0">No se encontraron pacientes que coincidan con: <strong>"${searchTerm}"</strong></p>
           </td>
@@ -623,15 +644,6 @@
     const fechaNacimientoField = document.getElementById('fecha_nacimiento');
     if (fechaNacimientoField) {
       fechaNacimientoField.addEventListener('input', calcularEdad);
-    }
-
-    // Funcionalidad del botón "Nuevo Paciente"
-    const newPatientButton = document.getElementById('agregar-formulario');
-    if (newPatientButton) {
-      newPatientButton.addEventListener('click', function () {
-        // Aquí puedes agregar la lógica para mostrar el formulario o redirigir
-        console.log("Agregar nuevo paciente");
-      });
     }
 
     // Limpiar búsqueda al cargar la página

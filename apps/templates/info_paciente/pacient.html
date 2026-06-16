@@ -224,12 +224,38 @@
 
                 </div>
                 <div class="col-md-4 text-right">
+                  {% if proyecto.id in proyectos_con_consentimiento_firmado %}
+                  <span class="badge badge-success" title="Consentimiento ya firmado">
+                    <i class="fas fa-check-circle mr-1"></i> Consentimiento firmado
+                  </span>
+                  {% else %}
+                  <form method="POST"
+                    action="{% url 'enviar_link_firma_consentimiento' paciente_id=paciente.id proyecto_id=proyecto.id %}"
+                    class="d-inline"
+                    onsubmit="return confirm('¿Enviar enlace de firma de consentimiento al correo del paciente?');">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline-primary btn-sm" title="Enviar link de firma">
+                      <i class="fas fa-paper-plane mr-1"></i> Enviar link firma
+                    </button>
+                  </form>
+                  {% endif %}
                   <!-- BOTÓN CORREGIDO -->
                   <button class="btn btn-light btn-sm" data-toggle="modal"
                     data-target="#modalAgregarVisita-{{ proyecto.id }}">
                     <i class="fas fa-plus mr-2"></i>
                     Nueva Visita
                   </button>
+                  {% if request.user.is_superuser %}
+                  <form method="POST"
+                    action="{% url 'quitar_paciente_proyecto' paciente_id=paciente.id proyecto_id=proyecto.id %}"
+                    class="d-inline"
+                    onsubmit="return confirm('¿Quitar al paciente del proyecto {{ proyecto.nombre }}? No se eliminará del sistema.');">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline-danger btn-sm" title="Quitar del proyecto">
+                      <i class="fas fa-unlink mr-1"></i> Quitar
+                    </button>
+                  </form>
+                  {% endif %}
                 </div>
               </div>
             </div>
@@ -315,6 +341,53 @@
                         </form>
                         {% endif %}
                       </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Notas aclaratorias (editable incluso post-firma) -->
+                <div class="card-body pt-2 pb-2 border-top">
+                  <div class="d-flex align-items-start">
+                    <div class="flex-grow-1">
+                      <h6 class="text-muted mb-1">
+                        <i class="fas fa-sticky-note mr-1"></i> Notas aclaratorias
+                      </h6>
+                      {% if visita.notas_aclaratorias %}
+                      <p class="mb-0 small">{{ visita.notas_aclaratorias|linebreaksbr }}</p>
+                      {% else %}
+                      <p class="mb-0 small text-muted"><em>Sin notas aclaratorias.</em></p>
+                      {% endif %}
+                    </div>
+                    <button type="button" class="btn btn-sm btn-outline-info ml-2"
+                      data-toggle="modal" data-target="#modalNotas-{{ visita.id }}"
+                      title="Editar notas aclaratorias">
+                      <i class="fas fa-edit"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Modal para editar notas aclaratorias -->
+                <div class="modal fade" id="modalNotas-{{ visita.id }}" tabindex="-1" role="dialog">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <form method="POST" action="{% url 'editar_notas_aclaratorias' visita.id %}">
+                        {% csrf_token %}
+                        <div class="modal-header">
+                          <h5 class="modal-title">Notas aclaratorias — {{ visita.nombre }}</h5>
+                          <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                        </div>
+                        <div class="modal-body">
+                          <textarea name="notas_aclaratorias" class="form-control" rows="5"
+                            placeholder="Escriba notas de clarificación...">{{ visita.notas_aclaratorias|default:"" }}</textarea>
+                          <small class="form-text text-muted">
+                            Estas notas son editables incluso después de firmar la visita.
+                          </small>
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                          <button type="submit" class="btn btn-primary">Guardar</button>
+                        </div>
+                      </form>
                     </div>
                   </div>
                 </div>
@@ -774,6 +847,13 @@
     console.log("Inicializando scripts...");
 
     var visitaSelects = document.querySelectorAll(".tipo-visita");
+    var categoriasExamen = {
+      MEDICAS: "Evaluaciones Medicas",
+      CLINICAS: "Escalas clinicas",
+      NEUROPSICO: "Evaluaciones Neuropsicologicas",
+      SUENO: "Escalas de sueno",
+      OTROS: "Otros"
+    };
     console.log("Selectores de visita encontrados:", visitaSelects.length);
 
     visitaSelects.forEach(function (select) {
@@ -811,7 +891,8 @@
 
               var label = document.createElement("label");
               label.htmlFor = checkbox.id;
-              label.textContent = examen.nombre;
+              var categoriaTexto = examen.categoria ? " [" + (categoriasExamen[examen.categoria] || examen.categoria) + "]" : "";
+              label.textContent = examen.nombre + categoriaTexto;
               label.className = "form-check-label";
 
               li.appendChild(checkbox);

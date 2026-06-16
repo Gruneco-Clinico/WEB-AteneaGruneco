@@ -20,6 +20,21 @@ urlpatterns = [
     path(
         "atenea_estadisticas/", views.atenea_estadisticas, name="atenea_estadisticas"
     ),  # Página de estadísticas
+    path(
+        "api/estadisticas-proyecto/",
+        views.api_estadisticas_proyecto,
+        name="api_estadisticas_proyecto",
+    ),
+    path(
+        "api/estadisticas-evaluadores/",
+        views.api_estadisticas_evaluadores,
+        name="api_estadisticas_evaluadores",
+    ),
+    path(
+        "api/dashboard-data/",
+        views.api_dashboard_data,
+        name="api_dashboard_data",
+    ),
     path("login/", login_view, name="login"),
     path("logout/", views.logout_view, name="logout"),
     path("profile/", profile_view, name="profile"),  # Perfil de usuario
@@ -85,6 +100,11 @@ urlpatterns = [
         name="confirmacion_registro_externo",
     ),
     path("consulta-examenes/", views.consulta_examenes, name="consulta_examenes"),
+    path(
+        "firma-consentimiento-publico/",
+        views.firma_consentimiento_publico,
+        name="firma_consentimiento_publico",
+    ),
     # URLs públicas para exámenes
     path(
         "guardar-examen-publico-epworth/",
@@ -107,6 +127,30 @@ urlpatterns = [
     path(
         "proyecto/<int:id>/eliminar/", views.eliminar_proyecto, name="eliminar_proyecto"
     ),
+    path(
+        "proyecto/<int:id>/editar/", views.editar_proyecto, name="editar_proyecto"
+    ),
+    path(
+        "proyecto/<int:proyecto_id>/exportar-csv/",
+        views.exportar_csv_proyecto,
+        name="exportar_csv_proyecto",
+    ),
+    path(
+        "paciente/<int:paciente_id>/proyecto/<int:proyecto_id>/quitar/",
+        views.quitar_paciente_proyecto,
+        name="quitar_paciente_proyecto",
+    ),
+    path(
+        "paciente/<int:paciente_id>/proyecto/<int:proyecto_id>/enviar-link-firma/",
+        views.enviar_link_firma_consentimiento,
+        name="enviar_link_firma_consentimiento",
+    ),
+    # Visitas pendientes de firma
+    path(
+        "visitas-pendientes-firma/",
+        views.visitas_pendientes_firma,
+        name="visitas_pendientes_firma",
+    ),
     # Tipos de visitas
     path("agregar-visita/", views.agregar_visita, name="agregar_visita"),
     path(
@@ -118,6 +162,11 @@ urlpatterns = [
     path("eliminar-visita/<int:visita_id>/", views.eliminar_v, name="eliminar_v"),
     path("editar-visita/<int:visita_id>/", views.editar_v, name="editar_v"),
     path("firmar-visita/<int:visita_id>/", views.firmar_visita, name="firmar_visita"),
+    path(
+        "editar-notas-aclaratorias/<int:visita_id>/",
+        views.editar_notas_aclaratorias,
+        name="editar_notas_aclaratorias",
+    ),
     path(
         "visita/<int:visita_id>/pdf/",
         views.generar_pdf_historia_clinica_visita,
@@ -138,6 +187,46 @@ urlpatterns = [
         "realizar_examen/<int:visita_id>/<int:examen_id>/<int:paciente_id>/",
         views.realizar_examen,
         name="realizar_examen",
+    ),
+    path(
+        "guardar_examen_builder/",
+        views.guardar_examen_builder,
+        name="guardar_examen_builder",
+    ),
+    path(
+        "builder/examenes/",
+        views.exam_builder_list,
+        name="exam_builder_list",
+    ),
+    path(
+        "builder/examenes/nuevo/",
+        views.exam_builder_create,
+        name="exam_builder_create",
+    ),
+    path(
+        "builder/examenes/preview/",
+        views.exam_builder_preview,
+        name="exam_builder_preview",
+    ),
+    path(
+        "builder/examenes/<int:pk>/",
+        views.exam_builder_edit,
+        name="exam_builder_edit",
+    ),
+    path(
+        "builder/examenes/<int:pk>/publicar/",
+        views.exam_builder_publish,
+        name="exam_builder_publish",
+    ),
+    path(
+        "builder/examenes/<int:pk>/eliminar/",
+        views.exam_builder_delete,
+        name="exam_builder_delete",
+    ),
+    path(
+        "builder/tipo-visita/<int:pk>/examenes/",
+        views.exam_builder_tipo_visita_edit,
+        name="exam_builder_tipo_visita_edit",
     ),
     path(
         "examen_sueno_fisico/",

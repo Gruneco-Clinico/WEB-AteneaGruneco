@@ -1,0 +1,66 @@
+{% load form_builder_tags %}
+{% comment %}
+  Renderer compartido del runtime/preview del Form Builder.
+  Las secciones top-level se muestran como pestañas; el resto de campos
+  top-level se renderizan en un bloque "general" antes de las pestañas.
+  Variables esperadas:
+    - builder_fields: lista de nodos top-level (normalizados).
+    - datos_examen: dict de respuestas previas (puede ser vacío).
+    - tabs_prefix (opcional): prefijo de IDs HTML para pestañas (default "fb").
+{% endcomment %}
+{% with sections=builder_fields|fb_filter_sections others=builder_fields|fb_filter_non_sections prefix=tabs_prefix|default:"fb" %}
+
+{% if others %}
+<div class="fb-runtime-general mb-3">
+  {% for field in others %}
+    {% include "examenes_builder/field_fragment.html" with field=field datos_examen=datos_examen name_prefix="" %}
+  {% endfor %}
+</div>
+{% endif %}
+
+{% if sections %}
+<div class="fb-runtime-tabs-wrap{% if sections|length > 7 %} fb-runtime-tabs-many{% endif %}"
+     data-fb-tabs-wrap
+     data-fb-tab-count="{{ sections|length }}">
+  <ul class="nav nav-tabs fb-runtime-tabs" role="tablist">
+    {% for sec in sections %}
+    <li class="nav-item fb-tab-li"
+        data-fb-tab-target="#{{ prefix }}-pane-{{ forloop.counter }}"
+        {% if sec.visible_when %}data-vw-cond="{{ sec.visible_when|fb_attr_json }}"{% endif %}>
+      <a class="nav-link {% if forloop.first %}active{% endif %}"
+         data-toggle="tab"
+         href="#{{ prefix }}-pane-{{ forloop.counter }}"
+         role="tab"
+         id="{{ prefix }}-tab-{{ forloop.counter }}"
+         aria-controls="{{ prefix }}-pane-{{ forloop.counter }}"
+         aria-selected="{% if forloop.first %}true{% else %}false{% endif %}">
+        <span class="fb-tab-num">{{ forloop.counter }}</span>
+        <span class="fb-tab-label">{{ sec.label|default:"(sin etiqueta)" }}</span>
+        {% if sec.visible_when %}<span class="fb-tab-vw" title="Visibilidad condicional" aria-label="Visibilidad condicional">&#9678;</span>{% endif %}
+      </a>
+    </li>
+    {% endfor %}
+  </ul>
+
+  <div class="tab-content fb-runtime-tab-content">
+    {% for sec in sections %}
+    <div class="tab-pane fb-tab-pane fade {% if forloop.first %}show active{% endif %}"
+         id="{{ prefix }}-pane-{{ forloop.counter }}"
+         role="tabpanel"
+         aria-labelledby="{{ prefix }}-tab-{{ forloop.counter }}"
+         {% if sec.visible_when %}data-vw-cond="{{ sec.visible_when|fb_attr_json }}"{% endif %}>
+      {% if sec.help_text %}<p class="text-muted small mb-2">{{ sec.help_text }}</p>{% endif %}
+      {% if sec.fields %}
+        {% for sf in sec.fields %}
+          {% include "examenes_builder/field_fragment.html" with field=sf datos_examen=datos_examen name_prefix="" %}
+        {% endfor %}
+      {% else %}
+        <p class="text-muted small mb-0">Esta sección no tiene campos configurados.</p>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+{% endwith %}

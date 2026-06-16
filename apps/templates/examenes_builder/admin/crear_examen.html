@@ -1,0 +1,34 @@
+{% extends "layouts/base.html" %}
+{% block title %}Nuevo examen — Form Builder{% endblock %}
+{% block content %}
+<div class="container-fluid mt-4">
+  <h1>Crear examen (Form Builder)</h1>
+  <p class="text-muted">Después podrá definir los campos en el editor visual.</p>
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
+  <form method="post" class="col-lg-6 pl-0">
+    {% csrf_token %}
+    <div class="form-group">
+      <label>Nombre <span class="text-danger">*</span></label>
+      <input type="text" name="nombre" class="form-control" required placeholder="Ej. Escala de ansiedad">
+    </div>
+    <div class="form-group">
+      <label>Categoría</label>
+      <select name="categoria" class="form-control">
+        {% for code, label in categorias %}
+          <option value="{{ code }}">{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Descripción (opcional)</label>
+      <textarea name="descripcion" class="form-control" rows="2"></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Crear y abrir editor</button>
+    <a href="{% url 'exam_builder_list' %}" class="btn btn-link">Volver</a>
+  </form>
+</div>
+{% endblock %}

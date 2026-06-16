@@ -1,0 +1,172 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+{% block title %}Editar examen {{ examen.id }}{% endblock %}
+{% block stylesheets %}
+<link rel="stylesheet" href="{% static 'assets/css/form_builder/builder.css' %}">
+{% endblock %}
+{% block content %}
+<div class="header bg-primary pb-6">
+  <div class="container-fluid">
+    <div class="header-body">
+      <div class="row align-items-center py-3">
+        <div class="col-lg-12">
+          <nav aria-label="breadcrumb" class="d-none d-md-inline-block">
+            <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
+              <li class="breadcrumb-item">
+                <a href="{% url 'home' %}"><i class="fas fa-home"></i></a>
+              </li>
+              <li class="breadcrumb-item">
+                <a href="{% url 'exam_builder_list' %}">Constructor de Exámenes</a>
+              </li>
+              <li class="breadcrumb-item active" aria-current="page">
+                Editar (#{{ examen.id }})
+              </li>
+            </ol>
+          </nav>
+        </div>
+      </div>
+      <div class="row align-items-center py-4">
+        <div class="col-lg-8 col-md-7">
+          <h2 class="text-white mb-0">{{ examen.nombre }}</h2>
+          <p class="text-white-50 mb-0 mt-1">ID {{ examen.id }} · {{ examen.get_categoria_display }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid mt--6" id="fb-root"
+     data-preview-url="{% url 'exam_builder_preview' %}">
+  {% if messages %}
+  <div class="row mb-3">
+    <div class="col">
+      {% for message in messages %}
+      <div class="alert alert-{% if 'error' in message.tags %}danger{% elif 'warning' in message.tags %}warning{% elif 'success' in message.tags %}success{% else %}info{% endif %} alert-dismissible fade show" role="alert">
+        <span class="alert-text">{{ message }}</span>
+        <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span></button>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  <form method="post" data-fb-main-form>
+    {% csrf_token %}
+    <input type="hidden" name="campos_json" value="">
+
+    <div class="card mb-3">
+      <div class="card-body row">
+        <div class="col-md-4">
+          <div class="form-group">
+            <label>Nombre</label>
+            <input type="text" name="nombre" class="form-control" value="{{ examen.nombre }}" required>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="form-group">
+            <label>Categoría</label>
+            <select name="categoria" class="form-control">
+              {% for code, label in categorias %}
+                <option value="{{ code }}" {% if examen.categoria == code %}selected{% endif %}>{{ label }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+        <div class="col-md-5">
+          <div class="form-group">
+            <label>Descripción</label>
+            <textarea name="descripcion" class="form-control" rows="2">{{ examen.descripcion }}</textarea>
+          </div>
+        </div>
+        <div class="col-12">
+          <div class="form-check">
+            <input type="checkbox" class="form-check-input" name="publicar" id="id_publicar" checked>
+            <label class="form-check-label" for="id_publicar">Publicar versión de esquema al guardar</label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <ul class="nav nav-tabs" role="tablist">
+      <li class="nav-item">
+        <a class="nav-link active" data-toggle="tab" href="#fb-tab-editor" role="tab">Editor visual</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" data-toggle="tab" href="#fb-tab-preview" role="tab">Vista previa</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" data-toggle="tab" href="#fb-tab-json" role="tab">JSON</a>
+      </li>
+    </ul>
+    <div class="tab-content border border-top-0 rounded-bottom p-3 bg-white mb-3">
+      <div class="tab-pane fade show active" id="fb-tab-editor" role="tabpanel">
+        <div class="row fb-builder-app">
+          <div class="col-lg-2 col-md-3 mb-3">
+            <h6 class="text-uppercase text-muted small">Paleta</h6>
+            <div data-fb-palette class="fb-palette"></div>
+          </div>
+          <div class="col-lg-5 col-md-5 mb-3">
+            <h6 class="text-uppercase text-muted small">Lienzo</h6>
+            <div data-fb-canvas class="fb-canvas"></div>
+          </div>
+          <div class="col-lg-5 col-md-4 mb-3">
+            <h6 class="text-uppercase text-muted small">Propiedades</h6>
+            <div data-fb-props class="fb-props-panel border rounded p-2 bg-light"></div>
+          </div>
+        </div>
+      </div>
+      <div class="tab-pane fade" id="fb-tab-preview" role="tabpanel">
+        <p class="text-muted small">Genera una vista previa con el estado actual del editor (guarde antes si desea persistir en BD).</p>
+        <button type="button" class="btn btn-outline-primary btn-sm mb-2" data-fb-refresh-preview>Actualizar vista previa</button>
+        <div id="fb-preview-container" data-fb-preview></div>
+      </div>
+      <div class="tab-pane fade" id="fb-tab-json" role="tabpanel">
+        <p class="text-muted small">Solo lectura — generado desde el editor.</p>
+        <pre class="fb-json-readonly" data-fb-json-readonly></pre>
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar</button>
+    <a href="{% url 'exam_builder_list' %}" class="btn btn-link">Volver</a>
+  </form>
+
+  <form method="post" action="{% url 'exam_builder_publish' examen.pk %}" class="d-inline-block mt-2">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-outline-secondary btn-sm">Solo publicar (sin otros cambios)</button>
+  </form>
+
+  <h3 class="mt-4">Versiones recientes</h3>
+  <ul>
+    {% for v in versions %}
+    <li>v{{ v.version }} — {{ v.created_at }}</li>
+    {% empty %}
+    <li>Ninguna aún</li>
+    {% endfor %}
+  </ul>
+</div>
+
+{{ initial_fields|json_script:"fb-initial-data" }}
+{% endblock %}
+
+{% block javascripts %}
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
+<script src="{% static 'assets/js/form_builder/runtime.js' %}"></script>
+<script src="{% static 'assets/js/form_builder/builder.js' %}"></script>
+<script>
+(function() {
+  var root = document.getElementById('fb-root');
+  if (!root || !window.FormBuilder) return;
+  var el = document.getElementById('fb-initial-data');
+  var initial = [];
+  try {
+    initial = JSON.parse(el ? el.textContent : '[]');
+  } catch (e) {}
+  var tokenEl = document.querySelector('[data-fb-main-form] [name=csrfmiddlewaretoken]');
+  FormBuilder.mount(root, {
+    initialFields: initial,
+    previewUrl: root.getAttribute('data-preview-url'),
+    csrfToken: tokenEl ? tokenEl.value : ''
+  });
+})();
+</script>
+{% endblock %}

@@ -36,7 +36,7 @@
           <h3 class="mb-0">Crear Nuevo Proyecto</h3>
         </div>
         <div class="card-body">
-          <form method="POST" action="{% url 'proyectos' %}">
+          <form method="POST" action="{% url 'proyectos' %}" enctype="multipart/form-data">
             {% csrf_token %}
             <div class="form-group">
               <label for="nombreProyecto">Nombre del Proyecto</label>
@@ -65,6 +65,17 @@
             <div class="form-group">
               <label for="fechaFinanciacion">Fecha de Financiación</label>
               <input type="date" class="form-control" id="fechaFinanciacion" name="fecha_financiacion">
+            </div>
+            <div class="form-group">
+              <label for="consentimientoPdf">
+                <i class="fas fa-file-pdf mr-1 text-danger"></i>
+                Consentimiento Informado (PDF)
+              </label>
+              <input type="file" class="form-control-file" id="consentimientoPdf" name="consentimiento_pdf" accept=".pdf">
+              <small class="form-text text-muted">
+                <i class="fas fa-info-circle"></i>
+                Sube el PDF que se enviará automáticamente al agendar citas para este proyecto.
+              </small>
             </div>
             <button type="submit" class="btn btn-primary">Crear Proyecto</button>
           </form>
@@ -120,6 +131,12 @@
                       <i class="fas fa-info-circle"></i>
                     </button>
 
+                    <button class="btn btn-light" data-toggle="modal"
+                      data-target="#modalEditarProyecto-{{ proyecto.id }}"
+                      title="Editar Proyecto">
+                      <i class="fas fa-edit"></i>
+                    </button>
+
                     <button class="btn btn-light" data-toggle="modal" data-target="#modalAgregarVisita"
                       data-proyecto-id="{{ proyecto.id }}" data-nombre="{{ proyecto.nombre }}"
                       title="Agregar Tipo de Visita">
@@ -133,6 +150,11 @@
                         <i class="fas fa-trash"></i>
                       </button>
                     </form>
+
+                    <a href="{% url 'exportar_csv_proyecto' proyecto_id=proyecto.id %}"
+                      class="btn btn-light" title="Exportar CSV">
+                      <i class="fas fa-file-csv"></i>
+                    </a>
                   </div>
                 </div>
               </div>
@@ -142,13 +164,29 @@
             <div class="card-body">
               <!-- Metadatos del Proyecto -->
               <div class="row mb-3">
-                <div class="col-md-6">
+                <div class="col-md-4">
                   <small class="text-muted d-block">Código SIU</small>
                   <strong>{{ proyecto.codigo_siu|default:"No asignado" }}</strong>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-4">
                   <small class="text-muted d-block">Fecha de Inicio</small>
                   <strong>{{ proyecto.fecha_inicio|date:"d/m/Y"|default:"No definida" }}</strong>
+                </div>
+                <div class="col-md-4">
+                  <small class="text-muted d-block">Consentimiento PDF</small>
+                  {% if proyecto.consentimiento_pdf %}
+                  <span class="badge badge-success">
+                    <i class="fas fa-file-pdf mr-1"></i>
+                    <a href="{{ proyecto.consentimiento_pdf.url }}" target="_blank" class="text-white">
+                      Configurado
+                    </a>
+                  </span>
+                  {% else %}
+                  <span class="badge badge-secondary">
+                    <i class="fas fa-times mr-1"></i>
+                    Sin PDF
+                  </span>
+                  {% endif %}
                 </div>
               </div>
 
@@ -228,7 +266,8 @@
                             <div class="col-md-6 mb-1">
                               <small class="badge badge-light border">
                                 <i class="fas fa-check-circle text-success mr-1"></i>
-                                {{ examen }}
+                                {{ examen.nombre }}
+                                <span class="text-muted">({{ examen.categoria_nombre }})</span>
                               </small>
                             </div>
                             {% endfor %}
@@ -362,13 +401,12 @@
                     Exámenes Asociados
                   </h6>
                   <div class="border rounded p-3" style="max-height: 200px; overflow-y: auto;">
-                    {% for examen in visita.examenes.all %}
+                    {% for examen in visita.examenes %}
                     <div class="form-check mb-1">
-                      <input class="form-check-input" type="checkbox" value="{{ examen.id }}"
-                        id="examen_asociado_{{ examen.id }}" checked>
-                      <label class="form-check-label" for="examen_asociado_{{ examen.id }}">
-                        <small class="badge badge-success">{{ examen }}</small>
-                      </label>
+                      <small class="badge badge-success">
+                        {{ examen.nombre }}
+                        <span class="ml-1">({{ examen.categoria_nombre }})</span>
+                      </small>
                     </div>
                     {% empty %}
                     <div class="text-center py-3">
@@ -386,16 +424,20 @@
                     Exámenes Disponibles
                   </h6>
                   <div class="border rounded p-3" style="max-height: 200px; overflow-y: auto;">
-                    {% for examen in examenes %}
-                    {% if examen.nombre not in visita.examenes.all %}
-                    <div class="form-check mb-1">
-                      <input class="form-check-input" type="checkbox" name="examenes" value="{{ examen.id }}"
-                        id="examen_disponible_{{ examen.id }}">
-                      <label class="form-check-label" for="examen_disponible_{{ examen.id }}">
+                    {% for grupo in examenes_por_categoria %}
+                    <div class="mb-2">
+                      <small class="text-muted font-weight-bold">{{ grupo.nombre }}</small>
+                    </div>
+                    {% for examen in grupo.examenes %}
+                    {% if examen.id not in visita.examenes_ids %}
+                    <div class="form-check mb-1 ml-2">
+                      <input class="form-check-input" type="checkbox" name="examenes" value="{{ examen.id }}" id="examen_disponible_{{ visita.id }}_{{ examen.id }}">
+                      <label class="form-check-label" for="examen_disponible_{{ visita.id }}_{{ examen.id }}">
                         <small class="badge badge-light border">{{ examen.nombre }}</small>
                       </label>
                     </div>
                     {% endif %}
+                    {% endfor %}
                     {% empty %}
                     <div class="text-center py-3">
                       <i class="fas fa-check-circle text-success"></i>
@@ -425,6 +467,121 @@
 {% endfor %}
 {% endif %}
 {% endfor %}
+{% endfor %}
+
+<!-- Modales Editar Proyecto -->
+{% for proyecto in proyectos %}
+<div class="modal fade" id="modalEditarProyecto-{{ proyecto.id }}" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header bg-warning">
+        <h5 class="modal-title text-white">
+          <i class="fas fa-edit mr-2"></i>
+          Editar Proyecto: {{ proyecto.nombre }}
+        </h5>
+        <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form method="POST" action="{% url 'editar_proyecto' id=proyecto.id %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="editNombre-{{ proyecto.id }}">
+              <i class="fas fa-flask mr-1"></i> Nombre del Proyecto
+            </label>
+            <input type="text" class="form-control" id="editNombre-{{ proyecto.id }}"
+              name="nombre" value="{{ proyecto.nombre }}" required>
+          </div>
+          <div class="form-group">
+            <label for="editDescripcion-{{ proyecto.id }}">
+              <i class="fas fa-align-left mr-1"></i> Descripción del Proyecto
+            </label>
+            <textarea class="form-control" id="editDescripcion-{{ proyecto.id }}"
+              name="descripcion" rows="3">{{ proyecto.descripcion|default_if_none:'' }}</textarea>
+          </div>
+          <div class="form-group">
+            <label for="editInvestigador-{{ proyecto.id }}">
+              <i class="fas fa-user-tie mr-1"></i> Investigador Principal
+            </label>
+            <input type="text" class="form-control" id="editInvestigador-{{ proyecto.id }}"
+              name="investigador_principal" value="{{ proyecto.investigador_principal|default_if_none:'' }}">
+          </div>
+          <div class="form-group">
+            <label for="editCodigo-{{ proyecto.id }}">
+              <i class="fas fa-barcode mr-1"></i> Código SIU
+            </label>
+            <input type="text" class="form-control" id="editCodigo-{{ proyecto.id }}"
+              name="codigo_siu" value="{{ proyecto.codigo_siu|default_if_none:'' }}">
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="editFechaInicio-{{ proyecto.id }}">
+                  <i class="fas fa-calendar mr-1"></i> Fecha de Inicio
+                </label>
+                <input type="date" class="form-control" id="editFechaInicio-{{ proyecto.id }}"
+                  name="fecha_inicio" value="{{ proyecto.fecha_inicio|date:'Y-m-d' }}">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="editFechaFinanciacion-{{ proyecto.id }}">
+                  <i class="fas fa-money-bill mr-1"></i> Fecha de Financiación
+                </label>
+                <input type="date" class="form-control" id="editFechaFinanciacion-{{ proyecto.id }}"
+                  name="fecha_financiacion" value="{{ proyecto.fecha_financiacion|date:'Y-m-d' }}">
+              </div>
+            </div>
+          </div>
+          
+          <!-- Campo de Consentimiento PDF -->
+          <div class="form-group mt-4">
+            <label for="editConsentimiento-{{ proyecto.id }}">
+              <i class="fas fa-file-pdf mr-1 text-danger"></i>
+              Consentimiento Informado (PDF)
+            </label>
+            
+            {% if proyecto.consentimiento_pdf %}
+            <div class="alert alert-success py-2 mb-2">
+              <i class="fas fa-check-circle mr-1"></i>
+              <strong>PDF actual:</strong> 
+              <a href="{{ proyecto.consentimiento_pdf.url }}" target="_blank" class="alert-link">
+                {{ proyecto.consentimiento_pdf.name|slice:"16:" }}
+                <i class="fas fa-external-link-alt ml-1"></i>
+              </a>
+            </div>
+            {% else %}
+            <div class="alert alert-warning py-2 mb-2">
+              <i class="fas fa-exclamation-triangle mr-1"></i>
+              No hay PDF de consentimiento configurado
+            </div>
+            {% endif %}
+            
+            <input type="file" class="form-control-file" id="editConsentimiento-{{ proyecto.id }}" 
+                   name="consentimiento_pdf" accept=".pdf">
+            <small class="form-text text-muted">
+              <i class="fas fa-info-circle"></i>
+              {% if proyecto.consentimiento_pdf %}
+              Sube un nuevo archivo para reemplazar el actual, o deja vacío para mantenerlo.
+              {% else %}
+              Sube el PDF que se enviará automáticamente al agendar citas.
+              {% endif %}
+            </small>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">
+            <i class="fas fa-times mr-1"></i>Cancelar
+          </button>
+          <button type="submit" class="btn btn-warning text-white">
+            <i class="fas fa-save mr-1"></i>Guardar Cambios
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
 {% endfor %}
 
 <!-- Modal Ver Descripción del Proyecto MEJORADO -->
@@ -534,15 +691,38 @@
                   <i class="fas fa-microscope mr-1"></i>
                   Exámenes Asociados
                 </label>
+                <div class="mb-3 d-flex flex-wrap">
+                  <button type="button" class="btn btn-sm btn-outline-primary mr-2 mb-2" id="seleccionar-todos-examenes">
+                    <i class="fas fa-check-double mr-1"></i>Seleccionar todos
+                  </button>
+                  <button type="button" class="btn btn-sm btn-outline-secondary mb-2" id="limpiar-todos-examenes">
+                    <i class="fas fa-eraser mr-1"></i>Limpiar todos
+                  </button>
+                </div>
                 <div class="border rounded p-3" style="max-height: 300px; overflow-y: auto;">
                   <div class="examenes-container">
-                    {% for examen in examenes %}
-                    <div class="form-check mb-2">
-                      <input class="form-check-input examen-checkbox" type="checkbox" data-id="{{ examen.id }}"
-                        data-nombre="{{ examen.nombre }}" id="examen_new_{{ examen.id }}">
-                      <label class="form-check-label" for="examen_new_{{ examen.id }}">
-                        <span class="badge badge-light border">{{ examen.nombre }}</span>
-                      </label>
+                    {% for grupo in examenes_por_categoria %}
+                    <div class="mb-3">
+                      <div class="d-flex align-items-center justify-content-between mb-2">
+                        <h6 class="text-muted mb-0">{{ grupo.nombre }}</h6>
+                        <div>
+                          <button type="button" class="btn btn-sm btn-link p-0 mr-2 btn-seleccionar-categoria" data-categoria="{{ grupo.codigo }}">
+                            Seleccionar
+                          </button>
+                          <button type="button" class="btn btn-sm btn-link text-secondary p-0 btn-limpiar-categoria" data-categoria="{{ grupo.codigo }}">
+                            Limpiar
+                          </button>
+                        </div>
+                      </div>
+                      {% for examen in grupo.examenes %}
+                      <div class="form-check mb-2 ml-2">
+                        <input class="form-check-input examen-checkbox" type="checkbox" data-id="{{ examen.id }}"
+                          data-nombre="{{ examen.nombre }}" data-categoria="{{ examen.categoria }}" id="examen_new_{{ examen.id }}">
+                        <label class="form-check-label" for="examen_new_{{ examen.id }}">
+                          <span class="badge badge-light border">{{ examen.nombre }}</span>
+                        </label>
+                      </div>
+                      {% endfor %}
                     </div>
                     {% endfor %}
                   </div>
@@ -604,24 +784,72 @@
     // Gestión de exámenes
     let checkboxes = document.querySelectorAll(".examen-checkbox");
     let hiddenInput = document.getElementById("examenes-json");
+    let btnSelectAll = document.getElementById("seleccionar-todos-examenes");
+    let btnClearAll = document.getElementById("limpiar-todos-examenes");
+    let btnSelectCategoria = document.querySelectorAll(".btn-seleccionar-categoria");
+    let btnClearCategoria = document.querySelectorAll(".btn-limpiar-categoria");
+
+    function syncExamenesJson() {
+      let examenesSeleccionados = [];
+      checkboxes.forEach(function (cb) {
+        if (cb.checked) {
+          examenesSeleccionados.push({
+            id: cb.dataset.id,
+            nombre: cb.dataset.nombre,
+            categoria: cb.dataset.categoria || 'OTROS'
+          });
+        }
+      });
+      hiddenInput.value = JSON.stringify(examenesSeleccionados);
+    }
+
+    function setCategoriaEstado(categoria, checked) {
+      checkboxes.forEach(function (cb) {
+        if (cb.dataset.categoria === categoria) {
+          cb.checked = checked;
+        }
+      });
+      syncExamenesJson();
+    }
+
+    function setTodosEstado(checked) {
+      checkboxes.forEach(function (cb) {
+        cb.checked = checked;
+      });
+      syncExamenesJson();
+    }
 
     checkboxes.forEach(checkbox => {
       checkbox.addEventListener("change", function () {
-        let examenesSeleccionados = JSON.parse(hiddenInput.value || "[]");
-        let examenId = this.dataset.id;
-        let examenNombre = this.dataset.nombre;
-
-        if (this.checked) {
-          if (!examenesSeleccionados.some(e => e.id === examenId)) {
-            examenesSeleccionados.push({ id: examenId, nombre: examenNombre });
-          }
-        } else {
-          examenesSeleccionados = examenesSeleccionados.filter(e => e.id !== examenId);
-        }
-
-        hiddenInput.value = JSON.stringify(examenesSeleccionados);
+        syncExamenesJson();
       });
     });
+
+    if (btnSelectAll) {
+      btnSelectAll.addEventListener("click", function () {
+        setTodosEstado(true);
+      });
+    }
+
+    if (btnClearAll) {
+      btnClearAll.addEventListener("click", function () {
+        setTodosEstado(false);
+      });
+    }
+
+    btnSelectCategoria.forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        setCategoriaEstado(this.dataset.categoria, true);
+      });
+    });
+
+    btnClearCategoria.forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        setCategoriaEstado(this.dataset.categoria, false);
+      });
+    });
+
+    syncExamenesJson();
   });
 </script>
 

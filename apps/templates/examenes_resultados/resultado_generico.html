@@ -23,6 +23,21 @@
     </div>
   </div>
 
+  <!-- Puntaje Total -->
+  {% if puntaje_total is not None %}
+  <div class="card shadow-sm mb-4 border-left-success">
+    <div class="card-body d-flex align-items-center">
+      <div class="mr-3">
+        <i class="ni ni-trophy text-success" style="font-size: 2rem;"></i>
+      </div>
+      <div>
+        <h6 class="text-uppercase text-muted mb-0">Puntaje Total</h6>
+        <h2 class="mb-0 font-weight-bold text-success">{{ puntaje_total }}</h2>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
   <!-- Sección de resultados -->
   <div class="card shadow-sm">
     <div class="card-header bg-light">

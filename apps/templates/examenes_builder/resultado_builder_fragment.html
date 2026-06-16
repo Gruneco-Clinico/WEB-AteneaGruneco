@@ -1,0 +1,45 @@
+{% load form_builder_tags %}
+{% for field in fields %}
+  {% if field.type == 'section' %}
+    <tr class="table-light">
+      <th colspan="2" class="border-top"><strong>{{ field.label }}</strong></th>
+    </tr>
+    {% if field.help_text %}
+    <tr>
+      <td colspan="2" class="text-muted small py-1">{{ field.help_text }}</td>
+    </tr>
+    {% endif %}
+    {% if field.fields %}
+      {% include "examenes_builder/resultado_builder_fragment.html" with fields=field.fields %}
+    {% endif %}
+  {% elif field.type == 'repeater' %}
+    <tr>
+      <th colspan="2" class="border-top">{{ field.label }}</th>
+    </tr>
+    {% with rows=submission.answers|get_item:field.id %}
+      {% if rows %}
+        {% for row in rows %}
+        <tr>
+          <td colspan="2">
+            <strong>Fila {{ forloop.counter }}</strong>
+            <ul class="mb-0 mt-1">
+              {% include "examenes_builder/resultado_repeater_row.html" with subfields=field.fields row=row %}
+            </ul>
+          </td>
+        </tr>
+        {% endfor %}
+      {% else %}
+        <tr><td colspan="2">—</td></tr>
+      {% endif %}
+    {% endwith %}
+  {% elif field.type == 'computed' %}
+    {# Los calculados se listan arriba en «Valores calculados» #}
+  {% elif field.type == 'info' %}
+    {# Bloque informativo: no hay dato guardado #}
+  {% else %}
+    <tr>
+      <th style="width:35%">{{ field.label }}</th>
+      <td>{{ submission.answers|get_item:field.id|default:"—" }}</td>
+    </tr>
+  {% endif %}
+{% endfor %}

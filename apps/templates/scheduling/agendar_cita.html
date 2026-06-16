@@ -261,6 +261,27 @@
                         </div>
                     </div>
 
+                    <!-- Selector de proyecto -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-control-label">
+                                    <i class="ni ni-briefcase-24 mr-2 text-info"></i>
+                                    Proyecto asociado *
+                                </label>
+                                <select class="form-control" id="proyecto_id" name="proyecto_id" required>
+                                    <option value="">— Seleccione un proyecto —</option>
+                                    {% for p in proyectos %}
+                                    <option value="{{ p.id }}">{{ p.nombre }}</option>
+                                    {% endfor %}
+                                </select>
+                                <small class="form-text text-muted">
+                                    Se personalizará el correo de confirmación según el proyecto seleccionado.
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Políticas y consentimiento -->
                     <div class="row mt-3 mb-5">
                         <div class="col-12">
@@ -474,6 +495,12 @@ function confirmarAgendamiento() {
         mostrarAlerta('Por favor completa todos los campos obligatorios (email y nombre)', 'warning');
         return;
     }
+
+    const proyectoSel = document.getElementById('proyecto_id').value;
+    if (!proyectoSel) {
+        mostrarAlerta('Por favor selecciona un proyecto asociado', 'warning');
+        return;
+    }
     
     if (!aceptaPoliticas) {
         mostrarAlerta('Debes aceptar las políticas de privacidad para continuar', 'warning');
@@ -503,7 +530,8 @@ function confirmarAgendamiento() {
         email_paciente: email,
         nombre_paciente: nombre,
         telefono_paciente: document.getElementById('telefono_paciente').value.trim(),
-        motivo_consulta: document.getElementById('motivo_consulta').value.trim()
+        motivo_consulta: document.getElementById('motivo_consulta').value.trim(),
+        proyecto_id: document.getElementById('proyecto_id').value || null
     };
     
     console.log('Enviando datos:', data);
