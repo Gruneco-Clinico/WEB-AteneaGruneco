@@ -171,6 +171,32 @@ def guardar_examen_builder(request):
     return redirect("detalle_paciente", paciente_id=paciente_id)
 
 
+def _remove_examen_from_tipos_visita(examen_id: int) -> None:
+    """Quita referencias al examen en TipoVisita.examenes (lista JSON)."""
+    for tv in TipoVisita.objects.all():
+        raw = tv.examenes
+        if not isinstance(raw, list):
+            continue
+        filtered = []
+        changed = False
+        for item in raw:
+            if not isinstance(item, dict):
+                filtered.append(item)
+                continue
+            try:
+                eid = int(item.get("id"))
+            except (TypeError, ValueError):
+                filtered.append(item)
+                continue
+            if eid == examen_id:
+                changed = True
+            else:
+                filtered.append(item)
+        if changed:
+            tv.examenes = filtered
+            tv.save(update_fields=["examenes"])
+
+
 def _examen_assignments_by_tipo_visita():
     """{examen_id: [\"Tipo (Proyecto)\", ...]} desde TipoVisita.examenes (lista JSON)."""
     assign = {}
@@ -402,6 +428,31 @@ def exam_builder_preview(request):
         request=request,
     )
     return JsonResponse({"ok": True, "html": html})
+
+
+@login_required
+@user_passes_test(_staff)
+def exam_builder_delete(request, pk):
+    if request.method != "POST":
+        return HttpResponseForbidden()
+    examen = get_object_or_404(Examen, pk=pk)
+    if is_legacy_examen(pk):
+        messages.warning(
+            request,
+            "Los exámenes legacy no se pueden eliminar desde el Form Builder.",
+        )
+        return redirect("exam_builder_list")
+    if examen.examenes_realizados.exists():
+        messages.error(
+            request,
+            "No se puede eliminar: el examen ya tiene registros en visitas de pacientes.",
+        )
+        return redirect("exam_builder_list")
+    nombre = examen.nombre
+    _remove_examen_from_tipos_visita(pk)
+    examen.delete()
+    messages.success(request, f"Examen «{nombre}» eliminado.")
+    return redirect("exam_builder_list")
 
 
 @login_required
