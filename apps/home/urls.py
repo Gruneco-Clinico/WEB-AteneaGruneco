@@ -219,6 +219,11 @@ urlpatterns = [
         name="exam_builder_publish",
     ),
     path(
+        "builder/examenes/<int:pk>/eliminar/",
+        views.exam_builder_delete,
+        name="exam_builder_delete",
+    ),
+    path(
         "builder/tipo-visita/<int:pk>/examenes/",
         views.exam_builder_tipo_visita_edit,
         name="exam_builder_tipo_visita_edit",

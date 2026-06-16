@@ -296,6 +296,97 @@ class LegacyExamBuilderBlockedTests(TestCase):
         )
 
 
+class ExamBuilderDeleteTests(TestCase):
+    """Eliminación de exámenes desde la lista del Form Builder."""
+
+    def setUp(self):
+        self.staff = User.objects.create_user(
+            "admin-delete", password="x", is_staff=True
+        )
+        self.client = Client()
+        self.client.force_login(self.staff)
+        self.examen = Examen.objects.create(
+            nombre="Examen borrable",
+            categoria="OTROS",
+            campos=[{"type": "text", "id": "x", "label": "X"}],
+        )
+        self.legacy_pk = _LEGACY_EDIT_PK
+        self.legacy_examen = Examen.objects.create(
+            pk=self.legacy_pk,
+            nombre="Legacy delete test",
+            categoria="OTROS",
+            campos=[],
+        )
+
+    def test_delete_removes_examen_and_schema_versions(self):
+        ExamenSchemaVersion.objects.create(
+            examen=self.examen,
+            version=1,
+            schema=self.examen.campos,
+        )
+        url = reverse("exam_builder_delete", kwargs={"pk": self.examen.pk})
+        resp = self.client.post(url)
+        self.assertRedirects(
+            resp,
+            reverse("exam_builder_list"),
+            status_code=302,
+            fetch_redirect_response=False,
+        )
+        self.assertFalse(Examen.objects.filter(pk=self.examen.pk).exists())
+        self.assertFalse(
+            ExamenSchemaVersion.objects.filter(examen_id=self.examen.pk).exists()
+        )
+
+    def test_delete_removes_from_tipo_visita_json(self):
+        proyecto = Proyecto.objects.create(nombre="Proy delete")
+        tv = TipoVisita.objects.create(
+            nombre="Visita delete",
+            proyecto=proyecto,
+            examenes=[
+                {"id": self.examen.pk, "nombre": self.examen.nombre, "categoria": "OTROS"},
+                {"id": 99999, "nombre": "Otro", "categoria": "OTROS"},
+            ],
+        )
+        url = reverse("exam_builder_delete", kwargs={"pk": self.examen.pk})
+        self.client.post(url)
+        tv.refresh_from_db()
+        self.assertEqual(len(tv.examenes), 1)
+        self.assertEqual(tv.examenes[0]["id"], 99999)
+
+    def test_delete_blocked_when_visita_examen_exists(self):
+        paciente = _make_paciente()
+        visita = _make_visita(paciente)
+        VisitaExamen.objects.create(visita=visita, examen=self.examen)
+        url = reverse("exam_builder_delete", kwargs={"pk": self.examen.pk})
+        resp = self.client.post(url)
+        self.assertRedirects(
+            resp,
+            reverse("exam_builder_list"),
+            status_code=302,
+            fetch_redirect_response=False,
+        )
+        self.assertTrue(Examen.objects.filter(pk=self.examen.pk).exists())
+
+    def test_delete_legacy_redirects_without_deleting(self):
+        url = reverse("exam_builder_delete", kwargs={"pk": self.legacy_pk})
+        resp = self.client.post(url)
+        self.assertRedirects(
+            resp,
+            reverse("exam_builder_list"),
+            status_code=302,
+            fetch_redirect_response=False,
+        )
+        self.assertTrue(Examen.objects.filter(pk=self.legacy_pk).exists())
+
+    def test_list_shows_delete_button_for_builder_not_legacy(self):
+        resp = self.client.get(reverse("exam_builder_list"))
+        self.assertContains(resp, reverse("exam_builder_delete", kwargs={"pk": self.examen.pk}))
+        self.assertNotContains(
+            resp,
+            reverse("exam_builder_delete", kwargs={"pk": self.legacy_pk}),
+        )
+
+
 class ExamBuilderListFiltersTests(TestCase):
     """Filtros GET en ``exam_builder_list``."""
 
