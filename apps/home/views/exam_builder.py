@@ -16,7 +16,7 @@ from ..exam_legacy import LEGACY_REALIZAR_EXAMEN_IDS, examen_has_builder_schema,
 
 
 def _staff(u):
-    return u.is_authenticated and u.is_staff
+    return u.is_authenticated and (u.is_staff or u.is_superuser)
 
 
 def ensure_schema_version(examen: Examen, user) -> ExamenSchemaVersion:
