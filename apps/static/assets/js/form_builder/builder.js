@@ -20,6 +20,7 @@
     multiselect: 'Múltiple opción',
     repeater: 'Repetidor',
     computed: 'Calculado',
+    info: 'Instrucciones / texto',
   };
 
   var SOFT_SECTION_LIMIT = 9;
@@ -107,7 +108,24 @@
         var n = nodes[i];
         if (n._bk === targetKey) return true;
         var t = n.type || 'text';
-        if (t !== 'section' && t !== 'repeater' && t !== 'computed' && n.id) acc.push(n.id);
+        if (t !== 'section' && t !== 'repeater' && t !== 'computed' && t !== 'info' && n.id) acc.push(n.id);
+        if (n.fields && n.fields.length && walk(n.fields)) return true;
+      }
+      return false;
+    }
+    walk(fields);
+    return acc;
+  }
+
+  /** Ids disponibles como dependencia de un calculado (incluye otros calculados previos). */
+  function collectPriorIdsForComputedDeps(fields, targetKey) {
+    var acc = [];
+    function walk(nodes) {
+      for (var i = 0; i < nodes.length; i++) {
+        var n = nodes[i];
+        if (n._bk === targetKey) return true;
+        var t = n.type || 'text';
+        if (t !== 'section' && t !== 'repeater' && n.id) acc.push(n.id);
         if (n.fields && n.fields.length && walk(n.fields)) return true;
       }
       return false;
@@ -122,7 +140,7 @@
       var n = fields[i];
       if (n._bk === excludeKey) continue;
       var t = n.type || 'text';
-      if (t !== 'section' && t !== 'repeater' && t !== 'computed' && n.id) acc.push(n.id);
+      if (t !== 'section' && t !== 'repeater' && t !== 'computed' && t !== 'info' && n.id) acc.push(n.id);
       if (n.fields && n.fields.length) allFieldIdsForDeps(n.fields, excludeKey, acc);
     }
     return acc;
@@ -190,6 +208,7 @@
           id: slugify('items') + '_' + Math.random().toString(36).slice(2, 5),
           label: 'Ítems repetidos',
           add_label: 'Agregar fila',
+          remove_label: 'Eliminar',
           required: false,
           fields: [
             {
@@ -210,6 +229,14 @@
           formula: '',
           precision: 2,
           depends_on: [],
+        };
+      case 'info':
+        return {
+          _bk: genKey(),
+          type: 'info',
+          label: 'Instrucciones',
+          content: '',
+          variant: 'plain',
         };
       default:
         return { _bk: genKey(), type: 'text', id: id, label: 'Texto', required: false };
@@ -245,11 +272,20 @@
         if (parentType === 'repeater' && (t === 'section' || t === 'repeater')) {
           errs.push('Dentro de un repetidor no se permiten ' + (t === 'section' ? 'secciones' : 'repetidores anidados') + ' (en «' + (n.label || n.id || '') + '»).');
         }
-        if (t !== 'section') {
+        if (t !== 'section' && t !== 'info') {
           if (!n.id || !String(n.id).trim()) errs.push('Cada campo (excepto sección) necesita un id.');
           else {
             if (seen[n.id]) errs.push('Id duplicado: ' + n.id);
             seen[n.id] = true;
+          }
+        }
+        if (t === 'info') {
+          if (!n.content || !String(n.content).trim()) {
+            errs.push('El bloque «' + (n.label || 'Instrucciones') + '» necesita contenido.');
+          }
+          var variant = (n.variant || 'plain').toLowerCase();
+          if (variant !== 'info' && variant !== 'warning' && variant !== 'plain') {
+            errs.push('Variante no válida en «' + (n.label || 'Instrucciones') + '».');
           }
         }
         if (t === 'select' || t === 'radio' || t === 'multiselect') {
@@ -391,7 +427,7 @@
       var li = document.createElement('li');
       li.setAttribute('data-key', node._bk);
       var card = document.createElement('div');
-      card.className = 'fb-card' + (state.selectedKey === node._bk ? ' fb-card-selected' : '');
+      card.className = 'fb-card' + (state.selectedKey === node._bk ? ' fb-card-selected' : '') + (t === 'info' ? ' fb-card-info' : '');
       card.setAttribute('data-key', node._bk);
 
       var head = document.createElement('div');
@@ -426,6 +462,14 @@
       titleText.className = 'fb-card-label';
       titleText.textContent = ' ' + (node.label || node.id || '');
       title.appendChild(titleText);
+
+      if (t === 'info' && node.content) {
+        var preview = document.createElement('div');
+        preview.className = 'fb-card-info-preview text-muted small';
+        var snippet = String(node.content).replace(/\s+/g, ' ').trim();
+        preview.textContent = snippet.length > 72 ? snippet.substring(0, 72) + '…' : snippet;
+        title.appendChild(preview);
+      }
 
       if (node.visible_when) {
         var vwIcon = document.createElement('span');
@@ -748,7 +792,7 @@
       var copy = JSON.parse(JSON.stringify(hit.node));
       function rekey(n) {
         n._bk = genKey();
-        if (n.id && n.type !== 'section') n.id = n.id + '_copy_' + Math.random().toString(36).slice(2, 4);
+        if (n.id && n.type !== 'section' && n.type !== 'info') n.id = n.id + '_copy_' + Math.random().toString(36).slice(2, 4);
         if (n.fields) n.fields.forEach(rekey);
       }
       rekey(copy);
@@ -891,7 +935,7 @@
       }
 
       addGroup('Campo seleccionado');
-      if (t !== 'section') {
+      if (t !== 'section' && t !== 'info') {
         var idInp = mkInput(n.id, function (v) {
           n.id = v.trim();
           syncHiddenJson();
@@ -932,7 +976,40 @@
         fieldRow('Texto de ayuda', secHt);
       }
 
-      if (t !== 'section' && t !== 'computed') {
+      if (t === 'info') {
+        var contentTa = document.createElement('textarea');
+        contentTa.className = 'form-control form-control-sm';
+        contentTa.rows = 6;
+        contentTa.placeholder = '**Importante:** texto en Markdown (negritas, listas, párrafos).';
+        contentTa.value = n.content || '';
+        contentTa.addEventListener('input', function () {
+          n.content = contentTa.value;
+          syncHiddenJson();
+          renderCanvas({ skipProps: true });
+        });
+        fieldRow('Contenido (Markdown)', contentTa);
+
+        var variantSel = document.createElement('select');
+        variantSel.className = 'form-control form-control-sm';
+        ;[
+          ['plain', 'Texto simple'],
+          ['info', 'Caja informativa (azul)'],
+          ['warning', 'Advertencia (amarilla)'],
+        ].forEach(function (pair) {
+          var o = document.createElement('option');
+          o.value = pair[0];
+          o.textContent = pair[1];
+          if ((n.variant || 'plain') === pair[0]) o.selected = true;
+          variantSel.appendChild(o);
+        });
+        variantSel.addEventListener('change', function () {
+          n.variant = variantSel.value;
+          syncHiddenJson();
+        });
+        fieldRow('Estilo visual', variantSel);
+      }
+
+      if (t !== 'section' && t !== 'computed' && t !== 'info') {
         var reqWrap = document.createElement('div');
         reqWrap.className = 'form-check';
         var rq = mkCheckbox(!!n.required, function (v) {
@@ -1113,6 +1190,11 @@
           syncHiddenJson();
         });
         fieldRow('Texto del botón «agregar»', al);
+        var rl = mkInput(n.remove_label || '', function (v) {
+          n.remove_label = v;
+          syncHiddenJson();
+        });
+        fieldRow('Texto del botón «eliminar»', rl);
       }
 
       if (t === 'computed') {
@@ -1149,7 +1231,7 @@
         fieldRow('Texto de ayuda', cht);
 
         addGroup('Dependencias (variables en la fórmula)');
-        var deps = allFieldIdsForDeps(state.fields, n._bk);
+        var deps = collectPriorIdsForComputedDeps(state.fields, n._bk);
         var depBox = document.createElement('div');
         deps.forEach(function (did) {
           var row = document.createElement('div');
@@ -1596,6 +1678,19 @@
       nextContainer.fields.unshift(node);
       renderCanvas();
       announce('Movido dentro de «' + (nextContainer.label || '') + '».');
+    }
+
+    // Eliminar un campo de los repetidores
+    function removeFieldFromRepeaters(key) {
+      var hit = findNode(state.fields, key);
+      if (!hit) return;
+      var node = hit.node;
+      var parent = hit.parent;
+      if (parent.type === 'repeater') {
+        parent.fields = parent.fields.filter(function (f) { return f._bk !== key; });
+      }
+      renderCanvas();
+      announce('Campo eliminado del repetidor.');
     }
 
     /* Preview tab */

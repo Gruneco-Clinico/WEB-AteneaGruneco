@@ -135,6 +135,28 @@ describe('FBRuntime — visibilidad condicional', () => {
     expect(wrap.style.display).toBe('');
   });
 
+  it('oculta de nuevo al pasar de Sí a No en radio boolean', () => {
+    document.body.innerHTML = `
+      <input type="radio" name="activo" id="activo_si" value="true">
+      <input type="radio" name="activo" id="activo_no" value="false" checked>
+      <div class="fb-field"
+           data-vw-cond='{"field":"activo","equals":true}'>x</div>
+    `;
+    window.FBRuntime.init(document);
+    const wrap = document.querySelector('.fb-field');
+    const si = document.querySelector('#activo_si');
+    const no = document.querySelector('#activo_no');
+    expect(wrap.style.display).toBe('none');
+
+    si.checked = true;
+    fire(si, 'change');
+    expect(wrap.style.display).toBe('');
+
+    no.checked = true;
+    fire(no, 'change');
+    expect(wrap.style.display).toBe('none');
+  });
+
   it('cae al catch ante JSON malformado y deja el wrap visible', () => {
     document.body.innerHTML = `
       <div class="fb-field" data-vw-cond='not-json'>x</div>
@@ -254,6 +276,43 @@ describe('FBRuntime — IMC en vivo', () => {
     window.FBRuntime.init(document);
     expect(document.getElementById('computed_imc1').value).toBe('23.44');
     expect(document.getElementById('computed_imc2').value).toBe('24.69');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 2bis) Calculados encadenados en vivo
+// ---------------------------------------------------------------------------
+
+describe('FBRuntime — calculados encadenados', () => {
+  it('suma subtotales de dos secciones en un calculado global', () => {
+    document.body.innerHTML = `
+      <input name="a1" type="number" value="10">
+      <input name="a2" type="number" value="5">
+      <input name="b1" type="number" value="3">
+      <input name="b2" type="number" value="7">
+      <div class="fb-computed" data-formula="a1+a2" data-id="total_a"
+           data-depends="a1,a2" data-precision="0">
+        <input id="computed_total_a">
+      </div>
+      <div class="fb-computed" data-formula="b1+b2" data-id="total_b"
+           data-depends="b1,b2" data-precision="0">
+        <input id="computed_total_b">
+      </div>
+      <div class="fb-computed" data-formula="total_a+total_b" data-id="gran_total"
+           data-depends="total_a,total_b" data-precision="0">
+        <input id="computed_gran_total">
+      </div>
+    `;
+    window.FBRuntime.init(document);
+    expect(document.getElementById('computed_total_a').value).toBe('15');
+    expect(document.getElementById('computed_total_b').value).toBe('10');
+    expect(document.getElementById('computed_gran_total').value).toBe('25');
+
+    const a1 = document.querySelector('[name="a1"]');
+    a1.value = '20';
+    fire(a1, 'input');
+    expect(document.getElementById('computed_total_a').value).toBe('25');
+    expect(document.getElementById('computed_gran_total').value).toBe('35');
   });
 });
 
@@ -415,6 +474,52 @@ describe('FBRuntime — repeaters', () => {
     const newRadio = document.querySelector('[name="x__1__r"]');
     expect(newCheckbox.checked).toBe(false);
     expect(newRadio.checked).toBe(false);
+  });
+
+  it('oculta eliminar cuando solo hay una fila', () => {
+    document.body.innerHTML = `
+      <div class="fb-repeater">
+        <div class="repeater-rows">
+          <div class="repeater-row" data-index="0">
+            <button type="button" class="fb-remove-row">Eliminar</button>
+            <input name="meds__0__nombre">
+          </div>
+        </div>
+        <button type="button" class="fb-add-row">+</button>
+      </div>
+    `;
+    window.FBRuntime.init(document);
+    expect(document.querySelector('.fb-remove-row').style.display).toBe('none');
+  });
+
+  it('elimina una fila y reindexa las restantes', () => {
+    document.body.innerHTML = `
+      <div class="fb-repeater">
+        <div class="repeater-rows">
+          <div class="repeater-row" data-index="0">
+            <button type="button" class="fb-remove-row">Eliminar</button>
+            <input name="meds__0__nombre" value="A">
+          </div>
+          <div class="repeater-row" data-index="1">
+            <button type="button" class="fb-remove-row">Eliminar</button>
+            <input name="meds__1__nombre" value="B">
+          </div>
+          <div class="repeater-row" data-index="2">
+            <button type="button" class="fb-remove-row">Eliminar</button>
+            <input name="meds__2__nombre" value="C">
+          </div>
+        </div>
+        <button type="button" class="fb-add-row">+</button>
+      </div>
+    `;
+    window.FBRuntime.init(document);
+    document.querySelectorAll('.fb-remove-row')[1].click();
+
+    const rows = document.querySelectorAll('.repeater-row');
+    expect(rows.length).toBe(2);
+    expect(document.querySelector('[name="meds__0__nombre"]').value).toBe('A');
+    expect(document.querySelector('[name="meds__1__nombre"]').value).toBe('C');
+    expect(document.querySelector('[name="meds__2__nombre"]')).toBeNull();
   });
 });
 

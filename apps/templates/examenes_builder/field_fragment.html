@@ -13,7 +13,8 @@
   </div>
 {% elif t == 'computed' %}
   <div class="form-group fb-computed" data-formula="{{ field.formula|default:'' }}" data-id="{{ field.id }}"
-       data-depends="{{ field.depends_on|default_if_none:''|join:',' }}">
+       data-depends="{{ field.depends_on|default_if_none:''|join:',' }}"
+       data-precision="{{ field.precision|default:2 }}">
     <label>{{ field.label }}</label>
     <input type="text" class="form-control" readonly id="computed_{{ field.id }}"
            value="{{ datos_examen|get_item:field.id|default:'' }}">
@@ -22,13 +23,16 @@
 {% elif t == 'repeater' %}
   <div class="form-group fb-repeater fb-field mb-3" data-rid="{{ field.id }}"
        {% if field.visible_when %}data-vw-cond="{{ field.visible_when|fb_attr_json }}"{% endif %}>
-    <label class="font-weight-bold">{{ field.label }}{% if field.required %} <span class="text-danger">*</span>{% endif %}</label>
-    {% if field.help_text %}<small class="d-block text-muted mb-1">{{ field.help_text }}</small>{% endif %}
-    {% with rows=datos_examen|get_item:field.id %}
+       <label class="font-weight-bold">{{ field.label }}{% if field.required %} <span class="text-danger">*</span>{% endif %}</label>
+       {% if field.help_text %}<small class="d-block text-muted mb-1">{{ field.help_text }}</small>{% endif %}
+       {% with rows=datos_examen|get_item:field.id %}
     <div class="repeater-rows">
       {% if rows %}
         {% for row in rows %}
         <div class="border rounded p-3 mb-2 repeater-row" data-index="{{ forloop.counter0 }}">
+          <div class="d-flex justify-content-end mb-2">
+            <button type="button" class="btn btn-sm btn-outline-danger fb-remove-row">{{ field.remove_label|default:"Eliminar" }}</button>
+          </div>
           {% for sf in field.fields %}
             {% fb_concat field.id "__" forloop.parentloop.counter0 "__" as rp %}
             {% include "examenes_builder/field_fragment.html" with field=sf datos_examen=row name_prefix=rp %}
@@ -37,6 +41,9 @@
         {% endfor %}
       {% else %}
         <div class="border rounded p-3 mb-2 repeater-row" data-index="0">
+          <div class="d-flex justify-content-end mb-2">
+            <button type="button" class="btn btn-sm btn-outline-danger fb-remove-row">{{ field.remove_label|default:"Eliminar" }}</button>
+          </div>
           {% for sf in field.fields %}
             {% fb_concat field.id "__0__" as rp %}
             {% include "examenes_builder/field_fragment.html" with field=sf datos_examen=None name_prefix=rp %}
@@ -46,6 +53,12 @@
     </div>
     {% endwith %}
     <button type="button" class="btn btn-sm btn-outline-primary fb-add-row mt-1">{{ field.add_label|default:"+ Agregar fila" }}</button>
+  </div>
+{% elif t == 'info' %}
+  <div class="fb-info fb-field mb-3{% if field.variant == 'info' %} alert alert-info{% elif field.variant == 'warning' %} alert alert-warning{% endif %}"
+       {% if field.visible_when %}data-vw-cond="{{ field.visible_when|fb_attr_json }}"{% endif %}>
+    {% if field.label %}<div class="fb-info-label font-weight-bold mb-2">{{ field.label }}</div>{% endif %}
+    <div class="fb-info-content{% if field.variant == 'plain' or not field.variant %} text-muted{% endif %}">{{ field.content|fb_markdown }}</div>
   </div>
 {% else %}
   {% fb_input_name name_prefix field.id as input_name %}
@@ -108,15 +121,15 @@
       </div>
 
     {% elif t == 'boolean' %}
-      <div class="custom-control custom-radio custom-control-inline">
+      <div class="fb-boolean-radio custom-control custom-radio custom-control-inline">
+        <label class="custom-control-label" for="{{ input_name|slugify }}_si">Sí</label>
         <input type="radio" class="custom-control-input" name="{{ input_name }}" id="{{ input_name|slugify }}_si" value="true"
           {% if datos_examen|get_item:field.id == True or datos_examen|get_item:field.id == 'true' %}checked{% endif %}>
-        <label class="custom-control-label" for="{{ input_name|slugify }}_si">Sí</label>
       </div>
-      <div class="custom-control custom-radio custom-control-inline">
+      <div class="fb-boolean-radio custom-control custom-radio custom-control-inline">
+        <label class="custom-control-label" for="{{ input_name|slugify }}_no">No</label>
         <input type="radio" class="custom-control-input" name="{{ input_name }}" id="{{ input_name|slugify }}_no" value="false"
           {% if datos_examen|get_item:field.id == False or datos_examen|get_item:field.id == 'false' %}checked{% endif %}>
-        <label class="custom-control-label" for="{{ input_name|slugify }}_no">No</label>
       </div>
 
     {% elif t == 'multiselect' %}

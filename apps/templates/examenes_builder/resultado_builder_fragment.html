@@ -34,6 +34,8 @@
     {% endwith %}
   {% elif field.type == 'computed' %}
     {# Los calculados se listan arriba en «Valores calculados» #}
+  {% elif field.type == 'info' %}
+    {# Bloque informativo: no hay dato guardado #}
   {% else %}
     <tr>
       <th style="width:35%">{{ field.label }}</th>

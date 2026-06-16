@@ -1,9 +1,11 @@
 document.addEventListener('DOMContentLoaded', function () {
+    const contenedorFormularios = document.getElementById('formulario-dinamicos');
+    if (!contenedorFormularios) return;
+
     // Estado para controlar los formularios abiertos
     const formulariosAbiertos = new Set();
 
     // Referencias al contenedor y botones
-    const contenedorFormularios = document.getElementById('formulario-dinamicos');
     const botonAgregarFormulario = document.getElementById('agregar-formulario');
     const botonEditarPaciente = document.querySelector('a[href*="editar_paciente"]');
 
@@ -51,11 +53,13 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Manejar el clic en el botón "Nuevo"
-    botonAgregarFormulario.addEventListener('click', function () {
-        const url = '/registro_demografico/'; // URL para el formulario de nuevo paciente
-        const formType = 'form-nuevo-paciente'; // Identificador del formulario
-        cargarFormulario(url, formType);
-    });
+    if (botonAgregarFormulario) {
+        botonAgregarFormulario.addEventListener('click', function () {
+            const url = '/registro_demografico/'; // URL para el formulario de nuevo paciente
+            const formType = 'form-nuevo-paciente'; // Identificador del formulario
+            cargarFormulario(url, formType);
+        });
+    }
 
     // Manejar el clic en el botón "Editar"
     if (botonEditarPaciente) {

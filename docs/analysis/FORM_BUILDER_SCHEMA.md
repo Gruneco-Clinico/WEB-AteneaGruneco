@@ -52,6 +52,31 @@ Lista de filas; cada fila es un diccionario de respuestas para los `fields` inte
 | `boolean` | Radios Sí/No; valor booleano. |
 | `multiselect` | `options`; valor = lista de strings en respuestas. |
 
+## Nodos informativos (sin valor guardado)
+
+### `info`
+
+Bloque de **instrucciones o descripción** de solo lectura. No tiene `id` ni se persiste en `answers`.
+
+| Propiedad | Descripción |
+|-----------|-------------|
+| `type` | `"info"` |
+| `content` | Texto en **Markdown básico** (negritas, cursivas, listas, párrafos). Obligatorio. |
+| `label` | Título opcional encima del bloque |
+| `variant` | `plain` (defecto), `info` (caja azul), `warning` (caja amarilla) |
+| `visible_when` | Igual que en otros nodos |
+
+El servidor sanitiza el HTML generado (`markdown` + `bleach`); no se admiten enlaces ni HTML arbitrario.
+
+```json
+{
+  "type": "info",
+  "label": "Instrucciones generales",
+  "content": "**Importante:** registre los puntajes obtenidos en la prueba aplicada en físico.\n\n- Puntaje máximo: 30",
+  "variant": "info"
+}
+```
+
 ## `visible_when` (condicional)
 
 Objeto opcional en **cualquier** nodo que se renderice como bloque (sección, repetidor, campo).

@@ -81,7 +81,7 @@ flowchart TD
 
 ## 4. Componentes de la paleta (qué hace cada uno)
 
-Todos los campos con valor (excepto la **sección**) tienen un **`id`**: es la **clave** con la que se guardan los datos. Debe ser **único** en todo el examen y conviene que sea estable (no cambiarlo a la ligera si ya hay datos guardados).
+Todos los campos con valor (excepto la **sección** y los bloques **Instrucciones / texto**) tienen un **`id`**: es la **clave** con la que se guardan los datos.
 
 ### Sección
 
@@ -132,6 +132,13 @@ Todos los campos con valor (excepto la **sección**) tienen un **`id`**: es la *
 
 - **Qué es:** varias casillas; la respuesta guardada es una **lista** de valores.
 - **Propiedades:** mismas opciones que `select`; reordenables.
+
+### Instrucciones / texto (`info`)
+
+- **Qué es:** bloque **informativo** sin entrada del usuario: instrucciones generales, criterios de puntaje o descripción de un ítem (similar a las cajas del MoCA legacy).
+- **Propiedades:** etiqueta opcional, **contenido** (Markdown: `**negrita**`, listas con `-`, párrafos separados por línea en blanco), **estilo visual** (`Texto simple`, `Caja informativa`, `Advertencia`), visibilidad condicional.
+- **Comportamiento:** no tiene `id` ni se guarda en los datos del paciente. En la vista del paciente puede mostrarse antes de las pestañas si está al nivel raíz del formulario.
+- **Ejemplo MoCA:** un bloque `info` con variante «Caja informativa» al inicio; antes de cada `select` de puntaje, un bloque `info` con los criterios en «Texto simple».
 
 ### Repetidor
 

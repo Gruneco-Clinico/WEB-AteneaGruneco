@@ -7,6 +7,8 @@
         <ul class="mb-0 mt-1">{% include "examenes_builder/resultado_repeater_row.html" with subfields=sf.fields row=row %}</ul>
       {% endif %}
     </li>
+  {% elif sf.type == 'info' %}
+    {# sin fila en resultados #}
   {% elif sf.type != 'computed' and sf.type != 'repeater' %}
     <li><strong>{{ sf.label }}:</strong> {{ row|get_item:sf.id|default:"—" }}</li>
   {% endif %}

@@ -80,7 +80,7 @@ def realizar_examen_builder(request, visita_id, examen_id, paciente_id):
     if submission:
         datos_examen = dict(submission.answers)
         if submission.computed:
-            datos_examen["_computed"] = submission.computed
+            datos_examen.update(submission.computed)
         modo_edicion = True
         try:
             datos_examen_json = json.dumps(datos_examen, default=str)
