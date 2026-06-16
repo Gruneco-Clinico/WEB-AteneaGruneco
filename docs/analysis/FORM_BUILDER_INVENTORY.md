@@ -32,6 +32,7 @@ Cualquier otro `examen_id` con fila `Examen` en BD y `campos` no vacío → **Fo
 | `boolean` | Si/No radios | |
 | `multiselect` | checkboxes | lista de valores |
 | `section` | encabezado | `label` obligatorio; sin `id` o `id` ignorado en guardado |
+| `info` | bloque informativo | Markdown sanitizado; sin `id` ni valor en respuestas |
 
 ## Fase 2 (PDF / Historia Clínica)
 

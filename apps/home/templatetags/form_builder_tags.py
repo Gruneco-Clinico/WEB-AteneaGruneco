@@ -3,6 +3,9 @@ import json
 
 from django import template
 from django.utils.html import escape
+from django.utils.safestring import mark_safe
+
+from apps.home.form_builder.markdown import render_safe_markdown
 
 register = template.Library()
 
@@ -44,6 +47,12 @@ def fb_attr_json(value):
     if value is None:
         return ""
     return escape(json.dumps(value, default=str, ensure_ascii=False))
+
+
+@register.filter
+def fb_markdown(value):
+    """Renderiza Markdown básico sanitizado para bloques ``info``."""
+    return mark_safe(render_safe_markdown(value or ""))
 
 
 def _field_type(f):

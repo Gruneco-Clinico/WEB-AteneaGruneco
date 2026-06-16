@@ -6,6 +6,8 @@ Ver docs/analysis/FORM_BUILDER_INVENTORY.md
 import re
 from typing import Any, Dict, List, Optional, Tuple
 
+_INFO_VARIANTS = frozenset({"info", "warning", "plain"})
+
 
 def normalize_schema(raw: Any) -> List[dict]:
     if raw is None:
@@ -22,6 +24,11 @@ def normalize_schema(raw: Any) -> List[dict]:
         t = n.get("type", "text")
         if t == "section":
             n.setdefault("label", n.get("id", f"Sección {i+1}"))
+        elif t == "info":
+            n.setdefault("label", "Instrucciones")
+            n.setdefault("content", "")
+            variant = (n.get("variant") or "plain").strip().lower()
+            n["variant"] = variant if variant in _INFO_VARIANTS else "plain"
         else:
             n.setdefault("id", f"field_{i}")
         out.append(n)
@@ -120,7 +127,7 @@ def parse_post_to_answers(fields: List[dict], post: dict) -> Tuple[dict, List[st
             if t == "section":
                 collect_simple(_section_fields(node))
                 continue
-            if t in ("repeater", "computed"):
+            if t in ("repeater", "computed", "info"):
                 continue
             fid = node.get("id")
             if not fid:
@@ -178,7 +185,7 @@ def parse_post_to_answers(fields: List[dict], post: dict) -> Tuple[dict, List[st
                     continue
                 validate_nodes(_section_fields(node))
                 continue
-            if t == "computed":
+            if t in ("computed", "info"):
                 continue
             if t == "repeater":
                 rid = node.get("id")
@@ -194,7 +201,7 @@ def parse_post_to_answers(fields: List[dict], post: dict) -> Tuple[dict, List[st
                     merged = {**answers, **row}
                     for sf in subfields:
                         st = sf.get("type", "text")
-                        if st == "section":
+                        if st in ("section", "info"):
                             continue
                         sid = sf.get("id")
                         if not sid:
@@ -239,65 +246,89 @@ def _safe_eval_arithmetic(formula: str, names: Dict[str, float]) -> Optional[flo
         return None
 
 
+def _resolve_numeric_dep(dep_id: str, answers: dict, computed: dict) -> Optional[float]:
+    """Obtiene un valor numérico de ``answers`` o de calculados ya resueltos."""
+    v = answers.get(dep_id)
+    if v in (None, ""):
+        v = computed.get(dep_id)
+    if v in (None, ""):
+        return None
+    try:
+        return float(v)
+    except (TypeError, ValueError):
+        return None
+
+
+def _try_compute_node(
+    node: dict, answers: dict, computed: dict
+) -> Optional[Any]:
+    cid = node.get("id")
+    formula = (node.get("formula") or "").strip()
+    deps = node.get("depends_on") or []
+    prec = node.get("precision")
+    if not cid or not formula:
+        return None
+
+    if formula == "imc":
+        try:
+            peso_key = deps[0] if len(deps) > 0 else "peso_kg"
+            talla_key = deps[1] if len(deps) > 1 else "talla_cm"
+            peso = _resolve_numeric_dep(peso_key, answers, computed)
+            talla = _resolve_numeric_dep(talla_key, answers, computed)
+            if peso is not None and talla not in (None, 0):
+                t_m = talla / 100.0
+                if t_m > 0:
+                    return round(peso / (t_m * t_m), 2)
+        except (TypeError, ValueError, ZeroDivisionError):
+            pass
+        return None
+
+    ctx: Dict[str, float] = {}
+    for d in deps:
+        num = _resolve_numeric_dep(str(d), answers, computed)
+        if num is None:
+            return None
+        ctx[str(d)] = num
+    if not ctx:
+        return None
+    val = _safe_eval_arithmetic(formula, ctx)
+    if val is None:
+        return None
+    if prec is not None:
+        try:
+            return round(val, int(prec))
+        except (TypeError, ValueError):
+            return val
+    return val
+
+
+def _collect_computed_nodes(fields: List[dict], acc: List[dict]) -> None:
+    for node in fields:
+        t = node.get("type", "text")
+        if t == "section":
+            _collect_computed_nodes(_section_fields(node), acc)
+        elif t == "computed":
+            acc.append(node)
+
+
 def apply_computed(fields: List[dict], answers: dict) -> dict:
+    """Calcula campos ``computed``, con soporte de encadenamiento entre ellos."""
     computed: Dict[str, Any] = {}
+    nodes: List[dict] = []
+    _collect_computed_nodes(fields, nodes)
 
-    def walk(nodes: List[dict]) -> None:
+    for _ in range(len(nodes) + 1):
+        progress = False
         for node in nodes:
-            t = node.get("type", "text")
-            if t == "section":
-                walk(_section_fields(node))
-                continue
-            if t != "computed":
-                continue
             cid = node.get("id")
-            formula = (node.get("formula") or "").strip()
-            deps = node.get("depends_on") or []
-            prec = node.get("precision")
-            if not cid or not formula:
+            if not cid or cid in computed:
                 continue
-
-            if formula == "imc":
-                try:
-                    peso = answers.get(deps[0]) if len(deps) > 0 else answers.get("peso_kg")
-                    talla = answers.get(deps[1]) if len(deps) > 1 else answers.get("talla_cm")
-                    if peso is not None and talla not in (None, "", 0):
-                        p = float(peso)
-                        t_cm = float(talla)
-                        if t_cm > 0:
-                            t_m = t_cm / 100.0
-                            computed[cid] = round(p / (t_m * t_m), 2)
-                except (TypeError, ValueError, ZeroDivisionError):
-                    pass
-                continue
-
-            ctx: Dict[str, float] = {}
-            skip = False
-            for d in deps:
-                v = answers.get(d)
-                if v in (None, ""):
-                    skip = True
-                    break
-                try:
-                    ctx[str(d)] = float(v)
-                except (TypeError, ValueError):
-                    skip = True
-                    break
-            if skip or not ctx:
-                continue
-            val = _safe_eval_arithmetic(formula, ctx)
-            if val is None:
-                continue
-            if prec is not None:
-                try:
-                    p_int = int(prec)
-                    computed[cid] = round(val, p_int)
-                except (TypeError, ValueError):
-                    computed[cid] = val
-            else:
-                computed[cid] = val
-
-    walk(fields)
+            result = _try_compute_node(node, answers, computed)
+            if result is not None:
+                computed[cid] = result
+                progress = True
+        if not progress:
+            break
     return computed
 
 

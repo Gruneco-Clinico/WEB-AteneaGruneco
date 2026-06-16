@@ -487,6 +487,98 @@ class ApplyComputedTests(SimpleTestCase):
         out = apply_computed([node], {"a": 1})
         self.assertNotIn("x", out)
 
+    def test_chained_computed_sums_section_totals(self):
+        """Un calculado puede depender de otros calculados (p. ej. total A + total B)."""
+        schema = [
+            {
+                "type": "section",
+                "label": "A",
+                "fields": [
+                    {"type": "computed", "id": "total_a", "formula": "a1+a2",
+                     "depends_on": ["a1", "a2"], "precision": 0},
+                ],
+            },
+            {
+                "type": "section",
+                "label": "B",
+                "fields": [
+                    {"type": "computed", "id": "total_b", "formula": "b1+b2",
+                     "depends_on": ["b1", "b2"], "precision": 0},
+                ],
+            },
+            {"type": "computed", "id": "gran_total", "formula": "total_a+total_b",
+             "depends_on": ["total_a", "total_b"], "precision": 0},
+        ]
+        out = apply_computed(
+            schema, {"a1": 10, "a2": 5, "b1": 3, "b2": 7}
+        )
+        self.assertEqual(out["total_a"], 15)
+        self.assertEqual(out["total_b"], 10)
+        self.assertEqual(out["gran_total"], 25)
+
+    def test_chained_computed_out_of_order_resolves(self):
+        """Multi-pase: el agregado puede declararse antes que sus subtotales."""
+        schema = [
+            {"type": "computed", "id": "gran_total", "formula": "total_a+total_b",
+             "depends_on": ["total_a", "total_b"], "precision": 0},
+            {"type": "computed", "id": "total_a", "formula": "a1+a2",
+             "depends_on": ["a1", "a2"], "precision": 0},
+            {"type": "computed", "id": "total_b", "formula": "b1+b2",
+             "depends_on": ["b1", "b2"], "precision": 0},
+        ]
+        out = apply_computed(
+            schema, {"a1": 1, "a2": 2, "b1": 4, "b2": 5}
+        )
+        self.assertEqual(out["total_a"], 3)
+        self.assertEqual(out["total_b"], 9)
+        self.assertEqual(out["gran_total"], 12)
+
+
+# ---------------------------------------------------------------------------
+# info (bloques de instrucciones, sin persistencia)
+# ---------------------------------------------------------------------------
+
+
+class InfoNodeTests(SimpleTestCase):
+    def test_normalize_info_defaults(self):
+        out = normalize_schema([{"type": "info"}])
+        self.assertEqual(out[0]["label"], "Instrucciones")
+        self.assertEqual(out[0]["content"], "")
+        self.assertEqual(out[0]["variant"], "plain")
+        self.assertNotIn("id", out[0])
+
+    def test_normalize_info_invalid_variant_falls_back_to_plain(self):
+        out = normalize_schema([{"type": "info", "variant": "danger"}])
+        self.assertEqual(out[0]["variant"], "plain")
+
+    def test_post_ignores_info_nodes(self):
+        schema = [
+            {"type": "info", "content": "**Instrucciones**"},
+            {"type": "text", "id": "nombre", "label": "Nombre", "required": True},
+        ]
+        ans, errors = parse_post_to_answers(schema, _qd({"nombre": "Ana"}))
+        self.assertEqual(ans, {"nombre": "Ana"})
+        self.assertEqual(errors, [])
+
+    def test_hidden_info_does_not_block_sibling_validation(self):
+        schema = [
+            {"type": "boolean", "id": "mostrar", "label": "Mostrar"},
+            {
+                "type": "info",
+                "content": "Solo visible si mostrar es sí",
+                "visible_when": {"field": "mostrar", "equals": True},
+            },
+            {
+                "type": "text",
+                "id": "detalle",
+                "label": "Detalle",
+                "required": True,
+                "visible_when": {"field": "mostrar", "equals": True},
+            },
+        ]
+        ans, errors = parse_post_to_answers(schema, _qd({}))
+        self.assertEqual(errors, [])
+
 
 # ---------------------------------------------------------------------------
 # _safe_eval_arithmetic — núcleo del sandbox de fórmulas
