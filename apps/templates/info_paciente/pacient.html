@@ -591,7 +591,7 @@
             <select class="form-control tipo-visita" name="tipo_visita">
               <option value="">Seleccione un tipo de visita</option>
               {% for visita in proyecto.visitas.all %}
-                <option value="{{ visita.id }}" data-examenes="{{ visita.examenes }}">
+                <option value="{{ visita.id }}" data-examenes='{{ visita.examenes|json_dumps }}'>
                   {{ visita.nombre }}
                 </option>
               {% endfor %}
@@ -872,8 +872,7 @@
 
         if (examenesData) {
           try {
-            var jsonString = examenesData.replace(/'/g, '"');
-            var examenes = JSON.parse(jsonString);
+            var examenes = JSON.parse(examenesData);
 
             // NO crear input oculto: usaremos checkboxes con el mismo `name` para enviar múltiples valores
 

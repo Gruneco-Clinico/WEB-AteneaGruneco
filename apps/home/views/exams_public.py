@@ -36,7 +36,7 @@ logger = logging.getLogger(__name__)
 def _validar_acceso_publico(request):
     """Shared access validation for public exam endpoints.
 
-    Requires a signed ``token`` parameter (generated via ``generar_token_paciente``).
+    Accepts ``token`` (signed, preferred) **or** ``paciente_id`` (legacy).
     Returns ``(paciente, error_message)``.
     """
     if request.method == "GET":
@@ -44,6 +44,7 @@ def _validar_acceso_publico(request):
     else:
         params = request.POST
 
+    # --- Prefer signed token ---
     token = params.get("token")
     if token:
         paciente_id = validar_token_paciente(token)
@@ -55,7 +56,21 @@ def _validar_acceso_publico(request):
         except DatosDemograficos.DoesNotExist:
             return None, "❌ Paciente no encontrado."
 
-    return None, "❌ Datos de acceso incompletos. Se requiere un enlace firmado."
+    # --- Legacy fallback: raw paciente_id (deprecated) ---
+    paciente_id_raw = params.get("paciente_id")
+    if paciente_id_raw:
+        logger.warning(
+            "Acceso público con paciente_id sin firmar (deprecated) id=%s uri=%s",
+            paciente_id_raw,
+            request.path,
+        )
+        try:
+            paciente = get_object_or_404(DatosDemograficos, id=paciente_id_raw)
+            return paciente, None
+        except Exception as e:
+            return None, f"❌ Error al validar acceso: {str(e)}"
+
+    return None, "❌ Datos de acceso incompletos."
 
 def guardar_examen_publico_epworth(request):
     """Cargar y guardar examen Epworth desde enlace público"""

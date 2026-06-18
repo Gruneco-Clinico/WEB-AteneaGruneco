@@ -1,4 +1,5 @@
 from django import template
+import json
 import re
 
 register = template.Library()
@@ -39,3 +40,11 @@ def to_int(value):
         return value
     match = re.match(r"(\d+)", str(value))
     return int(match.group(1)) if match else 0
+
+
+@register.filter
+def json_dumps(value):
+    """Serializa a JSON seguro para atributos HTML (p. ej. data-examenes)."""
+    if value is None:
+        return "[]"
+    return json.dumps(value, ensure_ascii=False)
