@@ -106,6 +106,9 @@ def crear_visita(request, paciente_id):
                 except (TypeError, ValueError):
                     continue
 
+            if not clean_ids:
+                clean_ids = tipo_visita.iter_examen_ids()
+
             for examen_id in clean_ids:
                 try:
                     examen = Examen.objects.get(id=examen_id)
@@ -118,6 +121,11 @@ def crear_visita(request, paciente_id):
                 messages.success(
                     request,
                     f"Visita creada con éxito con {created_count} exámenes asociados.",
+                )
+            elif tipo_visita.iter_examen_ids():
+                messages.warning(
+                    request,
+                    "Visita creada, pero no se pudieron asociar los exámenes del tipo de visita.",
                 )
         except Exception as e:
             messages.error(request, f"Error al procesar los exámenes seleccionados: {str(e)}")
@@ -270,9 +278,7 @@ def editar_v(request, visita_id):
     paciente = visita.paciente
     tipo_visita = visita.Tipo_visita  # Tipo de visita actual
     # Obtener exámenes disponibles según el tipo de visita (vienen en JSONField)
-    examenes_tipo_visita = [
-        int(examen["id"]) for examen in tipo_visita.examenes
-    ]  # Este es un JSONField con los exámenes permitidos
+    examenes_tipo_visita = tipo_visita.iter_examen_ids()
 
     examenes_actuales = VisitaExamen.objects.filter(visita=visita).values_list(
         "examen_id", flat=True

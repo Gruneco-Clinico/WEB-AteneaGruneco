@@ -3,7 +3,7 @@
 ## Requisitos
 
 1. Aplicar migraciones: `python manage.py migrate home`
-2. Rol **staff** para `/builder/examenes/`
+2. Rol **staff** o **administrador** (`is_staff` / `is_superuser`) para `/builder/examenes/`
 
 ## Convivencia con legacy
 

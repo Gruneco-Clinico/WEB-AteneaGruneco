@@ -207,7 +207,7 @@ class VisitaExamen(models.Model):
                 "examenfisicoresult_resultado",  # ✅ EXAMEN FÍSICO
                 "examenneurologicoresult_resultado",  # ✅ EXAMEN NEUROLÓGICO
                 "medicamentosresult_resultado",  # ✅ MEDICAMENTOS
-                "revisionsistemrasresult_resultado",  # ✅ REVISIÓN SISTEMAS
+                "revisionsistemasresult_resultado",  # ✅ REVISIÓN SISTEMAS
                 "cognitivo_anamnesis_resultado",  # ✅ COGNITIVO ANAMNESIS
                 # este examen es problemático dejar al final
                 "seguimientointervencionesresult_resultado",
@@ -256,25 +256,27 @@ class VisitaExamen(models.Model):
     def esta_realizado(self):
         """Verifica si el examen está completado y tiene un resultado concreto asociado."""
 
-        estado_completado = self.estado == "completado"
+        if self.estado != "completado":
+            return False
 
-        # Form Builder: resultado = ExamenSubmission (incluye IDs legacy si tienen ``campos``)
         from ..exam_legacy import examen_has_builder_schema, is_legacy_examen
 
-        if examen_has_builder_schema(self.examen.campos) or not is_legacy_examen(
-            self.examen_id
-        ):
+        # Legacy: siempre priorizar modelos *Result (convivencia Form Builder).
+        if is_legacy_examen(self.examen_id):
+            if self.get_resultado_instance() is not None:
+                return True
+            if examen_has_builder_schema(self.examen.campos):
+                from .exam_builder import ExamenSubmission
+
+                return ExamenSubmission.objects.filter(visita_examen=self).exists()
+            return False
+
+        if examen_has_builder_schema(self.examen.campos):
             from .exam_builder import ExamenSubmission
 
-            tiene = ExamenSubmission.objects.filter(visita_examen=self).exists()
-            return estado_completado and tiene
+            return ExamenSubmission.objects.filter(visita_examen=self).exists()
 
-        resultado = self.get_resultado_instance()
-        tiene_resultado = resultado is not None
-
-        final_result = estado_completado and tiene_resultado
-
-        return final_result
+        return self.get_resultado_instance() is not None
 
     @property
     def puede_editarse(self):

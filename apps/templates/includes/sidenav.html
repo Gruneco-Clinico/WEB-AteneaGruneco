@@ -115,7 +115,7 @@
               <span class="nav-link-text">Usuarios</span>
             </a>
           </li>
-          {% if user.is_staff %}
+          {% if user.is_staff or user.is_superuser %}
           <li class="nav-item">
             <a
               class="nav-link {% if 'builder/examenes' in request.path %} active {% endif %}"
