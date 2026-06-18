@@ -1,0 +1,44 @@
+name: Deploy Production
+
+on:
+  push:
+    branches: [Production]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production  # aquí configuras aprobación manual
+
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script_stop: true
+          script: |
+            set -e
+            cd /opt/bitnami/Repositories/WEB-AteneaGruneco
+
+            git fetch origin
+            git checkout Production
+            git pull origin Production
+
+            source bitnamivenv/bin/activate
+            pip install -r requirements.txt
+
+            BACKUP_DIR="/opt/bitnami/Repositories/Databases/backups"
+            mkdir -p "$BACKUP_DIR"
+            mysqldump -u root -p"${{ secrets.DB_PASSWORD }}" ateneagrunecodb \
+              > "$BACKUP_DIR/backup_$(date +%Y%m%d_%H%M%S).sql"
+
+            python manage.py migrate
+            python manage.py collectstatic --noinput
+
+            sudo chown -R bitnami:daemon logs/
+            sudo chmod -R 775 logs/
+            sudo /opt/bitnami/ctlscript.sh restart apache
+
+            echo "Deploy Production completado"
