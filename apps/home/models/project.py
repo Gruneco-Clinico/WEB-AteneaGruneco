@@ -122,5 +122,19 @@ class TipoVisita(models.Model):
         default=dict, verbose_name="Exámenes", null=True, blank=True
     )
 
+    def iter_examen_ids(self):
+        """IDs de exámenes configurados en el JSON ``examenes`` (lista de dicts)."""
+        raw = self.examenes
+        if not raw or not isinstance(raw, list):
+            return []
+        ids = []
+        for item in raw:
+            eid = item.get("id") if isinstance(item, dict) else item
+            try:
+                ids.append(int(eid))
+            except (TypeError, ValueError):
+                continue
+        return ids
+
     def __str__(self):
         return f"{self.nombre} - {self.proyecto.nombre}"
