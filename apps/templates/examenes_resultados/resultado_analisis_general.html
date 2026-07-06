@@ -1,11 +1,11 @@
-{% extends 'layouts/base.html' %}
+{% extends parent_template|default:"layouts/base.html" %}
 
 {% block content %}
 <div class="container-fluid py-4">
     <div class="row">
         <div class="col-12">
             <div class="card shadow">
-                <div class="card-header bg-white border-bottom">
+                <div class="card-header bg-white border-bottom hc-encabezado-web">
                     <div class="row align-items-center">
                         <div class="col">
                             <h3 class="mb-0">
@@ -260,6 +260,7 @@
                 </div>
 
                 <!-- Footer con acciones -->
+                {% if not print_mode %}
                 <div class="card-footer bg-light">
                     <div class="row align-items-center">
                         <div class="col">
@@ -275,6 +276,7 @@
                         </div>
                     </div>
                 </div>
+                {% endif %}
             </div>
         </div>
     </div>

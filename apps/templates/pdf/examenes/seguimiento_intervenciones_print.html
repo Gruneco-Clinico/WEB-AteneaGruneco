@@ -1,0 +1,15 @@
+<div class="subseccion">
+  {% if sesiones %}
+  <table class="tabla-simple">
+    <tr><th>Sesión</th><th>Fecha</th><th>Asistió</th><th>Observaciones</th></tr>
+    {% for s in sesiones %}
+    <tr>
+      <td>{{ s.numero_sesion }}</td>
+      <td>{{ s.fecha|date:"d/m/Y"|default:"—" }}</td>
+      <td>{{ s.asistencia|default:"—" }}</td>
+      <td>{{ s.observaciones|default:"—" }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% else %}<p>Sin sesiones registradas.</p>{% endif %}
+</div>

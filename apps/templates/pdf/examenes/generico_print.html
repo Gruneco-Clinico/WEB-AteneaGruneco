@@ -1,0 +1,10 @@
+<div class="subseccion">
+  {% if datos_resultado %}
+  <table class="tabla-simple">
+    {% for label, valor in datos_resultado.items %}
+    <tr><th>{{ label }}</th><td>{{ valor|default:"—" }}</td></tr>
+    {% endfor %}
+  </table>
+  {% endif %}
+  {% if puntaje_total %}<p><span class="campo-label">Puntaje total:</span> {{ puntaje_total }}</p>{% endif %}
+</div>

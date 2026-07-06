@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Historia Clínica</title>
+  <style>{{ print_css }}</style>
+  {% for css_url in ver_css_urls %}
+  <link rel="stylesheet" href="{{ css_url }}">
+  {% endfor %}
+</head>
+<body>
+  {% block content %}{% endblock %}
+</body>
+</html>

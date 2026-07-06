@@ -1,9 +1,9 @@
-{% extends "layouts/base.html" %}
+{% extends parent_template|default:"layouts/base.html" %}
 {% block content %}
-<div class="container mt-4">
+<div class="container mt-4{% if print_mode %} hc-examen-tabla{% endif %}">
 
   <!-- Encabezado -->
-  <div class="card shadow-sm mb-4">
+  <div class="card shadow-sm mb-4 hc-encabezado-web">
     <div class="card-body">
       <h3 class="card-title mb-2">
         🧾 Reporte de examen: <span class="text-primary">{{ visita_examen.examen.nombre }}</span>
@@ -25,11 +25,13 @@
 
   <!-- Puntaje Total -->
   {% if puntaje_total is not None %}
-  <div class="card shadow-sm mb-4 border-left-success">
+  <div class="card shadow-sm mb-3 border-left-success hc-puntaje-total">
     <div class="card-body d-flex align-items-center">
+      {% if not print_mode %}
       <div class="mr-3">
         <i class="ni ni-trophy text-success" style="font-size: 2rem;"></i>
       </div>
+      {% endif %}
       <div>
         <h6 class="text-uppercase text-muted mb-0">Puntaje Total</h6>
         <h2 class="mb-0 font-weight-bold text-success">{{ puntaje_total }}</h2>
@@ -39,14 +41,14 @@
   {% endif %}
 
   <!-- Sección de resultados -->
-  <div class="card shadow-sm">
+  <div class="card shadow-sm hc-tabla-resultados-card">
     <div class="card-header bg-light">
       <h5 class="mb-0">Resultados</h5>
     </div>
     <div class="card-body">
       {% if datos_resultado %}
       <div class="table-responsive">
-        <table class="table table-bordered table-hover align-middle">
+        <table class="table table-bordered align-middle hc-tabla-resultados">
           <thead class="table-light">
             <tr>
               <th>Parámetro</th>
@@ -57,23 +59,19 @@
             {% for campo, valor in datos_resultado.items %}
               {% if not "ID" in campo and valor %}
                 <tr>
-                  <!-- Campo -->
                   <td class="text-capitalize">
-                    <i class="ni ni-bullet-list-67 text-primary me-2"></i>
-                    <strong>{{ campo|capfirst }}</strong>
+                    {% if not print_mode %}<i class="ni ni-bullet-list-67 text-primary me-2"></i>{% endif %}
+                    {% if print_mode %}{{ campo|capfirst }}{% else %}<strong>{{ campo|capfirst }}</strong>{% endif %}
                   </td>
-
-                  <!-- Valor -->
-                  <td>
-                    <span class="badge bg-light text-dark border px-3 py-2">
-                      {{ valor }}
-                    </span>
+                  <td class="hc-valor-celda">
+                    {% if print_mode %}{{ valor }}{% else %}
+                    <span class="badge bg-light text-dark border px-3 py-2">{{ valor }}</span>
+                    {% endif %}
                   </td>
                 </tr>
               {% endif %}
             {% endfor %}
           </tbody>
-
         </table>
       </div>
       {% else %}
@@ -85,14 +83,16 @@
   </div>
 
   <!-- Acciones -->
+  {% if not print_mode %}
   <div class="d-flex justify-content-end mt-4">
     <a href="{% url 'detalle_paciente' paciente.id %}" class="btn btn-outline-secondary">
       ← Volver
     </a>
   </div>
+  {% endif %}
 
   </div>
-    {% include "includes/footer.html" %}
+    {% if not print_mode %}{% include "includes/footer.html" %}{% endif %}
   </div>
 
 </div>

@@ -1,0 +1,5 @@
+{# Título de examen en PDF HC — el paciente ya está en el membrete #}
+<div class="fila-titulo-hc fila-titulo-examen">{{ titulo }}</div>
+{% if fecha_completado %}
+<p class="examen-fecha-registro">Registrado: {{ fecha_completado|date:"d/m/Y H:i" }}</p>
+{% endif %}
