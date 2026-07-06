@@ -28,6 +28,7 @@ from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, 
 from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT, TA_JUSTIFY
 from io import BytesIO
 from .auth import is_superuser
+from ..export_registry import extract_exam_export_data, column_label, CAMPO_EXAMEN_LABELS
 
 logger = logging.getLogger(__name__)
 
@@ -367,26 +368,39 @@ def exportar_csv_proyecto(request, proyecto_id):
             ("correo", "Correo Electrónico"),
         ]
 
-        # Obtener exámenes del proyecto
-        examenes_proyecto = []
-        visitas = Visita.objects.filter(Tipo_visita__proyecto=proyecto)
+        # Obtener exámenes del proyecto (visitas + TipoVisita.examenes)
         examenes_ids = set()
+        tipos = TipoVisita.objects.filter(proyecto=proyecto)
+        for tipo in tipos:
+            examenes_ids.update(tipo.iter_examen_ids())
+        visitas = Visita.objects.filter(Tipo_visita__proyecto=proyecto)
         for visita in visitas:
             for ve in visita.visita_examenes.all():
                 examenes_ids.add(ve.examen.id)
-        
+
         examenes_proyecto = Examen.objects.filter(id__in=examenes_ids).order_by("nombre")
+
+        demograficos_preseleccionados = {
+            "numero_documento",
+            "tipo_documento",
+            "fecha_nacimiento",
+            "edad",
+            "genero",
+        }
 
         context = {
             "proyecto": proyecto,
             "campos_demograficos": campos_demograficos,
             "examenes_proyecto": examenes_proyecto,
+            "demograficos_preseleccionados": demograficos_preseleccionados,
         }
         return render(request, "home/exportar_proyecto_form.html", context)
 
     # Si es POST, generar CSV con campos seleccionados
     demograficos_selected = request.POST.getlist("demograficos")
     campos_examen_selected = request.POST.getlist("campos_examen")
+    if "resultados_tabla" not in campos_examen_selected:
+        campos_examen_selected = ["resultados_tabla", *campos_examen_selected]
     examenes_selected = request.POST.getlist("examenes")
 
     # Obtener visitas del proyecto
@@ -468,13 +482,8 @@ def exportar_csv_proyecto(request, proyecto_id):
         headers.append(campo_labels.get(campo, campo))
 
     # Agregar columnas de exámenes según campos seleccionados
-    campo_examen_labels = {
-        "motivo_consulta": "Motivo Consulta",
-        "puntaje_total": "Puntaje",
-        "interpretacion": "Interpretación",
-        "observaciones": "Observaciones",
-        "notas_aclaratorias": "Notas",
-    }
+    campo_examen_labels = dict(CAMPO_EXAMEN_LABELS)
+    campo_examen_labels.setdefault("notas_aclaratorias", "Notas Visita")
 
     if isinstance(examenes_incluir, list):
         # Si examenes_incluir es lista de strings (nombres)
@@ -538,30 +547,27 @@ def exportar_csv_proyecto(request, proyecto_id):
                 valor = paciente.get_regimen_display() if hasattr(paciente, 'get_regimen_display') else valor
             row.append(valor if valor else "")
 
-        # Obtener datos de exámenes
+        # Obtener datos de exámenes vía registro de exportación
         examenes_data = {}
         for ve in visita.visita_examenes.all():
             if ve.examen.nombre not in examenes_nombres:
                 continue
-            
-            datos = {}
-            if ve.estado == "completado":
-                try:
-                    resultado = ve.get_resultado_instance()
-                    if resultado:
-                        for campo in campos_examen_selected:
-                            valor = getattr(resultado, campo, "")
-                            datos[campo] = valor if valor is not None else ""
-                except Exception:
-                    pass
-            
-            examenes_data[ve.examen.nombre] = datos
+            campos_ve = list(campos_examen_selected)
+            if "notas_aclaratorias" in campos_ve:
+                campos_ve = [
+                    "notas_visita" if c == "notas_aclaratorias" else c
+                    for c in campos_ve
+                ]
+            examenes_data[ve.examen.nombre] = extract_exam_export_data(
+                ve, campos_solicitados=campos_ve
+            )
 
         # Agregar columnas de exámenes
         for examen_nombre in examenes_nombres:
             datos = examenes_data.get(examen_nombre, {})
             for campo_exam in campos_examen_selected:
-                row.append(datos.get(campo_exam, ""))
+                key = "notas_visita" if campo_exam == "notas_aclaratorias" else campo_exam
+                row.append(datos.get(key, datos.get(campo_exam, "")))
 
         writer.writerow(row)
 

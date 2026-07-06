@@ -98,7 +98,8 @@
                                 <div class="field-checkbox">
                                     <div class="custom-control custom-checkbox">
                                         <input type="checkbox" class="custom-control-input demograficos" 
-                                               id="demo_{{ field.0 }}" name="demograficos" value="{{ field.0 }}">
+                                               id="demo_{{ field.0 }}" name="demograficos" value="{{ field.0 }}"
+                                               {% if field.0 in demograficos_preseleccionados %}checked{% endif %}>
                                         <label class="custom-control-label" for="demo_{{ field.0 }}">
                                             {{ field.1 }}
                                         </label>
@@ -123,7 +124,18 @@
                                 <div class="field-checkbox">
                                     <div class="custom-control custom-checkbox">
                                         <input type="checkbox" class="custom-control-input examenes" 
-                                               id="exam_motivo" name="campos_examen" value="motivo_consulta" checked>
+                                               id="exam_tabla" name="campos_examen" value="resultados_tabla" checked>
+                                        <label class="custom-control-label" for="exam_tabla">
+                                            Resultados en tabla (JSON)
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="field-checkbox">
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input examenes" 
+                                               id="exam_motivo" name="campos_examen" value="motivo_consulta">
                                         <label class="custom-control-label" for="exam_motivo">
                                             Motivo de Consulta
                                         </label>
@@ -134,7 +146,7 @@
                                 <div class="field-checkbox">
                                     <div class="custom-control custom-checkbox">
                                         <input type="checkbox" class="custom-control-input examenes" 
-                                               id="exam_puntaje" name="campos_examen" value="puntaje_total" checked>
+                                               id="exam_puntaje" name="campos_examen" value="puntaje_total">
                                         <label class="custom-control-label" for="exam_puntaje">
                                             Puntaje Total
                                         </label>
@@ -167,9 +179,31 @@
                                 <div class="field-checkbox">
                                     <div class="custom-control custom-checkbox">
                                         <input type="checkbox" class="custom-control-input examenes" 
-                                               id="exam_notas" name="campos_examen" value="notas_aclaratorias">
+                                               id="exam_notas" name="campos_examen" value="notas_visita">
                                         <label class="custom-control-label" for="exam_notas">
-                                            Notas Aclaratorias
+                                            Notas de visita
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="field-checkbox">
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input examenes" 
+                                               id="exam_estado" name="campos_examen" value="estado_examen">
+                                        <label class="custom-control-label" for="exam_estado">
+                                            Estado del examen
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="field-checkbox">
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input examenes" 
+                                               id="exam_evaluador" name="campos_examen" value="evaluador">
+                                        <label class="custom-control-label" for="exam_evaluador">
+                                            Evaluador
                                         </label>
                                     </div>
                                 </div>
@@ -188,7 +222,7 @@
                             </button>
                         </div>
                         <div class="alert alert-sm alert-secondary">
-                            Selecciona qué exámenes incluir en el CSV. Para cada examen seleccionado se crearán columnas según los campos de exámenes marcados arriba.
+                            Selecciona qué exámenes incluir. La columna <strong>Resultados en tabla (JSON)</strong> incluye todos los exámenes tipo parámetro/resultado (Anamnesis, CDR, consentimientos, etc.) como <code>[{"parametro":"…","resultado":"…"}]</code>. Motivo de consulta y puntaje solo aplican a exámenes que tengan esos campos.
                         </div>
                         <div class="row">
                             {% for examen in examenes_proyecto %}
