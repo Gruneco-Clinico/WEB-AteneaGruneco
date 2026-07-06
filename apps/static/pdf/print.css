@@ -116,20 +116,6 @@ body {
   padding: 8px;
 }
 
-.celda-sin-padding {
-  border: none;
-  padding: 0;
-}
-
-.tabla-hc-anidada {
-  margin: 0;
-  width: 100%;
-}
-
-.tabla-hc-anidada .celda-hc {
-  width: 33.33%;
-}
-
 /* ----- Exámenes embebidos (misma vista que "Ver") ----- */
 .seccion-examenes {
   margin-top: 14px;

@@ -4,68 +4,62 @@
 
   <table class="tabla-hc">
     <tr>
-      <td class="fila-titulo-hc" colspan="2">Identificación del paciente o sujeto de investigación</td>
+      <td class="fila-titulo-hc" colspan="6">Identificación del paciente o sujeto de investigación</td>
     </tr>
     <tr>
-      {% include "pdf/partials/campo_hc.html" with etiqueta="Nombre y apellidos completos" valor=nombre_completo %}
-      {% include "pdf/partials/campo_hc.html" with etiqueta="Tipo y documento de identidad" valor=documento_identidad %}
+      {% include "pdf/partials/campo_hc.html" with etiqueta="Nombre y apellidos completos" valor=nombre_completo colspan=3 %}
+      {% include "pdf/partials/campo_hc.html" with etiqueta="Tipo y documento de identidad" valor=documento_identidad colspan=3 %}
     </tr>
     <tr>
-      <td colspan="2" class="celda-sin-padding">
-        <table class="tabla-hc tabla-hc-anidada">
-          <tr>
-            {% include "pdf/partials/campo_hc.html" with etiqueta="Fecha de nacimiento" valor=paciente.fecha_nacimiento|date:"d/m/Y" %}
-            {% include "pdf/partials/campo_hc.html" with etiqueta="Edad" valor=paciente.edad %}
-            {% include "pdf/partials/campo_hc.html" with etiqueta="Sexo biológico" valor=paciente.get_genero_display %}
-          </tr>
-        </table>
-      </td>
+      {% include "pdf/partials/campo_hc.html" with etiqueta="Fecha de nacimiento" valor=paciente.fecha_nacimiento|date:"d/m/Y" colspan=2 %}
+      {% include "pdf/partials/campo_hc.html" with etiqueta="Edad" valor=paciente.edad colspan=2 %}
+      {% include "pdf/partials/campo_hc.html" with etiqueta="Sexo biológico" valor=paciente.get_genero_display colspan=2 %}
     </tr>
     <tr>
-      {% include "pdf/partials/campo_hc.html" with etiqueta="Escolaridad" valor=paciente.get_escolaridad_display %}
-      {% include "pdf/partials/campo_hc.html" with etiqueta="Ocupación" valor=paciente.ocupacion %}
+      {% include "pdf/partials/campo_hc.html" with etiqueta="Escolaridad" valor=paciente.get_escolaridad_display colspan=3 %}
+      {% include "pdf/partials/campo_hc.html" with etiqueta="Ocupación" valor=paciente.ocupacion colspan=3 %}
     </tr>
     <tr>
-      {% include "pdf/partials/campo_hc.html" with etiqueta="Estado civil" valor=paciente.get_estado_civil_display %}
-      {% include "pdf/partials/campo_hc.html" with etiqueta="Etnia y raza" valor="—" %}
+      {% include "pdf/partials/campo_hc.html" with etiqueta="Estado civil" valor=paciente.get_estado_civil_display colspan=3 %}
+      {% include "pdf/partials/campo_hc.html" with etiqueta="Etnia y raza" valor="—" colspan=3 %}
     </tr>
     <tr>
-      {% include "pdf/partials/campo_hc.html" with etiqueta="Dirección" valor=paciente.direccion %}
-      {% include "pdf/partials/campo_hc.html" with etiqueta="Teléfono" valor=paciente.celular %}
+      {% include "pdf/partials/campo_hc.html" with etiqueta="Dirección" valor=paciente.direccion colspan=3 %}
+      {% include "pdf/partials/campo_hc.html" with etiqueta="Teléfono" valor=paciente.celular colspan=3 %}
     </tr>
     <tr>
-      {% include "pdf/partials/campo_hc.html" with etiqueta="Email" valor=paciente.correo %}
-      {% include "pdf/partials/campo_hc.html" with etiqueta="Entidad aseguradora (EPS)" valor=paciente.eps %}
+      {% include "pdf/partials/campo_hc.html" with etiqueta="Email" valor=paciente.correo colspan=3 %}
+      {% include "pdf/partials/campo_hc.html" with etiqueta="Entidad aseguradora (EPS)" valor=paciente.eps colspan=3 %}
     </tr>
   </table>
 
   <table class="tabla-hc">
     <tr>
-      <td class="fila-titulo-hc" colspan="2">Identificación del acompañante</td>
+      <td class="fila-titulo-hc" colspan="6">Identificación del acompañante</td>
     </tr>
     <tr>
-      {% include "pdf/partials/campo_hc.html" with etiqueta="Nombre y apellidos completos" valor=visita.acompanante_nombre %}
-      {% include "pdf/partials/campo_hc.html" with etiqueta="Teléfono" valor=visita.acompanante_telefono %}
+      {% include "pdf/partials/campo_hc.html" with etiqueta="Nombre y apellidos completos" valor=visita.acompanante_nombre colspan=3 %}
+      {% include "pdf/partials/campo_hc.html" with etiqueta="Teléfono" valor=visita.acompanante_telefono colspan=3 %}
     </tr>
     <tr>
-      {% include "pdf/partials/campo_hc.html" with etiqueta="Parentesco" valor=visita.acompanante_relacion colspan=2 %}
+      {% include "pdf/partials/campo_hc.html" with etiqueta="Parentesco" valor=visita.acompanante_relacion colspan=6 %}
     </tr>
   </table>
 
   <table class="tabla-hc">
     <tr>
-      <td class="fila-titulo-hc" colspan="2">Información de la atención</td>
+      <td class="fila-titulo-hc" colspan="6">Información de la atención</td>
     </tr>
     <tr>
-      {% include "pdf/partials/campo_hc.html" with etiqueta="Tipo de atención" valor=proyecto %}
-      {% include "pdf/partials/campo_hc.html" with etiqueta="Tipo de visita" valor=tipo_visita %}
+      {% include "pdf/partials/campo_hc.html" with etiqueta="Tipo de atención" valor=proyecto colspan=3 %}
+      {% include "pdf/partials/campo_hc.html" with etiqueta="Tipo de visita" valor=tipo_visita colspan=3 %}
     </tr>
     <tr>
-      {% include "pdf/partials/campo_hc.html" with etiqueta="Fecha y hora de la atención" valor=visita.fecha|date:"d/m/Y" %}
-      {% include "pdf/partials/campo_hc.html" with etiqueta="Nombre y apellidos completos del responsable (Quien realiza)" valor=evaluador %}
+      {% include "pdf/partials/campo_hc.html" with etiqueta="Fecha y hora de la atención" valor=visita.fecha|date:"d/m/Y" colspan=3 %}
+      {% include "pdf/partials/campo_hc.html" with etiqueta="Nombre y apellidos completos del responsable (Quien realiza)" valor=evaluador colspan=3 %}
     </tr>
     <tr>
-      {% include "pdf/partials/campo_hc.html" with etiqueta="Nombre y apellido completos del profesional (el que firma la historia)" valor=firmante colspan=2 %}
+      {% include "pdf/partials/campo_hc.html" with etiqueta="Nombre y apellido completos del profesional (el que firma la historia)" valor=firmante colspan=6 %}
     </tr>
   </table>
 
@@ -84,10 +78,10 @@
   <section class="seccion-notas">
     <table class="tabla-hc">
       <tr>
-        <td class="fila-titulo-hc">Notas aclaratorias</td>
+        <td class="fila-titulo-hc" colspan="6">Notas aclaratorias</td>
       </tr>
       <tr>
-        <td class="celda-hc celda-texto-libre">{{ visita.notas_aclaratorias|linebreaksbr }}</td>
+        <td class="celda-hc celda-texto-libre" colspan="6">{{ visita.notas_aclaratorias|linebreaksbr }}</td>
       </tr>
     </table>
   </section>
