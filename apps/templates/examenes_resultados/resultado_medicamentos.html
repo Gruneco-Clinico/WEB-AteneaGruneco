@@ -1,11 +1,11 @@
-{% extends 'layouts/base.html' %}
+{% extends parent_template|default:"layouts/base.html" %}
 
 {% block content %}
 <div class="container-fluid py-4">
     <div class="row">
         <div class="col-12">
             <div class="card">
-                <div class="card-header">
+                <div class="card-header hc-encabezado-web">
                     <h3>Medicamentos - {{ paciente.primer_nombre }} {{ paciente.primer_apellido }}</h3>
                     <small class="text-muted">Examen realizado: {{ visita_examen.fecha_completado|date:"d/m/Y H:i" }}</small>
                 </div>

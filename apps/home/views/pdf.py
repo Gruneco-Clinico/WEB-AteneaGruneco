@@ -585,8 +585,25 @@ def _build_footer(elements, styles):
 def construir_pdf_visita(buffer, visita):
     """
     Build the clinical-history PDF for *visita* into *buffer* (a BytesIO).
-    Called by both the download view and firmar_visita email attachment.
+    Prefiere WeasyPrint; si falla, usa ReportLab legacy.
     """
+    from ..services.hc_pdf import construir_pdf_weasyprint
+
+    pdf_bytes = construir_pdf_weasyprint(visita)
+    if pdf_bytes:
+        buffer.write(pdf_bytes)
+        buffer.seek(0)
+        return
+
+    logger.warning(
+        "WeasyPrint no disponible para visita %s; usando ReportLab legacy.",
+        visita.id,
+    )
+    _construir_pdf_visita_reportlab(buffer, visita)
+
+
+def _construir_pdf_visita_reportlab(buffer, visita):
+    """Generación PDF legacy con ReportLab."""
     paciente = visita.paciente
 
     doc = SimpleDocTemplate(

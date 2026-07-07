@@ -1,9 +1,9 @@
-{% extends "layouts/base.html" %}
+{% extends parent_template|default:"layouts/base.html" %}
 {% block content %}
-<div class="container mt-4">
+<div class="container mt-4{% if print_mode %} hc-examen-tabla{% endif %}">
 
   <!-- Encabezado -->
-  <div class="card shadow-sm mb-4">
+  <div class="card shadow-sm mb-4 hc-encabezado-web">
     <div class="card-body">
       <h3 class="card-title mb-2">
         🧾 Reporte de examen: <span class="text-primary">{{ visita_examen.examen.nombre }}</span>
@@ -95,18 +95,21 @@
     </div>
   </div>
 
+  {% if not print_mode %}
   <div class="d-flex justify-content-end mt-4">
     <a href="{% url 'detalle_paciente' paciente.id %}" class="btn btn-outline-secondary">
       ← Volver
     </a>
   </div>
+  {% endif %}
 
   </div>
-    {% include "includes/footer.html" %}
+    {% if not print_mode %}{% include "includes/footer.html" %}{% endif %}
   </div>
 
 </div>
 
+{% if not print_mode %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 document.addEventListener("DOMContentLoaded", function() {
@@ -143,5 +146,6 @@ document.addEventListener("DOMContentLoaded", function() {
     .catch(error => console.error("Error cargando resumen:", error));
 });
 </script>
+{% endif %}
 
 {% endblock %}

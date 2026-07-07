@@ -1,0 +1,10 @@
+<div class="subseccion">
+  {% if medicamentos %}
+  <table class="tabla-simple">
+    <tr><th>Comercial</th><th>Genérico</th><th>Dosis</th></tr>
+    {% for m in medicamentos %}
+    <tr><td>{{ m.nombre_comercial }}</td><td>{{ m.nombre_generico|default:"—" }}</td><td>{{ m.dosis|default:"—" }}</td></tr>
+    {% endfor %}
+  </table>
+  {% else %}<p>Sin medicamentos registrados.</p>{% endif %}
+</div>

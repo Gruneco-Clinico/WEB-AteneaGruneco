@@ -1,0 +1,43 @@
+<div class="subseccion">
+  {% if resultado.motivo_consulta %}
+  <p><span class="campo-label">Motivo de consulta:</span><br>{{ resultado.motivo_consulta|linebreaksbr }}</p>
+  {% endif %}
+  {% if resultado.enfermedad_actual %}
+  <p><span class="campo-label">Enfermedad actual:</span><br>{{ resultado.enfermedad_actual|linebreaksbr }}</p>
+  {% endif %}
+
+  <p><span class="campo-label">¿Presenta queja de sueño?</span> {{ resultado.presenta_queja|default:"—"|capfirst }}</p>
+
+  {% if tipos_queja %}
+  <p class="campo-label">Tipos de quejas:</p>
+  <ul class="lista-hijos">
+    {% for q in tipos_queja %}
+    <li>{{ q.nombre }}{% if q.inicio %} — Inicio: {{ q.inicio }}{% endif %}</li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+
+  {% if sustancias %}
+  <p class="campo-label">Sustancias:</p>
+  <table class="tabla-simple"><tr><th>Nombre</th><th>Frecuencia</th></tr>
+  {% for s in sustancias %}<tr><td>{{ s.nombre }}</td><td>{{ s.frecuencia|default:"—" }}</td></tr>{% endfor %}
+  </table>
+  {% endif %}
+
+  {% if medicamentos %}
+  <p class="campo-label">Medicamentos:</p>
+  <table class="tabla-simple"><tr><th>Nombre</th><th>Dosis</th></tr>
+  {% for m in medicamentos %}<tr><td>{{ m.nombre }}</td><td>{{ m.dosis|default:"—" }}</td></tr>{% endfor %}
+  </table>
+  {% endif %}
+
+  {% if sintomas_suenos %}
+  <p class="campo-label">Síntomas durante el sueño:</p>
+  <ul class="lista-hijos">{% for s in sintomas_suenos %}<li>{{ s.nombre }}</li>{% endfor %}</ul>
+  {% endif %}
+
+  {% if sintomas_diurnos %}
+  <p class="campo-label">Síntomas diurnos:</p>
+  <ul class="lista-hijos">{% for s in sintomas_diurnos %}<li>{{ s.nombre }}</li>{% endfor %}</ul>
+  {% endif %}
+</div>

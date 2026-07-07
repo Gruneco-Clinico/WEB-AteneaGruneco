@@ -1,4 +1,4 @@
-{% extends 'layouts/base.html' %}
+{% extends parent_template|default:"layouts/base.html" %}
 
 {% block title %}Resultado - Examen Cognitivo Anamnesis{% endblock %}
 
@@ -83,7 +83,7 @@
 </style>
 
 <!-- Header -->
-<div class="header bg-primary pb-6">
+<div class="header bg-primary pb-6 hc-encabezado-web">
     <div class="container-fluid">
         <div class="header-body">
             <div class="row align-items-center py-4">
@@ -104,7 +104,7 @@
         <div class="col-12">
             {% if resultado %}
             <!-- Información del paciente -->
-            <div class="card mb-4">
+            <div class="card mb-4 hc-encabezado-web">
                 <div class="card-header bg-gradient-info">
                     <h3 class="card-title text-white mb-0">
                         <i class="fas fa-user-circle"></i> Información del Examen
@@ -654,12 +654,12 @@
 </div>
 
 <!-- Botón de imprimir -->
+{% if not print_mode %}
 <button onclick="window.print()" class="btn btn-primary btn-lg print-btn">
     <i class="fas fa-print"></i> Imprimir
 </button>
 
 <script>
-// Mostrar mensaje de carga mientras se imprime
 document.querySelector('.print-btn').addEventListener('click', function() {
     this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Preparando...';
     setTimeout(() => {
@@ -667,5 +667,6 @@ document.querySelector('.print-btn').addEventListener('click', function() {
     }, 2000);
 });
 </script>
+{% endif %}
 
 {% endblock content %}

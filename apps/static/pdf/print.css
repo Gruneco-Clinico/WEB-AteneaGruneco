@@ -1,0 +1,513 @@
+@page {
+  size: letter;
+  margin: 1.6cm 1.2cm 2cm 1.2cm;
+  @bottom-center {
+    content: "Página " counter(page) " de " counter(pages);
+    font-size: 8pt;
+    color: #666;
+  }
+}
+
+body {
+  font-family: DejaVu Sans, Helvetica, Arial, sans-serif;
+  font-size: 9pt;
+  color: #000;
+  line-height: 1.35;
+}
+
+/* ----- Membrete (3 columnas como FormatoImprimir_HC.docx) ----- */
+.membrete-tabla {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 10px;
+  table-layout: fixed;
+}
+
+.membrete-col {
+  vertical-align: middle;
+  border: none;
+  padding: 0 4px;
+}
+
+.membrete-col-izq {
+  width: 22%;
+  text-align: left;
+}
+
+.membrete-col-centro {
+  width: 56%;
+  text-align: center;
+}
+
+.membrete-col-der {
+  width: 22%;
+  text-align: right;
+}
+
+.logo-udea {
+  max-height: 52px;
+  max-width: 100%;
+  width: auto;
+}
+
+.logo-gruneco {
+  max-height: 42px;
+  max-width: 100%;
+  width: auto;
+}
+
+.membrete-titulo {
+  font-size: 11pt;
+  font-weight: bold;
+  color: #000;
+  margin: 0 0 4px 0;
+  line-height: 1.2;
+}
+
+.membrete-paciente {
+  font-size: 9pt;
+  font-weight: bold;
+  margin: 0;
+  text-transform: uppercase;
+  line-height: 1.2;
+}
+
+/* ----- Tablas de cabecera (verde #026937 del .docx) ----- */
+.tabla-hc {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0 0 10px 0;
+  table-layout: fixed;
+}
+
+.fila-titulo-hc {
+  background-color: #026937;
+  color: #fff;
+  font-weight: bold;
+  font-size: 9pt;
+  padding: 5px 8px;
+  border: 1px solid #000;
+  text-align: left;
+}
+
+.celda-hc {
+  border: 1px solid #000;
+  padding: 4px 6px 8px 6px;
+  vertical-align: top;
+  min-height: 28px;
+}
+
+.etiqueta-hc {
+  font-size: 7.5pt;
+  font-weight: bold;
+  color: #000;
+  margin-bottom: 3px;
+  line-height: 1.2;
+}
+
+.valor-hc {
+  font-size: 9pt;
+  min-height: 14px;
+  line-height: 1.3;
+}
+
+.celda-texto-libre {
+  font-size: 9pt;
+  padding: 8px;
+}
+
+/* ----- Exámenes embebidos (misma vista que "Ver") ----- */
+.seccion-examenes {
+  margin-top: 14px;
+}
+
+.examen-ver-embed {
+  page-break-inside: auto;
+  break-inside: auto;
+  margin-bottom: 12px;
+  margin-top: 6px;
+}
+
+.fila-titulo-examen {
+  margin-top: 10px;
+  margin-bottom: 0;
+  page-break-after: avoid;
+}
+
+.examen-fecha-registro {
+  font-size: 8pt;
+  color: #555;
+  margin: 2px 0 8px 0;
+  padding: 0 4px;
+}
+
+/* Ocultar encabezados web con datos ya presentes en el membrete */
+.examen-ver-embed .hc-encabezado-web {
+  display: none !important;
+}
+
+/* Unificar paleta institucional (#026937) en el contenido clínico */
+.examen-ver-embed .text-primary,
+.examen-ver-embed h4.text-primary,
+.examen-ver-embed h5.text-primary,
+.examen-ver-embed .text-success {
+  color: #026937 !important;
+}
+
+.examen-ver-embed .card-body .card-header,
+.examen-ver-embed .card-body .card-header.bg-primary,
+.examen-ver-embed .card-body .card-header.bg-info,
+.examen-ver-embed .card-body .card-header.bg-success {
+  background-color: #026937 !important;
+  color: #fff !important;
+  padding: 5px 8px;
+  font-size: 9pt;
+  border: 1px solid #000;
+}
+
+.examen-ver-embed .section-header {
+  background: #026937 !important;
+  color: #fff !important;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 5px 8px;
+  font-size: 9.5pt;
+  margin-bottom: 8px;
+}
+
+.examen-ver-embed .bg-primary.text-white,
+.examen-ver-embed .alert-info {
+  background-color: #f0f7f3 !important;
+  color: #000 !important;
+  border: 1px solid #b8d4c4;
+}
+
+.examen-ver-embed .bg-light {
+  background-color: #f8f9fa !important;
+  border: 1px solid #dee2e6;
+}
+
+.examen-ver-embed .border-left-warning {
+  border-left: 3px solid #c9a227 !important;
+  background: #faf9f5;
+}
+
+.examen-ver-embed .badge {
+  display: inline-block;
+  padding: 2px 8px;
+  font-size: 7.5pt;
+  font-weight: 600;
+  line-height: 1.3;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  vertical-align: baseline;
+}
+
+.examen-ver-embed .badge-success {
+  background-color: #d4edda !important;
+  color: #155724 !important;
+  border-color: #b8d4c4 !important;
+}
+
+.examen-ver-embed .badge-warning {
+  background-color: #fff3cd !important;
+  color: #856404 !important;
+  border-color: #e6d9a8 !important;
+}
+
+.examen-ver-embed .badge-info {
+  background-color: #e8f4ef !important;
+  color: #026937 !important;
+  border-color: #b8d4c4 !important;
+}
+
+.examen-ver-embed .badge-secondary {
+  background-color: #e9ecef !important;
+  color: #495057 !important;
+  border-color: #ced4da !important;
+}
+
+.examen-ver-embed .hc-encabezado-web .badge {
+  display: none !important;
+}
+
+.examen-ver-embed .card-header.bg-light {
+  background-color: #026937 !important;
+  color: #fff !important;
+  border: 1px solid #000;
+  font-size: 9pt;
+}
+
+.examen-ver-embed .btn {
+  display: none !important;
+}
+
+.examen-ver-embed .card {
+  border: 1px solid #000;
+  margin-bottom: 10px;
+}
+
+.examen-ver-embed .card.shadow,
+.examen-ver-embed .card.shadow-sm {
+  box-shadow: none !important;
+}
+
+.examen-ver-embed .table thead th,
+.examen-ver-embed .table-light th {
+  background-color: #026937 !important;
+  color: #fff !important;
+  border: 1px solid #000;
+}
+
+.examen-ver-embed .table td,
+.examen-ver-embed .table th {
+  border: 1px solid #000;
+  font-size: 8.5pt;
+}
+
+.examen-ver-embed label.font-weight-bold,
+.examen-ver-embed .font-weight-bold {
+  font-weight: bold;
+  color: #000;
+}
+
+.examen-ver-embed .header.bg-primary {
+  display: none !important;
+}
+
+.examen-ver-embed .container-fluid.mt--6 {
+  margin-top: 0 !important;
+}
+
+.examen-ver-embed .container-fluid,
+.examen-ver-embed .container {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  max-width: 100% !important;
+}
+
+/* Paginación: permitir cortes naturales dentro del contenido clínico */
+.examen-ver-embed .card,
+.examen-ver-embed .card-body,
+.examen-ver-embed tr,
+.examen-ver-embed img,
+.examen-ver-embed .row,
+.examen-ver-embed [class*="col-"] {
+  page-break-inside: auto;
+  break-inside: auto;
+}
+
+.examen-ver-embed .h-100 {
+  height: auto !important;
+}
+
+.examen-ver-embed .py-4,
+.examen-ver-embed .mt-4 {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  margin-top: 0 !important;
+}
+
+.examen-ver-embed .card-body {
+  padding: 6px 8px;
+}
+
+.examen-ver-embed h3,
+.examen-ver-embed h4,
+.examen-ver-embed h5,
+.examen-ver-embed h6 {
+  margin: 6px 0 4px 0;
+}
+
+.examen-ver-embed p {
+  margin: 3px 0;
+}
+
+.examen-ver-embed .mb-3,
+.examen-ver-embed .mb-4 {
+  margin-bottom: 8px !important;
+}
+
+.examen-ver-embed .print-btn {
+  display: none !important;
+}
+
+/* ----- Exámenes tipo tabla (Pittsburgh, Epworth, builder, sesiones) ----- */
+.examen-ver-embed .hc-examen-tabla > .card,
+.examen-ver-embed .hc-examen-tabla .hc-tabla-resultados-card {
+  border: none;
+  margin-bottom: 0;
+}
+
+.examen-ver-embed .hc-examen-tabla .card-body {
+  padding: 0;
+}
+
+.examen-ver-embed .hc-examen-tabla .hc-puntaje-total {
+  border: 1px solid #026937;
+  margin-bottom: 10px;
+  background: #f0f7f3;
+}
+
+.examen-ver-embed .hc-examen-tabla .hc-puntaje-total .card-body {
+  padding: 8px 12px;
+}
+
+.examen-ver-embed .hc-examen-tabla .hc-puntaje-total h6 {
+  font-size: 7.5pt;
+  text-transform: uppercase;
+  color: #026937;
+  margin: 0 0 2px 0;
+  letter-spacing: 0.04em;
+}
+
+.examen-ver-embed .hc-examen-tabla .hc-puntaje-total h2 {
+  font-size: 16pt;
+  color: #026937;
+  margin: 0;
+  font-weight: bold;
+}
+
+.examen-ver-embed .hc-examen-tabla .hc-tabla-resultados-card > .card-header.bg-light,
+.examen-ver-embed .hc-examen-tabla > .card .card-header.bg-light {
+  display: none;
+}
+
+.examen-ver-embed .hc-examen-tabla .table-responsive {
+  overflow: visible;
+}
+
+.examen-ver-embed .hc-examen-tabla table.hc-tabla-resultados,
+.examen-ver-embed .hc-examen-tabla .table-bordered {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid #000;
+  margin: 0;
+  font-size: 8.5pt;
+}
+
+.examen-ver-embed .hc-examen-tabla .table-bordered thead th {
+  background-color: #026937 !important;
+  color: #fff !important;
+  font-weight: bold;
+  padding: 6px 8px;
+  border: 1px solid #026937;
+  text-align: left;
+}
+
+.examen-ver-embed .hc-examen-tabla .table-bordered tbody td {
+  padding: 5px 8px;
+  border: 1px solid #d0d0d0;
+  vertical-align: top;
+  line-height: 1.35;
+}
+
+.examen-ver-embed .hc-examen-tabla .table-bordered tbody tr:nth-child(even) td {
+  background-color: #f8faf9;
+}
+
+.examen-ver-embed .hc-examen-tabla .table-bordered tbody tr:last-child td {
+  font-weight: bold;
+  background-color: #f0f7f3;
+  border-top: 2px solid #026937;
+}
+
+.examen-ver-embed .hc-examen-tabla .table-bordered th:first-child,
+.examen-ver-embed .hc-examen-tabla .table-bordered td:first-child {
+  width: 52%;
+}
+
+.examen-ver-embed .hc-examen-tabla .hc-valor-celda {
+  color: #000;
+}
+
+.examen-ver-embed .hc-examen-tabla h4 {
+  font-size: 9pt;
+  font-weight: bold;
+  margin: 10px 0 4px 0;
+  padding: 5px 8px;
+  background: #026937;
+  color: #fff !important;
+}
+
+.examen-ver-embed .hc-examen-tabla .badge.bg-success {
+  background-color: #d4edda !important;
+  color: #155724 !important;
+  border: 1px solid #b8d4c4;
+}
+
+.examen-ver-embed .hc-examen-tabla .badge.bg-danger {
+  background-color: #f8d7da !important;
+  color: #721c24 !important;
+  border: 1px solid #f1b8be;
+}
+
+.examen-ver-embed .hc-examen-tabla .badge.bg-info {
+  background-color: #e8f4ef !important;
+  color: #026937 !important;
+  border: 1px solid #b8d4c4;
+}
+
+.examen-ver-embed .hc-examen-tabla .badge.bg-secondary {
+  background-color: #e9ecef !important;
+  color: #495057 !important;
+  border: 1px solid #ced4da;
+}
+
+.seccion-notas {
+  margin-top: 14px;
+  margin-bottom: 12px;
+}
+
+.campo-label {
+  font-weight: bold;
+}
+
+.lista-hijos {
+  margin: 4px 0 8px 16px;
+  padding: 0;
+}
+
+.lista-hijos li {
+  margin-bottom: 3px;
+}
+
+.subseccion {
+  margin: 6px 0;
+}
+
+table.tabla-simple {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 8.5pt;
+}
+
+table.tabla-simple th,
+table.tabla-simple td {
+  border: 1px solid #000;
+  padding: 3px 5px;
+}
+
+table.tabla-simple th {
+  background: #f0f0f0;
+}
+
+.sin-datos {
+  font-style: italic;
+  color: #666;
+}
+
+/* ----- Pie institucional ----- */
+.pie-institucional {
+  margin-top: 18px;
+  padding-top: 6px;
+  border-top: 1px solid #026937;
+  text-align: center;
+  font-size: 7pt;
+  color: #333;
+  line-height: 1.4;
+}
+
+.pie-institucional p {
+  margin: 1px 0;
+}
