@@ -114,7 +114,7 @@ def get_context_ver_examen(visita_examen):
             },
         )
 
-    if examen_id == 5:
+    if examen_id == 5 or "antecedentes" in visita_examen.examen.nombre.lower():
         link = AntecedentesVisitaLink.objects.get(visita_examen=visita_examen)
         antecedentes = AntecedentesResult.objects.prefetch_related(
             "antecedentes_patologicos",

@@ -1,14 +1,1 @@
-<div class="subseccion">
-  {% if patologicos %}
-  <p class="campo-label">Antecedentes patológicos:</p>
-  <table class="tabla-simple"><tr><th>Diagnóstico</th><th>Evolución</th></tr>
-  {% for p in patologicos %}<tr><td>{{ p.tipo_patologia }}</td><td>{{ p.tiempo_evolucion|default:"—" }}</td></tr>{% endfor %}
-  </table>
-  {% endif %}
-  {% if farmacologicos %}
-  <p class="campo-label">Farmacológicos:</p>
-  <table class="tabla-simple"><tr><th>Medicamento</th><th>Dosis</th></tr>
-  {% for f in farmacologicos %}<tr><td>{{ f.medicamento }}</td><td>{{ f.dosis|default:"—" }}</td></tr>{% endfor %}
-  </table>
-  {% endif %}
-</div>
+{% include "examenes_resultados/_antecedentes_tablas_print.html" %}

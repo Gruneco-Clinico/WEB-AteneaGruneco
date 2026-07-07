@@ -1,4 +1,4 @@
-{% load form_builder_tags %}
+{% load form_builder_tags custom_filters %}
 {% for field in fields %}
   {% if field.type == 'section' %}
     <tr class="table-light">
@@ -39,7 +39,7 @@
   {% else %}
     <tr>
       <th style="width:35%">{{ field.label }}</th>
-      <td>{{ submission.answers|get_item:field.id|default:"—" }}</td>
+      <td>{{ submission.answers|get_item:field.id|render_exam_value|default:"—" }}</td>
     </tr>
   {% endif %}
 {% endfor %}

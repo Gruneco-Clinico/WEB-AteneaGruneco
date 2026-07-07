@@ -1,7 +1,8 @@
 {% extends parent_template|default:"layouts/base.html" %}
+{% load custom_filters %}
 
 {% block content %}
-<div class="container-fluid py-4">
+<div class="container-fluid py-4{% if print_mode %} hc-examen-tabla hc-antecedentes-pdf{% endif %}">
     <div class="row">
         <div class="col-12">
             <div class="card">
@@ -10,7 +11,9 @@
                     <small class="text-muted">Examen realizado: {{ visita_examen.fecha_completado|date:"d/m/Y H:i" }}</small>
                 </div>
                 <div class="card-body">
-                    
+                    {% if print_mode %}
+                    {% include "examenes_resultados/_antecedentes_tablas_print.html" %}
+                    {% else %}
                     {% if resultado.observaciones_generales %}
                     <div class="mb-4">
                         <h5>Observaciones Generales</h5>
@@ -26,8 +29,10 @@
                         <div class="border p-3 mb-2">
                             <strong>{{ item.get_tipo_patologia_display }}</strong>
                             {% if item.descripcion_otros %} - {{ item.descripcion_otros }}{% endif %}
+                            {% if item.fecha_inicio %}
                             <br>
                             <small>Fecha inicio: {{ item.fecha_inicio|date:"d/m/Y" }}</small>
+                            {% endif %}
                             {% if item.observaciones %}<br><em>{{ item.observaciones }}</em>{% endif %}
                         </div>
                         {% endfor %}
@@ -40,9 +45,11 @@
                         <h5>Antecedentes Quirúrgicos</h5>
                         {% for item in quirurgicos %}
                         <div class="border p-3 mb-2">
-                            <strong>{{ item.descripcion }}</strong>
+                            <strong>{{ item.descripcion|empty_dash }}</strong>
+                            {% if item.fecha_intervencion %}
                             <br>
                             <small>Fecha intervención: {{ item.fecha_intervencion|date:"d/m/Y" }}</small>
+                            {% endif %}
                             {% if item.observaciones %}<br><em>{{ item.observaciones }}</em>{% endif %}
                         </div>
                         {% endfor %}
@@ -67,15 +74,19 @@
                             {% if item.presentacion or item.concentracion or item.unidad %}
                             <br>
                             <small>
-                                {{ item.presentacion }}{% if item.concentracion %} - {{ item.concentracion }}{% endif %}{% if item.unidad %} {{ item.unidad }}{% endif %}
+                                {% if item.presentacion %}{{ item.get_presentacion_display }}{% endif %}
+                                {% if item.concentracion %}{% if item.presentacion %} - {% endif %}{{ item.concentracion }}{% endif %}
+                                {% if item.unidad %} {{ item.get_unidad_display }}{% endif %}
                             </small>
                             {% endif %}
+                            {% if item.fecha_inicio %}
                             <br>
                             <small>Inicio: {{ item.fecha_inicio|date:"d/m/Y" }}</small>
+                            {% endif %}
                             {% if item.via_administracion or item.cantidad or item.frecuencia %}
                             <br>
                             <small>
-                                {% if item.via_administracion %}Vía: {{ item.via_administracion }}{% endif %}
+                                {% if item.via_administracion %}Vía: {{ item.get_via_administracion_display }}{% endif %}
                                 {% if item.cantidad %} • Cantidad: {{ item.cantidad }}{% endif %}
                                 {% if item.frecuencia %} • Frecuencia: {{ item.frecuencia }}{% endif %}
                             </small>
@@ -92,9 +103,11 @@
                         <h5>Antecedentes Tóxicos</h5>
                         {% for item in toxicos %}
                         <div class="border p-3 mb-2">
-                            <strong>{{ item.sustancia }}</strong>
+                            <strong>{{ item.sustancia|empty_dash }}</strong>
+                            {% if item.fecha_inicio %}
                             <br>
                             <small>Inicio: {{ item.fecha_inicio|date:"d/m/Y" }}</small>
+                            {% endif %}
                             {% if item.observaciones %}<br><em>{{ item.observaciones }}</em>{% endif %}
                         </div>
                         {% endfor %}
@@ -107,9 +120,9 @@
                         <h5>Antecedentes Familiares</h5>
                         {% for item in familiares %}
                         <div class="border p-3 mb-2">
-                            <strong>{{ item.parentesco }}</strong>
+                            <strong>{{ item.parentesco|empty_dash }}</strong>
                             <br>
-                            <span>{{ item.tipo_antecedente }}</span>
+                            <span>{{ item.tipo_antecedente|empty_dash }}</span>
                             {% if item.observaciones %}<br><em>{{ item.observaciones }}</em>{% endif %}
                         </div>
                         {% endfor %}
@@ -122,7 +135,7 @@
                         <h5>Antecedentes Alérgicos</h5>
                         {% for item in alergicos %}
                         <div class="border p-3 mb-2">
-                            <strong>{{ item.alergeno }}</strong>
+                            <strong>{{ item.alergeno|empty_dash }}</strong>
                             {% if item.observaciones %}<br><em>{{ item.observaciones }}</em>{% endif %}
                         </div>
                         {% endfor %}
@@ -135,9 +148,11 @@
                         <h5>Antecedentes Traumáticos</h5>
                         {% for item in traumaticos %}
                         <div class="border p-3 mb-2">
-                            <strong>{{ item.tipo_trauma }}</strong>
+                            <strong>{{ item.tipo_trauma|empty_dash }}</strong>
+                            {% if item.fecha %}
                             <br>
                             <small>Fecha: {{ item.fecha|date:"d/m/Y" }}</small>
+                            {% endif %}
                             {% if item.observaciones %}<br><em>{{ item.observaciones }}</em>{% endif %}
                         </div>
                         {% endfor %}
@@ -157,12 +172,22 @@
                         {% else %}
                             <div class="border p-3 mb-2">
                                 <small>Menarquia: {{ gineco_obstetricos.tiene_menarquia|yesno:"Sí,No" }}</small><br>
+                                {% if gineco_obstetricos.tiene_menarquia and gineco_obstetricos.edad_menarquia %}
                                 <small>Edad menarquia: {{ gineco_obstetricos.edad_menarquia }}</small><br>
+                                {% endif %}
                                 <small>Menopausia: {{ gineco_obstetricos.tiene_menopausia|yesno:"Sí,No" }}</small><br>
+                                {% if gineco_obstetricos.tiene_menopausia and gineco_obstetricos.edad_menopausia %}
                                 <small>Edad menopausia: {{ gineco_obstetricos.edad_menopausia }}</small><br>
+                                {% endif %}
+                                {% if gineco_obstetricos.gravidez is not None %}
                                 <small>Gravidez: {{ gineco_obstetricos.gravidez }}</small><br>
+                                {% endif %}
+                                {% if gineco_obstetricos.abortos is not None %}
                                 <small>Abortos: {{ gineco_obstetricos.abortos }}</small><br>
+                                {% endif %}
+                                {% if gineco_obstetricos.hijos_vivos is not None %}
                                 <small>Hijos vivos: {{ gineco_obstetricos.hijos_vivos }}</small><br>
+                                {% endif %}
                                 {% if gineco_obstetricos.observaciones %}
                                 <br><em>{{ gineco_obstetricos.observaciones }}</em>
                                 {% endif %}
@@ -177,7 +202,7 @@
                         <h5>Antecedentes Epidemiológicos</h5>
                         {% for item in epidemiologicos %}
                         <div class="border p-3 mb-2">
-                            <strong>{{ item.enfermedad }}</strong>
+                            <strong>{{ item.tipo_antecedente|empty_dash }}</strong>
                             <br>
                             <small>Situación actual: {{ item.activo_actualmente|yesno:"Sí,No" }}</small>
                         </div>
@@ -191,7 +216,7 @@
                         <h5>Antecedentes ETS</h5>
                         {% for item in ets %}
                         <div class="border p-3 mb-2">
-                            <strong>{{ item.tipo_ets }}</strong>
+                            <strong>{{ item.tipo_ets|empty_dash }}</strong>
                             <br>
                             <small>Curado: {{ item.curado|yesno:"Sí,No" }}</small>
                         </div>
@@ -205,11 +230,15 @@
                         <h5>Hospitalizaciones</h5>
                         {% for item in hospitalizaciones %}
                         <div class="border p-3 mb-2">
-                            <strong>{{ item.motivo_hospitalizacion }}</strong>
+                            <strong>{{ item.motivo_hospitalizacion|empty_dash }}</strong>
+                            {% if item.fecha_ingreso %}
                             <br>
                             <small>Fecha ingreso: {{ item.fecha_ingreso|date:"d/m/Y" }}</small>
+                            {% endif %}
+                            {% if item.fecha_egreso %}
                             <br>
                             <small>Fecha egreso: {{ item.fecha_egreso|date:"d/m/Y" }}</small>
+                            {% endif %}
                         </div>
                         {% endfor %}
                     </div>
@@ -221,9 +250,11 @@
                         <h5>Inmunizaciones</h5>
                         {% for item in inmunizaciones %}
                         <div class="border p-3 mb-2">
-                            <strong>{{ item.nombre_vacuna }}</strong>
+                            <strong>{{ item.nombre_vacuna|empty_dash }}</strong>
+                            {% if item.fecha_aplicacion %}
                             <br>
                             <small>Fecha: {{ item.fecha_aplicacion|date:"d/m/Y" }}</small>
+                            {% endif %}
                         </div>
                         {% endfor %}
                     </div>
@@ -235,12 +266,16 @@
                         <h5>Transfusionales</h5>
                         {% for item in transfusionales %}
                         <div class="border p-3 mb-2">
-                            <strong>{{ item.tipo_componente }}</strong>
+                            <strong>{{ item.tipo_componente|empty_dash }}</strong>
+                            {% if item.fecha_transfusion %}
                             <br>
                             <small>Fecha: {{ item.fecha_transfusion|date:"d/m/Y" }}</small>
+                            {% endif %}
                         </div>
                         {% endfor %}
                     </div>
+                    {% endif %}
+
                     {% endif %}
 
                 </div>

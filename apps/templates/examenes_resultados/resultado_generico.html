@@ -1,4 +1,5 @@
 {% extends parent_template|default:"layouts/base.html" %}
+{% load custom_filters %}
 {% block content %}
 <div class="container mt-4{% if print_mode %} hc-examen-tabla{% endif %}">
 
@@ -64,8 +65,8 @@
                     {% if print_mode %}{{ campo|capfirst }}{% else %}<strong>{{ campo|capfirst }}</strong>{% endif %}
                   </td>
                   <td class="hc-valor-celda">
-                    {% if print_mode %}{{ valor }}{% else %}
-                    <span class="badge bg-light text-dark border px-3 py-2">{{ valor }}</span>
+                    {% if print_mode %}{{ valor|render_exam_value }}{% else %}
+                    <span class="badge bg-light text-dark border px-3 py-2">{{ valor|render_exam_value }}</span>
                     {% endif %}
                   </td>
                 </tr>

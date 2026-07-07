@@ -167,14 +167,12 @@ def render_historia_clinica_html(visita):
     nombre_completo = _nombre_completo_paciente(paciente)
     tipo_doc = paciente.get_tipo_documento_display() if paciente.tipo_documento else ""
     documento_identidad = f"{tipo_doc} {paciente.numero_documento}".strip()
-    doc_line = f"{nombre_completo} – {documento_identidad}".strip()
 
     context = {
         "visita": visita,
         "paciente": paciente,
         "nombre_completo": nombre_completo,
         "documento_identidad": documento_identidad,
-        "doc_line": doc_line,
         "evaluador": evaluador,
         "firmante": firmante,
         "tipo_visita": visita.Tipo_visita.nombre if visita.Tipo_visita else "",
