@@ -24,7 +24,7 @@ jobs:
 
             git fetch origin
             git checkout Testing
-            git pull origin Testing
+            git reset --hard origin/Testing
 
             source bitnamivenv/bin/activate
             pip install -r requirements.txt
