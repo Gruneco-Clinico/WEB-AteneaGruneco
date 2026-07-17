@@ -6,8 +6,11 @@
       {% endif %}
     </td>
     <td class="membrete-col membrete-col-centro">
-      <p class="membrete-titulo">HISTORIA CLÍNICA ELECTRÓNICA</p>
-      <p class="membrete-paciente">Sistema ATENEA - GRUNECO | Universidad de Antioquia</p>
+      <p class="membrete-titulo">SISTEMA DE RESUMEN DIGITAL DE ATENCIÓN</p>
+      <p class="membrete-subtitulo">GRUNECO | Universidad de Antioquia</p>
+      {% if nombre_completo %}
+      <p class="membrete-paciente">{{ nombre_completo }}{% if documento_identidad %} &nbsp;·&nbsp; {{ documento_identidad }}{% endif %}</p>
+      {% endif %}
     </td>
     <td class="membrete-col membrete-col-der">
       {% if logo_gruneco_path %}

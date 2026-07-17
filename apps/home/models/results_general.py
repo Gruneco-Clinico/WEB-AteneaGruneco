@@ -1336,6 +1336,28 @@ class AntecedenteTransfusional(models.Model):
 class ExamenNeurologicoResult(ResultadoExamenBase):
     """Modelo para el Examen Neurológico"""
 
+    # A-06: mapa (campo_inicial -> título de subsección) usado para agrupar
+    # los campos por subsección en la vista "Ver" y en la impresión PDF.
+    # Cada campo abre una nueva subsección que agrupa todos los campos
+    # declarados a continuación hasta el siguiente marcador.
+    PRINT_SECCIONES_INICIOS = [
+        ("clavos_izquierdo", "I Par Craneal — Olfatorio"),
+        ("amaurosis", "II Par Craneal — Óptico"),
+        ("diplopia", "III, IV y VI Par Craneal — Oculomotores"),
+        ("tacto_frente_globo", "V Par Craneal — Trigémino"),
+        ("mimica_frente", "VII Par Craneal — Facial"),
+        ("hipoacusia", "VIII Par Craneal — Auditivo"),
+        ("disfonia", "IX y X Par Craneal — Glosofaríngeo y Vago"),
+        ("movimientos_cuello", "XI Par Craneal — Espinal accesorio"),
+        ("fasciculaciones_linguales", "XII Par Craneal — Hipogloso"),
+        ("dolor_cuello", "Sensibilidad"),
+        ("maseteriano_izquierdo", "Reflejos"),
+        ("brazo_abduccion_izq", "Fuerza muscular"),
+        ("coordinacion_dedo_nariz", "Coordinación"),
+        ("postura", "Marcha"),
+        ("convulsiones", "Movimientos anormales"),
+    ]
+
     # ===== I PAR CRANEAL (OLFATORIO) =====
     # Clavos
     clavos_izquierdo = models.BooleanField(

@@ -57,21 +57,44 @@
             </tr>
           </thead>
           <tbody>
-            {% for campo, valor in datos_resultado.items %}
-              {% if not "ID" in campo and valor %}
-                <tr>
-                  <td class="text-capitalize">
-                    {% if not print_mode %}<i class="ni ni-bullet-list-67 text-primary me-2"></i>{% endif %}
-                    {% if print_mode %}{{ campo|capfirst }}{% else %}<strong>{{ campo|capfirst }}</strong>{% endif %}
-                  </td>
-                  <td class="hc-valor-celda">
-                    {% if print_mode %}{{ valor|render_exam_value }}{% else %}
-                    <span class="badge bg-light text-dark border px-3 py-2">{{ valor|render_exam_value }}</span>
-                    {% endif %}
-                  </td>
+            {% if secciones %}
+              {% for seccion in secciones %}
+                <tr class="hc-subseccion">
+                  <td colspan="2" class="subseccion-titulo-hc">{{ seccion.titulo }}</td>
                 </tr>
-              {% endif %}
-            {% endfor %}
+                {% for campo, valor in seccion.campos %}
+                  {% if not "ID" in campo and valor %}
+                    <tr>
+                      <td class="text-capitalize">
+                        {% if not print_mode %}<i class="ni ni-bullet-list-67 text-primary me-2"></i>{% endif %}
+                        {% if print_mode %}{{ campo|capfirst }}{% else %}<strong>{{ campo|capfirst }}</strong>{% endif %}
+                      </td>
+                      <td class="hc-valor-celda">
+                        {% if print_mode %}{{ valor|render_exam_value }}{% else %}
+                        <span class="badge bg-light text-dark border px-3 py-2">{{ valor|render_exam_value }}</span>
+                        {% endif %}
+                      </td>
+                    </tr>
+                  {% endif %}
+                {% endfor %}
+              {% endfor %}
+            {% else %}
+              {% for campo, valor in datos_resultado.items %}
+                {% if not "ID" in campo and valor %}
+                  <tr>
+                    <td class="text-capitalize">
+                      {% if not print_mode %}<i class="ni ni-bullet-list-67 text-primary me-2"></i>{% endif %}
+                      {% if print_mode %}{{ campo|capfirst }}{% else %}<strong>{{ campo|capfirst }}</strong>{% endif %}
+                    </td>
+                    <td class="hc-valor-celda">
+                      {% if print_mode %}{{ valor|render_exam_value }}{% else %}
+                      <span class="badge bg-light text-dark border px-3 py-2">{{ valor|render_exam_value }}</span>
+                      {% endif %}
+                    </td>
+                  </tr>
+                {% endif %}
+              {% endfor %}
+            {% endif %}
           </tbody>
         </table>
       </div>

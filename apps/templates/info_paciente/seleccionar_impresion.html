@@ -1,0 +1,110 @@
+{% extends 'layouts/base.html' %}
+{% block content %}
+
+<div class="header bg-primary pb-6">
+  <div class="container-fluid">
+    <div class="header-body">
+      <div class="row align-items-center py-4">
+        <div class="col-lg-6 col-7">
+          <h6 class="h2 text-white d-inline-block mb-0">Imprimir Resumen Digital de Atención</h6>
+          <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
+            <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
+              <li class="breadcrumb-item"><a href="/pacientes/"><i class="fas fa-home"></i></a></li>
+              <li class="breadcrumb-item"><a href="{% url 'detalle_paciente' paciente.id %}">Paciente</a></li>
+              <li class="breadcrumb-item active" aria-current="page">Imprimir</li>
+            </ol>
+          </nav>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid mt--6">
+  <div class="row">
+    <div class="col-xl-8 m-auto">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="mb-0">Selecciona qué exámenes imprimir y en qué orden</h3>
+          <small class="text-muted">
+            Visita: {{ visita.nombre }} — Paciente: {{ paciente }}
+          </small>
+        </div>
+        <div class="card-body">
+          {% if examenes %}
+          <form method="post" action="{% url 'generar_pdf_historia_clinica_visita' visita.id %}">
+            {% csrf_token %}
+
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <div>
+                <button type="button" class="btn btn-sm btn-outline-secondary" id="btn-todos">Seleccionar todos</button>
+                <button type="button" class="btn btn-sm btn-outline-secondary" id="btn-ninguno">Ninguno</button>
+              </div>
+              <small class="text-muted">Usa ↑ / ↓ para reordenar</small>
+            </div>
+
+            <ul class="list-group" id="lista-examenes">
+              {% for ve in examenes %}
+              <li class="list-group-item d-flex align-items-center justify-content-between" data-item>
+                <div class="custom-control custom-checkbox">
+                  <input type="checkbox" class="custom-control-input" name="examen_ids"
+                         value="{{ ve.id }}" id="ex-{{ ve.id }}" checked>
+                  <label class="custom-control-label" for="ex-{{ ve.id }}">
+                    {{ ve.examen.nombre }}
+                    {% if ve.fecha_completado %}
+                    <small class="text-muted">— {{ ve.fecha_completado|date:"d/m/Y" }}</small>
+                    {% endif %}
+                  </label>
+                </div>
+                <span class="btn-group btn-group-sm">
+                  <button type="button" class="btn btn-outline-secondary btn-subir" title="Subir">↑</button>
+                  <button type="button" class="btn btn-outline-secondary btn-bajar" title="Bajar">↓</button>
+                </span>
+              </li>
+              {% endfor %}
+            </ul>
+
+            <div class="d-flex justify-content-end mt-4">
+              <a href="{% url 'detalle_paciente' paciente.id %}" class="btn btn-outline-secondary">Cancelar</a>
+              <button type="submit" class="btn btn-success">
+                <i class="fas fa-file-pdf"></i> Generar PDF
+              </button>
+            </div>
+          </form>
+          {% else %}
+          <div class="alert alert-warning mb-0">No hay exámenes completados para imprimir en esta visita.</div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  var lista = document.getElementById('lista-examenes');
+  if (!lista) return;
+
+  lista.addEventListener('click', function (e) {
+    var li = e.target.closest('[data-item]');
+    if (!li) return;
+    if (e.target.classList.contains('btn-subir')) {
+      var prev = li.previousElementSibling;
+      if (prev) lista.insertBefore(li, prev);
+    } else if (e.target.classList.contains('btn-bajar')) {
+      var next = li.nextElementSibling;
+      if (next) lista.insertBefore(next, li);
+    }
+  });
+
+  function setAll(state) {
+    lista.querySelectorAll('input[name="examen_ids"]').forEach(function (c) {
+      c.checked = state;
+    });
+  }
+  document.getElementById('btn-todos').addEventListener('click', function () { setAll(true); });
+  document.getElementById('btn-ninguno').addEventListener('click', function () { setAll(false); });
+})();
+</script>
+
+{% endblock %}
