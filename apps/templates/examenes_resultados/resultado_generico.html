@@ -1,7 +1,51 @@
 {% extends parent_template|default:"layouts/base.html" %}
 {% load custom_filters %}
 {% block content %}
-<div class="container mt-4{% if print_mode %} hc-examen-tabla{% endif %}">
+{% if not print_mode %}
+<style>
+  /* Ver examen: adaptar al ancho, sin scroll horizontal */
+  .examen-ver-web {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+  .examen-ver-web .table-responsive {
+    overflow-x: hidden !important;
+  }
+  .examen-ver-web table.hc-tabla-resultados {
+    width: 100%;
+    table-layout: fixed;
+    margin-bottom: 0;
+  }
+  .examen-ver-web table.hc-tabla-resultados th,
+  .examen-ver-web table.hc-tabla-resultados td {
+    white-space: normal !important;
+    word-wrap: break-word;
+    overflow-wrap: anywhere;
+    vertical-align: top;
+  }
+  .examen-ver-web table.hc-tabla-resultados th:first-child,
+  .examen-ver-web table.hc-tabla-resultados td:first-child {
+    width: 58%;
+  }
+  .examen-ver-web table.hc-tabla-resultados th:last-child,
+  .examen-ver-web table.hc-tabla-resultados td:last-child {
+    width: 42%;
+  }
+  .examen-ver-web .hc-valor-celda .badge {
+    white-space: normal !important;
+    text-align: left;
+    display: inline-block;
+    max-width: 100%;
+    line-height: 1.35;
+    font-weight: 500;
+  }
+  .examen-ver-web .subseccion-titulo-hc {
+    white-space: normal !important;
+    word-wrap: break-word;
+  }
+</style>
+{% endif %}
+<div class="container mt-4{% if print_mode %} hc-examen-tabla{% else %} examen-ver-web{% endif %}">
 
   <!-- Encabezado -->
   <div class="card shadow-sm mb-4 hc-encabezado-web">
@@ -65,7 +109,7 @@
                 {% for campo, valor in seccion.campos %}
                   {% if not "ID" in campo and valor %}
                     <tr>
-                      <td class="text-capitalize">
+                      <td>
                         {% if not print_mode %}<i class="ni ni-bullet-list-67 text-primary me-2"></i>{% endif %}
                         {% if print_mode %}{{ campo|capfirst }}{% else %}<strong>{{ campo|capfirst }}</strong>{% endif %}
                       </td>
@@ -82,7 +126,7 @@
               {% for campo, valor in datos_resultado.items %}
                 {% if not "ID" in campo and valor %}
                   <tr>
-                    <td class="text-capitalize">
+                    <td>
                       {% if not print_mode %}<i class="ni ni-bullet-list-67 text-primary me-2"></i>{% endif %}
                       {% if print_mode %}{{ campo|capfirst }}{% else %}<strong>{{ campo|capfirst }}</strong>{% endif %}
                     </td>

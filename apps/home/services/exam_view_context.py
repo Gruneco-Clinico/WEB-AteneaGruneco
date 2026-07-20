@@ -17,11 +17,29 @@ from apps.home.models import (
 )
 
 
+# Valores crudos frecuentes en formularios legacy (sin choices en el modelo).
+_VALORES_LEGIBLES = {
+    "si": "Sí",
+    "sí": "Sí",
+    "no": "No",
+    "ns": "No sabe",
+    "nose": "No sabe",
+    "no_sabe": "No sabe",
+    "na": "No aplica",
+    "n/a": "No aplica",
+    "correcto": "Correcto",
+    "incorrecto": "Incorrecto",
+    "true": "Sí",
+    "false": "No",
+}
+
+
 def _formatear_valor_campo(resultado, field):
     """Devuelve el valor legible de un campo de modelo (A-05).
 
     - Campos con ``choices`` → texto legible (``get_<field>_display``).
-    - Booleanos → "Sí"/"No".
+    - Booleanos → "Sí" (solo positivos; el negativo se omite).
+    - Cadenas ``si``/``no``/``correcto``/… → forma capitalizada.
     - Resto → valor tal cual (fechas/base64 los formatea ``render_exam_value``).
     """
     valor = getattr(resultado, field.name, None)
@@ -40,6 +58,11 @@ def _formatear_valor_campo(resultado, field):
         # generar ruido. La semántica normal/anormal · presente/ausente se
         # aborda en la Épica B (examen físico/neurológico).
         return "Sí" if valor else ""
+
+    if isinstance(valor, str):
+        clave = valor.strip().lower()
+        if clave in _VALORES_LEGIBLES:
+            return _VALORES_LEGIBLES[clave]
 
     return valor
 

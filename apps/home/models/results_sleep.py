@@ -50,41 +50,39 @@ class EpworthResult(ResultadoExamenBase):
 
 
 class MEWResult(ResultadoExamenBase):
-    hora_levantarse = models.CharField(max_length=150, blank=True, null=True)
-    hora_acostarse = models.CharField(max_length=150, blank=True, null=True)
-    uso_despertador = models.CharField(max_length=150, blank=True, null=True)
-    facilidad_levantarse = models.CharField(max_length=150, blank=True, null=True)
-    alerta_manana = models.CharField(max_length=150, blank=True, null=True)
-    apetito_manana = models.CharField(max_length=150, blank=True, null=True)
-    descanso_manana = models.CharField(max_length=150, blank=True, null=True)
-    hora_acostarse_libre = models.CharField(max_length=150, blank=True, null=True)
+    # verbose_name = texto exacto de la pregunta del template
+    # examenes_sueno/sueno_MEW.html (mapeo form->modelo en forms/exam_sleep.py).
+    hora_levantarse = models.CharField(max_length=150, blank=True, null=True, verbose_name="¿A qué hora te levantarías si tuvieras total libertad para planificar tu día?")
+    hora_acostarse = models.CharField(max_length=150, blank=True, null=True, verbose_name="¿A qué hora te irías a dormir si tuvieras total libertad para planificar tu noche?")
+    uso_despertador = models.CharField(max_length=150, blank=True, null=True, verbose_name="Si hay una hora específica a la que tienes que levantarte por la mañana, ¿en qué medida dependes de que te despierte un despertador?")
+    facilidad_levantarse = models.CharField(max_length=150, blank=True, null=True, verbose_name="¿Qué tan fácil te resulta levantarte por la mañana (cuando no te despiertan inesperadamente)?")
+    alerta_manana = models.CharField(max_length=150, blank=True, null=True, verbose_name="¿Qué tan alerta te sientes durante la primera media hora después de despertarte por la mañana?")
+    apetito_manana = models.CharField(max_length=150, blank=True, null=True, verbose_name="Una vez levantado por las mañanas, ¿cómo es tu apetito durante la primera media hora?")
+    descanso_manana = models.CharField(max_length=150, blank=True, null=True, verbose_name="Durante la primera media hora después de despertarte por la mañana, ¿qué tan cansado te sientes?")
+    hora_acostarse_libre = models.CharField(max_length=150, blank=True, null=True, verbose_name="Si no tuvieras compromisos al día siguiente, ¿a qué hora te irías a dormir en comparación con tu hora habitual?")
 
-    # Pregunta 9: Ejercicio de mañana (7:00-8:00 AM)
-    ejercicio_manana = models.CharField(max_length=150, blank=True, null=True)
+    ejercicio_manana = models.CharField(max_length=150, blank=True, null=True, verbose_name="Ejercicio entre las 7:00 y las 8:00 a. m. (según tu reloj interno), ¿cómo crees que te desempeñarías?")
 
-    ejercicio_fisico = models.CharField(max_length=150, blank=True, null=True)
-    hora_cansancio_noche = models.CharField(max_length=150, blank=True, null=True)
-    nivel_cansancia_11 = models.CharField(max_length=150, blank=True, null=True)
-    prueba_mental = models.CharField(max_length=150, blank=True, null=True)
+    ejercicio_fisico = models.CharField(max_length=150, blank=True, null=True, verbose_name="Ejercicio físico (MEQ)")
+    hora_cansancio_noche = models.CharField(max_length=150, blank=True, null=True, verbose_name="¿A qué hora aproximada de la noche te sientes cansado y como consecuencia necesitas dormir?")
+    nivel_cansancia_11 = models.CharField(max_length=150, blank=True, null=True, verbose_name="Nivel de cansancio (MEQ)")
+    prueba_mental = models.CharField(max_length=150, blank=True, null=True, verbose_name="Para una prueba de dos horas mentalmente agotadora, siendo libre de planificar el día, ¿qué horario elegirías?")
 
-    # Pregunta 12: Cansancio a las 11 PM
-    cansancio_11pm = models.CharField(max_length=150, blank=True, null=True)
+    cansancio_11pm = models.CharField(max_length=150, blank=True, null=True, verbose_name="Si te fueras a la cama a las 11:00 p.m., ¿qué tan cansado estarías?")
 
-    # Pregunta 13: Despertar tarde
-    despertar_tarde = models.CharField(max_length=150, blank=True, null=True)
+    despertar_tarde = models.CharField(max_length=150, blank=True, null=True, verbose_name="Te has acostado varias horas más tarde de lo habitual y al día siguiente no debes levantarte a ninguna hora en particular. ¿Cuándo crees que te despertarías?")
 
-    hora_despertarse_si_tarde = models.CharField(max_length=150, blank=True, null=True)
-    guardia_nocturna = models.CharField(max_length=150, blank=True, null=True)
-    horario_trabajo_fisico = models.CharField(max_length=150, blank=True, null=True)
+    hora_despertarse_si_tarde = models.CharField(max_length=150, blank=True, null=True, verbose_name="Hora de despertar si te acuestas tarde (MEQ)")
+    guardia_nocturna = models.CharField(max_length=150, blank=True, null=True, verbose_name="Una noche tienes que permanecer despierto de 4 a 6 de la madrugada por una guardia nocturna. Sin compromisos al día siguiente, ¿qué preferirías?")
+    horario_trabajo_fisico = models.CharField(max_length=150, blank=True, null=True, verbose_name="Horario para trabajo físico (MEQ)")
 
-    # Pregunta 15: Trabajo físico
-    trabajo_fisico = models.CharField(max_length=150, blank=True, null=True)
+    trabajo_fisico = models.CharField(max_length=150, blank=True, null=True, verbose_name="Tienes que hacer dos horas de trabajo físico pesado y eres libre de planificar el día. Pensando en cuándo te sentirías mejor, ¿qué horario escogerías?")
 
-    ejercicio_nocturno = models.CharField(max_length=150, blank=True, null=True)
-    horario_trabajo = models.CharField(max_length=150, blank=True, null=True)
-    maximo_bienestar = models.CharField(max_length=150, blank=True, null=True)
-    tipo_persona = models.CharField(max_length=150, blank=True, null=True)
-    puntuacion = models.IntegerField()
+    ejercicio_nocturno = models.CharField(max_length=150, blank=True, null=True, verbose_name="Ejercicio físico intenso una hora dos veces por semana de 10 a 11 de la noche. Pensando en cuándo te sentirías mejor, ¿cómo crees que te sentaría?")
+    horario_trabajo = models.CharField(max_length=150, blank=True, null=True, verbose_name="Jornada de cinco horas al día interesante y remunerada según tu rendimiento. ¿Qué cinco horas consecutivas seleccionarías?")
+    maximo_bienestar = models.CharField(max_length=150, blank=True, null=True, verbose_name="¿A qué hora del día crees que alcanzas tu máximo bienestar?")
+    tipo_persona = models.CharField(max_length=150, blank=True, null=True, verbose_name="Se habla de personas de tipo matutino y vespertino. ¿Cuál de estos tipos te consideras ser?")
+    puntuacion = models.IntegerField(verbose_name="Puntuación total MEQ")
 
     def __str__(self):
         return f"MEQ - {self.visita_examen_id}"
@@ -312,12 +310,12 @@ class AtenasResult(ResultadoExamenBase):
 
 
 class SuenoFisicoResult(ResultadoExamenBase):
-    peso = models.FloatField(blank=True, null=True)
-    talla = models.FloatField(blank=True, null=True)
-    imc = models.FloatField(blank=True, null=True)
-    rango_imc = models.CharField(max_length=50, blank=True, null=True)
-    circunferencia_cuello = models.FloatField(blank=True, null=True)
-    perimetro_abdominal = models.FloatField(blank=True, null=True)
+    peso = models.FloatField(blank=True, null=True, verbose_name="Peso (Kg)")
+    talla = models.FloatField(blank=True, null=True, verbose_name="Talla (cm)")
+    imc = models.FloatField(blank=True, null=True, verbose_name="Índice de Masa Corporal (IMC)")
+    rango_imc = models.CharField(max_length=50, blank=True, null=True, verbose_name="Rango IMC")
+    circunferencia_cuello = models.FloatField(blank=True, null=True, verbose_name="Circunferencia de cuello (cm)")
+    perimetro_abdominal = models.FloatField(blank=True, null=True, verbose_name="Perímetro abdominal (cm)")
 
     frecuencia_cardiaca = models.PositiveIntegerField(
         blank=True, null=True, verbose_name="Frecuencia cardiaca (lpm)"
@@ -335,17 +333,17 @@ class SuenoFisicoResult(ResultadoExamenBase):
         blank=True, null=True, verbose_name="Presión diastólica (mmHg)"
     )
 
-    simetria_narinas = models.CharField(max_length=50, blank=True, null=True)
-    tipo_narina = models.CharField(max_length=50, blank=True, null=True)
-    desviacion_septo = models.CharField(max_length=50, blank=True, null=True)
-    hipertrofia_cornetes = models.CharField(max_length=50, blank=True, null=True)
-    grado = models.CharField(max_length=50, blank=True, null=True)
-    hipertrofia_uvula = models.CharField(max_length=50, blank=True, null=True)
-    biotipo = models.CharField(max_length=50, blank=True, null=True)
-    mallampati = models.CharField(max_length=50, blank=True, null=True)
-    amigdalas = models.CharField(max_length=50, blank=True, null=True)
-    tipo_mordida = models.CharField(max_length=50, blank=True, null=True)
-    alteracion_craneo = models.CharField(max_length=100, blank=True, null=True)
+    simetria_narinas = models.CharField(max_length=50, blank=True, null=True, verbose_name="Simetría de las narinas")
+    tipo_narina = models.CharField(max_length=50, blank=True, null=True, verbose_name="Tipo de narina")
+    desviacion_septo = models.CharField(max_length=50, blank=True, null=True, verbose_name="Presencia de desviación de septo")
+    hipertrofia_cornetes = models.CharField(max_length=50, blank=True, null=True, verbose_name="Hipertrofia de cornetes")
+    grado = models.CharField(max_length=50, blank=True, null=True, verbose_name="Grado de obstrucción")
+    hipertrofia_uvula = models.CharField(max_length=50, blank=True, null=True, verbose_name="Hipertrofia de úvula")
+    biotipo = models.CharField(max_length=50, blank=True, null=True, verbose_name="Biotipo")
+    mallampati = models.CharField(max_length=50, blank=True, null=True, verbose_name="Clasificación de Mallampati")
+    amigdalas = models.CharField(max_length=50, blank=True, null=True, verbose_name="Hipertrofia de amígdalas (Escala de Friedman)")
+    tipo_mordida = models.CharField(max_length=50, blank=True, null=True, verbose_name="Tipo de mordida")
+    alteracion_craneo = models.CharField(max_length=100, blank=True, null=True, verbose_name="Alteración cráneo o cara")
 
     def __str__(self):
         return f"Examen físico de sueño - {self.visita_examen_id}"
