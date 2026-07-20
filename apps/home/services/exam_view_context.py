@@ -17,6 +17,126 @@ from apps.home.models import (
 )
 
 
+# Valores crudos frecuentes en formularios legacy (sin choices en el modelo).
+_VALORES_LEGIBLES = {
+    "si": "Sí",
+    "sí": "Sí",
+    "no": "No",
+    "ns": "No sabe",
+    "nose": "No sabe",
+    "no_sabe": "No sabe",
+    "na": "No aplica",
+    "n/a": "No aplica",
+    "correcto": "Correcto",
+    "incorrecto": "Incorrecto",
+    "true": "Sí",
+    "false": "No",
+}
+
+
+def _formatear_valor_campo(resultado, field):
+    """Devuelve el valor legible de un campo de modelo (A-05).
+
+    - Campos con ``choices`` → texto legible (``get_<field>_display``).
+    - Booleanos → "Sí" (solo positivos; el negativo se omite).
+    - Cadenas ``si``/``no``/``correcto``/… → forma capitalizada.
+    - Resto → valor tal cual (fechas/base64 los formatea ``render_exam_value``).
+    """
+    valor = getattr(resultado, field.name, None)
+
+    if getattr(field, "choices", None):
+        metodo = getattr(resultado, f"get_{field.name}_display", None)
+        if callable(metodo):
+            display = metodo()
+            if display not in (None, ""):
+                return display
+
+    from django.db.models import BooleanField
+
+    if isinstance(field, BooleanField):
+        # Solo se reporta el positivo ("Sí"); el negativo se omite para no
+        # generar ruido. La semántica normal/anormal · presente/ausente se
+        # aborda en la Épica B (examen físico/neurológico).
+        return "Sí" if valor else ""
+
+    if isinstance(valor, str):
+        clave = valor.strip().lower()
+        if clave in _VALORES_LEGIBLES:
+            return _VALORES_LEGIBLES[clave]
+
+    return valor
+
+
+_CAMPOS_OMITIR_SECCIONES = frozenset(
+    {"id", "visita_examen", "created_at", "updated_at",
+     "fecha_creacion", "fecha_actualizacion"}
+)
+
+
+def _construir_secciones(resultado):
+    """Agrupa los campos del resultado en subsecciones (A-06).
+
+    Usa ``type(resultado).PRINT_SECCIONES_INICIOS`` (lista ordenada de
+    ``(campo_inicial, título)``). Devuelve ``None`` si el modelo no lo define.
+    Los campos no cubiertos por un marcador quedan en la subsección abierta más
+    reciente, de modo que nunca se pierde información.
+    """
+    inicios = getattr(type(resultado), "PRINT_SECCIONES_INICIOS", None)
+    if not inicios:
+        return None
+
+    inicio_map = dict(inicios)
+    secciones = []
+    actual = {"titulo": "General", "campos": []}
+
+    for field in resultado._meta.fields:
+        if field.name in _CAMPOS_OMITIR_SECCIONES:
+            continue
+        if field.name in inicio_map:
+            if actual["campos"]:
+                secciones.append(actual)
+            actual = {"titulo": inicio_map[field.name], "campos": []}
+        valor = _formatear_valor_campo(resultado, field)
+        if valor in (None, ""):
+            continue  # se omiten campos vacíos para no dejar filas/secciones huecas
+        etiqueta = str(field.verbose_name) if field.verbose_name else field.name
+        actual["campos"].append((etiqueta, valor))
+
+    if actual["campos"]:
+        secciones.append(actual)
+
+    # Descarta subsecciones sin campos con contenido (evita títulos huérfanos).
+    return [s for s in secciones if s["campos"]] or None
+
+
+def _mapear_answers_a_etiquetas(visita_examen, answers):
+    """Mapea las claves (id de campo) de un submission a sus etiquetas (A-05)."""
+    try:
+        from ..form_builder.schema import normalize_schema
+    except Exception:
+        return answers
+
+    etiquetas = {}
+
+    def _recorrer(nodos):
+        for nodo in nodos:
+            if not isinstance(nodo, dict):
+                continue
+            if nodo.get("type") == "section":
+                _recorrer(normalize_schema(nodo.get("fields") or []))
+                continue
+            fid = nodo.get("id")
+            if fid:
+                etiquetas[fid] = nodo.get("label") or fid
+
+    try:
+        _recorrer(normalize_schema(getattr(visita_examen.examen, "campos", None)))
+    except Exception:
+        return answers
+
+    return {etiquetas.get(k, k): v for k, v in answers.items()}
+
+
 def get_context_ver_examen(visita_examen):
     """
     Devuelve (template_name, context) para renderizar resultado de un examen.
@@ -198,7 +318,9 @@ def get_context_ver_examen(visita_examen):
                     "visita_examen": visita_examen,
                     "resultado": submission,
                     "paciente": paciente,
-                    "datos_resultado": submission.answers or {},
+                    "datos_resultado": _mapear_answers_a_etiquetas(
+                        visita_examen, submission.answers or {}
+                    ),
                     "puntaje_total": None,
                     "codigo_proyecto": None,
                 },
@@ -208,9 +330,8 @@ def get_context_ver_examen(visita_examen):
     datos_resultado = {}
     for field in resultado._meta.fields:
         if field.name != "visita_examen":
-            datos_resultado[field.verbose_name or field.name] = getattr(
-                resultado, field.name
-            )
+            etiqueta = str(field.verbose_name) if field.verbose_name else field.name
+            datos_resultado[etiqueta] = _formatear_valor_campo(resultado, field)
 
     proyecto = visita_examen.visita.Tipo_visita.proyecto
     codigo_proyecto = (
@@ -228,6 +349,7 @@ def get_context_ver_examen(visita_examen):
             "visita_examen": visita_examen,
             "resultado": resultado,
             "datos_resultado": datos_resultado,
+            "secciones": _construir_secciones(resultado),
             "paciente": paciente,
             "codigo_proyecto": codigo_proyecto,
             "puntaje_total": puntaje_total,

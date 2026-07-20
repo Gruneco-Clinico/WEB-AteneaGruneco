@@ -24,7 +24,7 @@ jobs:
 
             git fetch origin
             git checkout Production
-            git pull origin Production
+            git reset --hard origin/Production
 
             source bitnamivenv/bin/activate
             pip install -r requirements.txt

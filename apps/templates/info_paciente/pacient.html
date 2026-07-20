@@ -293,10 +293,16 @@
                           <i class="fas fa-list"></i>
                         </button>
 
-                        <!-- Descargar PDF - SIEMPRE HABILITADO -->
+                        <!-- Descargar PDF (todo) - SIEMPRE HABILITADO -->
                         <a href="{% url 'generar_pdf_historia_clinica_visita' visita.id %}" 
-                          class="btn btn-outline-success" title="Descargar PDF de Historia Clínica">
+                          class="btn btn-outline-success" title="Descargar PDF (Resumen Digital de Atención completo)">
                           <i class="fas fa-file-pdf"></i>
+                        </a>
+
+                        <!-- Imprimir con selección de exámenes y orden -->
+                        <a href="{% url 'seleccionar_impresion_visita' visita.id %}"
+                          class="btn btn-outline-success" title="Seleccionar exámenes y orden a imprimir">
+                          <i class="fas fa-print"></i>
                         </a>
 
                         <!-- Editar Visita - DESHABILITADO si está firmada -->

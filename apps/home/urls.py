@@ -172,6 +172,11 @@ urlpatterns = [
         views.generar_pdf_historia_clinica_visita,
         name="generar_pdf_historia_clinica_visita",
     ),
+    path(
+        "visita/<int:visita_id>/imprimir/",
+        views.seleccionar_impresion_visita,
+        name="seleccionar_impresion_visita",
+    ),
     # Exámenes
     # path(
     #     "examen/resultado/<int:visita_examen_id>/",

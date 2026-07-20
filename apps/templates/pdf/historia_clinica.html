@@ -1,6 +1,7 @@
 {% extends "pdf/base_print.html" %}
 {% block content %}
   {% include "pdf/partials/membrete.html" %}
+  {% include "pdf/partials/pie_institucional.html" %}
 
   <table class="tabla-hc">
     <tr>
@@ -87,5 +88,5 @@
   </section>
   {% endif %}
 
-  {% include "pdf/partials/pie_institucional.html" %}
+  {% include "pdf/partials/firma_profesional.html" %}
 {% endblock %}

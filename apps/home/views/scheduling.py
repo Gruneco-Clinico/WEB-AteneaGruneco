@@ -32,6 +32,46 @@ from django.utils.decorators import method_decorator
 
 logger = logging.getLogger(__name__)
 
+
+def _slot_bloqueado(disponibilidad, fecha, hora_inicio, hora_fin):
+    """True si existe BloqueoDisponibilidad que cubre el slot."""
+    return BloqueoDisponibilidad.objects.filter(
+        disponibilidad=disponibilidad,
+        fecha=fecha,
+        hora_inicio__lt=hora_fin,
+        hora_fin__gt=hora_inicio,
+    ).exists()
+
+
+def _crear_o_reactivar_disponibilidad(usuario, sala, dia_semana, hora_inicio, hora_fin, fecha_inicio, fecha_fin):
+    """Crea bloque o reactiva registro inactivo con la misma clave única."""
+    existente = DisponibilidadUsuario.objects.filter(
+        usuario=usuario,
+        sala=sala,
+        dia_semana=dia_semana,
+        hora_inicio=hora_inicio,
+    ).first()
+    if existente:
+        if not existente.activa:
+            existente.activa = True
+            existente.hora_fin = hora_fin
+            existente.fecha_inicio = fecha_inicio
+            existente.fecha_fin = fecha_fin
+            existente.save()
+            return existente, True
+        return None, False
+    disp = DisponibilidadUsuario.objects.create(
+        usuario=usuario,
+        sala=sala,
+        dia_semana=dia_semana,
+        hora_inicio=hora_inicio,
+        hora_fin=hora_fin,
+        fecha_inicio=fecha_inicio,
+        fecha_fin=fecha_fin,
+    )
+    return disp, True
+
+
 class AgendarCitaPublicaView(TemplateView):
     """
     Vista pública para que los pacientes vean disponibilidad y agenden citas
@@ -126,8 +166,10 @@ def api_eventos_disponibilidad_publica(request):
                             estado__in=["agendada", "confirmada"],
                         ).first()
 
-                        # Solo mostrar como disponible si no hay cita agendada
-                        if not cita_existente:
+                        # Solo mostrar como disponible si no hay cita agendada ni bloqueo
+                        if not cita_existente and not _slot_bloqueado(
+                            disponibilidad, fecha, hora_actual, hora_fin_slot
+                        ):
                             evento = {
                                 "id": f"{disponibilidad.id}_{fecha}_{hora_actual}",
                                 "title": f"Dr(a). {disponibilidad.usuario.get_full_name() or disponibilidad.usuario.username}",
@@ -744,7 +786,9 @@ def api_eventos_disponibilidad(request):
                     if not disp.fecha_fin or fecha_evento <= disp.fecha_fin:
                         # Verificar si este slot está ocupado
                         slot_key = f"{disp.id}_{fecha_evento.strftime('%Y%m%d')}"
-                        if slot_key not in slots_ocupados:
+                        if slot_key not in slots_ocupados and not _slot_bloqueado(
+                            disp, fecha_evento, disp.hora_inicio, disp.hora_fin
+                        ):
                             eventos.append(
                                 {
                                     "id": f"disp_{disp.id}_{fecha_evento.strftime('%Y%m%d')}",
@@ -1017,6 +1061,8 @@ def agregar_disponibilidad(request):
 
         bloque_actual = hora_inicio_dt
         creados = 0
+        omitidos = 0
+        mensajes_conflicto = []
 
         while bloque_actual < hora_fin_dt:
             bloque_siguiente = bloque_actual + timedelta(hours=1)
@@ -1035,8 +1081,12 @@ def agregar_disponibilidad(request):
                 fecha_fin=fecha_fin_obj,
             )
 
-            if not conflictos:
-                DisponibilidadUsuario.objects.create(
+            if conflictos:
+                omitidos += 1
+                if conflictos not in mensajes_conflicto:
+                    mensajes_conflicto.append(conflictos)
+            else:
+                _, creado = _crear_o_reactivar_disponibilidad(
                     usuario=request.user,
                     sala=sala,
                     dia_semana=dia_semana,
@@ -1045,18 +1095,26 @@ def agregar_disponibilidad(request):
                     fecha_inicio=fecha_inicio_obj,
                     fecha_fin=fecha_fin_obj,
                 )
-                creados += 1
+                if creado:
+                    creados += 1
+                else:
+                    omitidos += 1
 
             bloque_actual = bloque_siguiente
 
         if creados == 0:
+            detalle = mensajes_conflicto[0] if mensajes_conflicto else "conflictos de horario"
             messages.error(
-                request, "❌ No se pudo crear la disponibilidad por conflictos."
+                request,
+                f"❌ No se pudo crear la disponibilidad ({omitidos} bloque(s) omitido(s)): {detalle}",
             )
         else:
-            messages.success(
-                request, f"✅ Disponibilidad creada en {creados} bloques de 1 hora."
-            )
+            msg = f"✅ Disponibilidad creada en {creados} bloque(s) de 1 hora."
+            if omitidos:
+                msg += f" {omitidos} bloque(s) omitido(s) por conflicto."
+                if mensajes_conflicto:
+                    msg += f" Motivo: {mensajes_conflicto[0]}"
+            messages.success(request, msg)
 
     except Exception as e:
         logger.exception(f"Error al agregar disponibilidad: {e}")
