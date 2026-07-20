@@ -319,3 +319,12 @@ else:
     SESSION_COOKIE_SECURE = False
     CSRF_COOKIE_SECURE = False
     X_FRAME_OPTIONS = "SAMEORIGIN"
+
+# ----- Proyecto Caracterización del Sueño (portal público) -----
+SUENO_PROYECTO_ID = config("SUENO_PROYECTO_ID", default=11, cast=int)
+SUENO_TIPO_VISITA_IDS = config(
+    "SUENO_TIPO_VISITA_IDS",
+    default="20,7",
+    cast=Csv(cast=int),
+)
+SUENO_PUBLIC_EXAM_IDS = {13, 14, 16}  # Pittsburgh, Epworth, MEW

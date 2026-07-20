@@ -689,10 +689,11 @@ def consulta_examenes(request):
         # Return same shape as "no exams" — prevents patient enumeration
         return JsonResponse({"examenes": []})
 
-    # 2. Buscar su visita más reciente
-    visita = Visita.objects.filter(paciente=paciente).order_by("-id").first()
+    from ..services.visita_sueno import resolver_visita_sueno, url_examen_publico
 
-    if not visita:
+    try:
+        visita = resolver_visita_sueno(paciente)
+    except Visita.DoesNotExist:
         return JsonResponse({"examenes": []})
 
     # 3. Buscar exámenes pendientes Y exámenes en proceso
@@ -700,63 +701,32 @@ def consulta_examenes(request):
         visita=visita, estado__in=["pendiente", "en_progreso"]
     )
 
+    public_paths = {
+        14: "/guardar-examen-publico-epworth/",
+        16: "/guardar-examen-publico-mew/",
+        13: "/guardar-examen-publico-pitsburg/",
+    }
+
     examenes_data = []
-
     for ve in examenes:
-        # Detectar el estado para enviarlo al frontend
-        estado = ve.estado  # pendiente | en_proceso
-
-        # ======================
-        # EPWORTH (id = 14)
-        # ======================
-        if ve.examen_id == 14:
-            examenes_data.append(
-                {
-                    "nombre": ve.examen.nombre,
-                    "estado": estado,
-                    "url": f"/guardar-examen-publico-epworth/?token={generar_token_paciente(paciente.id)}",
-                }
+        estado = ve.estado
+        if ve.examen_id in public_paths:
+            url = url_examen_publico(
+                public_paths[ve.examen_id], paciente.id, visita.id
             )
-            continue
+        else:
+            url = f"/examen/{ve.id}/"
 
-        # ======================
-        # MEW (id = 16)
-        # ======================
-        if ve.examen_id == 16:
-            examenes_data.append(
-                {
-                    "nombre": ve.examen.nombre,
-                    "estado": estado,
-                    "url": f"/guardar-examen-publico-mew/?token={generar_token_paciente(paciente.id)}",
-                }
-            )
-            continue
-
-        # ======================
-        # PITTSBURGH (id = 13)
-        # ======================
-        if ve.examen_id == 13:
-            examenes_data.append(
-                {
-                    "nombre": ve.examen.nombre,
-                    "estado": estado,
-                    "url": f"/guardar-examen-publico-pitsburg/?token={generar_token_paciente(paciente.id)}",
-                }
-            )
-            continue
-
-        # ======================
-        # OTROS
-        # ======================
         examenes_data.append(
             {
                 "nombre": ve.examen.nombre,
                 "estado": estado,
-                "url": f"/examen/{ve.id}/",
+                "url": url,
+                "visita_id": visita.id,
             }
         )
 
-    return JsonResponse({"examenes": examenes_data})
+    return JsonResponse({"examenes": examenes_data, "visita_id": visita.id})
 
 
 # ===== EXÁMENES PÚBLICOS =====

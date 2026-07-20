@@ -410,6 +410,13 @@
 <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/locales/es.global.min.js'></script>
 
 <script>
+function formatLocalDate(d) {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return y + '-' + m + '-' + day;
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     const calendarEl = document.getElementById('calendario-disponibilidad');
    
@@ -481,14 +488,14 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     calendar.render();
-    
+
     // Establecer fecha mínima para el formulario
-    document.getElementById('fechaInicioInput').min = new Date().toISOString().split('T')[0];
+    document.getElementById('fechaInicioInput').min = formatLocalDate(new Date());
 });
 
 function abrirModalNuevaDisponibilidadConFecha(fechaInicio, fechaFin) {
-    // Pre-llenar el formulario con la fecha seleccionada
-    const fechaStr = fechaInicio.toISOString().split('T')[0];
+    // Pre-llenar el formulario con la fecha seleccionada (hora local)
+    const fechaStr = formatLocalDate(fechaInicio);
     const horaInicio = fechaInicio.toTimeString().substring(0, 5);
     const horaFin = fechaFin.toTimeString().substring(0, 5);
     const diaSemana = fechaInicio.getDay(); // 0=domingo, 1=lunes, etc.
