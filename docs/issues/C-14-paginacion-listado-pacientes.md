@@ -23,5 +23,5 @@ número limitado de registros por página en vez de todo) para evitar el scroll 
 - Prioridad baja: hay workaround (`Shift`+scroll) y no bloquea el uso.
 
 ## Criterios de aceptación
-- [ ] El listado se pagina y no requiere scroll hasta el final para navegar.
-- [ ] Controles de paginación funcionales (siguiente/anterior/número de página).
+- [x] El listado se pagina y no requiere scroll hasta el final para navegar.
+- [x] Controles de paginación funcionales (siguiente/anterior/número de página).

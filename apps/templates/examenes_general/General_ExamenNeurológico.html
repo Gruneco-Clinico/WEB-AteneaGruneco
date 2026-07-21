@@ -111,6 +111,22 @@
     margin-bottom: 1rem;
     border-left: 4px solid #007bff;
   }
+
+  .toggle-state-badge {
+    margin-left: 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.1rem 0.5rem;
+    border-radius: 10px;
+    background: #e9ecef;
+    color: #6c757d;
+    white-space: nowrap;
+  }
+
+  .toggle-state-badge.is-on {
+    background: #d4edda;
+    color: #1e7e34;
+  }
   
   .bilateral-container {
     display: grid;
@@ -3518,12 +3534,20 @@ document.addEventListener('DOMContentLoaded', function() {
         return labels[key] || labels[checked] || (checked ? 'Sí' : 'No');
     }
 
+    function isStateWord(text) {
+        if (!text) return true;
+        const known = ['Presente', 'Ausente', 'Normal', 'Anormal',
+                       'Detecta', 'No detecta', 'Sí', 'Si', 'No'];
+        return known.indexOf(text.trim()) !== -1;
+    }
+
     function syncToggleLabel(checkbox) {
         const fieldName = checkbox.name || checkbox.id;
         const tipo = semantics[fieldName];
         if (!tipo) return;
         const container = checkbox.closest('.custom-control');
         if (!container) return;
+        const estado = labelForTipo(tipo, checkbox.checked);
         let labelEl = container.querySelector('.custom-control-label');
         if (!labelEl) {
             labelEl = document.createElement('span');
@@ -3531,7 +3555,27 @@ document.addEventListener('DOMContentLoaded', function() {
             if (checkbox.id) labelEl.setAttribute('for', checkbox.id);
             container.appendChild(labelEl);
         }
-        labelEl.textContent = labelForTipo(tipo, checkbox.checked);
+        // Guardar la etiqueta original (nombre de la pregunta) la primera vez.
+        if (labelEl.dataset.baseLabel === undefined) {
+            labelEl.dataset.baseLabel = labelEl.textContent.trim();
+        }
+        const base = labelEl.dataset.baseLabel;
+        if (isStateWord(base)) {
+            // La etiqueta ya representa el estado (la pregunta está en un
+            // encabezado aparte): se actualiza en el sitio.
+            labelEl.textContent = estado;
+            return;
+        }
+        // La etiqueta es la pregunta: se conserva y el estado se muestra aparte.
+        labelEl.textContent = base;
+        let stateEl = container.querySelector('.toggle-state-badge');
+        if (!stateEl) {
+            stateEl = document.createElement('span');
+            stateEl.className = 'toggle-state-badge';
+            container.appendChild(stateEl);
+        }
+        stateEl.textContent = estado;
+        stateEl.classList.toggle('is-on', !!checkbox.checked);
     }
 
     Object.keys(semantics).forEach(function(fieldName) {

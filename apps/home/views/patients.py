@@ -12,8 +12,9 @@ from django.contrib.auth.models import User
 from django.views.generic import TemplateView
 from django.core.mail import send_mail, EmailMessage
 from django.core.paginator import Paginator
-from django.db.models import Max
+from django.db.models import Max, Q
 from django.urls import reverse
+from urllib.parse import urlencode
 from datetime import datetime, timedelta
 from ..models import *
 from ..forms import ProyectoForm, RegistroDemograficoForm
@@ -73,27 +74,77 @@ def _build_codigos_map(pacientes):
     return codigos
 
 
+PACIENTES_POR_PAGINA = 25
+
+
+def _elided_page_range(page_obj):
+    """Rango de páginas con elipsis (Django ≥ 3.2)."""
+    try:
+        return list(
+            page_obj.paginator.get_elided_page_range(
+                page_obj.number, on_each_side=1, on_ends=1
+            )
+        )
+    except AttributeError:
+        return list(page_obj.paginator.page_range)
+
+
 @login_required
 def lista_pacientes(request):
-    pacientes = DatosDemograficos.objects.all()
-    proyectos = Proyecto.objects.all()
+    """Listado de pacientes con búsqueda GET, filtro por proyecto y paginación."""
+    q = (request.GET.get("q") or "").strip()
     filtro_proyecto = request.GET.get("proyecto", "")
+
+    pacientes = (
+        DatosDemograficos.objects.all()
+        .prefetch_related("proyectos")
+        .order_by("primer_apellido", "primer_nombre", "id")
+    )
+
     if filtro_proyecto:
         try:
             pacientes = pacientes.filter(proyectos__id=int(filtro_proyecto))
         except (ValueError, TypeError):
-            pass
-    codigos_map = _build_codigos_map(pacientes)
-    # Attach codes to each patient object for easy template access
-    for pac in pacientes:
+            filtro_proyecto = ""
+
+    if q:
+        pacientes = pacientes.filter(
+            Q(numero_documento__icontains=q)
+            | Q(primer_nombre__icontains=q)
+            | Q(segundo_nombre__icontains=q)
+            | Q(primer_apellido__icontains=q)
+            | Q(segundo_apellido__icontains=q)
+            | Q(proyectos__nombre__icontains=q)
+            | Q(proyectopacienteextra__codigo_proyecto__icontains=q)
+        ).distinct()
+
+    paginator = Paginator(pacientes, PACIENTES_POR_PAGINA)
+    page_obj = paginator.get_page(request.GET.get("page") or 1)
+
+    codigos_map = _build_codigos_map(page_obj)
+    for pac in page_obj:
         pac.codigos_list = codigos_map.get(pac.id, [])
+
+    query_params = {}
+    if q:
+        query_params["q"] = q
+    if filtro_proyecto:
+        query_params["proyecto"] = filtro_proyecto
+    pagination_query = urlencode(query_params)
+
+    proyectos = Proyecto.objects.all().order_by("nombre")
     return render(
         request,
         "home/tables.html",
         {
-            "pacientes": pacientes,
+            "pacientes": page_obj,
+            "page_obj": page_obj,
+            "page_range": _elided_page_range(page_obj),
+            "paginator_ellipsis": getattr(paginator, "ELLIPSIS", "…"),
+            "pagination_query": pagination_query,
             "proyectos": proyectos,
             "filtro_proyecto": filtro_proyecto,
+            "q": q,
             "codigos_map": codigos_map,
         },
     )
