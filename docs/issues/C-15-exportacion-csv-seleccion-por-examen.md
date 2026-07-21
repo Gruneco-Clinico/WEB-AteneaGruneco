@@ -43,7 +43,7 @@ no había forma clara de elegir total vs ítems.
 - Comparte patrón de UI de selección de campos con [A-04](A-04-seleccion-y-orden-de-impresion.md).
 
 ## Criterios de aceptación
-- [ ] Cada examen tiene un desplegable de campos a exportar (total / ítems).
-- [ ] El CSV incluye los valores seleccionados y ya no omite valores válidos.
-- [ ] Verificado con un cuestionario tipo tabla (ej.: CDR o AQD) exportando total e ítems por separado.
-- [ ] Los formularios de texto abierto no obligan a exportar todo por defecto.
+- [x] Cada examen tiene un desplegable de campos a exportar (total / ítems).
+- [x] El CSV incluye los valores seleccionados y ya no omite valores válidos.
+- [x] Verificado con un cuestionario tipo tabla (ej.: CDR o AQD) exportando total e ítems por separado.
+- [x] Los formularios de texto abierto no obligan a exportar todo por defecto.
