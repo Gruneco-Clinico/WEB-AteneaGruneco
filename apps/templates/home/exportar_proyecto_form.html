@@ -5,20 +5,13 @@
 {% block stylesheets %}
 <style>
     .field-checkbox {
-        padding: 8px 12px;
-        margin: 4px 0;
+        padding: 6px 10px;
+        margin: 2px 0;
         border: 1px solid #dee2e6;
         border-radius: 4px;
-        transition: background-color 0.2s;
     }
-    .field-checkbox:hover {
-        background-color: #f8f9fa;
-    }
-    .field-checkbox label {
-        margin: 0;
-        cursor: pointer;
-        font-weight: normal;
-    }
+    .field-checkbox:hover { background-color: #f8f9fa; }
+    .field-checkbox label { margin: 0; cursor: pointer; font-weight: normal; }
     .section-title {
         background: linear-gradient(90deg, #5e72e4 0%, #825ee4 100%);
         color: white;
@@ -28,11 +21,26 @@
         margin-top: 20px;
         margin-bottom: 15px;
     }
-    .select-all-btn {
-        font-size: 0.875rem;
-        padding: 4px 12px;
-        margin-left: 10px;
+    .select-all-btn { font-size: 0.8rem; padding: 2px 10px; margin-left: 6px; }
+    .exam-export-card { border: 1px solid #e9ecef; border-radius: 6px; margin-bottom: 12px; }
+    .exam-export-card .card-header {
+        background: #f6f9fc;
+        padding: 10px 14px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
     }
+    .exam-export-card .card-body { padding: 12px 14px; }
+    .exam-group-title {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: #8898aa;
+        margin: 10px 0 6px;
+        font-weight: 700;
+    }
+    .exam-actions .btn { margin: 2px 4px 2px 0; }
 </style>
 {% endblock %}
 
@@ -70,240 +78,145 @@
                         <i class="fas fa-file-csv mr-2"></i>
                         Seleccionar Campos para Exportar - {{ proyecto.nombre }}
                     </h3>
-                    <p class="text-sm text-muted mb-0">Selecciona los campos que deseas incluir en el archivo CSV</p>
+                    <p class="text-sm text-muted mb-0">
+                        Por cada examen elige totales, ítems específicos o ambos. Los formularios de texto abierto no se exportan por defecto.
+                    </p>
                 </div>
                 <div class="card-body">
                     <form method="POST" action="{% url 'exportar_csv_proyecto' proyecto_id=proyecto.id %}">
                         {% csrf_token %}
-                        
-                        <!-- Campos base siempre incluidos -->
+
                         <div class="alert alert-info">
                             <i class="fas fa-info-circle mr-2"></i>
-                            <strong>Campos base incluidos automáticamente:</strong> Código Proyecto, Paciente, Tipo de Visita, Fecha Visita, Estado Visita
+                            <strong>Campos base incluidos automáticamente:</strong>
+                            Código Proyecto, Paciente, Tipo de Visita, Fecha Visita, Estado Visita
                         </div>
 
-                        <!-- Datos Demográficos -->
                         <div class="section-title">
                             <i class="fas fa-user mr-2"></i> Datos Demográficos
-                            <button type="button" class="btn btn-sm btn-light select-all-btn" onclick="toggleSection('demograficos', true)">
-                                Seleccionar Todos
-                            </button>
-                            <button type="button" class="btn btn-sm btn-light select-all-btn" onclick="toggleSection('demograficos', false)">
-                                Deseleccionar Todos
-                            </button>
+                            <button type="button" class="btn btn-sm btn-light select-all-btn" onclick="toggleSection('demograficos', true)">Seleccionar Todos</button>
+                            <button type="button" class="btn btn-sm btn-light select-all-btn" onclick="toggleSection('demograficos', false)">Deseleccionar Todos</button>
                         </div>
                         <div class="row">
                             {% for field in campos_demograficos %}
                             <div class="col-md-4">
                                 <div class="field-checkbox">
                                     <div class="custom-control custom-checkbox">
-                                        <input type="checkbox" class="custom-control-input demograficos" 
+                                        <input type="checkbox" class="custom-control-input demograficos"
                                                id="demo_{{ field.0 }}" name="demograficos" value="{{ field.0 }}">
-                                        <label class="custom-control-label" for="demo_{{ field.0 }}">
-                                            {{ field.1 }}
-                                        </label>
+                                        <label class="custom-control-label" for="demo_{{ field.0 }}">{{ field.1 }}</label>
                                     </div>
                                 </div>
                             </div>
                             {% endfor %}
                         </div>
 
-                        <!-- Campos de Exámenes -->
-                        <div class="section-title">
-                            <i class="fas fa-notes-medical mr-2"></i> Campos de Exámenes
-                            <button type="button" class="btn btn-sm btn-light select-all-btn" onclick="toggleSection('examenes', true)">
-                                Seleccionar Todos
-                            </button>
-                            <button type="button" class="btn btn-sm btn-light select-all-btn" onclick="toggleSection('examenes', false)">
-                                Deseleccionar Todos
-                            </button>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-4">
-                                <div class="field-checkbox">
-                                    <div class="custom-control custom-checkbox">
-                                        <input type="checkbox" class="custom-control-input examenes" 
-                                               id="exam_motivo" name="campos_examen" value="motivo_consulta" checked>
-                                        <label class="custom-control-label" for="exam_motivo">
-                                            Motivo de Consulta
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="field-checkbox">
-                                    <div class="custom-control custom-checkbox">
-                                        <input type="checkbox" class="custom-control-input examenes" 
-                                               id="exam_puntaje" name="campos_examen" value="puntaje_total" checked>
-                                        <label class="custom-control-label" for="exam_puntaje">
-                                            Puntaje Total
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="field-checkbox">
-                                    <div class="custom-control custom-checkbox">
-                                        <input type="checkbox" class="custom-control-input examenes"
-                                               id="exam_suma_cajas" name="campos_examen" value="suma_cajas">
-                                        <label class="custom-control-label" for="exam_suma_cajas">
-                                            CDR — Suma de cajas
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="field-checkbox">
-                                    <div class="custom-control custom-checkbox">
-                                        <input type="checkbox" class="custom-control-input examenes"
-                                               id="exam_cdr_global" name="campos_examen" value="cdr_global">
-                                        <label class="custom-control-label" for="exam_cdr_global">
-                                            CDR Global
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="field-checkbox">
-                                    <div class="custom-control custom-checkbox">
-                                        <input type="checkbox" class="custom-control-input examenes"
-                                               id="exam_rl_autocuidado" name="campos_examen" value="puntaje_autocuidado">
-                                        <label class="custom-control-label" for="exam_rl_autocuidado">
-                                            RedLat — Autocuidado
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="field-checkbox">
-                                    <div class="custom-control custom-checkbox">
-                                        <input type="checkbox" class="custom-control-input examenes"
-                                               id="exam_rl_hogar" name="campos_examen" value="puntaje_cuidado_hogar">
-                                        <label class="custom-control-label" for="exam_rl_hogar">
-                                            RedLat — Cuidado del hogar
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="field-checkbox">
-                                    <div class="custom-control custom-checkbox">
-                                        <input type="checkbox" class="custom-control-input examenes"
-                                               id="exam_rl_trabajo" name="campos_examen" value="puntaje_trabajo_recreacion">
-                                        <label class="custom-control-label" for="exam_rl_trabajo">
-                                            RedLat — Trabajo/recreación
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="field-checkbox">
-                                    <div class="custom-control custom-checkbox">
-                                        <input type="checkbox" class="custom-control-input examenes"
-                                               id="exam_rl_compras" name="campos_examen" value="puntaje_compras_dinero">
-                                        <label class="custom-control-label" for="exam_rl_compras">
-                                            RedLat — Compras/dinero
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="field-checkbox">
-                                    <div class="custom-control custom-checkbox">
-                                        <input type="checkbox" class="custom-control-input examenes"
-                                               id="exam_rl_viajes" name="campos_examen" value="puntaje_viajes">
-                                        <label class="custom-control-label" for="exam_rl_viajes">
-                                            RedLat — Viajes
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="field-checkbox">
-                                    <div class="custom-control custom-checkbox">
-                                        <input type="checkbox" class="custom-control-input examenes"
-                                               id="exam_rl_com" name="campos_examen" value="puntaje_comunicacion">
-                                        <label class="custom-control-label" for="exam_rl_com">
-                                            RedLat — Comunicación
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="field-checkbox">
-                                    <div class="custom-control custom-checkbox">
-                                        <input type="checkbox" class="custom-control-input examenes"
-                                               id="exam_rl_tec" name="campos_examen" value="puntaje_tecnologia">
-                                        <label class="custom-control-label" for="exam_rl_tec">
-                                            RedLat — Tecnología
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="field-checkbox">
-                                    <div class="custom-control custom-checkbox">
-                                        <input type="checkbox" class="custom-control-input examenes" 
-                                               id="exam_interpretacion" name="campos_examen" value="interpretacion">
-                                        <label class="custom-control-label" for="exam_interpretacion">
-                                            Interpretación
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="field-checkbox">
-                                    <div class="custom-control custom-checkbox">
-                                        <input type="checkbox" class="custom-control-input examenes" 
-                                               id="exam_observaciones" name="campos_examen" value="observaciones">
-                                        <label class="custom-control-label" for="exam_observaciones">
-                                            Observaciones
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="field-checkbox">
-                                    <div class="custom-control custom-checkbox">
-                                        <input type="checkbox" class="custom-control-input examenes" 
-                                               id="exam_notas" name="campos_examen" value="notas_aclaratorias">
-                                        <label class="custom-control-label" for="exam_notas">
-                                            Notas Aclaratorias
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Exámenes del Proyecto -->
-                        {% if examenes_proyecto %}
                         <div class="section-title">
                             <i class="fas fa-clipboard-list mr-2"></i> Exámenes del Proyecto
-                            <button type="button" class="btn btn-sm btn-light select-all-btn" onclick="toggleSection('examenes_lista', true)">
-                                Seleccionar Todos
-                            </button>
-                            <button type="button" class="btn btn-sm btn-light select-all-btn" onclick="toggleSection('examenes_lista', false)">
-                                Deseleccionar Todos
-                            </button>
+                            <button type="button" class="btn btn-sm btn-light select-all-btn" onclick="selectExamDefaults()">Defaults (totales)</button>
+                            <button type="button" class="btn btn-sm btn-light select-all-btn" onclick="clearAllExams()">Ningún examen</button>
                         </div>
-                        <div class="alert alert-sm alert-secondary">
-                            Selecciona qué exámenes incluir en el CSV. Para cada examen seleccionado se crearán columnas según los campos de exámenes marcados arriba.
-                        </div>
-                        <div class="row">
-                            {% for examen in examenes_proyecto %}
-                            <div class="col-md-6">
-                                <div class="field-checkbox">
-                                    <div class="custom-control custom-checkbox">
-                                        <input type="checkbox" class="custom-control-input examenes_lista" 
-                                               id="examen_{{ examen.id }}" name="examenes" value="{{ examen.id }}" checked>
-                                        <label class="custom-control-label" for="examen_{{ examen.id }}">
-                                            {{ examen.nombre }}
-                                        </label>
+
+                        {% if exam_catalog %}
+                        {% for cat in exam_catalog %}
+                        <div class="exam-export-card" data-exam-id="{{ cat.examen_id }}">
+                            <div class="card-header" data-toggle="collapse" data-target="#exam-body-{{ cat.examen_id }}">
+                                <div class="custom-control custom-checkbox" onclick="event.stopPropagation();">
+                                    <input type="checkbox" class="custom-control-input exam-master"
+                                           id="examen_{{ cat.examen_id }}" name="examenes" value="{{ cat.examen_id }}"
+                                           {% if cat.default_selected %}checked{% endif %}
+                                           onchange="toggleExamBody({{ cat.examen_id }}, this.checked)">
+                                    <label class="custom-control-label font-weight-bold" for="examen_{{ cat.examen_id }}">
+                                        {{ cat.examen_nombre }}
+                                    </label>
+                                </div>
+                                <small class="text-muted selected-count" id="count-{{ cat.examen_id }}">0 campos</small>
+                            </div>
+                            <div id="exam-body-{{ cat.examen_id }}" class="collapse {% if cat.default_selected %}show{% endif %}">
+                                <div class="card-body">
+                                    {% if not cat.fields %}
+                                    <p class="text-muted mb-0">Sin campos exportables detectados.</p>
+                                    {% else %}
+                                    <div class="exam-actions mb-2">
+                                        <button type="button" class="btn btn-sm btn-outline-primary" onclick="examSelectGroup({{ cat.examen_id }}, 'summary', true)">Solo totales</button>
+                                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="examSelectGroup({{ cat.examen_id }}, 'item', true)">Todos los ítems</button>
+                                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="examSelectAll({{ cat.examen_id }}, true)">Seleccionar todo</button>
+                                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="examSelectAll({{ cat.examen_id }}, false)">Ninguno</button>
                                     </div>
+
+                                    {% if cat.summaries %}
+                                    <div class="exam-group-title">Resultados y puntajes</div>
+                                    <div class="row">
+                                        {% for f in cat.summaries %}
+                                        <div class="col-md-6">
+                                            <div class="field-checkbox">
+                                                <div class="custom-control custom-checkbox">
+                                                    <input type="checkbox"
+                                                           class="custom-control-input exam-field exam-{{ cat.examen_id }} group-summary"
+                                                           id="f_{{ cat.examen_id }}_{{ forloop.counter }}_s"
+                                                           name="campos_examen_{{ cat.examen_id }}"
+                                                           value="{{ f.key }}"
+                                                           data-group="summary"
+                                                           {% if cat.default_selected and f.default_selected %}checked{% endif %}
+                                                           onchange="updateCount({{ cat.examen_id }})">
+                                                    <label class="custom-control-label" for="f_{{ cat.examen_id }}_{{ forloop.counter }}_s">{{ f.label }}</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+
+                                    {% if cat.items %}
+                                    <div class="exam-group-title">Ítems</div>
+                                    <div class="row">
+                                        {% for f in cat.items %}
+                                        <div class="col-md-6">
+                                            <div class="field-checkbox">
+                                                <div class="custom-control custom-checkbox">
+                                                    <input type="checkbox"
+                                                           class="custom-control-input exam-field exam-{{ cat.examen_id }} group-item"
+                                                           id="f_{{ cat.examen_id }}_{{ forloop.counter }}_i"
+                                                           name="campos_examen_{{ cat.examen_id }}"
+                                                           value="{{ f.key }}"
+                                                           data-group="item"
+                                                           onchange="updateCount({{ cat.examen_id }})">
+                                                    <label class="custom-control-label" for="f_{{ cat.examen_id }}_{{ forloop.counter }}_i">{{ f.label }}</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+
+                                    {% if cat.tables %}
+                                    <div class="exam-group-title">Tablas</div>
+                                    <div class="row">
+                                        {% for f in cat.tables %}
+                                        <div class="col-md-6">
+                                            <div class="field-checkbox">
+                                                <div class="custom-control custom-checkbox">
+                                                    <input type="checkbox"
+                                                           class="custom-control-input exam-field exam-{{ cat.examen_id }} group-table"
+                                                           id="f_{{ cat.examen_id }}_{{ forloop.counter }}_t"
+                                                           name="campos_examen_{{ cat.examen_id }}"
+                                                           value="{{ f.key }}"
+                                                           data-group="table"
+                                                           onchange="updateCount({{ cat.examen_id }})">
+                                                    <label class="custom-control-label" for="f_{{ cat.examen_id }}_{{ forloop.counter }}_t">{{ f.label }}</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                    {% endif %}
                                 </div>
                             </div>
-                            {% endfor %}
                         </div>
+                        {% endfor %}
+                        {% else %}
+                        <div class="alert alert-warning">No hay exámenes en las visitas de este proyecto.</div>
                         {% endif %}
 
                         <div class="mt-4 text-right">
@@ -323,10 +236,83 @@
 
 <script>
 function toggleSection(sectionClass, checked) {
-    document.querySelectorAll('.' + sectionClass).forEach(checkbox => {
+    document.querySelectorAll('.' + sectionClass).forEach(function (checkbox) {
         checkbox.checked = checked;
     });
 }
-</script>
 
+function updateCount(examId) {
+    var n = document.querySelectorAll('.exam-' + examId + ':checked').length;
+    var el = document.getElementById('count-' + examId);
+    if (el) el.textContent = n + (n === 1 ? ' campo' : ' campos');
+}
+
+function toggleExamBody(examId, checked) {
+    var body = document.getElementById('exam-body-' + examId);
+    if (!body) return;
+    if (checked) {
+        body.classList.add('show');
+    } else {
+        examSelectAll(examId, false);
+        body.classList.remove('show');
+    }
+    updateCount(examId);
+}
+
+function examSelectAll(examId, checked) {
+    document.querySelectorAll('.exam-' + examId).forEach(function (cb) {
+        cb.checked = checked;
+    });
+    var master = document.getElementById('examen_' + examId);
+    if (master && checked) master.checked = true;
+    updateCount(examId);
+}
+
+function examSelectGroup(examId, group, checked) {
+    if (group === 'summary') {
+        document.querySelectorAll('.exam-' + examId).forEach(function (cb) {
+            cb.checked = cb.dataset.group === 'summary' ? checked : false;
+        });
+    } else if (group === 'item') {
+        document.querySelectorAll('.exam-' + examId + '.group-item').forEach(function (cb) {
+            cb.checked = checked;
+        });
+    }
+    var master = document.getElementById('examen_' + examId);
+    if (master) master.checked = true;
+    var body = document.getElementById('exam-body-' + examId);
+    if (body) body.classList.add('show');
+    updateCount(examId);
+}
+
+function clearAllExams() {
+    document.querySelectorAll('.exam-master').forEach(function (cb) {
+        cb.checked = false;
+        toggleExamBody(parseInt(cb.value, 10), false);
+    });
+}
+
+function selectExamDefaults() {
+    document.querySelectorAll('.exam-export-card').forEach(function (card) {
+        var examId = parseInt(card.getAttribute('data-exam-id'), 10);
+        var master = document.getElementById('examen_' + examId);
+        var summaries = card.querySelectorAll('.group-summary');
+        var hasSummary = summaries.length > 0;
+        if (master) master.checked = hasSummary;
+        document.querySelectorAll('.exam-' + examId).forEach(function (cb) {
+            cb.checked = hasSummary && cb.dataset.group === 'summary';
+        });
+        var body = document.getElementById('exam-body-' + examId);
+        if (body) {
+            if (hasSummary) body.classList.add('show');
+            else body.classList.remove('show');
+        }
+        updateCount(examId);
+    });
+}
+
+document.querySelectorAll('.exam-export-card').forEach(function (card) {
+    updateCount(parseInt(card.getAttribute('data-exam-id'), 10));
+});
+</script>
 {% endblock %}
