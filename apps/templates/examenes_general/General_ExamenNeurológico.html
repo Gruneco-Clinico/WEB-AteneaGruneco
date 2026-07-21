@@ -296,6 +296,17 @@
               <!-- TAB 1: PARES CRANEALES -->
               <!-- ========================================= -->
               <div class="tab-pane fade show active" id="pares" role="tabpanel">
+                <div class="seccion-evaluado-bar mb-3 d-flex align-items-center justify-content-between border rounded p-2 bg-light">
+                  <strong>Pares craneales</strong>
+                  <div class="custom-control custom-switch">
+                    <input type="checkbox" class="custom-control-input seccion-evaluado-toggle"
+                           id="seccion_pares_craneales_evaluado" name="seccion_pares_craneales_evaluado"
+                           data-seccion-body="pares-body"
+                           {% if not datos_examen or datos_examen.seccion_pares_craneales_evaluado != False %}checked{% endif %}>
+                    <label class="custom-control-label" for="seccion_pares_craneales_evaluado">Evaluado</label>
+                  </div>
+                </div>
+                <div id="pares-body" class="seccion-evaluado-body">
                 
                 <!-- I Par (Olfatorio) -->
                 <div class="neuro-card">
@@ -1435,6 +1446,7 @@
                 <!-- Continúa con los demás pares craneales... -->
                 <!-- Por brevedad, muestro la estructura. Necesitarías repetir el patrón para V, VII, VIII, IX-X, XI, XII -->
 
+                </div>
               </div>
 
               <!-- ========================================= -->
@@ -1442,6 +1454,17 @@
               <!-- TAB 2: SENSIBILIDAD -->
               <!-- ========================================= -->
               <div class="tab-pane fade" id="sensibilidad" role="tabpanel">
+                <div class="seccion-evaluado-bar mb-3 d-flex align-items-center justify-content-between border rounded p-2 bg-light">
+                  <strong>Sensibilidad</strong>
+                  <div class="custom-control custom-switch">
+                    <input type="checkbox" class="custom-control-input seccion-evaluado-toggle"
+                           id="seccion_sensibilidad_evaluado" name="seccion_sensibilidad_evaluado"
+                           data-seccion-body="sensibilidad-body"
+                           {% if not datos_examen or datos_examen.seccion_sensibilidad_evaluado != False %}checked{% endif %}>
+                    <label class="custom-control-label" for="seccion_sensibilidad_evaluado">Evaluado</label>
+                  </div>
+                </div>
+                <div id="sensibilidad-body" class="seccion-evaluado-body">
                 <div class="neuro-card">
                   <div class="sensibilidad-card par-craneal-header">
                     <div class="d-flex align-items-center">
@@ -1700,11 +1723,23 @@
 
                   </div>
                 </div>
+                </div>
               </div>
               <!-- ========================================= -->
               <!-- TAB 3: REFLEJOS -->
               <!-- ========================================= -->
               <div class="tab-pane fade" id="reflejos" role="tabpanel">
+                <div class="seccion-evaluado-bar mb-3 d-flex align-items-center justify-content-between border rounded p-2 bg-light">
+                  <strong>Reflejos</strong>
+                  <div class="custom-control custom-switch">
+                    <input type="checkbox" class="custom-control-input seccion-evaluado-toggle"
+                           id="seccion_reflejos_evaluado" name="seccion_reflejos_evaluado"
+                           data-seccion-body="reflejos-body"
+                           {% if not datos_examen or datos_examen.seccion_reflejos_evaluado != False %}checked{% endif %}>
+                    <label class="custom-control-label" for="seccion_reflejos_evaluado">Evaluado</label>
+                  </div>
+                </div>
+                <div id="reflejos-body" class="seccion-evaluado-body">
                 <div class="neuro-card">
                   <div class="reflejos-card par-craneal-header">
                     <div class="d-flex align-items-center">
@@ -2211,11 +2246,23 @@
 
                   </div>
                 </div>
+                </div>
               </div>
 
               <!-- TAB 4: FUERZA -->
               <!-- ========================================= -->
               <div class="tab-pane fade" id="fuerza" role="tabpanel">
+                <div class="seccion-evaluado-bar mb-3 d-flex align-items-center justify-content-between border rounded p-2 bg-light">
+                  <strong>Fuerza muscular</strong>
+                  <div class="custom-control custom-switch">
+                    <input type="checkbox" class="custom-control-input seccion-evaluado-toggle"
+                           id="seccion_fuerza_evaluado" name="seccion_fuerza_evaluado"
+                           data-seccion-body="fuerza-body"
+                           {% if not datos_examen or datos_examen.seccion_fuerza_evaluado != False %}checked{% endif %}>
+                    <label class="custom-control-label" for="seccion_fuerza_evaluado">Evaluado</label>
+                  </div>
+                </div>
+                <div id="fuerza-body" class="seccion-evaluado-body">
                 <div class="neuro-card">
                   <div class="fuerza-card par-craneal-header">
                     <div class="d-flex align-items-center">
@@ -2950,6 +2997,7 @@
                 </div>
               </div>
               </div>
+              </div>
               <!-- ========================================= -->
               </div>
    
@@ -2958,6 +3006,17 @@
           <!-- TAB 5: OTROS (Coordinación, Marcha y Movimientos Anormales) -->
 <!-- ========================================= -->
 <div class="tab-pane fade" id="otros" role="tabpanel">
+  <div class="seccion-evaluado-bar mb-3 d-flex align-items-center justify-content-between border rounded p-2 bg-light">
+    <strong>Coordinación, marcha y movimientos</strong>
+    <div class="custom-control custom-switch">
+      <input type="checkbox" class="custom-control-input seccion-evaluado-toggle"
+             id="seccion_coordinacion_marcha_evaluado" name="seccion_coordinacion_marcha_evaluado"
+             data-seccion-body="otros-body"
+             {% if not datos_examen or datos_examen.seccion_coordinacion_marcha_evaluado != False %}checked{% endif %}>
+      <label class="custom-control-label" for="seccion_coordinacion_marcha_evaluado">Evaluado</label>
+    </div>
+  </div>
+  <div id="otros-body" class="seccion-evaluado-body">
   
   <!-- COORDINACIÓN -->
   <div class="neuro-card">
@@ -3422,6 +3481,8 @@
     </div>
   </div>
 
+  </div>
+
   <!-- Botones de Acción -->
   <div class="row mt-4">
     <div class="col-12 text-center">
@@ -3441,38 +3502,95 @@
 </div>
 </div>
 <script>
+window.FIELD_TOGGLE_SEMANTICS = {{ field_toggle_semantics_json|default:"{}"|safe }};
+window.TOGGLE_LABELS = {{ toggle_labels_json|default:"{}"|safe }};
+window.MODO_EDICION = {{ modo_edicion|yesno:"true,false" }};
+</script>
+<script>
 document.addEventListener('DOMContentLoaded', function() {
-    // ===================================================
-    // CARGAR DATOS EN MODO EDICIÓN
-    // ===================================================
-    {% if modo_edicion and datos_examen %}
-        console.log('🧠 Cargando Examen Neurológico en modo edición');
-        
-        // Aquí cargarías todos los campos según datos_examen
-        // Ejemplo para cada tipo de campo:
-        
-        // Checkboxes simples
-        ['clavos_izquierdo', 'clavos_derecho', 'pimienta_izquierdo', /* etc */].forEach(function(field) {
-            const checkbox = document.getElementById(field);
-            if (checkbox && {{ datos_examen|yesno:"true,false" }}[field]) {
-                checkbox.checked = true;
+    const semantics = window.FIELD_TOGGLE_SEMANTICS || {};
+    const toggleLabels = window.TOGGLE_LABELS || {};
+
+    function labelForTipo(tipo, checked) {
+        const labels = toggleLabels[tipo];
+        if (!labels) return checked ? 'Sí' : 'No';
+        const key = checked ? 'true' : 'false';
+        return labels[key] || labels[checked] || (checked ? 'Sí' : 'No');
+    }
+
+    function syncToggleLabel(checkbox) {
+        const fieldName = checkbox.name || checkbox.id;
+        const tipo = semantics[fieldName];
+        if (!tipo) return;
+        const container = checkbox.closest('.custom-control');
+        if (!container) return;
+        let labelEl = container.querySelector('.custom-control-label');
+        if (!labelEl) {
+            labelEl = document.createElement('span');
+            labelEl.className = 'toggle-semantics-label custom-control-label';
+            if (checkbox.id) labelEl.setAttribute('for', checkbox.id);
+            container.appendChild(labelEl);
+        }
+        labelEl.textContent = labelForTipo(tipo, checkbox.checked);
+    }
+
+    Object.keys(semantics).forEach(function(fieldName) {
+        const checkbox = document.getElementById(fieldName)
+            || document.querySelector('input[type="checkbox"][name="' + fieldName + '"]');
+        if (!checkbox) return;
+        syncToggleLabel(checkbox);
+        checkbox.addEventListener('change', function() {
+            syncToggleLabel(checkbox);
+        });
+    });
+
+    function applySeccionEvaluado(toggle) {
+        const bodyId = toggle.getAttribute('data-seccion-body');
+        const body = bodyId ? document.getElementById(bodyId) : null;
+        if (!body) return;
+        const evaluated = toggle.checked;
+        body.style.display = evaluated ? '' : 'none';
+        const label = document.querySelector('label[for="' + toggle.id + '"]');
+        if (label) {
+            label.textContent = evaluated ? 'Evaluado' : 'No evaluado';
+        }
+        body.querySelectorAll('[required]').forEach(function(el) {
+            if (!evaluated) {
+                el.dataset.wasRequired = '1';
+                el.removeAttribute('required');
+            } else if (el.dataset.wasRequired === '1') {
+                el.setAttribute('required', '');
             }
         });
-        
-        console.log('✅ Examen Neurológico cargado correctamente');
-    {% endif %}
+        body.querySelectorAll('input, select, textarea').forEach(function(el) {
+            if (!evaluated) {
+                if (el.disabled) {
+                    el.dataset.wasDisabled = '1';
+                } else {
+                    el.disabled = true;
+                }
+            } else if (el.dataset.wasDisabled === '1') {
+                el.disabled = true;
+                delete el.dataset.wasDisabled;
+            } else {
+                el.disabled = false;
+            }
+        });
+    }
 
-    // Funcionalidad de vista previa
-    document.getElementById('preview-btn').addEventListener('click', function() {
-        // Implementar lógica de vista previa
-        alert('Vista previa del examen neurológico');
+    document.querySelectorAll('.seccion-evaluado-toggle').forEach(function(toggle) {
+        applySeccionEvaluado(toggle);
+        toggle.addEventListener('change', function() {
+            applySeccionEvaluado(toggle);
+        });
     });
 
-    // Validación antes de envío
-    document.querySelector('form').addEventListener('submit', function(e) {
-        // Aquí puedes agregar validaciones
-        console.log('Enviando examen neurológico...');
-    });
+    const previewBtn = document.getElementById('preview-btn');
+    if (previewBtn) {
+        previewBtn.addEventListener('click', function() {
+            alert('Vista previa del examen neurológico');
+        });
+    }
 });
 </script>
 

@@ -11,7 +11,7 @@
   <div class="hc-seccion-tabla">
     <div class="fila-titulo-hc hc-seccion-titulo">Antecedentes patológicos</div>
     <table class="hc-tabla-resultados table table-bordered">
-      <thead><tr><th>Diagnóstico</th><th>Fecha inicio</th><th>Observaciones</th></tr></thead>
+      <thead><tr><th>Diagnóstico</th><th>Fecha inicio</th><th>Tratamiento</th><th>Complicaciones</th><th>Activo</th><th>Observaciones</th></tr></thead>
       <tbody>
         {% for item in patologicos %}
         <tr>
@@ -19,6 +19,9 @@
             {{ item.get_tipo_patologia_display }}{% if item.descripcion_otros %} — {{ item.descripcion_otros }}{% endif %}
           </td>
           <td>{% if item.fecha_inicio %}{{ item.fecha_inicio|date:"d/m/Y" }}{% else %}—{% endif %}</td>
+          <td>{{ item.ha_recibido_tratamiento|yesno:"Sí,No" }}{% if item.ha_recibido_tratamiento and item.detalle_tratamiento %} — {{ item.detalle_tratamiento }}{% endif %}</td>
+          <td>{{ item.tiene_complicaciones|yesno:"Sí,No" }}{% if item.tiene_complicaciones and item.detalle_complicaciones %} — {{ item.detalle_complicaciones }}{% endif %}</td>
+          <td>{{ item.activo|yesno:"Sí,No" }}</td>
           <td>{{ item.observaciones|empty_dash }}</td>
         </tr>
         {% endfor %}
@@ -31,12 +34,14 @@
   <div class="hc-seccion-tabla">
     <div class="fila-titulo-hc hc-seccion-titulo">Antecedentes quirúrgicos</div>
     <table class="hc-tabla-resultados table table-bordered">
-      <thead><tr><th>Procedimiento</th><th>Fecha</th><th>Observaciones</th></tr></thead>
+      <thead><tr><th>Procedimiento</th><th>Fecha</th><th>Tratamiento</th><th>Complicaciones</th><th>Observaciones</th></tr></thead>
       <tbody>
         {% for item in quirurgicos %}
         <tr>
           <td>{{ item.descripcion|empty_dash }}</td>
           <td>{% if item.fecha_intervencion %}{{ item.fecha_intervencion|date:"d/m/Y" }}{% else %}—{% endif %}</td>
+          <td>{{ item.ha_recibido_tratamiento|yesno:"Sí,No" }}{% if item.ha_recibido_tratamiento and item.detalle_tratamiento %} — {{ item.detalle_tratamiento }}{% endif %}</td>
+          <td>{{ item.tiene_complicaciones|yesno:"Sí,No" }}{% if item.tiene_complicaciones and item.detalle_complicaciones %} — {{ item.detalle_complicaciones }}{% endif %}</td>
           <td>{{ item.observaciones|empty_dash }}</td>
         </tr>
         {% endfor %}
@@ -82,12 +87,14 @@
   <div class="hc-seccion-tabla">
     <div class="fila-titulo-hc hc-seccion-titulo">Antecedentes tóxicos</div>
     <table class="hc-tabla-resultados table table-bordered">
-      <thead><tr><th>Sustancia</th><th>Inicio</th><th>Observaciones</th></tr></thead>
+      <thead><tr><th>Sustancia</th><th>Inicio</th><th>Tratamiento</th><th>Complicaciones</th><th>Observaciones</th></tr></thead>
       <tbody>
         {% for item in toxicos %}
         <tr>
-          <td>{{ item.sustancia|empty_dash }}</td>
+          <td>{% if item.get_tipos_display %}{{ item.get_tipos_display|join:", " }}{% else %}{{ item.tipos_toxico|join:", "|empty_dash }}{% endif %}{% if item.descripcion_otros %} — {{ item.descripcion_otros }}{% endif %}</td>
           <td>{% if item.fecha_inicio %}{{ item.fecha_inicio|date:"d/m/Y" }}{% else %}—{% endif %}</td>
+          <td>{{ item.ha_recibido_tratamiento|yesno:"Sí,No" }}{% if item.ha_recibido_tratamiento and item.detalle_tratamiento %} — {{ item.detalle_tratamiento }}{% endif %}</td>
+          <td>{{ item.tiene_complicaciones|yesno:"Sí,No" }}{% if item.tiene_complicaciones and item.detalle_complicaciones %} — {{ item.detalle_complicaciones }}{% endif %}</td>
           <td>{{ item.observaciones|empty_dash }}</td>
         </tr>
         {% endfor %}
@@ -118,11 +125,14 @@
   <div class="hc-seccion-tabla">
     <div class="fila-titulo-hc hc-seccion-titulo">Antecedentes alérgicos</div>
     <table class="hc-tabla-resultados table table-bordered">
-      <thead><tr><th>Alérgeno</th><th>Observaciones</th></tr></thead>
+      <thead><tr><th>Alérgeno</th><th>Inicio</th><th>Tratamiento</th><th>Activo</th><th>Observaciones</th></tr></thead>
       <tbody>
         {% for item in alergicos %}
         <tr>
-          <td>{{ item.alergeno|empty_dash }}</td>
+          <td>{{ item.descripcion|empty_dash }}</td>
+          <td>{% if item.fecha_inicio %}{{ item.fecha_inicio|date:"d/m/Y" }}{% else %}—{% endif %}</td>
+          <td>{{ item.tratamiento_recibido|default:"" }}{% if item.detalle_tratamiento %} — {{ item.detalle_tratamiento }}{% endif %}{% if not item.tratamiento_recibido and not item.detalle_tratamiento %}—{% endif %}</td>
+          <td>{{ item.activo|yesno:"Sí,No" }}</td>
           <td>{{ item.observaciones|empty_dash }}</td>
         </tr>
         {% endfor %}
@@ -135,12 +145,14 @@
   <div class="hc-seccion-tabla">
     <div class="fila-titulo-hc hc-seccion-titulo">Antecedentes traumáticos</div>
     <table class="hc-tabla-resultados table table-bordered">
-      <thead><tr><th>Tipo</th><th>Fecha</th><th>Observaciones</th></tr></thead>
+      <thead><tr><th>Tipo</th><th>Fecha</th><th>Tratamiento</th><th>Activo</th><th>Observaciones</th></tr></thead>
       <tbody>
         {% for item in traumaticos %}
         <tr>
-          <td>{{ item.tipo_trauma|empty_dash }}</td>
-          <td>{% if item.fecha %}{{ item.fecha|date:"d/m/Y" }}{% else %}—{% endif %}</td>
+          <td>{{ item.descripcion|empty_dash }}</td>
+          <td>{% if item.fecha_inicio %}{{ item.fecha_inicio|date:"d/m/Y" }}{% else %}—{% endif %}</td>
+          <td>{{ item.tratamiento_recibido|default:"" }}{% if item.detalle_tratamiento %} — {{ item.detalle_tratamiento }}{% endif %}{% if not item.tratamiento_recibido and not item.detalle_tratamiento %}—{% endif %}</td>
+          <td>{{ item.activo|yesno:"Sí,No" }}</td>
           <td>{{ item.observaciones|empty_dash }}</td>
         </tr>
         {% endfor %}

@@ -471,6 +471,15 @@ def exportar_csv_proyecto(request, proyecto_id):
     campo_examen_labels = {
         "motivo_consulta": "Motivo Consulta",
         "puntaje_total": "Puntaje",
+        "suma_cajas": "Suma de cajas",
+        "cdr_global": "CDR Global",
+        "puntaje_autocuidado": "RedLat Autocuidado",
+        "puntaje_cuidado_hogar": "RedLat Cuidado hogar",
+        "puntaje_trabajo_recreacion": "RedLat Trabajo/recreación",
+        "puntaje_compras_dinero": "RedLat Compras/dinero",
+        "puntaje_viajes": "RedLat Viajes",
+        "puntaje_comunicacion": "RedLat Comunicación",
+        "puntaje_tecnologia": "RedLat Tecnología",
         "interpretacion": "Interpretación",
         "observaciones": "Observaciones",
         "notas_aclaratorias": "Notas",
@@ -550,7 +559,14 @@ def exportar_csv_proyecto(request, proyecto_id):
                     resultado = ve.get_resultado_instance()
                     if resultado:
                         for campo in campos_examen_selected:
-                            valor = getattr(resultado, campo, "")
+                            if campo == "puntaje_total":
+                                valor = getattr(resultado, "puntaje_total", None)
+                                if valor is None:
+                                    valor = getattr(resultado, "puntuacion_total", None)
+                                if valor is None:
+                                    valor = getattr(resultado, "puntuacion", None)
+                            else:
+                                valor = getattr(resultado, campo, None)
                             datos[campo] = valor if valor is not None else ""
                 except Exception:
                     pass

@@ -136,7 +136,15 @@
                   <!-- Resultado Global -->
                   <div class="form-group mt-4">
                     <label for="cdr_global"><strong>CDR Global (calculado automáticamente)</strong></label>
-                    <input type="text" class="form-control" id="cdr_global" name="cdr_global" readonly>
+                    <input type="text" class="form-control" id="cdr_global" name="cdr_global" readonly
+                           value="{{ datos_examen.cdr_global|default:'' }}">
+                  </div>
+
+                  <div class="form-group">
+                    <label for="suma_cajas"><strong>Suma de los 6 dominios (cajas)</strong></label>
+                    <input type="text" class="form-control" id="suma_cajas" name="suma_cajas" readonly
+                           value="{{ datos_examen.suma_cajas|default:'' }}">
+                    <small class="form-text text-muted">Suma de Memoria + Orientación + Juicio + Comunitarias + Pasatiempos + Cuidado. Distinta del CDR Global.</small>
                   </div>
 
                   <!-- Interpretación -->
@@ -230,6 +238,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
     globalInput.value = global.toString();
     interpretacionTextarea.value = interpretarCDR(globalInput.value);
+
+    const sumaInput = document.getElementById("suma_cajas");
+    if (sumaInput) {
+      const suma = valores.reduce((a, b) => a + b, 0);
+      sumaInput.value = suma.toString();
+    }
   }
 
   function interpretarCDR(valor) {

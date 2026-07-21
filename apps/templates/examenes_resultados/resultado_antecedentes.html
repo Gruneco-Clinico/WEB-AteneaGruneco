@@ -33,6 +33,12 @@
                             <br>
                             <small>Fecha inicio: {{ item.fecha_inicio|date:"d/m/Y" }}</small>
                             {% endif %}
+                            <br>
+                            <small>Tratamiento: {{ item.ha_recibido_tratamiento|yesno:"Sí,No" }}{% if item.ha_recibido_tratamiento and item.detalle_tratamiento %} — {{ item.detalle_tratamiento }}{% endif %}</small>
+                            <br>
+                            <small>Complicaciones: {{ item.tiene_complicaciones|yesno:"Sí,No" }}{% if item.tiene_complicaciones and item.detalle_complicaciones %} — {{ item.detalle_complicaciones }}{% endif %}</small>
+                            <br>
+                            <small>Activo: {{ item.activo|yesno:"Sí,No" }}</small>
                             {% if item.observaciones %}<br><em>{{ item.observaciones }}</em>{% endif %}
                         </div>
                         {% endfor %}
@@ -50,6 +56,10 @@
                             <br>
                             <small>Fecha intervención: {{ item.fecha_intervencion|date:"d/m/Y" }}</small>
                             {% endif %}
+                            <br>
+                            <small>Tratamiento: {{ item.ha_recibido_tratamiento|yesno:"Sí,No" }}{% if item.ha_recibido_tratamiento and item.detalle_tratamiento %} — {{ item.detalle_tratamiento }}{% endif %}</small>
+                            <br>
+                            <small>Complicaciones: {{ item.tiene_complicaciones|yesno:"Sí,No" }}{% if item.tiene_complicaciones and item.detalle_complicaciones %} — {{ item.detalle_complicaciones }}{% endif %}</small>
                             {% if item.observaciones %}<br><em>{{ item.observaciones }}</em>{% endif %}
                         </div>
                         {% endfor %}
@@ -103,11 +113,16 @@
                         <h5>Antecedentes Tóxicos</h5>
                         {% for item in toxicos %}
                         <div class="border p-3 mb-2">
-                            <strong>{{ item.sustancia|empty_dash }}</strong>
+                            <strong>{% if item.get_tipos_display %}{{ item.get_tipos_display|join:", " }}{% else %}{{ item.tipos_toxico|join:", "|empty_dash }}{% endif %}</strong>
+                            {% if item.descripcion_otros %} — {{ item.descripcion_otros }}{% endif %}
                             {% if item.fecha_inicio %}
                             <br>
                             <small>Inicio: {{ item.fecha_inicio|date:"d/m/Y" }}</small>
                             {% endif %}
+                            <br>
+                            <small>Tratamiento: {{ item.ha_recibido_tratamiento|yesno:"Sí,No" }}{% if item.ha_recibido_tratamiento and item.detalle_tratamiento %} — {{ item.detalle_tratamiento }}{% endif %}</small>
+                            <br>
+                            <small>Complicaciones: {{ item.tiene_complicaciones|yesno:"Sí,No" }}{% if item.tiene_complicaciones and item.detalle_complicaciones %} — {{ item.detalle_complicaciones }}{% endif %}</small>
                             {% if item.observaciones %}<br><em>{{ item.observaciones }}</em>{% endif %}
                         </div>
                         {% endfor %}
@@ -135,7 +150,21 @@
                         <h5>Antecedentes Alérgicos</h5>
                         {% for item in alergicos %}
                         <div class="border p-3 mb-2">
-                            <strong>{{ item.alergeno|empty_dash }}</strong>
+                            <strong>{{ item.descripcion|empty_dash }}</strong>
+                            {% if item.fecha_inicio %}
+                            <br>
+                            <small>Inicio: {{ item.fecha_inicio|date:"d/m/Y" }}</small>
+                            {% endif %}
+                            {% if item.tratamiento_recibido or item.detalle_tratamiento %}
+                            <br>
+                            <small>Tratamiento: {{ item.tratamiento_recibido|default:"" }}{% if item.detalle_tratamiento %} — {{ item.detalle_tratamiento }}{% endif %}</small>
+                            {% endif %}
+                            {% if item.complicaciones %}
+                            <br>
+                            <small>Complicaciones: {{ item.complicaciones }}</small>
+                            {% endif %}
+                            <br>
+                            <small>Activo: {{ item.activo|yesno:"Sí,No" }}</small>
                             {% if item.observaciones %}<br><em>{{ item.observaciones }}</em>{% endif %}
                         </div>
                         {% endfor %}
@@ -148,11 +177,21 @@
                         <h5>Antecedentes Traumáticos</h5>
                         {% for item in traumaticos %}
                         <div class="border p-3 mb-2">
-                            <strong>{{ item.tipo_trauma|empty_dash }}</strong>
-                            {% if item.fecha %}
+                            <strong>{{ item.descripcion|empty_dash }}</strong>
+                            {% if item.fecha_inicio %}
                             <br>
-                            <small>Fecha: {{ item.fecha|date:"d/m/Y" }}</small>
+                            <small>Fecha: {{ item.fecha_inicio|date:"d/m/Y" }}</small>
                             {% endif %}
+                            {% if item.tratamiento_recibido or item.detalle_tratamiento %}
+                            <br>
+                            <small>Tratamiento: {{ item.tratamiento_recibido|default:"" }}{% if item.detalle_tratamiento %} — {{ item.detalle_tratamiento }}{% endif %}</small>
+                            {% endif %}
+                            {% if item.complicaciones %}
+                            <br>
+                            <small>Complicaciones: {{ item.complicaciones }}</small>
+                            {% endif %}
+                            <br>
+                            <small>Activo: {{ item.activo|yesno:"Sí,No" }}</small>
                             {% if item.observaciones %}<br><em>{{ item.observaciones }}</em>{% endif %}
                         </div>
                         {% endfor %}
@@ -203,8 +242,17 @@
                         {% for item in epidemiologicos %}
                         <div class="border p-3 mb-2">
                             <strong>{{ item.tipo_antecedente|empty_dash }}</strong>
+                            {% if item.fecha_inicio %}
+                            <br>
+                            <small>Inicio: {{ item.fecha_inicio|date:"d/m/Y" }}</small>
+                            {% endif %}
                             <br>
                             <small>Situación actual: {{ item.activo_actualmente|yesno:"Sí,No" }}</small>
+                            {% if item.tratamiento_detalle %}
+                            <br>
+                            <small>Tratamiento: {{ item.tratamiento_detalle }}</small>
+                            {% endif %}
+                            {% if item.observaciones %}<br><em>{{ item.observaciones }}</em>{% endif %}
                         </div>
                         {% endfor %}
                     </div>

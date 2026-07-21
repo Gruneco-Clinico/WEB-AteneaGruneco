@@ -797,6 +797,12 @@
                     <input type="text" id="puntaje_tecnologia" class="form-control" readonly>
                     <input type="hidden" name="puntaje_tecnologia" id="puntaje_tecnologia_hidden">
                   </div>
+
+                  <div class="alert alert-info d-flex justify-content-between align-items-center mt-3 mx-3">
+                    <span><strong>Puntaje total RedLat</strong> (suma de componentes)</span>
+                    <span class="h4 mb-0" id="puntaje_total_display">{{ datos_examen.puntaje_total|default:0 }}</span>
+                  </div>
+                  <input type="hidden" name="puntaje_total" id="puntaje_total" value="{{ datos_examen.puntaje_total|default:0 }}">
                 </div>
               </div>
               <!-- Botón de envío final -->
@@ -872,6 +878,7 @@ document.addEventListener("DOMContentLoaded", function () {
       // Al cambiar, recalcular y guardar texto
       select.addEventListener('change', () => {
         calcularPuntaje(seccion.clase, seccion.id);
+        recalcularPuntajeTotalRedLat();
       });
       // ⚡ Al cargar la página, sincronizar hidden con valor actual
       syncSelectWithHidden(select);
@@ -879,9 +886,25 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   // ---- Inicializar puntajes al cargar ----
+  function recalcularPuntajeTotalRedLat() {
+    let total = 0;
+    secciones.forEach(seccion => {
+      const hidden = document.getElementById(seccion.id + "_hidden");
+      if (hidden && hidden.value !== "") {
+        const v = parseFloat(hidden.value);
+        if (!isNaN(v)) total += v;
+      }
+    });
+    const display = document.getElementById("puntaje_total_display");
+    const hiddenTotal = document.getElementById("puntaje_total");
+    if (display) display.textContent = total;
+    if (hiddenTotal) hiddenTotal.value = total;
+  }
+
   secciones.forEach(seccion => {
     calcularPuntaje(seccion.clase, seccion.id);
   });
+  recalcularPuntajeTotalRedLat();
 
   // ---- Botones siguiente sección ----
   const nextButtons = document.querySelectorAll('.btn-next');
@@ -912,6 +935,7 @@ document.addEventListener("DOMContentLoaded", function () {
       secciones.forEach(seccion => {
         calcularPuntaje(seccion.clase, seccion.id);
       });
+      recalcularPuntajeTotalRedLat();
     });
   }
 
