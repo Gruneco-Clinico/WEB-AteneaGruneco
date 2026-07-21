@@ -510,11 +510,12 @@ def guardar_examen_antecedentes(request):
                         antecedentes_result.antecedentes_epidemiologicos.all().delete()
 
                         for item in epidemiologicos_list:
-                            if item.get("descripcion"):
+                            tipo = item.get("tipo_antecedente") or item.get("descripcion")
+                            if tipo:
                                 tiene_antecedentes = True
                                 AntecedenteEpidemiologico.objects.create(
                                     antecedente_result=antecedentes_result,
-                                    tipo_antecedente=item.get("descripcion"),
+                                    tipo_antecedente=tipo,
                                     fecha_inicio=datetime.strptime(
                                         item.get("fecha_inicio"), "%Y-%m-%d"
                                     ).date()

@@ -29,6 +29,7 @@ esperado, referencias técnicas al código y criterios de aceptación.
 | [B-11](B-11-editar-formularios-legacy-no-carga-datos.md) | Bug: al editar formularios legacy no cargan los datos guardados | Alta |
 | [B-12](B-12-antecedentes-campos-no-se-guardan.md) | Bug: campos de Antecedentes no se guardan/muestran completos | Media |
 | [B-13](B-13-estandarizar-nombres-variables-etiquetas.md) | Estandarizar nombres de variables y etiquetas en formularios | Baja |
+| [B-13 inventario](B-13-inventario-nombres-parcial.md) | Inventario parcial de nombres (sin renombres; entregable Épica B) | Baja |
 
 ### Épica C — UX / Exportación
 | # | Título | Prioridad |
@@ -49,6 +50,19 @@ esperado, referencias técnicas al código y criterios de aceptación.
 | A-07 | ✅ Hecho | Se eliminó el resaltado de "total" en `tr:last-child`; ahora solo aplica a filas con clase `.hc-fila-total`. |
 
 > **Pendiente de verificación visual**: WeasyPrint no está instalado en el entorno de desarrollo usado; el HTML y el CSS se validaron y siguen el patrón documentado de *running elements* de WeasyPrint. Se recomienda generar un PDF real (visita firmada y de ≥ 2 páginas) para confirmar encabezado/pie repetidos y márgenes.
+
+## Estado de implementación — Épica B (parcial; no cerrada)
+
+| # | Estado | Notas de implementación |
+|---|--------|-------------------------|
+| B-08 | 🟡 Parcial avanzado | `FIELD_TOGGLE_SEMANTICS` + `formatear_toggle()`; defaults normales; etiquetas en captura; impresión True/False. Precarga físico alineada (`pared_abdominal_normal/_anormal`, `masas`/`megalias` booleanos; `value="anormal"` sin espacio). Migración `0013`. **Pendiente Carlos:** mapeo formal campo→detecta/síntoma/estructura. |
+| B-09 | 🟡 Parcial avanzado | Flags `seccion_*_evaluado`; JS `applySeccionEvaluado()` oculta y **deshabilita** inputs; etiqueta dinámica Evaluado/No evaluado; impresión “Sección: No evaluado”. **Pendiente:** QA de aceptación y tests E2E de persistencia. |
+| B-10 | 🟡 Parcial avanzado | `puntaje_total` AQD/RedLat; `suma_cajas` CDR; vista/impresión; export CSV con subescalas. **Vista/PDF:** sin caja de total en Yesavage/AQD/RedLat; CDR resalta **CDR Global** + subtítulo «Suma de los 6 dominios» calculada en vivo (corrige 0 en registros antiguos). **Pendiente Carlos:** inventario total de cuestionarios. |
+| B-11 | 🟡 Parcial | `build_datos_examen_edicion()` + dispatch; tests de precarga neurológico, físico (pared/masas/megalias) y antecedentes. **Pendiente:** verificación en prod/datos reales; cobertura del resto de legacy. |
+| B-12 | 🟡 Parcial avanzado | Subcampos patológicos en guardado/precarga/ver/print; tóxicos vía `get_tipos_display`; alérgicos/traumáticos usan `descripcion`/`fecha_inicio`; epidemiológicos muestran observaciones y alias de precarga `descripcion`↔`tipo_antecedente`. **Pendiente:** ciclo E2E completo en entorno clínico. |
+| B-13 | 🟡 Parcial (explícito) | Entregable: [B-13-inventario-nombres-parcial.md](B-13-inventario-nombres-parcial.md) — inventario liviano **sin renombres**. Impresión ya usa `verbose_name` (A-05). **Pendiente Carlos:** inventario exhaustivo + decisión renombrar variables vs. solo etiquetas. |
+
+> **Cierre de épica bloqueado** hasta: (1) refinos de mapeo/inventarios con Carlos, (2) QA de aceptación en entorno con datos reales. Gaps técnicos locales de B-08…B-12 abordados en esta pasada. **Falta aplicar migración**: `python manage.py migrate` (`0013_epic_b_toggles_evaluado_scores`).
 
 ## Convenciones
 - **Prioridad**: Alta (bloquea uso clínico/normativo), Media (mejora relevante), Baja (calidad de vida).

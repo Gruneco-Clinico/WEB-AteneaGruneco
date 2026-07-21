@@ -488,6 +488,60 @@ class AQDCuidadorResult(ResultadoExamenBase):
     falta_de_interes = models.CharField(max_length=50, blank=True, null=True, verbose_name="¿Ha notado al paciente con falta de interés en cosas que antes le interesaban?")
     deprimido = models.CharField(max_length=50, blank=True, null=True, verbose_name="¿Ha notado al paciente más deprimido?")
 
+    # B-10: suma de ítems en escala 1–4
+    puntaje_total = models.IntegerField(
+        blank=True, null=True, default=0, verbose_name="Puntaje total"
+    )
+
+    _AQD_ITEM_FIELDS = (
+        "recordar_fecha",
+        "orientacion_lugares_nuevos",
+        "recordar_llamadas",
+        "entender_conversacion",
+        "firmar",
+        "entender_lectura",
+        "mantener_orden",
+        "recordar_lugar_objetos",
+        "escribir",
+        "manejar_dinero",
+        "orientacion_zona_donde_vive",
+        "recordar_citas",
+        "pasatiempos",
+        "comunicarse_con_gente",
+        "calculos_mentales",
+        "recordar_compras",
+        "contener_orina",
+        "entender_pelicula",
+        "orientacion_en_casa",
+        "hacer_tareas_hogar",
+        "comer_solo",
+        "realizar_tramites",
+        "decisiones_y_adaptacion",
+        "egoismo",
+        "enojo_menos_paciencia",
+        "llorar_con_facilidad",
+        "reir_situaciones_inapropiadas",
+        "temas_sexuales",
+        "falta_de_interes",
+        "deprimido",
+    )
+
+    def calcular_puntaje_total(self):
+        total = 0
+        for name in self._AQD_ITEM_FIELDS:
+            raw = getattr(self, name, None)
+            if raw in (None, ""):
+                continue
+            try:
+                total += int(str(raw).strip().split()[0])
+            except (TypeError, ValueError):
+                continue
+        return total
+
+    def save(self, *args, **kwargs):
+        self.puntaje_total = self.calcular_puntaje_total()
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return f"AQ-D Cuidador - {self.visita_examen_id}"
 
@@ -528,8 +582,28 @@ class AQDParticipanteResult(ResultadoExamenBase):
     falta_de_interes = models.CharField(max_length=50, blank=True, null=True, verbose_name="¿Ha notado usted falta de interés en cosas que antes le interesaban?")
     deprimido = models.CharField(max_length=50, blank=True, null=True, verbose_name="¿Se ha sentido más deprimido?")
 
-    # Puntaje total
-    # puntaje_total = models.IntegerField(blank=True, null=True)
+    # B-10: suma de ítems en escala 1–4
+    puntaje_total = models.IntegerField(
+        blank=True, null=True, default=0, verbose_name="Puntaje total"
+    )
+
+    _AQD_ITEM_FIELDS = AQDCuidadorResult._AQD_ITEM_FIELDS
+
+    def calcular_puntaje_total(self):
+        total = 0
+        for name in self._AQD_ITEM_FIELDS:
+            raw = getattr(self, name, None)
+            if raw in (None, ""):
+                continue
+            try:
+                total += int(str(raw).strip().split()[0])
+            except (TypeError, ValueError):
+                continue
+        return total
+
+    def save(self, *args, **kwargs):
+        self.puntaje_total = self.calcular_puntaje_total()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"AQ-D Participante - {self.visita_examen_id}"
@@ -1147,6 +1221,37 @@ class RedLatSpanishResult(ResultadoExamenBase):
     puntaje_comunicacion = models.CharField(max_length=20, blank=True, null=True, verbose_name="Puntaje comunicación")
     puntaje_tecnologia = models.CharField(max_length=20, blank=True, null=True, verbose_name="Puntaje tecnología")
 
+    # B-10: suma de componentes
+    puntaje_total = models.FloatField(
+        blank=True, null=True, default=0, verbose_name="Puntaje total"
+    )
+
+    _REDLAT_COMPONENTES = (
+        "puntaje_autocuidado",
+        "puntaje_cuidado_hogar",
+        "puntaje_trabajo_recreacion",
+        "puntaje_compras_dinero",
+        "puntaje_viajes",
+        "puntaje_comunicacion",
+        "puntaje_tecnologia",
+    )
+
+    def calcular_puntaje_total(self):
+        total = 0.0
+        for name in self._REDLAT_COMPONENTES:
+            raw = getattr(self, name, None)
+            if raw in (None, ""):
+                continue
+            try:
+                total += float(str(raw).replace("%", "").strip())
+            except (TypeError, ValueError):
+                continue
+        return total
+
+    def save(self, *args, **kwargs):
+        self.puntaje_total = self.calcular_puntaje_total()
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return f"RedLat Spanish - {self.visita_examen}"
 
@@ -1212,6 +1317,38 @@ class PuntajeCDRResult(ResultadoExamenBase):
     cdr_cuidado = models.CharField(max_length=10, verbose_name="CDR Cuidado personal")
     cdr_global = models.CharField(max_length=10, verbose_name="CDR Global")
     cdr_interpretacion = models.TextField(blank=True, verbose_name="Interpretación CDR")
+    # B-10: suma de cajas (suma de dominios; distinta del CDR global algorítmico)
+    suma_cajas = models.FloatField(
+        blank=True,
+        null=True,
+        default=0,
+        verbose_name="Suma de los 6 dominios (cajas)",
+    )
+
+    _CDR_DOMINIOS = (
+        "cdr_memoria",
+        "cdr_orientacion",
+        "cdr_juicio",
+        "cdr_comunitarias",
+        "cdr_pasatiempos",
+        "cdr_cuidado",
+    )
+
+    def calcular_suma_cajas(self):
+        total = 0.0
+        for name in self._CDR_DOMINIOS:
+            raw = getattr(self, name, None)
+            if raw in (None, ""):
+                continue
+            try:
+                total += float(raw)
+            except (TypeError, ValueError):
+                continue
+        return total
+
+    def save(self, *args, **kwargs):
+        self.suma_cajas = self.calcular_suma_cajas()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"CDR - {self.visita_examen_id}"

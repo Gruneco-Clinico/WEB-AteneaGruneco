@@ -340,19 +340,13 @@
                             <input
                               type="checkbox"
                               class="custom-control-input"
-                              name="cie10_estado_{{ forloop.counter }}"
-                              value="confirmado_nuevo"
-                              id="cie10-confirmado-nuevo-{{ forloop.counter }}"
-                              {%
-                              if
-                              diagnostico.confirmado_nuevo
-                              %}checked{%
-                              endif
-                              %}
+                              name="cie10_confirmado_nuevo_{{ forloop.counter0 }}"
+                              id="cie10-confirmado-nuevo-{{ forloop.counter0 }}"
+                              {% if diagnostico.confirmado_nuevo %}checked{% endif %}
                             />
                             <label
                               class="custom-control-label"
-                              for="cie10-confirmado-nuevo-{{ forloop.counter }}"
+                              for="cie10-confirmado-nuevo-{{ forloop.counter0 }}"
                               >Confirmado Nuevo</label
                             >
                           </div>
@@ -362,19 +356,13 @@
                             <input
                               type="checkbox"
                               class="custom-control-input"
-                              name="cie10_estado_{{ forloop.counter }}"
-                              value="confirmado_antiguo"
-                              id="cie10-confirmado-antiguo-{{ forloop.counter }}"
-                              {%
-                              if
-                              diagnostico.confirmado_antiguo
-                              %}checked{%
-                              endif
-                              %}
+                              name="cie10_confirmado_antiguo_{{ forloop.counter0 }}"
+                              id="cie10-confirmado-antiguo-{{ forloop.counter0 }}"
+                              {% if diagnostico.confirmado_antiguo %}checked{% endif %}
                             />
                             <label
                               class="custom-control-label"
-                              for="cie10-confirmado-antiguo-{{ forloop.counter }}"
+                              for="cie10-confirmado-antiguo-{{ forloop.counter0 }}"
                               >Confirmado Antiguo</label
                             >
                           </div>
@@ -384,19 +372,13 @@
                             <input
                               type="checkbox"
                               class="custom-control-input"
-                              name="cie10_estado_{{ forloop.counter }}"
-                              value="en_estudio"
-                              id="cie10-en-estudio-{{ forloop.counter }}"
-                              {%
-                              if
-                              diagnostico.en_estudio
-                              %}checked{%
-                              endif
-                              %}
+                              name="cie10_en_estudio_{{ forloop.counter0 }}"
+                              id="cie10-en-estudio-{{ forloop.counter0 }}"
+                              {% if diagnostico.en_estudio %}checked{% endif %}
                             />
                             <label
                               class="custom-control-label"
-                              for="cie10-en-estudio-{{ forloop.counter }}"
+                              for="cie10-en-estudio-{{ forloop.counter0 }}"
                               >En Estudio</label
                             >
                           </div>
@@ -449,12 +431,12 @@
                             <input
                               type="checkbox"
                               class="custom-control-input"
-                              name="cie10_confirmado_nuevo_{{ forloop.counter0 }}"
-                              id="cie10-confirmado-nuevo-{{ forloop.counter }}"
+                              name="cie10_confirmado_nuevo_0"
+                              id="cie10-confirmado-nuevo-0"
                             />
                             <label
                               class="custom-control-label"
-                              for="cie10-confirmado-nuevo-{{ forloop.counter }}"
+                              for="cie10-confirmado-nuevo-0"
                               >Confirmado Nuevo</label
                             >
                           </div>
@@ -464,12 +446,12 @@
                             <input
                               type="checkbox"
                               class="custom-control-input"
-                              name="cie10_confirmado_antiguo_{{ forloop.counter0 }}"
-                              id="cie10-confirmado-antiguo-{{ forloop.counter }}"
+                              name="cie10_confirmado_antiguo_0"
+                              id="cie10-confirmado-antiguo-0"
                             />
                             <label
                               class="custom-control-label"
-                              for="cie10-confirmado-antiguo-{{ forloop.counter }}"
+                              for="cie10-confirmado-antiguo-0"
                               >Confirmado Antiguo</label
                             >
                           </div>
@@ -479,12 +461,12 @@
                             <input
                               type="checkbox"
                               class="custom-control-input"
-                              name="cie10_en_estudio_{{ forloop.counter0 }}"
-                              id="cie10-en-estudio-{{ forloop.counter }}"
+                              name="cie10_en_estudio_0"
+                              id="cie10-en-estudio-0"
                             />
                             <label
                               class="custom-control-label"
-                              for="cie10-en-estudio-{{ forloop.counter }}"
+                              for="cie10-en-estudio-0"
                               >En Estudio</label
                             >
                           </div>
@@ -552,19 +534,13 @@
                             <input
                               type="checkbox"
                               class="custom-control-input"
-                              name="dsmv_estado_{{ forloop.counter }}"
-                              value="confirmado_nuevo"
-                              id="dsmv-confirmado-nuevo-{{ forloop.counter }}"
-                              {%
-                              if
-                              diagnostico.confirmado_nuevo
-                              %}checked{%
-                              endif
-                              %}
+                              name="dsmv_confirmado_nuevo_{{ forloop.counter0 }}"
+                              id="dsmv-confirmado-nuevo-{{ forloop.counter0 }}"
+                              {% if diagnostico.confirmado_nuevo %}checked{% endif %}
                             />
                             <label
                               class="custom-control-label"
-                              for="dsmv-confirmado-nuevo-{{ forloop.counter }}"
+                              for="dsmv-confirmado-nuevo-{{ forloop.counter0 }}"
                               >Confirmado Nuevo</label
                             >
                           </div>
@@ -574,19 +550,13 @@
                             <input
                               type="checkbox"
                               class="custom-control-input"
-                              name="dsmv_estado_{{ forloop.counter }}"
-                              value="confirmado_antiguo"
-                              id="dsmv-confirmado-antiguo-{{ forloop.counter }}"
-                              {%
-                              if
-                              diagnostico.confirmado_antiguo
-                              %}checked{%
-                              endif
-                              %}
+                              name="dsmv_confirmado_antiguo_{{ forloop.counter0 }}"
+                              id="dsmv-confirmado-antiguo-{{ forloop.counter0 }}"
+                              {% if diagnostico.confirmado_antiguo %}checked{% endif %}
                             />
                             <label
                               class="custom-control-label"
-                              for="dsmv-confirmado-antiguo-{{ forloop.counter }}"
+                              for="dsmv-confirmado-antiguo-{{ forloop.counter0 }}"
                               >Confirmado Antiguo</label
                             >
                           </div>
@@ -596,19 +566,13 @@
                             <input
                               type="checkbox"
                               class="custom-control-input"
-                              name="dsmv_estado_{{ forloop.counter }}"
-                              value="en_estudio"
-                              id="dsmv-en-estudio-{{ forloop.counter }}"
-                              {%
-                              if
-                              diagnostico.en_estudio
-                              %}checked{%
-                              endif
-                              %}
+                              name="dsmv_en_estudio_{{ forloop.counter0 }}"
+                              id="dsmv-en-estudio-{{ forloop.counter0 }}"
+                              {% if diagnostico.en_estudio %}checked{% endif %}
                             />
                             <label
                               class="custom-control-label"
-                              for="dsmv-en-estudio-{{ forloop.counter }}"
+                              for="dsmv-en-estudio-{{ forloop.counter0 }}"
                               >En Estudio</label
                             >
                           </div>

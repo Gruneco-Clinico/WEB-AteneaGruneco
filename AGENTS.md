@@ -10,6 +10,7 @@
 - Issues y tickets del trabajo se mantienen en markdown dentro del repo (`docs/issues/`).
 - Prefiere planes por fases con nombres de ramas y épicas antes de implementar cambios grandes.
 - En exportación CSV de proyectos, campos tipo tabla deben salir como JSON (parámetro + resultado).
+- En vista/impresión de anosognosia: sin caja de «Puntaje total» en Yesavage ni AQD (participante/cuidador); en RedLat Spanish solo puntajes por dominio/componente; en CDR Evaluación Clínica mostrar CDR Global y la suma de los 6 dominios (cajas).
 
 ## Learned Workspace Facts
 
@@ -21,3 +22,4 @@
 - Backlog de épicas/issues en `docs/issues/` (A impresión/PDF, B formularios/exámenes, C exportación/UX).
 - Nombres de exámenes legacy suelen usar guiones bajos (p. ej. `General_Antecedentes`); no renombrar al azar o dejan de resolverse.
 - Dominios frecuentes: calendario de disponibilidad/salas, caracterización del sueño en seguimientos, anosognosia (AQD/CDR), y exportación del módulo de proyectos.
+- Épica B (formularios): toggles tipados (`FIELD_TOGGLE_SEMANTICS` / `field_toggle_semantics.py`), secciones Evaluado/No evaluado en examen físico/neurológico, y precarga de edición legacy vía `exam_edit_context.py`.

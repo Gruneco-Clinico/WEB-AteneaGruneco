@@ -2156,18 +2156,15 @@ hospitalizaciones: function (indice) {
         }
       }
 
-      // Cargar cada tipo de antecedente
+      // Cargar cada tipo de antecedente (llenar de inmediato tras crear el card)
       Object.keys(contadores).forEach(tipo => {
         if (datosExamen[tipo] && Array.isArray(datosExamen[tipo]) && datosExamen[tipo].length > 0) {
           console.log(`📋 Cargando ${tipo}:`, datosExamen[tipo]);
-          datosExamen[tipo].forEach((item, index) => {
-            // Agregar el elemento
+          datosExamen[tipo].forEach((item) => {
+            const idxAntes = contadores[tipo];
             agregarAntecedente(tipo);
-            
-            // Llenar los datos después de un pequeño delay
-            setTimeout(() => {
-              llenarDatosItem(tipo, index, item);
-            }, 50 * (index + 1)); // Delay escalonado
+            // El card nuevo usa el índice actual (idxAntes) como data-index
+            llenarDatosItem(tipo, idxAntes, item);
           });
         }
       });
