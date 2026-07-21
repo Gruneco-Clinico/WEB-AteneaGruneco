@@ -330,6 +330,89 @@
     outline: 2px solid rgba(0, 123, 255, 0.5);
     outline-offset: 2px;
   }
+
+  /* Evitar scroll horizontal: wrap en celdas clave */
+  #patientTable td,
+  #patientTable th {
+    white-space: normal !important;
+    word-break: break-word;
+  }
+
+  #patientTable .acciones-cell {
+    white-space: normal !important;
+  }
+
+  #patientTable .acciones-cell .btn {
+    margin-bottom: 0.25rem;
+  }
+
+  /* <768px: filas tipo tarjeta (sin scroll horizontal) */
+  @media (max-width: 767.98px) {
+    .pacientes-table-wrap {
+      overflow-x: visible !important;
+    }
+
+    #patientTable thead {
+      display: none;
+    }
+
+    #patientTable,
+    #patientTable tbody,
+    #patientTable tr,
+    #patientTable td {
+      display: block;
+      width: 100%;
+    }
+
+    #patientTable tbody tr {
+      margin-bottom: 1rem;
+      border: 1px solid #e9ecef;
+      border-radius: 10px;
+      padding: 0.75rem 1rem;
+      background: #fff;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    }
+
+    #patientTable tbody tr:hover {
+      transform: none;
+    }
+
+    #patientTable td {
+      padding: 0.4rem 0 !important;
+      border: none !important;
+      text-align: left !important;
+    }
+
+    #patientTable td::before {
+      content: attr(data-label);
+      display: block;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      color: #8898aa;
+      margin-bottom: 0.15rem;
+    }
+
+    #patientTable td.acciones-cell .btn {
+      display: inline-block;
+      width: auto;
+    }
+
+    .pacientes-filtros-form {
+      flex-direction: column !important;
+      align-items: stretch !important;
+    }
+
+    .pacientes-filtros-form .form-control,
+    .pacientes-filtros-form .input-group,
+    .pacientes-filtros-form .btn {
+      max-width: 100% !important;
+      width: 100%;
+      margin-right: 0 !important;
+      margin-bottom: 0.5rem;
+    }
+  }
 </style>
 {% endblock stylesheets %}
 
@@ -364,12 +447,9 @@
         </div>
 
         <div class="col-lg-6 col-md-6">
-          <!-- Controls Container Reorganizado -->
-          <div class="d-flex justify-content-end align-items-center">
-
-            <!-- Project Filter -->
-            <select class="form-control mr-3" id="filtroProyecto" style="max-width: 200px;"
-                    onchange="window.location.href='?proyecto='+this.value">
+          <form method="get" action="{% url 'tables.html' %}" class="d-flex justify-content-end align-items-center flex-wrap pacientes-filtros-form">
+            <select class="form-control mr-3 mb-2 mb-md-0" id="filtroProyecto" name="proyecto" style="max-width: 200px;"
+                    onchange="this.form.submit()">
               <option value="">Todos los proyectos</option>
               {% for p in proyectos %}
               <option value="{{ p.id }}" {% if filtro_proyecto == p.id|stringformat:"s" %}selected{% endif %}>
@@ -378,25 +458,24 @@
               {% endfor %}
             </select>
 
-            <!-- Search Input -->
-            <div class="input-group mr-3" style="max-width: 300px;">
-              <input type="text" class="form-control" id="searchPatient" placeholder="Buscar paciente...">
+            <div class="input-group mr-3 mb-2 mb-md-0" style="max-width: 300px;">
+              <input type="text" class="form-control" id="searchPatient" name="q"
+                     value="{{ q|default:'' }}" placeholder="Buscar paciente..."
+                     aria-label="Buscar paciente">
               <div class="input-group-append">
-                <button class="btn btn-outline-light" type="button" onclick="searchTable()">
+                <button class="btn btn-outline-light" type="submit" title="Buscar">
                   <i class="fas fa-search"></i>
                 </button>
               </div>
             </div>
 
-            <!-- New Button -->
-            <button class="btn btn-neutral" id="agregar-formulario">
+            <button class="btn btn-neutral mb-2 mb-md-0" id="agregar-formulario" type="button">
               <span class="btn-inner--icon">
                 <i class="fas fa-plus"></i>
               </span>
               <span class="btn-inner--text">Nuevo Paciente</span>
             </button>
-
-          </div>
+          </form>
         </div>
       </div>
 
@@ -413,8 +492,7 @@
         <div class="card-header border-0">
           <h3 class="mb-0">Listado de Pacientes</h3>
         </div>
-        <!-- Light table -->
-        <div class="table-responsive">
+        <div class="table-responsive pacientes-table-wrap">
           <table id="patientTable" class="table align-items-center table-flush">
             <thead class="thead-light">
               <tr>
@@ -423,7 +501,6 @@
                 <th scope="col" class="sort" data-sort="codes">Códigos</th>
                 <th scope="col" class="sort" data-sort="age">Edad</th>
                 <th scope="col" class="sort" data-sort="gender">Fecha nacimiento</th>
-                <!-- <th scope="col" class="sort" data-sort="status">Ocupación</th> -->
                 <th scope="col" class="sort" data-sort="projects">Proyectos asociados</th>
                 <th scope="col">Acciones</th>
               </tr>
@@ -431,9 +508,9 @@
             <tbody class="list">
               {% for paciente in pacientes %}
               <tr>
-                <td><strong>{{ paciente.numero_documento }}</strong></td>
-                <td>{{ paciente.primer_nombre }} {{ paciente.primer_apellido }}</td>
-                <td>
+                <td data-label="ID del Paciente"><strong>{{ paciente.numero_documento }}</strong></td>
+                <td data-label="Nombre">{{ paciente.primer_nombre }} {{ paciente.primer_apellido }}</td>
+                <td data-label="Códigos">
                   {% if paciente.codigos_list %}
                     {% for code in paciente.codigos_list %}
                       <span class="badge badge-primary">{{ code }}</span>
@@ -442,11 +519,10 @@
                     <span class="text-muted">—</span>
                   {% endif %}
                 </td>
-                <td><span class="badge badge-pill badge-success">{{ paciente.edad }} años</span></td>
-                <td>{{ paciente.fecha_nacimiento|date:"d/m/Y" }}</td>
-                <!-- <td>{{ paciente.ocupacion|title }}</td> -->
-                <td>
-                  {% if paciente.proyectos.exists %}
+                <td data-label="Edad"><span class="badge badge-pill badge-success">{{ paciente.edad }} años</span></td>
+                <td data-label="Fecha nacimiento">{{ paciente.fecha_nacimiento|date:"d/m/Y" }}</td>
+                <td data-label="Proyectos asociados">
+                  {% if paciente.proyectos.all %}
                     {% for proyecto in paciente.proyectos.all %}
                       <span class="badge badge-info">{{ proyecto.nombre }}</span>
                     {% endfor %}
@@ -454,7 +530,7 @@
                     <span class="text-muted">Sin proyectos</span>
                   {% endif %}
                 </td>
-                <td>
+                <td class="acciones-cell" data-label="Acciones">
                   <a href="{% url 'detalle_paciente' paciente.id %}" class="btn btn-sm btn-neutral"
                     title="Ver detalles">
                     <i class="fas fa-eye"></i> Ver
@@ -473,10 +549,21 @@
                   </form>
                 </td>
               </tr>
+              {% empty %}
+              <tr>
+                <td colspan="7" class="text-center py-4 text-muted">
+                  {% if q or filtro_proyecto %}
+                    No se encontraron pacientes con los filtros actuales.
+                  {% else %}
+                    No hay pacientes registrados.
+                  {% endif %}
+                </td>
+              </tr>
               {% endfor %}
             </tbody>
           </table>
         </div>
+        {% include "includes/pagination.html" %}
       </div>
       <div id="formulario-dinamicos" class="mt-3">
         <!-- Aquí se cargarán dinámicamente los formularios -->
@@ -496,94 +583,6 @@
 
 {% block javascripts %}
 <script>
-  // FUNCIÓN DE BÚSQUEDA CORREGIDA
-  function searchTable() {
-    const searchTerm = document.getElementById("searchPatient").value.toLowerCase().trim();
-    const tableBody = document.querySelector("#patientTable tbody");
-    const rows = tableBody.getElementsByTagName("tr");
-
-    console.log("Buscando:", searchTerm); // Debug
-
-    for (let i = 0; i < rows.length; i++) {
-      let row = rows[i];
-      let cells = row.getElementsByTagName("td");
-      let match = false;
-      let rowText = "";
-
-      // Construir texto de toda la fila
-      for (let j = 0; j < cells.length - 1; j++) { // -1 para excluir columna de acciones
-        rowText += cells[j].innerText.toLowerCase() + " ";
-      }
-
-      // Verificar si hay coincidencia
-      if (searchTerm === "" || rowText.includes(searchTerm)) {
-        match = true;
-      }
-
-      // Mostrar/ocultar fila
-      if (match) {
-        row.style.display = "";
-      } else {
-        row.style.display = "none";
-      }
-    }
-
-    // Mostrar mensaje si no hay resultados
-    const visibleRows = Array.from(rows).filter(row => row.style.display !== "none");
-    const noResultsMessage = document.getElementById("no-results-message");
-
-    if (visibleRows.length === 0 && searchTerm !== "") {
-      if (!noResultsMessage) {
-        const messageRow = document.createElement("tr");
-        messageRow.id = "no-results-message";
-        messageRow.innerHTML = `
-          <td colspan="7" class="text-center py-4">
-            <i class="fas fa-search text-muted mb-2" style="font-size: 2rem;"></i>
-            <p class="text-muted mb-0">No se encontraron pacientes que coincidan con: <strong>"${searchTerm}"</strong></p>
-          </td>
-        `;
-        tableBody.appendChild(messageRow);
-      }
-    } else if (noResultsMessage) {
-      noResultsMessage.remove();
-    }
-  }
-
-  // BÚSQUEDA EN TIEMPO REAL
-  document.addEventListener('DOMContentLoaded', function () {
-    const searchInput = document.getElementById('searchPatient');
-
-    if (searchInput) {
-      // Búsqueda mientras se escribe
-      searchInput.addEventListener('input', function () {
-        clearTimeout(this.searchTimeout);
-        this.searchTimeout = setTimeout(() => {
-          searchTable();
-        }, 200);
-      });
-
-      // Búsqueda al presionar Enter
-      searchInput.addEventListener('keypress', function (e) {
-        if (e.key === 'Enter') {
-          e.preventDefault();
-          searchTable();
-        }
-      });
-
-      console.log("Búsqueda inicializada correctamente"); // Debug
-    }
-
-    // Botón de búsqueda
-    const searchButton = document.querySelector('.btn-outline-light');
-    if (searchButton) {
-      searchButton.addEventListener('click', function (e) {
-        e.preventDefault();
-        searchTable();
-      });
-    }
-  });
-
-  // FUNCIÓN PARA CALCULAR EDAD (mantenida)
   function calcularEdad() {
     const fechaNacimiento = document.getElementById('fecha_nacimiento');
     const edadField = document.getElementById('edad');
@@ -597,10 +596,7 @@
     }
   }
 
-  // MEJORAS ADICIONALES
   document.addEventListener('DOMContentLoaded', function () {
-
-    // Auto-hide alerts
     const alerts = document.querySelectorAll('.alert');
     alerts.forEach(alert => {
       setTimeout(() => {
@@ -610,59 +606,10 @@
       }, 4000);
     });
 
-    // Mejorar confirmación de eliminación
-    const deleteButtons = document.querySelectorAll('.btn-danger');
-    deleteButtons.forEach(button => {
-      button.addEventListener('click', function (e) {
-        e.preventDefault();
-        const form = this.closest('form');
-
-        // Extraer nombre del paciente del atributo onclick
-        const onclickText = this.getAttribute('onclick');
-        let patientName = 'este paciente';
-
-        if (onclickText) {
-          const match = onclickText.match(/paciente (.+?)\?'/);
-          if (match) {
-            patientName = match[1];
-          }
-        }
-
-        const confirmation = confirm(`⚠️ ¿Confirmas la eliminación de ${patientName}?\n\nEsta acción no se puede deshacer.`);
-
-        if (confirmation) {
-          this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Eliminando...';
-          this.disabled = true;
-          setTimeout(() => {
-            form.submit();
-          }, 500);
-        }
-      });
-    });
-
-    // Evento para fecha de nacimiento si existe
     const fechaNacimientoField = document.getElementById('fecha_nacimiento');
     if (fechaNacimientoField) {
       fechaNacimientoField.addEventListener('input', calcularEdad);
     }
-
-    // Limpiar búsqueda al cargar la página
-    const searchInput = document.getElementById('searchPatient');
-    if (searchInput) {
-      searchInput.value = '';
-    }
-
-    console.log("JavaScript inicializado correctamente"); // Debug
   });
-
-  // FUNCIÓN PARA LIMPIAR BÚSQUEDA
-  function clearSearch() {
-    const searchInput = document.getElementById('searchPatient');
-    if (searchInput) {
-      searchInput.value = '';
-      searchTable();
-      searchInput.focus();
-    }
-  }
 </script>
 {% endblock javascripts %}
