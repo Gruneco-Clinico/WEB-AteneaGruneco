@@ -64,6 +64,15 @@ esperado, referencias técnicas al código y criterios de aceptación.
 
 > **Cierre de épica bloqueado** hasta: (1) refinos de mapeo/inventarios con Carlos, (2) QA de aceptación en entorno con datos reales. Gaps técnicos locales de B-08…B-12 abordados en esta pasada. **Falta aplicar migración**: `python manage.py migrate` (`0013_epic_b_toggles_evaluado_scores`).
 
+## Estado de implementación — Épica C (implementada en ramas dedicadas)
+
+| # | Estado | Rama / Notas de implementación |
+|---|--------|--------------------------------|
+| C-15 | ✅ Hecho | Rama `feature/c-15-export-csv-por-examen`. Servicio `apps/home/services/project_csv_export.py` (catálogo por examen, POST namespaced `campos_examen_<id>`, fallback lista global, legacy + builder, tablas JSON, preserva `0`/`False`). Overrides `export` en `exam_registry.py` (CDR, RedLat, MEW, tablas). UI por examen en `exportar_proyecto_form.html`. Vista `exportar_csv_proyecto` adelgazada a orquestación. Tests: `apps/home/tests/test_project_csv_export.py`. |
+| C-14 | ✅ Hecho | Rama `feature/c-14-paginacion-listado-pacientes`. `lista_pacientes`: orden estable, `prefetch_related("proyectos")`, búsqueda GET `q` (documento/nombres/proyectos/códigos), filtro `proyecto`, `Paginator(25)`, códigos solo de la página, `pagination_query` conserva filtros. UI: formulario GET, parcial `includes/pagination.html`, responsive tipo tarjeta &lt;768px (`data-label`) sin scroll horizontal. Tests: `apps/home/tests/test_patient_list.py`. |
+
+> **Notas:** No se mezclan C-14 y C-15 en un solo PR. No hay migraciones nuevas ni perfiles de exportación persistidos. Criterios de aceptación de ambos issues quedan cubiertos a nivel código/tests; falta QA visual en entorno clínico.
+
 ## Convenciones
 - **Prioridad**: Alta (bloquea uso clínico/normativo), Media (mejora relevante), Baja (calidad de vida).
 - **Referencias técnicas**: rutas y funciones reales del repo al momento de redactar el backlog.
