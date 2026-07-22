@@ -10,7 +10,8 @@
 - Issues y tickets del trabajo se mantienen en markdown dentro del repo (`docs/issues/`).
 - Prefiere planes por fases con nombres de ramas y épicas antes de implementar cambios grandes.
 - En exportación CSV de proyectos, campos tipo tabla deben salir como JSON (parámetro + resultado).
-- En vista/impresión de anosognosia: sin caja de «Puntaje total» en Yesavage ni AQD (participante/cuidador); en RedLat Spanish solo puntajes por dominio/componente; en CDR Evaluación Clínica mostrar CDR Global y la suma de los 6 dominios (cajas).
+- Puntajes en vista/impresión: sin caja de «Puntaje total» en Yesavage ni AQD (participante/cuidador); en RedLat Spanish solo puntajes por dominio/componente; en CDR Evaluación Clínica mostrar CDR Global y la suma de los 6 dominios; en Sueño MEW (matutinidad/vespertinidad) mostrar «Puntuación total MEQ».
+- En toggles de examen (Presente/Ausente u equivalentes), mostrar siempre el nombre de la pregunta junto a las etiquetas del toggle; no dejar solo Presente/Ausente.
 
 ## Learned Workspace Facts
 
@@ -23,3 +24,4 @@
 - Nombres de exámenes legacy suelen usar guiones bajos (p. ej. `General_Antecedentes`); no renombrar al azar o dejan de resolverse.
 - Dominios frecuentes: calendario de disponibilidad/salas, caracterización del sueño en seguimientos, anosognosia (AQD/CDR), y exportación del módulo de proyectos.
 - Épica B (formularios): toggles tipados (`FIELD_TOGGLE_SEMANTICS` / `field_toggle_semantics.py`), secciones Evaluado/No evaluado en examen físico/neurológico, y precarga de edición legacy vía `exam_edit_context.py`.
+- Épica C (exportación/UX): CSV con selección por examen; listado de pacientes con layout compacto y paginación dentro del contenedor de la lista (visible sin scroll excesivo); formulario de exportación debe acomodar etiquetas largas sin solaparse.

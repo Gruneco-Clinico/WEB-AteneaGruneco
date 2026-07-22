@@ -29,111 +29,77 @@
   .card {
     border-radius: 12px !important;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08) !important;
-    transition: all 0.3s ease;
   }
 
-  .card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12) !important;
-  }
-
-  .card-header {
-    padding: 1.75rem !important;
+  .pacientes-list-card .card-header {
+    padding: 0.75rem 1rem !important;
     border-radius: 12px 12px 0 0 !important;
   }
 
-  .card-header h3 {
+  .pacientes-list-card .pacientes-card-toolbar {
+    gap: 0.5rem 1rem;
+  }
+
+  .pacientes-list-card .pacientes-filtros-form .form-control,
+  .pacientes-list-card .pacientes-filtros-form .btn {
+    height: calc(1.5em + 0.5rem + 2px);
+  }
+
+  .pacientes-list-card .card-header h3 {
     font-weight: 600 !important;
-    font-size: 1.4rem !important;
+    font-size: 1.15rem !important;
     display: flex;
     align-items: center;
   }
 
-  .card-header h3::before {
+  .pacientes-list-card .card-header h3::before {
     content: '\f0c0';
     font-family: 'Font Awesome 5 Free';
     font-weight: 900;
-    margin-right: 0.75rem;
+    margin-right: 0.5rem;
     opacity: 0.7;
   }
 
-  /* Mejorar tabla sin cambiar colores */
-  .thead-light th {
+  /* Densidad de tabla del listado */
+  #patientTable.thead-light th,
+  #patientTable thead.thead-light th {
     font-weight: 600 !important;
     text-transform: uppercase !important;
-    letter-spacing: 0.5px !important;
-    font-size: 0.85rem !important;
-    padding: 1.25rem 1rem !important;
+    letter-spacing: 0.4px !important;
+    font-size: 0.75rem !important;
+    padding: 0.55rem 0.75rem !important;
     position: relative;
     cursor: pointer;
-    transition: all 0.2s ease;
   }
 
-  .thead-light th.sort::after {
+  #patientTable thead.thead-light th.sort::after {
     content: '\f0dc';
     font-family: 'Font Awesome 5 Free';
     font-weight: 900;
-    margin-left: 0.5rem;
+    margin-left: 0.35rem;
     opacity: 0.5;
-    transition: all 0.2s ease;
   }
 
-  .thead-light th.sort:hover::after {
-    opacity: 0.8;
+  #patientTable tbody tr:hover {
+    background-color: #f8f9fe;
   }
 
-  /* Mejorar filas */
-  .table tbody tr {
-    transition: all 0.2s ease;
-  }
-
-  .table tbody tr:hover {
-    transform: scale(1.001);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-  }
-
-  .table tbody td {
-    padding: 1.25rem 1rem !important;
+  #patientTable tbody td {
+    padding: 0.55rem 0.75rem !important;
     vertical-align: middle !important;
     font-weight: 500 !important;
+    font-size: 0.9rem !important;
   }
 
-  /* Mejorar botones manteniendo colores originales */
-  .table .btn-sm {
-    padding: 0.5rem 1rem !important;
-    margin: 0 0.15rem !important;
-    border-radius: 6px !important;
+  #patientTable .badge {
+    padding: 0.3rem 0.55rem !important;
     font-weight: 500 !important;
-    font-size: 0.8rem !important;
-    transition: all 0.2s ease !important;
-    position: relative;
-    overflow: hidden;
+    font-size: 0.72rem !important;
   }
 
-  .table .btn-sm::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-    transition: left 0.4s;
-  }
-
-  .table .btn-sm:hover {
-    transform: translateY(-1px) !important;
-  }
-
-  .table .btn-sm:hover::before {
-    left: 100%;
-  }
-
-  /* Mejorar badges */
-  .badge-pill {
-    padding: 0.5rem 1rem !important;
-    font-weight: 500 !important;
-    font-size: 0.8rem !important;
+  #patientTable .badge-pill {
+    padding: 0.3rem 0.6rem !important;
+    font-size: 0.72rem !important;
   }
 
   /* Mejorar alertas */
@@ -171,6 +137,10 @@
     padding-left: 3.5rem !important;
   }
 
+  .breadcrumb{
+    margin-bottom: 0.5rem !important;
+  }
+
   /* Mejorar breadcrumb */
   .breadcrumb-dark .breadcrumb-item a {
     transition: all 0.2s ease;
@@ -186,69 +156,16 @@
     font-weight: 600;
   }
 
-  /* Animaciones de entrada suaves */
-  .table tbody tr {
-    animation: fadeInRow 0.4s ease-out forwards;
-    opacity: 0;
-    transform: translateY(10px);
-  }
-
-  .table tbody tr:nth-child(1) {
-    animation-delay: 0.05s;
-  }
-
-  .table tbody tr:nth-child(2) {
-    animation-delay: 0.1s;
-  }
-
-  .table tbody tr:nth-child(3) {
-    animation-delay: 0.15s;
-  }
-
-  .table tbody tr:nth-child(4) {
-    animation-delay: 0.2s;
-  }
-
-  .table tbody tr:nth-child(5) {
-    animation-delay: 0.25s;
-  }
-
-  @keyframes fadeInRow {
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
   /* Responsive mejorado */
   @media (max-width: 768px) {
-    .card-header h3 {
-      font-size: 1.2rem !important;
+    .pacientes-list-card .card-header h3 {
+      font-size: 1.05rem !important;
       text-align: center;
-      flex-direction: column;
-      gap: 0.5rem;
     }
 
-    .table .btn-sm {
-      font-size: 0.75rem !important;
-      padding: 0.4rem 0.8rem !important;
-      margin: 0.1rem !important;
-    }
-
-    .thead-light th {
-      padding: 1rem 0.5rem !important;
-      font-size: 0.75rem !important;
-    }
-
-    .table tbody td {
-      padding: 1rem 0.5rem !important;
-      font-size: 0.9rem !important;
-    }
-
-    /* Responsive para controles reorganizados */
     .header .d-flex.justify-content-end {
       flex-direction: column !important;
-      gap: 1rem;
+      gap: 0.75rem;
     }
 
     .header .input-group {
@@ -261,15 +178,6 @@
       width: 100%;
       justify-content: center;
     }
-
-    .header .h2 {
-      font-size: 1.5rem !important;
-      text-align: center;
-    }
-
-    .header .text-white-50 {
-      text-align: center;
-    }
   }
 
   @media (max-width: 992px) {
@@ -278,50 +186,10 @@
     }
   }
 
-  /* Loading state sutil */
-  .table-loading {
-    position: relative;
-    opacity: 0.8;
-    pointer-events: none;
-  }
-
-  .table-loading::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 24px;
-    height: 24px;
-    border: 2px solid #f3f3f3;
-    border-top: 2px solid #007bff;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-  }
-
-  @keyframes spin {
-    0% {
-      transform: translate(-50%, -50%) rotate(0deg);
-    }
-
-    100% {
-      transform: translate(-50%, -50%) rotate(360deg);
-    }
-  }
-
   /* Mejorar spacing general */
   .container-fluid {
     padding-left: 1.5rem;
     padding-right: 1.5rem;
-  }
-
-  /* Mejorar interactividad sutil */
-  .btn:hover {
-    transition: all 0.2s ease;
-  }
-
-  .form-control:focus {
-    transition: all 0.2s ease;
   }
 
   /* Mejorar accesibilidad */
@@ -338,12 +206,58 @@
     word-break: break-word;
   }
 
+  /* Acciones: iconos en una sola fila */
+  #patientTable td.acciones-cell,
   #patientTable .acciones-cell {
-    white-space: normal !important;
+    white-space: nowrap !important;
+    width: 1%;
   }
 
-  #patientTable .acciones-cell .btn {
-    margin-bottom: 0.25rem;
+  #patientTable .acciones-cell .btn-group {
+    display: inline-flex;
+    flex-wrap: nowrap;
+  }
+
+  #patientTable .acciones-cell .btn-icon {
+    width: 32px;
+    height: 32px;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px !important;
+    font-size: 0.85rem !important;
+  }
+
+  #patientTable .acciones-cell form {
+    display: contents;
+  }
+
+  /* La tarjeta ocupa el alto visible; solo las filas hacen scroll. */
+  .pacientes-list-card {
+    display: flex;
+    flex-direction: column;
+    min-height: 360px;
+    overflow: hidden;
+  }
+
+  .pacientes-list-card .card-header,
+  .pacientes-pagination-footer {
+    flex: 0 0 auto;
+  }
+
+  .pacientes-list-card .pacientes-table-wrap {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+  }
+
+  .pacientes-list-card #patientTable thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: #f6f9fc;
   }
 
   /* <768px: filas tipo tarjeta (sin scroll horizontal) */
@@ -365,20 +279,20 @@
     }
 
     #patientTable tbody tr {
-      margin-bottom: 1rem;
+      margin-bottom: 0.75rem;
       border: 1px solid #e9ecef;
       border-radius: 10px;
-      padding: 0.75rem 1rem;
+      padding: 0.6rem 0.85rem;
       background: #fff;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
     }
 
     #patientTable tbody tr:hover {
-      transform: none;
+      background-color: #fff;
     }
 
     #patientTable td {
-      padding: 0.4rem 0 !important;
+      padding: 0.35rem 0 !important;
       border: none !important;
       text-align: left !important;
     }
@@ -394,9 +308,12 @@
       margin-bottom: 0.15rem;
     }
 
-    #patientTable td.acciones-cell .btn {
-      display: inline-block;
-      width: auto;
+    #patientTable td.acciones-cell {
+      white-space: nowrap !important;
+    }
+
+    #patientTable td.acciones-cell .btn-icon {
+      display: inline-flex;
     }
 
     .pacientes-filtros-form {
@@ -417,15 +334,13 @@
 {% endblock stylesheets %}
 
 {% block content %}
-<!-- ESTRUCTURA ORIGINAL SIN CAMBIOS -->
-<div class="header bg-primary pb-6">
+<div class="header bg-primary pb-5">
   <div class="container-fluid">
     <div class="header-body">
-      <!-- Breadcrumb Row -->
-      <div class="row align-items-center py-3">
+      <div class="row align-items-center py-2">
         <div class="col-lg-12">
-          <nav aria-label="breadcrumb" class="d-none d-md-inline-block">
-            <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
+          <!-- <nav aria-label="breadcrumb" class="d-none d-md-inline-block">
+            <ol class="breadcrumb breadcrumb-links breadcrumb-dark mb-0">
               <li class="breadcrumb-item">
                 <a href="#"><i class="fas fa-home"></i></a>
               </li>
@@ -433,52 +348,9 @@
                 <a href="/pacientes/">Gestión de Pacientes</a>
               </li>
             </ol>
-          </nav>
+          </nav> -->
         </div>
       </div>
-
-      <!-- Title and Controls Row - REORGANIZADO -->
-      <div class="row align-items-center py-4">
-        <div class="col-lg-6 col-md-6">
-
-          <p class="text-white-50 mb-0 mt-1">
-            Administra la información de los participantes
-          </p>
-        </div>
-
-        <div class="col-lg-6 col-md-6">
-          <form method="get" action="{% url 'tables.html' %}" class="d-flex justify-content-end align-items-center flex-wrap pacientes-filtros-form">
-            <select class="form-control mr-3 mb-2 mb-md-0" id="filtroProyecto" name="proyecto" style="max-width: 200px;"
-                    onchange="this.form.submit()">
-              <option value="">Todos los proyectos</option>
-              {% for p in proyectos %}
-              <option value="{{ p.id }}" {% if filtro_proyecto == p.id|stringformat:"s" %}selected{% endif %}>
-                {{ p.nombre }}
-              </option>
-              {% endfor %}
-            </select>
-
-            <div class="input-group mr-3 mb-2 mb-md-0" style="max-width: 300px;">
-              <input type="text" class="form-control" id="searchPatient" name="q"
-                     value="{{ q|default:'' }}" placeholder="Buscar paciente..."
-                     aria-label="Buscar paciente">
-              <div class="input-group-append">
-                <button class="btn btn-outline-light" type="submit" title="Buscar">
-                  <i class="fas fa-search"></i>
-                </button>
-              </div>
-            </div>
-
-            <button class="btn btn-neutral mb-2 mb-md-0" id="agregar-formulario" type="button">
-              <span class="btn-inner--icon">
-                <i class="fas fa-plus"></i>
-              </span>
-              <span class="btn-inner--text">Nuevo Paciente</span>
-            </button>
-          </form>
-        </div>
-      </div>
-
     </div>
   </div>
 </div>
@@ -487,10 +359,48 @@
 <div class="container-fluid mt--6">
   <div class="row">
     <div class="col">
-      <div class="card">
-        <!-- Card header -->
+      <div class="card pacientes-list-card" id="pacientesListCard">
         <div class="card-header border-0">
-          <h3 class="mb-0">Listado de Pacientes</h3>
+          <div class="d-flex justify-content-between align-items-center flex-wrap pacientes-card-toolbar">
+            <div class="mb-2 mb-md-0">
+              <h3 class="mb-0">Listado de Pacientes</h3>
+              {% if page_obj %}
+              <span class="text-muted small">
+                {{ page_obj.paginator.count }} paciente{{ page_obj.paginator.count|pluralize:"s" }}
+                · página {{ page_obj.number }}/{{ page_obj.paginator.num_pages }}
+              </span>
+              {% endif %}
+            </div>
+            <form method="get" action="{% url 'tables.html' %}" class="d-flex justify-content-end align-items-center flex-wrap pacientes-filtros-form w-75">
+              <select class="form-control form-control-sm mr-2 mb-2 mb-md-0" id="filtroProyecto" name="proyecto" style="max-width: 200px;"
+                      onchange="this.form.submit()" aria-label="Filtrar por proyecto">
+                <option value="">Todos los proyectos</option>
+                {% for p in proyectos %}
+                <option value="{{ p.id }}" {% if filtro_proyecto == p.id|stringformat:"s" %}selected{% endif %}>
+                  {{ p.nombre }}
+                </option>
+                {% endfor %}
+              </select>
+
+              <div class="input-group input-group-sm mr-2 mb-2 mb-md-0" style="max-width: 240px;">
+                <input type="text" class="form-control" id="searchPatient" name="q"
+                       value="{{ q|default:'' }}" placeholder="Buscar paciente..."
+                       aria-label="Buscar paciente">
+                <div class="input-group-append">
+                  <button class="btn btn-outline-primary" type="submit" title="Buscar">
+                    <i class="fas fa-search"></i>
+                  </button>
+                </div>
+              </div>
+
+              <button class="btn btn-primary btn-sm mb-2 mb-md-0" id="agregar-formulario" type="button">
+                <span class="btn-inner--icon">
+                  <i class="fas fa-plus"></i>
+                </span>
+                <span class="btn-inner--text">Nuevo Paciente</span>
+              </button>
+            </form>
+          </div>
         </div>
         <div class="table-responsive pacientes-table-wrap">
           <table id="patientTable" class="table align-items-center table-flush">
@@ -531,22 +441,23 @@
                   {% endif %}
                 </td>
                 <td class="acciones-cell" data-label="Acciones">
-                  <a href="{% url 'detalle_paciente' paciente.id %}" class="btn btn-sm btn-neutral"
-                    title="Ver detalles">
-                    <i class="fas fa-eye"></i> Ver
-                  </a>
-                  <a href="{% url 'editar_paciente' paciente.numero_documento %}" class="btn btn-sm btn-neutral"
-                    title="Editar paciente">
-                    <i class="fas fa-edit"></i> Editar
-                  </a>
-                  <form action="{% url 'eliminar_paciente' paciente.numero_documento %}" method="post"
-                    style="display: inline;">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-sm btn-danger" title="Eliminar paciente"
-                      onclick="return confirm('¿Estás seguro de que deseas eliminar al paciente {{ paciente.primer_nombre }} {{ paciente.primer_apellido }}?');">
-                      <i class="fas fa-trash"></i> Eliminar
-                    </button>
-                  </form>
+                  <div class="btn-group btn-group-sm" role="group" aria-label="Acciones del paciente">
+                    <a href="{% url 'detalle_paciente' paciente.id %}" class="btn btn-neutral btn-icon"
+                      title="Ver" aria-label="Ver">
+                      <i class="fas fa-eye"></i>
+                    </a>
+                    <a href="{% url 'editar_paciente' paciente.numero_documento %}" class="btn btn-neutral btn-icon"
+                      title="Editar" aria-label="Editar">
+                      <i class="fas fa-edit"></i>
+                    </a>
+                    <form action="{% url 'eliminar_paciente' paciente.numero_documento %}" method="post">
+                      {% csrf_token %}
+                      <button type="submit" class="btn btn-danger btn-icon" title="Eliminar" aria-label="Eliminar"
+                        onclick="return confirm('¿Estás seguro de que deseas eliminar al paciente {{ paciente.primer_nombre }} {{ paciente.primer_apellido }}?');">
+                        <i class="fas fa-trash"></i>
+                      </button>
+                    </form>
+                  </div>
                 </td>
               </tr>
               {% empty %}
@@ -563,7 +474,9 @@
             </tbody>
           </table>
         </div>
-        {% include "includes/pagination.html" %}
+        <div class="border-top pacientes-pagination-footer">
+          {% include "includes/pagination.html" %}
+        </div>
       </div>
       <div id="formulario-dinamicos" class="mt-3">
         <!-- Aquí se cargarán dinámicamente los formularios -->
@@ -597,6 +510,18 @@
   }
 
   document.addEventListener('DOMContentLoaded', function () {
+    const listCard = document.getElementById('pacientesListCard');
+
+    function ajustarAltoListado() {
+      if (!listCard) return;
+      const top = listCard.getBoundingClientRect().top;
+      const available = window.innerHeight - top - 16;
+      listCard.style.height = Math.max(360, available) + 'px';
+    }
+
+    ajustarAltoListado();
+    window.addEventListener('resize', ajustarAltoListado);
+
     const alerts = document.querySelectorAll('.alert');
     alerts.forEach(alert => {
       setTimeout(() => {
