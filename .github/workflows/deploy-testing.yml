@@ -1,0 +1,40 @@
+name: Deploy Testing
+
+on:
+  push:
+    branches: [Testing]
+  workflow_dispatch:  # permite lanzarlo manualmente
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: testing
+
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script_stop: true
+          script: |
+            set -e
+            cd /opt/bitnami/Repositories/WEB-AteneaGruneco-TESTING
+
+            git fetch origin
+            git checkout Testing
+            git reset --hard origin/Testing
+
+            source bitnamivenv/bin/activate
+            pip install -r requirements.txt
+
+            mkdir -p logs/
+            sudo chown -R bitnami:daemon logs/
+            sudo chmod -R 775 logs/
+
+            python manage.py migrate
+            python manage.py collectstatic --noinput
+            sudo /opt/bitnami/ctlscript.sh restart apache
+
+            echo "Deploy Testing completado"

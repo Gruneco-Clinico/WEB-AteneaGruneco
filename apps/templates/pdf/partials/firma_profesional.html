@@ -1,0 +1,24 @@
+{% if visita.firmado and firmante %}
+<section class="bloque-firma">
+  <table class="tabla-hc">
+    <tr>
+      <td class="fila-titulo-hc" colspan="6">Firma del profesional responsable</td>
+    </tr>
+  </table>
+  <div class="firma-recuadro">
+    {% if firma_img %}
+    <img src="{{ firma_img }}" alt="Firma" class="firma-img">
+    {% else %}
+    <div class="firma-linea">&nbsp;</div>
+    {% endif %}
+    <p class="firma-nombre">{{ firmante }}</p>
+    {% if registro_medico %}
+    <p class="firma-dato">Registro médico: {{ registro_medico }}</p>
+    {% endif %}
+    {% if visita.fecha_firma %}
+    <p class="firma-dato">Fecha de firma: {{ visita.fecha_firma|date:"d/m/Y H:i" }}</p>
+    {% endif %}
+    <p class="firma-electronica-nota">Documento firmado electrónicamente en el sistema Atenea.</p>
+  </div>
+</section>
+{% endif %}

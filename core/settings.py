@@ -190,6 +190,55 @@ DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL", default="Atenea Gruneco <atene
 LOG_DIR = os.path.join(CORE_DIR, "logs")
 os.makedirs(LOG_DIR, exist_ok=True)
 
+
+def _log_dir_is_writable():
+    test_path = os.path.join(LOG_DIR, ".write_test")
+    try:
+        with open(test_path, "w", encoding="utf-8"):
+            pass
+        os.remove(test_path)
+        return True
+    except OSError:
+        return False
+
+
+USE_FILE_LOGGING = _log_dir_is_writable()
+
+_LOG_HANDLERS = {
+    "console": {
+        "level": "INFO",
+        "class": "logging.StreamHandler",
+        "formatter": "simple",
+    },
+}
+if USE_FILE_LOGGING:
+    _LOG_HANDLERS["file_general"] = {
+        "level": "INFO",
+        "class": "logging.handlers.RotatingFileHandler",
+        "filename": os.path.join(LOG_DIR, "atenea.log"),
+        "maxBytes": 5 * 1024 * 1024,  # 5 MB
+        "backupCount": 5,
+        "formatter": "verbose",
+        "encoding": "utf-8",
+    }
+    _LOG_HANDLERS["file_security"] = {
+        "level": "INFO",
+        "class": "logging.handlers.RotatingFileHandler",
+        "filename": os.path.join(LOG_DIR, "security.log"),
+        "maxBytes": 5 * 1024 * 1024,  # 5 MB
+        "backupCount": 10,
+        "formatter": "verbose",
+        "encoding": "utf-8",
+    }
+
+
+def _app_log_handlers(*, security=False):
+    handlers = ["console"]
+    if USE_FILE_LOGGING:
+        handlers.append("file_security" if security else "file_general")
+    return handlers
+
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -213,65 +262,41 @@ LOGGING = {
             "()": "django.utils.log.RequireDebugTrue",
         },
     },
-    "handlers": {
-        "console": {
-            "level": "INFO",
-            "class": "logging.StreamHandler",
-            "formatter": "simple",
-        },
-        "file_general": {
-            "level": "INFO",
-            "class": "logging.handlers.RotatingFileHandler",
-            "filename": os.path.join(LOG_DIR, "atenea.log"),
-            "maxBytes": 5 * 1024 * 1024,  # 5 MB
-            "backupCount": 5,
-            "formatter": "verbose",
-            "encoding": "utf-8",
-        },
-        "file_security": {
-            "level": "INFO",
-            "class": "logging.handlers.RotatingFileHandler",
-            "filename": os.path.join(LOG_DIR, "security.log"),
-            "maxBytes": 5 * 1024 * 1024,  # 5 MB
-            "backupCount": 10,
-            "formatter": "verbose",
-            "encoding": "utf-8",
-        },
-    },
+    "handlers": _LOG_HANDLERS,
     "loggers": {
         "django": {
-            "handlers": ["console", "file_general"],
+            "handlers": _app_log_handlers(),
             "level": "INFO",
             "propagate": False,
         },
         "django.security": {
-            "handlers": ["console", "file_security"],
+            "handlers": _app_log_handlers(security=True),
             "level": "INFO",
             "propagate": False,
         },
         "django.request": {
-            "handlers": ["console", "file_general"],
+            "handlers": _app_log_handlers(),
             "level": "WARNING",
             "propagate": False,
         },
         "apps.home": {
-            "handlers": ["console", "file_general"],
+            "handlers": _app_log_handlers(),
             "level": "DEBUG" if DEBUG else "INFO",
             "propagate": False,
         },
         "apps.home.tokens": {
-            "handlers": ["console", "file_security"],
+            "handlers": _app_log_handlers(security=True),
             "level": "INFO",
             "propagate": False,
         },
         "apps.home.decorators": {
-            "handlers": ["console", "file_security"],
+            "handlers": _app_log_handlers(security=True),
             "level": "INFO",
             "propagate": False,
         },
     },
     "root": {
-        "handlers": ["console", "file_general"],
+        "handlers": _app_log_handlers(),
         "level": "INFO",
     },
 }
@@ -294,3 +319,12 @@ else:
     SESSION_COOKIE_SECURE = False
     CSRF_COOKIE_SECURE = False
     X_FRAME_OPTIONS = "SAMEORIGIN"
+
+# ----- Proyecto Caracterización del Sueño (portal público) -----
+SUENO_PROYECTO_ID = config("SUENO_PROYECTO_ID", default=11, cast=int)
+SUENO_TIPO_VISITA_IDS = config(
+    "SUENO_TIPO_VISITA_IDS",
+    default="20,7",
+    cast=Csv(cast=int),
+)
+SUENO_PUBLIC_EXAM_IDS = {13, 14, 16}  # Pittsburgh, Epworth, MEW

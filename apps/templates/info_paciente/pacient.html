@@ -1,5 +1,60 @@
 {% extends 'layouts/base.html' %}
 {% load custom_filters %}
+{% block stylesheets %}
+<style>
+  /* Centrar icono/texto dentro de botones de acción */
+  .paciente-acciones .btn,
+  .visita-acciones .btn,
+  .btn-icon-centered {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .paciente-acciones {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  .paciente-acciones form {
+    display: inline-flex;
+    margin: 0;
+  }
+
+  .paciente-acciones .btn {
+    margin-right: 0 !important;
+  }
+
+  /* Botones solo-icono: tamaño uniforme y contenido centrado */
+  .visita-acciones.btn-group > .btn,
+  .visita-acciones.btn-group > form > .btn {
+    width: 2rem;
+    height: 2rem;
+    padding: 0;
+    margin-right: 0 !important;
+  }
+
+  .visita-acciones.btn-group > form {
+    display: inline-flex;
+    margin: 0;
+  }
+
+  .visita-acciones .btn i,
+  .btn-icon-centered i {
+    margin: 0 !important;
+    line-height: 1;
+  }
+
+  .btn-icon-centered {
+    width: 2rem;
+    height: 2rem;
+    padding: 0;
+  }
+</style>
+{% endblock stylesheets %}
 {% block content %}
 
 <div class="header bg-primary pb-6">
@@ -223,7 +278,8 @@
                   </h4>
 
                 </div>
-                <div class="col-md-4 text-right">
+                <div class="col-md-4">
+                  <div class="paciente-acciones">
                   {% if proyecto.id in proyectos_con_consentimiento_firmado %}
                   <span class="badge badge-success" title="Consentimiento ya firmado">
                     <i class="fas fa-check-circle mr-1"></i> Consentimiento firmado
@@ -231,7 +287,6 @@
                   {% else %}
                   <form method="POST"
                     action="{% url 'enviar_link_firma_consentimiento' paciente_id=paciente.id proyecto_id=proyecto.id %}"
-                    class="d-inline"
                     onsubmit="return confirm('¿Enviar enlace de firma de consentimiento al correo del paciente?');">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-outline-primary btn-sm" title="Enviar link de firma">
@@ -239,7 +294,6 @@
                     </button>
                   </form>
                   {% endif %}
-                  <!-- BOTÓN CORREGIDO -->
                   <button class="btn btn-light btn-sm" data-toggle="modal"
                     data-target="#modalAgregarVisita-{{ proyecto.id }}">
                     <i class="fas fa-plus mr-2"></i>
@@ -248,7 +302,6 @@
                   {% if request.user.is_superuser %}
                   <form method="POST"
                     action="{% url 'quitar_paciente_proyecto' paciente_id=paciente.id proyecto_id=proyecto.id %}"
-                    class="d-inline"
                     onsubmit="return confirm('¿Quitar al paciente del proyecto {{ proyecto.nombre }}? No se eliminará del sistema.');">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-outline-danger btn-sm" title="Quitar del proyecto">
@@ -256,6 +309,7 @@
                     </button>
                   </form>
                   {% endif %}
+                  </div>
                 </div>
               </div>
             </div>
@@ -286,17 +340,23 @@
 
                     <div class="col-md-4 text-right">
                       <!-- Botones de Acción de Visita -->
-                      <div class="btn-group btn-group-sm" role="group">
+                      <div class="btn-group btn-group-sm visita-acciones" role="group">
                         <!-- Ver Exámenes - SIEMPRE HABILITADO -->
                         <button type="button" class="btn btn-outline-info" data-toggle="collapse"
                           data-target="#examenes-visita-{{ visita.id }}" title="Ver Exámenes">
                           <i class="fas fa-list"></i>
                         </button>
 
-                        <!-- Descargar PDF - SIEMPRE HABILITADO -->
-                        <a href="{% url 'generar_pdf_historia_clinica_visita' visita.id %}" 
-                          class="btn btn-outline-success" title="Descargar PDF de Historia Clínica">
+                        <!-- Descargar PDF (todo) - SIEMPRE HABILITADO -->
+                        <a href="{% url 'generar_pdf_historia_clinica_visita' visita.id %}"
+                          class="btn btn-outline-success" title="Descargar PDF (Resumen Digital de Atención completo)">
                           <i class="fas fa-file-pdf"></i>
+                        </a>
+
+                        <!-- Imprimir con selección de exámenes y orden -->
+                        <a href="{% url 'seleccionar_impresion_visita' visita.id %}"
+                          class="btn btn-outline-success" title="Seleccionar exámenes y orden a imprimir">
+                          <i class="fas fa-print"></i>
                         </a>
 
                         <!-- Editar Visita - DESHABILITADO si está firmada -->
@@ -313,7 +373,7 @@
 
                         <!-- Firmar Visita - Solo superusuario -->
                         {% if request.user.is_superuser and not visita.firmado %}
-                        <form action="{% url 'firmar_visita' visita.id %}" method="POST" class="d-inline"
+                        <form action="{% url 'firmar_visita' visita.id %}" method="POST"
                           onsubmit="return confirm('¿Está seguro de firmar y cerrar esta visita? Esta acción no se puede deshacer.');">
                           {% csrf_token %}
                           <button type="submit" class="btn btn-outline-primary" title="Firmar Visita">
@@ -332,7 +392,7 @@
                           <i class="fas fa-trash"></i>
                         </button>
                         {% else %}
-                        <form action="{% url 'eliminar_v' visita.id %}" method="POST" class="d-inline"
+                        <form action="{% url 'eliminar_v' visita.id %}" method="POST"
                           onsubmit="return confirm('¿Eliminar esta visita?');">
                           {% csrf_token %}
                           <button type="submit" class="btn btn-outline-danger" title="Eliminar">
@@ -358,7 +418,7 @@
                       <p class="mb-0 small text-muted"><em>Sin notas aclaratorias.</em></p>
                       {% endif %}
                     </div>
-                    <button type="button" class="btn btn-sm btn-outline-info ml-2"
+                    <button type="button" class="btn btn-sm btn-outline-info btn-icon-centered ml-2"
                       data-toggle="modal" data-target="#modalNotas-{{ visita.id }}"
                       title="Editar notas aclaratorias">
                       <i class="fas fa-edit"></i>

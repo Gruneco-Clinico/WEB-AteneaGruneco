@@ -27,6 +27,23 @@ EXAM_REGISTRY = {
         "template": "examenes_general/General_Antecedentes.html",
         "related_name": None,  # Uses AntecedentesVisitaLink bridge
         "use_bridge": True,
+        "export": {
+            "tables": [
+                {
+                    "related_name": "antecedentes_patologicos",
+                    "label": "Antecedentes patológicos",
+                    "columns": (
+                        "tipo_patologia",
+                        "fecha_inicio",
+                        "ha_recibido_tratamiento",
+                        "detalle_tratamiento",
+                        "tiene_complicaciones",
+                        "activo",
+                        "observaciones",
+                    ),
+                },
+            ],
+        },
     },
     7: {
         "model_name": "AnalisisGeneralResult",
@@ -37,6 +54,22 @@ EXAM_REGISTRY = {
         "model_name": "MedicamentosResult",
         "template": "examenes_general/General_Medicamentos.html",
         "related_name": "medicamentosresult_resultado",
+        "export": {
+            "tables": [
+                {
+                    "related_name": "medicamentos",
+                    "label": "Medicamentos",
+                    "columns": (
+                        "nombre_comercial",
+                        "nombre_generico",
+                        "concentracion",
+                        "cantidad",
+                        "frecuencia",
+                        "via_administracion",
+                    ),
+                },
+            ],
+        },
     },
     9: {
         "model_name": "ExamenNeurologicoResult",
@@ -77,6 +110,9 @@ EXAM_REGISTRY = {
         "model_name": "MEWResult",
         "template": "examenes_sueno/sueno_MEW.html",
         "related_name": "mewresult_resultado",
+        "export": {
+            "summary_fields": ["puntuacion", "tipo_persona"],
+        },
     },
     17: {
         "model_name": "BerlinResult",
@@ -157,6 +193,18 @@ EXAM_REGISTRY = {
         "model_name": "RedLatSpanishResult",
         "template": "examenes_anosognosia/Anosognosia_Cuidador_RedLatSpanish.html",
         "related_name": "redlatspanishresult_resultado",
+        "export": {
+            "summary_fields": [
+                "puntaje_total",
+                "puntaje_autocuidado",
+                "puntaje_cuidado_hogar",
+                "puntaje_trabajo_recreacion",
+                "puntaje_compras_dinero",
+                "puntaje_viajes",
+                "puntaje_comunicacion",
+                "puntaje_tecnologia",
+            ],
+        },
     },
     33: {
         "model_name": "CDRCuidadorResult",
@@ -172,6 +220,9 @@ EXAM_REGISTRY = {
         "model_name": "PuntajeCDRResult",
         "template": "examenes_anosognosia/CDR_Evaluacion_Clinica.html",
         "related_name": "puntajecdrresult_resultado",
+        "export": {
+            "summary_fields": ["cdr_global", "suma_cajas", "cdr_interpretacion"],
+        },
     },
     36: {
         "model_name": "ConsentimientoInformadoParticipanteResult",

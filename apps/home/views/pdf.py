@@ -582,11 +582,30 @@ def _build_footer(elements, styles):
 # ---------------------------------------------------------------------------
 # Public: reusable PDF builder
 # ---------------------------------------------------------------------------
-def construir_pdf_visita(buffer, visita):
+def construir_pdf_visita(buffer, visita, examen_ids=None):
     """
     Build the clinical-history PDF for *visita* into *buffer* (a BytesIO).
-    Called by both the download view and firmar_visita email attachment.
+    Prefiere WeasyPrint; si falla, usa ReportLab legacy.
+
+    ``examen_ids``: lista opcional de IDs de VisitaExamen a incluir y su orden.
     """
+    from ..services.hc_pdf import construir_pdf_weasyprint
+
+    pdf_bytes = construir_pdf_weasyprint(visita, examen_ids=examen_ids)
+    if pdf_bytes:
+        buffer.write(pdf_bytes)
+        buffer.seek(0)
+        return
+
+    logger.warning(
+        "WeasyPrint no disponible para visita %s; usando ReportLab legacy.",
+        visita.id,
+    )
+    _construir_pdf_visita_reportlab(buffer, visita)
+
+
+def _construir_pdf_visita_reportlab(buffer, visita):
+    """Generación PDF legacy con ReportLab."""
     paciente = visita.paciente
 
     doc = SimpleDocTemplate(
@@ -641,19 +660,71 @@ def construir_pdf_visita(buffer, visita):
 
 
 # ---------------------------------------------------------------------------
+# Helper: parse selección/orden de exámenes desde el request (A-04)
+# ---------------------------------------------------------------------------
+def _parse_examen_ids(request, visita):
+    """Devuelve la lista ordenada de IDs de VisitaExamen a imprimir.
+
+    Lee ``examen_ids`` del POST (checkboxes) o del GET (``examenes=1,2,3``).
+    Retorna ``None`` cuando no hay selección (=> imprimir todo).
+    """
+    raw = None
+    if request.method == "POST":
+        raw = request.POST.getlist("examen_ids")
+    if not raw:
+        qs = request.GET.get("examenes")
+        if qs:
+            raw = [p for p in qs.split(",") if p]
+    if not raw:
+        return None
+    ids = []
+    for value in raw:
+        try:
+            ids.append(int(value))
+        except (TypeError, ValueError):
+            continue
+    return ids or None
+
+
+# ---------------------------------------------------------------------------
+# View: selección de impresión (A-04)
+# ---------------------------------------------------------------------------
+@login_required
+def seleccionar_impresion_visita(request, visita_id):
+    """Muestra el formulario para elegir qué exámenes imprimir y su orden."""
+    from django.shortcuts import render
+
+    visita = get_object_or_404(Visita, id=visita_id)
+    examenes = list(
+        visita.visita_examenes.filter(estado="completado").select_related("examen")
+    )
+    context = {
+        "visita": visita,
+        "paciente": visita.paciente,
+        "examenes": examenes,
+    }
+    return render(request, "info_paciente/seleccionar_impresion.html", context)
+
+
+# ---------------------------------------------------------------------------
 # View: download PDF
 # ---------------------------------------------------------------------------
 @login_required
 def generar_pdf_historia_clinica_visita(request, visita_id):
-    """Genera y descarga un PDF con la historia clinica de una visita."""
+    """Genera y descarga un PDF con la historia clinica de una visita.
+
+    Acepta selección y orden de exámenes vía ``examen_ids`` (POST) o
+    ``examenes=1,2,3`` (GET). Sin selección => imprime todos (A-04).
+    """
     try:
         visita = get_object_or_404(Visita, id=visita_id)
+        examen_ids = _parse_examen_ids(request, visita)
         buffer = BytesIO()
-        construir_pdf_visita(buffer, visita)
+        construir_pdf_visita(buffer, visita, examen_ids=examen_ids)
 
         response = HttpResponse(buffer.getvalue(), content_type="application/pdf")
         response["Content-Disposition"] = (
-            f'attachment; filename="Historia_Clinica_Visita_{visita_id}'
+            f'attachment; filename="Resumen_Digital_Atencion_Visita_{visita_id}'
             f'_{datetime.now().strftime("%Y%m%d")}.pdf"'
         )
         return response

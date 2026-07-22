@@ -1,0 +1,9 @@
+<div class="subseccion">
+  {% if resultado.motivo_consulta %}<p><span class="campo-label">Motivo:</span> {{ resultado.motivo_consulta|linebreaksbr }}</p>{% endif %}
+  {% if resultado.enfermedad_actual %}<p><span class="campo-label">Enfermedad actual:</span> {{ resultado.enfermedad_actual|linebreaksbr }}</p>{% endif %}
+  {% if resultado.plan_manejo %}<p><span class="campo-label">Plan de manejo:</span> {{ resultado.plan_manejo|linebreaksbr }}</p>{% endif %}
+  {% if diagnosticos_cie10 %}
+  <p class="campo-label">Diagnósticos CIE-10:</p>
+  <ul class="lista-hijos">{% for d in diagnosticos_cie10 %}<li>{{ d.codigo }} — {{ d.descripcion }}</li>{% endfor %}</ul>
+  {% endif %}
+</div>

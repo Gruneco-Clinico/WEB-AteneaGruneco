@@ -12,8 +12,9 @@ from django.contrib.auth.models import User
 from django.views.generic import TemplateView
 from django.core.mail import send_mail, EmailMessage
 from django.core.paginator import Paginator
-from django.db.models import Max
+from django.db.models import Max, Q
 from django.urls import reverse
+from urllib.parse import urlencode
 from datetime import datetime, timedelta
 from ..models import *
 from ..forms import ProyectoForm, RegistroDemograficoForm
@@ -73,27 +74,77 @@ def _build_codigos_map(pacientes):
     return codigos
 
 
+PACIENTES_POR_PAGINA = 25
+
+
+def _elided_page_range(page_obj):
+    """Rango de páginas con elipsis (Django ≥ 3.2)."""
+    try:
+        return list(
+            page_obj.paginator.get_elided_page_range(
+                page_obj.number, on_each_side=1, on_ends=1
+            )
+        )
+    except AttributeError:
+        return list(page_obj.paginator.page_range)
+
+
 @login_required
 def lista_pacientes(request):
-    pacientes = DatosDemograficos.objects.all()
-    proyectos = Proyecto.objects.all()
+    """Listado de pacientes con búsqueda GET, filtro por proyecto y paginación."""
+    q = (request.GET.get("q") or "").strip()
     filtro_proyecto = request.GET.get("proyecto", "")
+
+    pacientes = (
+        DatosDemograficos.objects.all()
+        .prefetch_related("proyectos")
+        .order_by("primer_apellido", "primer_nombre", "id")
+    )
+
     if filtro_proyecto:
         try:
             pacientes = pacientes.filter(proyectos__id=int(filtro_proyecto))
         except (ValueError, TypeError):
-            pass
-    codigos_map = _build_codigos_map(pacientes)
-    # Attach codes to each patient object for easy template access
-    for pac in pacientes:
+            filtro_proyecto = ""
+
+    if q:
+        pacientes = pacientes.filter(
+            Q(numero_documento__icontains=q)
+            | Q(primer_nombre__icontains=q)
+            | Q(segundo_nombre__icontains=q)
+            | Q(primer_apellido__icontains=q)
+            | Q(segundo_apellido__icontains=q)
+            | Q(proyectos__nombre__icontains=q)
+            | Q(proyectopacienteextra__codigo_proyecto__icontains=q)
+        ).distinct()
+
+    paginator = Paginator(pacientes, PACIENTES_POR_PAGINA)
+    page_obj = paginator.get_page(request.GET.get("page") or 1)
+
+    codigos_map = _build_codigos_map(page_obj)
+    for pac in page_obj:
         pac.codigos_list = codigos_map.get(pac.id, [])
+
+    query_params = {}
+    if q:
+        query_params["q"] = q
+    if filtro_proyecto:
+        query_params["proyecto"] = filtro_proyecto
+    pagination_query = urlencode(query_params)
+
+    proyectos = Proyecto.objects.all().order_by("nombre")
     return render(
         request,
         "home/tables.html",
         {
-            "pacientes": pacientes,
+            "pacientes": page_obj,
+            "page_obj": page_obj,
+            "page_range": _elided_page_range(page_obj),
+            "paginator_ellipsis": getattr(paginator, "ELLIPSIS", "…"),
+            "pagination_query": pagination_query,
             "proyectos": proyectos,
             "filtro_proyecto": filtro_proyecto,
+            "q": q,
             "codigos_map": codigos_map,
         },
     )
@@ -689,10 +740,11 @@ def consulta_examenes(request):
         # Return same shape as "no exams" — prevents patient enumeration
         return JsonResponse({"examenes": []})
 
-    # 2. Buscar su visita más reciente
-    visita = Visita.objects.filter(paciente=paciente).order_by("-id").first()
+    from ..services.visita_sueno import resolver_visita_sueno, url_examen_publico
 
-    if not visita:
+    try:
+        visita = resolver_visita_sueno(paciente)
+    except Visita.DoesNotExist:
         return JsonResponse({"examenes": []})
 
     # 3. Buscar exámenes pendientes Y exámenes en proceso
@@ -700,63 +752,32 @@ def consulta_examenes(request):
         visita=visita, estado__in=["pendiente", "en_progreso"]
     )
 
+    public_paths = {
+        14: "/guardar-examen-publico-epworth/",
+        16: "/guardar-examen-publico-mew/",
+        13: "/guardar-examen-publico-pitsburg/",
+    }
+
     examenes_data = []
-
     for ve in examenes:
-        # Detectar el estado para enviarlo al frontend
-        estado = ve.estado  # pendiente | en_proceso
-
-        # ======================
-        # EPWORTH (id = 14)
-        # ======================
-        if ve.examen_id == 14:
-            examenes_data.append(
-                {
-                    "nombre": ve.examen.nombre,
-                    "estado": estado,
-                    "url": f"/guardar-examen-publico-epworth/?token={generar_token_paciente(paciente.id)}",
-                }
+        estado = ve.estado
+        if ve.examen_id in public_paths:
+            url = url_examen_publico(
+                public_paths[ve.examen_id], paciente.id, visita.id
             )
-            continue
+        else:
+            url = f"/examen/{ve.id}/"
 
-        # ======================
-        # MEW (id = 16)
-        # ======================
-        if ve.examen_id == 16:
-            examenes_data.append(
-                {
-                    "nombre": ve.examen.nombre,
-                    "estado": estado,
-                    "url": f"/guardar-examen-publico-mew/?token={generar_token_paciente(paciente.id)}",
-                }
-            )
-            continue
-
-        # ======================
-        # PITTSBURGH (id = 13)
-        # ======================
-        if ve.examen_id == 13:
-            examenes_data.append(
-                {
-                    "nombre": ve.examen.nombre,
-                    "estado": estado,
-                    "url": f"/guardar-examen-publico-pitsburg/?token={generar_token_paciente(paciente.id)}",
-                }
-            )
-            continue
-
-        # ======================
-        # OTROS
-        # ======================
         examenes_data.append(
             {
                 "nombre": ve.examen.nombre,
                 "estado": estado,
-                "url": f"/examen/{ve.id}/",
+                "url": url,
+                "visita_id": visita.id,
             }
         )
 
-    return JsonResponse({"examenes": examenes_data})
+    return JsonResponse({"examenes": examenes_data, "visita_id": visita.id})
 
 
 # ===== EXÁMENES PÚBLICOS =====
