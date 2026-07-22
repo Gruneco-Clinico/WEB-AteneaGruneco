@@ -1,16 +1,18 @@
-{# Controles de paginación reutilizables.
-   Espera: page_obj, page_range, pagination_query, paginator_ellipsis #}
-{% if page_obj.paginator.num_pages > 1 %}
-<nav class="pacientes-pagination mt-3 mb-2 px-3" aria-label="Paginación de pacientes">
+{% comment %}
+Controles de paginación reutilizables.
+Espera: page_obj, page_range, pagination_query, paginator_ellipsis
+{% endcomment %}
+{% if page_obj and page_obj.paginator.num_pages > 1 %}
+<nav class="pacientes-pagination px-3 py-2" aria-label="Paginación de pacientes">
   <ul class="pagination justify-content-center flex-wrap mb-0">
     <li class="page-item {% if not page_obj.has_previous %}disabled{% endif %}">
       {% if page_obj.has_previous %}
       <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if pagination_query %}&{{ pagination_query }}{% endif %}"
          aria-label="Anterior">
-        <span aria-hidden="true">&laquo;</span> Anterior
+        <span aria-hidden="true">&laquo;</span>
       </a>
       {% else %}
-      <span class="page-link"><span aria-hidden="true">&laquo;</span> Anterior</span>
+      <span class="page-link"><span aria-hidden="true">&laquo;</span></span>
       {% endif %}
     </li>
 
@@ -28,14 +30,14 @@
       {% if page_obj.has_next %}
       <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if pagination_query %}&{{ pagination_query }}{% endif %}"
          aria-label="Siguiente">
-        Siguiente <span aria-hidden="true">&raquo;</span>
+         <span aria-hidden="true">&raquo;</span>
       </a>
       {% else %}
-      <span class="page-link">Siguiente <span aria-hidden="true">&raquo;</span></span>
+      <span class="page-link"> <span aria-hidden="true">&raquo;</span></span>
       {% endif %}
     </li>
   </ul>
-  <p class="text-center text-muted small mt-2 mb-0">
+  <p class="text-center text-muted small mt-1 mb-0">
     Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
     · {{ page_obj.paginator.count }} paciente{{ page_obj.paginator.count|pluralize:"s" }}
   </p>
