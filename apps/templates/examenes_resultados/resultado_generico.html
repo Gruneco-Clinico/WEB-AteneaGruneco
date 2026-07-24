@@ -68,7 +68,7 @@
     </div>
   </div>
 
-  <!-- Resumen de puntaje (solo cuando aplica; AQD/Yesavage/RedLat sin caja) -->
+  <!-- Resumen de puntaje (solo cuando aplica; AQD/Yesavage/RedLat sin caja de total) -->
   {% if score_banner_valor is not None %}
   <div class="card shadow-sm mb-3 border-left-success hc-puntaje-total">
     <div class="card-body d-flex align-items-center">
@@ -84,6 +84,18 @@
         <small class="text-muted">{{ score_banner_detalle }}</small>
         {% endif %}
       </div>
+    </div>
+  </div>
+  {% endif %}
+
+  {% if aqd_anosognosia %}
+  <div class="card shadow-sm mb-3 border-left-info hc-aqd-anosognosia">
+    <div class="card-body">
+      <h6 class="text-uppercase text-muted mb-1">Anosognosia (AQD cuidador − participante)</h6>
+      <p class="mb-1"><strong>Delta:</strong> {{ aqd_anosognosia.delta }}
+        <span class="text-muted">(cuidador {{ aqd_anosognosia.total_cuidador }} − participante {{ aqd_anosognosia.total_participante }})</span>
+      </p>
+      <p class="mb-0 font-weight-bold">{{ aqd_anosognosia.interpretacion }}</p>
     </div>
   </div>
   {% endif %}

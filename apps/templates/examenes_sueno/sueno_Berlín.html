@@ -202,6 +202,12 @@
                     </div>
                 </div>
 
+                <div class="mb-3">
+                    <label class="form-control-label">IMC (opcional, categoría 3 si &gt; 30)</label>
+                    <input type="number" step="0.1" min="0" class="form-control" name="imc"
+                        value="{{ datos_examen.imc|default:'' }}" placeholder="kg/m²">
+                </div>
+
             </div>
 
 

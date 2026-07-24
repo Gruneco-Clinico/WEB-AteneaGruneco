@@ -283,9 +283,10 @@
 
                                 <div class="alert alert-warning mt-4">
                                     <strong>Interpretación de la escala:</strong><br>
-                                    - <strong>0-6 puntos:</strong> Somnolencia diurna normal<br>
-                                    - <strong>7-8 puntos:</strong> Somnolencia diurna leve<br>
-                                    - <strong>9-24 puntos:</strong> Somnolencia diurna severa (posiblemente patológica)
+                                    - <strong>0-5 puntos:</strong> Somnolencia diurna normal<br>
+                                    - <strong>6-10 puntos:</strong> Somnolencia diurna media<br>
+                                    - <strong>11-15 puntos:</strong> Somnolencia diurna moderada<br>
+                                    - <strong>16-24 puntos:</strong> Somnolencia diurna severa
                                 </div>
                             </div>
                         </div>
@@ -332,12 +333,14 @@
 
             // Determinar interpretación
             let interpretacion = "";
-            if (total <= 6) {
+            if (total <= 5) {
                 interpretacion = "Somnolencia diurna normal";
-            } else if (total <= 8) {
-                interpretacion = "Somnolencia diurna leve";
+            } else if (total <= 10) {
+                interpretacion = "Somnolencia diurna media";
+            } else if (total <= 15) {
+                interpretacion = "Somnolencia diurna moderada";
             } else {
-                interpretacion = "Somnolencia diurna severa (posiblemente patológica)";
+                interpretacion = "Somnolencia diurna severa";
             }
 
             interpretacionDisplay.textContent = interpretacion;

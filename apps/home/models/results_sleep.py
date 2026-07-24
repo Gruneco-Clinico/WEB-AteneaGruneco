@@ -35,6 +35,31 @@ class PittsburghResult(ResultadoExamenBase):
     otros_inconvenientes = models.CharField(max_length=100, blank=True, null=True, verbose_name="Otros inconvenientes")
     descripcion_inconvenientes = models.CharField(max_length=100, blank=True, null=True, verbose_name="Descripción de inconvenientes")
     puntuacion_total = models.IntegerField(default=0, blank=True, null=True, verbose_name="Puntuación total")
+    # D-16: componentes PSQI (0–3) e interpretación clínica
+    componente_calidad = models.PositiveSmallIntegerField(
+        blank=True, null=True, verbose_name="Componente 1: Calidad subjetiva"
+    )
+    componente_latencia = models.PositiveSmallIntegerField(
+        blank=True, null=True, verbose_name="Componente 2: Latencia"
+    )
+    componente_duracion = models.PositiveSmallIntegerField(
+        blank=True, null=True, verbose_name="Componente 3: Duración"
+    )
+    componente_eficiencia = models.PositiveSmallIntegerField(
+        blank=True, null=True, verbose_name="Componente 4: Eficiencia"
+    )
+    componente_perturbaciones = models.PositiveSmallIntegerField(
+        blank=True, null=True, verbose_name="Componente 5: Perturbaciones"
+    )
+    componente_medicacion = models.PositiveSmallIntegerField(
+        blank=True, null=True, verbose_name="Componente 6: Medicación"
+    )
+    componente_disfuncion = models.PositiveSmallIntegerField(
+        blank=True, null=True, verbose_name="Componente 7: Disfunción diurna"
+    )
+    interpretacion = models.CharField(
+        max_length=255, blank=True, null=True, verbose_name="Interpretación"
+    )
 
 
 class EpworthResult(ResultadoExamenBase):
@@ -47,6 +72,9 @@ class EpworthResult(ResultadoExamenBase):
     despues_comer = models.IntegerField(verbose_name="Después de comer")
     trafico = models.IntegerField(verbose_name="En el tráfico")
     puntaje_total = models.IntegerField(verbose_name="Puntaje total")
+    interpretacion = models.CharField(
+        max_length=255, blank=True, null=True, verbose_name="Interpretación"
+    )
 
 
 class MEWResult(ResultadoExamenBase):
@@ -99,6 +127,24 @@ class BerlinResult(ResultadoExamenBase):
     fatiga_dia = models.CharField(max_length=50, verbose_name="Fatiga durante el día")
     somnolencia_conducir = models.BooleanField(null=True, blank=True, verbose_name="Somnolencia al conducir")
     presion_alta = models.BooleanField(null=True, blank=True, verbose_name="Presión arterial alta")
+    # D-16: IMC opcional (categoría 3) + scoring Berlín
+    imc = models.FloatField(blank=True, null=True, verbose_name="IMC")
+    categoria1_positiva = models.BooleanField(
+        blank=True, null=True, verbose_name="Categoría 1 positiva (ronquidos)"
+    )
+    categoria2_positiva = models.BooleanField(
+        blank=True, null=True, verbose_name="Categoría 2 positiva (somnolencia)"
+    )
+    categoria3_positiva = models.BooleanField(
+        blank=True, null=True, verbose_name="Categoría 3 positiva (HTA/IMC)"
+    )
+    categorias_positivas = models.PositiveSmallIntegerField(
+        blank=True, null=True, verbose_name="Nº de categorías positivas"
+    )
+    riesgo = models.CharField(max_length=20, blank=True, null=True, verbose_name="Nivel de riesgo")
+    interpretacion = models.CharField(
+        max_length=255, blank=True, null=True, verbose_name="Interpretación"
+    )
 
 
 class SuenoAnamnesisResult(ResultadoExamenBase):
@@ -304,6 +350,9 @@ class AtenasResult(ResultadoExamenBase):
     funcionamiento_dia = models.CharField(max_length=50, verbose_name="Funcionamiento diurno")
     somnolencia_dia = models.CharField(max_length=50, verbose_name="Somnolencia diurna")
     puntuacion_total = models.IntegerField(blank=True, null=True, verbose_name="Puntuación total")
+    interpretacion = models.CharField(
+        max_length=255, blank=True, null=True, verbose_name="Interpretación"
+    )
 
     def __str__(self):
         return f"Atenas - {self.visita_examen_id}"
@@ -358,6 +407,9 @@ class ISIResult(ResultadoExamenBase):
     preocupacion_sueno = models.CharField(max_length=50, verbose_name="Preocupación por el sueño")
     interferencia_sueno = models.CharField(max_length=50, verbose_name="Interferencia en la vida diaria")
     puntuacion_total = models.IntegerField(blank=True, null=True, verbose_name="Puntuación total")
+    interpretacion = models.CharField(
+        max_length=255, blank=True, null=True, verbose_name="Interpretación"
+    )
 
     def __str__(self):
         return f"ISI - {self.visita_examen_id}"

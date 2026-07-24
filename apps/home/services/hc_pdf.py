@@ -212,8 +212,7 @@ def render_historia_clinica_html(visita, examen_ids=None):
     firma_img, registro_medico = _firma_profesional(visita.firmado_por)
 
     nombre_completo = _nombre_completo_paciente(paciente)
-    tipo_doc = paciente.get_tipo_documento_display() if paciente.tipo_documento else ""
-    documento_identidad = f"{tipo_doc} {paciente.numero_documento}".strip()
+    documento_identidad = f"{paciente.numero_documento}".strip()
 
     context = {
         "visita": visita,

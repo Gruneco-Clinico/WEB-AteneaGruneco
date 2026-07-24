@@ -114,6 +114,12 @@
               </select>
             </div>
 
+            <div class="alert alert-secondary" id="eq5d-codigo-box">
+              <strong>Código de estado EQ-5D-5L:</strong>
+              <span id="eq5d-codigo">{{ datos_examen.estado_salud|default:"—" }}</span>
+              <input type="hidden" name="estado_salud" id="estado_salud" value="{{ datos_examen.estado_salud|default:'' }}">
+            </div>
+
             <div class="text-right mt-4">
               <button type="submit" class="btn btn-primary">Guardar</button>
               <a href="{% url 'detalle_paciente' paciente_id %}" class="btn btn-secondary">Ver Paciente</a>
@@ -125,5 +131,37 @@
     </div>
   </div>
 </div>
+
+<script>
+(function () {
+  const dims = ["movilidad", "cuidado_personal", "actividades", "dolor", "ansiedad"];
+  function nivelFromText(t) {
+    if (!t) return null;
+    const s = t.toLowerCase();
+    if (s.includes("incapaz") || s.includes("extrem") || s.includes("en la cama")) return 5;
+    if (s.includes("sever")) return 4;
+    if (s.includes("moder")) return 3;
+    if (s.includes("leve") || s.includes("levemente")) return 2;
+    if (s.includes("no tengo") || s.includes("no estoy")) return 1;
+    return null;
+  }
+  function actualizarCodigo() {
+    const digits = dims.map(id => {
+      const el = document.getElementById(id);
+      return nivelFromText(el ? el.value : "");
+    });
+    const codigo = digits.every(d => d) ? digits.join("") : "—";
+    const span = document.getElementById("eq5d-codigo");
+    const hidden = document.getElementById("estado_salud");
+    if (span) span.textContent = codigo;
+    if (hidden) hidden.value = codigo === "—" ? "" : codigo;
+  }
+  dims.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener("change", actualizarCodigo);
+  });
+  actualizarCodigo();
+})();
+</script>
 
 {% endblock %}

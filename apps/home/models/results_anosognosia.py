@@ -19,7 +19,8 @@ class LawtonBrodyResult(ResultadoExamenBase):
     manejo_dinero = models.CharField(max_length=255, verbose_name="Manejo de dinero")
 
     puntaje_total = models.IntegerField(verbose_name="Puntaje total")
-    diagnostico = models.CharField(max_length=100, verbose_name="Diagnóstico")
+    # D-18: etiqueta clínica «Interpretación» (campo histórico `diagnostico`)
+    diagnostico = models.CharField(max_length=100, verbose_name="Interpretación")
 
     def __str__(self):
         return f"Lawton & Brody - {self.visita_examen_id}"
@@ -170,8 +171,8 @@ class CuidadorNPIResult(ResultadoExamenBase):
     apetito_F_G = models.IntegerField(blank=True, null=True, verbose_name="F x G apetito")
     apetito_distres = models.CharField(max_length=50, blank=True, null=True, verbose_name="Distrés apetito")
 
-    puntaje_total = models.IntegerField(blank=True, null=True, default=0, verbose_name="Puntaje total")
     carga_total = models.IntegerField(blank=True, null=True, default=0, verbose_name="Carga total")
+    puntaje_total = models.IntegerField(blank=True, null=True, default=0, verbose_name="Puntaje total")
 
     def calcular_puntaje_total(self):
         items_fg = [
@@ -191,8 +192,38 @@ class CuidadorNPIResult(ResultadoExamenBase):
 
         return sum(int(x) for x in items_fg if x not in (None, ""))
 
+    def calcular_carga_total(self):
+        distres_fields = [
+            "ideas_delirantes_distres",
+            "alucinaciones_distres",
+            "agitacion_distres",
+            "depresion_distres",
+            "ansiedad_distres",
+            "euforia_distres",
+            "apatia_distres",
+            "desinhibicion_distres",
+            "irritabilidad_distres",
+            "conducta_motor_distres",
+            "sueno_distres",
+            "apetito_distres",
+        ]
+        total = 0
+        for name in distres_fields:
+            raw = getattr(self, name, None)
+            if raw in (None, ""):
+                continue
+            try:
+                total += int(str(raw).strip().split()[0])
+            except (TypeError, ValueError):
+                continue
+        return total
+
     def save(self, *args, **kwargs):
         self.puntaje_total = self.calcular_puntaje_total()
+        # Recalcular carga si hay distrés; conservar POST si ya vino
+        calculated = self.calcular_carga_total()
+        if calculated or self.carga_total in (None, ""):
+            self.carga_total = calculated
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -257,6 +288,10 @@ class EuroQol5D5LResult(ResultadoExamenBase):
     actividades = models.CharField(max_length=255, verbose_name="Actividades")
     dolor = models.CharField(max_length=255, verbose_name="Dolor")
     ansiedad = models.CharField(max_length=255, verbose_name="Ansiedad")
+    # D-20: código de estado EQ-5D-5L (ej. "11243"); sin índice de utilidad
+    estado_salud = models.CharField(
+        max_length=5, blank=True, null=True, verbose_name="Estado de salud (código EQ-5D)"
+    )
 
     def __str__(self):
         return f"EuroQol-5D-5L - {self.visita_examen}"
@@ -325,6 +360,21 @@ class MoCAResult(ResultadoExamenBase):
 
     diferido = models.PositiveSmallIntegerField(default=0, verbose_name="Total recuerdo diferido")  # 0–5
 
+    # D-19: MIS — recuerdo con pistas (categoría / opción múltiple)
+    pista_cat_rostro = models.BooleanField(default=False, verbose_name="Pista categoría: rostro")
+    pista_cat_seda = models.BooleanField(default=False, verbose_name="Pista categoría: seda")
+    pista_cat_iglesia = models.BooleanField(default=False, verbose_name="Pista categoría: iglesia")
+    pista_cat_clavel = models.BooleanField(default=False, verbose_name="Pista categoría: clavel")
+    pista_cat_rojo = models.BooleanField(default=False, verbose_name="Pista categoría: rojo")
+    pista_opcion_rostro = models.BooleanField(default=False, verbose_name="Pista opción: rostro")
+    pista_opcion_seda = models.BooleanField(default=False, verbose_name="Pista opción: seda")
+    pista_opcion_iglesia = models.BooleanField(default=False, verbose_name="Pista opción: iglesia")
+    pista_opcion_clavel = models.BooleanField(default=False, verbose_name="Pista opción: clavel")
+    pista_opcion_rojo = models.BooleanField(default=False, verbose_name="Pista opción: rojo")
+    mis = models.PositiveSmallIntegerField(
+        blank=True, null=True, default=0, verbose_name="MIS (índice de memoria)"
+    )
+
     # ===== 11: Orientación =====
     orientacion_fecha = models.BooleanField(default=False, verbose_name="Orientación: fecha")
     orientacion_mes = models.BooleanField(default=False, verbose_name="Orientación: mes")
@@ -341,6 +391,18 @@ class MoCAResult(ResultadoExamenBase):
     # ===== Totales =====
     puntaje_total = models.PositiveSmallIntegerField(default=0, verbose_name="Puntaje total")
     interpretacion = models.CharField(max_length=255, blank=True, null=True, verbose_name="Interpretación")
+
+    # D-19: impresión por dominios (no ítem a ítem)
+    PRINT_SECCIONES_INICIOS = [
+        ("alternancia", "Visuoespacial / Ejecutiva"),
+        ("denominacion", "Denominación"),
+        ("atencion_secuencia", "Atención"),
+        ("repeticion_frase_1", "Lenguaje"),
+        ("abstraccion", "Abstracción"),
+        ("palabra_rostro", "Memoria diferida / MIS"),
+        ("orientacion_fecha", "Orientación"),
+        ("educacion_baja", "Totales"),
+    ]
 
     def __str__(self):
         return f"MoCA - {self.visita_examen_id}"
@@ -1303,6 +1365,15 @@ class BettyFerrelResult(ResultadoExamenBase):
     estado_espiritual = models.CharField(max_length=255, blank=True, null=True, verbose_name="Estado espiritual")
 
     puntaje_total = models.IntegerField(default=0, verbose_name="Puntaje total")
+    # D-18: subescalas (promedios 1–4) e interpretación por terciles
+    promedio_fisico = models.FloatField(blank=True, null=True, verbose_name="Promedio bienestar físico")
+    promedio_psicologico = models.FloatField(blank=True, null=True, verbose_name="Promedio bienestar psicológico")
+    promedio_social = models.FloatField(blank=True, null=True, verbose_name="Promedio bienestar social")
+    promedio_espiritual = models.FloatField(blank=True, null=True, verbose_name="Promedio bienestar espiritual")
+    promedio_global = models.FloatField(blank=True, null=True, verbose_name="Promedio global")
+    interpretacion = models.CharField(
+        max_length=255, blank=True, null=True, verbose_name="Interpretación"
+    )
 
     def __str__(self):
         return f"Betty Ferrel - {self.visita_examen}"

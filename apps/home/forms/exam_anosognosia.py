@@ -29,6 +29,14 @@ from ..models import (
     AnamnesisParticipanteResult,
     SeguimientoIntervencionesResult,
 )
+from ..services.exam_scoring import (
+    codigo_estado_eq5d,
+    score_betty,
+    score_yesavage,
+    score_concentracion_moca,
+    score_mis_moca,
+    interpretar_moca,
+)
 
 
 # ─── Helper mixin for HTML→model field remapping ───
@@ -117,6 +125,17 @@ class EuroQol5D5LForm(forms.ModelForm):
         model = EuroQol5D5LResult
         exclude = ["visita_examen"]
 
+    def clean(self):
+        cleaned = super().clean()
+        cleaned["estado_salud"] = codigo_estado_eq5d(
+            cleaned.get("movilidad"),
+            cleaned.get("cuidado_personal"),
+            cleaned.get("actividades"),
+            cleaned.get("dolor"),
+            cleaned.get("ansiedad"),
+        )
+        return cleaned
+
 
 class EuroQolEVASaludForm(forms.ModelForm):
     class Meta:
@@ -127,7 +146,14 @@ class EuroQolEVASaludForm(forms.ModelForm):
 class ParticipanteYesavageForm(forms.ModelForm):
     class Meta:
         model = ParticipanteYesavageResult
-        exclude = ["visita_examen"]
+        exclude = ["visita_examen", "puntaje_total", "interpretacion"]
+
+    def clean(self):
+        cleaned = super().clean()
+        scored = score_yesavage(cleaned)
+        cleaned["puntaje_total"] = scored["puntaje_total"]
+        cleaned["interpretacion"] = scored["interpretacion"]
+        return cleaned
 
 
 class ZaritForm(_TextoSuffixMixin, forms.ModelForm):
@@ -175,7 +201,22 @@ class RedLatSpanishForm(_TextoSuffixMixin, forms.ModelForm):
 class BettyFerrelForm(_TextoSuffixMixin, forms.ModelForm):
     class Meta:
         model = BettyFerrelResult
-        exclude = ["visita_examen"]
+        exclude = [
+            "visita_examen",
+            "puntaje_total",
+            "promedio_fisico",
+            "promedio_psicologico",
+            "promedio_social",
+            "promedio_espiritual",
+            "promedio_global",
+            "interpretacion",
+        ]
+
+    def clean(self):
+        cleaned = super().clean()
+        scored = score_betty(cleaned)
+        cleaned.update(scored)
+        return cleaned
 
 
 class ConsentimientoParticipanteForm(forms.ModelForm):
@@ -206,10 +247,7 @@ class AnamnesisParticipanteForm(forms.ModelForm):
 
 
 class MoCAForm(forms.ModelForm):
-    """
-    MoCA has extensive scoring computed from raw answers.
-    The clean() method replicates the scoring logic currently in the view.
-    """
+    """MoCA: scoring en clean(); ítem 6 (≤1 error) + MIS."""
 
     HTML_FIELD_MAP = {
         "frase_1": "repeticion_frase_1",
@@ -218,15 +256,18 @@ class MoCAForm(forms.ModelForm):
 
     class Meta:
         model = MoCAResult
-        exclude = ["visita_examen",
-                   "puntaje_total",
-        "interpretacion",
-        "atencion",
-        "repeticion",
-        "fluidez",
-        "diferido",
-        "orientacion",
-        "concentracion_resultado",]
+        exclude = [
+            "visita_examen",
+            "puntaje_total",
+            "interpretacion",
+            "atencion",
+            "repeticion",
+            "fluidez",
+            "diferido",
+            "orientacion",
+            "concentracion_resultado",
+            "mis",
+        ]
 
     def __init__(self, data=None, *args, **kwargs):
         if data is not None:
@@ -239,20 +280,16 @@ class MoCAForm(forms.ModelForm):
     def clean(self):
         cleaned = super().clean()
 
-        # ── Atención composite ──
         atencion_secuencia = cleaned.get("atencion_secuencia", 0) or 0
         atencion_inversa = cleaned.get("atencion_inversa", 0) or 0
 
-        # Concentración: 0 errors → 1pt
         errores = cleaned.get("errores_concentracion", 0) or 0
-        concentracion_val = 1 if errores == 0 else 0
-        cleaned["concentracion_resultado"] = "no_fallo" if concentracion_val else "fallo"
+        concentracion_val, resultado = score_concentracion_moca(errores)
+        cleaned["concentracion_resultado"] = resultado
 
-        # Sustracción: count correct answers
         sustraccion_count = sum(
             1 for i in range(1, 6) if cleaned.get(f"sustraccion_{i}", False)
         )
-        # Scoring: 4-5 correct →3pts, 2-3 →2pts, 1 →1pt, 0 →0pts
         if sustraccion_count >= 4:
             sustraccion_puntaje = 3
         elif sustraccion_count >= 2:
@@ -262,30 +299,49 @@ class MoCAForm(forms.ModelForm):
         else:
             sustraccion_puntaje = 0
 
-        atencion_total = int(atencion_secuencia) + int(atencion_inversa) + concentracion_val + sustraccion_puntaje
+        atencion_total = (
+            int(atencion_secuencia)
+            + int(atencion_inversa)
+            + concentracion_val
+            + sustraccion_puntaje
+        )
         cleaned["atencion"] = min(atencion_total, 6)
 
-        # ── Repetición ──
         rep1 = 1 if cleaned.get("repeticion_frase_1", False) else 0
         rep2 = 1 if cleaned.get("repeticion_frase_2", False) else 0
         cleaned["repeticion"] = rep1 + rep2
 
-        # ── Fluidez ──
         num_palabras = cleaned.get("numero_palabras_fluidez", 0) or 0
         cleaned["fluidez"] = 1 if int(num_palabras) >= 11 else 0
 
-        # ── Diferido (recuerdo) ──
-        recall_fields = ["palabra_rostro", "palabra_seda", "palabra_iglesia", "palabra_clavel", "palabra_rojo"]
-        cleaned["diferido"] = sum(1 for f in recall_fields if cleaned.get(f, False))
+        recall_fields = [
+            "palabra_rostro", "palabra_seda", "palabra_iglesia",
+            "palabra_clavel", "palabra_rojo",
+        ]
+        cat_fields = [
+            "pista_cat_rostro", "pista_cat_seda", "pista_cat_iglesia",
+            "pista_cat_clavel", "pista_cat_rojo",
+        ]
+        opc_fields = [
+            "pista_opcion_rostro", "pista_opcion_seda", "pista_opcion_iglesia",
+            "pista_opcion_clavel", "pista_opcion_rojo",
+        ]
+        free = [bool(cleaned.get(f, False)) for f in recall_fields]
+        cleaned["diferido"] = sum(1 for f in free if f)
+        cleaned["mis"] = score_mis_moca(
+            free,
+            [bool(cleaned.get(f, False)) for f in cat_fields],
+            [bool(cleaned.get(f, False)) for f in opc_fields],
+        )
 
-        # ── Orientación ──
         orient_fields = [
             "orientacion_fecha", "orientacion_mes", "orientacion_anio",
             "orientacion_dia_semana", "orientacion_lugar", "orientacion_localidad",
         ]
-        cleaned["orientacion"] = sum(1 for f in orient_fields if cleaned.get(f, False))
+        cleaned["orientacion"] = sum(
+            1 for f in orient_fields if cleaned.get(f, False)
+        )
 
-        # ── Puntaje total ──
         alternancia = int(cleaned.get("alternancia", 0) or 0)
         cubo = int(cleaned.get("cubo", 0) or 0)
         reloj = int(cleaned.get("reloj", 0) or 0)
@@ -301,22 +357,11 @@ class MoCAForm(forms.ModelForm):
             + cleaned["diferido"]
             + cleaned["orientacion"]
         )
-
-        # Educación baja: +1 point
         if cleaned.get("educacion_baja", False):
             puntaje += 1
 
         cleaned["puntaje_total"] = min(puntaje, 30)
-
-        # ── Interpretación ──
-        pt = cleaned["puntaje_total"]
-        if pt >= 26:
-            cleaned["interpretacion"] = "Normal"
-        elif pt >= 18:
-            cleaned["interpretacion"] = "Deterioro cognitivo leve"
-        else:
-            cleaned["interpretacion"] = "Deterioro cognitivo significativo"
-
+        cleaned["interpretacion"] = interpretar_moca(cleaned["puntaje_total"])
         return cleaned
 
 

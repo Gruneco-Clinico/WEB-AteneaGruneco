@@ -95,6 +95,20 @@ _CAMPOS_OCULTOS_POR_MODELO = {
     "RedLatSpanishResult": frozenset({"puntaje_total"}),
     "PuntajeCDRResult": frozenset({"suma_cajas"}),  # resumen aparte, no fila suelta
     "MEWResult": frozenset({"puntuacion"}),  # va en banner «Puntuación total MEQ»
+    # D-16/D-18/D-20: derivados van en banner
+    "PittsburghResult": frozenset({"puntuacion_total"}),
+    "EpworthResult": frozenset({"puntaje_total"}),
+    "AtenasResult": frozenset({"puntuacion_total"}),
+    "ISIResult": frozenset({"puntuacion_total"}),
+    "StopBangResult": frozenset({"puntaje_total"}),
+    "BerlinResult": frozenset({
+        "categoria1_positiva", "categoria2_positiva", "categoria3_positiva",
+        "categorias_positivas", "riesgo",
+    }),
+    "BettyFerrelResult": frozenset({"puntaje_total", "promedio_global"}),
+    "EuroQol5D5LResult": frozenset({"estado_salud"}),
+    "CuidadorNPIResult": frozenset({"puntaje_total"}),
+    "MoCAResult": frozenset({"puntaje_total"}),
 }
 
 
@@ -102,11 +116,20 @@ def _resolver_scores_vista(resultado):
     """Decide qué resumen de puntaje mostrar en ver/impresión.
 
     - Yesavage / AQD / RedLat: sin caja de total (RedLat ya lista componentes).
-    - CDR: resalta CDR Global; calcula en vivo la suma de los 6 dominios
-      (etiqueta clara) para no mostrar 0 de registros antiguos.
+    - CDR: resalta CDR Global; calcula en vivo la suma de los 6 dominios.
     - MEW: ``puntuacion`` → banner «Puntuación total MEQ».
-    - Resto: ``puntaje_total`` / ``puntuacion_total`` / ``puntuacion`` si existen.
+    - Sueño / Betty / MoCA / EuroQoL / NPI: total + interpretación en detalle.
     """
+    from apps.home.services.exam_scoring import (
+        interpretar_epworth,
+        interpretar_psqi,
+        interpretar_atenas,
+        interpretar_isi,
+        interpretar_stopbang,
+        interpretar_betty,
+        interpretar_yesavage,
+    )
+
     model_name = type(resultado).__name__
     out = {
         "puntaje_total": None,
@@ -115,6 +138,7 @@ def _resolver_scores_vista(resultado):
         "score_banner_titulo": None,
         "score_banner_valor": None,
         "score_banner_detalle": None,
+        "aqd_anosognosia": None,
     }
 
     if model_name == "PuntajeCDRResult":
@@ -144,6 +168,185 @@ def _resolver_scores_vista(resultado):
             out["score_banner_detalle"] = str(tipo)
         return out
 
+    if model_name == "PittsburghResult":
+        total = getattr(resultado, "puntuacion_total", None)
+        out["puntaje_total"] = total
+        out["score_banner_titulo"] = "Puntaje Total PSQI"
+        out["score_banner_valor"] = total
+        interp = getattr(resultado, "interpretacion", None) or (
+            interpretar_psqi(total) if total is not None else None
+        )
+        comps = [
+            getattr(resultado, f"componente_{c}", None)
+            for c in (
+                "calidad", "latencia", "duracion", "eficiencia",
+                "perturbaciones", "medicacion", "disfuncion",
+            )
+        ]
+        detalle_parts = []
+        if any(c is not None for c in comps):
+            detalle_parts.append(
+                "Componentes: "
+                + " · ".join(
+                    f"{n}={v if v is not None else '—'}"
+                    for n, v in zip(
+                        ("C1", "C2", "C3", "C4", "C5", "C6", "C7"), comps
+                    )
+                )
+            )
+        if interp:
+            detalle_parts.append(str(interp))
+        out["score_banner_detalle"] = " | ".join(detalle_parts) or None
+        return out
+
+    if model_name == "EpworthResult":
+        total = getattr(resultado, "puntaje_total", None)
+        out["puntaje_total"] = total
+        out["score_banner_titulo"] = "Puntaje Total"
+        out["score_banner_valor"] = total
+        interp = getattr(resultado, "interpretacion", None) or (
+            interpretar_epworth(total) if total is not None else None
+        )
+        out["score_banner_detalle"] = interp
+        return out
+
+    if model_name == "AtenasResult":
+        total = getattr(resultado, "puntuacion_total", None)
+        out["puntaje_total"] = total
+        out["score_banner_titulo"] = "Puntaje Total"
+        out["score_banner_valor"] = total
+        out["score_banner_detalle"] = getattr(
+            resultado, "interpretacion", None
+        ) or (interpretar_atenas(total) if total is not None else None)
+        return out
+
+    if model_name == "ISIResult":
+        total = getattr(resultado, "puntuacion_total", None)
+        out["puntaje_total"] = total
+        out["score_banner_titulo"] = "Puntaje Total"
+        out["score_banner_valor"] = total
+        out["score_banner_detalle"] = getattr(
+            resultado, "interpretacion", None
+        ) or (interpretar_isi(total) if total is not None else None)
+        return out
+
+    if model_name == "StopBangResult":
+        total = getattr(resultado, "puntaje_total", None)
+        out["puntaje_total"] = total
+        out["score_banner_titulo"] = "Puntaje Total STOP-Bang"
+        out["score_banner_valor"] = total
+        riesgo = getattr(resultado, "riesgo", None)
+        stop = getattr(resultado, "stop_positivos", None)
+        bang = getattr(resultado, "bang_positivos", None)
+        scored = interpretar_stopbang(
+            total, stop, bang, getattr(resultado, "alto_riesgo_alternativo", None)
+        )
+        parts = []
+        if stop is not None or bang is not None:
+            parts.append(f"STOP={stop or 0} · BANG={bang or 0}")
+        parts.append(f"Riesgo: {riesgo or scored['riesgo']}")
+        parts.append(scored["interpretacion"])
+        out["score_banner_detalle"] = " | ".join(parts)
+        return out
+
+    if model_name == "BerlinResult":
+        riesgo = getattr(resultado, "riesgo", None)
+        positivas = getattr(resultado, "categorias_positivas", None)
+        out["score_banner_titulo"] = "Riesgo Berlín"
+        out["score_banner_valor"] = riesgo or "—"
+        c1 = getattr(resultado, "categoria1_positiva", None)
+        c2 = getattr(resultado, "categoria2_positiva", None)
+        c3 = getattr(resultado, "categoria3_positiva", None)
+        interp = getattr(resultado, "interpretacion", None)
+        parts = [
+            f"Categorías positivas: {positivas if positivas is not None else '—'}",
+            f"C1={'Sí' if c1 else 'No' if c1 is not None else '—'} · "
+            f"C2={'Sí' if c2 else 'No' if c2 is not None else '—'} · "
+            f"C3={'Sí' if c3 else 'No' if c3 is not None else '—'}",
+        ]
+        if interp:
+            parts.append(str(interp))
+        out["score_banner_detalle"] = " | ".join(parts)
+        return out
+
+    if model_name == "BettyFerrelResult":
+        global_avg = getattr(resultado, "promedio_global", None)
+        out["puntaje_total"] = getattr(resultado, "puntaje_total", None)
+        out["score_banner_titulo"] = "Promedio global QOL"
+        out["score_banner_valor"] = global_avg
+        interp = getattr(resultado, "interpretacion", None) or interpretar_betty(
+            global_avg
+        )
+        dims = []
+        for label, attr in (
+            ("Físico", "promedio_fisico"),
+            ("Psicológico", "promedio_psicologico"),
+            ("Social", "promedio_social"),
+            ("Espiritual", "promedio_espiritual"),
+        ):
+            v = getattr(resultado, attr, None)
+            if v is not None:
+                dims.append(f"{label}={v}")
+        detalle = " · ".join(dims)
+        if interp:
+            detalle = f"{detalle} | {interp}" if detalle else interp
+        out["score_banner_detalle"] = detalle or None
+        return out
+
+    if model_name == "EuroQol5D5LResult":
+        codigo = getattr(resultado, "estado_salud", None)
+        out["score_banner_titulo"] = "Estado de salud EQ-5D"
+        out["score_banner_valor"] = codigo or "—"
+        out["score_banner_detalle"] = (
+            "Código de 5 dígitos (sin índice de utilidad)"
+        )
+        return out
+
+    if model_name == "EuroQolEVASaludResult":
+        vas = getattr(resultado, "termometro_estado_salud", None)
+        out["puntaje_total"] = vas
+        out["score_banner_titulo"] = "EQ-VAS"
+        out["score_banner_valor"] = vas
+        out["score_banner_detalle"] = "Autovaloración 0–100"
+        return out
+
+    if model_name == "CuidadorNPIResult":
+        total = getattr(resultado, "puntaje_total", None)
+        carga = getattr(resultado, "carga_total", None)
+        out["puntaje_total"] = total
+        out["score_banner_titulo"] = "Puntaje total NPI"
+        out["score_banner_valor"] = total
+        if carga is not None:
+            out["score_banner_detalle"] = f"Carga total (distrés): {carga}"
+        return out
+
+    if model_name == "MoCAResult":
+        total = getattr(resultado, "puntaje_total", None)
+        out["puntaje_total"] = total
+        out["score_banner_titulo"] = "Puntaje Total MoCA"
+        out["score_banner_valor"] = total
+        parts = []
+        interp = getattr(resultado, "interpretacion", None)
+        if interp:
+            parts.append(str(interp))
+        mis = getattr(resultado, "mis", None)
+        if mis is not None:
+            parts.append(f"MIS: {mis}")
+        out["score_banner_detalle"] = " | ".join(parts) or None
+        return out
+
+    if model_name == "ParticipanteYesavageResult":
+        # Sin caja de total (política B-10); sí mostrar interpretación si hay
+        interp = getattr(resultado, "interpretacion", None)
+        if not interp or str(interp).strip() in ("0", ""):
+            pt = getattr(resultado, "puntaje_total", None)
+            if pt is not None:
+                interp = interpretar_yesavage(pt)
+        if interp and str(interp).strip() not in ("0", ""):
+            out["score_banner_titulo"] = "Interpretación Yesavage"
+            out["score_banner_valor"] = interp
+        return out
+
     if model_name in _OCULTAR_PUNTAJE_TOTAL:
         return out
 
@@ -156,8 +359,37 @@ def _resolver_scores_vista(resultado):
     if puntaje_total is not None:
         out["score_banner_titulo"] = "Puntaje Total"
         out["score_banner_valor"] = puntaje_total
+        interp = getattr(resultado, "interpretacion", None)
+        if interp and str(interp).strip() not in ("0", ""):
+            out["score_banner_detalle"] = str(interp)
     return out
 
+
+def _resolver_aqd_anosognosia(visita_examen, resultado):
+    """Si la visita tiene ambos AQD, calcula delta de anosognosia (D-17)."""
+    model_name = type(resultado).__name__
+    if model_name not in ("AQDCuidadorResult", "AQDParticipanteResult"):
+        return None
+    try:
+        from apps.home.models import AQDCuidadorResult, AQDParticipanteResult
+        from apps.home.services.exam_scoring import interpretar_aqd_anosognosia
+    except Exception:
+        return None
+
+    visita = visita_examen.visita
+    cuid = (
+        AQDCuidadorResult.objects.filter(visita_examen__visita=visita)
+        .order_by("-id")
+        .first()
+    )
+    part = (
+        AQDParticipanteResult.objects.filter(visita_examen__visita=visita)
+        .order_by("-id")
+        .first()
+    )
+    if not cuid or not part:
+        return None
+    return interpretar_aqd_anosognosia(cuid.puntaje_total, part.puntaje_total)
 
 def _campos_ocultos_resultado(resultado):
     model_name = type(resultado).__name__
@@ -484,6 +716,9 @@ def get_context_ver_examen(visita_examen):
         .first()
     )
     scores = _resolver_scores_vista(resultado)
+    aqd_anosognosia = _resolver_aqd_anosognosia(visita_examen, resultado)
+    if aqd_anosognosia:
+        scores["aqd_anosognosia"] = aqd_anosognosia
 
     return (
         "examenes_resultados/resultado_generico.html",

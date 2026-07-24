@@ -254,7 +254,7 @@
                             </p>
                             <!-- Campo oculto para enviar el total e interpretación -->
                             <input type="hidden" name="puntaje_total" id="puntaje_total" value="{{ datos_examen.puntaje_total|default:'0' }}">
-                            <input type="hidden" name="interpretacion" id="interpretacion" value="{{ datos_examen.interpretacion|default:'0' }}">
+                            <input type="hidden" name="interpretacion" id="interpretacion" value="{{ datos_examen.interpretacion|default:'' }}">
                         </div>
 
                         
@@ -319,6 +319,8 @@
             }
 
             interpretacionDisplay.textContent = interpretacion;
+            const interpretacionInput = document.getElementById('interpretacion');
+            if (interpretacionInput) interpretacionInput.value = interpretacion;
             resultadoContainer.style.display = 'block';
         }
 
