@@ -1,13 +1,28 @@
 <div class="subseccion">
-  {% if datos_resultado %}
+  {% if secciones %}
+  {% for seccion in secciones %}
+  <h4 class="subseccion-titulo">{{ seccion.titulo }}</h4>
+  <table class="tabla-simple">
+    {% for label, valor in seccion.campos %}
+    <tr{% if label == "Puntaje total" %} class="hc-fila-total"{% endif %}><th>{{ label }}</th><td>{{ valor|default:"—" }}</td></tr>
+    {% endfor %}
+  </table>
+  {% endfor %}
+  {% elif datos_resultado %}
   <table class="tabla-simple">
     {% for label, valor in datos_resultado.items %}
-    <tr><th>{{ label }}</th><td>{{ valor|default:"—" }}</td></tr>
+    <tr{% if label == "Puntaje total" %} class="hc-fila-total"{% endif %}><th>{{ label }}</th><td>{{ valor|default:"—" }}</td></tr>
     {% endfor %}
   </table>
   {% endif %}
   {% if score_banner_valor is not None %}
-  <p><span class="campo-label">{{ score_banner_titulo|default:"Puntaje" }}:</span> {{ score_banner_valor }}</p>
+  <p class="hc-fila-total"><span class="campo-label">{{ score_banner_titulo|default:"Puntaje" }}:</span> {{ score_banner_valor }}</p>
   {% if score_banner_detalle %}<p class="text-muted">{{ score_banner_detalle }}</p>{% endif %}
+  {% endif %}
+  {% if aqd_anosognosia %}
+  <p><span class="campo-label">Anosognosia (Δ AQD):</span> {{ aqd_anosognosia.delta }}
+    — {{ aqd_anosognosia.interpretacion }}
+    <span class="text-muted">(cuidador {{ aqd_anosognosia.total_cuidador }} − participante {{ aqd_anosognosia.total_participante }})</span>
+  </p>
   {% endif %}
 </div>

@@ -56,3 +56,5 @@ __pycache__/
 *$py.class
 .history
 .cursor/*
+docs/files
+docs/issues

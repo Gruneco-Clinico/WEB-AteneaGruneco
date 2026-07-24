@@ -342,6 +342,44 @@
                 <input type="hidden" name="diferido" id="diferido_total" value="0">
               </div>
 
+            <!-- D-19: MIS — pistas categoría y opción múltiple -->
+            <div class="form-group">
+              <label><strong>MIS — Recuerdo con pistas</strong></label>
+              <p class="text-muted small">Solo marcar pistas para palabras <em>no</em> recordadas libremente. MIS = libre×3 + categoría×2 + opción×1 (máx. 15).</p>
+              <div class="table-responsive">
+                <table class="table table-sm table-bordered">
+                  <thead><tr><th>Palabra</th><th>Pista categoría</th><th>Opción múltiple</th></tr></thead>
+                  <tbody>
+                    <tr>
+                      <td>rostro</td>
+                      <td><input type="checkbox" name="pista_cat_rostro" {% if datos_examen.pista_cat_rostro %}checked{% endif %}></td>
+                      <td><input type="checkbox" name="pista_opcion_rostro" {% if datos_examen.pista_opcion_rostro %}checked{% endif %}></td>
+                    </tr>
+                    <tr>
+                      <td>seda</td>
+                      <td><input type="checkbox" name="pista_cat_seda" {% if datos_examen.pista_cat_seda %}checked{% endif %}></td>
+                      <td><input type="checkbox" name="pista_opcion_seda" {% if datos_examen.pista_opcion_seda %}checked{% endif %}></td>
+                    </tr>
+                    <tr>
+                      <td>iglesia</td>
+                      <td><input type="checkbox" name="pista_cat_iglesia" {% if datos_examen.pista_cat_iglesia %}checked{% endif %}></td>
+                      <td><input type="checkbox" name="pista_opcion_iglesia" {% if datos_examen.pista_opcion_iglesia %}checked{% endif %}></td>
+                    </tr>
+                    <tr>
+                      <td>clavel</td>
+                      <td><input type="checkbox" name="pista_cat_clavel" {% if datos_examen.pista_cat_clavel %}checked{% endif %}></td>
+                      <td><input type="checkbox" name="pista_opcion_clavel" {% if datos_examen.pista_opcion_clavel %}checked{% endif %}></td>
+                    </tr>
+                    <tr>
+                      <td>rojo</td>
+                      <td><input type="checkbox" name="pista_cat_rojo" {% if datos_examen.pista_cat_rojo %}checked{% endif %}></td>
+                      <td><input type="checkbox" name="pista_opcion_rojo" {% if datos_examen.pista_opcion_rojo %}checked{% endif %}></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
             <div class="form-group">
                 <label><strong>11. Orientación</strong></label>
                 <p>Responda correctamente a: <br>
@@ -454,7 +492,9 @@
       // Calcular secciones de atención (secuencia + inversa + sustracción)
       const valSecuencia = parseInt(document.querySelector('[name="atencion_secuencia"]')?.value || 0);
       const valInversa = parseInt(document.querySelector('[name="atencion_inversa"]')?.value || 0);
-      const valConcentracion = parseInt(document.querySelector('[name="atencion_concentracion"]')?.value || 0);
+      const erroresConc = parseInt(document.querySelector('[name="errores_concentracion"]')?.value || 0);
+      // Ítem 6 MoCA: 0–1 error → 1 punto
+      const valConcentracion = (erroresConc <= 1) ? 1 : 0;
       const valSustraccion = calcularPuntajeSustraccion();
 
       const totalAtencion = valSecuencia + valInversa + valConcentracion + valSustraccion;
@@ -501,9 +541,10 @@
     document.querySelectorAll('.repeticion-check, .diferido-check, .orientacion-check, .sustraccion-check')
       .forEach(cb => cb.addEventListener("change", calcularTotal));
 
-    ['atencion_secuencia', 'atencion_inversa', 'atencion_concentracion'].forEach(name => {
+    ['atencion_secuencia', 'atencion_inversa', 'errores_concentracion'].forEach(name => {
       const el = document.querySelector(`[name="${name}"]`);
       if (el) el.addEventListener("change", calcularTotal);
+      if (el) el.addEventListener("input", calcularTotal);
     });
 
     document.getElementById('educacion_baja')?.addEventListener("change", calcularTotal);

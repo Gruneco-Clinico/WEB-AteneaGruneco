@@ -115,12 +115,20 @@ class ScoreBannerPolicyTests(SimpleTestCase):
         for cls, kwargs in (
             (AQDCuidadorResult, {"puntaje_total": 12}),
             (AQDParticipanteResult, {"puntaje_total": 8}),
-            (ParticipanteYesavageResult, {"puntaje_total": 5}),
             (RedLatSpanishResult, {"puntaje_total": 40}),
         ):
             scores = _resolver_scores_vista(cls(**kwargs))
             self.assertIsNone(scores["puntaje_total"], cls.__name__)
             self.assertIsNone(scores["score_banner_valor"], cls.__name__)
+
+    def test_yesavage_muestra_interpretacion_sin_caja_de_total(self):
+        """D-19: sin puntaje_total en banner de total; sí interpretación legible."""
+        scores = _resolver_scores_vista(
+            ParticipanteYesavageResult(puntaje_total=5, interpretacion="Normal")
+        )
+        self.assertIsNone(scores["puntaje_total"])
+        self.assertEqual(scores["score_banner_titulo"], "Interpretación Yesavage")
+        self.assertEqual(scores["score_banner_valor"], "Normal")
 
     def test_cdr_banner_es_global_y_suma_en_vivo(self):
         obj = PuntajeCDRResult(

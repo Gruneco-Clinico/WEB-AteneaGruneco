@@ -591,15 +591,10 @@ def confirmacion_registro_externo(request):
 
 
 def get_interpretacion_epworth(puntaje):
-    """Devuelve la interpretación del puntaje Epworth"""
-    if puntaje <= 6:
-        return "Somnolencia normal"
-    elif puntaje <= 10:
-        return "Somnolencia leve"
-    elif puntaje <= 15:
-        return "Somnolencia moderada"
-    else:
-        return "Somnolencia severa"
+    """Devuelve la interpretación del puntaje Epworth (escala D-16)."""
+    from apps.home.services.exam_scoring import interpretar_epworth
+
+    return interpretar_epworth(puntaje)
 
 
 def calcular_puntuacion_mew_publico(post_data):

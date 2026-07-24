@@ -199,7 +199,7 @@
             <div class="alert alert-success mt-4">
               <h4 class="alert-heading">Resultado de la Escala</h4>
               <p><strong>Puntaje Total:</strong> <span id="puntaje-lawton">{{ datos_examen.total|default:"0" }}</span></p>
-              <p><strong>Diagnóstico:</strong> <span id="diagnostico-lawton">{{ datos_examen.diagnostico|default:"-" }}</span></p>
+              <p><strong>Interpretación:</strong> <span id="diagnostico-lawton">{{ datos_examen.diagnostico|default:"-" }}</span></p>
               <!-- Guardar el puntaje para enviar al servidor -->
               <input type="hidden" name="total" id="total-lawton" value="{{ datos_examen.total|default:'0' }}">
               <input type="hidden" name="diagnostico" id="diagnostico-lawton-hidden" value="{{ datos_examen.diagnostico|default:'-' }}">
@@ -269,7 +269,7 @@
         else diagnostico = "Dependencia total";
       }
       puntajeSpan.textContent = total;
-      diagnosticoSpan.textContent = diagnostico || "Seleccione género para ver diagnóstico.";
+      diagnosticoSpan.textContent = diagnostico || "Seleccione género para ver interpretación.";
       totalHidden.value = total;
       diagnosticoHidden.value = diagnostico;
     }
