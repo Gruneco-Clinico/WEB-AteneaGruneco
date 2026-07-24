@@ -174,48 +174,56 @@ def guardar_examen_cognitivo_anamnesis(request):
                 cognitivo_anamnesis.actividades_vida_diaria.all().delete()
                 cognitivo_anamnesis.actividades_complejas.all().delete()
 
-                # Procesar actitudes
-                for actitud in request.POST.getlist("actitud_tipo[]"):
+                # Nombres POST alineados con cognitivo_Anamnesis.html
+                for actitud in request.POST.getlist("actitud_seleccion"):
                     if actitud:
                         ActitudCognitiva.objects.create(
                             anamnesis=cognitivo_anamnesis, tipo=actitud
                         )
 
-                # Procesar problemas de atención
-                atencion_tipos = request.POST.getlist("atencion_tipo[]")
-                atencion_edades = request.POST.getlist("atencion_edad_inicio[]")
-                atencion_caracteristicas = request.POST.getlist(
-                    "atencion_caracteristicas[]"
-                )
-                for i, tipo in enumerate(atencion_tipos):
-                    if tipo:
-                        AtencionCognitiva.objects.create(
-                            anamnesis=cognitivo_anamnesis,
-                            tipo=tipo,
-                            edad_inicio=atencion_edades[i]
-                            if i < len(atencion_edades)
-                            else "",
-                            caracteristicas=atencion_caracteristicas[i]
-                            if i < len(atencion_caracteristicas)
-                            else "",
-                        )
+                atencion_prefix = {
+                    "Quejas atencionales": "quejas",
+                    "Alteración atención sostenida": "sostenida",
+                    "Alteración atención dividida": "dividida",
+                    "Incapacidad para quedarse quieto": "quieto",
+                    "Dificultad para finalizar una tarea": "tarea",
+                    "Dificultad para seguir instrucciones": "instrucciones",
+                    "Distracción con estímulos irrelevantes": "distraccion",
+                }
+                for tipo in request.POST.getlist("atencion_seleccion[]"):
+                    if not tipo:
+                        continue
+                    prefix = atencion_prefix.get(tipo)
+                    edad = (
+                        request.POST.get(f"{prefix}_edad_inicio", "")
+                        if prefix
+                        else ""
+                    )
+                    caract = (
+                        request.POST.get(f"{prefix}_caracteristicas", "")
+                        if prefix
+                        else ""
+                    )
+                    AtencionCognitiva.objects.create(
+                        anamnesis=cognitivo_anamnesis,
+                        tipo=tipo,
+                        edad_inicio=edad or "",
+                        caracteristicas=caract or "",
+                    )
 
-                # Procesar errores de lenguaje
-                for error in request.POST.getlist("error_lenguaje[]"):
+                for error in request.POST.getlist("lenguaje_errores[]"):
                     if error:
                         ErrorLenguajeCognitivo.objects.create(
                             anamnesis=cognitivo_anamnesis, tipo=error
                         )
 
-                # Procesar actividades de vida diaria
-                for actividad in request.POST.getlist("actividad_vida_diaria[]"):
+                for actividad in request.POST.getlist("actividades_vida_diaria[]"):
                     if actividad:
                         ActividadVidaDiaria.objects.create(
                             anamnesis=cognitivo_anamnesis, tipo=actividad
                         )
 
-                # Procesar actividades complejas
-                for actividad in request.POST.getlist("actividad_compleja[]"):
+                for actividad in request.POST.getlist("actividades_complejas[]"):
                     if actividad:
                         ActividadCompleja.objects.create(
                             anamnesis=cognitivo_anamnesis, tipo=actividad

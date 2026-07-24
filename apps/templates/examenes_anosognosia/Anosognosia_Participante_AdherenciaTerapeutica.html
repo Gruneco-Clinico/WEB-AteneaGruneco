@@ -510,6 +510,37 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
+      // Precarga B-11: valores guardados en selects
+      const datosExamen = {% if datos_examen_json %}{{ datos_examen_json|safe }}{% else %}null{% endif %};
+      if (datosExamen) {
+        const campos = [
+          "dieta_rigurosa","asistir_consultas","pendiente_sintomas","recomendacion_medico",
+          "alimentos_permitidos","seguir_tratamiento","regresar_consulta","seguridad_tratamiento",
+          "olvido_medicamentos","dejar_tratamiento","sin_mejoria","hacer_ejercicio",
+          "recordar_medicamentos","analisis_periodicos","confianza_medico","mejorar_enfermedad",
+          "apego_tratamiento","adherencia_tratamiento","menos_medicamento","confianza_medicamento",
+          "dosis_indicada","revisiones_periodicas","medico_sintoma","mejoria_salud",
+          "sintomas_deterioro","mediciones_indicadas","respeto_dieta","modificacion_tratamiento",
+          "mantener_controlado","seguridad_resultados"
+        ];
+        campos.forEach(function (name) {
+          if (datosExamen[name] === undefined || datosExamen[name] === null || datosExamen[name] === "") return;
+          const el = document.querySelector('select[name="' + name + '"]');
+          if (!el) return;
+          const val = String(datosExamen[name]);
+          let matched = false;
+          Array.from(el.options).forEach(function (opt) {
+            if (opt.value === val || (opt.dataset && opt.dataset.text === val)) {
+              el.value = opt.value;
+              matched = true;
+            }
+          });
+          if (!matched && /^[0-5]$/.test(val)) {
+            el.value = val;
+          }
+        });
+      }
+
       const factor1Items = [2, 3, 6, 7, 8, 14, 15, 16, 17, 18, 21, 22, 24, 25, 29, 30];
       const factor2Items = [1, 4, 5, 12, 26, 27];
       const factor3Items = [9, 10, 11, 13, 19, 20, 23, 28];

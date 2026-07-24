@@ -162,3 +162,147 @@ class ExamEditPreloadTests(TestCase):
         self.assertEqual(datos["epidemiologicos"][0]["tipo_antecedente"], "COVID-19")
         self.assertEqual(datos["epidemiologicos"][0]["descripcion"], "COVID-19")
         self.assertEqual(datos["epidemiologicos"][0]["observaciones"], "Leve")
+
+    def test_cognitivo_anamnesis_preload_scalars_and_children(self):
+        from apps.home.models import (
+            ActividadCompleja,
+            ActividadVidaDiaria,
+            ActitudCognitiva,
+            AtencionCognitiva,
+            CognitivoAnamnesisResult,
+            ErrorLenguajeCognitivo,
+        )
+
+        ve = self._ve(20, "Cognitivo_Anamnesis")
+        result = CognitivoAnamnesisResult.objects.create(
+            visita_examen=ve,
+            motivo_consulta="Olvidos frecuentes",
+            descripcion_general="Paciente refiere fallas de memoria",
+            apariencia_estado="Adecuada",
+            memoria_quejas="Si",
+            independencia_vida_diaria="si",
+        )
+        ActitudCognitiva.objects.create(anamnesis=result, tipo="Colaborador")
+        ActitudCognitiva.objects.create(anamnesis=result, tipo="Amable")
+        AtencionCognitiva.objects.create(
+            anamnesis=result,
+            tipo="Quejas atencionales",
+            edad_inicio="60",
+            caracteristicas="Se distrae fácil",
+        )
+        ErrorLenguajeCognitivo.objects.create(
+            anamnesis=result, tipo="Errores semánticos"
+        )
+        ActividadVidaDiaria.objects.create(anamnesis=result, tipo="comer")
+        ActividadCompleja.objects.create(anamnesis=result, tipo="telefono")
+
+        model = get_exam_model(20)
+        datos, modo, _ = build_datos_examen_edicion(ve, self.paciente, 20, model)
+        self.assertTrue(modo)
+        self.assertEqual(datos["motivo_consulta"], "Olvidos frecuentes")
+        self.assertEqual(datos["apariencia_estado"], "Adecuada")
+        self.assertEqual(datos["memoria_quejas"], "Si")
+        self.assertIn("Colaborador", datos["actitudes_tipos"])
+        self.assertIn("Amable", datos["actitudes_tipos"])
+        self.assertIn("Quejas atencionales", datos["atencion_tipos"])
+        self.assertEqual(
+            datos["atencion_map"]["Quejas atencionales"]["edad_inicio"], "60"
+        )
+        self.assertEqual(
+            datos["atencion_map"]["Quejas atencionales"]["prefix"], "quejas"
+        )
+        self.assertIn("Errores semánticos", datos["errores_lenguaje_tipos"])
+        self.assertIn("comer", datos["actividades_vida_diaria_tipos"])
+        self.assertIn("telefono", datos["actividades_complejas_tipos"])
+
+    def test_medicamentos_extra_datos_medicamentos_json(self):
+        from apps.home.models import Medicamento, MedicamentosResult
+
+        ve = self._ve(8, "General_Medicamentos")
+        result = MedicamentosResult.objects.create(visita_examen=ve)
+        Medicamento.objects.create(
+            medicamentos_result=result,
+            nombre_comercial="Losartan",
+            presentacion="tableta",
+            concentracion="50",
+            unidad="miligramos",
+            via_administracion="oral",
+            cantidad="1 tableta",
+            frecuencia="Cada 24 horas",
+            fecha_inicio="2024-01-01",
+            indicacion="HTA",
+        )
+        model = get_exam_model(8)
+        datos, modo, extra = build_datos_examen_edicion(ve, self.paciente, 8, model)
+        self.assertTrue(modo)
+        self.assertEqual(len(datos["medicamentos"]), 1)
+        self.assertIn("datos_medicamentos", extra)
+        self.assertIn("Losartan", extra["datos_medicamentos"])
+
+    def test_revision_sistemas_preload_detalles(self):
+        from apps.home.models import DetalleRevisionSistemas, RevisionSistemasResult
+
+        ve = self._ve(4, "General_RevisiónSistemas")
+        result = RevisionSistemasResult.objects.create(
+            visita_examen=ve,
+            sintoma_general="si",
+            sintoma_cardiopulmonar="no",
+        )
+        DetalleRevisionSistemas.objects.create(
+            revision_sistemas_result=result,
+            sistema="general",
+            sintoma="Fiebre",
+            tiempo="2 días",
+            caracteristicas="Intermitente",
+        )
+        model = get_exam_model(4)
+        datos, modo, _ = build_datos_examen_edicion(ve, self.paciente, 4, model)
+        self.assertTrue(modo)
+        self.assertEqual(datos["sintoma_general"], "si")
+        self.assertEqual(datos["sistemas_detalles"]["general"][0]["sintoma"], "Fiebre")
+
+    def test_adherencia_preload_scalar(self):
+        from apps.home.models import AdherenciaTerapeuticaResult
+
+        ve = self._ve(28, "Adherencia_Terapeutica")
+        AdherenciaTerapeuticaResult.objects.create(
+            visita_examen=ve,
+            dieta_rigurosa="4",
+            asistir_consultas="5",
+            pendiente_sintomas="3",
+            recomendacion_medico="4",
+            alimentos_permitidos="3",
+            seguir_tratamiento="5",
+            regresar_consulta="4",
+            seguridad_tratamiento="5",
+            olvido_medicamentos="1",
+            dejar_tratamiento="0",
+            sin_mejoria="1",
+            hacer_ejercicio="2",
+            recordar_medicamentos="4",
+            analisis_periodicos="5",
+            confianza_medico="5",
+            mejorar_enfermedad="4",
+            apego_tratamiento="5",
+            adherencia_tratamiento="4",
+            menos_medicamento="1",
+            confianza_medicamento="5",
+            dosis_indicada="5",
+            revisiones_periodicas="4",
+            medico_sintoma="3",
+            mejoria_salud="4",
+            sintomas_deterioro="3",
+            mediciones_indicadas="4",
+            respeto_dieta="3",
+            modificacion_tratamiento="1",
+            mantener_controlado="5",
+            seguridad_resultados="4",
+            factor1=50,
+            factor2=20,
+            factor3=10,
+        )
+        model = get_exam_model(28)
+        datos, modo, _ = build_datos_examen_edicion(ve, self.paciente, 28, model)
+        self.assertTrue(modo)
+        self.assertEqual(datos["dieta_rigurosa"], "4")
+        self.assertEqual(datos["factor1"], 50)

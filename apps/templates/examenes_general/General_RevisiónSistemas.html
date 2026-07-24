@@ -757,7 +757,8 @@
 <!-- Script para controlar la visibilidad de los campos -->
 <script>
   document.addEventListener('DOMContentLoaded', function () {
-    // Función para mostrar/ocultar campos de un sistema
+    const datos = {% if datos_examen_json %}{{ datos_examen_json|safe }}{% else %}null{% endif %};
+
     function toggleCampos(toggle) {
       const sistema = toggle.getAttribute('data-sistema');
       const camposDetalle = document.querySelector(`.sistema-${sistema}-detalle`);
@@ -774,14 +775,12 @@
         hiddenInput.value = 'no';
         setTimeout(() => {
           camposDetalle.classList.add('hide-details');
-          // Limpiar todos los síntomas excepto el primero
           const container = document.getElementById(`sintomas_${sistema}_container`);
           const sintomas = container.querySelectorAll('.sintoma-item');
           sintomas.forEach((sintoma, index) => {
             if (index > 0) {
               sintoma.remove();
             } else {
-              // Limpiar inputs del primer síntoma
               sintoma.querySelectorAll('input').forEach(input => input.value = '');
             }
           });
@@ -789,35 +788,30 @@
       }
     }
 
-    // Configurar toggles de sistemas
-    document.querySelectorAll('.sistema-toggle').forEach(toggle => {
-      toggleCampos(toggle);
-      toggle.addEventListener('change', function () { toggleCampos(this); });
-    });
-
-    // Función para agregar nuevo síntoma
-    function agregarSintoma(sistema) {
+    function agregarSintoma(sistema, valores) {
       const container = document.getElementById(`sintomas_${sistema}_container`);
       const nuevoSintoma = document.createElement('div');
       nuevoSintoma.className = 'sintoma-item mb-3 border-bottom pb-3';
+      const v = valores || {};
+      const esc = (s) => String(s || '').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
       nuevoSintoma.innerHTML = `
         <div class="row">
           <div class="col-md-4">
             <div class="form-group">
               <input type="text" class="form-control" placeholder="Describa el síntoma"
-                name="${sistema}_sintoma[]">
+                name="${sistema}_sintoma[]" value="${esc(v.sintoma)}">
             </div>
           </div>
           <div class="col-md-3">
             <div class="form-group">
-              <input type="text" class="form-control" placeholder="Tiempo de evolución" 
-                name="${sistema}_tiempo[]">
+              <input type="text" class="form-control" placeholder="Tiempo de evolución"
+                name="${sistema}_tiempo[]" value="${esc(v.tiempo)}">
             </div>
           </div>
           <div class="col-md-3">
             <div class="form-group">
               <input type="text" class="form-control" placeholder="Detalles del síntoma"
-                name="${sistema}_caracteristicas[]">
+                name="${sistema}_caracteristicas[]" value="${esc(v.caracteristicas)}">
             </div>
           </div>
           <div class="col-md-2 d-flex align-items-end">
@@ -828,14 +822,54 @@
         </div>
       `;
       container.appendChild(nuevoSintoma);
-
-      // Agregar evento al botón de eliminar
       nuevoSintoma.querySelector('.btn-remove-sintoma').addEventListener('click', function () {
         nuevoSintoma.remove();
       });
     }
 
-    // Configurar botones para agregar síntomas
+    // Precarga B-11: activar toggles según datos guardados
+    if (datos) {
+      const sistemas = [
+        "general", "cabeza_cuello", "cardiopulmonar", "gastrointestinal",
+        "genitourinario", "vascular_periferico", "osteomuscular",
+        "piel_faneras", "otros"
+      ];
+      sistemas.forEach(function (sistema) {
+        const flag = datos["sintoma_" + sistema];
+        const toggle = document.querySelector('.sistema-toggle[data-sistema="' + sistema + '"]');
+        if (toggle && flag === "si") {
+          toggle.checked = true;
+        }
+      });
+    }
+
+    document.querySelectorAll('.sistema-toggle').forEach(toggle => {
+      toggleCampos(toggle);
+      toggle.addEventListener('change', function () { toggleCampos(this); });
+    });
+
+    if (datos && datos.sistemas_detalles) {
+      Object.keys(datos.sistemas_detalles).forEach(function (sistema) {
+        const filas = datos.sistemas_detalles[sistema] || [];
+        if (!filas.length) return;
+        const container = document.getElementById("sintomas_" + sistema + "_container");
+        if (!container) return;
+        const first = container.querySelector(".sintoma-item");
+        if (first && filas[0]) {
+          const s0 = filas[0];
+          const sInput = first.querySelector('input[name="' + sistema + '_sintoma[]"]');
+          const tInput = first.querySelector('input[name="' + sistema + '_tiempo[]"]');
+          const cInput = first.querySelector('input[name="' + sistema + '_caracteristicas[]"]');
+          if (sInput) sInput.value = s0.sintoma || "";
+          if (tInput) tInput.value = s0.tiempo || "";
+          if (cInput) cInput.value = s0.caracteristicas || "";
+        }
+        for (let i = 1; i < filas.length; i++) {
+          agregarSintoma(sistema, filas[i]);
+        }
+      });
+    }
+
     document.querySelectorAll('.btn-add-sintoma').forEach(btn => {
       btn.addEventListener('click', function () {
         const sistema = this.getAttribute('data-sistema');
@@ -843,11 +877,11 @@
       });
     });
 
-    // Mostrar botón de eliminar en el primer síntoma si hay más de uno
     document.querySelectorAll('.sintoma-item').forEach(item => {
       const container = item.closest('[id^="sintomas_"]');
       if (container.querySelectorAll('.sintoma-item').length > 1) {
-        item.querySelector('.btn-remove-sintoma').style.display = 'block';
+        const btn = item.querySelector('.btn-remove-sintoma');
+        if (btn) btn.style.display = 'block';
       }
     });
   });
