@@ -1,0 +1,20 @@
+<table class="membrete-tabla">
+  <tr>
+    <td class="membrete-col membrete-col-izq">
+      {% if logo_udea_path %}
+      <img src="file://{{ logo_udea_path }}" alt="Universidad de Antioquia" class="logo-udea">
+      {% endif %}
+    </td>
+    <td class="membrete-col membrete-col-centro">
+      <p class="membrete-titulo">RESUMEN DIGITAL DE ATENCIÓN</p>
+      {% if nombre_completo %}
+      <p class="membrete-paciente">{{ nombre_completo }}{% if documento_identidad %} &nbsp;·&nbsp; {{ documento_identidad }}{% endif %}</p>
+      {% endif %}
+    </td>
+    <td class="membrete-col membrete-col-der">
+      {% if logo_gruneco_path %}
+      <img src="file://{{ logo_gruneco_path }}" alt="GRUNECO" class="logo-gruneco">
+      {% endif %}
+    </td>
+  </tr>
+</table>

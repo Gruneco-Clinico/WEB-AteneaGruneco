@@ -24,15 +24,17 @@ jobs:
 
             git fetch origin
             git checkout Testing
-            git pull origin Testing
+            git reset --hard origin/Testing
 
             source bitnamivenv/bin/activate
             pip install -r requirements.txt
-            python manage.py migrate
-            python manage.py collectstatic --noinput
 
+            mkdir -p logs/
             sudo chown -R bitnami:daemon logs/
             sudo chmod -R 775 logs/
+
+            python manage.py migrate
+            python manage.py collectstatic --noinput
             sudo /opt/bitnami/ctlscript.sh restart apache
 
             echo "Deploy Testing completado"

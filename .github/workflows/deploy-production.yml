@@ -24,10 +24,14 @@ jobs:
 
             git fetch origin
             git checkout Production
-            git pull origin Production
+            git reset --hard origin/Production
 
             source bitnamivenv/bin/activate
             pip install -r requirements.txt
+
+            mkdir -p logs/
+            sudo chown -R bitnami:daemon logs/
+            sudo chmod -R 775 logs/
 
             BACKUP_DIR="/opt/bitnami/Repositories/Databases/backups"
             mkdir -p "$BACKUP_DIR"
@@ -36,9 +40,6 @@ jobs:
 
             python manage.py migrate
             python manage.py collectstatic --noinput
-
-            sudo chown -R bitnami:daemon logs/
-            sudo chmod -R 775 logs/
             sudo /opt/bitnami/ctlscript.sh restart apache
 
             echo "Deploy Production completado"

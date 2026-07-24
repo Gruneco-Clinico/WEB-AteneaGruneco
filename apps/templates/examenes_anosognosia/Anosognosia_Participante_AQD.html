@@ -530,6 +530,11 @@
                           <input type="hidden" name="deprimido_texto" value="{{ datos_examen.deprimido_texto|default:'' }}">
                         </div>
 
+                        <div class="alert alert-info d-flex justify-content-between align-items-center mt-3">
+                          <span><strong>Puntaje total</strong> (suma de ítems 1–4)</span>
+                          <span class="h4 mb-0" id="puntaje_total_display">{{ datos_examen.puntaje_total|default:0 }}</span>
+                        </div>
+
                         <div class="text-right mt-4">
                           <button type="submit" class="btn btn-primary">Guardar</button>
                           <a href="{% url 'detalle_paciente' paciente_id %}" class="btn btn-secondary">Ver Paciente</a>
@@ -538,6 +543,18 @@
 <script>
   document.addEventListener("DOMContentLoaded", function () {
     const selects = document.querySelectorAll('.adherencia-select');
+    const puntajeHidden = document.getElementById('puntaje_total');
+    const puntajeDisplay = document.getElementById('puntaje_total_display');
+
+    function recalcularPuntajeAQD() {
+      let total = 0;
+      selects.forEach(select => {
+        const v = parseInt(select.value, 10);
+        if (!isNaN(v)) total += v;
+      });
+      if (puntajeHidden) puntajeHidden.value = total;
+      if (puntajeDisplay) puntajeDisplay.textContent = total;
+    }
 
     selects.forEach(select => {
       select.addEventListener('change', function () {
@@ -548,6 +565,7 @@
         if (hiddenInput) {
           hiddenInput.value = texto;
         }
+        recalcularPuntajeAQD();
       });
 
       // Cargar texto inicial si hay valores precargados
@@ -561,6 +579,7 @@
         }
       }
     });
+    recalcularPuntajeAQD();
   });
 </script>
 

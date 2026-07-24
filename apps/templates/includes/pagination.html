@@ -1,0 +1,45 @@
+{% comment %}
+Controles de paginación reutilizables.
+Espera: page_obj, page_range, pagination_query, paginator_ellipsis
+{% endcomment %}
+{% if page_obj and page_obj.paginator.num_pages > 1 %}
+<nav class="pacientes-pagination px-3 py-2" aria-label="Paginación de pacientes">
+  <ul class="pagination justify-content-center flex-wrap mb-0">
+    <li class="page-item {% if not page_obj.has_previous %}disabled{% endif %}">
+      {% if page_obj.has_previous %}
+      <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if pagination_query %}&{{ pagination_query }}{% endif %}"
+         aria-label="Anterior">
+        <span aria-hidden="true">&laquo;</span>
+      </a>
+      {% else %}
+      <span class="page-link"><span aria-hidden="true">&laquo;</span></span>
+      {% endif %}
+    </li>
+
+    {% for num in page_range %}
+      {% if num == paginator_ellipsis %}
+      <li class="page-item disabled"><span class="page-link">…</span></li>
+      {% else %}
+      <li class="page-item {% if num == page_obj.number %}active{% endif %}">
+        <a class="page-link" href="?page={{ num }}{% if pagination_query %}&{{ pagination_query }}{% endif %}">{{ num }}</a>
+      </li>
+      {% endif %}
+    {% endfor %}
+
+    <li class="page-item {% if not page_obj.has_next %}disabled{% endif %}">
+      {% if page_obj.has_next %}
+      <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if pagination_query %}&{{ pagination_query }}{% endif %}"
+         aria-label="Siguiente">
+         <span aria-hidden="true">&raquo;</span>
+      </a>
+      {% else %}
+      <span class="page-link"> <span aria-hidden="true">&raquo;</span></span>
+      {% endif %}
+    </li>
+  </ul>
+  <p class="text-center text-muted small mt-1 mb-0">
+    Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+    · {{ page_obj.paginator.count }} paciente{{ page_obj.paginator.count|pluralize:"s" }}
+  </p>
+</nav>
+{% endif %}

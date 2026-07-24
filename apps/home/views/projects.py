@@ -332,171 +332,69 @@ import csv
 @user_passes_test(is_superuser, login_url="/login/")
 def exportar_csv_proyecto(request, proyecto_id):
     """
-    Exporta un CSV con los datos de pacientes y puntajes de exámenes
-    para un proyecto específico.
-    GET: Muestra formulario de selección de campos
-    POST: Genera CSV con campos seleccionados
+    Exporta un CSV con datos demográficos y campos seleccionados por examen (C-15).
+    GET: formulario con catálogo tipado por examen.
+    POST: genera CSV con selección namespaced `campos_examen_<id>`.
     """
+    from apps.home.services.project_csv_export import (
+        DEMOGRAPHIC_FIELDS,
+        build_csv_headers,
+        build_exam_export_catalog,
+        extract_exam_value,
+        parse_export_selection,
+        serialize_demographic_value,
+    )
+
     proyecto = get_object_or_404(Proyecto, id=proyecto_id)
 
-    # Si es GET, mostrar formulario de selección
+    visitas_base = Visita.objects.filter(Tipo_visita__proyecto=proyecto)
+    examenes_ids = (
+        VisitaExamen.objects.filter(visita__Tipo_visita__proyecto=proyecto)
+        .values_list("examen_id", flat=True)
+        .distinct()
+    )
+    examenes_proyecto = Examen.objects.filter(id__in=examenes_ids).order_by("nombre")
+    exam_catalog = build_exam_export_catalog(examenes_proyecto)
+
     if request.method == "GET":
-        # Definir campos demográficos disponibles
-        campos_demograficos = [
-            ("numero_documento", "Número de Documento"),
-            ("tipo_documento", "Tipo de Documento"),
-            ("celular", "Celular"),
-            ("fecha_nacimiento", "Fecha de Nacimiento"),
-            ("edad", "Edad"),
-            ("genero", "Género"),
-            ("municipio_nacimiento", "Municipio de Nacimiento"),
-            ("departamento_nacimiento", "Departamento de Nacimiento"),
-            ("pais_nacimiento", "País de Nacimiento"),
-            ("estado_civil", "Estado Civil"),
-            ("escolaridad", "Escolaridad"),
-            ("ocupacion", "Ocupación"),
-            ("lateralidad", "Lateralidad"),
-            ("grupo_sanguineo", "Grupo Sanguíneo"),
-            ("religion", "Religión"),
-            ("eps", "EPS"),
-            ("regimen", "Régimen"),
-            ("direccion", "Dirección"),
-            ("municipio_residencia", "Municipio de Residencia"),
-            ("departamento_residencia", "Departamento de Residencia"),
-            ("pais_residencia", "País de Residencia"),
-            ("correo", "Correo Electrónico"),
-        ]
-
-        # Obtener exámenes del proyecto
-        examenes_proyecto = []
-        visitas = Visita.objects.filter(Tipo_visita__proyecto=proyecto)
-        examenes_ids = set()
-        for visita in visitas:
-            for ve in visita.visita_examenes.all():
-                examenes_ids.add(ve.examen.id)
-        
-        examenes_proyecto = Examen.objects.filter(id__in=examenes_ids).order_by("nombre")
-
         context = {
             "proyecto": proyecto,
-            "campos_demograficos": campos_demograficos,
+            "campos_demograficos": DEMOGRAPHIC_FIELDS,
+            "exam_catalog": exam_catalog,
             "examenes_proyecto": examenes_proyecto,
         }
         return render(request, "home/exportar_proyecto_form.html", context)
 
-    # Si es POST, generar CSV con campos seleccionados
     demograficos_selected = request.POST.getlist("demograficos")
-    campos_examen_selected = request.POST.getlist("campos_examen")
-    examenes_selected = request.POST.getlist("examenes")
+    selection = parse_export_selection(request.POST, exam_catalog)
 
-    # Obtener visitas del proyecto
-    visitas = Visita.objects.filter(
-        Tipo_visita__proyecto=proyecto
-    ).select_related(
-        "paciente", "Tipo_visita"
-    ).prefetch_related(
-        "visita_examenes__examen"
-    ).order_by("paciente__primer_apellido", "fecha")
+    visitas = (
+        visitas_base.select_related("paciente", "Tipo_visita")
+        .prefetch_related("visita_examenes__examen")
+        .order_by("paciente__primer_apellido", "fecha")
+    )
 
     if not visitas.exists():
         messages.warning(request, "No hay visitas registradas en este proyecto.")
         return redirect("proyectos")
 
-    # Obtener exámenes a incluir
-    examenes_incluir = []
-    if examenes_selected:
-        examenes_incluir = Examen.objects.filter(id__in=examenes_selected).order_by("nombre")
-    else:
-        # Si no se seleccionó ninguno, incluir todos
-        examenes_unicos = set()
-        for visita in visitas:
-            for ve in visita.visita_examenes.all():
-                examenes_unicos.add(ve.examen.nombre)
-        examenes_incluir = sorted(examenes_unicos)
+    codigos = {
+        extra.paciente_id: extra.codigo_proyecto
+        for extra in ProyectoPacienteExtra.objects.filter(proyecto=proyecto)
+    }
 
-    # Obtener códigos de proyecto para los pacientes
-    codigos = {}
-    for extra in ProyectoPacienteExtra.objects.filter(proyecto=proyecto):
-        codigos[extra.paciente_id] = extra.codigo_proyecto
-
-    # Crear respuesta CSV
     response = HttpResponse(content_type="text/csv; charset=utf-8")
     response["Content-Disposition"] = (
         f'attachment; filename="Proyecto_{proyecto.nombre}_{datetime.now().strftime("%Y%m%d")}.csv"'
     )
-    response.write("\ufeff")  # BOM para Excel
+    response.write("\ufeff")
 
     writer = csv.writer(response, delimiter=";")
-
-    # Construir encabezados dinámicamente
-    headers = [
-        "Código Proyecto",
-        "Paciente",
-        "Tipo de Visita",
-        "Fecha Visita",
-        "Estado Visita",
-    ]
-
-    # Mapeo de nombres técnicos a nombres legibles
-    campo_labels = {
-        "numero_documento": "Documento",
-        "tipo_documento": "Tipo Documento",
-        "celular": "Celular",
-        "fecha_nacimiento": "Fecha Nacimiento",
-        "edad": "Edad",
-        "genero": "Género",
-        "municipio_nacimiento": "Municipio Nacimiento",
-        "departamento_nacimiento": "Departamento Nacimiento",
-        "pais_nacimiento": "País Nacimiento",
-        "estado_civil": "Estado Civil",
-        "escolaridad": "Escolaridad",
-        "ocupacion": "Ocupación",
-        "lateralidad": "Lateralidad",
-        "grupo_sanguineo": "Grupo Sanguíneo",
-        "religion": "Religión",
-        "eps": "EPS",
-        "regimen": "Régimen",
-        "direccion": "Dirección",
-        "municipio_residencia": "Municipio Residencia",
-        "departamento_residencia": "Departamento Residencia",
-        "pais_residencia": "País Residencia",
-        "correo": "Correo",
-    }
-
-    # Agregar campos demográficos seleccionados
-    for campo in demograficos_selected:
-        headers.append(campo_labels.get(campo, campo))
-
-    # Agregar columnas de exámenes según campos seleccionados
-    campo_examen_labels = {
-        "motivo_consulta": "Motivo Consulta",
-        "puntaje_total": "Puntaje",
-        "interpretacion": "Interpretación",
-        "observaciones": "Observaciones",
-        "notas_aclaratorias": "Notas",
-    }
-
-    if isinstance(examenes_incluir, list):
-        # Si examenes_incluir es lista de strings (nombres)
-        for examen_nombre in examenes_incluir:
-            for campo_exam in campos_examen_selected:
-                label = campo_examen_labels.get(campo_exam, campo_exam)
-                headers.append(f"{examen_nombre} - {label}")
-    else:
-        # Si examenes_incluir es queryset de objetos Examen
-        for examen in examenes_incluir:
-            for campo_exam in campos_examen_selected:
-                label = campo_examen_labels.get(campo_exam, campo_exam)
-                headers.append(f"{examen.nombre} - {label}")
-
+    headers = build_csv_headers(demograficos_selected, selection, exam_catalog)
     writer.writerow(headers)
 
-    # Escribir filas de datos
-    examenes_nombres = []
-    if isinstance(examenes_incluir, list):
-        examenes_nombres = examenes_incluir
-    else:
-        examenes_nombres = [e.nombre for e in examenes_incluir]
+    # Orden estable de columnas de examen = orden de selection.items() (Python 3.7+)
+    exam_column_order = list(selection.items())
 
     for visita in visitas:
         paciente = visita.paciente
@@ -505,63 +403,22 @@ def exportar_csv_proyecto(request, proyecto_id):
 
         codigo = codigos.get(paciente.id, "")
         nombre_paciente = f"{paciente.primer_nombre} {paciente.primer_apellido}"
-
         tipo_visita = visita.Tipo_visita.nombre if visita.Tipo_visita else ""
         fecha = visita.fecha.strftime("%d/%m/%Y") if visita.fecha else ""
         estado = "Firmada" if visita.firmado else "Abierta"
 
-        # Construir fila base
-        row = [
-            codigo,
-            nombre_paciente,
-            tipo_visita,
-            fecha,
-            estado,
-        ]
-
-        # Agregar campos demográficos seleccionados
+        row = [codigo, nombre_paciente, tipo_visita, fecha, estado]
         for campo in demograficos_selected:
-            valor = getattr(paciente, campo, "")
-            if campo == "fecha_nacimiento" and valor:
-                valor = valor.strftime("%d/%m/%Y")
-            elif campo == "tipo_documento":
-                valor = paciente.get_tipo_documento_display() if hasattr(paciente, 'get_tipo_documento_display') else valor
-            elif campo == "genero":
-                valor = paciente.get_genero_display() if hasattr(paciente, 'get_genero_display') else valor
-            elif campo == "estado_civil":
-                valor = paciente.get_estado_civil_display() if hasattr(paciente, 'get_estado_civil_display') else valor
-            elif campo == "escolaridad":
-                valor = paciente.get_escolaridad_display() if hasattr(paciente, 'get_escolaridad_display') else valor
-            elif campo == "lateralidad":
-                valor = paciente.get_lateralidad_display() if hasattr(paciente, 'get_lateralidad_display') else valor
-            elif campo == "regimen":
-                valor = paciente.get_regimen_display() if hasattr(paciente, 'get_regimen_display') else valor
-            row.append(valor if valor else "")
+            row.append(serialize_demographic_value(paciente, campo))
 
-        # Obtener datos de exámenes
-        examenes_data = {}
-        for ve in visita.visita_examenes.all():
-            if ve.examen.nombre not in examenes_nombres:
-                continue
-            
-            datos = {}
-            if ve.estado == "completado":
-                try:
-                    resultado = ve.get_resultado_instance()
-                    if resultado:
-                        for campo in campos_examen_selected:
-                            valor = getattr(resultado, campo, "")
-                            datos[campo] = valor if valor is not None else ""
-                except Exception:
-                    pass
-            
-            examenes_data[ve.examen.nombre] = datos
-
-        # Agregar columnas de exámenes
-        for examen_nombre in examenes_nombres:
-            datos = examenes_data.get(examen_nombre, {})
-            for campo_exam in campos_examen_selected:
-                row.append(datos.get(campo_exam, ""))
+        ve_by_exam = {ve.examen_id: ve for ve in visita.visita_examenes.all()}
+        for exam_id, fields in exam_column_order:
+            ve = ve_by_exam.get(exam_id)
+            for spec in fields:
+                if ve is None or ve.estado != "completado":
+                    row.append("")
+                else:
+                    row.append(extract_exam_value(ve, spec))
 
         writer.writerow(row)
 

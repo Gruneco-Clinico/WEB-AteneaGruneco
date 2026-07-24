@@ -1,0 +1,278 @@
+{% load custom_filters %}
+<div class="hc-antecedentes-tablas">
+  {% if resultado.observaciones_generales %}
+  <div class="hc-seccion-tabla">
+    <div class="fila-titulo-hc hc-seccion-titulo">Observaciones generales</div>
+    <p class="hc-texto-libre">{{ resultado.observaciones_generales }}</p>
+  </div>
+  {% endif %}
+
+  {% if patologicos %}
+  <div class="hc-seccion-tabla">
+    <div class="fila-titulo-hc hc-seccion-titulo">Antecedentes patológicos</div>
+    <table class="hc-tabla-resultados table table-bordered">
+      <thead><tr><th>Diagnóstico</th><th>Fecha inicio</th><th>Tratamiento</th><th>Complicaciones</th><th>Activo</th><th>Observaciones</th></tr></thead>
+      <tbody>
+        {% for item in patologicos %}
+        <tr>
+          <td>
+            {{ item.get_tipo_patologia_display }}{% if item.descripcion_otros %} — {{ item.descripcion_otros }}{% endif %}
+          </td>
+          <td>{% if item.fecha_inicio %}{{ item.fecha_inicio|date:"d/m/Y" }}{% else %}—{% endif %}</td>
+          <td>{{ item.ha_recibido_tratamiento|yesno:"Sí,No" }}{% if item.ha_recibido_tratamiento and item.detalle_tratamiento %} — {{ item.detalle_tratamiento }}{% endif %}</td>
+          <td>{{ item.tiene_complicaciones|yesno:"Sí,No" }}{% if item.tiene_complicaciones and item.detalle_complicaciones %} — {{ item.detalle_complicaciones }}{% endif %}</td>
+          <td>{{ item.activo|yesno:"Sí,No" }}</td>
+          <td>{{ item.observaciones|empty_dash }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+
+  {% if quirurgicos %}
+  <div class="hc-seccion-tabla">
+    <div class="fila-titulo-hc hc-seccion-titulo">Antecedentes quirúrgicos</div>
+    <table class="hc-tabla-resultados table table-bordered">
+      <thead><tr><th>Procedimiento</th><th>Fecha</th><th>Tratamiento</th><th>Complicaciones</th><th>Observaciones</th></tr></thead>
+      <tbody>
+        {% for item in quirurgicos %}
+        <tr>
+          <td>{{ item.descripcion|empty_dash }}</td>
+          <td>{% if item.fecha_intervencion %}{{ item.fecha_intervencion|date:"d/m/Y" }}{% else %}—{% endif %}</td>
+          <td>{{ item.ha_recibido_tratamiento|yesno:"Sí,No" }}{% if item.ha_recibido_tratamiento and item.detalle_tratamiento %} — {{ item.detalle_tratamiento }}{% endif %}</td>
+          <td>{{ item.tiene_complicaciones|yesno:"Sí,No" }}{% if item.tiene_complicaciones and item.detalle_complicaciones %} — {{ item.detalle_complicaciones }}{% endif %}</td>
+          <td>{{ item.observaciones|empty_dash }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+
+  {% if farmacologicos %}
+  <div class="hc-seccion-tabla">
+    <div class="fila-titulo-hc hc-seccion-titulo">Antecedentes farmacológicos</div>
+    <table class="hc-tabla-resultados table table-bordered">
+      <thead><tr><th>Medicamento</th><th>Presentación / dosis</th><th>Inicio</th><th>Administración</th></tr></thead>
+      <tbody>
+        {% for item in farmacologicos %}
+        <tr>
+          <td>
+            {% if item.nombre_comercial %}{{ item.nombre_comercial }}
+            {% elif item.nombre_generico %}{{ item.nombre_generico }}
+            {% else %}—{% endif %}
+          </td>
+          <td>
+            {% if item.presentacion %}{{ item.get_presentacion_display }}{% endif %}
+            {% if item.concentracion %}{% if item.presentacion %} — {% endif %}{{ item.concentracion }}{% endif %}
+            {% if item.unidad %} {{ item.get_unidad_display }}{% endif %}
+            {% if not item.presentacion and not item.concentracion and not item.unidad %}—{% endif %}
+          </td>
+          <td>{% if item.fecha_inicio %}{{ item.fecha_inicio|date:"d/m/Y" }}{% else %}—{% endif %}</td>
+          <td>
+            {% if item.via_administracion %}{{ item.get_via_administracion_display }}{% endif %}
+            {% if item.cantidad %}{% if item.via_administracion %}; {% endif %}{{ item.cantidad }}{% endif %}
+            {% if item.frecuencia %}{% if item.via_administracion or item.cantidad %}; {% endif %}{{ item.frecuencia }}{% endif %}
+            {% if not item.via_administracion and not item.cantidad and not item.frecuencia %}—{% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+
+  {% if toxicos %}
+  <div class="hc-seccion-tabla">
+    <div class="fila-titulo-hc hc-seccion-titulo">Antecedentes tóxicos</div>
+    <table class="hc-tabla-resultados table table-bordered">
+      <thead><tr><th>Sustancia</th><th>Inicio</th><th>Tratamiento</th><th>Complicaciones</th><th>Observaciones</th></tr></thead>
+      <tbody>
+        {% for item in toxicos %}
+        <tr>
+          <td>{% if item.get_tipos_display %}{{ item.get_tipos_display|join:", " }}{% else %}{{ item.tipos_toxico|join:", "|empty_dash }}{% endif %}{% if item.descripcion_otros %} — {{ item.descripcion_otros }}{% endif %}</td>
+          <td>{% if item.fecha_inicio %}{{ item.fecha_inicio|date:"d/m/Y" }}{% else %}—{% endif %}</td>
+          <td>{{ item.ha_recibido_tratamiento|yesno:"Sí,No" }}{% if item.ha_recibido_tratamiento and item.detalle_tratamiento %} — {{ item.detalle_tratamiento }}{% endif %}</td>
+          <td>{{ item.tiene_complicaciones|yesno:"Sí,No" }}{% if item.tiene_complicaciones and item.detalle_complicaciones %} — {{ item.detalle_complicaciones }}{% endif %}</td>
+          <td>{{ item.observaciones|empty_dash }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+
+  {% if familiares %}
+  <div class="hc-seccion-tabla">
+    <div class="fila-titulo-hc hc-seccion-titulo">Antecedentes familiares</div>
+    <table class="hc-tabla-resultados table table-bordered">
+      <thead><tr><th>Parentesco</th><th>Antecedente</th><th>Observaciones</th></tr></thead>
+      <tbody>
+        {% for item in familiares %}
+        <tr>
+          <td>{{ item.parentesco|empty_dash }}</td>
+          <td>{{ item.tipo_antecedente|empty_dash }}</td>
+          <td>{{ item.observaciones|empty_dash }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+
+  {% if alergicos %}
+  <div class="hc-seccion-tabla">
+    <div class="fila-titulo-hc hc-seccion-titulo">Antecedentes alérgicos</div>
+    <table class="hc-tabla-resultados table table-bordered">
+      <thead><tr><th>Alérgeno</th><th>Inicio</th><th>Tratamiento</th><th>Activo</th><th>Observaciones</th></tr></thead>
+      <tbody>
+        {% for item in alergicos %}
+        <tr>
+          <td>{{ item.descripcion|empty_dash }}</td>
+          <td>{% if item.fecha_inicio %}{{ item.fecha_inicio|date:"d/m/Y" }}{% else %}—{% endif %}</td>
+          <td>{{ item.tratamiento_recibido|default:"" }}{% if item.detalle_tratamiento %} — {{ item.detalle_tratamiento }}{% endif %}{% if not item.tratamiento_recibido and not item.detalle_tratamiento %}—{% endif %}</td>
+          <td>{{ item.activo|yesno:"Sí,No" }}</td>
+          <td>{{ item.observaciones|empty_dash }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+
+  {% if traumaticos %}
+  <div class="hc-seccion-tabla">
+    <div class="fila-titulo-hc hc-seccion-titulo">Antecedentes traumáticos</div>
+    <table class="hc-tabla-resultados table table-bordered">
+      <thead><tr><th>Tipo</th><th>Fecha</th><th>Tratamiento</th><th>Activo</th><th>Observaciones</th></tr></thead>
+      <tbody>
+        {% for item in traumaticos %}
+        <tr>
+          <td>{{ item.descripcion|empty_dash }}</td>
+          <td>{% if item.fecha_inicio %}{{ item.fecha_inicio|date:"d/m/Y" }}{% else %}—{% endif %}</td>
+          <td>{{ item.tratamiento_recibido|default:"" }}{% if item.detalle_tratamiento %} — {{ item.detalle_tratamiento }}{% endif %}{% if not item.tratamiento_recibido and not item.detalle_tratamiento %}—{% endif %}</td>
+          <td>{{ item.activo|yesno:"Sí,No" }}</td>
+          <td>{{ item.observaciones|empty_dash }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+
+  {% if gineco_obstetricos %}
+  <div class="hc-seccion-tabla">
+    <div class="fila-titulo-hc hc-seccion-titulo">Antecedentes gineco-obstétricos</div>
+    <table class="hc-tabla-resultados table table-bordered">
+      <thead><tr><th>Parámetro</th><th>Resultado</th></tr></thead>
+      <tbody>
+        <tr><td>Menarquia</td><td>{{ gineco_obstetricos.tiene_menarquia|yesno:"Sí,No" }}</td></tr>
+        {% if gineco_obstetricos.tiene_menarquia and gineco_obstetricos.edad_menarquia %}
+        <tr><td>Edad menarquia</td><td>{{ gineco_obstetricos.edad_menarquia }}</td></tr>
+        {% endif %}
+        <tr><td>Menopausia</td><td>{{ gineco_obstetricos.tiene_menopausia|yesno:"Sí,No" }}</td></tr>
+        {% if gineco_obstetricos.tiene_menopausia and gineco_obstetricos.edad_menopausia %}
+        <tr><td>Edad menopausia</td><td>{{ gineco_obstetricos.edad_menopausia }}</td></tr>
+        {% endif %}
+        <tr><td>Gravidez</td><td>{{ gineco_obstetricos.gravidez }}</td></tr>
+        <tr><td>Abortos</td><td>{{ gineco_obstetricos.abortos }}</td></tr>
+        <tr><td>Hijos vivos</td><td>{{ gineco_obstetricos.hijos_vivos }}</td></tr>
+        {% if gineco_obstetricos.observaciones %}
+        <tr><td>Observaciones</td><td>{{ gineco_obstetricos.observaciones }}</td></tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+
+  {% if epidemiologicos %}
+  <div class="hc-seccion-tabla">
+    <div class="fila-titulo-hc hc-seccion-titulo">Antecedentes epidemiológicos</div>
+    <table class="hc-tabla-resultados table table-bordered">
+      <thead><tr><th>Antecedente</th><th>Fecha inicio</th><th>Activo</th><th>Observaciones</th></tr></thead>
+      <tbody>
+        {% for item in epidemiologicos %}
+        <tr>
+          <td>{{ item.tipo_antecedente|empty_dash }}</td>
+          <td>{% if item.fecha_inicio %}{{ item.fecha_inicio|date:"d/m/Y" }}{% else %}—{% endif %}</td>
+          <td>{{ item.activo_actualmente|yesno:"Sí,No" }}</td>
+          <td>{{ item.observaciones|empty_dash }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+
+  {% if ets %}
+  <div class="hc-seccion-tabla">
+    <div class="fila-titulo-hc hc-seccion-titulo">Antecedentes ETS</div>
+    <table class="hc-tabla-resultados table table-bordered">
+      <thead><tr><th>Tipo</th><th>Fecha diagnóstico</th><th>Curado</th><th>Observaciones</th></tr></thead>
+      <tbody>
+        {% for item in ets %}
+        <tr>
+          <td>{{ item.tipo_ets|empty_dash }}</td>
+          <td>{% if item.fecha_diagnostico %}{{ item.fecha_diagnostico|date:"d/m/Y" }}{% else %}—{% endif %}</td>
+          <td>{{ item.curado|yesno:"Sí,No" }}</td>
+          <td>{{ item.observaciones|empty_dash }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+
+  {% if hospitalizaciones %}
+  <div class="hc-seccion-tabla">
+    <div class="fila-titulo-hc hc-seccion-titulo">Hospitalizaciones</div>
+    <table class="hc-tabla-resultados table table-bordered">
+      <thead><tr><th>Motivo</th><th>Ingreso</th><th>Egreso</th></tr></thead>
+      <tbody>
+        {% for item in hospitalizaciones %}
+        <tr>
+          <td>{{ item.motivo_hospitalizacion|empty_dash }}</td>
+          <td>{% if item.fecha_ingreso %}{{ item.fecha_ingreso|date:"d/m/Y" }}{% else %}—{% endif %}</td>
+          <td>{% if item.fecha_egreso %}{{ item.fecha_egreso|date:"d/m/Y" }}{% else %}—{% endif %}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+
+  {% if inmunizaciones %}
+  <div class="hc-seccion-tabla">
+    <div class="fila-titulo-hc hc-seccion-titulo">Inmunizaciones</div>
+    <table class="hc-tabla-resultados table table-bordered">
+      <thead><tr><th>Vacuna</th><th>Fecha</th></tr></thead>
+      <tbody>
+        {% for item in inmunizaciones %}
+        <tr>
+          <td>{{ item.nombre_vacuna|empty_dash }}</td>
+          <td>{% if item.fecha_aplicacion %}{{ item.fecha_aplicacion|date:"d/m/Y" }}{% else %}—{% endif %}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+
+  {% if transfusionales %}
+  <div class="hc-seccion-tabla">
+    <div class="fila-titulo-hc hc-seccion-titulo">Transfusionales</div>
+    <table class="hc-tabla-resultados table table-bordered">
+      <thead><tr><th>Componente</th><th>Fecha</th></tr></thead>
+      <tbody>
+        {% for item in transfusionales %}
+        <tr>
+          <td>{{ item.tipo_componente|empty_dash }}</td>
+          <td>{% if item.fecha_transfusion %}{{ item.fecha_transfusion|date:"d/m/Y" }}{% else %}—{% endif %}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+</div>

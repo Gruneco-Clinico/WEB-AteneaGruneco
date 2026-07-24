@@ -1,9 +1,54 @@
-{% extends "layouts/base.html" %}
+{% extends parent_template|default:"layouts/base.html" %}
+{% load custom_filters %}
 {% block content %}
-<div class="container mt-4">
+{% if not print_mode %}
+<style>
+  /* Ver examen: adaptar al ancho, sin scroll horizontal */
+  .examen-ver-web {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+  .examen-ver-web .table-responsive {
+    overflow-x: hidden !important;
+  }
+  .examen-ver-web table.hc-tabla-resultados {
+    width: 100%;
+    table-layout: fixed;
+    margin-bottom: 0;
+  }
+  .examen-ver-web table.hc-tabla-resultados th,
+  .examen-ver-web table.hc-tabla-resultados td {
+    white-space: normal !important;
+    word-wrap: break-word;
+    overflow-wrap: anywhere;
+    vertical-align: top;
+  }
+  .examen-ver-web table.hc-tabla-resultados th:first-child,
+  .examen-ver-web table.hc-tabla-resultados td:first-child {
+    width: 58%;
+  }
+  .examen-ver-web table.hc-tabla-resultados th:last-child,
+  .examen-ver-web table.hc-tabla-resultados td:last-child {
+    width: 42%;
+  }
+  .examen-ver-web .hc-valor-celda .badge {
+    white-space: normal !important;
+    text-align: left;
+    display: inline-block;
+    max-width: 100%;
+    line-height: 1.35;
+    font-weight: 500;
+  }
+  .examen-ver-web .subseccion-titulo-hc {
+    white-space: normal !important;
+    word-wrap: break-word;
+  }
+</style>
+{% endif %}
+<div class="container mt-4{% if print_mode %} hc-examen-tabla{% else %} examen-ver-web{% endif %}">
 
   <!-- Encabezado -->
-  <div class="card shadow-sm mb-4">
+  <div class="card shadow-sm mb-4 hc-encabezado-web">
     <div class="card-body">
       <h3 class="card-title mb-2">
         🧾 Reporte de examen: <span class="text-primary">{{ visita_examen.examen.nombre }}</span>
@@ -23,30 +68,47 @@
     </div>
   </div>
 
-  <!-- Puntaje Total -->
-  {% if puntaje_total is not None %}
-  <div class="card shadow-sm mb-4 border-left-success">
+  <!-- Resumen de puntaje (solo cuando aplica; AQD/Yesavage/RedLat sin caja de total) -->
+  {% if score_banner_valor is not None %}
+  <div class="card shadow-sm mb-3 border-left-success hc-puntaje-total">
     <div class="card-body d-flex align-items-center">
+      {% if not print_mode %}
       <div class="mr-3">
         <i class="ni ni-trophy text-success" style="font-size: 2rem;"></i>
       </div>
+      {% endif %}
       <div>
-        <h6 class="text-uppercase text-muted mb-0">Puntaje Total</h6>
-        <h2 class="mb-0 font-weight-bold text-success">{{ puntaje_total }}</h2>
+        <h6 class="text-uppercase text-muted mb-0">{{ score_banner_titulo|default:"Puntaje" }}</h6>
+        <h2 class="mb-0 font-weight-bold text-success">{{ score_banner_valor }}</h2>
+        {% if score_banner_detalle %}
+        <small class="text-muted">{{ score_banner_detalle }}</small>
+        {% endif %}
       </div>
     </div>
   </div>
   {% endif %}
 
+  {% if aqd_anosognosia %}
+  <div class="card shadow-sm mb-3 border-left-info hc-aqd-anosognosia">
+    <div class="card-body">
+      <h6 class="text-uppercase text-muted mb-1">Anosognosia (AQD cuidador − participante)</h6>
+      <p class="mb-1"><strong>Delta:</strong> {{ aqd_anosognosia.delta }}
+        <span class="text-muted">(cuidador {{ aqd_anosognosia.total_cuidador }} − participante {{ aqd_anosognosia.total_participante }})</span>
+      </p>
+      <p class="mb-0 font-weight-bold">{{ aqd_anosognosia.interpretacion }}</p>
+    </div>
+  </div>
+  {% endif %}
+
   <!-- Sección de resultados -->
-  <div class="card shadow-sm">
+  <div class="card shadow-sm hc-tabla-resultados-card">
     <div class="card-header bg-light">
       <h5 class="mb-0">Resultados</h5>
     </div>
     <div class="card-body">
       {% if datos_resultado %}
       <div class="table-responsive">
-        <table class="table table-bordered table-hover align-middle">
+        <table class="table table-bordered align-middle hc-tabla-resultados">
           <thead class="table-light">
             <tr>
               <th>Parámetro</th>
@@ -54,26 +116,45 @@
             </tr>
           </thead>
           <tbody>
-            {% for campo, valor in datos_resultado.items %}
-              {% if not "ID" in campo and valor %}
-                <tr>
-                  <!-- Campo -->
-                  <td class="text-capitalize">
-                    <i class="ni ni-bullet-list-67 text-primary me-2"></i>
-                    <strong>{{ campo|capfirst }}</strong>
-                  </td>
-
-                  <!-- Valor -->
-                  <td>
-                    <span class="badge bg-light text-dark border px-3 py-2">
-                      {{ valor }}
-                    </span>
-                  </td>
+            {% if secciones %}
+              {% for seccion in secciones %}
+                <tr class="hc-subseccion">
+                  <td colspan="2" class="subseccion-titulo-hc">{{ seccion.titulo }}</td>
                 </tr>
-              {% endif %}
-            {% endfor %}
+                {% for campo, valor in seccion.campos %}
+                  {% if not "ID" in campo and valor %}
+                    <tr>
+                      <td>
+                        {% if not print_mode %}<i class="ni ni-bullet-list-67 text-primary me-2"></i>{% endif %}
+                        {% if print_mode %}{{ campo|capfirst }}{% else %}<strong>{{ campo|capfirst }}</strong>{% endif %}
+                      </td>
+                      <td class="hc-valor-celda">
+                        {% if print_mode %}{{ valor|render_exam_value }}{% else %}
+                        <span class="badge bg-light text-dark border px-3 py-2">{{ valor|render_exam_value }}</span>
+                        {% endif %}
+                      </td>
+                    </tr>
+                  {% endif %}
+                {% endfor %}
+              {% endfor %}
+            {% else %}
+              {% for campo, valor in datos_resultado.items %}
+                {% if not "ID" in campo and valor %}
+                  <tr>
+                    <td>
+                      {% if not print_mode %}<i class="ni ni-bullet-list-67 text-primary me-2"></i>{% endif %}
+                      {% if print_mode %}{{ campo|capfirst }}{% else %}<strong>{{ campo|capfirst }}</strong>{% endif %}
+                    </td>
+                    <td class="hc-valor-celda">
+                      {% if print_mode %}{{ valor|render_exam_value }}{% else %}
+                      <span class="badge bg-light text-dark border px-3 py-2">{{ valor|render_exam_value }}</span>
+                      {% endif %}
+                    </td>
+                  </tr>
+                {% endif %}
+              {% endfor %}
+            {% endif %}
           </tbody>
-
         </table>
       </div>
       {% else %}
@@ -85,14 +166,16 @@
   </div>
 
   <!-- Acciones -->
+  {% if not print_mode %}
   <div class="d-flex justify-content-end mt-4">
     <a href="{% url 'detalle_paciente' paciente.id %}" class="btn btn-outline-secondary">
       ← Volver
     </a>
   </div>
+  {% endif %}
 
   </div>
-    {% include "includes/footer.html" %}
+    {% if not print_mode %}{% include "includes/footer.html" %}{% endif %}
   </div>
 
 </div>

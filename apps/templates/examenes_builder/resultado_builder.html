@@ -1,12 +1,12 @@
-{% extends "layouts/base.html" %}
+{% extends parent_template|default:"layouts/base.html" %}
 {% load form_builder_tags %}
 
 {% block title %}Resultado — {{ visita_examen.examen.nombre }}{% endblock %}
 
 {% block content %}
-<div class="container-fluid mt-4">
+<div class="container-fluid mt-4{% if print_mode %} hc-examen-tabla{% endif %}">
   <div class="card shadow">
-    <div class="card-header">
+    <div class="card-header hc-encabezado-web">
       <h2 class="mb-0">{{ visita_examen.examen.nombre }}</h2>
       <small class="text-muted">{{ paciente }}</small>
     </div>

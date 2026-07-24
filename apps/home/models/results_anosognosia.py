@@ -19,7 +19,8 @@ class LawtonBrodyResult(ResultadoExamenBase):
     manejo_dinero = models.CharField(max_length=255, verbose_name="Manejo de dinero")
 
     puntaje_total = models.IntegerField(verbose_name="Puntaje total")
-    diagnostico = models.CharField(max_length=100, verbose_name="Diagnóstico")
+    # D-18: etiqueta clínica «Interpretación» (campo histórico `diagnostico`)
+    diagnostico = models.CharField(max_length=100, verbose_name="Interpretación")
 
     def __str__(self):
         return f"Lawton & Brody - {self.visita_examen_id}"
@@ -31,6 +32,7 @@ class CuidadorNPIResult(ResultadoExamenBase):
         choices=[("si", "Sí"), ("no", "No"), ("ns", "No Sabe")],
         blank=True,
         null=True,
+        verbose_name="Ideas delirantes",
     )
     ideas_delirantes_frecuencia = models.CharField(max_length=50, blank=True, null=True, verbose_name="Frecuencia ideas delirantes")
     ideas_delirantes_gravedad = models.CharField(max_length=50, blank=True, null=True, verbose_name="Gravedad ideas delirantes")
@@ -42,6 +44,7 @@ class CuidadorNPIResult(ResultadoExamenBase):
         choices=[("si", "Sí"), ("no", "No"), ("ns", "No Sabe")],
         blank=True,
         null=True,
+        verbose_name="Alucinaciones",
     )
     alucinaciones_frecuencia = models.CharField(max_length=50, blank=True, null=True, verbose_name="Frecuencia alucinaciones")
     alucinaciones_gravedad = models.CharField(max_length=50, blank=True, null=True, verbose_name="Gravedad alucinaciones")
@@ -53,6 +56,7 @@ class CuidadorNPIResult(ResultadoExamenBase):
         choices=[("si", "Sí"), ("no", "No"), ("ns", "No Sabe")],
         blank=True,
         null=True,
+        verbose_name="Agitación/Agresión",
     )
     agitacion_frecuencia = models.CharField(max_length=50, blank=True, null=True, verbose_name="Frecuencia agitación")
     agitacion_gravedad = models.CharField(max_length=50, blank=True, null=True, verbose_name="Gravedad agitación")
@@ -64,6 +68,7 @@ class CuidadorNPIResult(ResultadoExamenBase):
         choices=[("si", "Sí"), ("no", "No"), ("ns", "No Sabe")],
         blank=True,
         null=True,
+        verbose_name="Depresión/Disforia",
     )
     depresion_frecuencia = models.CharField(max_length=50, blank=True, null=True, verbose_name="Frecuencia depresión")
     depresion_gravedad = models.CharField(max_length=50, blank=True, null=True, verbose_name="Gravedad depresión")
@@ -75,6 +80,7 @@ class CuidadorNPIResult(ResultadoExamenBase):
         choices=[("si", "Sí"), ("no", "No"), ("ns", "No Sabe")],
         blank=True,
         null=True,
+        verbose_name="Ansiedad",
     )
     ansiedad_frecuencia = models.CharField(max_length=50, blank=True, null=True, verbose_name="Frecuencia ansiedad")
     ansiedad_gravedad = models.CharField(max_length=50, blank=True, null=True, verbose_name="Gravedad ansiedad")
@@ -86,6 +92,7 @@ class CuidadorNPIResult(ResultadoExamenBase):
         choices=[("si", "Sí"), ("no", "No"), ("ns", "No Sabe")],
         blank=True,
         null=True,
+        verbose_name="Euforia/Alegría",
     )
     euforia_frecuencia = models.CharField(max_length=50, blank=True, null=True, verbose_name="Frecuencia euforia")
     euforia_gravedad = models.CharField(max_length=50, blank=True, null=True, verbose_name="Gravedad euforia")
@@ -97,6 +104,7 @@ class CuidadorNPIResult(ResultadoExamenBase):
         choices=[("si", "Sí"), ("no", "No"), ("ns", "No Sabe")],
         blank=True,
         null=True,
+        verbose_name="Apatía/Indiferencia",
     )
     apatia_frecuencia = models.CharField(max_length=50, blank=True, null=True, verbose_name="Frecuencia apatía")
     apatia_gravedad = models.CharField(max_length=50, blank=True, null=True, verbose_name="Gravedad apatía")
@@ -108,6 +116,7 @@ class CuidadorNPIResult(ResultadoExamenBase):
         choices=[("si", "Sí"), ("no", "No"), ("ns", "No Sabe")],
         blank=True,
         null=True,
+        verbose_name="Desinhibición",
     )
     desinhibicion_frecuencia = models.CharField(max_length=50, blank=True, null=True, verbose_name="Frecuencia desinhibición")
     desinhibicion_gravedad = models.CharField(max_length=50, blank=True, null=True, verbose_name="Gravedad desinhibición")
@@ -119,6 +128,7 @@ class CuidadorNPIResult(ResultadoExamenBase):
         choices=[("si", "Sí"), ("no", "No"), ("ns", "No Sabe")],
         blank=True,
         null=True,
+        verbose_name="Irritabilidad/Labilidad",
     )
     irritabilidad_frecuencia = models.CharField(max_length=50, blank=True, null=True, verbose_name="Frecuencia irritabilidad")
     irritabilidad_gravedad = models.CharField(max_length=50, blank=True, null=True, verbose_name="Gravedad irritabilidad")
@@ -130,6 +140,7 @@ class CuidadorNPIResult(ResultadoExamenBase):
         choices=[("si", "Sí"), ("no", "No"), ("ns", "No Sabe")],
         blank=True,
         null=True,
+        verbose_name="Conducta Motora Aberrante",
     )
     conducta_motor_frecuencia = models.CharField(max_length=50, blank=True, null=True, verbose_name="Frecuencia conducta motora")
     conducta_motor_gravedad = models.CharField(max_length=50, blank=True, null=True, verbose_name="Gravedad conducta motora")
@@ -141,6 +152,7 @@ class CuidadorNPIResult(ResultadoExamenBase):
         choices=[("si", "Sí"), ("no", "No"), ("ns", "No Sabe")],
         blank=True,
         null=True,
+        verbose_name="Sueño",
     )
     sueno_frecuencia = models.CharField(max_length=50, blank=True, null=True, verbose_name="Frecuencia problemas de sueño")
     sueno_gravedad = models.CharField(max_length=50, blank=True, null=True, verbose_name="Gravedad problemas de sueño")
@@ -152,14 +164,15 @@ class CuidadorNPIResult(ResultadoExamenBase):
         choices=[("si", "Sí"), ("no", "No"), ("ns", "No Sabe")],
         blank=True,
         null=True,
+        verbose_name="Apetito/Alimentación",
     )
     apetito_frecuencia = models.CharField(max_length=50, blank=True, null=True, verbose_name="Frecuencia problemas de apetito")
     apetito_gravedad = models.CharField(max_length=50, blank=True, null=True, verbose_name="Gravedad problemas de apetito")
     apetito_F_G = models.IntegerField(blank=True, null=True, verbose_name="F x G apetito")
     apetito_distres = models.CharField(max_length=50, blank=True, null=True, verbose_name="Distrés apetito")
 
-    puntaje_total = models.IntegerField(blank=True, null=True, default=0, verbose_name="Puntaje total")
     carga_total = models.IntegerField(blank=True, null=True, default=0, verbose_name="Carga total")
+    puntaje_total = models.IntegerField(blank=True, null=True, default=0, verbose_name="Puntaje total")
 
     def calcular_puntaje_total(self):
         items_fg = [
@@ -179,8 +192,38 @@ class CuidadorNPIResult(ResultadoExamenBase):
 
         return sum(int(x) for x in items_fg if x not in (None, ""))
 
+    def calcular_carga_total(self):
+        distres_fields = [
+            "ideas_delirantes_distres",
+            "alucinaciones_distres",
+            "agitacion_distres",
+            "depresion_distres",
+            "ansiedad_distres",
+            "euforia_distres",
+            "apatia_distres",
+            "desinhibicion_distres",
+            "irritabilidad_distres",
+            "conducta_motor_distres",
+            "sueno_distres",
+            "apetito_distres",
+        ]
+        total = 0
+        for name in distres_fields:
+            raw = getattr(self, name, None)
+            if raw in (None, ""):
+                continue
+            try:
+                total += int(str(raw).strip().split()[0])
+            except (TypeError, ValueError):
+                continue
+        return total
+
     def save(self, *args, **kwargs):
         self.puntaje_total = self.calcular_puntaje_total()
+        # Recalcular carga si hay distrés; conservar POST si ya vino
+        calculated = self.calcular_carga_total()
+        if calculated or self.carga_total in (None, ""):
+            self.carga_total = calculated
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -245,6 +288,10 @@ class EuroQol5D5LResult(ResultadoExamenBase):
     actividades = models.CharField(max_length=255, verbose_name="Actividades")
     dolor = models.CharField(max_length=255, verbose_name="Dolor")
     ansiedad = models.CharField(max_length=255, verbose_name="Ansiedad")
+    # D-20: código de estado EQ-5D-5L (ej. "11243"); sin índice de utilidad
+    estado_salud = models.CharField(
+        max_length=5, blank=True, null=True, verbose_name="Estado de salud (código EQ-5D)"
+    )
 
     def __str__(self):
         return f"EuroQol-5D-5L - {self.visita_examen}"
@@ -313,6 +360,21 @@ class MoCAResult(ResultadoExamenBase):
 
     diferido = models.PositiveSmallIntegerField(default=0, verbose_name="Total recuerdo diferido")  # 0–5
 
+    # D-19: MIS — recuerdo con pistas (categoría / opción múltiple)
+    pista_cat_rostro = models.BooleanField(default=False, verbose_name="Pista categoría: rostro")
+    pista_cat_seda = models.BooleanField(default=False, verbose_name="Pista categoría: seda")
+    pista_cat_iglesia = models.BooleanField(default=False, verbose_name="Pista categoría: iglesia")
+    pista_cat_clavel = models.BooleanField(default=False, verbose_name="Pista categoría: clavel")
+    pista_cat_rojo = models.BooleanField(default=False, verbose_name="Pista categoría: rojo")
+    pista_opcion_rostro = models.BooleanField(default=False, verbose_name="Pista opción: rostro")
+    pista_opcion_seda = models.BooleanField(default=False, verbose_name="Pista opción: seda")
+    pista_opcion_iglesia = models.BooleanField(default=False, verbose_name="Pista opción: iglesia")
+    pista_opcion_clavel = models.BooleanField(default=False, verbose_name="Pista opción: clavel")
+    pista_opcion_rojo = models.BooleanField(default=False, verbose_name="Pista opción: rojo")
+    mis = models.PositiveSmallIntegerField(
+        blank=True, null=True, default=0, verbose_name="MIS (índice de memoria)"
+    )
+
     # ===== 11: Orientación =====
     orientacion_fecha = models.BooleanField(default=False, verbose_name="Orientación: fecha")
     orientacion_mes = models.BooleanField(default=False, verbose_name="Orientación: mes")
@@ -329,6 +391,18 @@ class MoCAResult(ResultadoExamenBase):
     # ===== Totales =====
     puntaje_total = models.PositiveSmallIntegerField(default=0, verbose_name="Puntaje total")
     interpretacion = models.CharField(max_length=255, blank=True, null=True, verbose_name="Interpretación")
+
+    # D-19: impresión por dominios (no ítem a ítem)
+    PRINT_SECCIONES_INICIOS = [
+        ("alternancia", "Visuoespacial / Ejecutiva"),
+        ("denominacion", "Denominación"),
+        ("atencion_secuencia", "Atención"),
+        ("repeticion_frase_1", "Lenguaje"),
+        ("abstraccion", "Abstracción"),
+        ("palabra_rostro", "Memoria diferida / MIS"),
+        ("orientacion_fecha", "Orientación"),
+        ("educacion_baja", "Totales"),
+    ]
 
     def __str__(self):
         return f"MoCA - {self.visita_examen_id}"
@@ -440,279 +514,667 @@ class ZaritResult(ResultadoExamenBase):
 
 
 class AQDCuidadorResult(ResultadoExamenBase):
-    recordar_fecha = models.CharField(max_length=50, blank=True, null=True, verbose_name="Recordar fecha")
-    orientacion_lugares_nuevos = models.CharField(max_length=50, blank=True, null=True, verbose_name="Orientación en lugares nuevos")
-    recordar_llamadas = models.CharField(max_length=50, blank=True, null=True, verbose_name="Recordar llamadas")
-    entender_conversacion = models.CharField(max_length=50, blank=True, null=True, verbose_name="Entender conversación")
-    firmar = models.CharField(max_length=50, blank=True, null=True, verbose_name="Firmar")
-    entender_lectura = models.CharField(max_length=50, blank=True, null=True, verbose_name="Entender lectura")
-    mantener_orden = models.CharField(max_length=50, blank=True, null=True, verbose_name="Mantener orden")
-    recordar_lugar_objetos = models.CharField(max_length=50, blank=True, null=True, verbose_name="Recordar lugar de objetos")
-    escribir = models.CharField(max_length=50, blank=True, null=True, verbose_name="Escribir")
-    manejar_dinero = models.CharField(max_length=50, blank=True, null=True, verbose_name="Manejar dinero")
-    orientacion_zona_donde_vive = models.CharField(max_length=50, blank=True, null=True)
-    recordar_citas = models.CharField(max_length=50, blank=True, null=True)
-    pasatiempos = models.CharField(max_length=50, blank=True, null=True)
-    comunicarse_con_gente = models.CharField(max_length=50, blank=True, null=True)
-    calculos_mentales = models.CharField(max_length=50, blank=True, null=True)
-    recordar_compras = models.CharField(max_length=50, blank=True, null=True)
-    contener_orina = models.CharField(max_length=50, blank=True, null=True)
-    entender_pelicula = models.CharField(max_length=50, blank=True, null=True)
-    orientacion_en_casa = models.CharField(max_length=50, blank=True, null=True)
-    hacer_tareas_hogar = models.CharField(max_length=50, blank=True, null=True)
-    comer_solo = models.CharField(max_length=50, blank=True, null=True)
-    realizar_tramites = models.CharField(max_length=50, blank=True, null=True)
-    decisiones_y_adaptacion = models.CharField(max_length=50, blank=True, null=True)
-    egoismo = models.CharField(max_length=50, blank=True, null=True)
-    enojo_menos_paciencia = models.CharField(max_length=50, blank=True, null=True)
-    llorar_con_facilidad = models.CharField(max_length=50, blank=True, null=True)
+    # verbose_name = texto exacto de la pregunta en el template
+    # examenes_anosognosia/Anosognosia_Cuidador_AQD.html (para que impresión
+    # y vista "Ver" muestren la pregunta completa).
+    recordar_fecha = models.CharField(max_length=50, blank=True, null=True, verbose_name="¿Tiene el paciente dificultades para recordar la fecha?")
+    orientacion_lugares_nuevos = models.CharField(max_length=50, blank=True, null=True, verbose_name="¿Tiene el paciente dificultades para orientarse en lugares nuevos?")
+    recordar_llamadas = models.CharField(max_length=50, blank=True, null=True, verbose_name="¿Tiene el paciente dificultades para recordar llamadas telefónicas?")
+    entender_conversacion = models.CharField(max_length=50, blank=True, null=True, verbose_name="¿Tiene el paciente dificultades para entender conversaciones?")
+    firmar = models.CharField(max_length=50, blank=True, null=True, verbose_name="¿Tiene el paciente dificultades para firmar?")
+    entender_lectura = models.CharField(max_length=50, blank=True, null=True, verbose_name="¿Tiene el paciente dificultades para entender lo que lee?")
+    mantener_orden = models.CharField(max_length=50, blank=True, null=True, verbose_name="¿Tiene el paciente dificultades para mantener en orden sus cosas?")
+    recordar_lugar_objetos = models.CharField(max_length=50, blank=True, null=True, verbose_name="¿Tiene el paciente dificultades para recordar dónde deja los objetos en su casa?")
+    escribir = models.CharField(max_length=50, blank=True, null=True, verbose_name="¿Tiene el paciente dificultades para escribir?")
+    manejar_dinero = models.CharField(max_length=50, blank=True, null=True, verbose_name="¿Tiene el paciente dificultades para manejar dinero?")
+    orientacion_zona_donde_vive = models.CharField(max_length=50, blank=True, null=True, verbose_name="¿Tiene el paciente dificultades para orientarse en la zona donde vive?")
+    recordar_citas = models.CharField(max_length=50, blank=True, null=True, verbose_name="¿Tiene el paciente dificultades para recordar citas (ejemplo: cuándo ir al médico)?")
+    pasatiempos = models.CharField(max_length=50, blank=True, null=True, verbose_name="¿Tiene el paciente dificultades para practicar sus pasatiempos?")
+    comunicarse_con_gente = models.CharField(max_length=50, blank=True, null=True, verbose_name="¿Tiene el paciente dificultades para comunicarse con la gente?")
+    calculos_mentales = models.CharField(max_length=50, blank=True, null=True, verbose_name="¿Tiene el paciente dificultades para hacer cálculos mentales? (por ejemplo: sumar, restar, multiplicar, dividir).")
+    recordar_compras = models.CharField(max_length=50, blank=True, null=True, verbose_name="¿Tiene el paciente dificultades para recordar las cosas que va a comprar?")
+    contener_orina = models.CharField(max_length=50, blank=True, null=True, verbose_name="¿Tiene el paciente dificultades para contener la orina?")
+    entender_pelicula = models.CharField(max_length=50, blank=True, null=True, verbose_name="¿Tiene el paciente dificultades para entender una película?")
+    orientacion_en_casa = models.CharField(max_length=50, blank=True, null=True, verbose_name="¿Tiene el paciente dificultades para orientarse dentro de su casa?")
+    hacer_tareas_hogar = models.CharField(max_length=50, blank=True, null=True, verbose_name="¿Tiene el paciente dificultades para realizar tareas del hogar como cocinar, limpiar, etc.?")
+    comer_solo = models.CharField(max_length=50, blank=True, null=True, verbose_name="¿Tiene el paciente dificultades para comer solo?")
+    realizar_tramites = models.CharField(max_length=50, blank=True, null=True, verbose_name="¿Tiene el paciente dificultades para realizar trámites? (por ejemplo: ir al banco, a la EPS, etc.).")
+    decisiones_y_adaptacion = models.CharField(max_length=50, blank=True, null=True, verbose_name="¿Ha notado al paciente menos flexible para tomar decisiones y sin poder adaptarse a cosas nuevas?")
+    egoismo = models.CharField(max_length=50, blank=True, null=True, verbose_name="¿Ha notado al paciente más egoísta y que no presta atención a las necesidades de los demás?")
+    enojo_menos_paciencia = models.CharField(max_length=50, blank=True, null=True, verbose_name="¿Ha notado que el paciente se enoja por pequeñeces y pierde la paciencia con más facilidad?")
+    llorar_con_facilidad = models.CharField(max_length=50, blank=True, null=True, verbose_name="¿Ha notado que el paciente llora con excesiva facilidad?")
     reir_situaciones_inapropiadas = models.CharField(
-        max_length=50, blank=True, null=True
+        max_length=50, blank=True, null=True, verbose_name="¿Ha notado que el paciente se ríe en situaciones inapropiadas?"
     )
-    temas_sexuales = models.CharField(max_length=50, blank=True, null=True)
-    falta_de_interes = models.CharField(max_length=50, blank=True, null=True)
-    deprimido = models.CharField(max_length=50, blank=True, null=True)
+    temas_sexuales = models.CharField(max_length=50, blank=True, null=True, verbose_name="¿Ha notado al paciente más interesado en temas sexuales, y habla permanentemente de esos temas?")
+    falta_de_interes = models.CharField(max_length=50, blank=True, null=True, verbose_name="¿Ha notado al paciente con falta de interés en cosas que antes le interesaban?")
+    deprimido = models.CharField(max_length=50, blank=True, null=True, verbose_name="¿Ha notado al paciente más deprimido?")
+
+    # B-10: suma de ítems en escala 1–4
+    puntaje_total = models.IntegerField(
+        blank=True, null=True, default=0, verbose_name="Puntaje total"
+    )
+
+    _AQD_ITEM_FIELDS = (
+        "recordar_fecha",
+        "orientacion_lugares_nuevos",
+        "recordar_llamadas",
+        "entender_conversacion",
+        "firmar",
+        "entender_lectura",
+        "mantener_orden",
+        "recordar_lugar_objetos",
+        "escribir",
+        "manejar_dinero",
+        "orientacion_zona_donde_vive",
+        "recordar_citas",
+        "pasatiempos",
+        "comunicarse_con_gente",
+        "calculos_mentales",
+        "recordar_compras",
+        "contener_orina",
+        "entender_pelicula",
+        "orientacion_en_casa",
+        "hacer_tareas_hogar",
+        "comer_solo",
+        "realizar_tramites",
+        "decisiones_y_adaptacion",
+        "egoismo",
+        "enojo_menos_paciencia",
+        "llorar_con_facilidad",
+        "reir_situaciones_inapropiadas",
+        "temas_sexuales",
+        "falta_de_interes",
+        "deprimido",
+    )
+
+    def calcular_puntaje_total(self):
+        total = 0
+        for name in self._AQD_ITEM_FIELDS:
+            raw = getattr(self, name, None)
+            if raw in (None, ""):
+                continue
+            try:
+                total += int(str(raw).strip().split()[0])
+            except (TypeError, ValueError):
+                continue
+        return total
+
+    def save(self, *args, **kwargs):
+        self.puntaje_total = self.calcular_puntaje_total()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"AQ-D Cuidador - {self.visita_examen_id}"
 
 
 class AQDParticipanteResult(ResultadoExamenBase):
-    recordar_fecha = models.CharField(max_length=50, blank=True, null=True, verbose_name="Recordar fecha")
-    orientacion_lugares_nuevos = models.CharField(max_length=50, blank=True, null=True, verbose_name="Orientación en lugares nuevos")
-    recordar_llamadas = models.CharField(max_length=50, blank=True, null=True, verbose_name="Recordar llamadas")
-    entender_conversacion = models.CharField(max_length=50, blank=True, null=True, verbose_name="Entender conversación")
-    firmar = models.CharField(max_length=50, blank=True, null=True, verbose_name="Firmar")
-    entender_lectura = models.CharField(max_length=50, blank=True, null=True, verbose_name="Entender lectura")
-    mantener_orden = models.CharField(max_length=50, blank=True, null=True, verbose_name="Mantener orden")
-    recordar_lugar_objetos = models.CharField(max_length=50, blank=True, null=True, verbose_name="Recordar lugar de objetos")
-    escribir = models.CharField(max_length=50, blank=True, null=True, verbose_name="Escribir")
-    manejar_dinero = models.CharField(max_length=50, blank=True, null=True, verbose_name="Manejar dinero")
-    orientacion_zona_donde_vive = models.CharField(max_length=50, blank=True, null=True, verbose_name="Orientación en zona donde vive")
-    recordar_citas = models.CharField(max_length=50, blank=True, null=True, verbose_name="Recordar citas")
-    pasatiempos = models.CharField(max_length=50, blank=True, null=True, verbose_name="Pasatiempos")
-    comunicarse_con_gente = models.CharField(max_length=50, blank=True, null=True, verbose_name="Comunicarse con gente")
-    calculos_mentales = models.CharField(max_length=50, blank=True, null=True, verbose_name="Cálculos mentales")
-    recordar_compras = models.CharField(max_length=50, blank=True, null=True, verbose_name="Recordar compras")
-    contener_orina = models.CharField(max_length=50, blank=True, null=True, verbose_name="Contener orina")
-    entender_pelicula = models.CharField(max_length=50, blank=True, null=True, verbose_name="Entender película")
-    orientacion_en_casa = models.CharField(max_length=50, blank=True, null=True, verbose_name="Orientación en casa")
-    hacer_tareas_hogar = models.CharField(max_length=50, blank=True, null=True, verbose_name="Hacer tareas del hogar")
-    comer_solo = models.CharField(max_length=50, blank=True, null=True, verbose_name="Comer solo")
-    realizar_tramites = models.CharField(max_length=50, blank=True, null=True, verbose_name="Realizar trámites")
-    decisiones_y_adaptacion = models.CharField(max_length=50, blank=True, null=True, verbose_name="Decisiones y adaptación")
-    egoismo = models.CharField(max_length=50, blank=True, null=True, verbose_name="Egoísmo")
-    enojo_menos_paciencia = models.CharField(max_length=50, blank=True, null=True, verbose_name="Enojo y menos paciencia")
-    llorar_con_facilidad = models.CharField(max_length=50, blank=True, null=True, verbose_name="Llorar con facilidad")
+    # verbose_name = texto exacto de la pregunta en el template
+    # examenes_anosognosia/Anosognosia_Participante_AQD.html.
+    recordar_fecha = models.CharField(max_length=50, blank=True, null=True, verbose_name="¿Tiene usted dificultades para recordar la fecha?")
+    orientacion_lugares_nuevos = models.CharField(max_length=50, blank=True, null=True, verbose_name="¿Tiene usted dificultades para orientarse en lugares nuevos?")
+    recordar_llamadas = models.CharField(max_length=50, blank=True, null=True, verbose_name="¿Tiene usted dificultades para recordar llamadas telefónicas?")
+    entender_conversacion = models.CharField(max_length=50, blank=True, null=True, verbose_name="¿Tiene usted dificultades para entender conversaciones?")
+    firmar = models.CharField(max_length=50, blank=True, null=True, verbose_name="¿Tiene usted dificultades para firmar?")
+    entender_lectura = models.CharField(max_length=50, blank=True, null=True, verbose_name="¿Tiene usted dificultades para entender lo que lee?")
+    mantener_orden = models.CharField(max_length=50, blank=True, null=True, verbose_name="¿Tiene usted dificultades para mantener en orden sus cosas?")
+    recordar_lugar_objetos = models.CharField(max_length=50, blank=True, null=True, verbose_name="¿Tiene usted dificultades para recordar dónde deja los objetos en su casa?")
+    escribir = models.CharField(max_length=50, blank=True, null=True, verbose_name="¿Tiene usted dificultades para escribir?")
+    manejar_dinero = models.CharField(max_length=50, blank=True, null=True, verbose_name="¿Tiene usted dificultades para manejar dinero?")
+    orientacion_zona_donde_vive = models.CharField(max_length=50, blank=True, null=True, verbose_name="¿Tiene usted dificultades para orientarse en la zona donde vive?")
+    recordar_citas = models.CharField(max_length=50, blank=True, null=True, verbose_name="¿Tiene usted dificultades para recordar citas (ejemplo: cuándo ir al médico)?")
+    pasatiempos = models.CharField(max_length=50, blank=True, null=True, verbose_name="¿Tiene usted dificultades para practicar sus pasatiempos?")
+    comunicarse_con_gente = models.CharField(max_length=50, blank=True, null=True, verbose_name="¿Tiene usted dificultades para comunicarse con las personas?")
+    calculos_mentales = models.CharField(max_length=50, blank=True, null=True, verbose_name="¿Tiene usted dificultades para hacer cálculos mentales? (por ejemplo: sumar, restar, multiplicar, dividir).")
+    recordar_compras = models.CharField(max_length=50, blank=True, null=True, verbose_name="¿Tiene usted dificultades para recordar las cosas que va a comprar?")
+    contener_orina = models.CharField(max_length=50, blank=True, null=True, verbose_name="¿Tiene usted dificultades para contener la orina?")
+    entender_pelicula = models.CharField(max_length=50, blank=True, null=True, verbose_name="¿Tiene usted dificultades para entender una película?")
+    orientacion_en_casa = models.CharField(max_length=50, blank=True, null=True, verbose_name="¿Tiene usted dificultades para orientarse dentro de su casa?")
+    hacer_tareas_hogar = models.CharField(max_length=50, blank=True, null=True, verbose_name="¿Tiene usted dificultades para realizar tareas del hogar como cocinar, limpiar, etc.?")
+    comer_solo = models.CharField(max_length=50, blank=True, null=True, verbose_name="¿Tiene usted dificultades para comer solo?")
+    realizar_tramites = models.CharField(max_length=50, blank=True, null=True, verbose_name="¿Tiene usted dificultades para realizar trámites? (por ejemplo: ir al banco, a la EPS, etc.).")
+    decisiones_y_adaptacion = models.CharField(max_length=50, blank=True, null=True, verbose_name="¿Se siente usted menos flexible para tomar decisiones y sin poder adaptarse a cosas nuevas?")
+    egoismo = models.CharField(max_length=50, blank=True, null=True, verbose_name="¿Ha notado que usted está más egoísta y no presta atención a las necesidades de los demás?")
+    enojo_menos_paciencia = models.CharField(max_length=50, blank=True, null=True, verbose_name="¿Ha notado que usted se enoja por pequeñeces y pierde la paciencia con más facilidad?")
+    llorar_con_facilidad = models.CharField(max_length=50, blank=True, null=True, verbose_name="¿Ha notado usted que llora con excesiva facilidad?")
     reir_situaciones_inapropiadas = models.CharField(
-        max_length=50, blank=True, null=True, verbose_name="Reír en situaciones inapropiadas"
+        max_length=50, blank=True, null=True, verbose_name="¿Ha notado usted que se ríe en situaciones inapropiadas?"
     )
-    temas_sexuales = models.CharField(max_length=50, blank=True, null=True, verbose_name="Temas sexuales")
-    falta_de_interes = models.CharField(max_length=50, blank=True, null=True, verbose_name="Falta de interés")
-    deprimido = models.CharField(max_length=50, blank=True, null=True, verbose_name="Deprimido")
+    temas_sexuales = models.CharField(max_length=50, blank=True, null=True, verbose_name="¿Ha notado que usted está más interesado en temas sexuales, y habla permanentemente de esos temas?")
+    falta_de_interes = models.CharField(max_length=50, blank=True, null=True, verbose_name="¿Ha notado usted falta de interés en cosas que antes le interesaban?")
+    deprimido = models.CharField(max_length=50, blank=True, null=True, verbose_name="¿Se ha sentido más deprimido?")
 
-    # Puntaje total
-    # puntaje_total = models.IntegerField(blank=True, null=True)
+    # B-10: suma de ítems en escala 1–4
+    puntaje_total = models.IntegerField(
+        blank=True, null=True, default=0, verbose_name="Puntaje total"
+    )
+
+    _AQD_ITEM_FIELDS = AQDCuidadorResult._AQD_ITEM_FIELDS
+
+    def calcular_puntaje_total(self):
+        total = 0
+        for name in self._AQD_ITEM_FIELDS:
+            raw = getattr(self, name, None)
+            if raw in (None, ""):
+                continue
+            try:
+                total += int(str(raw).strip().split()[0])
+            except (TypeError, ValueError):
+                continue
+        return total
+
+    def save(self, *args, **kwargs):
+        self.puntaje_total = self.calcular_puntaje_total()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"AQ-D Participante - {self.visita_examen_id}"
 
 
 class CDRCuidadorResult(ResultadoExamenBase):
+    # verbose_name = texto de Anosognosia_Cuidador_CDR.html (para Ver/PDF).
+    PRINT_SECCIONES_INICIOS = [
+        ("memoria_p1", "Memoria"),
+        ("orientacion_p1", "Orientación"),
+        ("juicio_p1", "Juicio y resolución de problemas"),
+        ("trabaja_actualmente", "Actividades comunitarias"),
+        ("cambios_tareas_domesticas", "Actividades domésticas y pasatiempos"),
+        ("cuidado_p1", "Cuidado personal"),
+    ]
+
     # ====================
     # Dominio: Memoria
     # ====================
-    memoria_p1 = models.CharField(max_length=100, blank=True, null=True, verbose_name="Memoria pregunta 1")  # sí/no
+    memoria_p1 = models.CharField(
+        max_length=100, blank=True, null=True,
+        verbose_name="¿Ha notado pérdida de memoria reciente?",
+    )
     memoria_p1_1 = models.CharField(
-        max_length=10, blank=True, null=True, verbose_name="Memoria pregunta 1.1"
-    )  # sí/no, subpregunta
+        max_length=10, blank=True, null=True,
+        verbose_name="¿Es este un problema constante (a diferencia de esporádico)?",
+    )
     memoria_p2 = models.CharField(
-        max_length=20, blank=True, null=True, verbose_name="Memoria pregunta 2"
-    )  # generalmente/a_veces/raramente
-    memoria_p3 = models.CharField(max_length=200, blank=True, null=True, verbose_name="Memoria pregunta 3")
-    memoria_p4 = models.CharField(max_length=100, blank=True, null=True, verbose_name="Memoria pregunta 4")  # sí/no
-    memoria_p5 = models.CharField(max_length=100, blank=True, null=True, verbose_name="Memoria pregunta 5")  # sí/no
-    memoria_p6 = models.CharField(max_length=200, blank=True, null=True, verbose_name="Memoria pregunta 6")
-    memoria_p7 = models.CharField(max_length=200, blank=True, null=True, verbose_name="Memoria pregunta 7")
-    memoria_p8 = models.CharField(max_length=200, blank=True, null=True, verbose_name="Memoria pregunta 8")
+        max_length=20, blank=True, null=True,
+        verbose_name="¿Puede él/ella recordar eventos recientes?",
+    )
+    memoria_p3 = models.CharField(
+        max_length=200, blank=True, null=True,
+        verbose_name="¿Puede él/ella recordar una lista breve de artículos (compras)?",
+    )
+    memoria_p4 = models.CharField(
+        max_length=100, blank=True, null=True,
+        verbose_name="¿Se ha registrado algún deterioro en su memoria durante el último año?",
+    )
+    memoria_p5 = models.CharField(
+        max_length=100, blank=True, null=True,
+        verbose_name=(
+            "¿Se encuentra su memoria deteriorada a tal punto que habría interferido "
+            "con la realización de sus actividades cotidianas habituales de años atrás "
+            "(o actividades previas a la jubilación)?"
+        ),
+    )
+    memoria_p6 = models.CharField(
+        max_length=200, blank=True, null=True,
+        verbose_name=(
+            "¿Se olvida él/ella completamente de un evento importante "
+            "(ej., viaje, fiesta, matrimonio familiar) a pocas semanas del evento?"
+        ),
+    )
+    memoria_p7 = models.CharField(
+        max_length=200, blank=True, null=True,
+        verbose_name="¿Se olvida él/ella de detalles relevantes del evento importante?",
+    )
+    memoria_p8 = models.CharField(
+        max_length=200, blank=True, null=True,
+        verbose_name=(
+            "¿Se olvida él/ella completamente de información importante del pasado lejano "
+            "(ej. fecha de cumpleaños, fecha de matrimonio, lugar de trabajo)?"
+        ),
+    )
 
-    # Evento reciente (respuestas abiertas)
-    evento_recuerda_semana = models.TextField(blank=True, null=True, verbose_name="Evento que recuerda de la semana")
-    evento_recuerda_mes = models.TextField(blank=True, null=True, verbose_name="Evento que recuerda del mes")
+    evento_recuerda_semana = models.TextField(
+        blank=True, null=True,
+        verbose_name="Evento reciente que debería recordar (en el curso de una semana)",
+    )
+    evento_recuerda_mes = models.TextField(
+        blank=True, null=True,
+        verbose_name="Evento reciente que debería recordar (en el curso de un mes)",
+    )
 
-    # Datos personales
-    nacimiento_fecha = models.DateField(blank=True, null=True, verbose_name="Fecha de nacimiento")
-    nacimiento_lugar = models.CharField(max_length=150, blank=True, null=True, verbose_name="Lugar de nacimiento")
-    colegio_nombre = models.CharField(max_length=150, blank=True, null=True, verbose_name="Nombre del colegio")
-    colegio_lugar = models.CharField(max_length=150, blank=True, null=True, verbose_name="Lugar del colegio")
-    colegio_grado = models.CharField(max_length=100, blank=True, null=True, verbose_name="Grado escolar")
-    ocupacion_principal = models.CharField(max_length=150, blank=True, null=True, verbose_name="Ocupación principal")
-    ultimo_trabajo = models.CharField(max_length=150, blank=True, null=True, verbose_name="Último trabajo")
-    jubilacion = models.TextField(blank=True, null=True, verbose_name="Jubilación")
+    nacimiento_fecha = models.DateField(blank=True, null=True, verbose_name="¿Cuándo nació él/ella?")
+    nacimiento_lugar = models.CharField(max_length=150, blank=True, null=True, verbose_name="¿Dónde nació él/ella?")
+    colegio_nombre = models.CharField(
+        max_length=150, blank=True, null=True,
+        verbose_name="Último colegio al que asistió — Nombre",
+    )
+    colegio_lugar = models.CharField(
+        max_length=150, blank=True, null=True,
+        verbose_name="Último colegio al que asistió — Lugar",
+    )
+    colegio_grado = models.CharField(
+        max_length=100, blank=True, null=True,
+        verbose_name="Último colegio al que asistió — Grado",
+    )
+    ocupacion_principal = models.CharField(
+        max_length=150, blank=True, null=True,
+        verbose_name=(
+            "¿Cuál fue la principal ocupación de él/ella "
+            "(o la ocupación del cónyuge si el sujeto no trabajaba)?"
+        ),
+    )
+    ultimo_trabajo = models.CharField(
+        max_length=150, blank=True, null=True,
+        verbose_name=(
+            "¿Cuál fue el último trabajo de él/ella "
+            "(o trabajo del cónyuge si el sujeto no trabajaba)?"
+        ),
+    )
+    jubilacion = models.TextField(
+        blank=True, null=True,
+        verbose_name="¿Cuándo se jubiló él/ella (o cónyuge) y por qué?",
+    )
 
     # ====================
     # Dominio: Orientación
     # ====================
-    orientacion_p1 = models.CharField(max_length=200, blank=True, null=True, verbose_name="Orientación pregunta 1")
-    orientacion_p2 = models.CharField(max_length=200, blank=True, null=True, verbose_name="Orientación pregunta 2")
-    orientacion_p3 = models.CharField(max_length=200, blank=True, null=True, verbose_name="Orientación pregunta 3")
-    orientacion_p4 = models.CharField(max_length=200, blank=True, null=True, verbose_name="Orientación pregunta 4")
-    orientacion_p5 = models.CharField(max_length=200, blank=True, null=True, verbose_name="Orientación pregunta 5")
-    orientacion_p6 = models.CharField(max_length=200, blank=True, null=True, verbose_name="Orientación pregunta 6")
-    orientacion_p7 = models.CharField(max_length=200, blank=True, null=True, verbose_name="Orientación pregunta 7")
-    orientacion_p8 = models.CharField(max_length=200, blank=True, null=True, verbose_name="Orientación pregunta 8")
+    orientacion_p1 = models.CharField(
+        max_length=200, blank=True, null=True,
+        verbose_name="¿Con qué frecuencia sabe él/ella exactamente la fecha del día?",
+    )
+    orientacion_p2 = models.CharField(
+        max_length=200, blank=True, null=True,
+        verbose_name="¿Con qué frecuencia sabe él/ella exactamente el mes?",
+    )
+    orientacion_p3 = models.CharField(
+        max_length=200, blank=True, null=True,
+        verbose_name="¿Con qué frecuencia sabe él/ella exactamente el año?",
+    )
+    orientacion_p4 = models.CharField(
+        max_length=200, blank=True, null=True,
+        verbose_name="¿Con qué frecuencia sabe él/ella exactamente el día de la semana?",
+    )
+    orientacion_p5 = models.CharField(
+        max_length=200, blank=True, null=True,
+        verbose_name=(
+            "¿Presenta él/ella dificultad para relacionar acontecimientos en el tiempo "
+            "(cuándo ocurrieron unos eventos en relación con los otros)?"
+        ),
+    )
+    orientacion_p6 = models.CharField(
+        max_length=200, blank=True, null=True,
+        verbose_name="¿Puede él/ella orientarse en calles que le son conocidas?",
+    )
+    orientacion_p7 = models.CharField(
+        max_length=200, blank=True, null=True,
+        verbose_name=(
+            "¿Con qué frecuencia sabe él/ella cómo llegar de un lugar a otro "
+            "cuando se encuentra fuera de su vecindario?"
+        ),
+    )
+    orientacion_p8 = models.CharField(
+        max_length=200, blank=True, null=True,
+        verbose_name="¿Con qué frecuencia puede él/ella orientarse dentro de su casa?",
+    )
 
     # ====================
     # Dominio: Juicio y resolución de problemas
     # ====================
-    juicio_p1 = models.CharField(max_length=100, blank=True, null=True, verbose_name="Juicio pregunta 1")
-    juicio_p2 = models.CharField(max_length=100, blank=True, null=True, verbose_name="Juicio pregunta 2")
-    juicio_p3 = models.CharField(max_length=100, blank=True, null=True, verbose_name="Juicio pregunta 3")
-    juicio_p4 = models.CharField(max_length=150, blank=True, null=True, verbose_name="Juicio pregunta 4")
-    juicio_p5 = models.CharField(max_length=500, blank=True, null=True, verbose_name="Juicio pregunta 5")
-    juicio_p6 = models.CharField(max_length=500, blank=True, null=True, verbose_name="Juicio pregunta 6")
+    juicio_p1 = models.CharField(
+        max_length=100, blank=True, null=True,
+        verbose_name=(
+            "En general, si Ud. tuviera que evaluar la capacidad de él/ella "
+            "para resolver problemas en este momento, Ud. la consideraría:"
+        ),
+    )
+    juicio_p2 = models.CharField(
+        max_length=100, blank=True, null=True,
+        verbose_name=(
+            "Evalúe la capacidad de él/ella para manejar pequeñas sumas de dinero "
+            "(ej. dar cambio, dejar una pequeña propina):"
+        ),
+    )
+    juicio_p3 = models.CharField(
+        max_length=100, blank=True, null=True,
+        verbose_name=(
+            "Evalúe la capacidad de él/ella para manejar transacciones financieras "
+            "o de negocios complicadas (ej. balancear una chequera, pagar cuentas):"
+        ),
+    )
+    juicio_p4 = models.CharField(
+        max_length=150, blank=True, null=True,
+        verbose_name=(
+            "¿Puede él/ella manejar una emergencia doméstica "
+            "(ej. gotera en las cañerías, pequeño incendio)?"
+        ),
+    )
+    juicio_p5 = models.CharField(
+        max_length=500, blank=True, null=True,
+        verbose_name="¿Puede él/ella comprender situaciones o explicaciones?",
+    )
+    juicio_p6 = models.CharField(
+        max_length=500, blank=True, null=True,
+        verbose_name=(
+            "¿Se comporta apropiadamente en situaciones sociales e interacciones "
+            "con otra gente (como usualmente se comportaba antes de la enfermedad)?"
+        ),
+    )
 
     # ====================
     # Actividades comunitarias
     # ====================
     trabaja_actualmente = models.CharField(
-        max_length=100, blank=True, null=True, verbose_name="Trabaja actualmente"
-    )  # na/si/no
+        max_length=100, blank=True, null=True,
+        verbose_name="¿Él/Ella sigue trabajando?",
+    )
     memoria_causa_jubilacion = models.CharField(
-        max_length=100, blank=True, null=True, verbose_name="Memoria como causa de jubilación"
-    )  # si/no/nose
+        max_length=100, blank=True, null=True,
+        verbose_name=(
+            "¿Problemas con la memoria o el pensamiento de él/ella "
+            "contribuyeron a su decisión de jubilarse?"
+        ),
+    )
     dificultades_trabajo_memoria = models.CharField(
-        max_length=100, blank=True, null=True, verbose_name="Dificultades en el trabajo por memoria"
+        max_length=100, blank=True, null=True,
+        verbose_name=(
+            "¿Él/Ella presenta dificultades significativas en el trabajo "
+            "debido a problemas con su memoria o pensamiento?"
+        ),
     )
 
-    condujo_alguna_vez = models.CharField(max_length=50, blank=True, null=True, verbose_name="Condujo alguna vez")  # si/no
+    condujo_alguna_vez = models.CharField(
+        max_length=50, blank=True, null=True,
+        verbose_name="¿Condujo él/ella alguna vez un carro?",
+    )
     conduce_actualmente = models.CharField(
-        max_length=50, blank=True, null=True, verbose_name="Conduce actualmente"
-    )  # si/no
+        max_length=50, blank=True, null=True,
+        verbose_name="¿Actualmente, él/ella conduce un carro?",
+    )
     dejo_de_conducir_por_memoria = models.CharField(
-        max_length=5, blank=True, null=True, verbose_name="Dejó de conducir por memoria"
-    )  # si/no
-    riesgos_conduccion = models.CharField(max_length=50, blank=True, null=True, verbose_name="Riesgos de conducción")  # si/no
+        max_length=5, blank=True, null=True,
+        verbose_name="¿Se debe esto a problemas con su memoria o pensamiento?",
+    )
+    riesgos_conduccion = models.CharField(
+        max_length=50, blank=True, null=True,
+        verbose_name=(
+            "Si él/ella todavía conduce, ¿existen problemas o riesgos "
+            "debido a un pensamiento pobre?"
+        ),
+    )
 
-    compras_independientes = models.CharField(max_length=50, blank=True, null=True, verbose_name="Compras independientes")
-    actividades_fuera_hogar = models.CharField(max_length=50, blank=True, null=True, verbose_name="Actividades fuera del hogar")
+    compras_independientes = models.CharField(
+        max_length=50, blank=True, null=True,
+        verbose_name="¿Es él/ella todavía capaz de salir a comprar lo que necesita en forma independiente?",
+    )
+    actividades_fuera_hogar = models.CharField(
+        max_length=50, blank=True, null=True,
+        verbose_name="¿Es él/ella capaz de llevar a cabo actividades fuera del hogar en forma independiente?",
+    )
     asiste_funciones_sociales = models.CharField(
-        max_length=5, blank=True, null=True, verbose_name="Asiste a funciones sociales"
-    )  # si/no
-    motivo_no_funciones = models.TextField(blank=True, null=True, verbose_name="Motivo de no asistir a funciones")
+        max_length=5, blank=True, null=True,
+        verbose_name="¿Asiste él/ella a funciones sociales fuera del hogar familiar?",
+    )
+    motivo_no_funciones = models.TextField(
+        blank=True, null=True,
+        verbose_name="En caso negativo, ¿por qué no asiste a funciones sociales?",
+    )
 
-    parece_enfermo = models.CharField(max_length=5, blank=True, null=True, verbose_name="Parece enfermo")  # si/no
+    parece_enfermo = models.CharField(
+        max_length=5, blank=True, null=True,
+        verbose_name=(
+            "¿Alguien que no conozca al sujeto y observara su comportamiento "
+            "pensaría que éste/a se encuentra enfermo/a?"
+        ),
+    )
     participa_hogar_geriatrico = models.CharField(
-        max_length=50, blank=True, null=True, verbose_name="Participa en hogar geriátrico"
-    )  # si/no
+        max_length=50, blank=True, null=True,
+        verbose_name=(
+            "Si el sujeto se encuentra en un hogar geriátrico, ¿participa activamente "
+            "él/ella en actividades sociales (con participación intelectual)?"
+        ),
+    )
     info_suficiente_comunitarias = models.CharField(
-        max_length=50, blank=True, null=True, verbose_name="Información suficiente sobre actividades comunitarias"
-    )  # si/no
-    notas_comunitarias = models.TextField(blank=True, null=True, verbose_name="Notas sobre actividades comunitarias")
+        max_length=50, blank=True, null=True,
+        verbose_name=(
+            "¿Existe suficiente información disponible para evaluar el grado de "
+            "deterioro del sujeto en las actividades comunitarias?"
+        ),
+    )
+    notas_comunitarias = models.TextField(
+        blank=True, null=True,
+        verbose_name="Notas adicionales (actividades comunitarias)",
+    )
 
     # ====================
     # Actividades domésticas y pasatiempos
     # ====================
-    cambios_tareas_domesticas = models.TextField(blank=True, null=True, verbose_name="Cambios en tareas domésticas")
-    cosas_que_aun_realiza_domesticas = models.TextField(blank=True, null=True, verbose_name="Cosas que aún realiza (domésticas)")
-    cambios_pasatiempos = models.TextField(blank=True, null=True, verbose_name="Cambios en pasatiempos")
-    cosas_que_aun_realiza_pasatiempos = models.TextField(blank=True, null=True, verbose_name="Cosas que aún realiza (pasatiempos)")
-    actividades_no_realiza_en_hogar = models.TextField(blank=True, null=True, verbose_name="Actividades que no realiza en el hogar")
+    cambios_tareas_domesticas = models.TextField(
+        blank=True, null=True,
+        verbose_name="¿Qué cambios se han registrado en las habilidades de él/ella para realizar tareas domésticas?",
+    )
+    cosas_que_aun_realiza_domesticas = models.TextField(
+        blank=True, null=True,
+        verbose_name="¿Qué cosas puede él/ella todavía realizar bien? (tareas domésticas)",
+    )
+    cambios_pasatiempos = models.TextField(
+        blank=True, null=True,
+        verbose_name="¿Qué cambios se han registrado en las habilidades de él/ella para realizar pasatiempos?",
+    )
+    cosas_que_aun_realiza_pasatiempos = models.TextField(
+        blank=True, null=True,
+        verbose_name="¿Qué cosas puede él/ella todavía realizar bien? (pasatiempos)",
+    )
+    actividades_no_realiza_en_hogar = models.TextField(
+        blank=True, null=True,
+        verbose_name=(
+            "Si el sujeto se encuentra en un hogar geriátrico, ¿qué cosas ya no puede "
+            "realizar bien (actividades domésticas y pasatiempos)?"
+        ),
+    )
 
-    habilidad_domestica_dementia_scale = models.TextField(blank=True, null=True, verbose_name="Habilidad doméstica (escala de demencia)")
-    descripcion_habilidad_domestica = models.TextField(blank=True, null=True, verbose_name="Descripción de habilidad doméstica")
-    nivel_desempeno_domestico = models.CharField(max_length=2000, blank=True, null=True, verbose_name="Nivel de desempeño doméstico")
-    notas_domesticas_pasatiempos = models.TextField(blank=True, null=True, verbose_name="Notas sobre actividades domésticas y pasatiempos")
+    habilidad_domestica_dementia_scale = models.TextField(
+        blank=True, null=True,
+        verbose_name="Habilidad para realizar tareas domésticas (Dementia Scale of Blessed)",
+    )
+    descripcion_habilidad_domestica = models.TextField(
+        blank=True, null=True,
+        verbose_name="Descripción de la habilidad doméstica",
+    )
+    nivel_desempeno_domestico = models.CharField(
+        max_length=2000, blank=True, null=True,
+        verbose_name="¿En qué nivel es él/ella capaz de realizar tareas domésticas?",
+    )
+    notas_domesticas_pasatiempos = models.TextField(
+        blank=True, null=True,
+        verbose_name="Notas sobre actividades domésticas y pasatiempos",
+    )
 
     # ====================
     # Cuidado personal
     # ====================
-    cuidado_p1 = models.TextField(blank=True, null=True, verbose_name="Vestirse")  # Vestirse
-    cuidado_p2 = models.TextField(blank=True, null=True, verbose_name="Lavado y aseo")  # Lavado/aseo
-    cuidado_p3 = models.TextField(blank=True, null=True, verbose_name="Alimentación")  # Alimentación
-    cuidado_p4 = models.TextField(blank=True, null=True, verbose_name="Control de esfínteres")  # Control de esfínteres
+    cuidado_p1 = models.TextField(
+        blank=True, null=True,
+        verbose_name="Vestirse (The Dementia Scale of Blessed)",
+    )
+    cuidado_p2 = models.TextField(blank=True, null=True, verbose_name="Lavado, aseo")
+    cuidado_p3 = models.TextField(blank=True, null=True, verbose_name="Hábitos de alimentación")
+    cuidado_p4 = models.TextField(
+        blank=True, null=True,
+        verbose_name="Control de esfínteres (The Dementia Scale of Blessed)",
+    )
 
     def __str__(self):
         return f"CDR Cuidador - {self.visita_examen_id}"
 
 
 class CDRParticipanteResult(ResultadoExamenBase):
+    # verbose_name = texto de Anosognosia_Participante_CDR.html (para Ver/PDF).
+    PRINT_SECCIONES_INICIOS = [
+        ("memoria_p1", "Memoria"),
+        ("orientacion_p1", "Orientación"),
+        ("juicio_p1_respuesta", "Juicio y resolución de problemas"),
+    ]
+
     # ====================
     # Dominio: Memoria
     # ====================
-    memoria_p1 = models.CharField(max_length=5, blank=True, null=True, verbose_name="Memoria pregunta 1")  # si/no
+    memoria_p1 = models.CharField(
+        max_length=5, blank=True, null=True,
+        verbose_name="¿Tiene usted problemas con su memoria o pensamiento?",
+    )
 
-    evento_recuerda_semana = models.TextField(blank=True, null=True, verbose_name="Evento que recuerda de la semana")
-    memoria_semana_calificacion = models.TextField(blank=True, null=True, verbose_name="Calificación memoria de la semana")
+    evento_recuerda_semana = models.TextField(
+        blank=True, null=True,
+        verbose_name="Evento reciente que debería recordar (en el curso de una semana)",
+    )
+    memoria_semana_calificacion = models.TextField(
+        blank=True, null=True,
+        verbose_name="Calificación del recuerdo (semana)",
+    )
 
-    evento_recuerda_mes = models.TextField(blank=True, null=True, verbose_name="Evento que recuerda del mes")
-    memoria_mes_calificacion = models.TextField(blank=True, null=True, verbose_name="Calificación memoria del mes")
+    evento_recuerda_mes = models.TextField(
+        blank=True, null=True,
+        verbose_name="Evento reciente que debería recordar (en el curso de un mes)",
+    )
+    memoria_mes_calificacion = models.TextField(
+        blank=True, null=True,
+        verbose_name="Calificación del recuerdo (mes)",
+    )
 
     # Ensayos (checkboxes del nombre/dirección)
-    ensayo1_juan = models.BooleanField(default=False, verbose_name="Ensayo 1: Juan")
-    ensayo1_perez = models.BooleanField(default=False, verbose_name="Ensayo 1: Pérez")
-    ensayo1_calle = models.BooleanField(default=False, verbose_name="Ensayo 1: Calle")
-    ensayo1_avenida = models.BooleanField(default=False, verbose_name="Ensayo 1: Avenida")
-    ensayo1_cali = models.BooleanField(default=False, verbose_name="Ensayo 1: Cali")
+    ensayo1_juan = models.BooleanField(default=False, verbose_name="Ensayo 1 — Juan")
+    ensayo1_perez = models.BooleanField(default=False, verbose_name="Ensayo 1 — Pérez")
+    ensayo1_calle = models.BooleanField(default=False, verbose_name="Ensayo 1 — Calle 42")
+    ensayo1_avenida = models.BooleanField(default=False, verbose_name="Ensayo 1 — Avenida Boyacá")
+    ensayo1_cali = models.BooleanField(default=False, verbose_name="Ensayo 1 — Cali")
 
-    ensayo2_juan = models.BooleanField(default=False, verbose_name="Ensayo 2: Juan")
-    ensayo2_perez = models.BooleanField(default=False, verbose_name="Ensayo 2: Pérez")
-    ensayo2_calle = models.BooleanField(default=False, verbose_name="Ensayo 2: Calle")
-    ensayo2_avenida = models.BooleanField(default=False, verbose_name="Ensayo 2: Avenida")
-    ensayo2_cali = models.BooleanField(default=False, verbose_name="Ensayo 2: Cali")
+    ensayo2_juan = models.BooleanField(default=False, verbose_name="Ensayo 2 — Juan")
+    ensayo2_perez = models.BooleanField(default=False, verbose_name="Ensayo 2 — Pérez")
+    ensayo2_calle = models.BooleanField(default=False, verbose_name="Ensayo 2 — Calle 42")
+    ensayo2_avenida = models.BooleanField(default=False, verbose_name="Ensayo 2 — Avenida Boyacá")
+    ensayo2_cali = models.BooleanField(default=False, verbose_name="Ensayo 2 — Cali")
 
-    ensayo3_juan = models.BooleanField(default=False, verbose_name="Ensayo 3: Juan")
-    ensayo3_perez = models.BooleanField(default=False, verbose_name="Ensayo 3: Pérez")
-    ensayo3_calle = models.BooleanField(default=False, verbose_name="Ensayo 3: Calle")
-    ensayo3_avenida = models.BooleanField(default=False, verbose_name="Ensayo 3: Avenida")
-    ensayo3_cali = models.BooleanField(default=False, verbose_name="Ensayo 3: Cali")
+    ensayo3_juan = models.BooleanField(default=False, verbose_name="Ensayo 3 — Juan")
+    ensayo3_perez = models.BooleanField(default=False, verbose_name="Ensayo 3 — Pérez")
+    ensayo3_calle = models.BooleanField(default=False, verbose_name="Ensayo 3 — Calle 42")
+    ensayo3_avenida = models.BooleanField(default=False, verbose_name="Ensayo 3 — Avenida Boyacá")
+    ensayo3_cali = models.BooleanField(default=False, verbose_name="Ensayo 3 — Cali")
 
-    fecha_nacimiento = models.DateField(blank=True, null=True, verbose_name="Fecha de nacimiento")
-    lugar_nacimiento = models.CharField(max_length=100, blank=True, null=True, verbose_name="Lugar de nacimiento")
+    fecha_nacimiento = models.DateField(blank=True, null=True, verbose_name="¿Cuándo nació?")
+    lugar_nacimiento = models.CharField(max_length=100, blank=True, null=True, verbose_name="¿Dónde nació?")
 
-    colegio_nombre = models.CharField(max_length=100, blank=True, null=True, verbose_name="Nombre del colegio")
-    colegio_lugar = models.CharField(max_length=100, blank=True, null=True, verbose_name="Lugar del colegio")
-    colegio_grado = models.CharField(max_length=200, blank=True, null=True, verbose_name="Grado escolar")
+    colegio_nombre = models.CharField(
+        max_length=100, blank=True, null=True,
+        verbose_name="Último colegio al que asistió — Nombre",
+    )
+    colegio_lugar = models.CharField(
+        max_length=100, blank=True, null=True,
+        verbose_name="Último colegio al que asistió — Lugar",
+    )
+    colegio_grado = models.CharField(
+        max_length=200, blank=True, null=True,
+        verbose_name="Último colegio al que asistió — Grado",
+    )
 
-    ocupacion_principal = models.CharField(max_length=150, blank=True, null=True, verbose_name="Ocupación principal")
-    ultimo_trabajo = models.CharField(max_length=150, blank=True, null=True, verbose_name="Último trabajo")
-    jubilacion = models.TextField(blank=True, null=True, verbose_name="Jubilación")
+    ocupacion_principal = models.CharField(
+        max_length=150, blank=True, null=True,
+        verbose_name=(
+            "¿Cuál era su principal ocupación/trabajo o la de su cónyuge, "
+            "si Ud. no estaba empleado/a?"
+        ),
+    )
+    ultimo_trabajo = models.CharField(
+        max_length=150, blank=True, null=True,
+        verbose_name=(
+            "¿Cuál fue su último trabajo importante "
+            "(o el de su cónyuge, si Ud. no estaba empleado/a)?"
+        ),
+    )
+    jubilacion = models.TextField(
+        blank=True, null=True,
+        verbose_name="¿Cuándo se jubiló (o su cónyuge) y por qué?",
+    )
 
     # Repetición del nombre/dirección
-    repeticion_juan = models.BooleanField(default=False, verbose_name="Repetición: Juan")
-    repeticion_perez = models.BooleanField(default=False, verbose_name="Repetición: Pérez")
-    repeticion_calle = models.BooleanField(default=False, verbose_name="Repetición: Calle")
-    repeticion_avenida = models.BooleanField(default=False, verbose_name="Repetición: Avenida")
-    repeticion_cali = models.BooleanField(default=False, verbose_name="Repetición: Cali")
+    repeticion_juan = models.BooleanField(default=False, verbose_name="Repetición — Juan")
+    repeticion_perez = models.BooleanField(default=False, verbose_name="Repetición — Pérez")
+    repeticion_calle = models.BooleanField(default=False, verbose_name="Repetición — Calle 42")
+    repeticion_avenida = models.BooleanField(default=False, verbose_name="Repetición — Avenida Boyacá")
+    repeticion_cali = models.BooleanField(default=False, verbose_name="Repetición — Cali")
 
     # ====================
     # Dominio: Orientación
     # ====================
     orientacion_p1 = models.CharField(
-        max_length=15, blank=True, null=True, verbose_name="Orientación pregunta 1"
-    )  # correcto/incorrecto
-    orientacion_p2 = models.CharField(max_length=150, blank=True, null=True, verbose_name="Orientación pregunta 2")
-    orientacion_p3 = models.CharField(max_length=150, blank=True, null=True, verbose_name="Orientación pregunta 3")
-    orientacion_p4 = models.CharField(max_length=150, blank=True, null=True, verbose_name="Orientación pregunta 4")
-    orientacion_p5 = models.CharField(max_length=500, blank=True, null=True, verbose_name="Orientación pregunta 5")
-    orientacion_p6 = models.CharField(max_length=500, blank=True, null=True, verbose_name="Orientación pregunta 6")
-    orientacion_p7 = models.CharField(max_length=150, blank=True, null=True, verbose_name="Orientación pregunta 7")
-    orientacion_p8 = models.CharField(max_length=150, blank=True, null=True, verbose_name="Orientación pregunta 8")
+        max_length=15, blank=True, null=True,
+        verbose_name="¿Qué fecha es hoy?",
+    )
+    orientacion_p2 = models.CharField(
+        max_length=150, blank=True, null=True,
+        verbose_name="¿Qué día de la semana es hoy?",
+    )
+    orientacion_p3 = models.CharField(
+        max_length=150, blank=True, null=True,
+        verbose_name="¿En qué mes estamos?",
+    )
+    orientacion_p4 = models.CharField(
+        max_length=150, blank=True, null=True,
+        verbose_name="¿En qué año estamos?",
+    )
+    orientacion_p5 = models.CharField(
+        max_length=500, blank=True, null=True,
+        verbose_name="¿Cómo se llama este lugar?",
+    )
+    orientacion_p6 = models.CharField(
+        max_length=500, blank=True, null=True,
+        verbose_name="¿En qué pueblo o ciudad estamos?",
+    )
+    orientacion_p7 = models.CharField(
+        max_length=150, blank=True, null=True,
+        verbose_name="¿Qué hora es?",
+    )
+    orientacion_p8 = models.CharField(
+        max_length=150, blank=True, null=True,
+        verbose_name="¿Sabe el sujeto quién es el informante (según el criterio del entrevistador)?",
+    )
 
     # ====================
     # Dominio: Juicio y resolución de problemas
     # ====================
-    juicio_p1_respuesta = models.TextField(blank=True, null=True, verbose_name="Juicio P1 respuesta")
-    juicio_p1_puntaje = models.IntegerField(blank=True, null=True, verbose_name="Juicio P1 puntaje")
+    juicio_p1_respuesta = models.TextField(
+        blank=True, null=True,
+        verbose_name="¿En qué se parecen un rábano y una coliflor? — Respuesta",
+    )
+    juicio_p1_puntaje = models.IntegerField(
+        blank=True, null=True,
+        verbose_name="¿En qué se parecen un rábano y una coliflor? — Puntaje",
+    )
 
-    juicio_p2_respuesta = models.TextField(blank=True, null=True, verbose_name="Juicio P2 respuesta")
-    juicio_p2_puntaje = models.IntegerField(blank=True, null=True, verbose_name="Juicio P2 puntaje")
+    juicio_p2_respuesta = models.TextField(
+        blank=True, null=True,
+        verbose_name="¿En qué se parecen un escritorio y una estantería? — Respuesta",
+    )
+    juicio_p2_puntaje = models.IntegerField(
+        blank=True, null=True,
+        verbose_name="¿En qué se parecen un escritorio y una estantería? — Puntaje",
+    )
 
-    juicio_p3_respuesta = models.TextField(blank=True, null=True, verbose_name="Juicio P3 respuesta")
-    juicio_p3_puntaje = models.IntegerField(blank=True, null=True, verbose_name="Juicio P3 puntaje")
+    juicio_p3_respuesta = models.TextField(
+        blank=True, null=True,
+        verbose_name="¿Cuál es la diferencia entre una mentira y una equivocación? — Respuesta",
+    )
+    juicio_p3_puntaje = models.IntegerField(
+        blank=True, null=True,
+        verbose_name="¿Cuál es la diferencia entre una mentira y una equivocación? — Puntaje",
+    )
 
-    juicio_p4_respuesta = models.TextField(blank=True, null=True, verbose_name="Juicio P4 respuesta")
-    juicio_p4_puntaje = models.IntegerField(blank=True, null=True, verbose_name="Juicio P4 puntaje")
+    juicio_p4_respuesta = models.TextField(
+        blank=True, null=True,
+        verbose_name="¿Cuál es la diferencia entre un río y un canal? — Respuesta",
+    )
+    juicio_p4_puntaje = models.IntegerField(
+        blank=True, null=True,
+        verbose_name="¿Cuál es la diferencia entre un río y un canal? — Puntaje",
+    )
 
     juicio_p5 = models.CharField(
         max_length=15,
@@ -722,7 +1184,7 @@ class CDRParticipanteResult(ResultadoExamenBase):
         ],
         blank=True,
         null=True,
-        verbose_name="Juicio pregunta 5",
+        verbose_name="¿Cuántos centavos hay en un peso?",
     )
 
     juicio_p6 = models.CharField(
@@ -733,7 +1195,7 @@ class CDRParticipanteResult(ResultadoExamenBase):
         ],
         blank=True,
         null=True,
-        verbose_name="Juicio pregunta 6",
+        verbose_name="¿Cuántas monedas de 50 pesos hay en $1,350?",
     )
 
     juicio_p7 = models.CharField(
@@ -744,14 +1206,21 @@ class CDRParticipanteResult(ResultadoExamenBase):
         ],
         blank=True,
         null=True,
-        verbose_name="Juicio pregunta 7",
+        verbose_name="Restar 3 de 20 y continuar hasta llegar a 2 o 1",
     )
 
-    juicio_p8_puntaje = models.IntegerField(blank=True, null=True, verbose_name="Juicio P8 puntaje")
+    juicio_p8_puntaje = models.IntegerField(
+        blank=True, null=True,
+        verbose_name="Al llegar a una ciudad extraña, ¿cómo localizaría usted a un amigo? — Puntaje",
+    )
 
     juicio_p9 = models.CharField(
-        max_length=50, blank=True, null=True, verbose_name="Juicio P9 percepción"
-    )  # Buena, parcial, poca percepción
+        max_length=50, blank=True, null=True,
+        verbose_name=(
+            "Evaluación del sujeto respecto a su discapacidad, posición social "
+            "y comprensión de por qué se encuentra en el test"
+        ),
+    )
 
     def __str__(self):
         return f"CDR Participante - {self.visita_examen_id}"
@@ -814,6 +1283,37 @@ class RedLatSpanishResult(ResultadoExamenBase):
     puntaje_comunicacion = models.CharField(max_length=20, blank=True, null=True, verbose_name="Puntaje comunicación")
     puntaje_tecnologia = models.CharField(max_length=20, blank=True, null=True, verbose_name="Puntaje tecnología")
 
+    # B-10: suma de componentes
+    puntaje_total = models.FloatField(
+        blank=True, null=True, default=0, verbose_name="Puntaje total"
+    )
+
+    _REDLAT_COMPONENTES = (
+        "puntaje_autocuidado",
+        "puntaje_cuidado_hogar",
+        "puntaje_trabajo_recreacion",
+        "puntaje_compras_dinero",
+        "puntaje_viajes",
+        "puntaje_comunicacion",
+        "puntaje_tecnologia",
+    )
+
+    def calcular_puntaje_total(self):
+        total = 0.0
+        for name in self._REDLAT_COMPONENTES:
+            raw = getattr(self, name, None)
+            if raw in (None, ""):
+                continue
+            try:
+                total += float(str(raw).replace("%", "").strip())
+            except (TypeError, ValueError):
+                continue
+        return total
+
+    def save(self, *args, **kwargs):
+        self.puntaje_total = self.calcular_puntaje_total()
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return f"RedLat Spanish - {self.visita_examen}"
 
@@ -865,6 +1365,15 @@ class BettyFerrelResult(ResultadoExamenBase):
     estado_espiritual = models.CharField(max_length=255, blank=True, null=True, verbose_name="Estado espiritual")
 
     puntaje_total = models.IntegerField(default=0, verbose_name="Puntaje total")
+    # D-18: subescalas (promedios 1–4) e interpretación por terciles
+    promedio_fisico = models.FloatField(blank=True, null=True, verbose_name="Promedio bienestar físico")
+    promedio_psicologico = models.FloatField(blank=True, null=True, verbose_name="Promedio bienestar psicológico")
+    promedio_social = models.FloatField(blank=True, null=True, verbose_name="Promedio bienestar social")
+    promedio_espiritual = models.FloatField(blank=True, null=True, verbose_name="Promedio bienestar espiritual")
+    promedio_global = models.FloatField(blank=True, null=True, verbose_name="Promedio global")
+    interpretacion = models.CharField(
+        max_length=255, blank=True, null=True, verbose_name="Interpretación"
+    )
 
     def __str__(self):
         return f"Betty Ferrel - {self.visita_examen}"
@@ -879,6 +1388,38 @@ class PuntajeCDRResult(ResultadoExamenBase):
     cdr_cuidado = models.CharField(max_length=10, verbose_name="CDR Cuidado personal")
     cdr_global = models.CharField(max_length=10, verbose_name="CDR Global")
     cdr_interpretacion = models.TextField(blank=True, verbose_name="Interpretación CDR")
+    # B-10: suma de cajas (suma de dominios; distinta del CDR global algorítmico)
+    suma_cajas = models.FloatField(
+        blank=True,
+        null=True,
+        default=0,
+        verbose_name="Suma de los 6 dominios (cajas)",
+    )
+
+    _CDR_DOMINIOS = (
+        "cdr_memoria",
+        "cdr_orientacion",
+        "cdr_juicio",
+        "cdr_comunitarias",
+        "cdr_pasatiempos",
+        "cdr_cuidado",
+    )
+
+    def calcular_suma_cajas(self):
+        total = 0.0
+        for name in self._CDR_DOMINIOS:
+            raw = getattr(self, name, None)
+            if raw in (None, ""):
+                continue
+            try:
+                total += float(raw)
+            except (TypeError, ValueError):
+                continue
+        return total
+
+    def save(self, *args, **kwargs):
+        self.suma_cajas = self.calcular_suma_cajas()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"CDR - {self.visita_examen_id}"

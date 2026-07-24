@@ -1,4 +1,4 @@
-{% extends 'layouts/base.html' %}
+{% extends parent_template|default:"layouts/base.html" %}
 
 {% block content %}
 
@@ -7,7 +7,7 @@
     <div class="col">
       <div class="card shadow">
         <!-- Card header -->
-        <div class="card-header border-0">
+        <div class="card-header border-0 hc-encabezado-web">
           <div class="row align-items-center">
             <div class="col">
               <h3 class="mb-0">Resultado: Anamnesis de Sueño</h3>
@@ -20,12 +20,14 @@
             <div class="col text-right">
               <span class="text-muted">{{ visita_examen.fecha_completado|date:"d/m/Y H:i" }}</span>
               <br><span class="badge badge-success">Completado</span>
+              {% if not print_mode %}
               <div class="mt-2">
                 <a href="{% url 'realizar_examen' visita_examen.visita.id visita_examen.examen.id paciente.id %}" 
                    class="btn btn-primary btn-sm">
                   <i class="fas fa-edit"></i> Editar
                 </a>
               </div>
+              {% endif %}
             </div>
           </div>
         </div>
@@ -583,6 +585,7 @@
       </div>
     </div>
   </div>
+   {% if not print_mode %}
    <div class="card-footer bg-light">
     <div class="row align-items-center">
         <div class="col">
@@ -598,9 +601,11 @@
         </div>
     </div>
 </div>
+   {% endif %}
 </div>
 
 <!-- Estilos para impresión -->
+{% if not print_mode %}
 <style>
 @media print {
   .btn, .badge { 
@@ -627,24 +632,5 @@
   }
 }
 </style>
+{% endif %}
 {% endblock %}
-<!-- Estilos para impresión -->
-<style>
-@media print {
-  .btn, .badge { 
-    display: none !important; 
-  }
-  .card {
-    border: 1px solid #dee2e6 !important;
-    box-shadow: none !important;
-    break-inside: avoid;
-  }
-  .card-header {
-    background-color: #f8f9fa !important;
-    color: #000 !important;
-  }
-  body {
-    font-size: 12px;
-  }
-}
-</style>

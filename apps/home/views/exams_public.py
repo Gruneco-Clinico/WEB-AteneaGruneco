@@ -29,8 +29,99 @@ from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT, TA_JUSTIFY
 from io import BytesIO
 
 from ..tokens import generar_token_paciente, validar_token_paciente
+from ..services.visita_sueno import resolver_visita_examen_publico
 
 logger = logging.getLogger(__name__)
+
+
+def _visita_id_from_request(request):
+    params = request.GET if request.method == "GET" else request.POST
+    raw = params.get("visita_id")
+    if not raw:
+        return None
+    try:
+        return int(raw)
+    except (TypeError, ValueError):
+        return None
+
+
+def _cargar_formulario_examen_publico(
+    request,
+    paciente,
+    examen_id,
+    examen_tipo_label,
+    template_name,
+    extra_context=None,
+    result_model=None,
+):
+    """GET compartido: resuelve visita/examen y renderiza formulario o completado."""
+    visita_id = _visita_id_from_request(request)
+    try:
+        visita, visita_examen = resolver_visita_examen_publico(
+            paciente, examen_id, visita_id=visita_id
+        )
+    except Visita.DoesNotExist:
+        messages.error(request, "❌ No se encontró la visita asociada.")
+        return redirect("formulario_demografico_externo")
+
+    if visita_examen.visita.paciente_id != paciente.id:
+        messages.error(request, "❌ La visita no corresponde a este paciente.")
+        return redirect("formulario_demografico_externo")
+
+    if visita_examen.estado == "completado":
+        messages.info(
+            request, "ℹ️ Este examen ya ha sido completado anteriormente."
+        )
+        return render(
+            request,
+            "registro_publico/examen_completado.html",
+            {"examen_tipo": examen_tipo_label, "paciente": paciente},
+        )
+
+    if visita_examen.estado == "pendiente":
+        visita_examen.estado = "en_progreso"
+        visita_examen.fecha_inicio = timezone.now()
+        visita_examen.save()
+
+    context = {
+        "paciente": paciente,
+        "visita": visita,
+        "visita_examen": visita_examen,
+        "token": generar_token_paciente(paciente.id),
+        "visita_id": visita.id,
+    }
+    if result_model:
+        context["datos_examen"] = _datos_examen_existente(result_model, visita_examen)
+    if extra_context:
+        context.update(extra_context)
+    return render(request, template_name, context)
+
+
+def _datos_examen_existente(result_model, visita_examen):
+    try:
+        resultado = result_model.objects.get(visita_examen=visita_examen)
+        datos = model_to_dict(resultado)
+        datos.pop("id", None)
+        datos.pop("visita_examen", None)
+        return datos
+    except result_model.DoesNotExist:
+        return None
+
+
+def _visita_examen_desde_post(request, paciente, examen_id):
+    """Resuelve VisitaExamen en POST validando paciente y visita_id."""
+    visita_id = _visita_id_from_request(request)
+    if visita_id is None:
+        raise ValueError("Falta visita_id en el formulario.")
+
+    visita, visita_examen = resolver_visita_examen_publico(
+        paciente, examen_id, visita_id=visita_id
+    )
+    if visita_examen.visita.paciente_id != paciente.id:
+        raise PermissionError("La visita no corresponde a este paciente.")
+    if visita_examen.estado == "completado":
+        raise ValueError("Este examen ya fue completado.")
+    return visita_examen
 
 
 def _validar_acceso_publico(request):
@@ -82,70 +173,18 @@ def guardar_examen_publico_epworth(request):
         return redirect("formulario_demografico_externo")
 
     if request.method == "GET":
-        # MOSTRAR FORMULARIO
-        try:
-            # Buscar visita automática (soporta tipo 20 actual y tipo 7 legacy)
-            visita = Visita.objects.filter(
-                paciente=paciente, Tipo_visita_id__in=[20, 7]
-            ).order_by("-id").first()
-
-            if not visita:
-                messages.error(request, "❌ No se encontró la visita asociada.")
-                return redirect("formulario_demografico_externo")
-
-            # Buscar o crear VisitaExamen para Epworth
-            visita_examen = VisitaExamen.objects.filter(
-                visita=visita,
-                examen_id=14,  # ID del examen Epworth
-            ).first()
-
-            if not visita_examen:
-                # Crear el VisitaExamen si no existe
-                examen_epworth = Examen.objects.get(id=14)
-                visita_examen = VisitaExamen.objects.create(
-                    visita=visita, examen=examen_epworth, estado="pendiente"
-                )
-
-            # Verificar si ya fue completado
-            if visita_examen.estado == "completado":
-                messages.info(
-                    request, "ℹ️ Este examen ya ha sido completado anteriormente."
-                )
-                return render(
-                    request,
-                    "registro_publico/examen_completado.html",
-                    {"examen_tipo": "Escala de Epworth", "paciente": paciente},
-                )
-
-            # Marcar como iniciado
-            if visita_examen.estado == "pendiente":
-                visita_examen.estado = "en_progreso"
-                visita_examen.fecha_inicio = timezone.now()
-                visita_examen.save()
-
-            context = {
-                "paciente": paciente,
-                "visita": visita,
-                "visita_examen": visita_examen,
-                "token": generar_token_paciente(paciente.id),
-            }
-
-            return render(request, "registro_publico/epworth_publico.html", context)
-
-        except Exception as e:
-            messages.error(request, f"❌ Error al cargar el examen: {str(e)}")
-            return redirect("formulario_demografico_externo")
+        return _cargar_formulario_examen_publico(
+            request,
+            paciente,
+            examen_id=14,
+            examen_tipo_label="Escala de Epworth",
+            template_name="registro_publico/epworth_publico.html",
+        )
 
     elif request.method == "POST":
         # GUARDAR RESULTADOS
         try:
-            visita_id = request.POST.get("visita_id")
-            examen_id = 14  # ID fijo para Epworth
-
-            # Obtener la instancia de VisitaExamen
-            visita_examen = get_object_or_404(
-                VisitaExamen, visita_id=visita_id, examen_id=examen_id
-            )
+            visita_examen = _visita_examen_desde_post(request, paciente, examen_id=14)
 
             # Obtener las respuestas
             sentado_leyendo = int(request.POST.get("epworth_leyendo", "0"))
@@ -207,6 +246,12 @@ def guardar_examen_publico_epworth(request):
                 },
             )
 
+        except PermissionError as e:
+            messages.error(request, f"❌ {e}")
+            return redirect("formulario_demografico_externo")
+        except ValueError as e:
+            messages.error(request, f"❌ {e}")
+            return redirect("formulario_demografico_externo")
         except Exception as e:
             messages.error(request, f"❌ Error al guardar el examen: {str(e)}")
             return redirect("formulario_demografico_externo")
@@ -226,83 +271,18 @@ def guardar_examen_publico_mew(request):
         return redirect("formulario_demografico_externo")
 
     if request.method == "GET":
-        # MOSTRAR FORMULARIO
-        try:
-            # Buscar visita automática (soporta tipo 20 actual y tipo 7 legacy)
-            visita = Visita.objects.filter(
-                paciente=paciente, Tipo_visita_id__in=[20, 7]
-            ).order_by("-id").first()
-
-            if not visita:
-                messages.error(request, "❌ No se encontró la visita asociada.")
-                return redirect("formulario_demografico_externo")
-
-            # Buscar o crear VisitaExamen para MEW
-            visita_examen = VisitaExamen.objects.filter(
-                visita=visita,
-                examen_id=16,  # ID del examen MEW
-            ).first()
-
-            if not visita_examen:
-                # Crear el VisitaExamen si no existe
-                examen_mew = Examen.objects.get(id=16)
-                visita_examen = VisitaExamen.objects.create(
-                    visita=visita, examen=examen_mew, estado="pendiente"
-                )
-
-            # Verificar si ya fue completado
-            if visita_examen.estado == "completado":
-                messages.info(
-                    request, "ℹ️ Este examen ya ha sido completado anteriormente."
-                )
-                return render(
-                    request,
-                    "registro_publico/examen_completado.html",
-                    {"examen_tipo": "Cuestionario MEW", "paciente": paciente},
-                )
-
-            # Marcar como iniciado
-            if visita_examen.estado == "pendiente":
-                visita_examen.estado = "en_progreso"
-                visita_examen.fecha_inicio = timezone.now()
-                visita_examen.save()
-
-            # Buscar datos existentes si los hay
-            datos_examen = None
-            try:
-                resultado_existente = MEWResult.objects.get(visita_examen=visita_examen)
-                datos_examen = model_to_dict(resultado_existente)
-                datos_examen.pop("id", None)
-                datos_examen.pop("visita_examen", None)
-            except MEWResult.DoesNotExist:
-                datos_examen = None
-
-            context = {
-                "paciente": paciente,
-                "visita": visita,
-                "visita_examen": visita_examen,
-                "datos_examen": datos_examen,
-                "token": generar_token_paciente(paciente.id),
-            }
-
-            return render(request, "registro_publico/mew_publico.html", context)
-
-        except Exception as e:
-            messages.error(request, f"❌ Error al cargar el examen: {str(e)}")
-            return redirect("formulario_demografico_externo")
+        return _cargar_formulario_examen_publico(
+            request,
+            paciente,
+            examen_id=16,
+            examen_tipo_label="Cuestionario MEW",
+            template_name="registro_publico/mew_publico.html",
+            result_model=MEWResult,
+        )
 
     elif request.method == "POST":
         try:
-            # Recuperar paciente otra vez
-            paciente_id = request.POST.get("paciente_id")
-            paciente = get_object_or_404(DatosDemograficos, id=paciente_id)
-
-            visita_id = request.POST.get("visita_id")
-            examen_id = 16  # ID fijo para MEW
-
-            visita_examen = get_object_or_404(
-                VisitaExamen, visita_id=visita_id, examen_id=examen_id
-            )
+            visita_examen = _visita_examen_desde_post(request, paciente, examen_id=16)
 
             # Obtener la puntuación calculada en el frontend
             puntuacion_frontend = request.POST.get("puntuacion", "0")
@@ -317,7 +297,7 @@ def guardar_examen_publico_mew(request):
                     request, "❌ Error: Puntuación MEQ fuera del rango válido (16-86)."
                 )
                 return redirect(
-                    f"/guardar-examen-publico-mew/?token={generar_token_paciente(paciente.id)}"
+                    f"/guardar-examen-publico-mew/?token={generar_token_paciente(paciente.id)}&visita_id={visita_examen.visita_id}"
                 )
 
             # Obtener campos del formulario MEW (usando nombres del formulario HTML)
@@ -420,6 +400,12 @@ def guardar_examen_publico_mew(request):
                 },
             )
 
+        except PermissionError as e:
+            messages.error(request, f"❌ {e}")
+            return redirect("formulario_demografico_externo")
+        except ValueError as e:
+            messages.error(request, f"❌ {e}")
+            return redirect("formulario_demografico_externo")
         except Exception as e:
             messages.error(request, f"❌ Error al guardar el examen: {str(e)}")
             return redirect("formulario_demografico_externo")
@@ -453,85 +439,24 @@ def guardar_examen_publico_pitsburg(request):
         return redirect("formulario_demografico_externo")
 
     if request.method == "GET":
-        # MOSTRAR FORMULARIO
-        try:
-            # Buscar visita automática (soporta tipo 20 actual y tipo 7 legacy)
-            visita = Visita.objects.filter(
-                paciente=paciente, Tipo_visita_id__in=[20, 7]
-            ).order_by("-id").first()
-
-            if not visita:
-                messages.error(request, "❌ No se encontró la visita asociada.")
-                return redirect("formulario_demografico_externo")
-
-            # Buscar o crear VisitaExamen para Pittsburgh
-            visita_examen = VisitaExamen.objects.filter(
-                visita=visita,
-                examen_id=13,  # ID del examen Pittsburgh
-            ).first()
-
-            if not visita_examen:
-                # Crear el VisitaExamen si no existe
-                examen_pitsburg = Examen.objects.get(id=13)
-                visita_examen = VisitaExamen.objects.create(
-                    visita=visita, examen=examen_pitsburg, estado="pendiente"
-                )
-
-            # Verificar si ya fue completado
-            if visita_examen.estado == "completado":
-                messages.info(
-                    request, "ℹ️ Este examen ya ha sido completado anteriormente."
-                )
-                return render(
-                    request,
-                    "registro_publico/examen_completado.html",
-                    {"examen_tipo": "Cuestionario de Pittsburgh", "paciente": paciente},
-                )
-
-            # Marcar como iniciado
-            if visita_examen.estado == "pendiente":
-                visita_examen.estado = "en_progreso"
-                visita_examen.fecha_inicio = timezone.now()
-                visita_examen.save()
-
-            # Buscar datos existentes si los hay
-            datos_examen = None
-            try:
-                resultado_existente = PittsburghResult.objects.get(
-                    visita_examen=visita_examen
-                )
-                datos_examen = model_to_dict(resultado_existente)
-                datos_examen.pop("id", None)
-                datos_examen.pop("visita_examen", None)
-            except PittsburghResult.DoesNotExist:
-                datos_examen = None
-
-            context = {
-                "paciente": paciente,
-                "visita": visita,
-                "visita_examen": visita_examen,
-                "datos_examen": datos_examen,
+        return _cargar_formulario_examen_publico(
+            request,
+            paciente,
+            examen_id=13,
+            examen_tipo_label="Cuestionario de Pittsburgh",
+            template_name="registro_publico/Pitsburg_publico.html",
+            result_model=PittsburghResult,
+            extra_context={
                 "paciente_id": paciente.id,
                 "examen_id": 13,
-                "token": generar_token_paciente(paciente.id),
-            }
-
-            return render(request, "registro_publico/Pitsburg_publico.html", context)
-
-        except Exception as e:
-            messages.error(request, f"❌ Error al cargar el examen: {str(e)}")
-            return redirect("formulario_demografico_externo")
+            },
+        )
 
     elif request.method == "POST":
         print("POST DATA:", request.POST)
         # GUARDAR RESULTADOS
         try:
-            visita_id = request.POST.get("visita_id")
-            examen_id = 13  # ID fijo para Pittsburgh
-
-            visita_examen = get_object_or_404(
-                VisitaExamen, visita_id=visita_id, examen_id=examen_id
-            )
+            visita_examen = _visita_examen_desde_post(request, paciente, examen_id=13)
 
             # Obtener los campos según los NOMBRES EXACTOS del modelo PittsburghResult
             hora_acostarse = request.POST.get("hora_acostarse", "")
@@ -666,15 +591,10 @@ def confirmacion_registro_externo(request):
 
 
 def get_interpretacion_epworth(puntaje):
-    """Devuelve la interpretación del puntaje Epworth"""
-    if puntaje <= 6:
-        return "Somnolencia normal"
-    elif puntaje <= 10:
-        return "Somnolencia leve"
-    elif puntaje <= 15:
-        return "Somnolencia moderada"
-    else:
-        return "Somnolencia severa"
+    """Devuelve la interpretación del puntaje Epworth (escala D-16)."""
+    from apps.home.services.exam_scoring import interpretar_epworth
+
+    return interpretar_epworth(puntaje)
 
 
 def calcular_puntuacion_mew_publico(post_data):

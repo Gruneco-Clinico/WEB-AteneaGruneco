@@ -1,6 +1,11 @@
 from django import template
 import json
 import re
+from datetime import date, datetime, time as time_cls
+
+from django.utils.formats import date_format, time_format
+from django.utils.html import escape
+from django.utils.safestring import mark_safe
 
 register = template.Library()
 
@@ -48,3 +53,45 @@ def json_dumps(value):
     if value is None:
         return "[]"
     return json.dumps(value, ensure_ascii=False)
+
+
+@register.filter
+def empty_dash(value):
+    """None o vacío → guión; útil en PDF/impresión."""
+    if value is None or value == "":
+        return "—"
+    return value
+
+
+@register.filter
+def exam_display_name(name):
+    """Nombre técnico del examen → etiqueta legible."""
+    if not name:
+        return ""
+    return str(name).replace("_", " ")
+
+
+@register.filter
+def render_exam_value(value):
+    """Renderiza valores de examen: fechas legibles o firmas base64 como <img>."""
+    if value is None or value == "":
+        return mark_safe("")
+
+    if isinstance(value, datetime):
+        return mark_safe(escape(date_format(value, "DATETIME_FORMAT")))
+    if isinstance(value, date):
+        return mark_safe(escape(date_format(value, "DATE_FORMAT")))
+    if isinstance(value, time_cls):
+        return mark_safe(escape(time_format(value, "TIME_FORMAT")))
+
+    s = str(value).strip()
+    if s.lower() in ("none", "null"):
+        return mark_safe("")
+
+    if s.startswith("data:image/") and ";base64," in s:
+        safe_src = s.replace('"', "%22")
+        return mark_safe(
+            f'<img src="{safe_src}" alt="Firma" class="hc-firma-img" />'
+        )
+
+    return mark_safe(escape(s))

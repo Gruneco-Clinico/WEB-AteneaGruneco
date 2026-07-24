@@ -1,0 +1,92 @@
+{% extends "pdf/base_print.html" %}
+{% block content %}
+  {% include "pdf/partials/membrete.html" %}
+  {% include "pdf/partials/pie_institucional.html" %}
+
+  <table class="tabla-hc">
+    <tr>
+      <td class="fila-titulo-hc" colspan="6">Identificación del paciente o sujeto de investigación</td>
+    </tr>
+    <tr>
+      {% include "pdf/partials/campo_hc.html" with etiqueta="Nombre y apellidos completos" valor=nombre_completo colspan=3 %}
+      {% include "pdf/partials/campo_hc.html" with etiqueta="Tipo y documento de identidad" valor=documento_identidad colspan=3 %}
+    </tr>
+    <tr>
+      {% include "pdf/partials/campo_hc.html" with etiqueta="Fecha de nacimiento" valor=paciente.fecha_nacimiento|date:"d/m/Y" colspan=2 %}
+      {% include "pdf/partials/campo_hc.html" with etiqueta="Edad" valor=paciente.edad colspan=2 %}
+      {% include "pdf/partials/campo_hc.html" with etiqueta="Sexo biológico" valor=paciente.get_genero_display colspan=2 %}
+    </tr>
+    <tr>
+      {% include "pdf/partials/campo_hc.html" with etiqueta="Escolaridad" valor=paciente.get_escolaridad_display colspan=3 %}
+      {% include "pdf/partials/campo_hc.html" with etiqueta="Ocupación" valor=paciente.ocupacion colspan=3 %}
+    </tr>
+    <tr>
+      {% include "pdf/partials/campo_hc.html" with etiqueta="Estado civil" valor=paciente.get_estado_civil_display colspan=3 %}
+      {% include "pdf/partials/campo_hc.html" with etiqueta="Etnia y raza" valor="—" colspan=3 %}
+    </tr>
+    <tr>
+      {% include "pdf/partials/campo_hc.html" with etiqueta="Dirección" valor=paciente.direccion colspan=3 %}
+      {% include "pdf/partials/campo_hc.html" with etiqueta="Teléfono" valor=paciente.celular colspan=3 %}
+    </tr>
+    <tr>
+      {% include "pdf/partials/campo_hc.html" with etiqueta="Email" valor=paciente.correo colspan=3 %}
+      {% include "pdf/partials/campo_hc.html" with etiqueta="Entidad aseguradora (EPS)" valor=paciente.eps colspan=3 %}
+    </tr>
+  </table>
+
+  <table class="tabla-hc">
+    <tr>
+      <td class="fila-titulo-hc" colspan="6">Identificación del acompañante</td>
+    </tr>
+    <tr>
+      {% include "pdf/partials/campo_hc.html" with etiqueta="Nombre y apellidos completos" valor=visita.acompanante_nombre colspan=3 %}
+      {% include "pdf/partials/campo_hc.html" with etiqueta="Teléfono" valor=visita.acompanante_telefono colspan=3 %}
+    </tr>
+    <tr>
+      {% include "pdf/partials/campo_hc.html" with etiqueta="Parentesco" valor=visita.acompanante_relacion colspan=6 %}
+    </tr>
+  </table>
+
+  <table class="tabla-hc">
+    <tr>
+      <td class="fila-titulo-hc" colspan="6">Información de la atención</td>
+    </tr>
+    <tr>
+      {% include "pdf/partials/campo_hc.html" with etiqueta="Tipo de atención" valor=proyecto colspan=3 %}
+      {% include "pdf/partials/campo_hc.html" with etiqueta="Tipo de visita" valor=tipo_visita colspan=3 %}
+    </tr>
+    <tr>
+      {% include "pdf/partials/campo_hc.html" with etiqueta="Fecha y hora de la atención" valor=visita.fecha|date:"d/m/Y" colspan=3 %}
+      {% include "pdf/partials/campo_hc.html" with etiqueta="Nombre y apellidos completos del responsable (Quien realiza)" valor=evaluador colspan=3 %}
+    </tr>
+    <tr>
+      {% include "pdf/partials/campo_hc.html" with etiqueta="Nombre y apellido completos del profesional (el que firma la historia)" valor=firmante colspan=6 %}
+    </tr>
+  </table>
+
+  <section class="seccion-examenes">
+    {% for section in exam_sections %}
+    <div class="examen-ver-embed">
+      {% include "examenes_resultados/_pdf_titulo_examen.html" with titulo=section.examen_nombre fecha_completado=section.visita_examen.fecha_completado %}
+      {{ section.html|safe }}
+    </div>
+    {% empty %}
+    <p class="sin-datos">No hay exámenes completados en esta visita.</p>
+    {% endfor %}
+  </section>
+
+  {% if visita.notas_aclaratorias %}
+  <section class="seccion-notas">
+    <table class="tabla-hc">
+      <tr>
+        <td class="fila-titulo-hc" colspan="6">Notas aclaratorias</td>
+      </tr>
+      <tr>
+        <td class="celda-hc celda-texto-libre" colspan="6">{{ visita.notas_aclaratorias|linebreaksbr }}</td>
+      </tr>
+    </table>
+  </section>
+  {% endif %}
+
+  {% include "pdf/partials/firma_profesional.html" %}
+{% endblock %}

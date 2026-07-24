@@ -1,0 +1,5 @@
+<div class="subseccion">
+  {% if resultado.motivo_consulta %}<p><span class="campo-label">Motivo:</span> {{ resultado.motivo_consulta }}</p>{% endif %}
+  {% if actitudes %}<p class="campo-label">Actitudes:</p><ul class="lista-hijos">{% for a in actitudes %}<li>{{ a.tipo }}</li>{% endfor %}</ul>{% endif %}
+  {% if atenciones %}<p class="campo-label">Atención:</p><ul class="lista-hijos">{% for a in atenciones %}<li>{{ a.tipo }} — {{ a.caracteristicas|default:"" }}</li>{% endfor %}</ul>{% endif %}
+</div>

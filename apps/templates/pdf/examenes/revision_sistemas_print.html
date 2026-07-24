@@ -1,0 +1,6 @@
+<div class="subseccion">
+  {% for sistema, detalles in sistemas_detalles.items %}
+  <p class="campo-label">{{ sistema }}:</p>
+  <ul class="lista-hijos">{% for d in detalles %}<li>{{ d.sintoma }} — {{ d.presente|yesno:"Sí,No" }}</li>{% endfor %}</ul>
+  {% endfor %}
+</div>

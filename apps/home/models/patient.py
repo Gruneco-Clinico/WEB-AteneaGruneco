@@ -32,6 +32,13 @@ class CustomUser(AbstractUser):
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="perfil")
     firma = models.TextField(blank=True, null=True)
+    registro_medico = models.CharField(
+        max_length=50,
+        blank=True,
+        null=True,
+        verbose_name="Registro médico",
+        help_text="Número de registro médico / tarjeta profesional del firmante.",
+    )
 
     def __str__(self):
         return self.user.username

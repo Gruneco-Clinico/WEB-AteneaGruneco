@@ -25,32 +25,39 @@
 
           <div class="card-body">
             <div class="alert alert-info">
-              <strong>Instrucciones:</strong> Esta escala le permite indicar qué tan bueno o malo considera su estado de salud el día de hoy. Mueva el control deslizante hacia el número que mejor represente su salud.
+              <strong>Instrucciones:</strong> Indique qué tan bueno o malo considera su estado de salud el día de hoy
+              (0 = peor imaginable, 100 = mejor imaginable).
             </div>
 
-            <!-- Termómetro EuroQol -->
-            <div class="form-group text-center">
+            <div class="form-group">
               <label for="termometro_estado_salud">
-                <strong>Termómetro EuroQol de Autovaloración del Estado de Salud</strong>
+                <strong>EQ-VAS — Termómetro de salud (0–100)</strong>
               </label>
-              <p class="text-muted" style="font-size: 0.9rem;">
-                Este termómetro representa su salud general el día de HOY. El 100 es el mejor estado de salud imaginable y el 0 el peor.
-              </p>
-
-              <div class="d-flex flex-column align-items-center">
-                <span>100 (Mejor estado imaginable)</span>
-                <input
-                  type="range"
-                  class="form-control-range"
-                  id="termometro_estado_salud"
-                  name="termometro_estado_salud"
-                  min="0"
-                  max="100"
-                  value="{{ datos_examen.termometro_estado_salud|default:50 }}"
-                  style="writing-mode: bt-lr; -webkit-appearance: slider-vertical; height: 300px; width: 30px;"
-                >
-                <span>0 (Peor estado imaginable)</span>
-                <p class="mt-2">Valor actual: <strong id="valor_termometro">{{ datos_examen.termometro_estado_salud|default:50 }}</strong></p>
+              <div class="d-flex justify-content-between text-muted small mb-1">
+                <span>0 peor</span>
+                <span>50</span>
+                <span>100 mejor</span>
+              </div>
+              <input
+                type="range"
+                class="form-control-range w-100"
+                id="termometro_estado_salud"
+                name="termometro_estado_salud"
+                min="0"
+                max="100"
+                step="1"
+                value="{{ datos_examen.termometro_estado_salud|default:50 }}"
+                style="height: 2rem;"
+              >
+              <div class="text-center mt-3">
+                <span class="display-4 font-weight-bold" id="valor_termometro">{{ datos_examen.termometro_estado_salud|default:50 }}</span>
+                <div class="text-muted">Valor actual</div>
+              </div>
+              <div class="mt-3">
+                <label for="termometro_numero" class="sr-only">Valor numérico</label>
+                <input type="number" class="form-control mx-auto" style="max-width: 120px;"
+                       id="termometro_numero" min="0" max="100"
+                       value="{{ datos_examen.termometro_estado_salud|default:50 }}">
               </div>
             </div>
 
@@ -68,10 +75,15 @@
 <script>
   const slider = document.getElementById("termometro_estado_salud");
   const valor = document.getElementById("valor_termometro");
-
-  slider.addEventListener("input", () => {
-    valor.textContent = slider.value;
-  });
+  const numero = document.getElementById("termometro_numero");
+  function sync(v) {
+    const n = Math.max(0, Math.min(100, parseInt(v || 0, 10)));
+    slider.value = n;
+    numero.value = n;
+    valor.textContent = n;
+  }
+  slider.addEventListener("input", () => sync(slider.value));
+  numero.addEventListener("input", () => sync(numero.value));
 </script>
 
 {% endblock %}

@@ -178,6 +178,36 @@ class DiagnosticoNoClasificado(models.Model):
 class ExamenFisicoResult(ResultadoExamenBase):
     """Modelo para el Examen Físico General"""
 
+    # A-06 / B-08: subsecciones de impresión alineadas a pestañas del formulario
+    PRINT_SECCIONES_INICIOS = [
+        ("talla", "Signos vitales"),
+        ("perimetro_cefalico", "Cabeza y cuello"),
+        ("forma_torax", "Tórax / Cardio / Respiratorio"),
+        ("peristaltismo", "Abdomen"),
+        ("curvatura_cervical_normal", "Osteomuscular"),
+        ("maculas", "Piel y anexos"),
+    ]
+
+    # B-09: Evaluado / No evaluado por sección gruesa (default True = no ocultar histórico)
+    seccion_signos_vitales_evaluado = models.BooleanField(
+        default=True, verbose_name="Signos vitales evaluados"
+    )
+    seccion_cabeza_cuello_evaluado = models.BooleanField(
+        default=True, verbose_name="Cabeza y cuello evaluados"
+    )
+    seccion_torax_evaluado = models.BooleanField(
+        default=True, verbose_name="Tórax/Cardio/Resp evaluado"
+    )
+    seccion_abdomen_evaluado = models.BooleanField(
+        default=True, verbose_name="Abdomen evaluado"
+    )
+    seccion_osteomuscular_evaluado = models.BooleanField(
+        default=True, verbose_name="Osteomuscular evaluado"
+    )
+    seccion_piel_evaluado = models.BooleanField(
+        default=True, verbose_name="Piel y anexos evaluados"
+    )
+
     # Signos Vitales
     talla = models.FloatField(
         verbose_name="Talla (cm)", help_text="Rango normal adultos: 150-190 cm"
@@ -214,7 +244,7 @@ class ExamenFisicoResult(ResultadoExamenBase):
     )
 
     cuero_cabelludo_normal = models.BooleanField(
-        default=False, verbose_name="Cuero Cabelludo Normal"
+        default=True, verbose_name="Cuero Cabelludo Normal"
     )
     cuero_cabelludo_anormal = models.BooleanField(
         default=False, verbose_name="Cuero Cabelludo Anormal"
@@ -223,19 +253,19 @@ class ExamenFisicoResult(ResultadoExamenBase):
         blank=True, null=True, verbose_name="Observaciones Cuero Cabelludo"
     )
 
-    oidos_normal = models.BooleanField(default=False, verbose_name="Oídos Normal")
+    oidos_normal = models.BooleanField(default=True, verbose_name="Oídos Normal")
     oidos_anormal = models.BooleanField(default=False, verbose_name="Oídos Anormal")
     observaciones_oidos = models.TextField(
         blank=True, null=True, verbose_name="Observaciones Oídos"
     )
 
-    nariz_normal = models.BooleanField(default=False, verbose_name="Nariz Normal")
+    nariz_normal = models.BooleanField(default=True, verbose_name="Nariz Normal")
     nariz_anormal = models.BooleanField(default=False, verbose_name="Nariz Anormal")
     observaciones_nariz = models.TextField(
         blank=True, null=True, verbose_name="Observaciones Nariz"
     )
 
-    cuello_normal = models.BooleanField(default=False, verbose_name="Cuello Normal")
+    cuello_normal = models.BooleanField(default=True, verbose_name="Cuello Normal")
     cuello_anormal = models.BooleanField(default=False, verbose_name="Cuello Anormal")
     observaciones_cuello = models.TextField(
         blank=True, null=True, verbose_name="Observaciones Cuello"
@@ -303,7 +333,7 @@ class ExamenFisicoResult(ResultadoExamenBase):
     )
 
     pared_abdominal_normal = models.BooleanField(
-        default=False, verbose_name="Pared Abdominal Normal"
+        default=True, verbose_name="Pared Abdominal Normal"
     )
     pared_abdominal_anormal = models.BooleanField(
         default=False, verbose_name="Pared Abdominal Anormal"
@@ -319,49 +349,49 @@ class ExamenFisicoResult(ResultadoExamenBase):
 
     # Sistema Osteomuscular
     curvatura_cervical_normal = models.BooleanField(
-        default=False, verbose_name="Curvatura Cervical Normal"
+        default=True, verbose_name="Curvatura Cervical Normal"
     )
     curvatura_cervical_anormal = models.BooleanField(
         default=False, verbose_name="Curvatura Cervical Anormal"
     )
 
     curvatura_toracica_normal = models.BooleanField(
-        default=False, verbose_name="Curvatura Torácica Normal"
+        default=True, verbose_name="Curvatura Torácica Normal"
     )
     curvatura_toracica_anormal = models.BooleanField(
         default=False, verbose_name="Curvatura Torácica Anormal"
     )
 
     curvatura_lumbar_normal = models.BooleanField(
-        default=False, verbose_name="Curvatura Lumbar Normal"
+        default=True, verbose_name="Curvatura Lumbar Normal"
     )
     curvatura_lumbar_anormal = models.BooleanField(
         default=False, verbose_name="Curvatura Lumbar Anormal"
     )
 
     arcos_movimiento_superiores_normal = models.BooleanField(
-        default=False, verbose_name="Arcos Movimiento Superiores Normal"
+        default=True, verbose_name="Arcos Movimiento Superiores Normal"
     )
     arcos_movimiento_superiores_anormal = models.BooleanField(
         default=False, verbose_name="Arcos Movimiento Superiores Anormal"
     )
 
     arcos_movimiento_inferiores_normal = models.BooleanField(
-        default=False, verbose_name="Arcos Movimiento Inferiores Normal"
+        default=True, verbose_name="Arcos Movimiento Inferiores Normal"
     )
     arcos_movimiento_inferiores_anormal = models.BooleanField(
         default=False, verbose_name="Arcos Movimiento Inferiores Anormal"
     )
 
     asimetrias_inferiores_normal = models.BooleanField(
-        default=False, verbose_name="Asimetrías Inferiores Normal"
+        default=True, verbose_name="Asimetrías Inferiores Normal"
     )
     asimetrias_inferiores_anormal = models.BooleanField(
         default=False, verbose_name="Asimetrías Inferiores Anormal"
     )
 
     asimetrias_superiores_normal = models.BooleanField(
-        default=False, verbose_name="Asimetrías Superiores Normal"
+        default=True, verbose_name="Asimetrías Superiores Normal"
     )
     asimetrias_superiores_anormal = models.BooleanField(
         default=False, verbose_name="Asimetrías Superiores Anormal"
@@ -1336,45 +1366,84 @@ class AntecedenteTransfusional(models.Model):
 class ExamenNeurologicoResult(ResultadoExamenBase):
     """Modelo para el Examen Neurológico"""
 
+    # A-06: mapa (campo_inicial -> título de subsección) usado para agrupar
+    # los campos por subsección en la vista "Ver" y en la impresión PDF.
+    # Cada campo abre una nueva subsección que agrupa todos los campos
+    # declarados a continuación hasta el siguiente marcador.
+    PRINT_SECCIONES_INICIOS = [
+        ("clavos_izquierdo", "I Par Craneal — Olfatorio"),
+        ("amaurosis", "II Par Craneal — Óptico"),
+        ("diplopia", "III, IV y VI Par Craneal — Oculomotores"),
+        ("tacto_frente_globo", "V Par Craneal — Trigémino"),
+        ("mimica_frente", "VII Par Craneal — Facial"),
+        ("hipoacusia", "VIII Par Craneal — Auditivo"),
+        ("disfonia", "IX y X Par Craneal — Glosofaríngeo y Vago"),
+        ("movimientos_cuello", "XI Par Craneal — Espinal accesorio"),
+        ("fasciculaciones_linguales", "XII Par Craneal — Hipogloso"),
+        ("dolor_cuello", "Sensibilidad"),
+        ("maseteriano_izquierdo", "Reflejos"),
+        ("brazo_abduccion_izq", "Fuerza muscular"),
+        ("coordinacion_dedo_nariz", "Coordinación"),
+        ("postura", "Marcha"),
+        ("convulsiones", "Movimientos anormales"),
+    ]
+
+    # B-09: Evaluado / No evaluado por sección gruesa (tabs del formulario)
+    seccion_pares_craneales_evaluado = models.BooleanField(
+        default=True, verbose_name="Pares craneales evaluados"
+    )
+    seccion_sensibilidad_evaluado = models.BooleanField(
+        default=True, verbose_name="Sensibilidad evaluada"
+    )
+    seccion_reflejos_evaluado = models.BooleanField(
+        default=True, verbose_name="Reflejos evaluados"
+    )
+    seccion_fuerza_evaluado = models.BooleanField(
+        default=True, verbose_name="Fuerza muscular evaluada"
+    )
+    seccion_coordinacion_marcha_evaluado = models.BooleanField(
+        default=True, verbose_name="Coordinación / marcha / movimientos evaluados"
+    )
+
     # ===== I PAR CRANEAL (OLFATORIO) =====
     # Clavos
     clavos_izquierdo = models.BooleanField(
-        default=False, verbose_name="Clavos - Fosa nasal izquierda"
+        default=True, verbose_name="Clavos - Fosa nasal izquierda"
     )
     clavos_derecho = models.BooleanField(
-        default=False, verbose_name="Clavos - Fosa nasal derecha"
+        default=True, verbose_name="Clavos - Fosa nasal derecha"
     )
 
     # Pimienta
     pimienta_izquierdo = models.BooleanField(
-        default=False, verbose_name="Pimienta - Fosa nasal izquierda"
+        default=True, verbose_name="Pimienta - Fosa nasal izquierda"
     )
     pimienta_derecho = models.BooleanField(
-        default=False, verbose_name="Pimienta - Fosa nasal derecha"
+        default=True, verbose_name="Pimienta - Fosa nasal derecha"
     )
 
     # Café
     cafe_izquierdo = models.BooleanField(
-        default=False, verbose_name="Café - Fosa nasal izquierda"
+        default=True, verbose_name="Café - Fosa nasal izquierda"
     )
     cafe_derecho = models.BooleanField(
-        default=False, verbose_name="Café - Fosa nasal derecha"
+        default=True, verbose_name="Café - Fosa nasal derecha"
     )
 
     # Canela
     canela_izquierdo = models.BooleanField(
-        default=False, verbose_name="Canela - Fosa nasal izquierda"
+        default=True, verbose_name="Canela - Fosa nasal izquierda"
     )
     canela_derecho = models.BooleanField(
-        default=False, verbose_name="Canela - Fosa nasal derecha"
+        default=True, verbose_name="Canela - Fosa nasal derecha"
     )
 
     # Alcohol
     alcohol_izquierdo = models.BooleanField(
-        default=False, verbose_name="Alcohol - Fosa nasal izquierda"
+        default=True, verbose_name="Alcohol - Fosa nasal izquierda"
     )
     alcohol_derecho = models.BooleanField(
-        default=False, verbose_name="Alcohol - Fosa nasal derecha"
+        default=True, verbose_name="Alcohol - Fosa nasal derecha"
     )
 
     # ===== II PAR CRANEAL (ÓPTICO) =====
@@ -1520,59 +1589,59 @@ class ExamenNeurologicoResult(ResultadoExamenBase):
     # ===== V PAR CRANEAL (TRIGÉMINO) =====
     # Tacto superficial
     tacto_frente_globo = models.BooleanField(
-        default=False, verbose_name="Tacto superficial - Frente/globo ocular alterado"
+        default=True, verbose_name="Tacto superficial - Frente/globo ocular alterado"
     )
     tacto_parpado_labio_sup = models.BooleanField(
-        default=False,
+        default=True,
         verbose_name="Tacto superficial - Párpado inferior/labio superior alterado",
     )
     tacto_labio_inf_menton = models.BooleanField(
-        default=False, verbose_name="Tacto superficial - Labio inferior/mentón alterado"
+        default=True, verbose_name="Tacto superficial - Labio inferior/mentón alterado"
     )
 
     # Dolor
     dolor_frente_globo = models.BooleanField(
-        default=False, verbose_name="Dolor - Frente/globo ocular alterado"
+        default=True, verbose_name="Dolor - Frente/globo ocular alterado"
     )
     dolor_parpado_labio_sup = models.BooleanField(
-        default=False, verbose_name="Dolor - Párpado inferior/labio superior alterado"
+        default=True, verbose_name="Dolor - Párpado inferior/labio superior alterado"
     )
     dolor_labio_inf_menton = models.BooleanField(
-        default=False, verbose_name="Dolor - Labio inferior/mentón alterado"
+        default=True, verbose_name="Dolor - Labio inferior/mentón alterado"
     )
 
     # Temperatura
     temp_frente_globo = models.BooleanField(
-        default=False, verbose_name="Temperatura - Frente/globo ocular alterado"
+        default=True, verbose_name="Temperatura - Frente/globo ocular alterado"
     )
     temp_parpado_labio_sup = models.BooleanField(
-        default=False,
+        default=True,
         verbose_name="Temperatura - Párpado inferior/labio superior alterado",
     )
     temp_labio_inf_menton = models.BooleanField(
-        default=False, verbose_name="Temperatura - Labio inferior/mentón alterado"
+        default=True, verbose_name="Temperatura - Labio inferior/mentón alterado"
     )
 
     # Fuerza muscular
     fuerza_maseteros = models.BooleanField(
-        default=False, verbose_name="Fuerza muscular - Maseteros alterada"
+        default=True, verbose_name="Fuerza muscular - Maseteros alterada"
     )
     fuerza_temporales = models.BooleanField(
-        default=False, verbose_name="Fuerza muscular - Temporales alterada"
+        default=True, verbose_name="Fuerza muscular - Temporales alterada"
     )
     fuerza_pterigoideos = models.BooleanField(
-        default=False, verbose_name="Fuerza muscular - Pterigoideos alterada"
+        default=True, verbose_name="Fuerza muscular - Pterigoideos alterada"
     )
 
     # Trofismo
     trofismo_maseteros = models.BooleanField(
-        default=False, verbose_name="Trofismo - Maseteros alterado"
+        default=True, verbose_name="Trofismo - Maseteros alterado"
     )
     trofismo_temporales = models.BooleanField(
-        default=False, verbose_name="Trofismo - Temporales alterado"
+        default=True, verbose_name="Trofismo - Temporales alterado"
     )
     trofismo_pterigoideos = models.BooleanField(
-        default=False, verbose_name="Trofismo - Pterigoideos alterado"
+        default=True, verbose_name="Trofismo - Pterigoideos alterado"
     )
 
     observaciones_v_par = models.TextField(
@@ -1582,19 +1651,19 @@ class ExamenNeurologicoResult(ResultadoExamenBase):
     # ===== VII PAR CRANEAL (FACIAL) =====
     # Mímica facial
     mimica_frente = models.BooleanField(
-        default=False, verbose_name="Mímica facial - Frente alterada"
+        default=True, verbose_name="Mímica facial - Frente alterada"
     )
     mimica_parpados = models.BooleanField(
-        default=False, verbose_name="Mímica facial - Párpados alterada"
+        default=True, verbose_name="Mímica facial - Párpados alterada"
     )
     mimica_elevacion_nasal = models.BooleanField(
-        default=False, verbose_name="Mímica facial - Elevación nasal alterada"
+        default=True, verbose_name="Mímica facial - Elevación nasal alterada"
     )
     mimica_buccinadores = models.BooleanField(
-        default=False, verbose_name="Mímica facial - Buccinadores alterada"
+        default=True, verbose_name="Mímica facial - Buccinadores alterada"
     )
     mimica_orbicular_labios = models.BooleanField(
-        default=False, verbose_name="Mímica facial - Orbicular labios alterada"
+        default=True, verbose_name="Mímica facial - Orbicular labios alterada"
     )
 
     # Gusto
@@ -1722,54 +1791,54 @@ class ExamenNeurologicoResult(ResultadoExamenBase):
     # ===== SENSIBILIDAD =====
     # Dolor al pinchazo
     dolor_cuello = models.BooleanField(
-        default=False, verbose_name="Dolor al pinchazo - Cuello alterado"
+        default=True, verbose_name="Dolor al pinchazo - Cuello alterado"
     )
     dolor_torax = models.BooleanField(
-        default=False, verbose_name="Dolor al pinchazo - Tórax alterado"
+        default=True, verbose_name="Dolor al pinchazo - Tórax alterado"
     )
     dolor_miembros_superiores = models.BooleanField(
-        default=False, verbose_name="Dolor al pinchazo - Miembros superiores alterado"
+        default=True, verbose_name="Dolor al pinchazo - Miembros superiores alterado"
     )
     dolor_abdomen = models.BooleanField(
-        default=False, verbose_name="Dolor al pinchazo - Abdomen alterado"
+        default=True, verbose_name="Dolor al pinchazo - Abdomen alterado"
     )
     dolor_miembros_inferiores = models.BooleanField(
-        default=False, verbose_name="Dolor al pinchazo - Miembros inferiores alterado"
+        default=True, verbose_name="Dolor al pinchazo - Miembros inferiores alterado"
     )
 
     # Táctil superficial
     tactil_cuello = models.BooleanField(
-        default=False, verbose_name="Táctil superficial - Cuello alterado"
+        default=True, verbose_name="Táctil superficial - Cuello alterado"
     )
     tactil_torax = models.BooleanField(
-        default=False, verbose_name="Táctil superficial - Tórax alterado"
+        default=True, verbose_name="Táctil superficial - Tórax alterado"
     )
     tactil_miembros_superiores = models.BooleanField(
-        default=False, verbose_name="Táctil superficial - Miembros superiores alterado"
+        default=True, verbose_name="Táctil superficial - Miembros superiores alterado"
     )
     tactil_abdomen = models.BooleanField(
-        default=False, verbose_name="Táctil superficial - Abdomen alterado"
+        default=True, verbose_name="Táctil superficial - Abdomen alterado"
     )
     tactil_miembros_inferiores = models.BooleanField(
-        default=False, verbose_name="Táctil superficial - Miembros inferiores alterado"
+        default=True, verbose_name="Táctil superficial - Miembros inferiores alterado"
     )
 
     # Discriminación térmica
     termica_cuello = models.BooleanField(
-        default=False, verbose_name="Sensibilidad térmica - Cuello alterada"
+        default=True, verbose_name="Sensibilidad térmica - Cuello alterada"
     )
     termica_torax = models.BooleanField(
-        default=False, verbose_name="Sensibilidad térmica - Tórax alterado"
+        default=True, verbose_name="Sensibilidad térmica - Tórax alterado"
     )
     termica_miembros_superiores = models.BooleanField(
-        default=False,
+        default=True,
         verbose_name="Sensibilidad térmica - Miembros superiores alterada",
     )
     termica_abdomen = models.BooleanField(
-        default=False, verbose_name="Sensibilidad térmica - Abdomen alterado"
+        default=True, verbose_name="Sensibilidad térmica - Abdomen alterado"
     )
     termica_miembros_inferiores = models.BooleanField(
-        default=False,
+        default=True,
         verbose_name="Sensibilidad térmica - Miembros inferiores alterada",
     )
 
@@ -3329,3 +3398,12 @@ class ActividadCompleja(models.Model):
         verbose_name = "Actividad Compleja"
         verbose_name_plural = "Actividades Complejas"
         ordering = ["tipo"]
+
+
+# B-08: mapa campo → semántica (detecta | sintoma | estructura), refinable
+from apps.home.models.field_toggle_semantics import build_field_toggle_semantics
+
+ExamenFisicoResult.FIELD_TOGGLE_SEMANTICS = build_field_toggle_semantics(ExamenFisicoResult)
+ExamenNeurologicoResult.FIELD_TOGGLE_SEMANTICS = build_field_toggle_semantics(
+    ExamenNeurologicoResult
+)

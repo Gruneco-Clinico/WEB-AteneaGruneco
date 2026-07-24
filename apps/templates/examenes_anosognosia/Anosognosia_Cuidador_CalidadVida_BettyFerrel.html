@@ -483,8 +483,8 @@ document.addEventListener("DOMContentLoaded", function () {
         "agotamiento", "cambios_alimenticios", "dolor", "cambios_sueno",
         "salud_fisica_general", "facilidad_enfrentar", "felicidad", "control_vida",
         "satisfaccion_vida", "concentracion", "utilidad_personal",
-        "angustia_diagnostico", "ansiedad", "depresion", "miedo_otra_enfermedad",
-        "miedo_retroceso", "miedo_avance", "estado_psicologico",
+        "angustia_diagnostico", "angustia_tratamiento", "ansiedad", "depresion",
+        "miedo_otra_enfermedad", "miedo_retroceso", "miedo_avance", "estado_psicologico",
         "angustia_familiar", "nivel_ayuda", "relaciones_personales", "vida_sexual",
         "trabajo", "actividades_hogar", "aislamiento", "carga_economica",
         "estado_social", "actividades_religiosas", "actividades_espirituales_personales",
@@ -492,12 +492,14 @@ document.addEventListener("DOMContentLoaded", function () {
         "esperanza", "estado_espiritual"
     ];
 
+    // Ítems de bienestar (positivos): invertir 5 − valor (Word Betty Ferrell)
     const invertidas = [
-        "agotamiento", "cambios_alimenticios", "dolor", "cambios_sueno",
-        "facilidad_enfrentar", "angustia_diagnostico", "ansiedad", "depresion",
-        "miedo_otra_enfermedad", "miedo_retroceso", "miedo_avance", "angustia_familiar",
-        "relaciones_personales", "vida_sexual", "trabajo", "actividades_hogar",
-        "aislamiento", "carga_economica", "incertidumbre_futuro"
+        "salud_fisica_general", "facilidad_enfrentar", "felicidad", "control_vida",
+        "satisfaccion_vida", "concentracion", "utilidad_personal", "estado_psicologico",
+        "nivel_ayuda", "relaciones_personales", "vida_sexual", "trabajo",
+        "actividades_hogar", "estado_social", "actividades_religiosas",
+        "actividades_espirituales_personales", "cambios_positivos", "proposito_vida",
+        "esperanza", "estado_espiritual"
     ];
 
     function actualizarPuntajeTotal() {

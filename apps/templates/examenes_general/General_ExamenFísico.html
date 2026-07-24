@@ -12,6 +12,22 @@
     display: flex;
     align-items: center;
   }
+
+  .toggle-state-badge {
+    margin-left: 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.1rem 0.5rem;
+    border-radius: 10px;
+    background: #e9ecef;
+    color: #6c757d;
+    white-space: nowrap;
+  }
+
+  .toggle-state-badge.is-on {
+    background: #d4edda;
+    color: #1e7e34;
+  }
 </style>
 
 <div class="header bg-primary pb-6">
@@ -86,6 +102,17 @@
             <div class="tab-content" id="examTabContent">
               <!-- Signos Vitales -->
               <div class="tab-pane fade show active" id="signos" role="tabpanel">
+                <div class="seccion-evaluado-bar mb-3 d-flex align-items-center justify-content-between border rounded p-2 bg-light">
+                  <strong>Signos vitales</strong>
+                  <div class="custom-control custom-switch">
+                    <input type="checkbox" class="custom-control-input seccion-evaluado-toggle"
+                           id="seccion_signos_vitales_evaluado" name="seccion_signos_vitales_evaluado"
+                           data-seccion-body="signos-body"
+                           {% if not datos_examen or datos_examen.seccion_signos_vitales_evaluado != False %}checked{% endif %}>
+                    <label class="custom-control-label" for="seccion_signos_vitales_evaluado">Evaluado</label>
+                  </div>
+                </div>
+                <div id="signos-body" class="seccion-evaluado-body">
                 <div class="card bg-gradient-default shadow-sm mb-4">
                   <div class="card-header bg-transparent">
                     <h4 class="text-white mb-0">Signos Vitales</h4>
@@ -164,9 +191,21 @@
                     </div>
                   </div>
                 </div>
+                </div>
               </div>
               <!-- Cabeza y Cuello -->
               <div class="tab-pane fade" id="cabeza" role="tabpanel">
+                <div class="seccion-evaluado-bar mb-3 d-flex align-items-center justify-content-between border rounded p-2 bg-light">
+                  <strong>Cabeza y cuello</strong>
+                  <div class="custom-control custom-switch">
+                    <input type="checkbox" class="custom-control-input seccion-evaluado-toggle"
+                           id="seccion_cabeza_cuello_evaluado" name="seccion_cabeza_cuello_evaluado"
+                           data-seccion-body="cabeza-body"
+                           {% if not datos_examen or datos_examen.seccion_cabeza_cuello_evaluado != False %}checked{% endif %}>
+                    <label class="custom-control-label" for="seccion_cabeza_cuello_evaluado">Evaluado</label>
+                  </div>
+                </div>
+                <div id="cabeza-body" class="seccion-evaluado-body">
                 <div class="card bg-gradient-default shadow-sm mb-4">
                   <div class="card-header bg-transparent">
                     <h4 class="text-white mb-0">Cabeza y Cuello</h4>
@@ -279,9 +318,21 @@
                     </div>
                   </div>
                 </div>
+                </div>
               </div>
               <!-- Tórax / Respiratorio / Cardiovascular -->
               <div class="tab-pane fade" id="torax" role="tabpanel">
+                <div class="seccion-evaluado-bar mb-3 d-flex align-items-center justify-content-between border rounded p-2 bg-light">
+                  <strong>Tórax / cardio / respiratorio</strong>
+                  <div class="custom-control custom-switch">
+                    <input type="checkbox" class="custom-control-input seccion-evaluado-toggle"
+                           id="seccion_torax_evaluado" name="seccion_torax_evaluado"
+                           data-seccion-body="torax-body"
+                           {% if not datos_examen or datos_examen.seccion_torax_evaluado != False %}checked{% endif %}>
+                    <label class="custom-control-label" for="seccion_torax_evaluado">Evaluado</label>
+                  </div>
+                </div>
+                <div id="torax-body" class="seccion-evaluado-body">
                 <div class="card bg-gradient-default shadow-sm mb-4">
                   <div class="card-header bg-transparent">
                     <h4 class="text-white mb-0">Tórax / Respiratorio / Cardiovascular</h4>
@@ -348,9 +399,21 @@
                     </div>
                   </div>
                 </div>
+                </div>
               </div>
               <!-- Abdomen -->
               <div class="tab-pane fade" id="abdomen" role="tabpanel">
+                <div class="seccion-evaluado-bar mb-3 d-flex align-items-center justify-content-between border rounded p-2 bg-light">
+                  <strong>Abdomen</strong>
+                  <div class="custom-control custom-switch">
+                    <input type="checkbox" class="custom-control-input seccion-evaluado-toggle"
+                           id="seccion_abdomen_evaluado" name="seccion_abdomen_evaluado"
+                           data-seccion-body="abdomen-body"
+                           {% if not datos_examen or datos_examen.seccion_abdomen_evaluado != False %}checked{% endif %}>
+                    <label class="custom-control-label" for="seccion_abdomen_evaluado">Evaluado</label>
+                  </div>
+                </div>
+                <div id="abdomen-body" class="seccion-evaluado-body">
                 <div class="card bg-gradient-default shadow-sm mb-4">
                   <div class="card-header bg-transparent">
                     <h4 class="text-white mb-0">Abdomen</h4>
@@ -371,12 +434,12 @@
                           <label class="form-control-label">Pared Abdominal</label>
                           <div class="custom-control custom-checkbox">
                             <input type="checkbox" class="custom-control-input" id="pared_abdominal_normal"
-                              name="pared_abdominal" value="normal" {% if datos_examen.pared_abdominal == "normal" %}checked{% endif %}>
+                              name="pared_abdominal" value="normal" {% if datos_examen.pared_abdominal_normal %}checked{% endif %}>
                             <label class="custom-control-label" for="pared_abdominal_normal">Normal</label>
                           </div>
                           <div class="custom-control custom-checkbox">
                             <input type="checkbox" class="custom-control-input" id="pared_abdominal_anormal"
-                              name="pared_abdominal" value="anormal " {% if datos_examen.pared_abdominal == "anormal" %}checked{% endif %}>
+                              name="pared_abdominal" value="anormal" {% if datos_examen.pared_abdominal_anormal %}checked{% endif %}>
                             <label class="custom-control-label" for="pared_abdominal_anormal">Anormal</label>
                           </div>
                         </div>
@@ -386,7 +449,7 @@
                           <label class="form-control-label">Masas</label>
                           <div class="custom-control custom-checkbox">
                             <input type="checkbox" class="custom-control-input" id="masas"
-                              name="masas" value="1" {% if datos_examen.masas == "1" %}checked{% endif %}>
+                              name="masas" value="1" {% if datos_examen.masas %}checked{% endif %}>
                             <label class="custom-control-label" for="masas">Presente</label>
                           </div>
                         </div>
@@ -396,7 +459,7 @@
                           <label class="form-control-label">Megalias</label>
                           <div class="custom-control custom-checkbox">
                             <input type="checkbox" class="custom-control-input" id="megalias"
-                              name="megalias" value="1" {% if datos_examen.megalias == "1" %}checked{% endif %}>
+                              name="megalias" value="1" {% if datos_examen.megalias %}checked{% endif %}>
                             <label class="custom-control-label" for="megalias">Presente</label>
                           </div>
                         </div>
@@ -413,10 +476,22 @@
                     </div>
                   </div>
                 </div>
+                </div>
               </div>
 
               <!-- Sistema Osteomuscular -->
               <div class="tab-pane fade" id="muscular" role="tabpanel">
+                <div class="seccion-evaluado-bar mb-3 d-flex align-items-center justify-content-between border rounded p-2 bg-light">
+                  <strong>Osteomuscular</strong>
+                  <div class="custom-control custom-switch">
+                    <input type="checkbox" class="custom-control-input seccion-evaluado-toggle"
+                           id="seccion_osteomuscular_evaluado" name="seccion_osteomuscular_evaluado"
+                           data-seccion-body="muscular-body"
+                           {% if not datos_examen or datos_examen.seccion_osteomuscular_evaluado != False %}checked{% endif %}>
+                    <label class="custom-control-label" for="seccion_osteomuscular_evaluado">Evaluado</label>
+                  </div>
+                </div>
+                <div id="muscular-body" class="seccion-evaluado-body">
                 <div class="card bg-gradient-default shadow-sm mb-4">
                   <div class="card-header bg-transparent">
                     <h4 class="text-white mb-0">Osteomuscular</h4>
@@ -544,9 +619,21 @@
                     </div>
                   </div>
                 </div>
+                </div>
               </div>
               <!-- Piel y Anexos -->
               <div class="tab-pane fade" id="piel" role="tabpanel">
+                <div class="seccion-evaluado-bar mb-3 d-flex align-items-center justify-content-between border rounded p-2 bg-light">
+                  <strong>Piel y anexos</strong>
+                  <div class="custom-control custom-switch">
+                    <input type="checkbox" class="custom-control-input seccion-evaluado-toggle"
+                           id="seccion_piel_evaluado" name="seccion_piel_evaluado"
+                           data-seccion-body="piel-body"
+                           {% if not datos_examen or datos_examen.seccion_piel_evaluado != False %}checked{% endif %}>
+                    <label class="custom-control-label" for="seccion_piel_evaluado">Evaluado</label>
+                  </div>
+                </div>
+                <div id="piel-body" class="seccion-evaluado-body">
                 <div class="card bg-gradient-default shadow-sm mb-4">
                   <div class="card-header bg-transparent">
                     <h4 class="text-white mb-0">Piel y Anexos</h4>
@@ -657,6 +744,7 @@
                     </div>
                   </div>
                 </div>
+                </div>
                 <!-- Botones de acción -->
                 <div class="row mt-4">
                   <div class="col-12 text-right">
@@ -676,14 +764,124 @@
 </div>
 
 <script>
+window.FIELD_TOGGLE_SEMANTICS = {{ field_toggle_semantics_json|default:"{}"|safe }};
+window.TOGGLE_LABELS = {{ toggle_labels_json|default:"{}"|safe }};
+window.MODO_EDICION = {{ modo_edicion|yesno:"true,false" }};
+</script>
+<script>
   document.addEventListener("DOMContentLoaded", function () {
+    const semantics = window.FIELD_TOGGLE_SEMANTICS || {};
+    const toggleLabels = window.TOGGLE_LABELS || {};
+
+    function labelForTipo(tipo, checked) {
+      const labels = toggleLabels[tipo];
+      if (!labels) return checked ? "Sí" : "No";
+      const key = checked ? "true" : "false";
+      return labels[key] || labels[checked] || (checked ? "Sí" : "No");
+    }
+
+    function isStateWord(text) {
+      if (!text) return true;
+      const known = ["Presente", "Ausente", "Normal", "Anormal",
+                     "Detecta", "No detecta", "Sí", "Si", "No"];
+      return known.indexOf(text.trim()) !== -1;
+    }
+
+    function syncToggleLabel(checkbox) {
+      const fieldName = checkbox.name || checkbox.id;
+      const tipo = semantics[fieldName];
+      if (!tipo) return;
+      const container = checkbox.closest(".custom-control");
+      if (!container) return;
+      const estado = labelForTipo(tipo, checkbox.checked);
+      let labelEl = container.querySelector(".custom-control-label");
+      if (!labelEl) {
+        labelEl = document.createElement("span");
+        labelEl.className = "toggle-semantics-label custom-control-label";
+        if (checkbox.id) labelEl.setAttribute("for", checkbox.id);
+        container.appendChild(labelEl);
+      }
+      // Guardar la etiqueta original (nombre de la pregunta) la primera vez.
+      if (labelEl.dataset.baseLabel === undefined) {
+        labelEl.dataset.baseLabel = labelEl.textContent.trim();
+      }
+      const base = labelEl.dataset.baseLabel;
+      if (isStateWord(base)) {
+        // La etiqueta ya representa el estado (la pregunta está en un
+        // encabezado aparte): se actualiza en el sitio.
+        labelEl.textContent = estado;
+        return;
+      }
+      // La etiqueta es la pregunta: se conserva y el estado se muestra aparte.
+      labelEl.textContent = base;
+      let stateEl = container.querySelector(".toggle-state-badge");
+      if (!stateEl) {
+        stateEl = document.createElement("span");
+        stateEl.className = "toggle-state-badge";
+        container.appendChild(stateEl);
+      }
+      stateEl.textContent = estado;
+      stateEl.classList.toggle("is-on", !!checkbox.checked);
+    }
+
+    Object.keys(semantics).forEach(function (fieldName) {
+      const checkbox = document.getElementById(fieldName)
+        || document.querySelector('input[type="checkbox"][name="' + fieldName + '"]');
+      if (!checkbox) return;
+      syncToggleLabel(checkbox);
+      checkbox.addEventListener("change", function () {
+        syncToggleLabel(checkbox);
+      });
+    });
+
+    function applySeccionEvaluado(toggle) {
+      const bodyId = toggle.getAttribute("data-seccion-body");
+      const body = bodyId ? document.getElementById(bodyId) : null;
+      if (!body) return;
+      const evaluated = toggle.checked;
+      body.style.display = evaluated ? "" : "none";
+      const label = document.querySelector('label[for="' + toggle.id + '"]');
+      if (label) {
+        label.textContent = evaluated ? "Evaluado" : "No evaluado";
+      }
+      body.querySelectorAll("[required]").forEach(function (el) {
+        if (!evaluated) {
+          el.dataset.wasRequired = "1";
+          el.removeAttribute("required");
+        } else if (el.dataset.wasRequired === "1") {
+          el.setAttribute("required", "");
+        }
+      });
+      body.querySelectorAll("input, select, textarea").forEach(function (el) {
+        if (!evaluated) {
+          if (el.disabled) {
+            el.dataset.wasDisabled = "1";
+          } else {
+            el.disabled = true;
+          }
+        } else if (el.dataset.wasDisabled === "1") {
+          el.disabled = true;
+          delete el.dataset.wasDisabled;
+        } else {
+          el.disabled = false;
+        }
+      });
+    }
+
+    document.querySelectorAll(".seccion-evaluado-toggle").forEach(function (toggle) {
+      applySeccionEvaluado(toggle);
+      toggle.addEventListener("change", function () {
+        applySeccionEvaluado(toggle);
+      });
+    });
+
     const tallaInput = document.getElementById('talla');
     const pesoInput = document.getElementById('peso');
     const imcInput = document.getElementById('imc');
     const interpretacionText = document.getElementById('interpretacion_imc');
 
     function calcularIMC() {
-      const talla = parseFloat(tallaInput.value) / 100; // Convertir cm a metros
+      const talla = parseFloat(tallaInput.value) / 100;
       const peso = parseFloat(pesoInput.value);
 
       if (!isNaN(talla) && !isNaN(peso) && talla > 0 && peso > 0) {
@@ -704,8 +902,10 @@
       return '';
     }
 
-    tallaInput.addEventListener('input', calcularIMC);
-    pesoInput.addEventListener('input', calcularIMC);
+    if (tallaInput && pesoInput) {
+      tallaInput.addEventListener('input', calcularIMC);
+      pesoInput.addEventListener('input', calcularIMC);
+    }
   });
 </script>
 {% endblock content %}
