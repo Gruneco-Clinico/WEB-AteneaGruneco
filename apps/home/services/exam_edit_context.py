@@ -382,10 +382,25 @@ def load_medicamentos_datos(resultado: MedicamentosResult):
             "fecha_finalizacion",
             "indicacion",
             "activo",
+            "adherencia",
+            "efectos_adversos",
+            "descripcion_efectos_adversos",
             "observaciones",
         )
     )
     return datos
+
+
+# Prefijos HTML de atención (checkbox value → name de edad/características).
+_ATENCION_PREFIX_BY_TIPO = {
+    "Quejas atencionales": "quejas",
+    "Alteración atención sostenida": "sostenida",
+    "Alteración atención dividida": "dividida",
+    "Incapacidad para quedarse quieto": "quieto",
+    "Dificultad para finalizar una tarea": "tarea",
+    "Dificultad para seguir instrucciones": "instrucciones",
+    "Distracción con estímulos irrelevantes": "distraccion",
+}
 
 
 def load_cognitivo_anamnesis_datos(resultado: CognitivoAnamnesisResult):
@@ -408,6 +423,28 @@ def load_cognitivo_anamnesis_datos(resultado: CognitivoAnamnesisResult):
     datos["actividades_complejas"] = list(
         anamnesis.actividades_complejas.values("tipo")
     )
+    # Claves planas para precarga en template/JS (B-11 cognitivo).
+    datos["actitudes_tipos"] = [row["tipo"] for row in datos["actitudes"]]
+    datos["errores_lenguaje_tipos"] = [
+        row["tipo"] for row in datos["errores_lenguaje"]
+    ]
+    datos["actividades_vida_diaria_tipos"] = [
+        row["tipo"] for row in datos["actividades_vida_diaria"]
+    ]
+    datos["actividades_complejas_tipos"] = [
+        row["tipo"] for row in datos["actividades_complejas"]
+    ]
+    atencion_map = {}
+    for row in datos["atenciones"]:
+        tipo = row["tipo"]
+        prefix = _ATENCION_PREFIX_BY_TIPO.get(tipo)
+        atencion_map[tipo] = {
+            "edad_inicio": row.get("edad_inicio") or "",
+            "caracteristicas": row.get("caracteristicas") or "",
+            "prefix": prefix or "",
+        }
+    datos["atencion_map"] = atencion_map
+    datos["atencion_tipos"] = list(atencion_map.keys())
     return datos
 
 
@@ -469,7 +506,15 @@ def build_datos_examen_edicion(visita_examen, paciente, examen_id, exam_model):
         return (load_revision_sistemas_datos(resultado), True, extra)
 
     if examen_id == 8 and isinstance(resultado, MedicamentosResult):
-        return (load_medicamentos_datos(resultado), True, extra)
+        datos = load_medicamentos_datos(resultado)
+        # La plantilla espera ``datos_medicamentos`` (JSON), no solo datos_examen.
+        try:
+            extra["datos_medicamentos"] = json.dumps(
+                _convert_dates(datos.get("medicamentos") or []), default=str
+            )
+        except Exception:
+            extra["datos_medicamentos"] = "[]"
+        return (datos, True, extra)
 
     if examen_id == 20 and isinstance(resultado, CognitivoAnamnesisResult):
         return (load_cognitivo_anamnesis_datos(resultado), True, extra)

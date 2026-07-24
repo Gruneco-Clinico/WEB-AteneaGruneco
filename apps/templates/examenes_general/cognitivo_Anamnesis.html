@@ -1556,6 +1556,120 @@
     </div>
 </div>
 <script>
+    // Precarga B-11: datos guardados → formulario de edición
+    (function () {
+        const datos = {% if datos_examen_json %}{{ datos_examen_json|safe }}{% else %}null{% endif %};
+        if (!datos) return;
+
+        function setValueByName(name, value) {
+            if (value === null || value === undefined || value === "") return;
+            const els = document.querySelectorAll('[name="' + name + '"]');
+            if (!els.length) return;
+            const first = els[0];
+            const type = (first.type || "").toLowerCase();
+            if (type === "radio") {
+                els.forEach(function (el) {
+                    el.checked = String(el.value) === String(value);
+                });
+                return;
+            }
+            if (type === "checkbox") {
+                return;
+            }
+            if (first.tagName === "SELECT" || first.tagName === "TEXTAREA" || first.tagName === "INPUT") {
+                first.value = value;
+            }
+        }
+
+        function checkByNameValues(name, values) {
+            if (!values || !values.length) return;
+            const set = {};
+            values.forEach(function (v) { set[String(v)] = true; });
+            document.querySelectorAll('[name="' + name + '"]').forEach(function (el) {
+                if (set[String(el.value)]) el.checked = true;
+            });
+        }
+
+        const scalarNames = [
+            "motivo_consulta", "descripcion_general",
+            "apariencia_descripcion", "apariencia_estado", "actitud_descripcion",
+            "estado_alerta_descripcion", "estado_alerta_seleccion",
+            "orientacion_descripcion", "orientacion_seleccion",
+            "atencion_descripcion",
+            "memoria_descripcion", "memoria_lopera_vida", "memoria_lopera_actual",
+            "memoria_quejas", "memoria_edad_inicio", "memoria_progresivas",
+            "memoria_cambio_previo", "memoria_compromete_basicas",
+            "memoria_compromete_complejas", "memoria_compromete_cotidiana",
+            "lenguaje_descripcion", "lenguaje_cantidad", "lenguaje_fluido",
+            "lenguaje_tono", "lenguaje_articulacion", "lenguaje_comprension",
+            "lenguaje_escritura", "lenguaje_lectura", "lenguaje_repeticion",
+            "pensamiento_descripcion", "pensamiento_forma", "pensamiento_contenido",
+            "pensamiento_juicio", "pensamiento_introspeccion", "pensamiento_prospeccion",
+            "sensopercepcion_descripcion", "sensopercepcion_alteraciones",
+            "funcion_ejecutiva_descripcion", "funcion_ejecutiva_comportamientos",
+            "comportamiento_edad_inicio", "comportamiento_caracteristicas",
+            "funcion_ejecutiva_sintomas", "sintomas_edad_inicio", "sintomas_caracteristicas",
+            "estado_animo_descripcion", "estado_animo_cualidades", "estado_animo_expresiones",
+            "apetito_descripcion", "apetito_cambios", "apetito_edad_inicio", "apetito_caracteristicas",
+            "funcionalidad_descripcion", "independencia_vida_diaria",
+            "independencia_actividades_complejas",
+            "conducta_motora_descripcion", "trastornos_cuantitativos", "trastornos_cualitativos"
+        ];
+        scalarNames.forEach(function (name) {
+            if (Object.prototype.hasOwnProperty.call(datos, name)) {
+                setValueByName(name, datos[name]);
+            }
+        });
+
+        checkByNameValues("actitud_seleccion", datos.actitudes_tipos || []);
+        checkByNameValues("lenguaje_errores[]", datos.errores_lenguaje_tipos || []);
+        checkByNameValues("actividades_vida_diaria[]", datos.actividades_vida_diaria_tipos || []);
+        checkByNameValues("actividades_complejas[]", datos.actividades_complejas_tipos || []);
+        checkByNameValues("atencion_seleccion[]", datos.atencion_tipos || []);
+
+        const atencionMap = datos.atencion_map || {};
+        Object.keys(atencionMap).forEach(function (tipo) {
+            const row = atencionMap[tipo] || {};
+            const prefix = row.prefix;
+            if (!prefix) return;
+            setValueByName(prefix + "_edad_inicio", row.edad_inicio);
+            setValueByName(prefix + "_caracteristicas", row.caracteristicas);
+        });
+
+        document.querySelectorAll(".atencion-checkbox").forEach(function (checkbox) {
+            const targetId = checkbox.getAttribute("data-target");
+            const targetElement = document.getElementById(targetId);
+            if (targetElement && checkbox.checked) {
+                targetElement.style.display = "flex";
+            }
+        });
+
+        const vidaDiaria = document.getElementById("actividades_vida_diaria");
+        if (vidaDiaria && datos.independencia_vida_diaria === "si") {
+            vidaDiaria.style.display = "block";
+        }
+        const actComplejas = document.getElementById("actividades_complejas");
+        if (actComplejas && datos.independencia_actividades_complejas === "si") {
+            actComplejas.style.display = "block";
+        }
+
+        const camposAdicionales = document.getElementById("memoria-campos-adicionales");
+        if (camposAdicionales && datos.memoria_quejas === "Si") {
+            camposAdicionales.style.display = "block";
+        }
+
+        function showIfValue(selectId, camposId) {
+            const sel = document.getElementById(selectId);
+            const campos = document.getElementById(camposId);
+            if (sel && campos && sel.value) {
+                campos.style.display = "block";
+            }
+        }
+        showIfValue("funcion_ejecutiva_comportamientos", "comportamiento-campos");
+        showIfValue("funcion_ejecutiva_sintomas", "sintomas-campos");
+        showIfValue("apetito_cambios", "apetito-campos");
+    })();
+
     document.getElementById('independencia_vida_diaria').addEventListener('change', function () {
         let actividades = document.getElementById('actividades_vida_diaria');
         actividades.style.display = this.value === 'si' ? 'block' : 'none';
