@@ -57,6 +57,12 @@ def realizar_examen_builder(request, visita_id, examen_id, paciente_id):
     if visita.firmado:
         messages.error(request, "No se puede editar un examen de una visita firmada.")
         return redirect("detalle_paciente", paciente_id=paciente_id)
+    if visita.estado_visita == "programada":
+        messages.error(
+            request,
+            "No se pueden realizar exámenes en una visita programada. Ábrala primero.",
+        )
+        return redirect("detalle_paciente", paciente_id=paciente_id)
 
     fields = normalize_schema(examen.campos)
     if not fields:
@@ -128,6 +134,12 @@ def guardar_examen_builder(request):
 
     if visita.firmado:
         messages.error(request, "No se puede guardar: visita firmada.")
+        return redirect("detalle_paciente", paciente_id=paciente_id)
+    if visita.estado_visita == "programada":
+        messages.error(
+            request,
+            "No se puede guardar: visita programada. Ábrala primero.",
+        )
         return redirect("detalle_paciente", paciente_id=paciente_id)
 
     if not examen_has_builder_schema(examen.campos):
