@@ -7,6 +7,7 @@ from django.contrib import admin
 from .models import (
     Proyecto,
     DatosDemograficos,
+    SerieVisitas,
     Visita,
     VisitaExamen,
     Examen,
@@ -57,6 +58,7 @@ class ProyectoAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Proyecto, ProyectoAdmin)
+admin.site.register(SerieVisitas)
 admin.site.register(Visita)
 
 
