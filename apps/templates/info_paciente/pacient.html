@@ -53,6 +53,33 @@
     height: 2rem;
     padding: 0;
   }
+
+  /* Cabecera colapsable de cada plan de visitas */
+  .plan-serie-toggle {
+    flex: 1 1 auto;
+    min-width: 0;
+    color: inherit;
+    text-decoration: none;
+    white-space: normal;
+  }
+
+  .plan-serie-toggle:hover,
+  .plan-serie-toggle:focus {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .plan-serie-chevron {
+    transition: transform 0.2s ease;
+  }
+
+  .plan-serie-toggle[aria-expanded="true"] .plan-serie-chevron {
+    transform: rotate(90deg);
+  }
+
+  .plan-serie-visita + .plan-serie-visita {
+    border-top: 1px solid #e9ecef;
+  }
 </style>
 {% endblock stylesheets %}
 {% block content %}
@@ -299,6 +326,11 @@
                     <i class="fas fa-plus mr-2"></i>
                     Nueva Visita
                   </button>
+                  <button class="btn btn-light btn-sm" data-toggle="modal"
+                    data-target="#modalPlanVisitas-{{ proyecto.id }}">
+                    <i class="fas fa-calendar-alt mr-2"></i>
+                    Plan de visitas
+                  </button>
                   {% if request.user.is_superuser %}
                   <form method="POST"
                     action="{% url 'quitar_paciente_proyecto' paciente_id=paciente.id proyecto_id=proyecto.id %}"
@@ -316,9 +348,90 @@
 
             <!-- Contenido del Proyecto -->
             <div class="card-body">
-              <!-- Lista de Visitas -->
-              {% for visita in visitas_paciente %}
+              <!-- Planes de visitas: cada uno colapsable e independiente -->
+              {% for serie in series_activas %}
+              {% if serie.Tipo_visita.proyecto_id == proyecto.id %}
+              <div class="card border-info mb-3 plan-serie">
+                <div class="card-header bg-white py-2 px-3 d-flex justify-content-between align-items-center">
+                  <button type="button" class="btn btn-link p-0 text-left plan-serie-toggle"
+                    data-toggle="collapse" data-target="#plan-serie-{{ serie.id }}"
+                    aria-expanded="false" aria-controls="plan-serie-{{ serie.id }}">
+                    <i class="fas fa-chevron-right plan-serie-chevron"></i>
+                    <i class="fas fa-calendar-check mx-1"></i>
+                    <strong>{{ serie.Tipo_visita.nombre }}</strong>
+                    <span class="text-muted font-weight-normal">
+                      · {{ serie.frecuencia_legible }}
+                      · {{ serie.fecha_inicio|date:"d/m/Y" }} → {{ serie.fecha_fin|date:"d/m/Y" }}
+                    </span>
+                    <span class="badge badge-info ml-2">
+                      {{ serie.visitas_programadas|length }} pendiente(s)
+                    </span>
+                  </button>
+                  <form method="POST" action="{% url 'cancelar_resto_serie' serie.id %}"
+                    onsubmit="return confirm('¿Cancelar las visitas programadas restantes de este plan? Las ya abiertas o firmadas no se eliminan.');">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm btn-outline-danger text-nowrap ml-2">
+                      <i class="fas fa-ban mr-1"></i>Cancelar resto
+                    </button>
+                  </form>
+                </div>
+                <div class="collapse" id="plan-serie-{{ serie.id }}">
+                  <div class="card-body py-2 px-3">
+                    {% for visita in serie.visitas_programadas %}
+                    <div class="d-flex justify-content-between align-items-center py-2 plan-serie-visita">
+                      <div>
+                        <span class="badge badge-info mr-2">Programada</span>
+                        <strong>{{ visita.nombre }}</strong>
+                        <small class="text-muted ml-2">
+                          <i class="fas fa-calendar mr-1"></i>{{ visita.fecha|date:"d/m/Y" }}
+                        </small>
+                      </div>
+                      <form method="POST" action="{% url 'abrir_visita_programada' visita.id %}"
+                        onsubmit="return confirm('¿Abrir esta visita y crear sus exámenes?');">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-primary">
+                          <i class="fas fa-folder-open mr-1"></i>Abrir visita
+                        </button>
+                      </form>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted small mb-0">
+                      Este plan ya no tiene visitas programadas pendientes.
+                    </p>
+                    {% endfor %}
+                  </div>
+                </div>
+              </div>
+              {% endif %}
+              {% endfor %}
+
+              <!-- Programadas sin plan asociado -->
+              {% for visita in programadas_sin_plan %}
               {% if visita.Tipo_visita.proyecto == proyecto %}
+              <div class="card border border-info mb-2">
+                <div class="card-body py-2 px-3 d-flex justify-content-between align-items-center">
+                  <div>
+                    <span class="badge badge-info mr-2">Programada</span>
+                    <strong>{{ visita.nombre }}</strong>
+                    <small class="text-muted ml-2">
+                      <i class="fas fa-calendar mr-1"></i>{{ visita.fecha|date:"d/m/Y" }}
+                    </small>
+                  </div>
+                  <form method="POST" action="{% url 'abrir_visita_programada' visita.id %}"
+                    onsubmit="return confirm('¿Abrir esta visita y crear sus exámenes?');">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm btn-primary">
+                      <i class="fas fa-folder-open mr-1"></i>Abrir visita
+                    </button>
+                  </form>
+                </div>
+              </div>
+              {% endif %}
+              {% endfor %}
+
+              <!-- Lista de Visitas abiertas/cerradas -->
+              {% for visita in visitas_paciente %}
+              {% if visita.Tipo_visita.proyecto == proyecto and visita.estado_visita != "programada" %}
 
               <!-- TARJETA DE VISITA CORREGIDA -->
               <div class="card border mb-3">
@@ -427,7 +540,7 @@
                 </div>
 
                 <!-- Modal para editar notas aclaratorias -->
-                <div class="modal fade" id="modalNotas-{{ visita.id }}" tabindex="-1" role="dialog">
+                <div class="modal fade" id="modalNotas-{{ visita.id }}" tabindex="-1" role="dialog" data-focus="false">
                   <div class="modal-dialog" role="document">
                     <div class="modal-content">
                       <form method="POST" action="{% url 'editar_notas_aclaratorias' visita.id %}">
@@ -603,7 +716,7 @@
 {% for proyecto in proyectos_asociados %}
 
 <!-- Modal Agregar Visita - ESTRUCTURA CORREGIDA -->
-<div class="modal fade" id="modalAgregarVisita-{{ proyecto.id }}" tabindex="-1" role="dialog">
+<div class="modal fade" id="modalAgregarVisita-{{ proyecto.id }}" tabindex="-1" role="dialog" data-focus="false">
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
 
@@ -651,11 +764,14 @@
             <select class="form-control tipo-visita" name="tipo_visita">
               <option value="">Seleccione un tipo de visita</option>
               {% for visita in proyecto.visitas.all %}
-                <option value="{{ visita.id }}" data-examenes='{{ visita.examenes|json_dumps }}'>
+                <option value="{{ visita.id }}" data-examenes-id="examenes-tipo-nueva-{{ visita.id }}-{{ proyecto.id }}">
                   {{ visita.nombre }}
                 </option>
               {% endfor %}
             </select>
+            {% for visita in proyecto.visitas.all %}
+            <script type="application/json" id="examenes-tipo-nueva-{{ visita.id }}-{{ proyecto.id }}">{{ visita.examenes|json_dumps|safe }}</script>
+            {% endfor %}
           </div>
 
           <div class="form-group">
@@ -735,11 +851,116 @@
   </div>
 </div>
 
+<!-- Modal Plan de Visitas -->
+<div class="modal fade" id="modalPlanVisitas-{{ proyecto.id }}" tabindex="-1" role="dialog" data-focus="false">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header bg-info text-white">
+        <h5 class="modal-title">
+          <i class="fas fa-calendar-alt mr-2"></i>
+          Plan de visitas – {{ proyecto.nombre }}
+        </h5>
+        <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form method="POST" action="{% url 'crear_plan_visitas' paciente.id %}" class="form-plan-visitas">
+        {% csrf_token %}
+        <div class="modal-body">
+          <div class="alert alert-light mb-3">
+            <i class="fas fa-info-circle mr-1"></i>
+            Se crearán visitas en estado <strong>programada</strong> (sin exámenes).
+            Ábralas cuando corresponda para materializar los exámenes.
+            Máximo 24 fechas por plan.
+          </div>
+
+          <div class="form-group">
+            <label>Tipo de Visita</label>
+            <select class="form-control tipo-visita-plan" name="tipo_visita" required>
+              <option value="">Seleccione un tipo de visita</option>
+              {% for tv in proyecto.visitas.all %}
+                <option value="{{ tv.id }}" data-examenes-id="examenes-tipo-{{ tv.id }}">
+                  {{ tv.nombre }}
+                </option>
+              {% endfor %}
+            </select>
+            {% for tv in proyecto.visitas.all %}
+            <script type="application/json" id="examenes-tipo-{{ tv.id }}">{{ tv.examenes|json_dumps|safe }}</script>
+            {% endfor %}
+          </div>
+
+          <div class="form-group">
+            <label>Exámenes del plan</label>
+            <div class="border rounded p-3 bg-light">
+              <ul class="examenes-lista-plan list-unstyled mb-0"></ul>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group col-md-6">
+              <label>Fecha inicio</label>
+              <input type="date" class="form-control plan-fecha-inicio" name="fecha_inicio" value="{% now 'Y-m-d' %}" required>
+            </div>
+            <div class="form-group col-md-6">
+              <label>Fecha fin</label>
+              <input type="date" class="form-control plan-fecha-fin" name="fecha_fin" required>
+              <div class="invalid-feedback plan-fecha-error">
+                La fecha de fin debe ser mayor o igual a la de inicio.
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="d-block mb-2">Frecuencia</label>
+            <input type="hidden" name="frecuencia_unidad" value="semanal" class="plan-freq-value">
+            <div class="plan-freq-group d-flex flex-wrap" role="group" aria-label="Frecuencia">
+              <button type="button" class="btn btn-outline-info flex-fill mb-1 mr-1 plan-freq-btn" data-freq="diario">Diario</button>
+              <button type="button" class="btn btn-outline-info flex-fill mb-1 mr-1 plan-freq-btn active" data-freq="semanal">Semanal</button>
+              <button type="button" class="btn btn-outline-info flex-fill mb-1 mr-1 plan-freq-btn" data-freq="lv">L-V</button>
+              <button type="button" class="btn btn-outline-info flex-fill mb-1 plan-freq-btn" data-freq="custom">Personalizado</button>
+            </div>
+            <small class="form-text text-muted plan-freq-hint"></small>
+          </div>
+
+          <div class="form-group plan-dias-custom d-none">
+            <label class="d-block mb-2">Días de la semana</label>
+            <div class="plan-dias-group d-flex flex-wrap" role="group" aria-label="Días de la semana">
+              <button type="button" class="btn btn-sm btn-outline-primary flex-fill mb-1 mr-1 plan-dia-btn" data-dia="0">Lun</button>
+              <button type="button" class="btn btn-sm btn-outline-primary flex-fill mb-1 mr-1 plan-dia-btn" data-dia="1">Mar</button>
+              <button type="button" class="btn btn-sm btn-outline-primary flex-fill mb-1 mr-1 plan-dia-btn" data-dia="2">Mié</button>
+              <button type="button" class="btn btn-sm btn-outline-primary flex-fill mb-1 mr-1 plan-dia-btn" data-dia="3">Jue</button>
+              <button type="button" class="btn btn-sm btn-outline-primary flex-fill mb-1 mr-1 plan-dia-btn" data-dia="4">Vie</button>
+              <button type="button" class="btn btn-sm btn-outline-primary flex-fill mb-1 mr-1 plan-dia-btn" data-dia="5">Sáb</button>
+              <button type="button" class="btn btn-sm btn-outline-primary flex-fill mb-1 plan-dia-btn" data-dia="6">Dom</button>
+            </div>
+            <div class="plan-dias-inputs"></div>
+          </div>
+
+          <div class="form-group">
+            <label>Vista previa de fechas</label>
+            <div class="border rounded p-2 bg-white plan-preview text-muted small">
+              Complete tipo, fechas y frecuencia para ver el preview.
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">
+            <i class="fas fa-times mr-1"></i> Cancelar
+          </button>
+          <button type="submit" class="btn btn-info btn-crear-plan" disabled>
+            <i class="fas fa-save mr-1"></i> Crear plan
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
 
 <!-- Modales Editar Visita para cada visita -->
 {% for visita in visitas_paciente %}
-{% if visita.Tipo_visita.proyecto == proyecto %}
-<div class="modal fade" id="modalEditarVisita-{{ visita.id }}" tabindex="-1" role="dialog">
+{% if visita.Tipo_visita.proyecto == proyecto and visita.estado_visita != "programada" %}
+<div class="modal fade" id="modalEditarVisita-{{ visita.id }}" tabindex="-1" role="dialog" data-focus="false">
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
 
@@ -904,9 +1125,6 @@
 <!-- JAVASCRIPT SIMPLIFICADO Y CORREGIDO -->
 <script>
   document.addEventListener("DOMContentLoaded", function () {
-    console.log("Inicializando scripts...");
-
-    var visitaSelects = document.querySelectorAll(".tipo-visita");
     var categoriasExamen = {
       MEDICAS: "Evaluaciones Medicas",
       CLINICAS: "Escalas clinicas",
@@ -914,76 +1132,254 @@
       SUENO: "Escalas de sueno",
       OTROS: "Otros"
     };
-    console.log("Selectores de visita encontrados:", visitaSelects.length);
+    var diasNombres = ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"];
 
-    visitaSelects.forEach(function (select) {
+    function leerExamenesJson(scriptId) {
+      if (!scriptId) return "[]";
+      var el = document.getElementById(scriptId);
+      if (!el) return "[]";
+      return el.textContent || "[]";
+    }
+
+    function renderExamenesLista(listaEl, examenesData, nameAttr) {
+      listaEl.innerHTML = "";
+      if (!examenesData) return;
+      try {
+        var examenes = typeof examenesData === "string" ? JSON.parse(examenesData) : examenesData;
+        if (!Array.isArray(examenes)) return;
+        examenes.forEach(function (examen) {
+          var li = document.createElement("li");
+          li.className = "mb-2";
+          var checkbox = document.createElement("input");
+          checkbox.type = "checkbox";
+          checkbox.name = nameAttr;
+          checkbox.id = "examen_" + examen.id + "_" + Math.random().toString(36).slice(2);
+          checkbox.value = examen.id;
+          checkbox.className = "form-check-input examen-checkbox mr-2";
+          checkbox.checked = true;
+          var label = document.createElement("label");
+          label.htmlFor = checkbox.id;
+          var categoriaTexto = examen.categoria
+            ? " [" + (categoriasExamen[examen.categoria] || examen.categoria) + "]"
+            : "";
+          label.textContent = (examen.nombre || ("Examen " + examen.id)) + categoriaTexto;
+          label.className = "form-check-label";
+          li.appendChild(checkbox);
+          li.appendChild(label);
+          listaEl.appendChild(li);
+        });
+      } catch (error) {
+        console.error("Error al procesar exámenes:", error);
+      }
+    }
+
+    document.querySelectorAll(".tipo-visita").forEach(function (select) {
       select.addEventListener("change", function () {
         var selectedOption = this.options[this.selectedIndex];
-        var examenesData = selectedOption.getAttribute("data-examenes");
         var currentForm = this.closest("form");
-        var examenesLista = currentForm.querySelector("#examenesLista");
-
-        if (!examenesLista) {
-          console.error("No se encontró #examenesLista");
-          return;
-        }
-
-        examenesLista.innerHTML = "";
-
-        if (examenesData) {
-          try {
-            var examenes = JSON.parse(examenesData);
-
-            // NO crear input oculto: usaremos checkboxes con el mismo `name` para enviar múltiples valores
-
-            examenes.forEach(function (examen) {
-              var li = document.createElement("li");
-              li.className = "mb-2";
-
-              var checkbox = document.createElement("input");
-              checkbox.type = "checkbox";
-              checkbox.name = "examenes_seleccionados"; // importante: nombre para enviar múltiples valores
-              checkbox.id = "examen_" + examen.id + "_" + Math.random();
-              checkbox.value = examen.id;
-              checkbox.className = "form-check-input examen-checkbox mr-2";
-              checkbox.checked = true;
-
-              var label = document.createElement("label");
-              label.htmlFor = checkbox.id;
-              var categoriaTexto = examen.categoria ? " [" + (categoriasExamen[examen.categoria] || examen.categoria) + "]" : "";
-              label.textContent = examen.nombre + categoriaTexto;
-              label.className = "form-check-label";
-
-              li.appendChild(checkbox);
-              li.appendChild(label);
-              examenesLista.appendChild(li);
-
-              // No necesitamos sincronizar a un input oculto; el formulario enviará los checkboxes seleccionados
-              // Pero mantenemos la clase 'examen-checkbox' para poder consultarlos si hace falta
-            });
-
-
-          } catch (error) {
-            console.error("Error al procesar exámenes:", error);
-          }
-        }
+        var examenesLista = currentForm.querySelector("#examenesLista") ||
+          currentForm.querySelector(".examenes-lista-plan");
+        if (!examenesLista) return;
+        renderExamenesLista(
+          examenesLista,
+          leerExamenesJson(selectedOption.getAttribute("data-examenes-id")),
+          "examenes_seleccionados"
+        );
       });
     });
 
-    function actualizarExamenesSeleccionados(form) {
-      var checkboxes = form.querySelectorAll('.examen-checkbox:checked');
-      var examenesSeleccionados = Array.from(checkboxes).map(function (cb) {
-        return cb.value;
+    function parseYmd(value) {
+      if (!value) return null;
+      var parts = value.split("-");
+      if (parts.length !== 3) return null;
+      return new Date(Date.UTC(+parts[0], +parts[1] - 1, +parts[2]));
+    }
+
+    function formatYmd(d) {
+      var m = String(d.getUTCMonth() + 1).padStart(2, "0");
+      var day = String(d.getUTCDate()).padStart(2, "0");
+      return d.getUTCFullYear() + "-" + m + "-" + day;
+    }
+
+    function weekdayLun0(d) {
+      // JS: 0=Dom … 6=Sáb → Python: 0=Lun … 6=Dom
+      return (d.getUTCDay() + 6) % 7;
+    }
+
+    function generarFechasPreview(inicio, fin, tipo, diasCustom) {
+      var fechas = [];
+      if (!inicio || !fin || fin < inicio) return fechas;
+      var permitidos = null;
+      if (tipo === "semanal") {
+        permitidos = {};
+        permitidos[weekdayLun0(inicio)] = true;
+      } else if (tipo === "lv") {
+        permitidos = { 0: true, 1: true, 2: true, 3: true, 4: true };
+      } else if (tipo === "custom") {
+        if (!diasCustom || !diasCustom.length) return fechas;
+        permitidos = {};
+        diasCustom.forEach(function (d) { permitidos[d] = true; });
+      }
+      var actual = new Date(inicio.getTime());
+      while (actual <= fin && fechas.length < 24) {
+        if (!permitidos || permitidos[weekdayLun0(actual)]) {
+          fechas.push(new Date(actual.getTime()));
+        }
+        actual.setUTCDate(actual.getUTCDate() + 1);
+      }
+      return fechas;
+    }
+
+    function diasSeleccionadosPlan(form) {
+      var dias = [];
+      form.querySelectorAll(".plan-dia-btn.active").forEach(function (btn) {
+        dias.push(parseInt(btn.getAttribute("data-dia"), 10));
+      });
+      dias.sort(function (a, b) { return a - b; });
+      return dias;
+    }
+
+    function sincronizarDiasPlan(form, dias) {
+      var contenedor = form.querySelector(".plan-dias-inputs");
+      if (!contenedor) return;
+      contenedor.innerHTML = "";
+      dias.forEach(function (dia) {
+        var input = document.createElement("input");
+        input.type = "hidden";
+        input.name = "dias_semana";
+        input.value = String(dia);
+        contenedor.appendChild(input);
+      });
+    }
+
+    function hintFrecuencia(tipo, inicio, dias) {
+      if (tipo === "diario") return "Una visita cada día del rango.";
+      if (tipo === "semanal") {
+        return inicio
+          ? "Cada semana el " + diasNombres[weekdayLun0(inicio)] + " (día de la fecha de inicio)."
+          : "Cada semana el día de la fecha de inicio.";
+      }
+      if (tipo === "lv") return "Solo lunes a viernes.";
+      if (tipo === "custom") {
+        if (!dias.length) return "Elija uno o más días de la semana.";
+        return "Cada semana: " + dias.map(function (d) { return diasNombres[d]; }).join(", ") + ".";
+      }
+      return "";
+    }
+
+    function actualizarPreviewPlan(form) {
+      var inputInicio = form.querySelector(".plan-fecha-inicio");
+      var inputFin = form.querySelector(".plan-fecha-fin");
+      var inicio = parseYmd(inputInicio.value);
+      var fin = parseYmd(inputFin.value);
+      var tipo = form.querySelector(".plan-freq-value").value || "semanal";
+      var preview = form.querySelector(".plan-preview");
+      var btn = form.querySelector(".btn-crear-plan");
+      var hint = form.querySelector(".plan-freq-hint");
+      var customBox = form.querySelector(".plan-dias-custom");
+      var tipoVisita = form.querySelector(".tipo-visita-plan").value;
+
+      form.querySelectorAll(".plan-freq-btn").forEach(function (b) {
+        b.classList.toggle("active", b.getAttribute("data-freq") === tipo);
+      });
+      if (customBox) {
+        customBox.classList.toggle("d-none", tipo !== "custom");
+      }
+
+      var dias = tipo === "custom" ? diasSeleccionadosPlan(form) : [];
+      sincronizarDiasPlan(form, dias);
+
+      if (hint) {
+        hint.textContent = hintFrecuencia(tipo, inicio, dias);
+      }
+
+      inputFin.min = inputInicio.value || "";
+      var rangoInvalido = !!(inicio && fin && fin < inicio);
+      inputFin.classList.toggle("is-invalid", rangoInvalido);
+
+      function bloquear(mensaje, esError) {
+        preview.innerHTML = '<span class="' + (esError ? "text-danger" : "text-muted") + '">' + mensaje + "</span>";
+        btn.disabled = true;
+        form.dataset.planCount = "0";
+      }
+
+      if (!tipoVisita) {
+        bloquear("Seleccione un tipo de visita.", false);
+        return;
+      }
+      if (!inicio || !fin) {
+        bloquear("Complete las fechas de inicio y fin.", false);
+        return;
+      }
+      if (rangoInvalido) {
+        bloquear("La fecha de fin debe ser mayor o igual a la de inicio.", true);
+        return;
+      }
+      if (tipo === "custom" && !dias.length) {
+        bloquear("Seleccione al menos un día de la semana.", true);
+        return;
+      }
+
+      var fechas = generarFechasPreview(inicio, fin, tipo, dias);
+      if (!fechas.length) {
+        bloquear("Esa frecuencia no genera ninguna fecha en el rango elegido.", true);
+        return;
+      }
+
+      preview.innerHTML =
+        "<strong>" + fechas.length + " visita(s):</strong> " +
+        fechas.map(formatYmd).join(", ") +
+        (fechas.length === 24 ? ' <span class="text-warning">(tope de 24 fechas)</span>' : "");
+      btn.disabled = false;
+      form.dataset.planCount = String(fechas.length);
+    }
+
+    document.querySelectorAll(".form-plan-visitas").forEach(function (form) {
+      var tipoSelect = form.querySelector(".tipo-visita-plan");
+      tipoSelect.addEventListener("change", function () {
+        var selectedOption = this.options[this.selectedIndex];
+        var lista = form.querySelector(".examenes-lista-plan");
+        renderExamenesLista(
+          lista,
+          leerExamenesJson(selectedOption.getAttribute("data-examenes-id")),
+          "examenes_seleccionados"
+        );
+        actualizarPreviewPlan(form);
       });
 
-      var hiddenInput = form.querySelector("#examenes_seleccionados");
-      if (hiddenInput) {
-        hiddenInput.value = JSON.stringify(examenesSeleccionados);
-      }
-    }
+      [".plan-fecha-inicio", ".plan-fecha-fin"].forEach(function (sel) {
+        var input = form.querySelector(sel);
+        ["change", "input"].forEach(function (evt) {
+          input.addEventListener(evt, function () {
+            actualizarPreviewPlan(form);
+          });
+        });
+      });
+
+      form.querySelectorAll(".plan-freq-btn").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          form.querySelector(".plan-freq-value").value = btn.getAttribute("data-freq");
+          actualizarPreviewPlan(form);
+        });
+      });
+
+      form.querySelectorAll(".plan-dia-btn").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          btn.classList.toggle("active");
+          actualizarPreviewPlan(form);
+        });
+      });
+
+      form.addEventListener("submit", function (e) {
+        var n = parseInt(form.dataset.planCount || "0", 10);
+        if (!n || !confirm("Se crearán " + n + " visita(s) programada(s). ¿Continuar?")) {
+          e.preventDefault();
+        }
+      });
+
+      actualizarPreviewPlan(form);
+    });
   });
-  const today = new Date().toISOString().split('T')[0]; // "YYYY-MM-DD"
-  document.getElementById('fecha').value = today;
 </script>
 
 {% endblock %}

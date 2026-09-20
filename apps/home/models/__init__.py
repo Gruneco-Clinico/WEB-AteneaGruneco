@@ -23,6 +23,7 @@ __all__ = [
     "ProyectoPacienteExtra",
     "Examen",
     "TipoVisita",
+    "SerieVisitas",
     "Visita",
     "VisitaExamen",
     "ResultadoExamenBase",

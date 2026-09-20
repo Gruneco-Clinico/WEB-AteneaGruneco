@@ -347,7 +347,9 @@ def exportar_csv_proyecto(request, proyecto_id):
 
     proyecto = get_object_or_404(Proyecto, id=proyecto_id)
 
-    visitas_base = Visita.objects.filter(Tipo_visita__proyecto=proyecto)
+    visitas_base = Visita.objects.filter(Tipo_visita__proyecto=proyecto).exclude(
+        estado_visita="programada"
+    )
     examenes_ids = (
         VisitaExamen.objects.filter(visita__Tipo_visita__proyecto=proyecto)
         .values_list("examen_id", flat=True)

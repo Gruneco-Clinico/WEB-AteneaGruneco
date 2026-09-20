@@ -12,9 +12,15 @@ from django.contrib.auth.models import User
 from django.views.generic import TemplateView
 from django.core.mail import send_mail, EmailMessage
 from django.db.models import Max, F
+from django.core.exceptions import ValidationError as DjangoValidationError
 from datetime import datetime, timedelta
 from ..models import *
 from ..forms import ProyectoForm, RegistroDemograficoForm
+from ..services.plan_visitas import (
+    crear_serie,
+    abrir_visita as servicio_abrir_visita,
+    cancelar_resto_serie,
+)
 import json
 import requests
 import logging
@@ -175,6 +181,13 @@ def firmar_visita(request, visita_id):
         paciente_id = visita.paciente.id
         paciente = visita.paciente
 
+        if visita.estado_visita == "programada":
+            messages.error(
+                request,
+                "No se puede firmar una visita programada. Ábrala primero.",
+            )
+            return redirect("detalle_paciente", paciente_id=paciente_id)
+
         # Marcar la visita como firmada y cerrada
         visita.firmado = True
         visita.firmado_por = request.user
@@ -276,6 +289,14 @@ def firmar_visita(request, visita_id):
 def editar_v(request, visita_id):
     visita = get_object_or_404(Visita, id=visita_id)
     paciente = visita.paciente
+
+    if visita.estado_visita == "programada":
+        messages.error(
+            request,
+            "No se puede editar una visita programada. Ábrala primero.",
+        )
+        return redirect("detalle_paciente", paciente_id=paciente.id)
+
     tipo_visita = visita.Tipo_visita  # Tipo de visita actual
     # Obtener exámenes disponibles según el tipo de visita (vienen en JSONField)
     examenes_tipo_visita = tipo_visita.iter_examen_ids()
@@ -397,6 +418,7 @@ def visitas_pendientes_firma(request):
     # Visitas no firmadas que tienen al menos un examen
     visitas_candidatas = (
         Visita.objects.filter(firmado=False)
+        .exclude(estado_visita="programada")
         .exclude(visita_examenes__isnull=True)
         .annotate(
             total_examenes=Count("visita_examenes"),
@@ -432,6 +454,115 @@ def editar_notas_aclaratorias(request, visita_id):
     visita.save()
     messages.success(request, "Notas aclaratorias actualizadas correctamente.")
     return redirect("detalle_paciente", paciente_id=visita.paciente.id)
+
+
+@login_required
+def crear_plan_visitas(request, paciente_id):
+    """Crea una serie de visitas programadas para un paciente."""
+    paciente = get_object_or_404(DatosDemograficos, id=paciente_id)
+
+    if request.method != "POST":
+        messages.error(request, "Método no permitido.")
+        return redirect("detalle_paciente", paciente_id=paciente_id)
+
+    tipo_visita_id = request.POST.get("tipo_visita")
+    fecha_inicio_raw = request.POST.get("fecha_inicio")
+    fecha_fin_raw = request.POST.get("fecha_fin")
+    frecuencia_unidad = request.POST.get("frecuencia_unidad", "semanal")
+    dias_raw = request.POST.getlist("dias_semana") or []
+
+    try:
+        tipo_visita = get_object_or_404(TipoVisita, id=tipo_visita_id)
+        fecha_inicio = datetime.strptime(fecha_inicio_raw, "%Y-%m-%d").date()
+        fecha_fin = datetime.strptime(fecha_fin_raw, "%Y-%m-%d").date()
+    except (TypeError, ValueError):
+        messages.error(request, "Datos del plan inválidos. Revise fechas y frecuencia.")
+        return redirect("detalle_paciente", paciente_id=paciente_id)
+
+    dias_semana = []
+    for d in dias_raw:
+        try:
+            dias_semana.append(int(d))
+        except (TypeError, ValueError):
+            continue
+
+    post_list = request.POST.getlist("examenes_seleccionados") or []
+    examen_ids = []
+    for eid in post_list:
+        try:
+            examen_ids.append(int(eid))
+        except (TypeError, ValueError):
+            continue
+
+    try:
+        _serie, creadas, omitidas = crear_serie(
+            paciente=paciente,
+            tipo_visita=tipo_visita,
+            fecha_inicio=fecha_inicio,
+            fecha_fin=fecha_fin,
+            frecuencia_unidad=frecuencia_unidad,
+            dias_semana=dias_semana,
+            evaluador=request.user,
+            examen_ids=examen_ids or None,
+        )
+    except DjangoValidationError as exc:
+        messages.error(request, "; ".join(exc.messages) if hasattr(exc, "messages") else str(exc))
+        return redirect("detalle_paciente", paciente_id=paciente_id)
+
+    msg = f"Plan creado: {len(creadas)} visita(s) programada(s)."
+    if omitidas:
+        msg += f" Se omitieron {omitidas} fecha(s) ya existentes."
+    if not creadas:
+        messages.warning(
+            request,
+            msg + " No se crearon visitas nuevas.",
+        )
+    else:
+        messages.success(request, msg)
+    return redirect("detalle_paciente", paciente_id=paciente_id)
+
+
+@login_required
+def abrir_visita_programada(request, visita_id):
+    """Abre una visita programada y materializa sus VisitaExamen."""
+    visita = get_object_or_404(Visita, id=visita_id)
+    paciente_id = visita.paciente_id
+
+    if request.method != "POST":
+        messages.error(request, "Método no permitido.")
+        return redirect("detalle_paciente", paciente_id=paciente_id)
+
+    try:
+        servicio_abrir_visita(visita)
+        messages.success(
+            request,
+            f"Visita '{visita.nombre}' abierta. Ya puede realizar los exámenes.",
+        )
+    except DjangoValidationError as exc:
+        messages.error(
+            request,
+            "; ".join(exc.messages) if hasattr(exc, "messages") else str(exc),
+        )
+
+    return redirect("detalle_paciente", paciente_id=paciente_id)
+
+
+@login_required
+def cancelar_resto_serie_view(request, serie_id):
+    """Cancela (elimina) las visitas programadas restantes de una serie."""
+    serie = get_object_or_404(SerieVisitas, id=serie_id)
+    paciente_id = serie.paciente_id
+
+    if request.method != "POST":
+        messages.error(request, "Método no permitido.")
+        return redirect("detalle_paciente", paciente_id=paciente_id)
+
+    deleted = cancelar_resto_serie(serie)
+    messages.success(
+        request,
+        f"Serie cancelada. Se eliminaron {deleted} visita(s) programada(s).",
+    )
+    return redirect("detalle_paciente", paciente_id=paciente_id)
 
 
 # proyectos ############################################################

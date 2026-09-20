@@ -7,6 +7,116 @@ from simple_history.models import HistoricalRecords
 from .patient import DatosDemograficos
 
 
+class SerieVisitas(models.Model):
+    """Plan recurrente de visitas para un paciente dentro de un tipo de visita."""
+
+    FRECUENCIA_UNIDAD_CHOICES = [
+        ("diario", "Diario"),
+        ("semanal", "Semanal"),
+        ("lv", "Lunes a viernes"),
+        ("custom", "Personalizado"),
+    ]
+
+    DIAS_SEMANA_LABELS = {
+        0: "Lun",
+        1: "Mar",
+        2: "Mié",
+        3: "Jue",
+        4: "Vie",
+        5: "Sáb",
+        6: "Dom",
+    }
+
+    paciente = models.ForeignKey(
+        DatosDemograficos,
+        on_delete=models.CASCADE,
+        related_name="series_visitas",
+    )
+    Tipo_visita = models.ForeignKey(
+        "TipoVisita",
+        on_delete=models.CASCADE,
+        related_name="series_visitas",
+    )
+    evaluador = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="series_visitas_evaluador",
+    )
+    fecha_inicio = models.DateField()
+    fecha_fin = models.DateField()
+    frecuencia_unidad = models.CharField(
+        max_length=10,
+        choices=FRECUENCIA_UNIDAD_CHOICES,
+        default="semanal",
+    )
+    frecuencia_cada = models.PositiveIntegerField(
+        default=1,
+        help_text="Reservado por compatibilidad; la UI usa presets de frecuencia.",
+    )
+    dias_semana = models.JSONField(
+        default=list,
+        blank=True,
+        verbose_name="Días de la semana",
+        help_text="Enteros 0=lun … 6=dom. Usado en personalizado y L-V.",
+    )
+    examenes = models.JSONField(
+        default=list,
+        blank=True,
+        verbose_name="Exámenes del plan",
+        help_text="Snapshot de IDs de exámenes a materializar al abrir cada visita.",
+    )
+    activa = models.BooleanField(default=True)
+    history = HistoricalRecords()
+
+    class Meta:
+        verbose_name = "Serie de visitas"
+        verbose_name_plural = "Series de visitas"
+        ordering = ["-fecha_inicio"]
+
+    def __str__(self):
+        tipo = self.Tipo_visita.nombre if self.Tipo_visita_id else "?"
+        return f"Serie {tipo} ({self.fecha_inicio} → {self.fecha_fin})"
+
+    def iter_examen_ids(self):
+        """IDs de exámenes del snapshot JSON (lista de ints o dicts con id)."""
+        raw = self.examenes
+        if not raw or not isinstance(raw, list):
+            return []
+        ids = []
+        for item in raw:
+            eid = item.get("id") if isinstance(item, dict) else item
+            try:
+                ids.append(int(eid))
+            except (TypeError, ValueError):
+                continue
+        return ids
+
+    def frecuencia_legible(self):
+        """Texto corto para banner de ficha (L-V, Lun/Mié/Jue, etc.)."""
+        tipo = self.frecuencia_unidad
+        if tipo == "diario":
+            return "Diario"
+        if tipo == "semanal":
+            return "Semanal"
+        if tipo == "lv":
+            return "L-V"
+        if tipo == "custom":
+            dias = self.dias_semana if isinstance(self.dias_semana, list) else []
+            labels = []
+            for d in dias:
+                try:
+                    n = int(d)
+                except (TypeError, ValueError):
+                    continue
+                label = self.DIAS_SEMANA_LABELS.get(n)
+                if label:
+                    labels.append(label)
+            return ", ".join(labels) if labels else "Personalizado"
+        return self.get_frecuencia_unidad_display()
+
+
 class Visita(models.Model):
     paciente = models.ForeignKey(
         DatosDemograficos,
@@ -23,6 +133,14 @@ class Visita(models.Model):
         null=True,
         blank=True,
     )
+    serie = models.ForeignKey(
+        SerieVisitas,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="visitas",
+        verbose_name="Serie de visitas",
+    )
     fecha = models.DateField(blank=True, null=True)
     evaluador = models.ForeignKey(
         User, on_delete=models.SET_NULL, null=True, blank=True, related_name="visitas_evaluador"
@@ -38,6 +156,7 @@ class Visita(models.Model):
     estado_visita = models.CharField(
         max_length=20,
         choices=[
+            ("programada", "Programada"),
             ("abierta", "Abierta"),
             ("cerrada", "Cerrada"),
         ],
@@ -65,6 +184,10 @@ class Visita(models.Model):
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
+
+        # No generar código ANG- para visitas aún no abiertas.
+        if self.estado_visita == "programada":
+            return
 
         if not self.Tipo_visita:
             return

@@ -21,11 +21,12 @@ def get_sueno_tipo_visita_ids():
 
 
 def _visitas_sueno_qs(paciente):
-    """Visitas del paciente vinculadas al proyecto sueño."""
+    """Visitas del paciente vinculadas al proyecto sueño (excluye programadas)."""
     proyecto_id = get_sueno_proyecto_id()
     tipo_ids = get_sueno_tipo_visita_ids()
     return (
         Visita.objects.filter(paciente=paciente)
+        .exclude(estado_visita="programada")
         .filter(
             models_q_or_proyecto(proyecto_id, tipo_ids)
         )

@@ -257,9 +257,30 @@ def detalle_paciente(request, paciente_id):
     )
 
     # Obtener las visitas con sus exámenes relacionados (optimización)
-    visitas_paciente = Visita.objects.filter(paciente=paciente).prefetch_related(
+    visitas_paciente = Visita.objects.filter(paciente=paciente).select_related(
+        "serie", "Tipo_visita", "Tipo_visita__proyecto", "evaluador"
+    ).prefetch_related(
         "visita_examenes__examen"
     )
+    series_activas = list(
+        SerieVisitas.objects.filter(paciente=paciente, activa=True).select_related(
+            "Tipo_visita", "Tipo_visita__proyecto"
+        )
+    )
+    # Agrupa las visitas programadas bajo su plan para poder colapsarlas por separado.
+    programadas = sorted(
+        (v for v in visitas_paciente if v.estado_visita == "programada"),
+        key=lambda v: v.fecha,
+    )
+    programadas_por_serie = {}
+    for visita in programadas:
+        programadas_por_serie.setdefault(visita.serie_id, []).append(visita)
+    for serie in series_activas:
+        serie.visitas_programadas = programadas_por_serie.get(serie.id, [])
+    ids_series_activas = {serie.id for serie in series_activas}
+    programadas_sin_plan = [
+        v for v in programadas if v.serie_id not in ids_series_activas
+    ]
     proyectos_con_consentimiento_firmado = list(
         ConsentimientoFirmaEnvio.objects.filter(
             paciente=paciente,
@@ -305,6 +326,8 @@ def detalle_paciente(request, paciente_id):
             "proyectos_asociados": proyectos_asociados,
             "proyectos_disponibles": proyectos_disponibles,
             "visitas_paciente": visitas_paciente,
+            "series_activas": series_activas,
+            "programadas_sin_plan": programadas_sin_plan,
             "proyectos_con_consentimiento_firmado": proyectos_con_consentimiento_firmado,
         },
     )

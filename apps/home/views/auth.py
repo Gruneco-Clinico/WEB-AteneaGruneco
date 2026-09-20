@@ -76,11 +76,14 @@ def profile_view(request):
     user = request.user
 
     # Total visits where user is evaluador
-    total_visitas = Visita.objects.filter(evaluador=user).count()
+    total_visitas = Visita.objects.filter(evaluador=user).exclude(
+        estado_visita="programada"
+    ).count()
 
     # Distinct patients seen
     total_pacientes = (
         Visita.objects.filter(evaluador=user)
+        .exclude(estado_visita="programada")
         .values("paciente")
         .distinct()
         .count()
@@ -89,6 +92,7 @@ def profile_view(request):
     # Visits per project
     visitas_por_proyecto = (
         Visita.objects.filter(evaluador=user, Tipo_visita__proyecto__isnull=False)
+        .exclude(estado_visita="programada")
         .values("Tipo_visita__proyecto__id", "Tipo_visita__proyecto__nombre")
         .annotate(
             num_visitas=Count("id"),

@@ -59,9 +59,15 @@ def realizar_examen(request, visita_id, examen_id, paciente_id):
     paciente = get_object_or_404(DatosDemograficos, id=paciente_id)
     visita = get_object_or_404(Visita, id=visita_id, paciente=paciente)
     
-    # BLOQUEAR EDICIÓN SI LA VISITA ESTÁ FIRMADA
+    # BLOQUEAR EDICIÓN SI LA VISITA ESTÁ FIRMADA O PROGRAMADA
     if visita.firmado:
         messages.error(request, "No se puede editar un examen de una visita firmada.")
+        return redirect("detalle_paciente", paciente_id=paciente_id)
+    if visita.estado_visita == "programada":
+        messages.error(
+            request,
+            "No se pueden realizar exámenes en una visita programada. Ábrala primero.",
+        )
         return redirect("detalle_paciente", paciente_id=paciente_id)
     
     try:

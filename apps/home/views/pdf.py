@@ -695,6 +695,12 @@ def seleccionar_impresion_visita(request, visita_id):
     from django.shortcuts import render
 
     visita = get_object_or_404(Visita, id=visita_id)
+    if visita.estado_visita == "programada":
+        messages.error(
+            request,
+            "No se puede imprimir una visita programada. Ábrala primero.",
+        )
+        return redirect("detalle_paciente", paciente_id=visita.paciente_id)
     examenes = list(
         visita.visita_examenes.filter(estado="completado").select_related("examen")
     )
@@ -718,6 +724,12 @@ def generar_pdf_historia_clinica_visita(request, visita_id):
     """
     try:
         visita = get_object_or_404(Visita, id=visita_id)
+        if visita.estado_visita == "programada":
+            messages.error(
+                request,
+                "No se puede generar PDF de una visita programada. Ábrala primero.",
+            )
+            return redirect("detalle_paciente", paciente_id=visita.paciente_id)
         examen_ids = _parse_examen_ids(request, visita)
         buffer = BytesIO()
         construir_pdf_visita(buffer, visita, examen_ids=examen_ids)

@@ -98,7 +98,7 @@ def _build_evaluator_stats(proyecto):
     visitas = Visita.objects.filter(
         Tipo_visita__proyecto=proyecto,
         evaluador__isnull=False,
-    )
+    ).exclude(estado_visita="programada")
 
     evaluadores = (
         visitas.values("evaluador__id", "evaluador__first_name", "evaluador__last_name", "evaluador__username")

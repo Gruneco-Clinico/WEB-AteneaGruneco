@@ -159,6 +159,21 @@ urlpatterns = [
     path("editarVisita/<int:visita_id>/", views.editar_visita, name="editar_visita"),
     # Visitas
     path("visita/<int:paciente_id>/", views.crear_visita, name="crear_visita"),
+    path(
+        "visita/<int:paciente_id>/plan/",
+        views.crear_plan_visitas,
+        name="crear_plan_visitas",
+    ),
+    path(
+        "visita/<int:visita_id>/abrir/",
+        views.abrir_visita_programada,
+        name="abrir_visita_programada",
+    ),
+    path(
+        "serie/<int:serie_id>/cancelar/",
+        views.cancelar_resto_serie_view,
+        name="cancelar_resto_serie",
+    ),
     path("eliminar-visita/<int:visita_id>/", views.eliminar_v, name="eliminar_v"),
     path("editar-visita/<int:visita_id>/", views.editar_v, name="editar_v"),
     path("firmar-visita/<int:visita_id>/", views.firmar_visita, name="firmar_visita"),
