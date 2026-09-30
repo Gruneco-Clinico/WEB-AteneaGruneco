@@ -1,10 +1,11 @@
 # -*- encoding: utf-8 -*-
 """Tests del plan de visitas programadas (épica D) — presets de frecuencia."""
-from datetime import date
+from datetime import date, timedelta
 
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
-from django.test import TestCase, override_settings
+from django.test import Client, TestCase, override_settings
+from django.urls import reverse
 
 from apps.home.models import (
     DatosDemograficos,
@@ -194,6 +195,126 @@ class CrearSerieTests(TestCase):
                 fecha_fin=date(2026, 2, 1),
                 frecuencia_unidad="semanal",
             )
+
+
+class FechasEspecificasTests(TestCase):
+    def setUp(self):
+        self.proyecto = Proyecto.objects.create(nombre="Proyecto Fechas")
+        self.examen = Examen.objects.create(nombre="PSQI", categoria="SUENO")
+        self.tipo = TipoVisita.objects.create(
+            nombre="Seguimiento fechas",
+            proyecto=self.proyecto,
+            examenes=[{"id": self.examen.id}],
+        )
+        self.paciente = _paciente("fechas")
+        self.proyecto.pacientes.add(self.paciente)
+
+    def _crear(self, fechas):
+        return crear_serie(
+            paciente=self.paciente,
+            tipo_visita=self.tipo,
+            frecuencia_unidad="fechas",
+            fechas=fechas,
+            examen_ids=[self.examen.id],
+        )
+
+    def test_ordena_y_deduplica(self):
+        serie, creadas, omitidas = self._crear(
+            [date(2026, 4, 20), date(2026, 4, 3), date(2026, 4, 20), date(2026, 4, 10)]
+        )
+        self.assertEqual(omitidas, 0)
+        self.assertEqual(
+            [v.fecha for v in creadas],
+            [date(2026, 4, 3), date(2026, 4, 10), date(2026, 4, 20)],
+        )
+        self.assertEqual(serie.fecha_inicio, date(2026, 4, 3))
+        self.assertEqual(serie.fecha_fin, date(2026, 4, 20))
+        self.assertEqual(serie.frecuencia_unidad, "fechas")
+        self.assertEqual(serie.dias_semana, [])
+        for v in creadas:
+            self.assertEqual(v.estado_visita, "programada")
+            self.assertEqual(v.serie_id, serie.id)
+
+    def test_lista_vacia_falla(self):
+        with self.assertRaises(ValidationError):
+            self._crear([])
+
+    def test_mas_de_24_falla(self):
+        fechas = [date(2026, 1, 1) + timedelta(days=i) for i in range(MAX_FECHAS_SERIE + 1)]
+        with self.assertRaises(ValidationError):
+            self._crear(fechas)
+
+    def test_omite_fecha_existente(self):
+        Visita.objects.create(
+            paciente=self.paciente,
+            nombre="Ya existe",
+            Tipo_visita=self.tipo,
+            fecha=date(2026, 5, 7),
+            estado_visita="abierta",
+        )
+        _serie, creadas, omitidas = self._crear([date(2026, 5, 7), date(2026, 5, 14)])
+        self.assertEqual(omitidas, 1)
+        self.assertEqual([v.fecha for v in creadas], [date(2026, 5, 14)])
+
+    def test_frecuencia_legible(self):
+        serie, _, _ = self._crear([date(2026, 6, 1)])
+        self.assertEqual(serie.frecuencia_legible(), "Fechas específicas")
+
+    def test_acepta_fecha_pasada(self):
+        pasada = date.today() - timedelta(days=30)
+        _serie, creadas, _ = self._crear([pasada])
+        self.assertEqual([v.fecha for v in creadas], [pasada])
+
+
+class CrearPlanVisitasVistaTests(TestCase):
+    def setUp(self):
+        self.proyecto = Proyecto.objects.create(nombre="Proyecto Vista")
+        self.examen = Examen.objects.create(nombre="ESS", categoria="SUENO")
+        self.tipo = TipoVisita.objects.create(
+            nombre="Control vista",
+            proyecto=self.proyecto,
+            examenes=[{"id": self.examen.id}],
+        )
+        self.paciente = _paciente("vista")
+        self.proyecto.pacientes.add(self.paciente)
+        self.user = User.objects.create_user("eval-vista", password="x")
+        self.client = Client()
+        self.client.force_login(self.user)
+        self.url = reverse("crear_plan_visitas", args=[self.paciente.id])
+
+    def test_post_fechas_especificas_sin_rango(self):
+        resp = self.client.post(
+            self.url,
+            {
+                "tipo_visita": self.tipo.id,
+                "frecuencia_unidad": "fechas",
+                "fechas": ["2026-07-15", "2026-07-02", "2026-07-09"],
+                "examenes_seleccionados": [self.examen.id],
+            },
+        )
+        self.assertEqual(resp.status_code, 302)
+        visitas = Visita.objects.filter(paciente=self.paciente).order_by("fecha")
+        self.assertEqual(
+            [v.fecha for v in visitas],
+            [date(2026, 7, 2), date(2026, 7, 9), date(2026, 7, 15)],
+        )
+        self.assertTrue(all(v.estado_visita == "programada" for v in visitas))
+        serie = visitas[0].serie
+        self.assertEqual(serie.frecuencia_unidad, "fechas")
+        self.assertEqual(serie.fecha_inicio, date(2026, 7, 2))
+        self.assertEqual(serie.fecha_fin, date(2026, 7, 15))
+
+    def test_post_fecha_invalida_no_crea(self):
+        resp = self.client.post(
+            self.url,
+            {
+                "tipo_visita": self.tipo.id,
+                "frecuencia_unidad": "fechas",
+                "fechas": ["2026-07-02", "no-es-fecha"],
+            },
+        )
+        self.assertEqual(resp.status_code, 302)
+        self.assertFalse(Visita.objects.filter(paciente=self.paciente).exists())
 
 
 class AbrirYCancelarTests(TestCase):
