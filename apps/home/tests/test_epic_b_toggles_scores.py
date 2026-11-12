@@ -75,6 +75,20 @@ class AQDScoreTests(SimpleTestCase):
         )
         self.assertEqual(obj.calcular_puntaje_total(), 3)
 
+    def test_suma_items_con_etiqueta_texto(self):
+        """Valores guardados como '2. A veces' deben sumar el entero inicial."""
+        obj = AQDCuidadorResult(
+            recordar_fecha="4. Siempre",
+            firmar="1. Nunca",
+            deprimido="2. A veces",
+        )
+        self.assertEqual(obj.calcular_puntaje_total(), 7)
+        obj2 = AQDParticipanteResult(
+            recordar_fecha="3. Casi siempre",
+            firmar="2. A veces",
+        )
+        self.assertEqual(obj2.calcular_puntaje_total(), 5)
+
 
 class CDRSumaCajasTests(SimpleTestCase):
     def test_suma_dominios(self):
@@ -181,3 +195,42 @@ class PuntajeCeroContextoTests(SimpleTestCase):
         )
         html = tpl.render(Context({"score_banner_valor": 0}))
         self.assertIn("<p>0</p>", html)
+
+
+class AQDAnosognosiaPrintTests(SimpleTestCase):
+    """D-17: el bloque delta AQD debe renderizarse en impresión (print_mode)."""
+
+    def test_resultado_generico_print_muestra_delta_aqd(self):
+        from django.template.loader import render_to_string
+
+        html = render_to_string(
+            "examenes_resultados/resultado_generico.html",
+            {
+                "print_mode": True,
+                "parent_template": "pdf/layouts/base_ver_embed.html",
+                "visita_examen": type(
+                    "VE",
+                    (),
+                    {
+                        "examen": type("E", (), {"nombre": "AQD Cuidador"})(),
+                        "fecha_completado": None,
+                    },
+                )(),
+                "paciente": "Paciente Test",
+                "codigo_proyecto": "P-1",
+                "datos_resultado": {"Ítem demo": "2"},
+                "secciones": None,
+                "score_banner_valor": None,
+                "aqd_anosognosia": {
+                    "delta": 12,
+                    "total_cuidador": 20,
+                    "total_participante": 8,
+                    "interpretacion": "SIN CONCIENCIA DE ENFERMEDAD",
+                },
+            },
+        )
+        self.assertIn("hc-aqd-anosognosia", html)
+        self.assertIn("SIN CONCIENCIA DE ENFERMEDAD", html)
+        self.assertIn("Delta:", html)
+        self.assertIn("20", html)
+        self.assertIn("8", html)
