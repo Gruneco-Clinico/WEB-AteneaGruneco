@@ -115,12 +115,22 @@ class BerlinScoringTests(SimpleTestCase):
 
 class AQDAnosognosiaTests(SimpleTestCase):
     def test_delta_umbral(self):
-        con = interpretar_aqd_anosognosia(20, 8)
-        self.assertEqual(con["delta"], 12)
-        self.assertIn("Con Anosognosia", con["interpretacion"])
-        sin = interpretar_aqd_anosognosia(15, 8)
-        self.assertEqual(sin["delta"], 7)
-        self.assertIn("Sin Anosognosia", sin["interpretacion"])
+        sin_conciencia = interpretar_aqd_anosognosia(20, 8)
+        self.assertEqual(sin_conciencia["delta"], 12)
+        self.assertEqual(
+            sin_conciencia["interpretacion"], "SIN CONCIENCIA DE ENFERMEDAD"
+        )
+        con_conciencia = interpretar_aqd_anosognosia(15, 8)
+        self.assertEqual(con_conciencia["delta"], 7)
+        self.assertEqual(
+            con_conciencia["interpretacion"], "CON CONCIENCIA DE ENFERMEDAD"
+        )
+
+    def test_delta_negativo_es_con_conciencia(self):
+        """Carlos: el delta puede ser negativo; sigue siendo CON CONCIENCIA."""
+        out = interpretar_aqd_anosognosia(5, 18)
+        self.assertEqual(out["delta"], -13)
+        self.assertEqual(out["interpretacion"], "CON CONCIENCIA DE ENFERMEDAD")
 
 
 class YesavageScoringTests(SimpleTestCase):

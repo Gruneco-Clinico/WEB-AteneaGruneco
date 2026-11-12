@@ -89,15 +89,33 @@
   {% endif %}
 
   {% if aqd_anosognosia %}
+  {% if print_mode %}
+  <div class="hc-aqd-anosognosia">
+    <h6>Conciencia de enfermedad (AQD acompañante − participante)</h6>
+    <p><span class="campo-label">Puntaje acompañante:</span> {{ aqd_anosognosia.total_cuidador }}
+      &nbsp;|&nbsp; <span class="campo-label">Puntaje participante:</span> {{ aqd_anosognosia.total_participante }}
+    </p>
+    <p><span class="campo-label">Delta:</span> {{ aqd_anosognosia.delta }}
+      (acompañante − participante)
+    </p>
+    <p class="hc-fila-total">{{ aqd_anosognosia.interpretacion }}</p>
+  </div>
+  {% else %}
   <div class="card shadow-sm mb-3 border-left-info hc-aqd-anosognosia">
     <div class="card-body">
-      <h6 class="text-uppercase text-muted mb-1">Anosognosia (AQD cuidador − participante)</h6>
+      <h6 class="text-uppercase text-muted mb-1">Conciencia de enfermedad (AQD acompañante − participante)</h6>
+      <p class="mb-1">
+        <strong>Acompañante:</strong> {{ aqd_anosognosia.total_cuidador }}
+        &nbsp;·&nbsp;
+        <strong>Participante:</strong> {{ aqd_anosognosia.total_participante }}
+      </p>
       <p class="mb-1"><strong>Delta:</strong> {{ aqd_anosognosia.delta }}
-        <span class="text-muted">(cuidador {{ aqd_anosognosia.total_cuidador }} − participante {{ aqd_anosognosia.total_participante }})</span>
+        <span class="text-muted">(acompañante − participante)</span>
       </p>
       <p class="mb-0 font-weight-bold">{{ aqd_anosognosia.interpretacion }}</p>
     </div>
   </div>
+  {% endif %}
   {% endif %}
 
   <!-- Sección de resultados -->

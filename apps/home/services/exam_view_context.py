@@ -365,18 +365,29 @@ def _resolver_scores_vista(resultado):
     return out
 
 
-def _resolver_aqd_anosognosia(visita_examen, resultado):
-    """Si la visita tiene ambos AQD, calcula delta de anosognosia (D-17)."""
-    model_name = type(resultado).__name__
-    if model_name not in ("AQDCuidadorResult", "AQDParticipanteResult"):
+def _aqd_total_efectivo(resultado):
+    """Preferir recálculo en vivo (ítems) sobre el entero persistido."""
+    if resultado is None:
         return None
+    if hasattr(resultado, "calcular_puntaje_total"):
+        try:
+            return resultado.calcular_puntaje_total()
+        except Exception:
+            pass
+    return getattr(resultado, "puntaje_total", None)
+
+
+def resolver_aqd_anosognosia_visita(visita):
+    """Si la visita tiene ambos AQD, calcula delta de anosognosia (D-17).
+
+    Usado por vista/PDF y por exportación CSV.
+    """
     try:
         from apps.home.models import AQDCuidadorResult, AQDParticipanteResult
         from apps.home.services.exam_scoring import interpretar_aqd_anosognosia
     except Exception:
         return None
 
-    visita = visita_examen.visita
     cuid = (
         AQDCuidadorResult.objects.filter(visita_examen__visita=visita)
         .order_by("-id")
@@ -389,7 +400,17 @@ def _resolver_aqd_anosognosia(visita_examen, resultado):
     )
     if not cuid or not part:
         return None
-    return interpretar_aqd_anosognosia(cuid.puntaje_total, part.puntaje_total)
+    return interpretar_aqd_anosognosia(
+        _aqd_total_efectivo(cuid), _aqd_total_efectivo(part)
+    )
+
+
+def _resolver_aqd_anosognosia(visita_examen, resultado):
+    """Si el resultado es AQD y la visita tiene ambos, calcula el delta."""
+    model_name = type(resultado).__name__
+    if model_name not in ("AQDCuidadorResult", "AQDParticipanteResult"):
+        return None
+    return resolver_aqd_anosognosia_visita(visita_examen.visita)
 
 def _campos_ocultos_resultado(resultado):
     model_name = type(resultado).__name__

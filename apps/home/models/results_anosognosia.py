@@ -1,6 +1,21 @@
+import re
+
 from django.db import models
 
 from .visit import ResultadoExamenBase
+
+
+def _parse_aqd_item_score(raw):
+    """Extrae el entero 1–4 de valores como ``2``, ``2.`` o ``2. A veces``."""
+    if raw in (None, ""):
+        return None
+    match = re.match(r"^\s*(\d+)", str(raw))
+    if not match:
+        return None
+    try:
+        return int(match.group(1))
+    except (TypeError, ValueError):
+        return None
 
 
 ### Anosognosia
@@ -591,13 +606,9 @@ class AQDCuidadorResult(ResultadoExamenBase):
     def calcular_puntaje_total(self):
         total = 0
         for name in self._AQD_ITEM_FIELDS:
-            raw = getattr(self, name, None)
-            if raw in (None, ""):
-                continue
-            try:
-                total += int(str(raw).strip().split()[0])
-            except (TypeError, ValueError):
-                continue
+            pts = _parse_aqd_item_score(getattr(self, name, None))
+            if pts is not None:
+                total += pts
         return total
 
     def save(self, *args, **kwargs):
@@ -654,13 +665,9 @@ class AQDParticipanteResult(ResultadoExamenBase):
     def calcular_puntaje_total(self):
         total = 0
         for name in self._AQD_ITEM_FIELDS:
-            raw = getattr(self, name, None)
-            if raw in (None, ""):
-                continue
-            try:
-                total += int(str(raw).strip().split()[0])
-            except (TypeError, ValueError):
-                continue
+            pts = _parse_aqd_item_score(getattr(self, name, None))
+            if pts is not None:
+                total += pts
         return total
 
     def save(self, *args, **kwargs):

@@ -203,14 +203,18 @@ def score_berlin(data: Mapping[str, Any]) -> Dict[str, Any]:
 def interpretar_aqd_anosognosia(
     total_cuidador: Any, total_participante: Any
 ) -> Dict[str, Any]:
-    """delta = cuidador − participante; ≥10 Con Anosognosia."""
+    """delta = acompañante/cuidador − participante (puede ser negativo).
+
+    ≥10 → SIN CONCIENCIA DE ENFERMEDAD
+    <10 → CON CONCIENCIA DE ENFERMEDAD
+    """
     c = _int(total_cuidador)
     p = _int(total_participante)
     delta = c - p
     if delta >= 10:
-        texto = "Sin conciencia (Con Anosognosia)"
+        texto = "SIN CONCIENCIA DE ENFERMEDAD"
     else:
-        texto = "Con conciencia (Sin Anosognosia)"
+        texto = "CON CONCIENCIA DE ENFERMEDAD"
     return {
         "delta": delta,
         "total_cuidador": c,
