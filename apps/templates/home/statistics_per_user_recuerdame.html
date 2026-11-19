@@ -1,9 +1,7 @@
 {% extends 'layouts/base.html' %}
 {% load static %}
-{% load custom_filters %}
 
 {% block content %}
-<!-- Header -->
 <div class="header bg-primary pb-6">
   <div class="container-fluid">
     <div class="header-body">
@@ -15,320 +13,123 @@
               <li class="breadcrumb-item"><a href="#"><i class="fas fa-home"></i></a></li>
               <li class="breadcrumb-item"><a href="#">Atenea</a></li>
               <li class="breadcrumb-item active" aria-current="page">
-                Estadísticas por usuario - RecuérdaMe
+                Biomarcadores por usuario - RecuérdaMe
               </li>
             </ol>
           </nav>
+        </div>
+        <div class="col-lg-6 col-5 text-right">
+          <div class="btn-group" role="group" aria-label="Rango de días">
+            {% for r in rangos %}
+              <a href="?dias={{ r }}"
+                 class="btn btn-sm {% if r == dias %}btn-primary border-white{% else %}btn-neutral{% endif %}">
+                {{ r }} días
+              </a>
+            {% endfor %}
+          </div>
         </div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Page content -->
 <div class="container-fluid mt--6">
-  <div class="row">
+  {% if error %}
+    <div class="alert alert-warning">
+      <i class="fas fa-exclamation-triangle"></i> {{ error }}
+    </div>
+  {% elif not usuario %}
+    <div class="alert alert-info">
+      No hay actividad registrada para <strong>{{ email }}</strong> en los últimos {{ dias }} días
+      ({{ date_from }} a {{ date_to }}).
+    </div>
+  {% endif %}
 
-    <!-- Tabla resumen de sesiones -->
-    <div class="col-12">
-      <div class="card mb-4 shadow">
+  {% if usuario %}
+  <div class="row">
+    <div class="col-xl-5">
+      <div class="card shadow">
         <div class="card-header d-flex align-items-center">
-          <a href="https://recuerdame.gna.org.co/" target="_blank">
-              <img src="{% static 'assets/img/theme/RecuerdaMe.png' %}" 
-                  alt="Logo" 
-                  style="height: 40px;" 
-                  class="mr-2">
+          <a href="https://recuerdame.gna.org.co/" target="_blank" rel="noopener">
+            <img src="{% static 'assets/img/theme/RecuerdaMe.png' %}" alt="Logo" style="height: 40px;" class="mr-2">
           </a>
-          <h3 class="mb-0">Resumen de sesiones</h3>
+          <h3 class="mb-0">{{ usuario.nombre|default:usuario.email }}</h3>
         </div>
         <div class="table-responsive">
           <table class="table align-items-center table-flush">
-            <thead class="thead-light">
-              <tr>
-                <th>Email</th>
-                <th>Ingresados</th>
-                <th>Convertidos</th>
-                <th>Dropped</th>
-                <th>Conversión (%)</th>
-                <th>Tiempo Promedio</th>
-                <th>Tiempo Mediano</th>
-              </tr>
-            </thead>
-            <tbody id="session-table">
-              {% for row in session_rows %}
-                <tr>
-                  <td>{{ row.email }}</td>
-                  <td>{{ row.entered }}</td>
-                  <td>{{ row.converted }}</td>
-                  <td>{{ row.dropped_off }}</td>
-                  <td>{{ row.conversion_rate }}%</td>
-                  <td>{{ row.avg_time }}</td>
-                  <td>{{ row.median_time }}</td>
-                </tr>
-              {% empty %}
-                <tr><td colspan="7">No hay datos</td></tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-    
-    <!-- Columna izquierda -->
-    <div class="col-xl-7">
-      
-      <!-- Vistas por página -->
-      <div class="card mb-4 shadow">
-        <div class="card-header d-flex align-items-center">
-          <a href="https://recuerdame.gna.org.co/" target="_blank">
-              <img src="{% static 'assets/img/theme/RecuerdaMe.png' %}" 
-                  alt="Logo" 
-                  style="height: 40px;" 
-                  class="mr-2">
-          </a>
-          <h3 class="mb-0">Vistas por página</h3>
-        </div>
-        <div class="card-body">
-          <canvas id="viewsPerPageChart" width="500" height="300"></canvas>
-        </div>
-      </div>
-
-      <!-- DAU por usuario -->
-      <div class="card mb-4 shadow">
-        <div class="card-header d-flex align-items-center">
-          <a href="https://recuerdame.gna.org.co/" target="_blank">
-              <img src="{% static 'assets/img/theme/RecuerdaMe.png' %}" 
-                  alt="Logo" 
-                  style="height: 40px;" 
-                  class="mr-2">
-          </a>
-          <h3 class="mb-0">Frecuencia de uso ({{ email }})</h3>
-        </div>
-        <div class="card-body">
-          <canvas id="dauUserChart" width="300" height="100"></canvas>
-        </div>
-      </div>
-    </div>
-
-
-
-    <!-- Columna derecha -->
-    <div class="col-xl-5">
-
-      <!-- Tabla de ingresos -->
-      <div class="card mb-4 shadow">
-        <div class="card-header d-flex align-items-center">
-          <a href="https://recuerdame.gna.org.co/" target="_blank">
-            <img src="{% static 'assets/img/theme/RecuerdaMe.png' %}" 
-                alt="Logo" 
-                style="height: 40px;" 
-                class="mr-2">
-          </a>
-          <h3 class="mb-0">Ingresos</h3>
-        </div>
-        <div class="table-responsive">
-          <table class="table align-items-center table-flush text-center">
-            <thead class="thead-light">
-              <tr>
-                <th scope="col">Email</th>
-                <th scope="col">Cantidad de Ingresos</th>
-              </tr>
-            </thead>
-            <tbody id="user-login-table"></tbody>
-          </table>
-        </div>
-      </div>
-
-      <div class="card mb-4 shadow">
-        <div class="card-header d-flex align-items-center">
-          <a href="https://recuerdame.gna.org.co/" target="_blank">
-            <img src="{% static 'assets/img/theme/RecuerdaMe.png' %}" 
-                alt="Logo" style="height: 40px;" class="mr-2">
-          </a>
-          <h3 class="mb-0">Actividad global</h3>
-        </div>
-        <div class="table-responsive">
-          <table class="table align-items-center table-flush text-center">
-            <thead class="thead-light">
-              <tr>
-                <th>Email</th>
-                <th>Número de eventos</th>
-              </tr>
-            </thead>
             <tbody>
-              {% for row in autocapture_rows %}
-                <tr>
-                  <td>{{ row.email }}</td>
-                  <td>{{ row.count }}</td>
-                </tr>
-              {% empty %}
-                <tr><td colspan="2">No hay datos</td></tr>
-              {% endfor %}
+              <tr><th scope="row">Correo</th><td>{{ usuario.email|default:"–" }}</td></tr>
+              <tr><th scope="row">Rol aproximado</th><td>{{ usuario.rol }}</td></tr>
+              <tr><th scope="row">Adherencia</th>
+                  <td>{{ usuario.adherencia }}% ({{ usuario.dias_activos }} de {{ usuario.dias_ventana }} días)</td></tr>
+              <tr><th scope="row">Sesiones</th><td>{{ usuario.sesiones }}</td></tr>
+              <tr><th scope="row">Vistas de página</th><td>{{ usuario.pageviews }}</td></tr>
+              <tr><th scope="row">Duración media de sesión</th><td>{{ usuario.duracion }}</td></tr>
+              <tr><th scope="row">Interacciones por sesión</th>
+                  <td>{{ usuario.interacciones_por_sesion }}</td></tr>
+              <tr><th scope="row">Secciones distintas</th><td>{{ usuario.secciones_distintas }}</td></tr>
+              <tr><th scope="row">Rageclicks</th><td>{{ usuario.rageclicks }}</td></tr>
+              <tr><th scope="row">Dispositivo principal</th><td>{{ usuario.dispositivo }}</td></tr>
+              <tr><th scope="row">Primera actividad</th><td>{{ usuario.primera_actividad }}</td></tr>
+              <tr><th scope="row">Última actividad</th>
+                  <td>{{ usuario.ultima_actividad }}
+                    {% if usuario.dias_desde_ultima != None and usuario.dias_desde_ultima != "" %}
+                      (hace {{ usuario.dias_desde_ultima }} días)
+                    {% endif %}
+                  </td></tr>
             </tbody>
           </table>
         </div>
       </div>
+    </div>
 
-      
+    <div class="col-xl-7">
+      <div class="card shadow">
+        <div class="card-header"><h3 class="mb-0">Vistas por sección ({{ usuario.email }})</h3></div>
+        <div class="card-body">
+          <div style="position: relative; height: 320px;"><canvas id="vistasChart"></canvas></div>
+        </div>
+      </div>
     </div>
   </div>
+  {% endif %}
 
-  <!-- Botón volver -->
   <div class="d-flex justify-content-end mt-3">
-    <a href="{% url 'listado_usuarios_recuerdame' %}" class="btn btn-outline-info">
-        ← Volver
-    </a>
+    <a href="{% url 'listado_usuarios_recuerdame' %}" class="btn btn-outline-info">← Volver</a>
   </div>
 
   {% include "includes/footer.html" %}
 </div>
 {% endblock content %}
 
-
-
 {% block javascripts %}
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
- 
-
-<!-- Identify user -->
-{{ user_labels|json_script:"user-labels" }}
-{{ user_values|json_script:"user-values" }}
-
-<!-- Sesiones -->
-{{ session_rows|json_script:"session-rows" }}
-
-
-<!-- Vistas por página -->
-{{ views_matrix|json_script:"views-matrix" }}
-{{ views_labels_breakdown|json_script:"views-labels-breakdown" }}
-
-<!-- DAU -->
-{{ dau_user_labels|json_script:"dau-user-labels" }}
-{{ dau_user_values|json_script:"dau-user-values" }}
-
-
-
-<script id="session-raw" type="application/json">
-  {{ session_raw|safe }}
-</script>
-
+{% if usuario %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+{{ usuario.vistas_secciones|json_script:"bio-vistas" }}
 <script>
-
-// === Tabla Identify User ===
-const userLabels = JSON.parse(document.getElementById("user-labels").textContent);
-const userValues = JSON.parse(document.getElementById("user-values").textContent);
-
-const tbody = document.getElementById("user-login-table");
-
-userLabels.forEach((email, i) => {
-  const count = userValues[i];
-
-  const row = document.createElement("tr");
-  row.innerHTML = `
-    <th scope="row">${email}</th>
-    <td>${count}</td>
-  `;
-  tbody.appendChild(row);
-});
-
-// === Tabla Sesiones ===
-const sessionRows = JSON.parse(document.getElementById("session-rows").textContent);
-
-const tbodySessions = document.getElementById("session-table");
-tbodySessions.innerHTML = ""; // limpiar antes
-
-sessionRows.forEach(row => {
-  const tr = document.createElement("tr");
-  tr.innerHTML = `
-    <th scope="row">${row.email}</th>
-    <td class="text-center">${row.entered}</td>
-    <td class="text-center">${row.converted}</td>
-    <td class="text-center">${row.dropped_off}</td>
-    <td class="text-center">
-      <span class="badge badge-success">
-        ${row.conversion_rate}%
-      </span>
-    </td>
-    <td class="text-center">${row.avg_time || "–"}</td>
-    <td class="text-center">${row.median_time || "–"}</td>
-  `;
-  tbodySessions.appendChild(tr);
-});
-
-
-// === DAU ===
-
-const dauUserLabels = JSON.parse(document.getElementById("dau-user-labels").textContent);
-const dauUserValues = JSON.parse(document.getElementById("dau-user-values").textContent);
-
-new Chart(document.getElementById("dauUserChart"), {
-  type: "line",
-  data: {
-    labels: dauUserLabels,
-    datasets: [{
-      label: "DAU ({{ email }})",
-      data: dauUserValues,
-      borderColor: "green",
-      backgroundColor: "rgba(0, 128, 0, 0.1)",
-      fill: true,
-      tension: 0.3
-    }]
-  },
-  options: {
-    responsive: true,
-    plugins: {
-      legend: { display: true },
-    },
-    scales: {
-      y: { beginAtZero: true }
-    }
-  }
-});
-
-// === Vistas por usuario y página ===
-const viewsMatrix = JSON.parse(document.getElementById("views-matrix").textContent);
-const viewsLabels = JSON.parse(document.getElementById("views-labels-breakdown").textContent);
-
-const ctxViews = document.getElementById("viewsPerPageChart").getContext("2d");
-
-// Tomar siempre el primer usuario (porque tu view está por email)
-const userRow = viewsMatrix[0];
-
-// Extraer valores en el mismo orden de labels
-const userViewsData = viewsLabels.map(label => userRow[label] || 0);
-
-new Chart(ctxViews, {
-  type: "bar",
-  data: {
-    labels: viewsLabels,
-    datasets: [{
-      label: `Vistas de ${userRow.email}`,
-      data: userViewsData,
-      backgroundColor: "rgba(54, 162, 235, 0.6)",
-      borderColor: "rgba(54, 162, 235, 1)",
-      borderWidth: 1
-    }]
-  },
-  options: {
-    indexAxis: "y", // barras horizontales, si prefieres vertical quítalo
-    responsive: true,
-    plugins: {
-      legend: { display: false },
-      datalabels: {
-        anchor: "end",
-        align: "right",
-        formatter: value => value > 0 ? value : ""
-      }
-    },
-    scales: {
-      x: { beginAtZero: true }
-    }
-  }
-});
-
-
+  (function () {
+    const vistas = JSON.parse(document.getElementById("bio-vistas").textContent);
+    new Chart(document.getElementById("vistasChart"), {
+      type: "bar",
+      data: {
+        labels: vistas.map((v) => v.etiqueta),
+        datasets: [{
+          label: "Vistas",
+          data: vistas.map((v) => v.vistas),
+          backgroundColor: "rgba(54, 162, 235, 0.6)",
+          borderColor: "rgba(54, 162, 235, 1)",
+          borderWidth: 1,
+        }],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        indexAxis: "y",
+        plugins: { legend: { display: false } },
+        scales: { x: { beginAtZero: true, ticks: { precision: 0 } } },
+      },
+    });
+  })();
 </script>
-
+{% endif %}
 {% endblock javascripts %}

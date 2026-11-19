@@ -170,6 +170,12 @@ POSTHOG_PAGES_VIEWS_PER_USER = config("POSTHOG_PAGES_VIEWS_PER_USER", default=""
 POSTHOG_DAU_PER_USER_ID = config("POSTHOG_DAU_PER_USER_ID", default="")
 POSTHOG_AUTOCAPTURE_PER_USER_ID = config("POSTHOG_AUTOCAPTURE_PER_USER_ID", default="")
 
+# Endpoint de actividad autenticada en RecuérdaMe (users + login_logs + sessionGame)
+RECUERDAME_API_URL = config(
+    "RECUERDAME_API_URL", default="https://recuerdame.gna.org.co"
+)
+RECUERDAME_ATENEA_API_KEY = config("RECUERDAME_ATENEA_API_KEY", default="")
+
 
 # Configuración del correo electrónico usando Gmail SMTP
 
