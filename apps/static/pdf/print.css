@@ -398,6 +398,35 @@ body {
   font-weight: bold;
 }
 
+/* D-17: delta AQD (cuidador − participante) visible en PDF */
+.examen-ver-embed .hc-examen-tabla .hc-aqd-anosognosia {
+  border: 1px solid #026937;
+  margin: 0 0 10px 0;
+  padding: 8px 12px;
+  background: #f0f7f3;
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+.examen-ver-embed .hc-examen-tabla .hc-aqd-anosognosia h6 {
+  font-size: 7.5pt;
+  text-transform: uppercase;
+  color: #026937;
+  margin: 0 0 4px 0;
+  letter-spacing: 0.04em;
+}
+
+.examen-ver-embed .hc-examen-tabla .hc-aqd-anosognosia p {
+  margin: 2px 0;
+  font-size: 9pt;
+  color: #000;
+}
+
+.examen-ver-embed .hc-examen-tabla .hc-aqd-anosognosia .hc-fila-total {
+  font-weight: bold;
+  color: #026937;
+}
+
 .examen-ver-embed .hc-examen-tabla .hc-tabla-resultados-card > .card-header.bg-light,
 .examen-ver-embed .hc-examen-tabla > .card .card-header.bg-light {
   display: none;

@@ -20,9 +20,11 @@
   {% if score_banner_detalle %}<p class="text-muted">{{ score_banner_detalle }}</p>{% endif %}
   {% endif %}
   {% if aqd_anosognosia %}
-  <p><span class="campo-label">Anosognosia (Δ AQD):</span> {{ aqd_anosognosia.delta }}
+  <p><span class="campo-label">AQD acompañante:</span> {{ aqd_anosognosia.total_cuidador }}
+    &nbsp;|&nbsp; <span class="campo-label">AQD participante:</span> {{ aqd_anosognosia.total_participante }}
+  </p>
+  <p><span class="campo-label">Delta AQD (acompañante − participante):</span> {{ aqd_anosognosia.delta }}
     — {{ aqd_anosognosia.interpretacion }}
-    <span class="text-muted">(cuidador {{ aqd_anosognosia.total_cuidador }} − participante {{ aqd_anosognosia.total_participante }})</span>
   </p>
   {% endif %}
 </div>

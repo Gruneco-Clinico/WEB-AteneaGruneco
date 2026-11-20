@@ -37,8 +37,22 @@ _SUMMARY_ATTRS = frozenset(
         "puntaje_viajes",
         "puntaje_comunicacion",
         "puntaje_tecnologia",
+        "aqd_total_acompanante",
+        "aqd_total_participante",
+        "aqd_delta",
+        "aqd_interpretacion",
     }
 )
+
+# Etiquetas legibles para campos virtuales (no existen en el modelo).
+_VIRTUAL_SUMMARY_LABELS = {
+    "aqd_total_acompanante": "Puntaje total AQD acompañante",
+    "aqd_total_participante": "Puntaje total AQD participante",
+    "aqd_delta": "Delta AQD (acompañante − participante)",
+    "aqd_interpretacion": "Conciencia de enfermedad AQD",
+}
+
+_AQD_VIRTUAL_ATTRS = frozenset(_VIRTUAL_SUMMARY_LABELS.keys())
 
 _TECHNICAL_FIELDS = frozenset(
     {
@@ -172,7 +186,9 @@ def get_legacy_export_fields(examen) -> List[ExportField]:
             0,
             ExportField(
                 key=f"summary:{name}",
-                label=name.replace("_", " ").title(),
+                label=_VIRTUAL_SUMMARY_LABELS.get(
+                    name, name.replace("_", " ").title()
+                ),
                 group="summary",
                 source="legacy",
                 attr=name,
@@ -367,6 +383,14 @@ def serialize_table_json(rows: List[dict]) -> str:
 
 def _legacy_attr_value(resultado, attr: str) -> Any:
     if attr == "puntaje_total":
+        # AQD: recalcular desde ítems para no exportar totales viejos/null.
+        model_name = type(resultado).__name__
+        if model_name in ("AQDCuidadorResult", "AQDParticipanteResult"):
+            if hasattr(resultado, "calcular_puntaje_total"):
+                try:
+                    return resultado.calcular_puntaje_total()
+                except Exception:
+                    pass
         valor = getattr(resultado, "puntaje_total", None)
         if valor is None:
             valor = getattr(resultado, "puntuacion_total", None)
@@ -386,6 +410,23 @@ def _legacy_attr_value(resultado, attr: str) -> Any:
         except Exception:
             pass
     return getattr(resultado, attr, None)
+
+
+def _extract_aqd_virtual(visita_examen, attr: str) -> Any:
+    """Totales cruzados / delta / interpretación AQD (misma visita)."""
+    from apps.home.services.exam_view_context import resolver_aqd_anosognosia_visita
+
+    data = resolver_aqd_anosognosia_visita(visita_examen.visita)
+    if not data:
+        return None
+    mapping = {
+        "aqd_total_acompanante": "total_cuidador",
+        "aqd_total_participante": "total_participante",
+        "aqd_delta": "delta",
+        "aqd_interpretacion": "interpretacion",
+    }
+    key = mapping.get(attr)
+    return data.get(key) if key else None
 
 
 def _serialize_related_table(resultado, related_name: str, columns: Sequence[str]) -> str:
@@ -461,6 +502,10 @@ def extract_exam_value(visita_examen, field_spec: ExportField) -> str:
     """Extrae y serializa un valor de un VisitaExamen según el ExportField."""
     try:
         if field_spec.source == "legacy":
+            if field_spec.attr in _AQD_VIRTUAL_ATTRS:
+                return serialize_csv_value(
+                    _extract_aqd_virtual(visita_examen, field_spec.attr)
+                )
             resultado = visita_examen.get_resultado_instance()
             if resultado is None:
                 return ""

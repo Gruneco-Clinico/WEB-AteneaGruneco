@@ -390,6 +390,16 @@ urlpatterns = [
     ),
     # INTEGRACIÓN RECUÉRDAME
     path("estadisticas/", views.estadisticas, name="estadisticas"),
+    path(
+        "estadisticas/biomarcadores.csv",
+        views.estadisticas_biomarcadores_csv,
+        name="estadisticas_biomarcadores_csv",
+    ),
+    path(
+        "estadisticas/anosognosia-cruce.csv",
+        views.estadisticas_anosognosia_cruce_csv,
+        name="estadisticas_anosognosia_cruce_csv",
+    ),
     # path("estadisticas_por_usuario/",
     #      views.estadisticas_por_usuario,
     #      name="estadisticas_por_usuario"),

@@ -18,7 +18,7 @@ from apps.home.models import Examen, SerieVisitas, TipoVisita, Visita, VisitaExa
 from apps.home.models.patient import DatosDemograficos
 
 MAX_FECHAS_SERIE = 24
-TIPOS_FRECUENCIA = frozenset({"diario", "semanal", "lv", "custom"})
+TIPOS_FRECUENCIA = frozenset({"diario", "semanal", "lv", "custom", "fechas"})
 DIAS_LV = [0, 1, 2, 3, 4]  # lun–vie (Python weekday)
 
 
@@ -96,6 +96,16 @@ def generar_fechas(
     return fechas
 
 
+def _normalizar_fechas_manuales(fechas: Optional[Iterable[date]]) -> List[date]:
+    """Deduplica y ordena fechas elegidas a mano; exige entre 1 y MAX_FECHAS_SERIE."""
+    limpias = sorted(set(fechas or []))
+    if not limpias:
+        raise ValidationError("Seleccione al menos una fecha.")
+    if len(limpias) > MAX_FECHAS_SERIE:
+        raise ValidationError(f"Máximo {MAX_FECHAS_SERIE} fechas por plan.")
+    return limpias
+
+
 def _normalize_examen_ids(examen_ids: Optional[Iterable]) -> List[int]:
     if not examen_ids:
         return []
@@ -129,9 +139,10 @@ def crear_serie(
     *,
     paciente: DatosDemograficos,
     tipo_visita: TipoVisita,
-    fecha_inicio: date,
-    fecha_fin: date,
     frecuencia_unidad: str,
+    fecha_inicio: Optional[date] = None,
+    fecha_fin: Optional[date] = None,
+    fechas: Optional[Sequence[date]] = None,
     dias_semana: Optional[Sequence] = None,
     evaluador: Optional[User] = None,
     examen_ids: Optional[Sequence] = None,
@@ -139,6 +150,10 @@ def crear_serie(
 ) -> Tuple[SerieVisitas, List[Visita], int]:
     """
     Crea la serie y visitas ``programada`` sin VisitaExamen.
+
+    Con ``frecuencia_unidad="fechas"`` usa la lista ``fechas`` tal cual
+    (deduplicada y ordenada) y el rango de la serie queda en su mínima y
+    máxima; en los demás presets se generan desde ``fecha_inicio``/``fecha_fin``.
 
     Omite fechas donde ya exista una Visita del mismo paciente+tipo+fecha.
 
@@ -150,9 +165,15 @@ def crear_serie(
             "El paciente no pertenece al proyecto del tipo de visita seleccionado."
         )
 
-    fechas = generar_fechas(
-        fecha_inicio, fecha_fin, frecuencia_unidad, dias_semana=dias_semana
-    )
+    if frecuencia_unidad == "fechas":
+        fechas = _normalizar_fechas_manuales(fechas)
+        fecha_inicio, fecha_fin = fechas[0], fechas[-1]
+    else:
+        if fecha_inicio is None or fecha_fin is None:
+            raise ValidationError("Indique la fecha de inicio y la fecha de fin del plan.")
+        fechas = generar_fechas(
+            fecha_inicio, fecha_fin, frecuencia_unidad, dias_semana=dias_semana
+        )
     dias_persist = _dias_a_persistir(frecuencia_unidad, dias_semana)
 
     clean_ids = _normalize_examen_ids(examen_ids)

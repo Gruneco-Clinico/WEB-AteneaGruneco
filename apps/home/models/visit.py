@@ -15,6 +15,7 @@ class SerieVisitas(models.Model):
         ("semanal", "Semanal"),
         ("lv", "Lunes a viernes"),
         ("custom", "Personalizado"),
+        ("fechas", "Fechas específicas"),
     ]
 
     DIAS_SEMANA_LABELS = {
@@ -114,6 +115,8 @@ class SerieVisitas(models.Model):
                 if label:
                     labels.append(label)
             return ", ".join(labels) if labels else "Personalizado"
+        if tipo == "fechas":
+            return "Fechas específicas"
         return self.get_frecuencia_unidad_display()
 
 

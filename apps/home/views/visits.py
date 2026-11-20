@@ -471,10 +471,18 @@ def crear_plan_visitas(request, paciente_id):
     frecuencia_unidad = request.POST.get("frecuencia_unidad", "semanal")
     dias_raw = request.POST.getlist("dias_semana") or []
 
+    fecha_inicio = fecha_fin = None
+    fechas = None
     try:
         tipo_visita = get_object_or_404(TipoVisita, id=tipo_visita_id)
-        fecha_inicio = datetime.strptime(fecha_inicio_raw, "%Y-%m-%d").date()
-        fecha_fin = datetime.strptime(fecha_fin_raw, "%Y-%m-%d").date()
+        if frecuencia_unidad == "fechas":
+            fechas = [
+                datetime.strptime(raw, "%Y-%m-%d").date()
+                for raw in request.POST.getlist("fechas")
+            ]
+        else:
+            fecha_inicio = datetime.strptime(fecha_inicio_raw, "%Y-%m-%d").date()
+            fecha_fin = datetime.strptime(fecha_fin_raw, "%Y-%m-%d").date()
     except (TypeError, ValueError):
         messages.error(request, "Datos del plan inválidos. Revise fechas y frecuencia.")
         return redirect("detalle_paciente", paciente_id=paciente_id)
@@ -500,6 +508,7 @@ def crear_plan_visitas(request, paciente_id):
             tipo_visita=tipo_visita,
             fecha_inicio=fecha_inicio,
             fecha_fin=fecha_fin,
+            fechas=fechas,
             frecuencia_unidad=frecuencia_unidad,
             dias_semana=dias_semana,
             evaluador=request.user,

@@ -47,9 +47,16 @@ class CatalogLegacyTests(SimpleTestCase):
         fields = get_legacy_export_fields(exam)
         keys = {f.key for f in fields}
         self.assertIn("summary:puntaje_total", keys)
+        self.assertIn("summary:aqd_total_acompanante", keys)
+        self.assertIn("summary:aqd_total_participante", keys)
+        self.assertIn("summary:aqd_delta", keys)
+        self.assertIn("summary:aqd_interpretacion", keys)
         self.assertTrue(any(f.group == "item" for f in fields))
         total = next(f for f in fields if f.key == "summary:puntaje_total")
         self.assertTrue(total.default_selected)
+        delta = next(f for f in fields if f.key == "summary:aqd_delta")
+        self.assertIn("acompañante", delta.label)
+        self.assertTrue(delta.default_selected)
 
     def test_cdr_summary_fields(self):
         exam = Examen(id=35, nombre="CDR")
@@ -200,6 +207,42 @@ class ExtractLegacyTests(SimpleTestCase):
         ve.get_resultado_instance.return_value = resultado
         spec = ExportField("item:firmar", "Firmar", "item", "legacy", "firmar")
         self.assertEqual(extract_exam_value(ve, spec), "1")
+
+    def test_aqd_delta_e_interpretacion_en_export(self):
+        ve = MagicMock()
+        ve.visita = MagicMock()
+        with patch(
+            "apps.home.services.exam_view_context.resolver_aqd_anosognosia_visita",
+            return_value={
+                "delta": 12,
+                "total_cuidador": 20,
+                "total_participante": 8,
+                "interpretacion": "SIN CONCIENCIA DE ENFERMEDAD",
+            },
+        ):
+            specs = {
+                "aqd_total_acompanante": "20",
+                "aqd_total_participante": "8",
+                "aqd_delta": "12",
+                "aqd_interpretacion": "SIN CONCIENCIA DE ENFERMEDAD",
+            }
+            for attr, expected in specs.items():
+                field = ExportField(
+                    f"summary:{attr}", attr, "summary", "legacy", attr
+                )
+                self.assertEqual(extract_exam_value(ve, field), expected, attr)
+
+    def test_aqd_delta_vacio_si_faltan_ambos(self):
+        ve = MagicMock()
+        ve.visita = MagicMock()
+        with patch(
+            "apps.home.services.exam_view_context.resolver_aqd_anosognosia_visita",
+            return_value=None,
+        ):
+            spec = ExportField(
+                "summary:aqd_delta", "Delta", "summary", "legacy", "aqd_delta"
+            )
+            self.assertEqual(extract_exam_value(ve, spec), "")
 
     def test_cdr_suma_cajas_en_vivo(self):
         resultado = PuntajeCDRResult(

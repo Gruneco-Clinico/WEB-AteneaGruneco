@@ -15,6 +15,8 @@ from django.db.models import Max, Count, Q, Avg, F
 from datetime import datetime, timedelta
 from ..models import *
 from ..forms import ProyectoForm, RegistroDemograficoForm
+from ..services import recuerdame_analytics, recuerdame_anosognosia_cruce
+import csv
 import json
 import requests
 import logging
@@ -365,206 +367,94 @@ def api_estadisticas_evaluadores(request):
 @login_required(login_url="/login/")
 @user_passes_test(is_superuser, login_url="/login/")
 def estadisticas(request):
-    url_query = (
-        f"{settings.POSTHOG_API_URL}/api/projects/{settings.POSTHOG_PROJECT_ID}/query/"
+    """Dashboard de biomarcadores digitales de RecuérdaMe (endpoint de cohorte)."""
+    dias = recuerdame_analytics.normalizar_dias(request.GET.get("dias"))
+    date_from, date_to = recuerdame_analytics.rango_fechas(dias)
+
+    cohorte = None
+    error = None
+    try:
+        cohorte = recuerdame_analytics.obtener_cohorte(date_from, date_to)
+    except recuerdame_analytics.RecuerdameAnalyticsError as exc:
+        error = str(exc)
+
+    cruce = None
+    try:
+        cruce = recuerdame_anosognosia_cruce.construir_cruce()
+    except Exception:
+        logger.exception("Error al construir el cruce Anosognosia × RecuérdaMe")
+        cruce = None
+
+    return render(
+        request,
+        "home/statistics_recuerdame.html",
+        {
+            "segment": "estadisticas",
+            "cohorte": cohorte,
+            "error": error,
+            "dias": dias,
+            "rangos": recuerdame_analytics.RANGOS_DIAS,
+            "date_from": date_from,
+            "date_to": date_to,
+            "cruce": cruce,
+        },
     )
-    headers = {
-        "Authorization": f"Bearer {settings.POSTHOG_PERSONAL_API_KEY}",
-        "Content-Type": "application/json",
-    }
+
+
+@login_required(login_url="/login/")
+@user_passes_test(is_superuser, login_url="/login/")
+def estadisticas_biomarcadores_csv(request):
+    """Descarga UN CSV con el biomarcador de todas las personas del periodo."""
+    dias = recuerdame_analytics.normalizar_dias(request.GET.get("dias"))
+    date_from, date_to = recuerdame_analytics.rango_fechas(dias)
 
     try:
-        # --------- 1. DAU (TrendsQuery) ---------
-        query_dau = {
-            "kind": "TrendsQuery",
-            "series": [
-                {
-                    "kind": "EventsNode",
-                    "event": "$pageview",
-                    "name": "$pageview",
-                    "math": "dau",
-                }
-            ],
-            "interval": "day",
-            "dateRange": {"date_from": "-30d", "explicitDate": False},
-        }
+        usuarios = recuerdame_analytics.obtener_usuarios(date_from, date_to)
+    except recuerdame_analytics.RecuerdameAnalyticsError as exc:
+        messages.error(request, str(exc))
+        return redirect("estadisticas")
 
-        r1 = requests.post(url_query, headers=headers, json={"query": query_dau}, timeout=10)
-        r1.raise_for_status()
-        data_dau = r1.json()
+    encabezados, filas = recuerdame_analytics.construir_tabla_csv(usuarios)
 
-        dau_labels, dau_values = [], []
-        results_dau = data_dau.get("results", [])
-        if results_dau:
-            dau_labels = results_dau[0].get("labels", [])
-            dau_values = results_dau[0].get("data", [])
+    response = HttpResponse(content_type="text/csv; charset=utf-8")
+    response["Content-Disposition"] = (
+        f'attachment; filename="Recuerdame_biomarcadores_{datetime.now().strftime("%Y%m%d")}.csv"'
+    )
+    response.write("\ufeff")
+    writer = csv.writer(response, delimiter=";")
+    writer.writerow(encabezados)
+    writer.writerows(filas)
+    return response
 
-        # --------- 2. Growth Accounting (LifecycleQuery) ---------
-        query_growth = {
-            "kind": "LifecycleQuery",
-            "series": [
-                {"event": "$pageview"}
-            ],  # puedes cambiar el evento si quieres otro
-            "dateRange": {"date_from": "-30d"},
-            "interval": "day",
-        }
 
-        r2 = requests.post(url_query, headers=headers, json={"query": query_growth}, timeout=10)
-        r2.raise_for_status()
-        data_growth = r2.json()
-
-        growth_labels, growth_datasets = [], []
-        results_growth = data_growth.get("results", [])
-        if results_growth:
-            # Todas las series comparten las mismas fechas
-            growth_labels = results_growth[0].get("days", [])
-            for serie in results_growth:
-                raw_label = serie.get("label", "")
-                clean_label = raw_label.split(" - ")[-1].capitalize()
-
-                # Dejamos los datos tal cual, incluso negativos
-                data = serie.get("data", [])
-
-                growth_datasets.append(
-                    {
-                        "label": clean_label,
-                        "data": data,
-                    }
-                )
-
-        # --------- 3. Device Type (Insight) ---------
-        device_labels, device_values = [], []
-
-        # 1. Obtener el insight ya configurado
-        url_insight = f"{settings.POSTHOG_API_URL}/api/projects/{settings.POSTHOG_PROJECT_ID}/insights/{settings.POSTHOG_DEVICE_TYPE_INSIGHT_ID}/"
-        r = requests.get(url_insight, headers=headers, timeout=10)
-        r.raise_for_status()
-        insight = r.json()
-
-        # 2. Ejecutar la query del insight
-        query = insight.get("query")
-        url_query = f"{settings.POSTHOG_API_URL}/api/projects/{settings.POSTHOG_PROJECT_ID}/query/"
-        r = requests.post(url_query, headers=headers, json={"query": query}, timeout=10)
-        r.raise_for_status()
-        data = r.json()
-
-        results = data.get("results") or data.get("result") or []
-
-        device_translation = {
-            "Desktop": "Computador",
-            "Mobile": "Celular",
-            "Tablet": "Tablet",
-        }
-
-        if results:
-            for serie in results:
-                # label / breakdown del dispositivo
-                device = (
-                    serie.get("breakdown_value")
-                    or serie.get("breakdown")
-                    or serie.get("label")
-                    or "Otro"
-                )
-                if isinstance(device, list):
-                    device = device[0] if device else "Otro"
-
-                # normalizar al español
-                device_name = device_translation.get(device, device)
-
-                # sacar valores → PostHog los devuelve en "data", "result" o "count"
-                total = None
-                if (
-                    "aggregated_value" in serie
-                    and serie["aggregated_value"] is not None
-                ):
-                    total = serie["aggregated_value"]
-                elif "count" in serie and serie["count"] is not None:
-                    total = serie["count"]
-                elif "data" in serie:
-                    total = sum(serie.get("data", []))
-                elif "result" in serie:
-                    vals = serie.get("result", [])
-                    if isinstance(vals, list):
-                        total = sum(v for v in vals if isinstance(v, (int, float)))
-
-                total = int(total or 0)
-
-                device_labels.append(device_name)
-                device_values.append(total)
-
-        # --------- 6. Conteo de vistas por página ---------
-
-        views_labels, views_values = [], []
-
-        # 1. Traer el insight
-        url_insight = f"{settings.POSTHOG_API_URL}/api/projects/{settings.POSTHOG_PROJECT_ID}/insights/{settings.POSTHOG_VIEWS_PER_PAGE}/"
-        r = requests.get(url_insight, headers=headers, timeout=10)
-        r.raise_for_status()
-        insight = r.json()
-
-        # 2. Ejecutar la query del insight
-        query = insight.get("query")
-        url_query = f"{settings.POSTHOG_API_URL}/api/projects/{settings.POSTHOG_PROJECT_ID}/query/"
-        r = requests.post(url_query, headers=headers, json={"query": query}, timeout=10)
-        r.raise_for_status()
-        data = r.json()
-
-        results = []
-
-        if isinstance(data, dict):
-            if "results" in data and isinstance(data["results"], list):
-                results = data["results"]
-            elif "result" in data and isinstance(data["result"], list):
-                results = data["result"]
-            elif "data" in data and isinstance(data["data"], list):
-                results = data["data"]
-        elif isinstance(data, list):
-            results = data
-
-        if results:
-            for idx, serie in enumerate(results):
-                # Nombre de la sección
-                section = serie.get("order")
-
-                # Total de vistas
-                total = None
-                if (
-                    "aggregated_value" in serie
-                    and serie["aggregated_value"] is not None
-                ):
-                    total = serie["aggregated_value"]
-
-                total = int(total or 0)
-
-                views_labels.append(section)
-                views_values.append(total)
-
-        # Construir dataset en formato Chart.js
-        views_dataset = [
-            {
-                "label": views_labels,
-                "data": views_values,
-            }
-        ]
-
-        # 5. Renderizar template
-        return render(
+@login_required(login_url="/login/")
+@user_passes_test(is_superuser, login_url="/login/")
+def estadisticas_anosognosia_cruce_csv(request):
+    """Un CSV con todas las sesiones Anosognosia (examen 56) enriquecidas con PostHog."""
+    try:
+        cruce = recuerdame_anosognosia_cruce.construir_cruce()
+    except Exception:
+        logger.exception("Error al exportar el cruce Anosognosia × RecuérdaMe")
+        messages.error(
             request,
-            "home/statistics_recuerdame.html",
-            {
-                "labels": dau_labels,
-                "values": dau_values,
-                "growth_labels": growth_labels,
-                "growth_datasets": growth_datasets,
-                "device_labels": device_labels,
-                "device_values": device_values,
-                "views_labels": views_labels,
-                "views_dataset": views_dataset,
-            },
+            "No fue posible generar el cruce Anosognosia × RecuérdaMe.",
         )
+        return redirect("estadisticas")
 
-    except requests.exceptions.RequestException as e:
-        return HttpResponseServerError(f"Error al obtener datos: {e}")
+    if cruce.get("error_posthog"):
+        messages.warning(request, cruce["error_posthog"])
+
+    encabezados, filas = recuerdame_anosognosia_cruce.construir_tabla_csv(cruce)
+    response = HttpResponse(content_type="text/csv; charset=utf-8")
+    response["Content-Disposition"] = (
+        'attachment; filename="Anosognosia_Recuerdame_cruce_'
+        f'{datetime.now().strftime("%Y%m%d")}.csv"'
+    )
+    response.write("\ufeff")
+    writer = csv.writer(response, delimiter=";")
+    writer.writerow(encabezados)
+    writer.writerows(filas)
+    return response
 
 
 @login_required(login_url="/login/")
@@ -620,305 +510,34 @@ def listado_usuarios_recuerdame(request):
 @login_required(login_url="/login/")
 @user_passes_test(is_superuser, login_url="/login/")
 def estadisticas_usuario_detalle(request, email):
-    """
-    Muestra las métricas de PostHog para un usuario específico (email).
-    """
-    url_query = (
-        f"{settings.POSTHOG_API_URL}/api/projects/{settings.POSTHOG_PROJECT_ID}/query/"
-    )
-    headers = {
-        "Authorization": f"Bearer {settings.POSTHOG_PERSONAL_API_KEY}",
-        "Content-Type": "application/json",
-    }
+    """Biomarcadores de una persona: su fila del mismo conjunto de usuarios
+    que alimenta el CSV (una sola llamada a PostHog, sin escrituras en BD)."""
+    dias = recuerdame_analytics.normalizar_dias(request.GET.get("dias"))
+    date_from, date_to = recuerdame_analytics.rango_fechas(dias)
 
+    usuario = None
+    error = None
     try:
-        # --------- 4. Ingresos por usuario (Login) ---------
-        url_insight = f"{settings.POSTHOG_API_URL}/api/projects/{settings.POSTHOG_PROJECT_ID}/insights/{settings.POSTHOG_IDENTIFY_COUNT_INSIGHT_ID}/"
-        r = requests.get(url_insight, headers=headers, timeout=10)
-        r.raise_for_status()
-        insight = r.json()
+        usuarios = recuerdame_analytics.obtener_usuarios(date_from, date_to)
+        fila = recuerdame_analytics.buscar_usuario_por_email(usuarios, email)
+        if fila is not None:
+            usuario = recuerdame_analytics.detalle_usuario(fila)
+    except recuerdame_analytics.RecuerdameAnalyticsError as exc:
+        error = str(exc)
 
-        # Ejecutar query
-        query = insight.get("query")
-        r = requests.post(url_query, headers=headers, json={"query": query}, timeout=10)
-        r.raise_for_status()
-        data = r.json()
-
-        user_labels, user_values = [], []
-
-        results = data.get("results") or data.get("result") or []
-        if results:
-            for serie in results:
-                # Identificar el email
-                email_field = (
-                    serie.get("breakdown_value")
-                    or serie.get("breakdown")
-                    or serie.get("label")
-                    or "Sin email"
-                )
-                if isinstance(email_field, list):
-                    email_value = email_field[0] if email_field else "Sin email"
-                else:
-                    email_value = email_field
-
-                # Filtrar SOLO el email solicitado
-                if str(email_value).lower() != str(email).lower():
-                    continue
-
-                total_sum = serie.get("aggregated_value") or serie.get("count") or 0
-                try:
-                    total_sum = int(total_sum)
-                except Exception:
-                    total_sum = 0
-
-                user_labels.append(email_value)
-                user_values.append(total_sum)
-
-        # --------- 5. Sesiones (Pageview -> Pageleave) ---------
-        session_rows = []
-        url_insight = f"{settings.POSTHOG_API_URL}/api/projects/{settings.POSTHOG_PROJECT_ID}/insights/{settings.POSTHOG_SESION_TIME_INSIGHT_ID}/"
-        r = requests.get(url_insight, headers=headers, timeout=10)
-        r.raise_for_status()
-        insight = r.json()
-
-        query = insight.get("query")
-        r = requests.post(url_query, headers=headers, json={"query": query}, timeout=10)
-        r.raise_for_status()
-        data = r.json()
-
-        results = data.get("steps") or data.get("results") or data.get("result") or []
-        if results:
-            for serie in results:
-                last = serie[-1] if isinstance(serie, list) else serie
-                first = serie[0] if isinstance(serie, list) else serie
-
-                email_field = (
-                    last.get("breakdown_value")
-                    or last.get("breakdown")
-                    or last.get("label")
-                    or "Sin dato"
-                )
-                if isinstance(email_field, list):
-                    email_value = email_field[0] if email_field else "Sin dato"
-                else:
-                    email_value = email_field
-
-                if str(email_value).lower() != str(email).lower():
-                    continue
-
-                entered = int(first.get("count") or 0)
-                converted = int(last.get("count") or 0)
-                dropped = max(entered - converted, 0)
-
-                def format_seconds(seconds):
-                    if not seconds:
-                        return "–"
-                    minutes, sec = divmod(int(seconds), 60)
-                    hours, minutes = divmod(minutes, 60)
-                    if hours:
-                        return f"{hours}h {minutes}m {sec}s"
-                    elif minutes:
-                        return f"{minutes}m {sec}s"
-                    else:
-                        return f"{sec}s"
-
-                session_rows.append(
-                    {
-                        "email": email_value,
-                        "entered": entered,
-                        "converted": converted,
-                        "dropped_off": dropped,
-                        "conversion_rate": round((converted / entered) * 100, 2)
-                        if entered > 0
-                        else 0,
-                        # "avg_time": last.get("average_conversion_time"),
-                        # "median_time": last.get("median_conversion_time"),
-                        "avg_time": format_seconds(last.get("average_conversion_time")),
-                        "median_time": format_seconds(
-                            last.get("median_conversion_time")
-                        ),
-                    }
-                )
-
-        # --------- 7. Vistas por página con breakdown por email ---------
-        url_insight = f"{settings.POSTHOG_API_URL}/api/projects/{settings.POSTHOG_PROJECT_ID}/insights/{settings.POSTHOG_PAGES_VIEWS_PER_USER}/"
-        r = requests.get(url_insight, headers=headers, timeout=10)
-        r.raise_for_status()
-        insight = r.json()
-
-        query = insight.get("query")
-        r = requests.post(url_query, headers=headers, json={"query": query}, timeout=10)
-        r.raise_for_status()
-        data = r.json()
-
-        results = data.get("results") or data.get("result") or []
-        user_page_views = {}
-
-        if results:
-            for serie in results:
-                email_field = (
-                    serie.get("breakdown_value")
-                    or serie.get("breakdown")
-                    or serie.get("label")
-                    or "Sin email"
-                )
-                if isinstance(email_field, list):
-                    email_value = email_field[0] if email_field else "Sin email"
-                else:
-                    email_value = email_field
-
-                if str(email_value).lower() != str(email).lower():
-                    continue
-
-                page = serie.get("order") or 0
-                try:
-                    page = int(page)
-                except Exception:
-                    pass
-
-                total = int(serie.get("aggregated_value") or 0)
-                if email_value not in user_page_views:
-                    user_page_views[email_value] = {}
-                user_page_views[email_value][page] = total
-
-        # Mapear páginas
-        label_map = {
-            0: "Sección: Información en Salud",
-            1: "Sección: Pasatiempos",
-            2: "Sección: Encuentros",
-            3: "Sección: Fortalece tu mente",
-            4: "Sección: Hazlo consciente",
-            5: "Hazlo Consciente - Módulo 2",
-            6: "Hazlo Consciente - Módulo 3",
-            7: "Hazlo Consciente - Módulo 4",
-            8: "Pasatiempos - Plantas",
-            9: "Pasatiempos - Mascotas",
-            10: "Pasatiempos - Recetas",
-            11: "Pasatiempos - Ejercicio",
-            12: "Polijuego",
-        }
-
-        all_pages = list(range(0, 13))
-        user_views_labels = [label_map[p] for p in all_pages]
-
-        views_matrix = []
-        row = {"email": email}
-        for page in all_pages:
-            row[label_map[page]] = user_page_views.get(email, {}).get(page, 0)
-        views_matrix.append(row)
-
-        # --------- DAU por usuario (Insight con breakdown) ---------
-        url_insight = f"{settings.POSTHOG_API_URL}/api/projects/{settings.POSTHOG_PROJECT_ID}/insights/{settings.POSTHOG_DAU_PER_USER_ID}/"
-        r = requests.get(url_insight, headers=headers, timeout=10)
-        r.raise_for_status()
-        insight = r.json()
-
-        query = insight.get("query")
-        r = requests.post(url_query, headers=headers, json={"query": query}, timeout=10)
-        r.raise_for_status()
-        data = r.json()
-
-        dau_user_labels, dau_user_values = [], []
-
-        results = data.get("results") or data.get("result") or []
-        if results:
-            for serie in results:
-                email_field = (
-                    serie.get("breakdown_value")
-                    or serie.get("breakdown")
-                    or serie.get("label")
-                    or "Sin email"
-                )
-                if isinstance(email_field, list):
-                    email_value = email_field[0] if email_field else "Sin email"
-                else:
-                    email_value = email_field
-
-                # 👇 Filtramos SOLO el email solicitado
-                if str(email_value).lower() != str(email).lower():
-                    continue
-
-                dau_user_labels = serie.get("labels", [])
-                dau_user_values = serie.get("data", [])
-                break
-
-        # --------- Autocapture por usuario ---------
-        url_insight = f"{settings.POSTHOG_API_URL}/api/projects/{settings.POSTHOG_PROJECT_ID}/insights/{settings.POSTHOG_AUTOCAPTURE_PER_USER_ID}/"
-        r = requests.get(url_insight, headers=headers, timeout=10)
-        r.raise_for_status()
-        insight = r.json()
-
-        query = insight.get("query")
-        r = requests.post(url_query, headers=headers, json={"query": query}, timeout=10)
-        r.raise_for_status()
-        data = r.json()
-
-        autocapture_rows = []
-
-        results = data.get("results") or data.get("result") or []
-        if results:
-            for serie in results:
-                email_field = (
-                    serie.get("breakdown_value")
-                    or serie.get("breakdown")
-                    or serie.get("label")
-                    or "Sin email"
-                )
-                if isinstance(email_field, list):
-                    email_value = email_field[0] if email_field else "Sin email"
-                else:
-                    email_value = email_field
-
-                # 👇 Filtramos SOLO el email solicitado
-                if str(email_value).lower() != str(email).lower():
-                    continue
-
-                count = int(serie.get("aggregated_value") or serie.get("count") or 0)
-
-                autocapture_rows.append(
-                    {
-                        "email": email_value,
-                        "count": count,
-                    }
-                )
-
-        if session_rows:
-            campos = {
-                "email": email,
-                "ingresos": user_values[0] if user_values else 0,
-                "sesiones_ingresadas": session_rows[0]["entered"],
-                "sesiones_convertidas": session_rows[0]["converted"],
-                "sesiones_abandonadas": session_rows[0]["dropped_off"],
-                "conversion_rate": session_rows[0]["conversion_rate"],
-                "tiempo_promedio": session_rows[0]["avg_time"],
-                "tiempo_mediano": session_rows[0]["median_time"],
-                "total_clicks": autocapture_rows[0]["count"] if autocapture_rows else 0,
-            }
-
-            EstadisticasUsuarioResult.objects.update_or_create(
-                email=email,
-                defaults=campos,
-            )
-
-        # Render
-        return render(
-            request,
-            "home/statistics_per_user_recuerdame.html",
-            {
-                "email": email,
-                "user_labels": user_labels,
-                "user_values": user_values,
-                "session_rows": session_rows,
-                "views_labels_breakdown": user_views_labels,
-                "views_matrix": views_matrix,
-                "dau_user_labels": dau_user_labels,
-                "dau_user_values": dau_user_values,
-                "autocapture_rows": autocapture_rows,
-            },
-        )
-
-    except requests.exceptions.RequestException as e:
-        return HttpResponseServerError(f"Error al obtener datos: {e}")
+    return render(
+        request,
+        "home/statistics_per_user_recuerdame.html",
+        {
+            "email": email,
+            "usuario": usuario,
+            "error": error,
+            "dias": dias,
+            "rangos": recuerdame_analytics.RANGOS_DIAS,
+            "date_from": date_from,
+            "date_to": date_to,
+        },
+    )
 
 
 #######################################################################################

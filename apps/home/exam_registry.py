@@ -183,11 +183,30 @@ EXAM_REGISTRY = {
         "model_name": "AQDCuidadorResult",
         "template": "examenes_anosognosia/Anosognosia_Cuidador_AQD.html",
         "related_name": "aqdcuidadorresult_resultado",
+        "export": {
+            # Carlos: totales acompañante/participante + delta + conciencia.
+            "summary_fields": [
+                "puntaje_total",
+                "aqd_total_acompanante",
+                "aqd_total_participante",
+                "aqd_delta",
+                "aqd_interpretacion",
+            ],
+        },
     },
     31: {
         "model_name": "AQDParticipanteResult",
         "template": "examenes_anosognosia/Anosognosia_Participante_AQD.html",
         "related_name": "aqdparticipanteresult_resultado",
+        "export": {
+            "summary_fields": [
+                "puntaje_total",
+                "aqd_total_acompanante",
+                "aqd_total_participante",
+                "aqd_delta",
+                "aqd_interpretacion",
+            ],
+        },
     },
     32: {
         "model_name": "RedLatSpanishResult",

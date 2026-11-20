@@ -80,7 +80,37 @@
   .plan-serie-visita + .plan-serie-visita {
     border-top: 1px solid #e9ecef;
   }
+
+  /* Calendario inline de fechas específicas a todo el ancho del modal */
+  .plan-fechas-calendario .plan-fechas-picker {
+    display: none;
+  }
+
+  .plan-fechas-calendario .flatpickr-calendar {
+    width: 100% !important;
+    max-width: 100%;
+    box-shadow: none;
+    border: 1px solid #dee2e6;
+  }
+
+  .plan-fechas-calendario .flatpickr-innerContainer,
+  .plan-fechas-calendario .flatpickr-rContainer,
+  .plan-fechas-calendario .flatpickr-weekdays,
+  .plan-fechas-calendario .flatpickr-days,
+  .plan-fechas-calendario .dayContainer {
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .plan-fechas-calendario .flatpickr-day {
+    max-width: none;
+    flex-basis: 14.2857143%;
+    height: 2.5rem;
+    line-height: 2.5rem;
+  }
 </style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.css">
 {% endblock stylesheets %}
 {% block content %}
 
@@ -896,7 +926,7 @@
             </div>
           </div>
 
-          <div class="form-row">
+          <div class="form-row plan-rango-fechas">
             <div class="form-group col-md-6">
               <label>Fecha inicio</label>
               <input type="date" class="form-control plan-fecha-inicio" name="fecha_inicio" value="{% now 'Y-m-d' %}" required>
@@ -917,7 +947,8 @@
               <button type="button" class="btn btn-outline-info flex-fill mb-1 mr-1 plan-freq-btn" data-freq="diario">Diario</button>
               <button type="button" class="btn btn-outline-info flex-fill mb-1 mr-1 plan-freq-btn active" data-freq="semanal">Semanal</button>
               <button type="button" class="btn btn-outline-info flex-fill mb-1 mr-1 plan-freq-btn" data-freq="lv">L-V</button>
-              <button type="button" class="btn btn-outline-info flex-fill mb-1 plan-freq-btn" data-freq="custom">Personalizado</button>
+              <button type="button" class="btn btn-outline-info flex-fill mb-1 mr-1 plan-freq-btn" data-freq="custom">Personalizado</button>
+              <button type="button" class="btn btn-outline-info flex-fill mb-1 plan-freq-btn" data-freq="fechas">Fechas específicas</button>
             </div>
             <small class="form-text text-muted plan-freq-hint"></small>
           </div>
@@ -934,6 +965,17 @@
               <button type="button" class="btn btn-sm btn-outline-primary flex-fill mb-1 plan-dia-btn" data-dia="6">Dom</button>
             </div>
             <div class="plan-dias-inputs"></div>
+          </div>
+
+          <div class="form-group plan-fechas-especificas d-none">
+            <label class="d-block mb-2">Fechas de las visitas</label>
+            <div class="plan-fechas-calendario">
+              <input type="hidden" class="plan-fechas-picker">
+            </div>
+            <small class="form-text text-muted">
+              Haga clic en los días para marcarlos o desmarcarlos; máximo 24 fechas.
+            </small>
+            <div class="plan-fechas-inputs"></div>
           </div>
 
           <div class="form-group">
@@ -1123,6 +1165,8 @@
 {% endfor %}
 
 <!-- JAVASCRIPT SIMPLIFICADO Y CORREGIDO -->
+<script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/l10n/es.js"></script>
 <script>
   document.addEventListener("DOMContentLoaded", function () {
     var categoriasExamen = {
@@ -1133,6 +1177,7 @@
       OTROS: "Otros"
     };
     var diasNombres = ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"];
+    var maxFechasPlan = 24;
 
     function leerExamenesJson(scriptId) {
       if (!scriptId) return "[]";
@@ -1252,6 +1297,48 @@
       });
     }
 
+    function fechasSeleccionadasPlan(form) {
+      if (!form._fp) return [];
+      return form._fp.selectedDates
+        .map(function (d) {
+          return new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+        })
+        .sort(function (a, b) { return a - b; });
+    }
+
+    function sincronizarFechasPlan(form, fechas) {
+      var contenedor = form.querySelector(".plan-fechas-inputs");
+      if (!contenedor) return;
+      contenedor.innerHTML = "";
+      fechas.forEach(function (fecha) {
+        var input = document.createElement("input");
+        input.type = "hidden";
+        input.name = "fechas";
+        input.value = formatYmd(fecha);
+        contenedor.appendChild(input);
+      });
+    }
+
+    function inicializarCalendarioPlan(form) {
+      if (form._fp || typeof flatpickr === "undefined") return;
+      var picker = form.querySelector(".plan-fechas-picker");
+      if (!picker) return;
+      form._fp = flatpickr(picker, {
+        mode: "multiple",
+        inline: true,
+        locale: "es",
+        dateFormat: "Y-m-d",
+        onChange: function (selectedDates, dateStr, instance) {
+          var excedido = selectedDates.length > maxFechasPlan;
+          if (excedido) {
+            instance.setDate(selectedDates.slice(0, maxFechasPlan), false);
+          }
+          form.dataset.planExcedido = excedido ? "1" : "";
+          actualizarPreviewPlan(form);
+        }
+      });
+    }
+
     function hintFrecuencia(tipo, inicio, dias) {
       if (tipo === "diario") return "Una visita cada día del rango.";
       if (tipo === "semanal") {
@@ -1264,6 +1351,7 @@
         if (!dias.length) return "Elija uno o más días de la semana.";
         return "Cada semana: " + dias.map(function (d) { return diasNombres[d]; }).join(", ") + ".";
       }
+      if (tipo === "fechas") return "Fechas elegidas manualmente.";
       return "";
     }
 
@@ -1277,7 +1365,10 @@
       var btn = form.querySelector(".btn-crear-plan");
       var hint = form.querySelector(".plan-freq-hint");
       var customBox = form.querySelector(".plan-dias-custom");
+      var rangoBox = form.querySelector(".plan-rango-fechas");
+      var fechasBox = form.querySelector(".plan-fechas-especificas");
       var tipoVisita = form.querySelector(".tipo-visita-plan").value;
+      var esFechas = tipo === "fechas";
 
       form.querySelectorAll(".plan-freq-btn").forEach(function (b) {
         b.classList.toggle("active", b.getAttribute("data-freq") === tipo);
@@ -1285,16 +1376,30 @@
       if (customBox) {
         customBox.classList.toggle("d-none", tipo !== "custom");
       }
+      if (rangoBox) {
+        rangoBox.classList.toggle("d-none", esFechas);
+      }
+      if (fechasBox) {
+        fechasBox.classList.toggle("d-none", !esFechas);
+      }
+      inputInicio.disabled = esFechas;
+      inputFin.disabled = esFechas;
+      if (esFechas) {
+        inicializarCalendarioPlan(form);
+      }
 
       var dias = tipo === "custom" ? diasSeleccionadosPlan(form) : [];
       sincronizarDiasPlan(form, dias);
+
+      var fechasManuales = esFechas ? fechasSeleccionadasPlan(form) : [];
+      sincronizarFechasPlan(form, fechasManuales);
 
       if (hint) {
         hint.textContent = hintFrecuencia(tipo, inicio, dias);
       }
 
       inputFin.min = inputInicio.value || "";
-      var rangoInvalido = !!(inicio && fin && fin < inicio);
+      var rangoInvalido = !esFechas && !!(inicio && fin && fin < inicio);
       inputFin.classList.toggle("is-invalid", rangoInvalido);
 
       function bloquear(mensaje, esError) {
@@ -1305,6 +1410,23 @@
 
       if (!tipoVisita) {
         bloquear("Seleccione un tipo de visita.", false);
+        return;
+      }
+      if (esFechas) {
+        if (!fechasManuales.length) {
+          bloquear("Seleccione al menos una fecha en el calendario.", false);
+          return;
+        }
+        var avisoExcedido = form.dataset.planExcedido === "1"
+          ? ' <span class="text-danger">(máximo ' + maxFechasPlan + " fechas; se descartó la última)</span>"
+          : "";
+        preview.innerHTML =
+          "<strong>" + fechasManuales.length + " visita(s):</strong> " +
+          fechasManuales.map(formatYmd).join(", ") +
+          (avisoExcedido ||
+            (fechasManuales.length === maxFechasPlan ? ' <span class="text-warning">(tope de 24 fechas)</span>' : ""));
+        btn.disabled = false;
+        form.dataset.planCount = String(fechasManuales.length);
         return;
       }
       if (!inicio || !fin) {
