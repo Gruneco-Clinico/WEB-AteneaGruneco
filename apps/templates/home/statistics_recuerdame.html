@@ -1,8 +1,7 @@
 {% extends 'layouts/base.html' %}
 {% load static %}
-{% load custom_filters %}
 
-{% block stylesheets %}{% endblock stylesheets %} {% block content %}
+{% block content %}
 <div class="header bg-primary pb-6">
   <div class="container-fluid">
     <div class="header-body">
@@ -11,302 +10,594 @@
           <h6 class="h2 text-white d-inline-block mb-0">GRUNECO</h6>
           <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
             <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
-              <li class="breadcrumb-item">
-                <a href="#"><i class="fas fa-home"></i></a>
-              </li>
+              <li class="breadcrumb-item"><a href="#"><i class="fas fa-home"></i></a></li>
               <li class="breadcrumb-item"><a href="#">Atenea</a></li>
               <li class="breadcrumb-item active" aria-current="page">
-                Estadísticas RecuérdaMe - últimos 30 días
+                Biomarcadores digitales - RecuérdaMe
               </li>
             </ol>
           </nav>
         </div>
+        <div class="col-lg-6 col-5 text-right">
+          <div class="btn-group" role="group" aria-label="Rango de días">
+            {% for r in rangos %}
+              <a href="?dias={{ r }}"
+                 class="btn btn-sm {% if r == dias %}btn-primary border-white{% else %}btn-neutral{% endif %}">
+                {{ r }} días
+              </a>
+            {% endfor %}
+          </div>
+        </div>
       </div>
+
+      {% if cohorte %}
+      <div class="row">
+        <div class="col-xl-3 col-md-6">
+          <div class="card card-stats">
+            <div class="card-body">
+              <div class="row">
+                <div class="col">
+                  <h5 class="card-title text-uppercase text-muted mb-0">Personas</h5>
+                  <span class="h2 font-weight-bold mb-0">{{ cohorte.kpis.personas }}</span>
+                </div>
+                <div class="col-auto">
+                  <div class="icon icon-shape bg-gradient-red text-white rounded-circle shadow">
+                    <i class="ni ni-single-02"></i>
+                  </div>
+                </div>
+              </div>
+              <p class="mt-3 mb-0 text-sm text-muted">Con actividad en el periodo</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+          <div class="card card-stats">
+            <div class="card-body">
+              <div class="row">
+                <div class="col">
+                  <h5 class="card-title text-uppercase text-muted mb-0">Adherencia mediana</h5>
+                  <span class="h2 font-weight-bold mb-0">{{ cohorte.kpis.adherencia_mediana }}%</span>
+                </div>
+                <div class="col-auto">
+                  <div class="icon icon-shape bg-gradient-orange text-white rounded-circle shadow">
+                    <i class="ni ni-calendar-grid-58"></i>
+                  </div>
+                </div>
+              </div>
+              <p class="mt-3 mb-0 text-sm text-muted">Días activos / días del periodo</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+          <div class="card card-stats">
+            <div class="card-body">
+              <div class="row">
+                <div class="col">
+                  <h5 class="card-title text-uppercase text-muted mb-0">Duración mediana</h5>
+                  <span class="h2 font-weight-bold mb-0">{{ cohorte.kpis.duracion_mediana }}</span>
+                </div>
+                <div class="col-auto">
+                  <div class="icon icon-shape bg-gradient-green text-white rounded-circle shadow">
+                    <i class="ni ni-watch-time"></i>
+                  </div>
+                </div>
+              </div>
+              <p class="mt-3 mb-0 text-sm text-muted">
+                Por sesión · intensidad mediana {{ cohorte.kpis.intensidad_mediana }}
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+          <div class="card card-stats">
+            <div class="card-body">
+              <div class="row">
+                <div class="col">
+                  <h5 class="card-title text-uppercase text-muted mb-0">Sesiones</h5>
+                  <span class="h2 font-weight-bold mb-0">{{ cohorte.kpis.sesiones }}</span>
+                </div>
+                <div class="col-auto">
+                  <div class="icon icon-shape bg-gradient-info text-white rounded-circle shadow">
+                    <i class="ni ni-chart-bar-32"></i>
+                  </div>
+                </div>
+              </div>
+              <p class="mt-3 mb-0 text-sm text-muted">
+                Amplitud mediana {{ cohorte.kpis.amplitud_mediana }} secciones ·
+                {{ cohorte.kpis.rageclicks_total }} rageclicks
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endif %}
     </div>
   </div>
 </div>
 
 <div class="container-fluid mt--6">
-  <div class="text-center mt-4">
-    <a href="{% url 'listado_usuarios_recuerdame' %}" class="btn btn-sm btn-neutral" title="Ver estadísticas por usuario">
-      <i class="fas fa-chart-bar"></i> Ver estadísticas por usuario
-    </a>
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags|default:'info' }}{% endif %} mt-4">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  {% if error %}
+    <div class="alert alert-warning mt-4">
+      <i class="fas fa-exclamation-triangle"></i> {{ error }}
+    </div>
+  {% endif %}
+
+  <div class="d-flex flex-wrap justify-content-between align-items-center mt-4">
+    <small class="text-muted mb-2">
+      Periodo: {{ date_from }} a {{ date_to }} (hora de Bogotá).
+      Zoom y pan en las gráficas; doble clic restablece la vista.
+    </small>
+    <div class="mb-2">
+      <a href="{% url 'listado_usuarios_recuerdame' %}" class="btn btn-sm btn-neutral"
+         title="Ver estadísticas por usuario">
+        <i class="fas fa-user"></i> Ver estadísticas por usuario
+      </a>
+      <a href="{% url 'estadisticas_biomarcadores_csv' %}?dias={{ dias }}" class="btn btn-sm btn-primary"
+         title="Un solo CSV con todas las personas del periodo">
+        <i class="fas fa-download"></i> Descargar CSV de todos
+      </a>
+      <a href="{% url 'estadisticas_anosognosia_cruce_csv' %}" class="btn btn-sm btn-neutral"
+         title="Sesiones Anosognosia (examen 56) enriquecidas con RecuérdaMe">
+        <i class="fas fa-link"></i> CSV cruce Anosognosia
+      </a>
+    </div>
   </div>
 
+  {% if cruce %}
+  <div class="row mt-4">
+    <div class="col-12">
+      <div class="card shadow">
+        <div class="card-header d-flex flex-wrap justify-content-between align-items-center">
+          <div>
+            <h3 class="mb-0">Cruce Anosognosia × RecuérdaMe</h3>
+            <small class="text-muted">
+              Examen 56 · sesiones {{ cruce.date_from }} a {{ cruce.date_to }}.
+              PostHog por correo · cuenta RecuérdaMe por documento/correo (logins y juegos).
+            </small>
+          </div>
+          <a href="{% url 'estadisticas_anosognosia_cruce_csv' %}" class="btn btn-sm btn-primary mt-2">
+            <i class="fas fa-download"></i> Descargar cruce
+          </a>
+        </div>
+        <div class="card-body">
+          {% if cruce.error_posthog %}
+            <div class="alert alert-warning">{{ cruce.error_posthog }}</div>
+          {% endif %}
+          {% if cruce.error_activity %}
+            <div class="alert alert-warning">{{ cruce.error_activity }}</div>
+          {% endif %}
+          <div class="row mb-4">
+            <div class="col-md-2 col-6 mb-2">
+              <div class="text-muted text-uppercase text-sm">Pacientes</div>
+              <div class="h2 mb-0">{{ cruce.kpis.pacientes }}</div>
+            </div>
+            <div class="col-md-2 col-6 mb-2">
+              <div class="text-muted text-uppercase text-sm">Sesiones</div>
+              <div class="h2 mb-0">{{ cruce.kpis.sesiones }}</div>
+            </div>
+            <div class="col-md-3 col-6 mb-2">
+              <div class="text-muted text-uppercase text-sm">Match PostHog</div>
+              <div class="h2 mb-0">{{ cruce.kpis.con_match_email }}</div>
+            </div>
+            <div class="col-md-3 col-6 mb-2">
+              <div class="text-muted text-uppercase text-sm">Match cuenta app</div>
+              <div class="h2 mb-0">{{ cruce.kpis.con_match_recuerdame }}</div>
+            </div>
+            <div class="col-md-2 col-6 mb-2">
+              <div class="text-muted text-uppercase text-sm">Fechas con uso</div>
+              <div class="h2 mb-0">
+                {{ cruce.kpis.fechas_con_actividad_recuerdame }}
+                <small class="text-muted">/ {{ cruce.kpis.fechas_intervencion }}</small>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-xl-5 mb-4">
+              <h4 class="mb-2">Personas activas en días de intervención</h4>
+              <div id="cruceActividadChart" style="height: 280px;"></div>
+            </div>
+            <div class="col-xl-7">
+              <div class="table-responsive" style="max-height: 320px;">
+                <table class="table table-sm table-hover mb-0">
+                  <thead class="thead-light">
+                    <tr>
+                      <th>Paciente</th>
+                      <th>Correo</th>
+                      <th>Sesiones</th>
+                      <th>Periodo</th>
+                      <th>PostHog</th>
+                      <th>Cuenta app</th>
+                      <th>Logins</th>
+                      <th>Juegos</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for p in cruce.pacientes %}
+                    <tr>
+                      <td>{{ p.nombre|default:"—" }}</td>
+                      <td class="text-break">{{ p.correo|default:"—" }}</td>
+                      <td>{{ p.sesiones }}</td>
+                      <td class="text-nowrap">
+                        {% if p.primera_sesion %}
+                          {{ p.primera_sesion }}{% if p.ultima_sesion and p.ultima_sesion != p.primera_sesion %} → {{ p.ultima_sesion }}{% endif %}
+                        {% else %}—{% endif %}
+                      </td>
+                      <td>
+                        {% if p.match_posthog == "sí" %}
+                          <span class="badge badge-success">sí</span>
+                        {% else %}
+                          <span class="badge badge-secondary">no</span>
+                        {% endif %}
+                      </td>
+                      <td>
+                        {% if p.match_recuerdame == "sí" %}
+                          <span class="badge badge-success">sí</span>
+                        {% else %}
+                          <span class="badge badge-secondary">no</span>
+                        {% endif %}
+                      </td>
+                      <td>
+                        {% if p.logins_en_ventana != "" %}{{ p.logins_en_ventana }}{% else %}—{% endif %}
+                      </td>
+                      <td>
+                        {% if p.sesiones_juego != "" %}{{ p.sesiones_juego }}{% else %}—{% endif %}
+                      </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="8" class="text-muted">Sin sesiones del examen 56.</td></tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
 
-  <div class="row">
+  {% if cohorte %}
+  <div class="row mt-4">
     <div class="col-xl-8">
-      <div class="card mt-4 shadow">
+      <div class="card shadow">
         <div class="card-header d-flex align-items-center">
-          <a href="https://recuerdame.gna.org.co/" target="_blank">
-              <img src="{% static 'assets/img/theme/RecuerdaMe.png' %}" 
-                  alt="Logo" 
-                  style="height: 40px;" 
-                  class="mr-2">
+          <a href="https://recuerdame.gna.org.co/" target="_blank" rel="noopener">
+            <img src="{% static 'assets/img/theme/RecuerdaMe.png' %}" alt="Logo" style="height: 40px;" class="mr-2">
           </a>
-          <h3 class="mb-0">Usuarios Activos Diarios</h3>
+          <div>
+            <h3 class="mb-0">Usuarios activos por día</h3>
+            <small class="text-muted">Arrastra para hacer zoom en el periodo</small>
+          </div>
         </div>
         <div class="card-body">
-          <canvas id="dauChart" width="300" height="100"></canvas>
+          <div id="actividadChart" style="height: 320px;"></div>
         </div>
       </div>
-
-      <!-- Gráfico Growth accounting -->
-
-      <div class="card mt-4 shadow">
-        <div class="card-header d-flex align-items-center">
-          <a href="https://recuerdame.gna.org.co/" target="_blank">
-              <img src="{% static 'assets/img/theme/RecuerdaMe.png' %}" 
-                  alt="Logo" 
-                  style="height: 40px;" 
-                  class="mr-2">
-          </a>
-          <h3 class="mb-0">Crecimiento</h3>
-        </div>
-        <div class="card-body">
-          <canvas id="growthChart" width="300" height="100"></canvas>
-        </div>
-      </div>
-
-      <!-- Gráfico cantidad de vistas por página -->
-
-      <div class="card mt-4 shadow">
-        <div class="card-header d-flex align-items-center">
-          <a href="https://recuerdame.gna.org.co/" target="_blank">
-              <img src="{% static 'assets/img/theme/RecuerdaMe.png' %}" 
-                  alt="Logo" 
-                  style="height: 40px;" 
-                  class="mr-2">
-          </a>
-          <h3 class="mb-0">Número de vistas por sección/página</h3>
-        </div>
-
-        <!-- <p>Labels: <span id="views-labels-debug"></span></p>
-        <p>Values: <span id="views-values-debug"></span></p> -->
-
-        <div class="card-body">
-          <canvas id="viewsChart"></canvas>
-        </div>
-      </div>
-
-
-      <!-- Gráficos que van a la derecha -->
     </div>
     <div class="col-xl-4">
-      <!-- Device Type -->
-      <div class="card mt-4 shadow">
-        <div class="card-header d-flex align-items-center">
-          <a href="https://recuerdame.gna.org.co/" target="_blank">
-              <img src="{% static 'assets/img/theme/RecuerdaMe.png' %}" 
-                  alt="Logo" 
-                  style="height: 40px;" 
-                  class="mr-2">
-          </a>
-          <h3 class="mb-0">Cantidad de usuarios por tipo de dispositivo</h3>
+      <div class="card shadow">
+        <div class="card-header">
+          <h3 class="mb-0">Dispositivo</h3>
+          <small class="text-muted">Personas por tipo</small>
         </div>
-
-        <!-- <p>Labels: <span id="device-labels-debug"></span></p>
-        <p>Values: <span id="device-values-debug"></span></p> -->
-
         <div class="card-body">
-          <canvas id="deviceChart"></canvas>
+          <div id="dispositivoChart" style="height: 320px;"></div>
         </div>
       </div>
     </div>
-
   </div>
-{% include "includes/footer.html" %}
-</div>
 
+  <div class="row">
+    <div class="col-xl-7">
+      <div class="card shadow">
+        <div class="card-header">
+          <h3 class="mb-0">Vistas por sección</h3>
+          <small class="text-muted">Contenido clínico / de cuidado</small>
+        </div>
+        <div class="card-body">
+          <div id="seccionesChart" style="height: 360px;"></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-5">
+      <div class="card shadow">
+        <div class="card-header">
+          <h3 class="mb-0">Actividad por hora</h3>
+          <small class="text-muted">Hora de Bogotá</small>
+        </div>
+        <div class="card-body">
+          <div id="horaChart" style="height: 360px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-xl-6">
+      <div class="card shadow">
+        <div class="card-header">
+          <h3 class="mb-0">Adherencia × duración de sesión</h3>
+          <small class="text-muted">Cada punto es una persona · color = rol</small>
+        </div>
+        <div class="card-body">
+          <div id="scatterAdherenciaChart" style="height: 380px;"></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-6">
+      <div class="card shadow">
+        <div class="card-header">
+          <h3 class="mb-0">Amplitud × sesiones</h3>
+          <small class="text-muted">Secciones distintas frente a frecuencia de uso</small>
+        </div>
+        <div class="card-body">
+          <div id="scatterAmplitudChart" style="height: 380px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-xl-12">
+      <div class="card shadow">
+        <div class="card-header">
+          <h3 class="mb-0">Distribución de adherencia por rol</h3>
+          <small class="text-muted">Caja y bigotes · hover para cuartiles</small>
+        </div>
+        <div class="card-body">
+          <div id="boxRolChart" style="height: 360px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  {% include "includes/footer.html" %}
+</div>
 {% endblock content %}
 
-
 {% block javascripts %}
+{% if cohorte or cruce %}
+<script src="https://cdn.jsdelivr.net/npm/plotly.js@2.35.2/dist/plotly.min.js"></script>
+{% endif %}
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
- 
-<!-- DAU -->
-{{ labels|json_script:"dau-labels" }}
-{{ values|json_script:"dau-values" }}
+{% if cruce %}
+{{ cruce.actividad_dias|json_script:"cruce-actividad" }}
+<script>
+  (function () {
+    const el = document.getElementById("cruce-actividad");
+    const chart = document.getElementById("cruceActividadChart");
+    if (!el || !chart || typeof Plotly === "undefined") return;
+    const data = JSON.parse(el.textContent);
+    Plotly.newPlot(
+      chart,
+      [{
+        type: "bar",
+        x: data.labels,
+        y: data.values,
+        marker: { color: "#11cdef" },
+        hovertemplate: "%{x}<br>%{y} personas en RecuérdaMe<extra></extra>",
+      }],
+      {
+        margin: { t: 16, r: 16, b: 56, l: 48 },
+        paper_bgcolor: "rgba(0,0,0,0)",
+        plot_bgcolor: "rgba(0,0,0,0)",
+        font: { family: "Open Sans, sans-serif", size: 12, color: "#525f7f" },
+        xaxis: { title: "Fecha intervención", type: "date" },
+        yaxis: { title: "Personas", rangemode: "tozero" },
+      },
+      {
+        responsive: true,
+        displaylogo: false,
+        modeBarButtonsToRemove: ["lasso2d", "select2d"],
+        toImageButtonOptions: { format: "png", filename: "anosognosia-recuerdame-dias" },
+      }
+    );
+  })();
+</script>
+{% endif %}
 
-<!-- Growth Accounting -->
-{{ growth_labels|json_script:"growth-labels" }}
-{{ growth_datasets|json_script:"growth-datasets" }}
-
-<!-- Device type -->
-{{ device_labels|json_script:"device-labels" }}
-{{ device_values|json_script:"device-values" }}
-
-<!-- Vistas por página -->
-{{ views_labels|json_script:"views-labels" }}
-{{ views_dataset|json_script:"views-dataset" }}
+{% if cohorte %}
+{{ cohorte.actividad|json_script:"bio-actividad" }}
+{{ cohorte.secciones|json_script:"bio-secciones" }}
+{{ cohorte.hora|json_script:"bio-hora" }}
+{{ cohorte.dispositivo|json_script:"bio-dispositivo" }}
+{{ cohorte.analisis|json_script:"bio-analisis" }}
 
 <script>
+  (function () {
+    const leer = (id) => JSON.parse(document.getElementById(id).textContent);
+    const actividad = leer("bio-actividad");
+    const secciones = leer("bio-secciones");
+    const hora = leer("bio-hora");
+    const dispositivo = leer("bio-dispositivo");
+    const analisis = leer("bio-analisis");
 
-  // === Gráfico DAU ===
-const dauLabels = JSON.parse(document.getElementById("dau-labels").textContent);
-const dauValues = JSON.parse(document.getElementById("dau-values").textContent);
+    const config = {
+      responsive: true,
+      displaylogo: false,
+      modeBarButtonsToRemove: ["lasso2d", "select2d"],
+      toImageButtonOptions: { format: "png", filename: "recuerdame-biomarcadores" },
+    };
 
-new Chart(document.getElementById("dauChart"), {
-  type: "line",
-  data: {
-    labels: dauLabels,
-    datasets: [{
-      label: "Usuarios Activos Diarios",
-      data: dauValues,
-      borderColor: "blue",
-      backgroundColor: "rgba(0, 0, 255, 0.1)",
-      fill: true,
-      tension: 0.3
-    }]
-  },
-  options: {
-    responsive: true,
-    plugins: {
-      legend: { display: true },
-    },
-    scales: {
-      y: { beginAtZero: true }
-    }
-  }
-});
+    const layoutBase = {
+      margin: { t: 24, r: 24, b: 48, l: 56 },
+      paper_bgcolor: "rgba(0,0,0,0)",
+      plot_bgcolor: "rgba(0,0,0,0)",
+      font: { family: "Open Sans, sans-serif", size: 12, color: "#525f7f" },
+      hovermode: "closest",
+    };
 
+    const paletaRol = {
+      Participante: "#5e72e4",
+      "Acompañante": "#2dce89",
+      Ambos: "#fb6340",
+      "Sin determinar": "#8898aa",
+    };
 
-// === Gráfico Growth Accounting ===
-const growthLabels = JSON.parse(document.getElementById("growth-labels").textContent);
-const growthDatasets = JSON.parse(document.getElementById("growth-datasets").textContent);
-
-// Colores fijos para cada categoría
-const colors = {
-  "Returning": "rgba(75, 192, 192, 0.6)",   // verde
-  "New": "rgba(54, 162, 235, 0.6)",        // azul
-  "Resurrecting": "rgba(153, 102, 255, 0.6)", // violeta
-  "Dormant": "rgba(255, 99, 132, 0.6)"     // rojo
-};
-
-// Traducción de etiquetas
-const traducciones = {
-  "Returning": "Recurrentes",
-  "New": "Nuevos",
-  "Resurrecting": "Resurgentes",
-  "Dormant": "Latentes"
-};
-
-new Chart(document.getElementById("growthChart"), {
-  type: "bar",
-  data: {
-    labels: growthLabels,
-    datasets: growthDatasets.map(ds => ({
-      label: traducciones[ds.label] || ds.label, 
-      data: ds.data,
-      backgroundColor: colors[ds.label] || "rgba(200,200,200,0.6)",
-    }))
-  },
-  options: {
-    responsive: true,
-    plugins: {
-      legend: { position: "top" }
-    },
-    scales: {
-      x: { stacked: true },
-      y: {
-        stacked: true,
-        beginAtZero: true,
-        // Dibujar negativos
-        min: Math.min(-5, Math.min(...growthDatasets.flatMap(ds => ds.data))),
-        max: Math.max(5, Math.max(...growthDatasets.flatMap(ds => ds.data)))
-      }
-    }
-  }
-});
-
-// === Gráfico Device Type ===
-const deviceLabels = JSON.parse(document.getElementById("device-labels").textContent);
-const deviceValues = JSON.parse(document.getElementById("device-values").textContent);
-
-new Chart(document.getElementById("deviceChart"), {
-  type: "doughnut",
-  data: {
-    labels: deviceLabels,
-    datasets: [{
-      data: deviceValues,
-      backgroundColor: ["#007bff", "#28a745", "#ffc107", "#dc3545"], // azul, verde, amarillo, rojo
-    }]
-  },
-  options: {
-    responsive: true,
-    plugins: {
-      legend: { position: "right" },
-      tooltip: { enabled: true }
-    }
-  }
-});
-
-// === Gráfico Vistas por Página ===
-const viewsLabels = JSON.parse(document.getElementById("views-labels").textContent);
-const viewsDataset = JSON.parse(document.getElementById("views-dataset").textContent);
-
-// console.log("Views Labels:", viewsLabels);
-// console.log("Views Dataset:", viewsDataset);
-
-// Diccionario de mapeo
-const labelMap = {
-  0: "Sección: Información en Salud",
-  1: "Sección: Pasatiempos",
-  2: "Sección: Encuentros",
-  3: "Sección: Fortalece tu mente",
-  4: "Sección: Hazlo consciente",
-  5: "Hazlo Consciente - Módulo 2",
-  6: "Hazlo Consciente - Módulo 3",
-  7: "Hazlo Consciente - Módulo 4",
-  8: "Pasatiempos - Plantas",
-  9: "Pasatiempos - Mascotas",
-  10: "Pasatiempos - Recetas",
-  11: "Pasatiempos - Ejercicio",
-  12: "Polijuego"
-};
-
-// Reemplazar labels numéricos por nombres
-const mappedLabels = viewsLabels.map(num => labelMap[num] || num);
-
-new Chart(document.getElementById("viewsChart"), {
-  type: "bar",
-  data: {
-    labels: mappedLabels,
-    datasets: viewsDataset
-  },
-  options: {
-    responsive: true,
-    plugins: {
-      legend: { display: false },
-      tooltip: {
-        callbacks: {
-          label: function(context) {
-            return context.raw; // solo muestra el valor
-          }
-        }
-      }
-    },
-    scales: {
-      x: {
-        ticks: {
-          autoSkip: false,
-          maxRotation: 45,
-          minRotation: 0
-        }
+    Plotly.newPlot(
+      "actividadChart",
+      [{
+        type: "scatter",
+        mode: "lines+markers",
+        x: actividad.labels,
+        y: actividad.values,
+        name: "Usuarios activos",
+        line: { color: "#5e72e4", width: 2, shape: "spline" },
+        marker: { size: 6 },
+        fill: "tozeroy",
+        fillcolor: "rgba(94, 114, 228, 0.12)",
+        hovertemplate: "%{x}<br>%{y} personas<extra></extra>",
+      }],
+      {
+        ...layoutBase,
+        xaxis: { title: "Fecha", rangeslider: { visible: true }, type: "date" },
+        yaxis: { title: "Personas", rangemode: "tozero", fixedrange: false },
       },
-      y: {
-        beginAtZero: true,
-        title: {
-          display: true,
-          text: "Cantidad de vistas"
-        }
-      }
+      config
+    );
+
+    Plotly.newPlot(
+      "dispositivoChart",
+      [{
+        type: "pie",
+        labels: dispositivo.labels,
+        values: dispositivo.values,
+        hole: 0.45,
+        marker: { colors: ["#5e72e4", "#2dce89", "#fb6340", "#11cdef", "#8898aa"] },
+        textinfo: "label+percent",
+        hovertemplate: "%{label}<br>%{value} personas (%{percent})<extra></extra>",
+      }],
+      { ...layoutBase, margin: { t: 16, r: 16, b: 16, l: 16 }, showlegend: true },
+      config
+    );
+
+    Plotly.newPlot(
+      "seccionesChart",
+      [{
+        type: "bar",
+        orientation: "h",
+        y: secciones.labels.slice().reverse(),
+        x: secciones.values.slice().reverse(),
+        marker: { color: "#2dce89" },
+        hovertemplate: "%{y}<br>%{x} vistas<extra></extra>",
+      }],
+      {
+        ...layoutBase,
+        margin: { t: 24, r: 24, b: 40, l: 140 },
+        xaxis: { title: "Vistas", rangemode: "tozero" },
+        yaxis: { automargin: true },
+      },
+      config
+    );
+
+    Plotly.newPlot(
+      "horaChart",
+      [{
+        type: "bar",
+        x: hora.labels,
+        y: hora.values,
+        marker: { color: "#fb6340" },
+        hovertemplate: "%{x}<br>%{y} eventos<extra></extra>",
+      }],
+      {
+        ...layoutBase,
+        xaxis: { title: "Hora" },
+        yaxis: { title: "Eventos", rangemode: "tozero" },
+      },
+      config
+    );
+
+    const puntos = analisis.puntos || [];
+    const roles = [...new Set(puntos.map((p) => p.rol))];
+
+    function scatterPorRol(xKey, yKey, xTitle, yTitle, targetId) {
+      const traces = roles.map((rol) => {
+        const subset = puntos.filter((p) => p.rol === rol);
+        return {
+          type: "scatter",
+          mode: "markers",
+          name: rol,
+          x: subset.map((p) => p[xKey]),
+          y: subset.map((p) => p[yKey]),
+          text: subset.map((p) => p.etiqueta),
+          customdata: subset.map((p) => [
+            p.sesiones,
+            p.amplitud,
+            p.intensidad,
+          ]),
+          marker: {
+            size: 9,
+            color: paletaRol[rol] || "#8898aa",
+            opacity: 0.75,
+            line: { width: 1, color: "#fff" },
+          },
+          hovertemplate:
+            "<b>%{text}</b><br>" +
+            xTitle + ": %{x}<br>" +
+            yTitle + ": %{y}<br>" +
+            "Sesiones: %{customdata[0]}<br>" +
+            "Amplitud: %{customdata[1]}<br>" +
+            "Intensidad: %{customdata[2]}<extra>" + rol + "</extra>",
+        };
+      });
+      Plotly.newPlot(
+        targetId,
+        traces,
+        {
+          ...layoutBase,
+          xaxis: { title: xTitle, rangemode: "tozero", zeroline: false },
+          yaxis: { title: yTitle, rangemode: "tozero", zeroline: false },
+          legend: { orientation: "h", y: 1.12 },
+        },
+        config
+      );
     }
-  }
-});
 
+    scatterPorRol(
+      "adherencia",
+      "duracion_seg",
+      "Adherencia (%)",
+      "Duración media (s)",
+      "scatterAdherenciaChart"
+    );
+    scatterPorRol(
+      "amplitud",
+      "sesiones",
+      "Amplitud (secciones)",
+      "Sesiones",
+      "scatterAmplitudChart"
+    );
+
+    const boxTraces = (analisis.adherencia_por_rol.labels || []).map((rol, i) => ({
+      type: "box",
+      name: rol,
+      y: analisis.adherencia_por_rol.series[i],
+      boxpoints: "outliers",
+      marker: { color: paletaRol[rol] || "#8898aa" },
+      line: { color: paletaRol[rol] || "#8898aa" },
+      hovertemplate: "%{y:.1f}%<extra>" + rol + "</extra>",
+    }));
+    Plotly.newPlot(
+      "boxRolChart",
+      boxTraces,
+      {
+        ...layoutBase,
+        yaxis: { title: "Adherencia (%)", rangemode: "tozero" },
+        showlegend: false,
+      },
+      config
+    );
+  })();
 </script>
-
+{% endif %}
 {% endblock javascripts %}
