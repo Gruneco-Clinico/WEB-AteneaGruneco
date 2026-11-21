@@ -13,7 +13,7 @@
               <li class="breadcrumb-item"><a href="#"><i class="fas fa-home"></i></a></li>
               <li class="breadcrumb-item"><a href="#">Atenea</a></li>
               <li class="breadcrumb-item active" aria-current="page">
-                Biomarcadores digitales - RecuérdaMe
+                RecuérdaMe — investigación
               </li>
             </ol>
           </nav>
@@ -37,7 +37,7 @@
             <div class="card-body">
               <div class="row">
                 <div class="col">
-                  <h5 class="card-title text-uppercase text-muted mb-0">Personas</h5>
+                  <h5 class="card-title text-uppercase text-muted mb-0">Personas con actividad</h5>
                   <span class="h2 font-weight-bold mb-0">{{ cohorte.kpis.personas }}</span>
                 </div>
                 <div class="col-auto">
@@ -46,7 +46,7 @@
                   </div>
                 </div>
               </div>
-              <p class="mt-3 mb-0 text-sm text-muted">Con actividad en el periodo</p>
+              <p class="mt-3 mb-0 text-sm text-muted">Cohorte PostHog del periodo seleccionado</p>
             </div>
           </div>
         </div>
@@ -93,7 +93,7 @@
             <div class="card-body">
               <div class="row">
                 <div class="col">
-                  <h5 class="card-title text-uppercase text-muted mb-0">Sesiones</h5>
+                  <h5 class="card-title text-uppercase text-muted mb-0">Sesiones app</h5>
                   <span class="h2 font-weight-bold mb-0">{{ cohorte.kpis.sesiones }}</span>
                 </div>
                 <div class="col-auto">
@@ -132,35 +132,48 @@
 
   <div class="d-flex flex-wrap justify-content-between align-items-center mt-4">
     <small class="text-muted mb-2">
-      Periodo: {{ date_from }} a {{ date_to }} (hora de Bogotá).
-      Zoom y pan en las gráficas; doble clic restablece la vista.
+      Periodo cohorte: {{ date_from }} a {{ date_to }} (Bogotá).
+      Zoom/pan en gráficas; doble clic restablece.
     </small>
     <div class="mb-2">
-      <a href="{% url 'listado_usuarios_recuerdame' %}" class="btn btn-sm btn-neutral"
-         title="Ver estadísticas por usuario">
-        <i class="fas fa-user"></i> Ver estadísticas por usuario
+      <a href="{% url 'listado_usuarios_recuerdame' %}" class="btn btn-sm btn-neutral">
+        <i class="fas fa-user"></i> Ficha por email
       </a>
-      <a href="{% url 'estadisticas_biomarcadores_csv' %}?dias={{ dias }}" class="btn btn-sm btn-primary"
-         title="Un solo CSV con todas las personas del periodo">
-        <i class="fas fa-download"></i> Descargar CSV de todos
+      <a href="{% url 'estadisticas_biomarcadores_csv' %}?dias={{ dias }}" class="btn btn-sm btn-primary">
+        <i class="fas fa-download"></i> CSV cohorte
       </a>
-      <a href="{% url 'estadisticas_anosognosia_cruce_csv' %}" class="btn btn-sm btn-neutral"
-         title="Sesiones Anosognosia (examen 56) enriquecidas con RecuérdaMe">
+      <a href="{% url 'estadisticas_anosognosia_cruce_csv' %}" class="btn btn-sm btn-neutral">
         <i class="fas fa-link"></i> CSV cruce Anosognosia
       </a>
     </div>
   </div>
 
+  {# —— 0. Lectura del tablero —— #}
+  <div class="card shadow mt-3 border-0">
+    <div class="card-body py-3">
+      <h3 class="mb-2">Cómo leer este tablero</h3>
+      <ol class="mb-2 pl-3 text-sm">
+        <li><strong>Cuenta RecuérdaMe</strong> (documento/correo): identidad clínica 1:1 — logins y juegos autenticados.</li>
+        <li><strong>PostHog paciente</strong> (email o franja única): biomarcadores atribuibles a una persona.</li>
+        <li><strong>PostHog franja / cohorte anónima</strong>: útiles a nivel grupo; <em>no</em> para conclusiones diagnósticas individuales.</li>
+      </ol>
+      <p class="mb-0 text-muted small">
+        Pincha una barra de día (o hora) para ver los <code>person_id</code> anónimos;
+        si ya hay identificación, se muestra nombre o correo.
+      </p>
+    </div>
+  </div>
+
   {% if cruce %}
+  {# —— 1. Anosognosia —— #}
   <div class="row mt-4">
     <div class="col-12">
       <div class="card shadow">
         <div class="card-header d-flex flex-wrap justify-content-between align-items-center">
           <div>
-            <h3 class="mb-0">Cruce Anosognosia × RecuérdaMe</h3>
+            <h3 class="mb-0">1. Anosognosia × RecuérdaMe</h3>
             <small class="text-muted">
-              Examen 56 · sesiones {{ cruce.date_from }} a {{ cruce.date_to }}.
-              PostHog por correo · cuenta RecuérdaMe por documento/correo (logins y juegos).
+              Examen 56 · intervenciones {{ cruce.date_from }} a {{ cruce.date_to }}.
             </small>
           </div>
           <a href="{% url 'estadisticas_anosognosia_cruce_csv' %}" class="btn btn-sm btn-primary mt-2">
@@ -174,89 +187,264 @@
           {% if cruce.error_activity %}
             <div class="alert alert-warning">{{ cruce.error_activity }}</div>
           {% endif %}
+
+          <div class="alert alert-secondary py-2 small">
+            <strong>Lectura rápida:</strong>
+            la cuenta app enlaza pacientes clínicos con uso autenticado;
+            PostHog 1:1 es raro (casi anónimo);
+            la mayoría de sesiones caen en franja grupal (candidatos, no atribuibles).
+          </div>
+
           <div class="row mb-4">
             <div class="col-md-2 col-6 mb-2">
-              <div class="text-muted text-uppercase text-sm">Pacientes</div>
+              <div class="text-muted text-uppercase text-sm">Pacientes clínicos</div>
               <div class="h2 mb-0">{{ cruce.kpis.pacientes }}</div>
             </div>
             <div class="col-md-2 col-6 mb-2">
-              <div class="text-muted text-uppercase text-sm">Sesiones</div>
+              <div class="text-muted text-uppercase text-sm">Sesiones intervención</div>
               <div class="h2 mb-0">{{ cruce.kpis.sesiones }}</div>
             </div>
-            <div class="col-md-3 col-6 mb-2">
-              <div class="text-muted text-uppercase text-sm">Match PostHog</div>
-              <div class="h2 mb-0">{{ cruce.kpis.con_match_email }}</div>
-            </div>
-            <div class="col-md-3 col-6 mb-2">
-              <div class="text-muted text-uppercase text-sm">Match cuenta app</div>
-              <div class="h2 mb-0">{{ cruce.kpis.con_match_recuerdame }}</div>
+            <div class="col-md-2 col-6 mb-2">
+              <div class="text-muted text-uppercase text-sm">Identificados PostHog (1:1)</div>
+              <div class="h2 mb-0">{{ cruce.kpis.con_match_paciente }}</div>
+              <small class="text-muted">email {{ cruce.kpis.con_match_email }} · único {{ cruce.kpis.con_match_horario_unico }}</small>
             </div>
             <div class="col-md-2 col-6 mb-2">
-              <div class="text-muted text-uppercase text-sm">Fechas con uso</div>
+              <div class="text-muted text-uppercase text-sm">Sesiones solo franja</div>
+              <div class="h2 mb-0">{{ cruce.kpis.sesiones_horario_grupo }}</div>
+              <small class="text-muted">no atribuible {{ cruce.kpis.sesiones_no_atribuible }}</small>
+            </div>
+            <div class="col-md-2 col-6 mb-2">
+              <div class="text-muted text-uppercase text-sm">Con cuenta RecuérdaMe</div>
+              <div class="h2 mb-0">{{ cruce.kpis.con_match_recuerdame }}</div>
+              <small class="text-muted">login en horario {{ cruce.kpis.sesiones_con_login_horario }}</small>
+            </div>
+            <div class="col-md-2 col-6 mb-2">
+              <div class="text-muted text-uppercase text-sm">Fechas con uso app</div>
               <div class="h2 mb-0">
                 {{ cruce.kpis.fechas_con_actividad_recuerdame }}
                 <small class="text-muted">/ {{ cruce.kpis.fechas_intervencion }}</small>
               </div>
             </div>
           </div>
+
           <div class="row">
-            <div class="col-xl-5 mb-4">
-              <h4 class="mb-2">Personas activas en días de intervención</h4>
+            <div class="col-xl-7 mb-4">
+              <h4 class="mb-1">Personas activas en días de intervención</h4>
+              <p class="text-muted small mb-2">Clic en una barra para listar person_id / etiquetas de ese día.</p>
               <div id="cruceActividadChart" style="height: 280px;"></div>
             </div>
-            <div class="col-xl-7">
-              <div class="table-responsive" style="max-height: 320px;">
-                <table class="table table-sm table-hover mb-0">
-                  <thead class="thead-light">
-                    <tr>
-                      <th>Paciente</th>
-                      <th>Correo</th>
-                      <th>Sesiones</th>
-                      <th>Periodo</th>
-                      <th>PostHog</th>
-                      <th>Cuenta app</th>
-                      <th>Logins</th>
-                      <th>Juegos</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {% for p in cruce.pacientes %}
-                    <tr>
-                      <td>{{ p.nombre|default:"—" }}</td>
-                      <td class="text-break">{{ p.correo|default:"—" }}</td>
-                      <td>{{ p.sesiones }}</td>
-                      <td class="text-nowrap">
-                        {% if p.primera_sesion %}
-                          {{ p.primera_sesion }}{% if p.ultima_sesion and p.ultima_sesion != p.primera_sesion %} → {{ p.ultima_sesion }}{% endif %}
-                        {% else %}—{% endif %}
-                      </td>
-                      <td>
-                        {% if p.match_posthog == "sí" %}
-                          <span class="badge badge-success">sí</span>
-                        {% else %}
-                          <span class="badge badge-secondary">no</span>
-                        {% endif %}
-                      </td>
-                      <td>
-                        {% if p.match_recuerdame == "sí" %}
-                          <span class="badge badge-success">sí</span>
-                        {% else %}
-                          <span class="badge badge-secondary">no</span>
-                        {% endif %}
-                      </td>
-                      <td>
-                        {% if p.logins_en_ventana != "" %}{{ p.logins_en_ventana }}{% else %}—{% endif %}
-                      </td>
-                      <td>
-                        {% if p.sesiones_juego != "" %}{{ p.sesiones_juego }}{% else %}—{% endif %}
-                      </td>
-                    </tr>
-                    {% empty %}
-                    <tr><td colspan="8" class="text-muted">Sin sesiones del examen 56.</td></tr>
-                    {% endfor %}
-                  </tbody>
-                </table>
+            <div class="col-xl-5 mb-4">
+              <div class="border rounded p-3 bg-secondary" style="min-height: 280px;">
+                <div id="crucePersonasDiaPanel">
+                  <p class="text-muted small mb-0">Selecciona un día en la gráfica.</p>
+                </div>
               </div>
+            </div>
+          </div>
+
+          {# Tabla pacientes #}
+          <div data-filter-root class="mt-2" id="filtro-pacientes-anosognosia">
+            <div class="d-flex flex-wrap align-items-end mb-2">
+              <h4 class="mb-2 mr-auto">Pacientes del cruce
+                <span class="badge badge-light" data-filter-count></span>
+              </h4>
+              <input type="search" class="form-control form-control-sm mr-2 mb-2" style="max-width:180px"
+                     placeholder="Nombre / correo / doc" data-filter-key="q" autocomplete="off">
+              <select class="form-control form-control-sm mr-2 mb-2" style="max-width:140px"
+                      data-filter-key="cuenta" data-filter-mode="exact">
+                <option value="">Cuenta app: todas</option>
+                <option value="si">Con cuenta</option>
+                <option value="no">Sin cuenta</option>
+              </select>
+              <select class="form-control form-control-sm mr-2 mb-2" style="max-width:150px"
+                      data-filter-key="ambito" data-filter-mode="exact">
+                <option value="">Ámbito PostHog</option>
+                <option value="paciente">paciente</option>
+                <option value="franja">franja</option>
+                <option value="ninguno">ninguno</option>
+              </select>
+              <select class="form-control form-control-sm mb-2" style="max-width:130px"
+                      data-filter-key="confianza" data-filter-mode="exact">
+                <option value="">Confianza</option>
+                <option value="alta">alta</option>
+                <option value="media">media</option>
+                <option value="baja">baja</option>
+              </select>
+            </div>
+            <div class="table-responsive" style="max-height: 420px;">
+              <table class="table table-sm table-hover mb-0">
+                <thead class="thead-light">
+                  <tr>
+                    <th></th>
+                    <th>Paciente</th>
+                    <th>Documento</th>
+                    <th>Sesiones</th>
+                    <th>Cuenta app</th>
+                    <th>Login horario</th>
+                    <th>Juegos</th>
+                    <th>Ámbito PH</th>
+                    <th>Candidatos franja</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for p in cruce.pacientes %}
+                  <tr data-filter-row
+                      data-q="{{ p.nombre }} {{ p.correo }} {{ p.documento }}"
+                      data-cuenta="{% if p.match_recuerdame == 'sí' %}si{% else %}no{% endif %}"
+                      data-ambito="{{ p.match_scope }}"
+                      data-confianza="{{ p.match_confianza }}">
+                    <td>
+                      <button type="button" class="btn btn-sm btn-link p-0" data-toggle="collapse"
+                              data-target="#pac-det-{{ p.paciente_id }}" aria-expanded="false">
+                        <i class="fas fa-chevron-down"></i>
+                      </button>
+                    </td>
+                    <td>
+                      <div>{{ p.nombre|default:"—" }}</div>
+                      <div class="small text-muted text-break">{{ p.correo|default:"" }}</div>
+                    </td>
+                    <td class="text-nowrap">{{ p.documento|default:"—" }}</td>
+                    <td>{{ p.sesiones }}</td>
+                    <td>
+                      {% if p.match_recuerdame == "sí" %}
+                        <span class="badge badge-success">sí</span>
+                      {% else %}
+                        <span class="badge badge-secondary">no</span>
+                      {% endif %}
+                    </td>
+                    <td>
+                      {% if p.sesiones_login_horario %}
+                        {{ p.sesiones_login_horario }}/{{ p.sesiones }}
+                        <span class="text-muted small">({{ p.pct_login_horario }}%)</span>
+                      {% else %}—{% endif %}
+                    </td>
+                    <td>{% if p.sesiones_juego != "" %}{{ p.sesiones_juego }}{% else %}—{% endif %}</td>
+                    <td>
+                      {% if p.match_scope == "paciente" %}
+                        <span class="badge badge-success">paciente</span>
+                      {% elif p.match_scope == "franja" %}
+                        <span class="badge badge-warning">franja</span>
+                      {% else %}
+                        <span class="badge badge-secondary">ninguno</span>
+                      {% endif %}
+                      {% if p.match_origen and p.match_origen != "ninguno" %}
+                        <div class="small text-muted">{{ p.match_origen }}{% if p.match_confianza %} · {{ p.match_confianza }}{% endif %}</div>
+                      {% endif %}
+                    </td>
+                    <td>{{ p.n_candidatos_franja|default:0 }}</td>
+                  </tr>
+                  <tr class="collapse bg-secondary" id="pac-det-{{ p.paciente_id }}">
+                    <td colspan="9" class="small">
+                      <div class="row py-2">
+                        <div class="col-md-4">
+                          <strong>Actividad autenticada</strong>
+                          <ul class="mb-0 pl-3">
+                            <li>Mongo: <code>{{ p.mongo_id|default:"—" }}</code></li>
+                            <li>Logins en ventana: {{ p.logins_en_ventana|default:"—" }}</li>
+                            <li>Días con login: {{ p.dias_con_login|default:"—" }}</li>
+                            <li>Juegos en horario: {{ p.sesiones_juego_horario|default:0 }}</li>
+                          </ul>
+                        </div>
+                        <div class="col-md-4">
+                          <strong>PostHog</strong>
+                          <ul class="mb-0 pl-3">
+                            {% if p.atribuible == "sí" and p.person_id %}
+                              <li>person_id: <code>{{ p.person_id_corto }}</code></li>
+                              <li>Adherencia: {{ p.adherencia_pct|default:"—" }}%</li>
+                              <li>Sesiones PH: {{ p.sesiones_posthog|default:"—" }}</li>
+                              <li>Dispositivo: {{ p.dispositivo_principal|default:"—" }}</li>
+                            {% else %}
+                              <li class="text-muted">Sin atribución 1:1 (biomarcadores individuales no aplicables).</li>
+                              <li>Sesiones en franja grupal: {{ p.franjas_grupo }}</li>
+                            {% endif %}
+                          </ul>
+                        </div>
+                        <div class="col-md-4">
+                          <strong>Candidatos de franja (no atribuibles)</strong>
+                          {% if p.person_ids_franja %}
+                            <ul class="mb-0 pl-3">
+                              {% for pid in p.person_ids_franja|slice:":12" %}
+                                <li><code>{{ pid|truncatechars:14 }}</code></li>
+                              {% endfor %}
+                              {% if p.n_candidatos_franja > 12 %}
+                                <li class="text-muted">… y más candidatos</li>
+                              {% endif %}
+                            </ul>
+                          {% else %}
+                            <p class="text-muted mb-0">Ninguno en sus franjas.</p>
+                          {% endif %}
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                  {% empty %}
+                  <tr><td colspan="9" class="text-muted">Sin sesiones del examen 56.</td></tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {# Tabla franjas #}
+          <div data-filter-root class="mt-4" id="filtro-franjas-anosognosia">
+            <div class="d-flex flex-wrap align-items-end mb-2">
+              <h4 class="mb-2 mr-auto">Franjas clínicas
+                <span class="badge badge-light" data-filter-count></span>
+              </h4>
+              <input type="search" class="form-control form-control-sm mr-2 mb-2" style="max-width:160px"
+                     placeholder="Fecha / hora / id" data-filter-key="q" autocomplete="off">
+              <select class="form-control form-control-sm mb-2" style="max-width:160px"
+                      data-filter-key="origen" data-filter-mode="exact">
+                <option value="">Origen: todos</option>
+                <option value="horario_unico">horario_unico</option>
+                <option value="horario_grupo">horario_grupo</option>
+                <option value="ninguno">ninguno</option>
+              </select>
+            </div>
+            <p class="text-muted small">N = pacientes Atenea · M = person_id PostHog en la ventana ±15 min.</p>
+            <div class="table-responsive" style="max-height: 320px;">
+              <table class="table table-sm table-hover mb-0">
+                <thead class="thead-light">
+                  <tr>
+                    <th>Fecha</th>
+                    <th>Horario</th>
+                    <th>N</th>
+                    <th>M</th>
+                    <th>Origen</th>
+                    <th>Confianza</th>
+                    <th>Personas (etiqueta / id)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for f in cruce.franjas %}
+                  <tr data-filter-row
+                      data-q="{{ f.fecha }} {{ f.hora_inicio }} {{ f.hora_final }} {{ f.person_ids_txt }}"
+                      data-origen="{{ f.match_origen }}">
+                    <td class="text-nowrap">{{ f.fecha }}</td>
+                    <td class="text-nowrap">{{ f.hora_inicio }}–{{ f.hora_final }}</td>
+                    <td>{{ f.n_pacientes }}</td>
+                    <td>{{ f.n_personas }}</td>
+                    <td>{{ f.match_origen }}</td>
+                    <td>{{ f.match_confianza|default:"—" }}</td>
+                    <td class="small">
+                      {% for pe in f.personas|slice:":6" %}
+                        {% if pe.identificado %}
+                          <span class="badge badge-success">{{ pe.etiqueta|truncatechars:28 }}</span>
+                        {% else %}
+                          <code>{{ pe.etiqueta }}</code>
+                        {% endif %}
+                      {% empty %}
+                        <span class="text-muted">—</span>
+                      {% endfor %}
+                      {% if f.n_personas > 6 %}<span class="text-muted">…</span>{% endif %}
+                    </td>
+                  </tr>
+                  {% empty %}
+                  <tr><td colspan="7" class="text-muted">Sin franjas.</td></tr>
+                  {% endfor %}
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
@@ -266,7 +454,17 @@
   {% endif %}
 
   {% if cohorte %}
+  {# —— 2. Cohorte —— #}
   <div class="row mt-4">
+    <div class="col-12">
+      <h3 class="mb-1">2. Uso de la app en el periodo</h3>
+      <p class="text-muted small mb-3">
+        Cohorte PostHog {{ date_from }} → {{ date_to }}. Series agregadas + desglose por person_id al hacer clic.
+      </p>
+    </div>
+  </div>
+
+  <div class="row">
     <div class="col-xl-8">
       <div class="card shadow">
         <div class="card-header d-flex align-items-center">
@@ -274,50 +472,76 @@
             <img src="{% static 'assets/img/theme/RecuerdaMe.png' %}" alt="Logo" style="height: 40px;" class="mr-2">
           </a>
           <div>
-            <h3 class="mb-0">Usuarios activos por día</h3>
-            <small class="text-muted">Arrastra para hacer zoom en el periodo</small>
+            <h3 class="mb-0">Activos por día</h3>
+            <small class="text-muted">Volumen y picos de uso · clic para ver personas</small>
           </div>
         </div>
         <div class="card-body">
-          <div id="actividadChart" style="height: 320px;"></div>
+          <div id="actividadChart" style="height: 300px;"></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-4">
+      <div class="card shadow h-100">
+        <div class="card-header">
+          <h3 class="mb-0">Personas del día</h3>
+          <small class="text-muted">Identificados primero; si no, id anónimo</small>
+        </div>
+        <div class="card-body" style="max-height: 340px; overflow: auto;">
+          <div id="cohortePersonasDiaPanel">
+            <p class="text-muted small mb-0">Selecciona un día en la gráfica.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mt-3">
+    <div class="col-xl-4">
+      <div class="card shadow">
+        <div class="card-header">
+          <h3 class="mb-0">Dispositivo</h3>
+          <small class="text-muted">Sesgo tablet/sala vs móvil · sin desglose por persona</small>
+        </div>
+        <div class="card-body">
+          <div id="dispositivoChart" style="height: 300px;"></div>
         </div>
       </div>
     </div>
     <div class="col-xl-4">
       <div class="card shadow">
         <div class="card-header">
-          <h3 class="mb-0">Dispositivo</h3>
-          <small class="text-muted">Personas por tipo</small>
+          <h3 class="mb-0">Vistas por sección</h3>
+          <small class="text-muted">Cobertura de contenidos · agregado</small>
         </div>
         <div class="card-body">
-          <div id="dispositivoChart" style="height: 320px;"></div>
+          <div id="seccionesChart" style="height: 300px;"></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-4">
+      <div class="card shadow">
+        <div class="card-header">
+          <h3 class="mb-0">Actividad por hora</h3>
+          <small class="text-muted">Bogotá · clic para person_ids de esa hora</small>
+        </div>
+        <div class="card-body">
+          <div id="horaChart" style="height: 220px;"></div>
+          <div id="cohortePersonasHoraPanel" class="mt-2 border-top pt-2" style="max-height: 120px; overflow: auto;">
+            <p class="text-muted small mb-0">Selecciona una hora.</p>
+          </div>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="row">
-    <div class="col-xl-7">
-      <div class="card shadow">
-        <div class="card-header">
-          <h3 class="mb-0">Vistas por sección</h3>
-          <small class="text-muted">Contenido clínico / de cuidado</small>
-        </div>
-        <div class="card-body">
-          <div id="seccionesChart" style="height: 360px;"></div>
-        </div>
-      </div>
-    </div>
-    <div class="col-xl-5">
-      <div class="card shadow">
-        <div class="card-header">
-          <h3 class="mb-0">Actividad por hora</h3>
-          <small class="text-muted">Hora de Bogotá</small>
-        </div>
-        <div class="card-body">
-          <div id="horaChart" style="height: 360px;"></div>
-        </div>
-      </div>
+  {# —— 3. Exploratorio —— #}
+  <div class="row mt-4">
+    <div class="col-12">
+      <h3 class="mb-1">3. Exploración por persona</h3>
+      <p class="text-muted small mb-3">
+        Heterogeneidad entre personas/roles (exploratorio, no causal). Hover muestra etiqueta o person_id.
+      </p>
     </div>
   </div>
 
@@ -346,7 +570,7 @@
     </div>
   </div>
 
-  <div class="row">
+  <div class="row mt-3">
     <div class="col-xl-12">
       <div class="card shadow">
         <div class="card-header">
@@ -354,7 +578,89 @@
           <small class="text-muted">Caja y bigotes · hover para cuartiles</small>
         </div>
         <div class="card-body">
-          <div id="boxRolChart" style="height: 360px;"></div>
+          <div id="boxRolChart" style="height: 320px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mt-3">
+    <div class="col-12">
+      <div class="card shadow" data-filter-root id="filtro-personas-cohorte">
+        <div class="card-header d-flex flex-wrap align-items-end">
+          <div class="mr-auto mb-2">
+            <h3 class="mb-0">Personas del periodo
+              <span class="badge badge-light" data-filter-count></span>
+            </h3>
+            <small class="text-muted">Tabla filtrable · enlace a ficha si hay email</small>
+          </div>
+          <input type="search" class="form-control form-control-sm mr-2 mb-2" style="max-width:180px"
+                 placeholder="Etiqueta / email / id" data-filter-key="q" autocomplete="off">
+          <select class="form-control form-control-sm mr-2 mb-2" style="max-width:150px"
+                  data-filter-key="rol" data-filter-mode="exact">
+            <option value="">Rol: todos</option>
+            <option value="participante">Participante</option>
+            <option value="acompanante">Acompañante</option>
+            <option value="ambos">Ambos</option>
+            <option value="sin determinar">Sin determinar</option>
+          </select>
+          <select class="form-control form-control-sm mb-2" style="max-width:140px"
+                  data-filter-key="dispositivo" data-filter-mode="exact">
+            <option value="">Dispositivo</option>
+            <option value="computador">Computador</option>
+            <option value="celular">Celular</option>
+            <option value="tablet">Tablet</option>
+            <option value="desconocido">Desconocido</option>
+          </select>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive" style="max-height: 420px;">
+            <table class="table table-sm table-hover mb-0">
+              <thead class="thead-light">
+                <tr>
+                  <th>Etiqueta</th>
+                  <th>person_id</th>
+                  <th>Rol</th>
+                  <th>Adherencia</th>
+                  <th>Sesiones</th>
+                  <th>Dispositivo</th>
+                  <th>Recencia (d)</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for u in cohorte.personas_tabla %}
+                <tr data-filter-row
+                    data-q="{{ u.etiqueta }} {{ u.email }} {{ u.person_id }}"
+                    data-rol="{{ u.rol|lower }}"
+                    data-dispositivo="{{ u.dispositivo|lower }}">
+                  <td>
+                    {% if u.identificado %}
+                      <span class="badge badge-success mr-1">id.</span>
+                    {% else %}
+                      <span class="badge badge-secondary mr-1">anon</span>
+                    {% endif %}
+                    <span class="text-break">{{ u.etiqueta }}</span>
+                  </td>
+                  <td><code class="small">{{ u.person_id_corto }}</code></td>
+                  <td>{{ u.rol }}</td>
+                  <td>{{ u.adherencia }}%</td>
+                  <td>{{ u.sesiones }}</td>
+                  <td>{{ u.dispositivo }}</td>
+                  <td>{{ u.recencia_dias }}</td>
+                  <td>
+                    {% if u.email %}
+                      <a class="btn btn-sm btn-link p-0"
+                         href="{% url 'estadisticas_usuario_detalle' u.email %}?dias={{ dias }}">Ver</a>
+                    {% else %}—{% endif %}
+                  </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="8" class="text-muted p-3">Sin personas en el periodo.</td></tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
@@ -366,18 +672,30 @@
 {% endblock content %}
 
 {% block javascripts %}
+<script src="{% static 'assets/js/recuerdame-dashboard.js' %}"></script>
 {% if cohorte or cruce %}
 <script src="https://cdn.jsdelivr.net/npm/plotly.js@2.35.2/dist/plotly.min.js"></script>
 {% endif %}
 
+<script>
+  document.querySelectorAll("[data-filter-root]").forEach(function (root) {
+    if (window.RecuerdameDash) RecuerdameDash.initTableFilters(root);
+  });
+</script>
+
 {% if cruce %}
 {{ cruce.actividad_dias|json_script:"cruce-actividad" }}
+{{ cruce.personas_por_dia|json_script:"cruce-personas-dia" }}
 <script>
   (function () {
     const el = document.getElementById("cruce-actividad");
+    const mapEl = document.getElementById("cruce-personas-dia");
     const chart = document.getElementById("cruceActividadChart");
+    const panel = document.getElementById("crucePersonasDiaPanel");
     if (!el || !chart || typeof Plotly === "undefined") return;
     const data = JSON.parse(el.textContent);
+    const porDia = mapEl ? JSON.parse(mapEl.textContent) : {};
+
     Plotly.newPlot(
       chart,
       [{
@@ -385,7 +703,7 @@
         x: data.labels,
         y: data.values,
         marker: { color: "#11cdef" },
-        hovertemplate: "%{x}<br>%{y} personas en RecuérdaMe<extra></extra>",
+        hovertemplate: "%{x}<br>%{y} personas · clic para ver IDs<extra></extra>",
       }],
       {
         margin: { t: 16, r: 16, b: 56, l: 48 },
@@ -402,6 +720,15 @@
         toImageButtonOptions: { format: "png", filename: "anosognosia-recuerdame-dias" },
       }
     );
+
+    chart.on("plotly_click", function (ev) {
+      const key = RecuerdameDash.dateKeyFromPlotly(ev.points && ev.points[0]);
+      RecuerdameDash.renderPersonList(
+        panel,
+        porDia[key] || [],
+        "Día " + key
+      );
+    });
   })();
 </script>
 {% endif %}
@@ -412,6 +739,8 @@
 {{ cohorte.hora|json_script:"bio-hora" }}
 {{ cohorte.dispositivo|json_script:"bio-dispositivo" }}
 {{ cohorte.analisis|json_script:"bio-analisis" }}
+{{ cohorte.personas_por_dia|json_script:"bio-personas-dia" }}
+{{ cohorte.personas_por_hora|json_script:"bio-personas-hora" }}
 
 <script>
   (function () {
@@ -421,6 +750,10 @@
     const hora = leer("bio-hora");
     const dispositivo = leer("bio-dispositivo");
     const analisis = leer("bio-analisis");
+    const personasDia = leer("bio-personas-dia");
+    const personasHora = leer("bio-personas-hora");
+    const panelDia = document.getElementById("cohortePersonasDiaPanel");
+    const panelHora = document.getElementById("cohortePersonasHoraPanel");
 
     const config = {
       responsive: true,
@@ -456,7 +789,7 @@
         marker: { size: 6 },
         fill: "tozeroy",
         fillcolor: "rgba(94, 114, 228, 0.12)",
-        hovertemplate: "%{x}<br>%{y} personas<extra></extra>",
+        hovertemplate: "%{x}<br>%{y} personas · clic para IDs<extra></extra>",
       }],
       {
         ...layoutBase,
@@ -464,7 +797,12 @@
         yaxis: { title: "Personas", rangemode: "tozero", fixedrange: false },
       },
       config
-    );
+    ).then(function (gd) {
+      gd.on("plotly_click", function (ev) {
+        const key = RecuerdameDash.dateKeyFromPlotly(ev.points && ev.points[0]);
+        RecuerdameDash.renderPersonList(panelDia, personasDia[key] || [], "Día " + key);
+      });
+    });
 
     Plotly.newPlot(
       "dispositivoChart",
@@ -507,15 +845,25 @@
         x: hora.labels,
         y: hora.values,
         marker: { color: "#fb6340" },
-        hovertemplate: "%{x}<br>%{y} eventos<extra></extra>",
+        hovertemplate: "%{x}<br>%{y} eventos · clic para IDs<extra></extra>",
       }],
       {
         ...layoutBase,
+        margin: { t: 16, r: 16, b: 40, l: 48 },
         xaxis: { title: "Hora" },
         yaxis: { title: "Eventos", rangemode: "tozero" },
       },
       config
-    );
+    ).then(function (gd) {
+      gd.on("plotly_click", function (ev) {
+        const key = RecuerdameDash.hourKeyFromPlotly(ev.points && ev.points[0]);
+        RecuerdameDash.renderPersonList(
+          panelHora,
+          personasHora[key] || [],
+          "Hora " + key + ":00"
+        );
+      });
+    });
 
     const puntos = analisis.puntos || [];
     const roles = [...new Set(puntos.map((p) => p.rol))];
@@ -534,6 +882,8 @@
             p.sesiones,
             p.amplitud,
             p.intensidad,
+            p.person_id || "",
+            p.identificado ? "sí" : "no",
           ]),
           marker: {
             size: 9,
@@ -547,7 +897,9 @@
             yTitle + ": %{y}<br>" +
             "Sesiones: %{customdata[0]}<br>" +
             "Amplitud: %{customdata[1]}<br>" +
-            "Intensidad: %{customdata[2]}<extra>" + rol + "</extra>",
+            "Intensidad: %{customdata[2]}<br>" +
+            "person_id: %{customdata[3]}<br>" +
+            "Identificado: %{customdata[4]}<extra>" + rol + "</extra>",
         };
       });
       Plotly.newPlot(

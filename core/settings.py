@@ -176,6 +176,18 @@ RECUERDAME_API_URL = config(
 )
 RECUERDAME_ATENEA_API_KEY = config("RECUERDAME_ATENEA_API_KEY", default="")
 
+# Cruce Anosognosia × PostHog por horario (filtros anti-ruido)
+RECUERDAME_POSTHOG_HOST = config(
+    "RECUERDAME_POSTHOG_HOST", default="recuerdame.gna.org.co"
+)
+# Dominios de correo staff/internos a excluir (coma-separados)
+RECUERDAME_STAFF_EMAIL_DOMAINS = config(
+    "RECUERDAME_STAFF_EMAIL_DOMAINS",
+    default="gna.org.co,udea.edu.co,gruneco.org",
+)
+# person_id conocidos de tablets/sala/pruebas (coma-separados)
+RECUERDAME_PERSON_ID_DENYLIST = config("RECUERDAME_PERSON_ID_DENYLIST", default="")
+
 
 # Configuración del correo electrónico usando Gmail SMTP
 

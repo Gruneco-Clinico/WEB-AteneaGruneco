@@ -141,6 +141,21 @@ def rango_fechas(dias):
 # ---------------------------------------------------------------------------
 
 
+def _posthog_configurado():
+    return bool(
+        settings.POSTHOG_API_URL
+        and settings.POSTHOG_PROJECT_ID
+        and settings.POSTHOG_PERSONAL_API_KEY
+    )
+
+
+def _posthog_headers():
+    return {
+        "Authorization": f"Bearer {settings.POSTHOG_PERSONAL_API_KEY}",
+        "Content-Type": "application/json",
+    }
+
+
 def _ejecutar_endpoint(nombre, date_from, date_to):
     """Ejecuta un endpoint de PostHog y devuelve una lista de dicts por fila."""
     clave_cache = f"recuerdame_bio:{nombre}:{date_from}:{date_to}"
@@ -148,11 +163,7 @@ def _ejecutar_endpoint(nombre, date_from, date_to):
     if en_cache is not None:
         return en_cache
 
-    if not (
-        settings.POSTHOG_API_URL
-        and settings.POSTHOG_PROJECT_ID
-        and settings.POSTHOG_PERSONAL_API_KEY
-    ):
+    if not _posthog_configurado():
         logger.error("Faltan variables de configuración de PostHog.")
         raise RecuerdameAnalyticsError(MENSAJE_ERROR)
 
@@ -160,17 +171,15 @@ def _ejecutar_endpoint(nombre, date_from, date_to):
         f"{settings.POSTHOG_API_URL.rstrip('/')}/api/projects/"
         f"{settings.POSTHOG_PROJECT_ID}/endpoints/{nombre}/run"
     )
-    headers = {
-        "Authorization": f"Bearer {settings.POSTHOG_PERSONAL_API_KEY}",
-        "Content-Type": "application/json",
-    }
     cuerpo = {
         "variables": {"date_from": date_from, "date_to": date_to},
         "limit": LIMITE_FILAS,
     }
 
     try:
-        respuesta = requests.post(url, headers=headers, json=cuerpo, timeout=TIMEOUT)
+        respuesta = requests.post(
+            url, headers=_posthog_headers(), json=cuerpo, timeout=TIMEOUT
+        )
         respuesta.raise_for_status()
         datos = respuesta.json()
     except requests.exceptions.RequestException as exc:
@@ -193,6 +202,45 @@ def _ejecutar_endpoint(nombre, date_from, date_to):
     return filas
 
 
+def _ejecutar_hogql(query_sql, *, cache_key=None):
+    """Ejecuta una HogQLQuery vía Query API y devuelve filas como dicts."""
+    if cache_key:
+        en_cache = cache.get(cache_key)
+        if en_cache is not None:
+            return en_cache
+
+    if not _posthog_configurado():
+        logger.error("Faltan variables de configuración de PostHog.")
+        raise RecuerdameAnalyticsError(MENSAJE_ERROR)
+
+    url = (
+        f"{settings.POSTHOG_API_URL.rstrip('/')}/api/projects/"
+        f"{settings.POSTHOG_PROJECT_ID}/query/"
+    )
+    cuerpo = {"query": {"kind": "HogQLQuery", "query": query_sql}}
+    # HogQL de actividad puede ser más pesado que los endpoints.
+    timeout_hogql = (5, 90)
+
+    try:
+        respuesta = requests.post(
+            url, headers=_posthog_headers(), json=cuerpo, timeout=timeout_hogql
+        )
+        respuesta.raise_for_status()
+        datos = respuesta.json()
+    except requests.exceptions.RequestException as exc:
+        estado = getattr(getattr(exc, "response", None), "status_code", None)
+        logger.error("Error HogQL PostHog (HTTP %s): %s", estado, exc)
+        raise RecuerdameAnalyticsError(MENSAJE_ERROR) from None
+    except ValueError:
+        logger.error("Respuesta no JSON de HogQL PostHog.")
+        raise RecuerdameAnalyticsError(MENSAJE_ERROR) from None
+
+    filas = _filas_como_dicts(datos)
+    if cache_key:
+        cache.set(cache_key, filas, CACHE_SEGUNDOS)
+    return filas
+
+
 def _filas_como_dicts(datos):
     """Normaliza la respuesta (``results`` + ``columns``) a una lista de dicts."""
     if not isinstance(datos, dict):
@@ -207,6 +255,254 @@ def _filas_como_dicts(datos):
             filas.append(fila)
         elif isinstance(fila, (list, tuple)) and columnas:
             filas.append(dict(zip(columnas, fila)))
+    return filas
+
+
+# ---------------------------------------------------------------------------
+# Actividad por persona (cruce horario Anosognosia)
+# ---------------------------------------------------------------------------
+
+
+def _lista_csv_setting(nombre, default=""):
+    raw = getattr(settings, nombre, default) or default
+    return {p.strip().lower() for p in str(raw).split(",") if p.strip()}
+
+
+def dominios_staff():
+    return _lista_csv_setting("RECUERDAME_STAFF_EMAIL_DOMAINS")
+
+
+def person_id_denylist():
+    return _lista_csv_setting("RECUERDAME_PERSON_ID_DENYLIST")
+
+
+def es_email_staff(email):
+    email = (email or "").strip().lower()
+    if not email or "@" not in email:
+        return False
+    dominio = email.rsplit("@", 1)[-1]
+    return dominio in dominios_staff()
+
+
+def es_person_id_denegado(person_id):
+    return str(person_id or "").strip().lower() in person_id_denylist()
+
+
+def _host_recuerdame():
+    return (
+        getattr(settings, "RECUERDAME_POSTHOG_HOST", None) or "recuerdame.gna.org.co"
+    ).strip()
+
+
+def _parse_ts_bogota(valor):
+    """Convierte timestamp PostHog a datetime aware en America/Bogota."""
+    if valor is None or valor == "":
+        return None
+    if isinstance(valor, datetime):
+        if valor.tzinfo is None:
+            return valor.replace(tzinfo=ZONA_HORARIA)
+        return valor.astimezone(ZONA_HORARIA)
+    texto = str(valor).strip()
+    if not texto:
+        return None
+    # ISO con Z o offset
+    if texto.endswith("Z"):
+        texto = texto[:-1] + "+00:00"
+    try:
+        dt = datetime.fromisoformat(texto)
+    except ValueError:
+        for fmt in (
+            "%Y-%m-%d %H:%M:%S",
+            "%Y-%m-%dT%H:%M:%S",
+            "%Y-%m-%d %H:%M:%S.%f",
+        ):
+            try:
+                dt = datetime.strptime(texto[:26], fmt)
+                break
+            except ValueError:
+                dt = None
+        if dt is None:
+            return None
+    if dt.tzinfo is None:
+        return dt.replace(tzinfo=ZONA_HORARIA)
+    return dt.astimezone(ZONA_HORARIA)
+
+
+def obtener_actividad_personas(date_from, date_to):
+    """Actividad RecuérdaMe por persona en el periodo (timestamps Bogotá).
+
+    Cada fila: ``{"person_id": str, "timestamp": datetime}`` ya filtrada de
+    bots, staff (por dominio de email de persona) y denylist de person_id.
+    Una sola query HogQL del rango; el cruce filtra por franja en memoria.
+    """
+    host = _host_recuerdame().replace("'", "")
+    # Escapar comillas simples en dominios para HogQL
+    dominios = sorted(dominios_staff())
+    if dominios:
+        conds = " OR ".join(
+            f"endsWith(lower(coalesce(person.properties.email, '')), '@{d}')"
+            for d in dominios
+            if "'" not in d
+        )
+        filtro_staff = f"AND NOT ({conds})" if conds else ""
+    else:
+        filtro_staff = ""
+
+    # Truncar a minuto para reducir filas sin perder cruce por franja (±15 min).
+    sql = f"""
+SELECT
+  toString(person_id) AS person_id,
+  toTimeZone(toStartOfMinute(timestamp), 'America/Bogota') AS ts
+FROM events
+WHERE
+  timestamp >= toDateTime('{date_from} 00:00:00', 'America/Bogota')
+  AND timestamp < toDateTime('{date_to} 00:00:00', 'America/Bogota') + INTERVAL 1 DAY
+  AND (
+    properties.$host = '{host}'
+    OR positionCaseInsensitive(coalesce(properties.$current_url, ''), '{host}') > 0
+  )
+  AND ifNull(toBool(properties.$is_bot), false) = false
+  AND event NOT IN ('$feature_flag_called', '$set', '$set_once', '$groupidentify')
+  AND coalesce(properties.$browser, '') NOT ILIKE '%bot%'
+  AND coalesce(properties.$raw_user_agent, '') NOT ILIKE '%bot%'
+  AND coalesce(properties.$raw_user_agent, '') NOT ILIKE '%crawl%'
+  AND coalesce(properties.$raw_user_agent, '') NOT ILIKE '%spider%'
+  {filtro_staff}
+GROUP BY person_id, ts
+ORDER BY ts
+LIMIT 200000
+""".strip()
+
+    clave = f"recuerdame_act_personas:{date_from}:{date_to}:{host}"
+    filas_raw = _ejecutar_hogql(sql, cache_key=clave)
+    denegados = person_id_denylist()
+    actividad = []
+    for fila in filas_raw:
+        pid = str(fila.get("person_id") or "").strip()
+        if not pid or pid.lower() in denegados:
+            continue
+        ts = _parse_ts_bogota(fila.get("ts") or fila.get("timestamp"))
+        if ts is None:
+            continue
+        actividad.append({"person_id": pid, "timestamp": ts})
+    return actividad
+
+
+def indice_usuarios_por_person_id(usuarios):
+    indice = {}
+    for fila in usuarios or []:
+        pid = str(fila.get("person_id") or "").strip()
+        if pid and pid not in indice:
+            indice[pid] = fila
+    return indice
+
+
+def person_id_corto(person_id, largo=8):
+    pid = str(person_id or "").strip()
+    if not pid:
+        return ""
+    if len(pid) <= largo:
+        return pid
+    return pid[:largo] + "…"
+
+
+def etiqueta_persona(usuario=None, person_id=""):
+    """Etiqueta legible compartida (cruce + cohorte).
+
+    Preferencia: nombre → email → person_id corto.
+    Retorna ``{"person_id", "etiqueta", "identificado"}``.
+    """
+    fila = usuario if isinstance(usuario, dict) else {}
+    pid = str(fila.get("person_id") or person_id or "").strip()
+    nombre = str(fila.get("nombre") or "").strip()
+    email = str(fila.get("email") or "").strip()
+    if nombre and email and "@" in email:
+        return {"person_id": pid, "etiqueta": f"{nombre} ({email})", "identificado": True}
+    if nombre:
+        return {"person_id": pid, "etiqueta": nombre, "identificado": True}
+    if email and "@" in email:
+        return {"person_id": pid, "etiqueta": email, "identificado": True}
+    corto = person_id_corto(pid) or "Persona"
+    return {"person_id": pid, "etiqueta": corto, "identificado": False}
+
+
+def construir_personas_por_dia(actividad, usuarios=None, fechas_filtro=None):
+    """Mapa YYYY-MM-DD → lista de personas (etiqueta + identificado), ordenadas.
+
+    ``fechas_filtro``: set/list de fechas ISO; si None, todas las de la actividad.
+    """
+    por_person_id = indice_usuarios_por_person_id(usuarios)
+    fechas_ok = None
+    if fechas_filtro is not None:
+        fechas_ok = {str(f)[:10] for f in fechas_filtro if f}
+
+    por_dia = {}
+    for item in actividad or []:
+        ts = item.get("timestamp")
+        pid = str(item.get("person_id") or "").strip()
+        if not pid or ts is None:
+            continue
+        dia = ts.date().isoformat() if hasattr(ts, "date") else str(ts)[:10]
+        if fechas_ok is not None and dia not in fechas_ok:
+            continue
+        bucket = por_dia.setdefault(dia, {})
+        if pid not in bucket:
+            bucket[pid] = etiqueta_persona(por_person_id.get(pid), pid)
+
+    salida = {}
+    for dia, personas in por_dia.items():
+        lista = list(personas.values())
+        lista.sort(key=lambda p: (not p["identificado"], p["etiqueta"].lower()))
+        salida[dia] = lista
+    return salida
+
+
+def construir_personas_por_hora(actividad, usuarios=None):
+    """Mapa \"00\"..\"23\" → lista de personas con actividad en esa hora (periodo)."""
+    por_person_id = indice_usuarios_por_person_id(usuarios)
+    por_hora = {f"{h:02d}": {} for h in range(24)}
+    for item in actividad or []:
+        ts = item.get("timestamp")
+        pid = str(item.get("person_id") or "").strip()
+        if not pid or ts is None:
+            continue
+        clave = f"{ts.hour:02d}"
+        if pid not in por_hora[clave]:
+            por_hora[clave][pid] = etiqueta_persona(por_person_id.get(pid), pid)
+
+    salida = {}
+    for clave, personas in por_hora.items():
+        lista = list(personas.values())
+        lista.sort(key=lambda p: (not p["identificado"], p["etiqueta"].lower()))
+        salida[clave] = lista
+    return salida
+
+
+def tabla_personas_periodo(usuarios):
+    """Filas listas para la tabla filtrable de cohorte."""
+    filas = []
+    for u in usuarios or []:
+        meta = etiqueta_persona(u)
+        rol_clave = _clave(u.get("rol_aproximado"))
+        disp = str(u.get("dispositivo_principal") or "")
+        filas.append(
+            {
+                "person_id": meta["person_id"],
+                "person_id_corto": person_id_corto(meta["person_id"]),
+                "etiqueta": meta["etiqueta"],
+                "identificado": meta["identificado"],
+                "email": str(u.get("email") or "").strip(),
+                "nombre": str(u.get("nombre") or "").strip(),
+                "rol": ROLES.get(rol_clave, u.get("rol_aproximado") or "Sin determinar"),
+                "adherencia": _adherencia_pct(u),
+                "sesiones": _entero(u.get("sesiones")),
+                "pageviews": _entero(u.get("pageviews")),
+                "dispositivo": DISPOSITIVOS.get(disp.lower(), disp or "Desconocido"),
+                "recencia_dias": _entero(u.get("recencia_dias")),
+                "amplitud": _entero(u.get("amplitud_secciones")),
+            }
+        )
+    filas.sort(key=lambda f: (-f["adherencia"], -f["sesiones"], f["etiqueta"].lower()))
     return filas
 
 
@@ -326,16 +622,7 @@ def _por_serie(filas):
 
 def _etiqueta_persona(fila):
     """Etiqueta legible para tooltips (nombre, correo o id corto)."""
-    nombre = str(fila.get("nombre") or "").strip()
-    email = str(fila.get("email") or "").strip()
-    if nombre and email:
-        return f"{nombre} ({email})"
-    if nombre or email:
-        return nombre or email
-    person_id = str(fila.get("person_id") or "").strip()
-    if person_id:
-        return person_id[:8] + "…"
-    return "Persona"
+    return etiqueta_persona(fila)["etiqueta"]
 
 
 def _payload_analisis(usuarios):
@@ -351,8 +638,11 @@ def _payload_analisis(usuarios):
         amplitud = _entero(fila.get("amplitud_secciones"))
         pageviews = _entero(fila.get("pageviews"))
         intensidad = round(_numero(fila.get("autocapture_por_sesion")), 1)
+        meta = etiqueta_persona(fila)
         punto = {
-            "etiqueta": _etiqueta_persona(fila),
+            "etiqueta": meta["etiqueta"],
+            "person_id": meta["person_id"],
+            "identificado": meta["identificado"],
             "rol": rol,
             "adherencia": adherencia,
             "duracion_seg": duracion,
@@ -414,6 +704,15 @@ def obtener_cohorte(date_from, date_to):
         for f in series.get("dispositivo", [])
     ]
 
+    personas_por_dia = {}
+    personas_por_hora = {f"{h:02d}": [] for h in range(24)}
+    try:
+        actividad = obtener_actividad_personas(date_from, date_to)
+        personas_por_dia = construir_personas_por_dia(actividad, usuarios)
+        personas_por_hora = construir_personas_por_hora(actividad, usuarios)
+    except RecuerdameAnalyticsError:
+        logger.warning("Cohorte sin desglose de personas por día/hora (HogQL).")
+
     return {
         "kpis": {
             "personas": personas,
@@ -434,6 +733,9 @@ def obtener_cohorte(date_from, date_to):
         },
         "dispositivo": {"labels": [e for e, _ in dispositivos], "values": [v for _, v in dispositivos]},
         "analisis": analisis,
+        "personas_por_dia": personas_por_dia,
+        "personas_por_hora": personas_por_hora,
+        "personas_tabla": tabla_personas_periodo(usuarios),
     }
 
 
